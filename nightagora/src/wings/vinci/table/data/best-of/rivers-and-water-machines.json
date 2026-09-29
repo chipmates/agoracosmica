@@ -3,7 +3,7 @@
  "pages": {
   "AR.175": {
    "lead": 0,
-   "notes": null,
+   "notes": "The only passage Richter prints from this side (Reference Table: §1015 = Br. M. 149a). It is a short note on building a large canal; the page's river survey with its distances is not transcribed by Richter. Page number read on the scan's running head (p. 233).",
    "passages": [
     {
      "index": 0,
@@ -23,7 +23,10 @@
      "de": {
       "text": "Um den großen Kanal zu bauen, mach zuerst den kleinen und gib ihm das Wasser, das mit dem Rad den großen machen wird.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'che colla rota farà il grāde': literally 'which with the wheel will make the great one'; Richter reads 'will help to fill the great one'. We keep the literal sense."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -42,9 +45,160 @@
     }
    ]
   },
+  "E.158": {
+   "lead": 0,
+   "notes": "Heading (the editor's): '[DRAGUEUR — INVENTIONS]'. His note 1: the b in the figure is written left to right, while the same letter in the text at the foot of the page is written right to left (the footnote marker after b is left out of the Italian). Passage 2 explains how the dredger works (crank n, pinion, toothed wheel f, the boxes, the two ropes). Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: Ravaisson's phototype plate of 75 verso (archive.org viewer n280) shows the same leaf as the SET image.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. III (1888), Ms E fol. 75v, block 1 of 3",
+     "it": {
+      "text": "STRUMENTO DACHAVARE TERRA\n[Figure :] m b f n\nQui la chalchulatione della potentia nonsipone al pesente Mattu lectore ai aintendere quessto a vere vtilita laqual nasscie mediante loabbre viamento deltenpo ilquale abbreviamento nasscie perche senpre ~~il~~ losstrumento cheporta laterra di p basso inalto e ino fitio desso portare nemai torna indirieto — Dicie lauersario inquesstocha so chettanto e aversare eandare incirchulo san za vtilita quanto ilritornare indirieto nelmede simo tenpo desso andare innanti. Ma ppoi che lli spati deltenpo piv interpossto infralli spati deltenpo ~~vti~~ vtile sono equali inquessto eintucte altre inven tioni qui edacierchare dun modo che ltenpo sia speso inpiu valita evtile operatione che sia possibile la qual fia tro vare strumento chef pigli piu terreno chome sidimossterra qui dirie to acquessta faccia —",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "INSTRUMENT FOR DIGGING EARTH\n[Figure:] m b f n\nHere the calculation of the power is not given for the present. But you, reader, must understand that this has a usefulness which comes from shortening the time. This shortening comes about because the instrument that carries the earth upward from p below is always at the work of carrying it and never goes back. The opponent says that in this case the tipping out and going round in a circle to no use comes to as much as going back, in the same time as going forward [?]. But since the extra stretches of time set between the stretches of useful time are equal in this and in all other inventions, one must look here for a way to spend the time on as effective and useful a work as possible; and that will be to find an instrument that takes up more earth, as will be shown here on the back of this face.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The heading 'STRUMENTO DACHAVARE TERRA' is Leonardo's own; the edition sets his titles in small capitals. The bracketed heading [DRAGUEUR — INVENTIONS] is the editor's.",
+       "The opponent's sentence is compressed: 'tanto e a versare e andare in circulo sanza vtilita quanto il ritornare indirieto nel medesimo tenpo d'esso andare innanti'. It is read as the objection that the idle half-turn of the wheel (tipping out the earth and coming round empty) costs as much time as the return stroke of a back-and-forth machine. Ravaisson reads it the same way; marked [?].",
+       "'in piu valita' is read as 'più valida' (more effective), after Ravaisson's 'aussi forte'.",
+       "'qui dirieto a questa faccia' (here behind this face) points to the other side of the leaf; Ravaisson's note gives folio 75 recto.",
+       "'il' and 'vti' are printed in italics, struck out by Leonardo; left out."
+      ]
+     },
+     "de": {
+      "text": "GERÄT ZUM AUSHEBEN VON ERDE\n[Figur:] m b f n\nDie Berechnung der Kraft wird hier vorerst nicht angegeben. Du aber, Leser, musst verstehen, dass dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt. Diese Verkürzung entsteht, weil das Gerät, das die Erde von p unten nach oben trägt, immer bei der Arbeit des Tragens ist und nie zurückläuft. Der Gegner sagt, in diesem Fall komme das Ausschütten und das nutzlose Kreisen auf ebenso viel hinaus wie das Zurücklaufen, in derselben Zeit wie das Vorwärtsgehen [?]. Da aber die zusätzlichen Zeitspannen, die zwischen den Spannen nützlicher Zeit liegen, bei diesem und bei allen anderen Erfindungen gleich sind, muss man hier eine Weise suchen, die Zeit auf eine möglichst wirksame und nützliche Arbeit zu verwenden. Und das heißt, ein Gerät zu finden, das mehr Erde fasst, wie sich hier auf der Rückseite dieser Seite zeigen wird.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The heading 'STRUMENTO DACHAVARE TERRA' is Leonardo's own; the edition sets his titles in small capitals. The bracketed heading [DRAGUEUR — INVENTIONS] is the editor's.",
+       "The opponent's sentence is compressed: 'tanto e a versare e andare in circulo sanza vtilita quanto il ritornare indirieto nel medesimo tenpo d'esso andare innanti'. It is read as the objection that the idle half-turn of the wheel (tipping out the earth and coming round empty) costs as much time as the return stroke of a back-and-forth machine. Ravaisson reads it the same way; marked [?].",
+       "'in piu valita' is read as 'più valida' (more effective), after Ravaisson's 'aussi forte'.",
+       "'qui dirieto a questa faccia' (here behind this face) points to the other side of the leaf; Ravaisson's note gives folio 75 recto.",
+       "'il' and 'vti' are printed in italics, struck out by Leonardo; left out."
+      ]
+     },
+     "fr": {
+      "text": "INSTRUMENT POUR EXTRAIRE DE LA TERRE.\n[Figure :] m b f n.\nIci le calcul de la puissance ne se pose pas à présent. Mais, toi, lecteur, tu as à entendre que ceci a une utilité qui naît moyennant l'abrègement du temps, abrègement qui naît de ce que toujours ~~le~~ l'instrument qui porte la terre de p bas en haut est en office de la porter, et ne retourne jamais en arrière. L'adversaire dit en ce cas qu'il y a autant à verser et aller en cercle sans utilité qu'à retourner en arrière dans le même temps où l'on avance ici. Mais puisque les espaces du temps en plus, interposés entre les espaces du temps ~~uti~~ utile, sont égaux en ceci et en toutes autres inventions, il y a à chercher ici un mode avec lequel le temps soit dépensé en aussi forte et utile opération qu'il soit possible, ce que fera trouver l'instrument qui prend plus de terre, comme on le montre derrière cette page."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), transcription (lower half of the page, under the heading [DRAGUEUR — INVENTIONS]); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Ravaisson-Mollien vol. III (1888), Ms E fol. 75v, block 2 of 3",
+     "it": {
+      "text": "Iluoltare delmanio n volta vna rochetta ecquessta rochet ta volta larota dentata f ecquesta rota f echonciunta cholla crocie delle chasse portatrici edellaterra del pantano chessischa richa sopra lebarche Malle due chorde m f he m b sauuol tano al polo f effa chaminare losstrumento cholle 2 bar che chontro al m ecqueste corde pertale vfitio sono vtilissime ec",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Turning the crank n turns a small wheel, and this small wheel turns the toothed wheel f; and this wheel f is joined to the cross of the boxes that carry the earth of the marsh, which is unloaded onto the boats. But the two ropes m f and m b wind round the axle f and make the machine travel with the 2 boats towards m; and these ropes are most useful for this work, etc.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'manio' is read as 'manico' (crank handle), Ravaisson's 'manivelle'; 'rochetta' is a small toothed wheel (a pinion).",
+       "'polo' (pole) is read as the axle at f round which the ropes wind; Ravaisson keeps 'pôle'.",
+       "'portatrici edellaterra' is printed with an extra 'e'; read with Ravaisson as the boxes carrying the earth.",
+       "m is the point towards which the machine hauls itself; on the drawing it stands at the end of the rope on the right."
+      ]
+     },
+     "de": {
+      "text": "Das Drehen der Kurbel n dreht ein kleines Rad, und dieses kleine Rad dreht das Zahnrad f; und dieses Rad f ist mit dem Kreuz der Kästen verbunden, die die Erde des Sumpfes tragen, die auf die Boote entladen wird. Die beiden Seile m f und m b aber wickeln sich um die Achse f und lassen das Gerät mit den 2 Booten gegen m vorrücken; und diese Seile sind für diese Arbeit sehr nützlich usw.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'manio' is read as 'manico' (crank handle), Ravaisson's 'manivelle'; 'rochetta' is a small toothed wheel (a pinion).",
+       "'polo' (pole) is read as the axle at f round which the ropes wind; Ravaisson keeps 'pôle'.",
+       "'portatrici edellaterra' is printed with an extra 'e'; read with Ravaisson as the boxes carrying the earth.",
+       "m is the point towards which the machine hauls itself; on the drawing it stands at the end of the rope on the right."
+      ]
+     },
+     "fr": {
+      "text": "La manivelle n, en tournant, fait tourner une petite roue, et cette petite roue fait tourner la roue dentée f; cette roue f est jointe à la croix des caisses portant la terre du bourbier, qui se décharge sur les barques. Mais les deux cordes m f et m b s'enroulent au pôle f, font cheminer l'instrument avec les deux barques contre m, et ces cordes sont très utiles pour cet office, etc."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), transcription (lower half of the page, under the heading [DRAGUEUR — INVENTIONS]); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Ravaisson-Mollien vol. III (1888), Ms E fol. 75v, block 3 of 3",
+     "it": {
+      "text": "[En marge :] ilpolo a chomodita del potere di sciendere intanta bas se~~ch.~~ za quan to debbe di sciendere larota perpro fondare la cqua alpadule",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "[In the margin:] The axle can conveniently be let down as low as the wheel must go down to deepen the water of the marsh.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'ch.' inside 'basseza' is printed in italics, struck out by Leonardo.",
+       "'padule' is a marsh or fen; 'profondare l'acqua' is to make the water deeper, that is, to dredge."
+      ]
+     },
+     "de": {
+      "text": "[Am Rand:] Die Achse lässt sich bequem so tief absenken, wie das Rad hinabreichen muss, um das Wasser des Sumpfes zu vertiefen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'ch.' inside 'basseza' is printed in italics, struck out by Leonardo.",
+       "'padule' is a marsh or fen; 'profondare l'acqua' is to make the water deeper, that is, to dredge."
+      ]
+     },
+     "fr": {
+      "text": "[En marge :] Le pôle a commodité de pouvoir [peut facilement] descendre aussi bas que doit descendre la roue pour approfondir l'eau du marais."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), transcription (lower half of the page, under the heading [DRAGUEUR — INVENTIONS]); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms E, FOLIO 75 (verso), French translation (lower half of the page, below the Italian); archive.org viewer page n279",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n279/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "B.114": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): 'POUR ÉLEVER DE L'EAU'. French Errata applied (line 2 and note 2). French footnotes: 1, 'a' is in the upper part of the vertical pipe (the figure at the top left); 2, the first two letters read from top to bottom on the right, a between the horizontals, and s on the left, at the counterweight. The curator's reason names the machines, not one line; the lead is the page's own title line. A blot before the first line on the Polona copy stands where the other lines have a dash.",
    "passages": [
     {
      "index": 0,
@@ -96,12 +250,18 @@
      "en": {
       "text": "The same. And it can be done with ropes as with a toothed wheel.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The sentence division follows the Errata: 'quel medesimo' (the same) stands alone, then 'e possi fare' (and one can do it)."
+      ]
      },
      "de": {
       "text": "Dasselbe. Und man kann es mit Seilen machen wie mit einem Zahnrad.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The sentence division follows the Errata: 'quel medesimo' (the same) stands alone, then 'e possi fare' (and one can do it)."
+      ]
      },
      "fr": {
       "text": "— a — Ce même. Et on peut le faire avec des cordes, comme avec une roue à dents."
@@ -133,12 +293,18 @@
      "en": {
       "text": "m n a s. Pipe. Let there be a valve in the mouth a, on the outside.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'animella' is a flap valve; Ravaisson keeps the word as 'animelle'."
+      ]
      },
      "de": {
       "text": "m n a s. Rohr. In der Mündung a sitze außen ein Ventil.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'animella' is a flap valve; Ravaisson keeps the word as 'animelle'."
+      ]
      },
      "fr": {
       "text": "— m n a s. — Tuyau. — Qu'il y ait une animelle dans la bouche a, au dehors."
@@ -198,7 +364,7 @@
   },
   "CA.7": {
    "lead": 0,
-   "notes": null,
+   "notes": "Richter prints the reference as 'C. A. 353b; 1105b' above the passage, but his Bibliography (vol. II p. 499) lists it as '353a 1105a 1069'; the modern folio 1006 verso rests on the Leonardo//thek@ catalogue entry for CA 1006v (texts given by Richter 1069) and on the image, which shows the map with the lists. Richter's notes: 'In the original the three columns are parallel.' and 'Two slightly sketched maps, one of Europe the other of Spain, are at the side of these notes.' His footnote gives Leonardo's own spellings: 'alamania franca, spognia', 'nolinberg, dalfinato', 'flandra', 'bisscaglia', 'casstiglia', 'taragona', 'granata'. The curator's reason points to this passage: lead 0.",
    "passages": [
     {
      "index": 0,
@@ -216,9 +382,14 @@
       "label": "Translation: Jean Paul Richter, 1883"
      },
      "de": {
-      "text": "DEUTSCHLAND.\na. Österreich,\nb. Sachsen,\nc. Nürnberg,\nd. Flandern;\nFRANKREICH.\na. Picardie,\nb. Normandie,\nc. Dauphiné;\nd.\nSPANIEN.\na. Biskaya,\nb. Kastilien,\nc. Galicien,\nd. Portugal,\ne. Tarragona,\nf. Granada.",
+      "text": "DEUTSCHLAND.\na. Österreich,\nb. Sachsen,\nc. Nürnberg,\nd. Flandern.\nFRANKREICH.\na. Picardie,\nb. Normandie,\nc. Dauphiné,\nd.\nSPANIEN.\na. Biskaya,\nb. Kastilien,\nc. Galicien,\nd. Portugal,\ne. Tarragona,\nf. Granada.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'Alemagnia' is the old Italian name for the German lands; rendered 'Deutschland' as Richter renders 'Germany'.",
+       "Under 'Francia' the letter 'd.' stands with no name after it, as printed; kept empty.",
+       "Richter's punctuation is his own (Leonardo has none); the German list ends each group with a full stop instead of his semicolons."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -237,9 +408,57 @@
     }
    ]
   },
+  "AR3.191": {
+   "lead": null,
+   "notes": "A survey sketch of a river: the only writing is labels (bearings and figures). The edition's critical transcription for this folio (p. 295*, archive.org viewer n261) gives only a traced copy of the drawing. Page match: the SET image is this edition's plate of fol. 275 verso (p0191 of the same scan), and the diplomatic page facing it is headed 'Fol. 275 verso'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Codice Arundel 263, part 3 (1928), fol. 275 verso, trascrizione diplomatica, passage 1 of 1",
+     "it": {
+      "text": "1/2 sci   400   3/4 sc   400\n1/2 sc   400   gre 4 8°\nsci 660\na 1/2 libe\n700\n200 a 1/2 libe\nsci\n130\n550\ngreco\n400",
+      "label": {
+       "en": "Transcription: the printed Arundel edition, 1923",
+       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+      }
+     },
+     "en": {
+      "text": "1/2 SE [?]   400   3/4 SE [?]   400\n1/2 SE [?]   400   NE 4 8° [?]\nSE 660\n1/2 to SW\n700\n200, 1/2 to SW\nSE\n130\n550\nNE\n400",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "doubts": [
+       "The page carries no sentences, only measurements and wind names written along the river course, many of them sideways or upside down; the edition prints them where they stand, turned as on the leaf. They are listed here from top to bottom as printed; the line breaks are not Leonardo's.",
+       "The wind names are read as compass bearings: 'sci' and 'sc' as scirocco (south-east), 'gre' and 'greco' as greco (north-east), 'libe' as libeccio (south-west). 'sc' alone is a shorter form and marked [?]. The numbers are most likely lengths in braccia, but no unit is written.",
+       "'gre 4 8°' is printed with a small raised o after the 8; whether it is 48 degrees or a fraction of the wind is not clear, so it stays as printed with [?].",
+       "'a 1/2 libe' is read as 'half a point towards libeccio' (a direction between two winds); this reading is an interpretation."
+      ]
+     },
+     "de": {
+      "text": "1/2 SO [?]   400   3/4 SO [?]   400\n1/2 SO [?]   400   NO 4 8° [?]\nSO 660\n1/2 nach SW\n700\n200, 1/2 nach SW\nSO\n130\n550\nNO\n400",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The page carries no sentences, only measurements and wind names written along the river course, many of them sideways or upside down; the edition prints them where they stand, turned as on the leaf. They are listed here from top to bottom as printed; the line breaks are not Leonardo's.",
+       "The wind names are read as compass bearings: 'sci' and 'sc' as scirocco (south-east), 'gre' and 'greco' as greco (north-east), 'libe' as libeccio (south-west). 'sc' alone is a shorter form and marked [?]. The numbers are most likely lengths in braccia, but no unit is written.",
+       "'gre 4 8°' is printed with a small raised o after the 8; whether it is 48 degrees or a fraction of the wind is not clear, so it stays as printed with [?].",
+       "'a 1/2 libe' is read as 'half a point towards libeccio' (a direction between two winds); this reading is an interpretation."
+      ]
+     },
+     "fr": null,
+     "label_only": true,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte terza (da fol. 221 a fol. 283), Roma: Danesi, 1928",
+       "page": "Parte terza, p. 443, headed \"Fol. 275 verso\" (the diplomatic transcription facing the plate); archive.org viewer page n191",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_03_01_1928_10290/page/n191/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "B.086": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '39b Pl. XCII, No. 1, 753', his only passage from this side. Richter's footnote: 'The original text is reproduced on Pl. XCII, No. 1 to the left hand at the bottom.' Ravaisson vol. II prints six notes on this side (Polona scan 162, i.e. archive.org lesmanuscritsdel02lo leaf n164 by the facts-0929 rule; OCR not proofread here): besides the building sentence, notes on naval warfare beside the galley (courtaldi against great ships, serpentine guns for light galleys, a spontoon, and a fire ship, 'questa zepata e bona a infochare navi'). Richter prints none of them; they are not in this record. The curator's reason points to this passage: lead 0.",
    "passages": [
     {
      "index": 0,
@@ -259,7 +478,10 @@
      "de": {
       "text": "Ein Gebäude soll immer ringsum frei stehen, damit es seine wahre Gestalt zeigen kann.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'a volere dimostrare': literally 'in order to want to show'; read as a purpose clause, as Richter does ('so that its form may be seen')."
+      ]
      },
      "fr": null,
      "label_only": false,

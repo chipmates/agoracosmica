@@ -92,5 +92,27 @@
      chevron, the name it already has for a reader of the screen */
   .reader-row[data-ways='0'] .vitrine-step:first-child::after {content:' ' attr(aria-label);font:14px/1 var(--sans);}
   .reader-row[data-ways='0'] .vitrine-step:last-child::before {content:attr(aria-label) ' ';font:14px/1 var(--sans);}
-  .reader-zoom {display:none;}
+  /* THE STRIP RIDES THE FOLDED CARD under the row, so the page keeps the
+     stage down to the card's edge */
+  .reader[data-dock='card'] .reader-ground,
+  .reader[data-dock='card'] .reader-stage {bottom:8px;}
+  .vitrine-payload-controls .reader-shelf {position:static;height:56px;margin:6px 0 0;padding:0;gap:4px;}
+  .vitrine-payload-controls .reader-page {width:40px;height:56px;min-width:40px;}
+  .vitrine-payload-controls .reader-absence {height:56px;}
+  .vitrine-payload-controls .reader-part {height:56px;}
+  /* the pinch's two steps as marks, their words kept for a reader of the
+     screen; the fit is the double tap's */
+  .reader-row .reader-zoom {display:contents;}
+  .reader-row .reader-zoom [data-zoom='whole'] {display:none;}
+  .reader-row .reader-zoom .vitrine-control {flex:0 0 44px;min-width:44px;padding:0;font-size:0;}
+  .reader-row .reader-zoom [data-zoom='nearer']::before {content:'+';font:400 20px/1 var(--sans);}
+  .reader-row .reader-zoom [data-zoom='further']::before {content:'\2212';font:400 20px/1 var(--sans);}
 }
+
+/* THE WHOLE TEXT ON THE RAISED CARD: the passages one under another, the lead
+   marked, the bare labels small */
+.reader-column .reader-passage + .reader-passage {margin-top:12px;padding-top:10px;border-top:1px solid color-mix(in srgb,var(--na-starlight) 12%,transparent);}
+.reader-column .reader-passage[data-lead='true'] {padding-left:10px;box-shadow:inset 2px 0 0 color-mix(in srgb,var(--na-gold) 70%,transparent);}
+.reader-column .vitrine-source-text {margin:0;font:400 15px/1.5 var(--serif);white-space:pre-line;color:var(--na-starlight);}
+.reader-column .reader-passage[data-label='true'] .vitrine-source-text {font:400 13px/1.4 var(--sans);opacity:.75;}
+.reader-column .reader-italian {width:auto;min-height:44px;margin:0 0 10px;}

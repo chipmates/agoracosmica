@@ -468,8 +468,11 @@ export function createWing(): WingModule {
     const sets = release?.sets ?? {}
     if (station === 'flight' || station === 'works') return [...(sets['flight'] ?? []), ...(sets['works'] ?? [])]
     if (station === 'picture-room' || station === 'picture-room-west') return sets['picture-room'] ?? []
+    // the reading table's set is the best-of's topics, which no clip of the film shows
+    if (station === 'reading-table') return look?.tableSet() ?? []
     return sets[station] ?? []
   }
+  const atTable = (): boolean => stationOf(LIFE[card]!.station).id === 'reading-table'
   function refreshCells(): void {
     const station = stationOf(LIFE[card]!.station).id
     const key = `${station}|${lang()}`
@@ -934,8 +937,14 @@ export function createWing(): WingModule {
         cells: () => cellsNow,
         open: id => openFromOverview(id),
         room: () => text(CARDS.station_short_names?.[stationOf(LIFE[card]!.station).id] ?? stationOf(LIFE[card]!.station).name),
+        // THE READING TABLE'S SHELF: its name, columns, whole books and absences, from the look once loaded
+        name: () => atTable() ? look?.shelf().name ?? null : null,
+        columns: () => atTable() ? 6 : null,
+        absent: () => atTable() ? look?.shelf().absent ?? null : null,
+        books: () => atTable() ? look?.shelf().books ?? null : null,
         // the three rooms whose set the card data measures: the hang, the machine hall, the leaves
         measure: () => {
+          if (atTable()) return look?.shelf().measure ?? null
           const here = stationOf(LIFE[card]!.station).id
           const key = here === 'picture-room' || here === 'picture-room-west' ? 'measure_wall' : here === 'flight' || here === 'works' ? 'measure_hall' : here === 'body' ? 'measure_book' : ''
           return key ? deskControl('overview', key) : null

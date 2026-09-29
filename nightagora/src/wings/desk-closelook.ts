@@ -19,6 +19,7 @@ import { setCloseLookBand } from './desk-stage'
 import { setRegister } from './frame'
 import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
+import type { VitrinePlace } from './vitrine/types'
 
 export interface CloseLookView {
   id: string
@@ -26,12 +27,14 @@ export interface CloseLookView {
   title: string
   /** the one thing to remember, in the page's language */
   line: string | null
+  /** THE SOURCE ROW under the line: whose words the line is, small */
+  note?: string | null
   /** the payload's kind, which chooses the gold control's word */
   kind: string
   certainty: VinciCertainty | null
   /** where the work stands in the set it belongs to, counted from one; a
       book that reads by its leaves names the leaf in the count's place */
-  set: { at: number; of: number; leaf?: string } | null
+  set: VitrinePlace | null
   /** A WORK WITH A NUMBER ON ITS FRAME is read as a catalogue entry: the
       number before its name, its date in the clock's place, and where the
       original is in the count's place, since the number already says which
@@ -43,6 +46,8 @@ export interface CloseLookView {
   words: readonly HTMLElement[]
   /** the wing's own controls, by the role the wing gave them */
   record: HTMLElement | null
+  /** a way of reading the whole text, standing between the drawer's word and the record */
+  text?: HTMLElement | null
   /** the two that walk the set: the way back and the way on */
   back: HTMLElement | null
   on: HTMLElement | null
@@ -51,6 +56,8 @@ export interface CloseLookView {
   /** true when the way on turns the payload's own page rather than walking
       the set: the gold control then names a page */
   paging: boolean
+  /** the gold control's word where the set names its own next object */
+  onKicker?: string | null
 }
 
 export interface CloseLookBand {
@@ -146,6 +153,8 @@ export function createCloseLookBand(options: {
   const clock = make('span', 'desk-clock')
   const count = make('span', 'desk-count')
   const line = make('p', 'desk-line desk-clb-line')
+  const note = make('p', 'desk-clb-note')
+  note.hidden = true
   /* THE FOOT ROW STANDS UNDER BOTH TEXTS, the line and the drawer, so the
      word that opened the drawer is the word that closes it, in the place the
      hand already is. */
@@ -166,7 +175,7 @@ export function createCloseLookBand(options: {
   const drawerWords = make('div', 'desk-clb-words')
   setRegister(drawerWords, 'drawer')
   drawer.append(drawerWords)
-  cap.append(nameRow, line, drawer)
+  cap.append(nameRow, line, note, drawer)
   left.append(cap, foot)
   more.setAttribute('aria-controls', drawer.id)
 
@@ -243,7 +252,7 @@ export function createCloseLookBand(options: {
     // the set names where the way on leads; a book's own step names it only
     // where it crosses into another volume
     const target = view.onTitle ?? on_?.dataset['title'] ?? ''
-    onKicker.textContent = say(wayOn(view.kind, view.paging))
+    onKicker.textContent = view.onKicker ?? say(wayOn(view.kind, view.paging))
     onTitle.textContent = target
     onTitle.hidden = !target
     on.disabled = !on_ || on_.disabled
@@ -294,10 +303,12 @@ export function createCloseLookBand(options: {
       numeral.textContent = entry?.number ?? ''
       title.textContent = next.title
       title.lang = language
-      clock.textContent = entry?.date ?? ''
-      clock.hidden = !entry?.date
+      // a page by topic names its folio where a catalogue names a date
+      const date = entry?.date ?? next.set?.seat ?? ''
+      clock.textContent = date
+      clock.hidden = !date
       // A COUNT OF ONE IS NOISE: a work alone in its set carries no count
-      const place = next.set?.leaf ?? (next.set && next.set.of > 1
+      const place = next.set?.said ?? next.set?.leaf ?? (next.set && next.set.of > 1
         ? say(WORD.place()).replace('{n}', String(next.set.at)).replace('{total}', String(next.set.of))
         : '')
       count.textContent = entry ? entry.where : place
@@ -305,6 +316,9 @@ export function createCloseLookBand(options: {
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = language
+      note.textContent = next.note ?? ''
+      note.hidden = !next.note
+      note.lang = language
       // THE MODULE'S OWN SENTENCES GO BEHIND ONE WORD. At rest the band says
       // the name and the line; everything the module wrote about the work is
       // one press away, which is what keeps the label a label.
@@ -319,6 +333,7 @@ export function createCloseLookBand(options: {
       more.setAttribute('aria-disabled', String(!drawerWords.childElementCount))
       foot.textContent = ''
       foot.append(more)
+      if (next.text) foot.append(next.text)
       if (next.record) foot.append(next.record)
       paintWays()
       measure()

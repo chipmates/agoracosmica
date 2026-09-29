@@ -1,4 +1,1709 @@
 {
  "topic": "his-words",
- "pages": {}
+ "pages": {
+  "TR.221": {
+   "lead": 0,
+   "notes": "Herzfeld signs the passage 'Ms. Tr. Fol. 38 r.', the page's folio. The title 'CŌPARATIONE' is Leonardo's; Herzfeld's 'Vergleich' renders it. Richter's 'Tr. N' numbers are his own count of the Trivulzianus pages and do not follow the folio numbers; Herzfeld signs by folio. The printed Italian here is Richter's; Beltrami 1891 was not used for this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1321 (Tr. 73), vol. II p. 375; Herzfeld 1906 p. 148, LXXX",
+     "it": {
+      "text": "CŌPARATIONE.\n\n¶Vn vaso crudo rotto si può riformare, ma il cotto no.¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A SIMILE.\n\nA vase of unbaked clay, when broken, may be remoulded, but not a baked one.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vergleich\n\nEin rohes Gefäß, wenn zerbrochen, ist wieder herzustellen; ein gebranntes nie.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 375",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n510/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 375",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n510/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 148",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n327/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "I.271": {
+   "lead": 0,
+   "notes": "Richter's 'I.2 82a' is leaf 82 recto of the second part of MS I; Herzfeld (who writes J for I) and the continuous foliation give 130r.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1160 (I.2 82a), vol. II p. 290; Herzfeld 1906 p. 2, II",
+     "it": {
+      "text": "La sciētia è il capitano, e la pratica sono i soldati.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Science is the captain, and practice the soldiers.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Wissenschaft ist der Kapitän, die Praxis, das sind Soldaten.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 290",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n425/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 290",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n425/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 2",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n181/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "TR.206": {
+   "lead": 1,
+   "notes": "All four passages carry Richter's reference 'Tr. 68'; Herzfeld signs her three 'Ms. Tr. Fol. 34 r.', the page's folio. Richter prints §1174 as one section with the saying 'La vita bene spesa lunga è' on its own line (his l. 5); it is split here because Herzfeld translates that line as a separate entry (p. 147). The dash in Richter's English of §1209 is his, printed. Richter's 'Tr. N' numbers are his own count of the Trivulzianus pages and do not follow the folio numbers; Herzfeld signs by folio. The printed Italian here is Richter's; Beltrami 1891 was not used for this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §43 (Tr. 68), vol. I p. 27",
+     "it": {
+      "text": "Pūto non è parte di linia.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A point is not part of a line.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Ein Punkt ist nicht Teil einer Linie.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 27",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 27",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n64/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1174 (Tr. 68), vol. II p. 294, ll. 1-4; Herzfeld 1906 p. 136, XXXIV",
+     "it": {
+      "text": "L'acqua che tochi de' fivmi, è l'ultima di quella · che ādò, e la prima di quelle · che viene; così il tēpo presēte;",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The water you touch in a river is the last of that which has passed, and the first of that which is coming. Thus it is with time present.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Das Wasser, das von den Flüssen du berührst, ist das letzte von jenem, das ging, und das erste von jenem, das kommt: also auch die gegenwärtige Zeit.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 294",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n429/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 294",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n429/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 136",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n315/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §1174 (Tr. 68), vol. II p. 294, l. 5; Herzfeld 1906 p. 147, LXVIII",
+     "it": {
+      "text": "La vita bene spesa lunga è.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Life if well spent, is long.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wohl angewendetes Leben ist lang.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 294",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n429/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 294",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n429/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 147",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n326/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §1209 (Tr. 68), vol. II p. 302; Herzfeld 1906 p. 146, LXV",
+     "it": {
+      "text": "¶Farisei ·, frati · santi vol dire.¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Pharisees—that is to say, friars.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Pharisäer, will sagen: heilige Klosterbrüder.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 302",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n437/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 302",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n437/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 146",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n325/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR1.169": {
+   "lead": 4,
+   "notes": "All three sections carry Richter's reference 'Br. M. 42b' (the Arundel manuscript's leaf 42 verso); Herzfeld cites his numbers and signs 'Fol. 42 v.'. Richter prints the prophecies (§1297) and the fables (§1314) each as one section; they are split here where Herzfeld's entries begin and end. The lead is the crab fable, which the curator names first.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1297 (Br. M. 42b), vol. II pp. 365-366, ll. 1-22; Herzfeld 1906 p. 287, XXXIV",
+     "it": {
+      "text": "PROFETIE.\n\nMolte fien quelle che crescerā nelle lor ruine.\n⸨La palla della neue rotolādo sopra la neue.⸩\n\nMolta turba fie quella che, dimēticato loro essere e nome, staran come morti sopra le spoglie deli altri morti.\n⸨Il dormire sopra le piume dell'uccielli.⸩\n\nVedrannosi le parti oriētali discorrere nell'occidentali e le meridionali in settentrione, avviluppandosi per l'universo con grande strepito e tremore o furore.\n⸨Il uento d'oriēte che scorreua in ponente.⸩",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "PROPHECIES.\n\nThere will be many which will increase in their destruction.\n⸨The Ball of Snow rolling over Snow.⸩\n\nThere will be many who, forgetting their existence and their name, will lie as dead on the spoils of other dead creatures.\n⸨Sleeping on the Feathers of Birds.⸩\n\nThe East will be seen to rush to the West and the South to the North in confusion round and about the universe, with great noise and trembling or fury.\n⸨In the East wind which rushes to the West.⸩",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Viele werden jene sein, so in den eigenen Ruinen wachsen.\nDer Schneeball, der über den Schnee hinrollt.\nGroß wird die Schar jener sein, die, in Vergessenheit ihres Namens und Daseins, wie Tote auf den Beutestücken von anderen Toten liegen werden.\nDas Schlafen auf den Federn von Vögeln.\nMan wird die östlichen Teile zu den westlichen fliehen sehen, und die südlichen nach dem Norden, im ganzen Weltall mit großem Lärm und Erschütterung und Wut durcheinander geratend.\nDer Ostwind, der nach Westen fuhr.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 365",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n500/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 365",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n500/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 287",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n466/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1297 (Br. M. 42b), vol. II pp. 365-366, ll. 23-36",
+     "it": {
+      "text": "I razzi solari accenderāno il foco in terra coll' quale s'infocherà ciò ch'è sotto il cielo, e ripercossi nel suo inpedimēto ritorneranno in basso.\n⸨Lo spechio cavo acciēde il foco, col quale si scalda il forno che à il fōdo che sta sotto il suo cielo.⸩",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The solar rays will kindle fire on the earth, by which a thing that is under the sky will be set on fire, and, being reflected by some obstacle, it will bend downwards.\n⸨The Concave Mirror kindles a Fire, with which we heat the oven, and this has its foundation beneath its roof.⸩",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Sonnenstrahlen werden auf der Erde Feuer entzünden, an dem sich entflammen wird, was unter dem Himmel ist, und von ihrem Hindernis zurückgeworfen, werden sie nach unten zurückkehren.\n⸨Der Hohlspiegel entzündet das Feuer, mit dem man den Ofen heizt, dessen Boden unter seinem Gewölbe liegt.⸩",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'cielo' is both the sky and the vault of an oven; the riddle plays on the double sense, rendered 'Himmel' in the prophecy and 'Gewölbe' in the answer.",
+       "'ripercossi nel suo inpedimēto': thrown back by (or at) their obstacle; Richter: 'being reflected by some obstacle'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 365",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n500/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 365",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n500/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §1297 (Br. M. 42b), vol. II pp. 365-366, ll. 37-66; Herzfeld 1906 p. 287, XXXV",
+     "it": {
+      "text": "Gran parte del mare si fuggirà inverso il cielo e per molto tēpo nō farà ritorno; ⸨Cioè pe' nuvoli.⸩\n\nRestaci · il moto che separa il motore dal mobile.\n\nSarà annegato chi fa il lume al culto diuino. ‖ ⸨Le ape che faño la cera delle candele.⸩\n\nI morti uscirāno di sotto terra e coi loro fieri mouimēti caccieranno dal mondo · innumerabili creature umane.\n⸨Il ferro uscito di sotto terra è morto, e se ne fa l'arme che ammorti tanti uomini.⸩\n\nLe grandissime montagnie ācorachè sieno remote da marini liti, scaccieraño il mare dal suo sito.\n⸨Questo sono li fiumi che portanno le terre, da loro leuate dalle mōtagnie, e le scaricano ai marini · liti, e doue entra la terra si fuggie il mare.⸩",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A great part of the sea will fly towards heaven and for a long time will not return. ⸨That is, in Clouds.⸩\n\nThere remains the motion which divides the mover from the thing moved.\n\nThose who give light for divine service will be destroyed. ⸨The Bees which make the Wax for Candles.⸩\n\nDead things will come from underground and by their fierce movements will send numberless human beings out of the world.\n⸨Iron, which comes from under ground is dead but the Weapons are made of it which kill so many Men.⸩\n\nThe greatest mountains, even those which are remote from the sea shore, will drive the sea from its place.\n⸨This is by Rivers which carry the Earth they wash away from the Mountains and bear it to the Sea-shore; and where the Earth comes the sea must retire.⸩",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Ein großer Teil des Meeres wird sich gegen den Himmel flüchten und durch lange Zeit nicht zurückkehren. — Das ist, als Wolken.\nBleibt uns die Bewegung, die den Motor vom Bewegten trennt.\nEs wird vernichtet werden, wer das Licht für den Dienst Gottes bereitet. Die Bienen, die das Wachs für die Kerzen machen.\nDie Toten werden unter der Erde hervorkommen, und durch ihre wilden Bewegungen werden sie ungezählte menschliche Geschöpfe aus der Welt jagen.\nDas Eisen, welches man unter der Erde hervorzieht, ist tot, und man macht daraus Waffen, die so viele Menschen töten.\nDie größten Berge, wenn sie auch vom Meeresstrand noch so weit entfernt sind, werden das Meer von seinem Platz vertreiben.\nEs sind das die Flüsse, welche die Erde bringen, so sie von den Bergen weggenommen haben, und sie am Merresstrand abladen; und wo diese Erde hinkommt, flieht das Meer.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 366",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n501/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 366",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n501/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 287",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n466/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §1297 (Br. M. 42b), vol. II pp. 365-366, ll. 67-88; Herzfeld 1906 p. 288, XXXVI",
+     "it": {
+      "text": "L'acqua caduta dai nuvoli ancora in moto sopra le spiaggie de' mōti si fermerà per lūgo spatio di tempo sanza fare alcū moto, e questo accaderà in molte e diuerse provincie.\n⸨La neve che fiocca che è acqua.⸩\n\nI gran sassi de' monti gitterā fuoco tale che brucieranno il legname di molte e grādissime selue e molte fere saluatiche e dimestiche.\n⸨La pietra del fucile, che fa foco che consuma tutte le some delle legnie con che si disfā le selve; E cuocierassi con esse la carne delle bestie.⸩\n\nO quanti grandi edifitj fieno ruinati per causa del fuoco!\n⸨Del fuoco delle bonbarde.⸩\n\nI buoi fieno in gran parte cavsa delle ruine delle città, e similmēte cavalli e bufoli\n⸨Tirā le bonbarde.⸩",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The water dropped from the clouds still in motion on the flanks of mountains will lie still for a long period of time without any motion whatever; and this will happen in many and divers lands.\n⸨Snow, which falls in flakes and is Water.⸩\n\nThe great rocks of the mountains will throw out fire; so that they will burn the timber of many vast forests, and many beasts both wild and tame.\n⸨The Flint in the Tinder-box which makes a Fire that consumes all the loads of Wood of which the Forests are despoiled and with this the flesh of Beasts is cooked.⸩\n\nOh! how many great buildings will be ruined by reason of Fire.\n⸨The Fire of great Guns.⸩\n\nOxen will be to a great extent the cause of the destruction of cities, and in the same way horses and buffaloes\n⸨by drawing Guns⸩.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Das Wasser, welches aus den Wolken gefallen, so noch über den Abhängen der Berge in Bewegung sind, wird für lange Zeit sich aufhalten, ohne sich irgendwie zu rühren, und das wird in vielen und verschiedenen Provinzen geschehen.\nDer Schnee, so in Flocken fällt, und Wasser ist.\nDie großen Steine der Berge werden Feuer auswerfen, so daß sie das Holz von vielen und sehr großen Wäldern und viele wilde und zahme Tiere verbrennen werden.\nDer Flintenstein, der Feuer macht, welches alle die Ladungen von Holz verbrennen wird, und so die Wälder verwüsten. Und man wird damit das Fleisch der Tiere braten.\nO, wie viele große Gebäude werden wegen des Feuers zerstört!\nVom Feuer der Bombarden.\nDie Ochsen werden zum großen Teil Ursache sein des Ruines der Städte, und gleicherweise Pferde und Büffel.\nSie ziehen die Bombarden.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 366",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n501/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 366",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n501/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 288",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n467/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Richter 1883 §1314 (Br. M. 42b), vol. II p. 373, ll. 1-8; Herzfeld 1906 p. 264, XXIV",
+     "it": {
+      "text": "FAUOLA.\n\nEl granchio stādo sotto il sasso per pigliare pesci che sotto a quello entrauano, vene la piena con rovinoso precipitamento di sassi, e col loro rotolare si fraciellò tal grāchio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A FABLE.\n\nThe crab standing under the rock to catch the fish which crept under it, it came to pass that the rock fell with a ruinous downfall of stones, and by their fall the crab was crushed.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Fabel\n\nAls der Krebs unter dem Felsblock sich aufhielt, um die Fische zu fangen, die unter jenen hineingingen, kam das Hochwasser mit verderblichem Herabsturz von Steinen, und mit ihrem Kollern zerschmetterten sie selbigen Krebs.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 264",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n443/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Richter 1883 §1314 (Br. M. 42b), vol. II p. 373, ll. 9-28; Herzfeld 1906 p. 271, XXXVIII",
+     "it": {
+      "text": "QUEL MEDESIMO.\n\nIl ragnio, stante infra l'uue, pigliaua le mosche che in su tali uve si pascievano; venne la vēdemmia e fu pestato, il ragno insieme coll'uue.\n\nLa uite invecchiata sopra l'albero vecchio · cade insieme colla ruina d'esso albero, e fu per la trista conpagnia a mancare insieme con quella.\n\nIl torrēte portò tanto di terra e pietre nel suo letto, che fu costretto a mutar sito.\n\nLa rete che soleua pigliare li pesci fu presa e portata via dal furor de' pesci.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "THE SAME.\n\nThe spider, being among the grapes, caught the flies which were feeding on those grapes. Then came the vintage, and the spider was cut down with the grapes.\n\nThe vine that has grown old on an old tree falls with the ruin of that tree, and through that bad companionship must perish with it.\n\nThe torrent carried so much earth and stones into its bed, that it was then constrained to change its course.\n\nThe net that was wont to take the fish was seized and carried away by the rush of fish.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Spinne, zwischen den Trauben befindlich, fing die Fliegen ab, so auf selbigen Trauben sich nährten; kam die Weinlese, und wurde die Spinne mitsamt den Trauben zerstampft.\n\nDie Rebe, auf dem bejahrten Baum alt geworden, fiel zugleich mit der Zerstörung des Baumes und mußte, wegen der schlechten Gesellschaft, mit jenem zugrunde gehen.\n\nDer Wildbach führte so viele Erde und Steine in seinem Bett mit, daß er gezwungen wurde, seinen Lauf zu verändern.\n\nDas Netz, so die Fische zu fangen pflegte, wurde gefangen und fortgetragen vom Furor der Fische.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 271",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n450/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 6,
+     "ref": "Richter 1883 §1314 (Br. M. 42b), vol. II p. 373, ll. 29-40; Herzfeld 1906 p. 271, XXXIX",
+     "it": {
+      "text": "La palla della neue quanto piv rotolando disciese dalle mōtagnie della neue tāto piv multiplicò la sua magnitudine.\n\nIl salice che per li sua lunghi giermi à a mente e uol cresciere da superare ciascuna altra piāta, per avere fatto cōpagnia colla vite che ogni anno si potta, fu ancora lui senpre storpiato.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The ball of snow when, as it rolls, it descends from the snowy mountains, increases in size as it falls.\n\nThe willow, which by its long shoots hopes as it grows, to outstrip every other plant, from having associated itself with the vine which is pruned every year was always crippled.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Schneeball, je mehr er rollend von den Bergen Schnee hinabtrug, desto mehr wuchs seine Größe.\n\nDie Weide, welche mit ihren langen Schößlingen gewillt ist zu wachsen und jeden andern Baum zu überragen, — weil sie mit der Weinrebe Gesellschaft schloß, die jedes Jahr beschnitten wird, wurde auch sie immer wieder verkrüppelt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 373",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n508/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 271",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n450/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 7,
+     "ref": "Richter 1883 §1541 (Br. M. 42b), vol. II p. 461",
+     "it": {
+      "text": "Due scuri grandi e vna piccina, 8 cucchiai d'ottone; 4 touaglie, 2 guardanappe, 15 tovagliolini, 2 tovagliole, canava 2, 2 invoglie, 3 paia di lenzuola, 2 paie nove e uno vecchio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Two large hatchets and one very small one, 8 brass spoons, 4 tablecloths, 2 towels, 15 small napkins, 2 coarse napkins, 2 coarse cloths, 2 wrappers, 3 pairs of sheets, 2 pairs new and 1 old.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Zwei große Beile und ein kleines, 8 Löffel aus Messing; 4 Tischtücher, 2 Handtücher [?], 15 kleine Servietten, 2 grobe Servietten [?], 2 Stück Hanftuch, 2 Packtücher, 3 Paar Leintücher, 2 Paar neu und eines alt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'guardanappe': a cloth for the table or the hands; Richter: 'towels'.",
+       "'tovagliole': Richter: 'coarse napkins'; the Italian word only says small cloths.",
+       "'canava': hemp cloth (canvas); Richter: 'coarse cloths'.",
+       "'invoglie': wrapping cloths; Richter: 'wrappers'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 461",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n610/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 461",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n610/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "ATL.0654.1": {
+   "lead": 1,
+   "notes": "The four passages Richter prints from this side (Reference Table: §§9, 10, 12, 21 = C. A. 117b; 361b, today's folio 327 verso by the catalogue's concordance), in his order. The lead is §10, the proem the curator quotes ('I know that many will call this useless work'); Richter prints a second proem under the same number (the 'omo sanza lettere' passage). Richter's apparatus to §10 gives for its line 2 the words 'naturalmente li omini boni disiderano sapere', which he does not print in the text; they are not added here. His footnote to §10 says the Demetrius saying also occurs as a memorandum in MS. Tr. 57, and quotes a scholar who thinks the name may be a slip for Demades. §11, printed between them, is from C. A. 115a and does not belong to this side.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §9 (C. A. 117b; 361b), vol. I p. 13",
+     "it": {
+      "text": "PROEMIO.\n\nVedendo io non potere pigliare materia di grāde vtilità o diletto, perchè li omini ināti a me nati ànno preso per loro tutte l'utili e neciessari temi, farò come colui il quale per povertà givgnie l'ultimo alla fiera; e nō potēdo d' altro fornirsi piglia tutte cose già da altri viste e non accettate ma rifiutate per la loro poca valitudine; io questa disprezata e rifiutata mercātia rimānēte de' molti cōpratori metterò sopra la mia debole soma, e con quella nō per le grosse città, ma pouere ville andrò distribuendo, pigliādo tal premio qual merita la cosa da me data.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "INTRODUCTION.\n\nSeeing that I can find no subject specially useful or pleasing—since the men who have come before me have taken for their own every useful or necessary theme—I must do like one who, being poor, comes last to the fair, and can find no other way of providing himself than by taking all the things already seen by other buyers, and not taken but refused by reason of their lesser value. I, then, will load my humble pack with this despised and rejected merchandise, the refuse of so many buyers; and will go about to distribute it, not indeed in great cities, but in the poorer towns, taking such a price as the wares I offer may be worth.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VORREDE.\n\nDa ich sehe, dass ich keinen Stoff von großem Nutzen oder Vergnügen wählen kann, weil die Menschen, die vor mir geboren sind, alle nützlichen und notwendigen Themen für sich genommen haben, will ich es machen wie einer, der aus Armut als Letzter auf den Markt kommt. Da er sich mit nichts anderem versorgen kann, nimmt er alles, was andere schon gesehen und nicht genommen, sondern wegen seines geringen Wertes zurückgewiesen haben. Diese verachtete und zurückgewiesene Ware, die von den vielen Käufern übrig blieb, werde ich auf meine schwache Traglast laden und damit nicht durch die großen Städte, sondern durch die armen Dörfer ziehen und sie verteilen, und ich nehme dafür den Lohn, den die Sache verdient, die ich gebe.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'metterò sopra la mia debole soma': literally 'I will put on my weak load'; Richter renders 'my humble pack'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 13",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n50/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 13",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n50/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §10 (C. A. 117b; 361b), vol. I pp. 13-14",
+     "it": {
+      "text": "PROEMIO.\n\nSo che molti diranno · questa · essere opera invtile; e questi · fieno · quelli de quali Demetrio disse, nō facieva conto · piv · del uento · il quale nella lor bocca causaua le parole, che del uēto ch' usciua delle parti di sotto · vomini i quali · ànno · solamēte desiderio di corporal richezze, e īteramēte priui di quello della sapiētia · cibo · e veramēte sicura richezza del' anima; perchè quāt' è piv degnia · l'anima · che 'l corpo, tanto · piv · degni fiē le richezze dell' anima · che del corpo · e spesso · quādo vedo · alcū di questi pigliare essa opera ī mano, dubito · nō sia come fa la scimia, se 'l mettino al naso, o che mi domādino, se è cosa māgiatiua.\n\nPROEMIO.\n\nSo bene che per non essere · io literato, che alcuno prosuntuoso gli parà ragionevolmente potermi biasimare coll' allegare · jo · essere homo sanza lettere; giēte stolta! nō sano questi · tali ch' io potrei sicome Mario · rispose contro a' patriti romani, io si rispondere, diciendo · quelli che dell'altrui fatiche se medesimi fanno · ornati · le mie a me medesimo nō uogliono · cōciedere: diranno che per non avere · io · lettere · non potere ben dire quello, di che voglio trattare · or nō sano · questi che le mie chose son piv da esser tratte dalla speriētia, che d'altra parola, la quale fu maestra di chi bene scrisse e cosi per maestra la in tutti casi allegherò.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "INTRODUCTION.\n\nI know that many will call this useless work; and they will be those of whom Demetrius declared that he took no more account of the wind that came out their mouth in words, than of that they expelled from their lower parts: men who desire nothing but material riches and are absolutely devoid of that of wisdom, which is the food and the only true riches of the mind. For so much more worthy as the soul is than the body, so much more noble are the possessions of the soul than those of the body. And often, when I see one of these men take this work in his hand, I wonder that he does not put it to his nose, like a monkey, or ask me if it is something good to eat.\n\nINTRODUCTION.\n\nI am fully concious that, not being a literary man, certain presumptuous persons will think that they may reasonably blame me; alleging that I am not a man of letters. Foolish folks! do they not know that I might retort as Marius did to the Roman Patricians by saying: That they, who deck themselves out in the labours of others will not allow me my own. They will say that I, having no literary skill, cannot properly express that which I desire to treat of; but they do not know that my subjects are to be dealt with by experience rather than by words; and [experience] has been the mistress of those who wrote well. And so, as mistress, I will cite her in all cases.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VORREDE.\n\nIch weiß, dass viele sagen werden, dies sei ein nutzloses Werk. Und das werden jene sein, von denen Demetrius sagte, er gebe auf den Wind, der in ihrem Mund die Worte machte, nicht mehr als auf den Wind, der aus ihren unteren Teilen kam: Menschen, die nur nach körperlichem Reichtum verlangen und ganz ohne das Verlangen nach Weisheit sind, der Speise und dem wahrhaft sicheren Reichtum der Seele. Denn so viel würdiger die Seele ist als der Körper, so viel würdiger sind die Reichtümer der Seele als die des Körpers. Und oft, wenn ich einen von ihnen dieses Werk in die Hand nehmen sehe, fürchte ich, sie machen es wie der Affe und halten es an die Nase oder fragen mich, ob es etwas zum Essen sei.\n\nVORREDE.\n\nIch weiß wohl, dass manchem Anmaßenden, weil ich kein Gelehrter bin, scheinen wird, er könne mich mit gutem Grund tadeln, indem er anführt, ich sei ein Mann ohne gelehrte Bildung. Törichte Leute! Wissen sie nicht, dass ich ihnen antworten könnte, wie Marius den römischen Patriziern antwortete, und sagen: Die sich mit fremder Mühe schmücken, wollen mir meine eigene nicht zugestehen. Sie werden sagen, ich könne, weil ich keine gelehrte Bildung habe, nicht gut sagen, was ich behandeln will. Wissen sie denn nicht, dass meine Dinge mehr aus der Erfahrung zu gewinnen sind als aus fremden Worten [?]? Sie [die Erfahrung] war die Lehrmeisterin derer, die gut schrieben, und so werde ich sie als Lehrmeisterin in allen Fällen anführen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Richter prints two proems under this one number, each headed 'Proemio'; both are kept, in his order.",
+       "'homo sanza lettere' and 'lettere': letters in the sense of learned, Latin schooling; we write 'gelehrte Bildung'.",
+       "'la quale fu maestra': grammatically 'la quale' follows 'parola'; Richter refers it to experience with his bracket '[experience]', and our '[die Erfahrung]' does the same.",
+       "'che d'altra parola': literally 'than from other word'; Richter reads 'rather than by words'. We write 'aus fremden Worten' and mark it.",
+       "'dubito · nō sia come fa la scimia': 'dubito' here means 'I suspect, I fear'; the Italian switches from one man to 'they' ('mettino', 'domādino'), and the German follows."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 13-14",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n50/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 13-14",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n50/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §12 (C. A. 117b; 361b), vol. I p. 15",
+     "it": {
+      "text": "Molti mi crederanno ragionevolmēte potere riprēdere, allegando · le mie · prove · esser cōtro · all' autorità d'alquanti · omini di grā reuerēza · apresso de loro · inesperti ivditi, nō cōsiderādo le mie cose essere nate sotto la senplice e mera sperientia · la quale · è maestra vera. Queste regole son cagione · di farti conosciere · jl uero · dal falso · la qual cosa fa che li omini · si promettano · le cose possibili e con piv moderanza, e che tu non ti veli di ignoranza · cosa tale · che non avendo · effetto, tu abbi con disperatione · a darti malinconia.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Many will think they may reasonably blame me by alleging that my proofs are opposed to the authority of certain men held in the highest reverence by their inexperienced judgments; not considering that my works are the issue of pure and simple experience, who is the one true mistress. These rules are sufficient to enable you to know the true from the false—and this aids men to look only for things that are possible and with due moderation—and not to wrap yourself in ignorance, a thing which can have no good result, so that in despair you would give yourself up to melancholy.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Viele werden glauben, sie könnten mich mit gutem Grund tadeln, indem sie anführen, meine Beweise stünden gegen die Autorität einiger Männer, die bei ihrem unerfahrenen Urteil in großem Ansehen stehen. Sie bedenken nicht, dass meine Dinge aus der einfachen und reinen Erfahrung entstanden sind, und die ist die wahre Lehrmeisterin. Diese Regeln lassen dich das Wahre vom Falschen unterscheiden. Das bewirkt, dass die Menschen sich mögliche Dinge vornehmen, und das mit mehr Maß, und dass du dich nicht in Unwissenheit hüllst, die dazu führt, dass du, wenn etwas nicht gelingt, verzweifelt in Schwermut verfällst.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'si promettano · le cose possibili': 'promise themselves (set out to do) possible things'; Richter adds 'only', which the Italian does not have.",
+       "'cosa tale · che non avendo · effetto, tu abbi con disperatione · a darti malinconia': the construction is loose; we read it, with Richter, as ignorance leading to despair when things fail."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 15",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n52/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 15",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n52/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §21 (C. A. 117b; 361b), vol. I p. 19",
+     "it": {
+      "text": "PROEMIO DI PROSPETTIVA, CIOÈ DEL'UFITIO DELL'OCHIO.\n\nOr', guarda · lettore · quello che non potremo credere ai nostri antichi, i quali ànno voluto difinire che cosa sia anima e uita: cose inprovabili; quando quelle (cose) che con isperiētia · ogni ora si possono chiaramēte conosciere e provare, sono per tāti seculi igniorate · o falsamēte credute ·! l'ochio, che cosi chiaramēte fa speriētia del suo · ofitio, è insino ai mia tēpi per infiniti autori stato difinito in v̄ modo: trovo per isperiētia essere vn altro.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "INTRODUCTION TO PERSPECTIVE:—THAT IS OF THE FUNCTION OF THE EYE.\n\nBehold here O reader! a thing concerning which we cannot trust our forefathers, the ancients, who tried to define what the Soul and Life are—which are beyond proof, whereas those things, which can at any time be clearly known and proved by experience, remained for many ages unknown or falsely understood. The eye, whose function we so certainly know by experience, has, down to my own time, been defined by an infinite number of authors as one thing; but I find, by experience, that it is quite another.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VORREDE ZUR PERSPEKTIVE, DAS HEISST ÜBER DIE AUFGABE DES AUGES.\n\nNun sieh, Leser, was wir unseren Alten nicht glauben können. Sie wollten bestimmen, was Seele und Leben sei, Dinge, die sich nicht beweisen lassen, während die Dinge, die man jederzeit durch Erfahrung klar erkennen und beweisen kann, so viele Jahrhunderte lang unbekannt geblieben oder falsch geglaubt worden sind! Das Auge, dessen Aufgabe man so klar erfahren kann, ist bis in meine Zeit von unzähligen Autoren auf eine Weise bestimmt worden. Ich finde durch Erfahrung, dass es eine andere ist.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'(cose)' is Richter's insertion in round brackets; the German needs the word anyway.",
+       "'che cosi chiaramēte fa speriētia del suo · ofitio': literally 'which so clearly gives experience of its function'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 19",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n56/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 19",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n56/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "G.020": {
+   "lead": 0,
+   "notes": "Richter's concordance lists G 8a (the recto) with §1495, 1161, 19, 421 and 430; all five references read 'G. 8a' on the scan. §19 and §1161 are one passage printed twice; §1495 is the title again with Leonardo's marginal note. Herzfeld translates the passage once (p. 2).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §19 (G. 8a), vol. I p. 18; Herzfeld 1906 p. 2, III",
+     "it": {
+      "text": "DELL' ERRORE DI QUELLI CHE VSANO LA PRATICA SANZA SCIĒTIA.\n\nQuelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere che ētra navilio sanza timone o bussola · che mai à certezza dove si uada; sēpre la pratica debbe esser edificata sopra la bona teorica della quale la prospettiva è guida e porta, e sanza questa nulla si fa bene ne' casi di pittura.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE MISTAKES MADE BY THOSE WHO PRACTISE WITHOUT KNOWLEDGE.\n\nThose who are in love with practice without knowledge are like the sailor who gets into a ship without rudder or compass and who never can be certain whether he is going. Practice must always be founded on sound theory, and to this Perspective is the guide and the gateway; and without this nothing can be done well in the matter of drawing.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vom Irrtum jener, so die Praxis ohne Wissenschaft anwenden\n\nJene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt: welcher dann nie Sicherheit besitzt, wohin es geht.\n\nImmer muß die Praxis auf die gute Theorie gebaut sein, zu der die Perspektive Führerin und Pforte ist, und ohne sie macht man nichts gut in den Vorfällen der Malerei.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 18",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n55/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 18",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n55/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 2",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n181/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §421 (G. 8a), vol. I p. 215",
+     "it": {
+      "text": "Le piāte giovani ànno le foglie più trāsparēti e piv polita scorza che le vechie, è in ispecie il noce è più chiaro di maggio che di settenbre.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Young plants have more transparent leaves and a more lustrous bark than old ones; and particularly the walnut is lighter coloured in May than in September.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Junge Pflanzen haben durchscheinendere Blätter und eine glattere Rinde als die alten, und besonders der Nussbaum ist im Mai heller als im September.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'è in ispecie' is printed with an accent on the first 'è'; read as 'e' (and), as Richter's English does.",
+       "'polita scorza': polished, smooth bark (Richter: 'more lustrous'); rendered 'glattere Rinde'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 215",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n304/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 215",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n304/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §430 (G. 8a), vol. I p. 217",
+     "it": {
+      "text": "Le ōbre delle piāte nō son mai nere, perchè dove l'aria penetra non può essere tenebre.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The shadows of plants are never black, for where the atmosphere penetrates there can never be utter darkness.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Schatten der Pflanzen sind nie schwarz, denn wo die Luft eindringt, kann keine Finsternis sein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 217",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n306/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 217",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n306/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §1161 (G. 8a), vol. II p. 290; Herzfeld 1906 p. 2, III (first paragraph)",
+     "it": {
+      "text": "DELL'ERRORE DI QUELLI CHE VSANO LA PRATICA SANZA SCIĒTIA.\n\nQuelli che s'inamorā di pratica sāza sciētia sō come 'l nocchiere che ētra navilio sanza timone e bussola, chè mai à certezza dove si vada.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE ERRORS OF THOSE WHO DEPEND ON PRACTICE WITHOUT SCIENCE.\n\nThose who fall in love with practice without science are like a sailor who enters a ship without a helm or a compass, and who never can be certain whither he is going.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vom Irrtum jener, so die Praxis ohne Wissenschaft anwenden\n\nJene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt: welcher dann nie Sicherheit besitzt, wohin es geht.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 290",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n425/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 290",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n425/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 2",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n181/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Richter 1883 §1495 (G. 8a), vol. II p. 450",
+     "it": {
+      "text": "Del'error di quelli che vsano la pratica sanza sciētia;—vedi primo la poetica d'Oratio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Of the error of those who practice without knowledge;—See first the 'Ars poetica' of Horace.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vom Irrtum derer, die die Praxis ohne Wissenschaft betreiben. Sieh zuerst die Poetik des Horaz.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la poetica d'Oratio': Horace's Ars poetica, as Richter reads it."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 450",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n599/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 450",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n599/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "TR.103": {
+   "lead": 0,
+   "notes": "text_source names Herzfeld p. 145; the entry is on p. 146 (the running page number checked on the scan). Herzfeld signs it 'Ms. Tr. Fol. 27 r.', the page's folio. Richter's 'Tr. N' numbers are his own count of the Trivulzianus pages and do not follow the folio numbers; Herzfeld signs by folio. The printed Italian here is Richter's; Beltrami 1891 was not used for this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1173 (Tr. 32), vol. II p. 293; Herzfeld 1906 p. 146, LX",
+     "it": {
+      "text": "¶Siccome · vna · giornata · bene spesa dà lieto dormire, così vna vita · bene · vsata · dà lieto morire.¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "As a day well spent procures a happy sleep, so a life well employed procures a happy death.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Nacht\n\nSo wie ein gut verbrachtes Tageswerk ein frohes Schlafen gibt, so gibt ein wohl angewandtes Leben einen heiteren Tod.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 293",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n428/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 293",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n428/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 146",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n325/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "H.106": {
+   "lead": 0,
+   "notes": "Richter prints the page's notes as one section (§1263); it is split here by his line numbers because Herzfeld translates two of its lines in separate entries. Richter's '¶' signs are kept as printed.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1263 (H.1 48b), vol. II p. 334, ll. 1-3; Herzfeld 1906 p. 143, XXXV",
+     "it": {
+      "text": "¶Moderanza raffrena tutti i vitj.\nL'ermelino prima morire che imbrattarsi.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Moderation checks all the vices.\nThe ermine will die rather than besmirch itself.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Mäßigkeit zügelt alle Laster.\nDer Hermelin — eher sterben als sich beschmutzen.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 143",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n322/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1263 (H.1 48b), vol. II p. 334, ll. 4-9",
+     "it": {
+      "text": "DELL'ANTIUEDERE.\n\nIl gallo nō cāta, se prima 3 volte nō batte l'alie; il papagalo nel mutarsi pe' rami nō mette i piè, doue non à prima messo il becco;",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF FORESIGHT.\n\nThe cock does not crow till it has thrice flapped its wings; the parrot in moving among boughs never puts its feet excepting where it has first put its beak.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VOM VORAUSSEHEN.\n\nDer Hahn kräht nicht, ehe er nicht dreimal mit den Flügeln geschlagen hat. Der Papagei setzt, wenn er von Ast zu Ast wechselt, die Füße nirgends hin, wo er nicht zuvor den Schnabel hingesetzt hat.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §1263 (H.1 48b), vol. II p. 334, ll. 9-10; Herzfeld 1906 p. 142, XXIV",
+     "it": {
+      "text": "¶il uoto nascie quādo la sperāza more.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Vows are not made till Hope is dead.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Es entsteht Leere, wo die Hoffnung stirbt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 142",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n321/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §1263 (H.1 48b), vol. II p. 334, l. 10",
+     "it": {
+      "text": "Il moto seguita il ciētro del peso.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Motion tends towards the centre of gravity.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Bewegung folgt dem Schwerpunkt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'il ciētro del peso' (the centre of the weight) rendered 'Schwerpunkt', as Richter's 'centre of gravity'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 334",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n469/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.014": {
+   "lead": 4,
+   "notes": "Richter's concordance lists B 3b (verso) with §329, 346, 638, 675 and 1188; §638 is added to the map's four (see its note). Richter prints §1188 as one section of two sentences; it is split here because Herzfeld translates them as two entries (L and LI). Ravaisson's vol. II prints further notes on this page that Richter does not print (water falling an ounce an hour; a definition of force and motion in animals); they are not included. Check source for the page's order: Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. II (Paris: Quantin, 1883), MS B fol. 3 verso, read in Polona's OCR of the volume.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §329 (B. 3), vol. I p. 178",
+     "it": {
+      "text": "Il piè dalla · punta al calcagnio ētra 2 volte dal calcagnio al ginochio, cioè dove l'osso della ganba si cōgivgnie con quello della coscia.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The length of the foot from the end of the toes to the heel goes twice into that from the heel to the knee, that is where the leg bone [fibula] joins the thigh bone [femur].",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Fuß, von der Spitze bis zur Ferse, geht zweimal in die Strecke von der Ferse bis zum Knie, das heißt bis dorthin, wo der Knochen des Unterschenkels mit dem des Oberschenkels zusammentrifft.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 178",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n239/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 178",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n239/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §346 (B. 3b), vol. I p. 183",
+     "it": {
+      "text": "La mano īsino doue si cōgivgnie col osso del braccio ētra 4 volte dalla pūta del piv lungo dito īsino alla givtura della spalla.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The hand from the longest finger to the wrist joint goes 4 times from the tip of the longest finger to the shoulder joint.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Hand, bis dorthin, wo sie mit dem Knochen des Arms zusammentrifft, geht viermal in die Strecke von der Spitze des längsten Fingers bis zum Schultergelenk.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'La mano īsino doue si cōgivgnie col osso del braccio': the hand up to where it joins the bone of the arm; Richter's English says 'from the longest finger to the wrist joint'. Same measure, different wording."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 183",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n254/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 183",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n254/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §638 (printed 'B. 2b'), vol. I p. 322",
+     "it": {
+      "text": "Ricordo come · l'acqua vite racoglie ī se tutti i colori e odori de' fiori, e se uoi fare azzurro metti ui fiordalisi e per rosso solani.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Note how aqua vitae absorbs into itself all the colours and smells of flowers. If you want to make blue put iris flowers into it and for red solanum berries (?)",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Merke, wie der Branntwein alle Farben und Düfte der Blumen in sich aufnimmt. Willst du Blau machen, gib Schwertlilien [?] hinein, und für Rot Nachtschatten [?].",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'fiordalisi': Richter reads iris flowers; in modern Italian 'fiordaliso' is the cornflower, and Ravaisson's French has 'bleuets [?]' (cornflowers).",
+       "'e per rosso solani': Richter's reading, which he marks '(?)' in his English; Ravaisson reads the same words as 'e presso rosolaci' (and then poppies). The red plant is uncertain."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 322",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n439/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 322",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n439/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §675 (B. 3b), vol. I p. 352",
+     "it": {
+      "text": "A la fama si de' dipigniere · tutta la persona piena di līgue in scanbio · di penne, e ī forma di uccello.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Fame should be depicted as covered all over with tongues instead of feathers, and in the figure of a bird.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Fama soll man mit einem Körper voller Zungen statt Federn malen, und in Gestalt eines Vogels.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la fama': Fame (also rumour) as a personification; kept as 'die Fama'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 352",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n501/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 352",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n501/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 4,
+     "ref": "Richter 1883 §1188 (B. 3b), vol. II p. 296, first sentence; Herzfeld 1906 p. 145, L",
+     "it": {
+      "text": "Se tu · avessi · il corpo secōdo la virtù ·, tu . nō carpesti in questo mōdo;",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "If you governed your body by the rules of virtue you would not walk on all fours in this world.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wenn du den Leib der Tugend gemäß hättest, begehrtest du nicht in dieser Welt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 296",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n431/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 296",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n431/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 145",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n324/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 5,
+     "ref": "Richter 1883 §1188 (B. 3b), vol. II p. 296, second sentence; Herzfeld 1906 p. 145, LI",
+     "it": {
+      "text": "Tu cresci ī reputatione come il pane ī mano a' putti.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "You grow in reputation like bread in the hands of a child.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Du wächst an Ruf wie Brot den Kindern auf der flachen Hand wächst.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 296",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n431/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 296",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n431/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 145",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n324/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "H.188": {
+   "lead": 0,
+   "notes": "Richter's 'H.2 41b' and Herzfeld's 'H. II. Fol. 41 v.' count the leaves of the second part of MS H; in the continuous foliation (Ravaisson 1891, the Institut) this is H 89v. Same text in both editions.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §845 (H.2 41b), vol. II p. 131; Herzfeld 1906 p. 117, LII",
+     "it": {
+      "text": "Facciamo nostra vita coll'altrui · morte.\nIn nella cosa morta rimā vita dissensata, la quale ricōgiūta alli stomachi de' viui ripiglia uita sēsitiva e ītellettiva.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Our life is made by the death of others.\nIn dead matter insensible life remains, which, reunited to the stomachs of living beings, resumes life, both sensual and intellectual.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wir machen unser Leben mit dem Tode anderer. In dem toten Gegenstand bleibt bewußtloses Leben zurück, das, dem Magen der Lebenden neu einverleibt, sinnliches und verstehendes Leben wiedergewinnt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 131",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n244/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 131",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n244/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 117",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n296/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "FB11r": {
+   "lead": 0,
+   "notes": "Richter's 'Mz. 8a (12)' and Herzfeld's 'Fol. 12 r.' use Leonardo's own leaf number; today's foliation is 11r (Richter's Bibliography: '12 altered in 11'; facts-0929).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1168 (Mz. 8a (12)), vol. II p. 292-293; Herzfeld 1906 p. 10, XXXI",
+     "it": {
+      "text": "È di tāto vilipēdio la bugia, che s'ella dicesse bene già cose di Dio, ella toglie gratia a sua deità, ed è di tāta eccellētia la uerità, che s'ella laudasse cose minime elle si fāno nobili;\n\nSanza dubbio tal proportione è dalla verità alla bugia, qual è dalla luce alle tenebre, ed è essa verità in se di tanta eccellētia che, ancora ch'ella s'estenda sopra vmili e basse materie, sanza comparatione ella eccede le incertezze e bugie estese sopra li magni e altissimi discorsi, perchè la mēte nostra, ancora ch'ell'abbia la bugia pel quīto elemēto, non resta però che la verità delle cose nō sia di sommo notrimento delli intelletti fini, ma non di uagabundi ingegni;\n\nMa tu che viui di sogni, ti piaciono più le ragioni soffistiche e barerie de' pallaji nelle cose grādi e incerte, che le certe naturali e nō di tāta altura.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "To lie is so vile, that even if it were in speaking well of godly things it would take off something from God's grace; and Truth is so excellent, that if it praises but small things they become noble.\n\nBeyond a doubt truth bears the same relation to falsehood as light to darkness; and this truth is in itself so excellent that, even when it dwells on humble and lowly matters, it is still infinitely above uncertainty and lies, disguised in high and lofty discourses; because in our minds, even if lying should be their fifth element, this does not prevent that the truth of things is the chief nutriment of superior intellects, though not of wandering wits.\n\nBut you who live in dreams are better pleased by the sophistical reasons and frauds of wits in great and uncertain things, than by those reasons which are certain and natural and not so far above us.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Es ist von solcher Verächtlichkeit die Lüge, daß, wenn sie von Gott selber große Dinge sagte, sie seiner Göttlichkeit die Gnade raubte, und es ist von solcher Fürtrefflichkeit die Wahrheit, daß, wenn sie ganz geringe Dinge lobt, dieselbigen edel werden.\n\nOhne Zweifel, solcher Abstand ist zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist, und es ist die Wahrheit an sich von solcher Vorzüglichkeit, daß sogar, wenn sie sich über bescheidene und niedrige Materien verbreitet, sie ohne Vergleich die Ungewißheiten und Lügen übertrifft, die sich über die großartigen und erhabensten Gegenstände auslassen, weil, besäße unser Geist auch die Lüge zum fünften Element, es dennoch nicht hintanbleibt, daß die Wahrheit der Dinge die höchste Nahrung der feinen Intellekte, aber nicht der schweifenden Ingenien ist.\n\n(Randnote). Aber du, so du von Träumen lebst, dir gefallen besser die sophistischen Gründe und die Spitzbübereien von Ballaufbläsern in grandiosen und ungewissen Sachen, als sichere, natürliche, und nicht von solcher Höhe.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 292-293",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n427/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 292-293",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n427/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 10",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n189/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "TR.197": {
+   "lead": 0,
+   "notes": "Herzfeld signs the passage 'Ms. Tr. Fol. 33 r.', the page's folio. Richter's 'Tr. N' numbers are his own count of the Trivulzianus pages and do not follow the folio numbers; Herzfeld signs by folio. The printed Italian here is Richter's; Beltrami 1891 was not used for this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1145 (Tr. 65), vol. II p. 287; Herzfeld 1906 p. 131, XVI",
+     "it": {
+      "text": "I sensi sono terrestri, la ragione sta fuor di quelli, quādo cōtenpla.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The senses are of the earth; Reason, stands apart in contemplation.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Sinne sind irdisch, die Vernunft steht außerhalb von ihnen, wenn sie betrachtet.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 287",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n422/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 287",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n422/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 131",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n310/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "I.140": {
+   "lead": 0,
+   "notes": "Placement: Richter and Ravaisson-Mollien both print all seven prophecies on 64 verso; Herzfeld's '65 r.' for the first five is taken as her slip (her own table of contents gives yet another leaf). 'I.2 16b' is leaf 16 verso of the second part of MS I, which is 64v in the continuous foliation (Ravaisson: 'FOLIO 64 [16]').",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1301 (I.2 16b), vol. II p. 368; Herzfeld 1906 p. 280, VII and VIII",
+     "it": {
+      "text": "¶Le penne leuerāno li omini siccome gli uccielli inverso il cielo; ⸨cioè per le lettere · fatte da esse pēne.⸩¶\n¶L'umane opere fieno cagione di lor morte; | ⸨le spade e lācie.⸩\n¶Li omini perseguirāno quella cosa della qual piv temono,¶ cioè | ⸨sarā miseri per nō venire ī miseria.⸩¶\n¶Le cose disunite · s'unirāno · e ricieverāno in se tal uirtù, che rēderanno la persa memoria alli omini ·, cioè i papiri · che sō fatti di peli disuniti e tēgono memoria delle cose e fatti delli omini.¶\n¶Vedrannosi l'ossa de' morti cō veloce moto trattare la fortuna del suo motore; ⸨i dadi.⸩¶\n¶I buoi colle lor corna difenderāno il foco dalla · sua · morte; || ⸨la lāterna.⸩¶\n¶Le selue partorirāno figlioli che fiano causa della lor morte; || ⸨il manico della scura.⸩¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Feathers will raise men, as they do birds, towards heaven ⸨that is, by the letters which are written with quills.⸩\nThe works of men's hands will occasion their death. ⸨Swords and Spears.⸩\nMen out of fear will cling to the thing they most fear. ⸨That is they will be miserable lest they should fall into misery.⸩\nThings that are separate shall be united and acquire such virtue that they will restore to man his lost memory; that is papyrus [sheets] which are made of separate strips and have preserved the memory of the things and acts of men.\nThe bones of the Dead will be seen to govern the fortunes of him who moves them. ⸨By Dice.⸩\nCattle with their horns protect the Flamme from its death. ⸨In a Lantern.⸩\nThe Forests will bring forth young which will be the cause of their death. ⸨The handle of the hatchet.⸩",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "[VII. MS. J. FOL. 65 r.]\n— Die Federn werden die Menschen gleichwie Vögel gegen Himmel heben — nämlich durch die Bücher, so diese Federn gemacht.\n— Die Werke der Menschen werden Ursachen ihres Todes sein: die Schwerter und Lanzen.\n— Die Menschen werden jene Sache verfolgen, vor der sie sich am meisten fürchten, d. h. sie werden elend sein, um nicht ins Elend zu geraten.\n— Die getrennten Sachen werden sich vereinigen, und in sich solche Kraft bekommen, daß sie den Menschen das verlorene Gedächtnis wiedergeben werden. — Nämlich, die Papyrus, welche aus zertrennten Fasern gemacht sind und die menschlichen Dinge und Taten der Erinnerung aufbewahren.\n— Man wird die Gebeine der Toten mit hurtiger Bewegung das Glück derer behandeln sehen, die sie\n[VIII. MS. J. FOL. 64 v.]\nin Bewegung setzen. — Die Würfel.\n— Die Rinder werden mit ihren Hörnern das Feuer gegen den Tod verteidigen. — Die Laternen.\n— Die Wälder werden Kinder gebären, die die Ursache ihres Todes sein werden. — Den Stiel der Axt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 368",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n503/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 368",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n503/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 280",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n459/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "E.024": {
+   "lead": 0,
+   "notes": "",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1155 (E. 8b), vol. II p. 289; Herzfeld 1906 p. 26, XXXIV",
+     "it": {
+      "text": "DELLA MECCANICA.\n\nLa meccanica è il paradiso delle sciētie matematiche, perchè cō quella si viene al frutto matematico.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF MECHANICS.\n\nMechanics are the Paradise of mathematical science, because here we come to the fruits of mathematics.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Mechanik ist das Paradies der mathematischen Wissenschaften; denn durch sie kommt man zur mathematischen Frucht.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 289",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n424/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 289",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n424/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 26",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n205/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "B.016": {
+   "lead": 0,
+   "notes": "Richter's concordance lists B 4b (verso) with §1212; the heading 'On spirits' is his side heading, not Leonardo's, and is left out. Ravaisson's vol. II prints further notes on this page that Richter does not print (the speed of water falling by ounces; experiments on the force of a shot arrow); they are not included.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1212 (B. 4b), vol. II pp. 303-304; Herzfeld 1906 p. 130, XIV",
+     "it": {
+      "text": "Nō può essere voce, dove non è movimēto e percussione d'aria; nō può essere percussione d'essa aria, doue non è strumēto; nō può essere strumēto incorporeo; essēdo così, vno spirito nō può avere nè voce nè forma nè forza, e se piglierà corpo, non potrà penetrare nè entrare doue li usci sono serrati; e se alcuno diciesse: per aria cōgregata e ristretta īsieme lo spirito piglia i corpi di uarie · forme ·, e per quello strumēto parla e move cō forza, a questa parte dico, che doue non sono nerui e ossa, non può essere forza · operata in nessuno movimēto fatto dagl' imaginati spiriti;\n\nfuggi i precetti · di quelli · speculatori, chè le loro ragioni · nō son · confermate · dalla · speriēza.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "There can be no voice where there is no motion or percussion of the air; there can be no percussion of the air where there is no instrument, there can be no instrument without a body; and this being so, a spirit can have neither voice, nor form, nor strength. And if it were to assume a body it could not penetrate nor enter where the passages are closed. And if any one should say that by air, compressed and compacted together, a spirit may take bodies of various forms and by this means speak and move with strength—to him I reply that when there are neither nerves nor bones there can be no force exercised in any kind of movement made by such imaginary spirits.\n\nBeware of the teaching of these speculators, because their reasoning is not confirmed by experience.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Es kann keine Stimme sein, wo nicht Bewegung und Erschütterung der Luft ist; es kann keine Erschütterung der Luft sein, wo kein Instrument ist; es kann kein Instrument unkörperlich sein; wenn dem so ist, so vermag ein Geist weder Stimme, noch Form, noch Kraft zu haben, und wenn er Körper annimmt, so wird er nicht eindringen noch eintreten können, wo die Eingänge versperrt sind; und wenn jemand sagte: „durch verdichtete und zusammengepreßte Luft nimmt der Geist Körper von verschiedenen Formen an und durch dieses Instrument spricht er und bewegt sich mit Kraft“, auf dies Teil sage ich, wo keine Sehnen und Knochen sind, kann nicht Kraft sein, ausgeübt in irgendeiner Bewegung von den eingebildeten Geistern.\n\nFliehe die Lehren jener Spekulatoren, denn ihre Gründe werden von der Erfahrung nicht bestätigt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 303-304",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n438/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 303-304",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n438/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 130",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n309/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "FB3r": {
+   "lead": 0,
+   "notes": "Richter's 'Mz. 1a (3)': Manzoni's leaf 1 recto, Leonardo's own number 3; before Leonardo's leaf 5 the old and the present foliation agree, so this is today's 3r (facts-0929: confirmed).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1154 (Mz. 1a (3)), vol. II p. 289; Herzfeld 1906 p. 26, XXXV",
+     "it": {
+      "text": "¶La scientia strumentale over machinale è nobilissima e sopra tutte l'altre vtilissima, cōciosiachè mediante quella tutti li corpi animati, che ànno moto, fanno tutte loro operationi, i quali moti nascono dal centro della lor grauità che è posto in mezzo a parte di pesi disequali, e à questo carestia e dovitia di muscoli, ed etiā lieva e contralieua.¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Instrumental or mechanical science is of all the noblest and the most useful, seeing that by means of this all animated bodies that have movement perform all their actions; and these movements are based on the centre of gravity which is placed in the middle deviding unequal weights, and it has dearth and wealth of muscles and also lever and counter-lever.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die instrumentale oder mechanische Wissenschaft ist höchst edel und über alle andern äußerst nützlich, nachdem vermittels ihrer alle belebten Körper, die Bewegung haben, ihre verschiedenen Operationen machen, welche Bewegungen im Zentrum ihrer Schwere entstehen, das sich in der seitlichen Mitte ungleicher Gewichte befindet: und besitzen (diese Körper) Armut und Reichtum der Muskeln, und gleicherweise Hebel und Gegenhebel.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 289",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n424/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 289",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n424/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 26",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n205/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
 }

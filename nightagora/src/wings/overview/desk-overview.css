@@ -21,7 +21,7 @@
   background: var(--na-abyss);
   color: var(--na-starlight);
   display: grid;
-  grid-template-rows: auto auto auto 1fr auto auto;
+  grid-template-rows: auto auto auto 1fr auto auto auto;
   row-gap: 0;
   overflow: hidden;
 }
@@ -196,6 +196,38 @@
 
 /* ---- what the set names and cannot show: said after the cells, never a cell ---- */
 .desk-ov-absent[hidden] { display: none; }
+/* THE WHOLE BOOKS, one row of sources under the set: small plates with their
+   names, each a door, never a cell of the set */
+.desk-ov-books[hidden] { display: none; }
+.desk-ov-books {
+  justify-self: center;
+  width: min(100%, calc(7 * 172px + 6 * 18px));
+  margin-top: 14px;
+}
+.desk-ov-books-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 18px;
+}
+.desk-ov-book {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 44px;
+  padding: 0 4px 0 0;
+  border: 0;
+  background: none;
+  font: 400 0.875rem/1.25rem var(--sans);
+  color: var(--na-mist);
+  cursor: pointer;
+}
+.desk-ov-book:hover .desk-ov-book-name,
+.desk-ov-book:focus-visible .desk-ov-book-name { color: var(--na-starlight); text-decoration: underline; text-underline-offset: 3px; }
+.desk-ov-book:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 2px; }
+.desk-ov-book-thumb { display: block; width: 30px; height: 40px; object-fit: cover; }
 .desk-ov-absent {
   justify-self: center;
   width: min(100%, calc(7 * 172px + 6 * 18px));

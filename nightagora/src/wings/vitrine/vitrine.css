@@ -58,6 +58,16 @@
 .vitrine-catalogue[hidden] {display:none;}
 .vitrine-line {margin:0 0 14px;font:400 21px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
 .vitrine-line[hidden] {display:none;}
+/* THE SOURCE ROW: whose words the line is, small, under it */
+.vitrine-note {margin:-10px 0 14px;font:400 13px/1.4 var(--sans);color:color-mix(in srgb,var(--na-starlight) 64%,transparent);text-wrap:pretty;}
+.vitrine-note[hidden],.vitrine-seat[hidden],.vitrine-seat [hidden] {display:none;}
+/* the folio where a date would stand, and the count, which opens the set */
+.vitrine-seat {display:flex;flex-wrap:wrap;align-items:center;column-gap:12px;margin:-6px 0 2px;
+  font:400 13px/1.3 var(--sans);color:color-mix(in srgb,var(--na-starlight) 70%,transparent);}
+.vitrine-count {min-height:44px;margin:0;padding:0;background:none;border:0;color:inherit;font:inherit;cursor:pointer;
+  text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--na-starlight) 40%,transparent);text-underline-offset:3px;}
+.vitrine-count:disabled {cursor:default;text-decoration:none;}
+.vitrine-count:focus-visible {outline:1px solid var(--na-gold);outline-offset:2px;}
 .vitrine-words p {margin:8px 0;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
 .vitrine-words .picture-policy-label,.vitrine-words .picture-label-language {display:block;min-width:0;}
 .vitrine-words .picture-first,.vitrine-words .picture-first-de {display:flex;align-items:baseline;gap:9px;margin:0 0 8px;font:400 16px/1.3 var(--serif);color:#f4ead6;}
@@ -142,6 +152,12 @@
 .vitrine[data-peek='true'] .vitrine-controls,
 .vitrine[data-peek='true'] .vitrine-foot {display:none;}
 .vitrine[data-peek='true'][data-payload='machine'] .vitrine-after {display:none;}
+/* A BOOK WHOSE PAGES CARRY A LINE keeps it at the peek: the lead in his words
+   is the one text at rest, its source row under it */
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {display:block;margin-bottom:8px;font-size:17px;line-height:1.3;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line[hidden] {display:none;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:-4px 0 6px;}
+.vitrine[data-peek='false'] .vitrine-note,.vitrine:not([data-peek='true']) .vitrine-note {margin-top:-4px;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the

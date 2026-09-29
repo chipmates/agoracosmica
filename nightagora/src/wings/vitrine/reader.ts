@@ -79,6 +79,14 @@ export interface ReaderSide {
   part?: string
   /** What this side's own reproduction is, where the book's line is not it. */
   honesty?: string
+  /** A BOOK OF PAGES BY TOPIC names the folio where a catalogue names a date,
+   * and says its own count: `Flight, 2 of 18`. */
+  seat?: string
+  count?: string
+  /** THE SOURCE ROW: whose words the side's line is, said under it. */
+  note?: string | null
+  /** What the card says of this side besides what is on it. */
+  notes?: readonly string[]
 }
 
 /** A cell in the strip that is not a page. Absence shown as absence: it
@@ -126,6 +134,12 @@ export interface ReaderWords {
 export interface ReaderPayload extends VitrinePayload {
   /** Open one side by its key. */
   open(id: string): void
+  /** Open or close the whole text beside the page; true while it stands. */
+  readAlong(open?: boolean): boolean
+  /** True while the whole text stands. */
+  columnOpen(): boolean
+  /** The side's words were changed by their caller: paint them again. */
+  refresh(): void
   /** The side standing now, for a caller painting the record beside it. */
   current(): ReaderSide | null
 }
@@ -164,15 +178,22 @@ export function createReaderPayload(options: {
   witnesses?(side: ReaderSide): readonly HTMLElement[]
   /** The side or the way changed: a caller repaints what stands beside it. */
   changed?(): void
+  /** THE WHOLE TEXT OF A SIDE, read beside the page on a wide stage and on
+   * the raised card on a narrow one, whatever way the page stands in. */
+  column?(side: ReaderSide): readonly HTMLElement[]
+  /** The side's line stands on the folded card, as the one text at rest. */
+  lined?: boolean
+  /** The whole text's own name, for a reader of the screen. */
+  columnLabel?: string
 }): ReaderPayload {
   let host: VitrinePayloadHost | undefined
   let book: ReaderBook | undefined
   let at = 0, way = 0
   let root: HTMLDivElement | undefined, stage: HTMLDivElement | undefined
   let ground: HTMLImageElement | undefined, shelf: HTMLOListElement | undefined
-  let beside: HTMLElement | undefined
+  let beside: HTMLElement | undefined, zoomRow: HTMLElement | undefined
   let plate: DeepPlatePayload | undefined
-  let moreOpen = false, settled = 0, live = false
+  let moreOpen = false, settled = 0, live = false, reading = false
   const cells: HTMLButtonElement[] = []
   /** Which side of the book each cell of the strip stands for. */
   const cellOf: number[] = []
@@ -223,6 +244,13 @@ export function createReaderPayload(options: {
       onDrawn: () => { if (ground) ground.hidden = true },
     })
     plate.mount(inner())
+    // the three the viewer built, named by what they do, so a narrow row can
+    // draw them as marks and keep their words for a reader of the screen
+    for (const [index, button] of [...(zoomRow?.children ?? [])].entries()) {
+      if (!(button instanceof HTMLElement)) continue
+      button.dataset['zoom'] = ['whole', 'nearer', 'further'][index] ?? 'detail'
+      button.setAttribute('aria-label', button.textContent ?? '')
+    }
     paintStand()
     showSide(true)
   }
@@ -232,7 +260,12 @@ export function createReaderPayload(options: {
   function inner(): VitrinePayloadHost {
     const outer = host!
     const zoom = make('div', 'reader-zoom')
-    outer.controls.append(zoom)
+    zoomRow = zoom
+    // A BUTTON BESIDE EVERY GESTURE: on the phone the pinch has its two
+    // steps in the row a thumb already reaches, between the page's arrows
+    const next = steps.next
+    if (outer.narrow && next?.parentElement) next.parentElement.insertBefore(zoom, next)
+    else outer.controls.append(zoom)
     return {
       element: stage!,
       controls: zoom,
@@ -296,8 +329,10 @@ export function createReaderPayload(options: {
    * again in what is left to it. True when the column came or went. */
   function paintBeside(): boolean {
     if (!root || !beside) return false
-    const view = chosen()
-    const words = view?.beside && host?.banded ? view.beside() : []
+    const view = chosen(), here = side()
+    const words = !host?.banded ? []
+      : reading && options.column && here ? options.column(here)
+        : view?.beside ? view.beside() : []
     const open = words.length > 0
     const was = root.dataset['beside'] === 'true'
     beside.replaceChildren(...words)
@@ -305,7 +340,7 @@ export function createReaderPayload(options: {
     beside.scrollTop = 0
     if (open) {
       root.dataset['beside'] = 'true'
-      beside.setAttribute('aria-label', view?.label ?? '')
+      beside.setAttribute('aria-label', reading ? options.columnLabel ?? '' : view?.label ?? '')
     } else delete root.dataset['beside']
     if (open === was) return false
     plate?.layout?.()
@@ -349,6 +384,7 @@ export function createReaderPayload(options: {
     if (inside.length > 1 && !host.banded) block.append(make('p', 'vitrine-meta reader-place',
       here.leaf ?? options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))))
     if (here.shows) block.append(make('p', '', here.shows))
+    for (const said of here.notes ?? []) if (said) block.append(make('p', '', said))
     if (here.named) block.append(make('p', 'reader-named', here.named))
     const line = chosen()?.line
     if (line) block.append(make('p', '', line))
@@ -364,8 +400,16 @@ export function createReaderPayload(options: {
     // where the side stands in its book goes with the name: a label that
     // counts the volumes of a room would count the wrong thing here
     host.rename?.(here.label, here.head, here.colour ?? null,
-      here.leaf ? { at: place + 1, of: inside.length, leaf: here.leaf }
-        : inside.length > 1 ? { at: place + 1, of: inside.length } : null)
+      here.count !== undefined ? { at: place + 1, of: inside.length, seat: here.seat, said: here.count }
+        : here.leaf ? { at: place + 1, of: inside.length, leaf: here.leaf }
+          : inside.length > 1 ? { at: place + 1, of: inside.length } : null,
+      here.note !== undefined ? here.note : undefined)
+    // THE WHOLE TEXT ON THE PHONE rides the raised card, one press away
+    if (reading && !banded && options.column) {
+      const texts = make('div', 'vitrine-description reader-texts reader-column')
+      texts.append(...options.column(here))
+      block.append(texts)
+    }
     const readBeside = banded && here.ways.some(item => item.beside)
     if (witnesses().length && !readBeside) {
       const texts = make('div', 'vitrine-description reader-texts')
@@ -383,7 +427,8 @@ export function createReaderPayload(options: {
       }, { signal: listening.signal })
       block.append(more, texts)
     }
-    block.append(make('p', 'vitrine-meta', here.honesty ?? book.honesty))
+    const honest = here.honesty ?? book.honesty
+    if (honest) block.append(make('p', 'vitrine-meta', honest))
     aside.append(block)
     // THE PHONE FOLDS THE CARD TO A PEEK. What stands on it is the page's
     // own name and the one control that brings the rest of the words up.
@@ -466,7 +511,9 @@ export function createReaderPayload(options: {
   function dockShelf(): void {
     if (!root || !shelf) return
     const aspect = shownAspect()
-    if (shelf.hidden || !host || host.narrow || aspect === null) { root.dataset['dock'] = 'foot'; return }
+    // ON THE PHONE THE STRIP IS PART OF THE FOLDED CARD, so the page keeps the stage
+    if (host?.narrow) { root.dataset['dock'] = 'card'; return }
+    if (shelf.hidden || !host || aspect === null) { root.dataset['dock'] = 'foot'; return }
     const box = root.getBoundingClientRect()
     if (box.width <= 0 || box.height <= 0) return
     const under = Math.min(box.width, (box.height - FOOT_UNDER) * aspect)
@@ -580,6 +627,7 @@ export function createReaderPayload(options: {
 
   function chooseWay(index: number): void {
     if (index === way || !waysOf(side())[index]) return
+    // a way of the page is chosen with the whole text still beside it
     way = index
     showSide(false)
     paintWords()
@@ -614,6 +662,21 @@ export function createReaderPayload(options: {
     open(id) {
       const index = book?.sides.findIndex(entry => entry.id === id) ?? -1
       if (index >= 0) go(index)
+    },
+    columnOpen() { return reading },
+    refresh() {
+      paintBeside()
+      paintWords()
+    },
+    readAlong(open) {
+      const next = open ?? !reading
+      if (next === reading || !options.column) return reading
+      reading = next
+      if (host?.narrow && reading) host.raise?.(true)
+      showSide(false)
+      paintWords()
+      options.changed?.()
+      return reading
     },
     current() { return side() ?? null },
     mount(next) {
@@ -654,7 +717,9 @@ export function createReaderPayload(options: {
         event.preventDefault()
         event.stopPropagation()
       }, { signal: listening.signal })
-      root.append(style, ground, stage, beside, shelf)
+      root.append(style, ground, stage, beside)
+      if (!next.narrow) root.append(shelf)
+      root.dataset['lined'] = String(Boolean(options.lined))
       next.element.append(root)
       next.surface('room')
       // The row a hand meets: the two that step one side with the ways
@@ -671,6 +736,7 @@ export function createReaderPayload(options: {
       }
       row.append(steps.next)
       next.controls.append(row)
+      if (next.narrow) next.controls.append(shelf)
       // THE STRIP TAKES ONE TAB STOP. Inside it the arrows walk, and its two
       // ends are Home and End.
       shelf.addEventListener('keydown', event => {
@@ -743,7 +809,8 @@ export function createReaderPayload(options: {
       plate = undefined
       options.room?.leave()
       root?.remove()
-      root = undefined; stage = undefined; ground = undefined; shelf = undefined; beside = undefined
+      shelf?.remove()
+      root = undefined; stage = undefined; ground = undefined; shelf = undefined; beside = undefined; zoomRow = undefined
       cells.length = 0
       ways.length = 0
       host = undefined

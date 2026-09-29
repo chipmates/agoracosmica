@@ -3,7 +3,7 @@
  "pages": {
   "B.174": {
    "lead": 3,
-   "notes": null,
+   "notes": "Ravaisson's topic heading for this page, 'JOUTES. — PROPULSEUR À HÉLICE POUR L'AÉRONAUTIQUE', is his own, not Leonardo's (his Errata say so). Passages follow the edition's blocks in printed order; the aerial screw is described in blocks 3 and 4, and the lead is the long block 4. A speck before 'presteza' on the Polona copy is not a letter. His footnote points to Govi's note in the Comptes rendus de l'Académie des sciences, t. XCIII, 1881, pp. 400-402.",
    "passages": [
     {
      "index": 0,
@@ -18,12 +18,18 @@
      "en": {
       "text": "To joust against",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The line breaks off after 'contro a' (against); the object is not written. Ravaisson marks the break with dots in his French."
+      ]
      },
      "de": {
       "text": "Tjostieren gegen",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The line breaks off after 'contro a' (against); the object is not written. Ravaisson marks the break with dots in his French."
+      ]
      },
      "fr": {
       "text": "— Jouter contre....."
@@ -55,12 +61,20 @@
      "en": {
       "text": "Support. These take the place of elephants. With these one can joust, and one can carry rockets [?] to frighten the enemy's horses, and one can put gunners in these who will break any rank.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'soffioni' (literally 'blowers') is a fire-spurting device; Ravaisson first read 'mèches [?]' and his Errata correct it to 'fusées' (rockets). The exact device is uncertain.",
+       "'sostegnio' (support) stands alone before the dash, likely a label; Ravaisson prints it the same way."
+      ]
      },
      "de": {
       "text": "Stütze. Diese stehen an der Stelle von Elefanten. Mit ihnen kann man tjostieren, man kann Raketen [?] mitführen, um die Pferde der Feinde zu erschrecken, und man kann Büchsenschützen hineinsetzen, die jede Schlachtreihe durchbrechen werden.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'soffioni' (literally 'blowers') is a fire-spurting device; Ravaisson first read 'mèches [?]' and his Errata correct it to 'fusées' (rockets). The exact device is uncertain.",
+       "'sostegnio' (support) stands alone before the dash, likely a label; Ravaisson prints it the same way."
+      ]
      },
      "fr": {
       "text": "— Support — Ceux-ci sont au lieu des [remplacent les] éléphants; avec eux, on peut jouter, et on peut tenir des fusées pour effrayer les chevaux des ennemis. On peut aussi y mettre des escopettiers qui rompent toute troupe."
@@ -129,12 +143,22 @@
      "en": {
       "text": "I find that if this instrument made as a screw is well made, that is, made of linen cloth with its pores stopped with starch, and is turned swiftly, the said screw will make its nut in the air and will rise high. Take the example of a wide, thin ruler swung with force through the air: you will see your arm guided along the line of the edge of the said board.\nLet the frame of the aforesaid cloth be of long, thick canes. One can make a small model of it out of paper, whose shaft is a thin strip of iron twisted by force; and when it is set free again, it makes the screw turn.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'la femina' (the female) is the nut of a screw: the screw 'makes its nut in the air', Leonardo's own image, kept as written.",
+       "'lostile suo' (its stile): Ravaisson glosses 'style [l'axe]'; 'shaft' follows that reading.",
+       "'carta' is paper or card; Ravaisson has 'carton'."
+      ]
      },
      "de": {
       "text": "Ich finde: Wenn dieses als Schraube gebaute Instrument gut gemacht ist, das heißt aus Leinentuch, dessen Poren mit Stärke verschlossen sind, und schnell gedreht wird, dann macht sich die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe. Nimm als Beispiel ein breites, dünnes Lineal, das mit Wucht durch die Luft geführt wird: Du wirst sehen, wie dein Arm entlang der Linie der Schneide dieses Brettes geführt wird.\nDas Gerüst des genannten Tuches sei aus langen, dicken Rohrstäben. Man kann davon ein kleines Modell aus Papier machen, dessen Achse ein dünnes Eisenblech ist, mit Kraft verdreht; wenn es wieder freikommt, lässt es die Schraube sich drehen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la femina' (the female) is the nut of a screw: the screw 'makes its nut in the air', Leonardo's own image, kept as written.",
+       "'lostile suo' (its stile): Ravaisson glosses 'style [l'axe]'; 'shaft' follows that reading.",
+       "'carta' is paper or card; Ravaisson has 'carton'."
+      ]
      },
      "fr": {
       "text": "— Je trouve que si cet instrument fait à vis est bien fait, c'est-à-dire fait de toile de lin, dont on a bouché les pores avec de l'amidon, [et] est tourné avec vitesse, ladite vis se fera l'écrou dans l'air, et montera haut. Prends l'exemple d'une règle large et mince, et menée violemment en l'air; tu verras que ton bras sera guidé par la ligne du tranchant de ladite planchette.\nQue l'armature de la susdite soit de cannes longues et épaisses. On peut s'en faire un petit modèle de carton, dont le style [l'axe] soit en une mince lame de fer, tordue avec force; en redevenant libre, elle fait tourner la vis."
@@ -157,7 +181,7 @@
   },
   "CA.9": {
    "lead": 0,
-   "notes": null,
+   "notes": "Richter's reference reads '1158b' on the scan (MAP.csv has 1156b). His footnote says a parachute is sketched beside the passage with an explanatory remark; he does not print that remark, so the parachute's own words are not in this record.",
    "passages": [
     {
      "index": 0,
@@ -177,7 +201,10 @@
      "de": {
       "text": "So viel Kraft übt ein Ding gegen die Luft aus, wie die Luft gegen das Ding. Sieh, wie die Flügel, die gegen die Luft schlagen, den schweren Adler hoch oben in der dünnen Luft tragen, nahe beim Element des Feuers. Sieh auch, wie die bewegte Luft über dem Meer in die geblähten Segel schlägt und das beladene, schwere Schiff laufen lässt. Aus diesen gezeigten und dargelegten Gründen kannst du erkennen, dass der Mensch mit seinen großen, gut gefügten Flügeln, wenn er Kraft gegen die widerstehende Luft ausübt und sie überwindet, sie bezwingen und sich über sie erheben kann.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'soggiogare a levarsi': Richter prints 'a'; read as 'and rise' (Richter: 'and rising above it')."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -198,7 +225,7 @@
   },
   "B.167": {
    "lead": 2,
-   "notes": null,
+   "notes": "Heading (the editor's, not Leonardo's): 'VOL À TIRE-D'AILE'. Italics in 'it' and 'fr' mark what the edition prints in italics: words Leonardo struck out. Ravaisson's note 1 to the French refers to folio 88 recto for 'calcula'. A speck after the first dash is not a letter.",
    "passages": [
     {
      "index": 0,
@@ -213,12 +240,22 @@
      "en": {
       "text": "This man exerts a force of 200 pounds with his head, and with his hands he exerts a force of 200 pounds, and that is just what the man weighs. The beating of the wings will be crosswise, like the gait of the horse.\nTherefore I affirm that this is better than any other.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The edition prints 'ellandare' (and the going) in italics, its sign for a word Leonardo struck out; the translations leave it out.",
+       "'sari' is printed so; read as 'sarà' (will be), as Ravaisson's French does.",
+       "'in croce' (crosswise): the wings beat in alternation like the diagonal legs of a trotting horse; the translation keeps the literal word."
+      ]
      },
      "de": {
       "text": "Dieser Mann übt mit seinem Kopf eine Kraft von 200 Pfund aus, und mit den Händen übt er eine Kraft von 200 Pfund aus, und genau so viel wiegt der Mann. Das Schlagen der Flügel wird über Kreuz gehen, so wie der Gang des Pferdes.\nDeshalb behaupte ich, dass dies besser ist als jedes andere.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The edition prints 'ellandare' (and the going) in italics, its sign for a word Leonardo struck out; the translations leave it out.",
+       "'sari' is printed so; read as 'sarà' (will be), as Ravaisson's French does.",
+       "'in croce' (crosswise): the wings beat in alternation like the diagonal legs of a trotting horse; the translation keeps the literal word."
+      ]
      },
      "fr": {
       "text": "— Cet homme fait avec sa tête de la force pour 200 livres, et avec les mains, il fait de la force pour 200 livres; et c'est cela même que pèse l'homme. Les ailes ~~iront...~~ seront menées en croix, semblablement à l'allure du cheval. C'est pourquoi j'affirme que ce [système] ci est meilleur qu'aucun [autre]."
@@ -250,12 +287,18 @@
      "en": {
       "text": "The cord of the second joint passes to the second treadle.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'calcula' (calcola) is a treadle or pedal worked by the foot, as on a loom; Ravaisson has 'marche [(pédale)]'."
+      ]
      },
      "de": {
       "text": "Das Seil des zweiten Gelenks läuft zum zweiten Tritt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'calcula' (calcola) is a treadle or pedal worked by the foot, as on a loom; Ravaisson has 'marche [(pédale)]'."
+      ]
      },
      "fr": {
       "text": "— Corde de la seconde jointure; elle passe à la seconde marche [(pédale)]."
@@ -287,12 +330,20 @@
      "en": {
       "text": "Ladder for climbing up and down: let it be 12 braccia high, and let the wings open 40 braccia, and let their rise be 8 braccia, and the body from stern to prow 20 braccia and 5 high, and apart from the frame [?] let everything be of cane and cloth.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'dallarmadura in fori' can mean 'except the frame' (the old idiom 'da ... in fuori') or 'from the frame outward'; Ravaisson reads 'l'armature à l'extérieur' (the frame on the outside). The translation follows the idiom and marks it.",
+       "'dapopa prua': the edition inserts no word; the French adds [à]. 'Stern to prow' is Leonardo's ship language for the machine's body."
+      ]
      },
      "de": {
       "text": "Leiter zum Hinauf- und Hinabsteigen: Sie sei 12 Braccia hoch, die Flügel sollen sich 40 Braccia weit öffnen, ihr Hub sei 8 Braccia, der Rumpf von Heck bis Bug 20 Braccia lang und 5 hoch, und außer dem Gerüst [?] sei alles aus Rohr und Tuch.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'dallarmadura in fori' can mean 'except the frame' (the old idiom 'da ... in fuori') or 'from the frame outward'; Ravaisson reads 'l'armature à l'extérieur' (the frame on the outside). The translation follows the idiom and marks it.",
+       "'dapopa prua': the edition inserts no word; the French adds [à]. 'Stern to prow' is Leonardo's ship language for the machine's body."
+      ]
      },
      "fr": {
       "text": "— Échelle pour monter et descendre; qu'elle soit haute de 12 brasses, que les ailes ouvrent de 40 brasses, que leur montée soit de 8 brasses, que le corps de poupe [à] proue soit de 20 brasses, haut de 5, et que l'armature à l'extérieur soit toute de cannes et de toile."
@@ -315,7 +366,7 @@
   },
   "E.094": {
    "lead": 0,
-   "notes": null,
+   "notes": "Deviation: the passage the brief expected (Herzfeld p. 12, 'Die Natur bricht ihr Gesetz nicht') sits, per Ravaisson's transcription and plates, on 43 recto, the other side of this leaf. The page's own printed text (Ravaisson, 43 verso: how the bird rises on the wind without beating its wings) is given first, with our EN and DE; the Herzfeld line follows, flagged. The curator's reason names the drawing, not a passage; lead 0 points to the page's own text.",
    "passages": [
     {
      "index": 0,
@@ -330,12 +381,20 @@
      "en": {
       "text": "How the bird rises by means of the wind without beating its wings.\nThe bird rises to a great height without beating its wings, by means of the wind, which strikes it in great quantity under the wings and the tail, held slantwise, and on the back, held at the opposite slant. This is proved: let the wind packed under the bird act beneath it as one sees with a wedge driven under a weight, a wedge which with every degree of movement makes the weight gain one degree of height. But because the opposite slant of the bird's body disposes it to descend against the oncoming wind with the same power with which that wind lifts it up, by means of the slant of the body, opposite to that of the wings, it covers itself by as much [?].\n[Beneath the figure of a sector:] Here one must calculate the degrees of the slant, because at no degree of slant does a thing on the water, or the bird in the air, stand still; they will move faster or slower as the position is less or more slanted.\nThat bird weighs less which spreads itself more, and conversely it weighs more the more it draws itself in; and butterflies make trial of this in their descents, etc.\nIf a b, ten, pushes c, nine, by the slant d e, which is greater than the slant a b, it will lift the weight 9 with less effort, but will not push it against the 10, because the greater slant alone has the power to lift.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'sichopretanto' (perhaps 'sì copre tanto') is unclear; Ravaisson renders 'il se couvre d'autant' and refers in a footnote to folio 45 verso. Translated literally and marked [?].",
+       "Figure labels and the editor's figure notes are left out of the translations; the words in Ravaisson's italics (struck out in the manuscript) are not translated."
+      ]
      },
      "de": {
       "text": "Wie der Vogel sich mit Hilfe des Windes erhebt, ohne die Flügel zu schlagen.\nDer Vogel steigt ohne Flügelschlag in große Höhe, mit Hilfe des Windes, der ihn in großer Menge unter die schräg gestellten Flügel und den Schwanz trifft, und auf den Rücken, der in die Gegenrichtung geneigt ist. Das wird so bewiesen: Der unter dem Vogel verdichtete Wind wirke unter ihm so, wie man es bei einem Keil sieht, der unter eine Last getrieben wird. Mit jedem Grad Bewegung lässt dieser Keil die Last um einen Grad an Höhe gewinnen. Weil aber die Gegenneigung des Rumpfes den Vogel dazu bringt, gegen den anströmenden Wind mit derselben Kraft abzusteigen, mit der dieser Wind ihn hebt, durch die Neigung des Rumpfes, die der Neigung der Flügel entgegengesetzt ist, deckt er sich um ebenso viel [?].\n[Unter der Figur eines Kreisausschnitts:] Hier muss man die Grade der Neigung berechnen. Denn bei keinem Grad der Neigung bleibt ein Ding auf dem Wasser oder der Vogel in der Luft stehen. Sie werden vielmehr umso schneller oder langsamer, je weniger oder je mehr ihre Lage geneigt ist.\nDer Vogel wiegt weniger, der sich mehr ausbreitet, und umgekehrt wiegt er mehr, je mehr er sich zusammenzieht. Das erproben die Schmetterlinge, wenn sie niedersinken, usw.\nWenn a b, zehn, c, neun, über die Neigung d e schiebt, die größer ist als die Neigung a b, hebt es die Last 9 mit weniger Mühe, schiebt sie aber nicht gegen die 10, denn nur die größere Neigung hat die Kraft zu heben.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sichopretanto' (perhaps 'sì copre tanto') is unclear; Ravaisson renders 'il se couvre d'autant' and refers in a footnote to folio 45 verso. Translated literally and marked [?].",
+       "Figure labels and the editor's figure notes are left out of the translations; the words in Ravaisson's italics (struck out in the manuscript) are not translated."
+      ]
      },
      "fr": {
       "text": "COMMENT L'OISEAU S'ÉLÈVE AU MOYEN DU VENT, SANS BATTEMENT D'AILES.\n[1ère figure :] e d c t a [2e fig. :] g a ef cd b [3e fig. :] dc b abeg.\nL'OISEAU S'ÉLÈVE EN GRANDE HAUTEUR SANS BATTEMENT D'AILES, AU MOYEN DU VENT QUI LE FRAPPE EN GRANDE SOMME SOUS LES AILES ET LA QUEUE PLACÉES OBLIQUEMENT, ET SUR L'ÉCHINE PLACÉE EN OBLIQUITÉ CONTRAIRE.\nOn le prouve : Soit le vent condensé sous l'oiseau faisant sous cet oiseau, comme on voit faire au coin poussé sous le poids, coin qui à chaque degré de mouvement fait ~~de ce~~ que ce poids acquiert un degré de hauteur. Mais parce que l'obliquité contraire du buste qu'a l'oiseau est en disposition de descendre contre l'arrivée du vent avec la même puissance avec laquelle le vent l'élève en haut, moyennant l'obliquité du buste contraire à celle des ailes, il se couvre d'autant.\n[Figures à gauche (marge) :] a b c d e.\n[Sous la fig. d'un secteur] Ici il est besoin de calculer les degrés de l'obliquité, parce qu'en aucun degré d'obliquité, ni la chose sur l'eau, ni l'oiseau dans l'air, ne s'arrêtent, mais leur vitesse se fera d'autant plus ou moins grande que la position sera ~~p~~ moins ou plus oblique,\nCet oiseau ~~qui~~ pèse ~~plus~~ moins qui s'élargit plus et à l'inverse celui-là pèse plus qui se resserre plus; c'est ce qu'expérimentent les papillons dans leurs descentes, etc.\n[Figures en bas :] a 10 b (levier) 9 c (poids) d ~~19~~ 20 e (levier).\nSi a b 10 pousse c 9 par l'obliquité d e, qui est plus grande que l'obliquité a b, a b enlèvera le poids 9 avec une moindre fatigue, mais ne le poussera pas contre le 10 parce que la plus grande obliquité a seule puissance pour élever."
@@ -368,7 +427,10 @@
      "en": {
       "text": "The end of the reflex movement is much higher (for the birds that fly against the wind) than the beginning of their incident reflex movement; and for this reason nature does not break her laws; and this is proved by the preceding [proposition].",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'natura non rompe sue leggie': Herzfeld and Ravaisson both read it as nature not breaking her law(s)."
+      ]
      },
      "de": {
       "text": "Die Natur bricht ihr Gesetz nicht.",
@@ -401,7 +463,7 @@
   },
   "B.155": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): 'VOL À TIRE-D'AILE'. Italics in 'it' mark letters or words the edition prints in italics, Leonardo's cancellations. The French page's footnote 1 reads 'Dans la dernière figure.' The ALTO OCR missed the French word 'léger.'; it was read from the scan.",
    "passages": [
     {
      "index": 0,
@@ -416,12 +478,18 @@
      "en": {
       "text": "A way to make the wing stay perforated when it rises, and all closed when it comes down. And it is seen from below, looking up.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'il suo vedere e di sotto in su' (its seeing is from below upward) most likely says the drawing shows the wing from below; Ravaisson reads it as an instruction to look from below."
+      ]
      },
      "de": {
       "text": "Ein Verfahren, damit der Flügel durchbrochen bleibt, wenn er sich hebt, und ganz geschlossen ist, wenn er sich senkt. Und man sieht ihn von unten nach oben.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'il suo vedere e di sotto in su' (its seeing is from below upward) most likely says the drawing shows the wing from below; Ravaisson reads it as an instruction to look from below."
+      ]
      },
      "fr": {
       "text": "— Procédé pour que quand l'aile s'élève, elle reste transpercée, et que quand elle baisse, elle soit toute unie. Et pour le voir, il faut regarder par-dessous."
@@ -453,12 +521,18 @@
      "en": {
       "text": "A B C",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Letters naming the parts of the drawing; the French page does not repeat them."
+      ]
      },
      "de": {
       "text": "A B C",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Letters naming the parts of the drawing; the French page does not repeat them."
+      ]
      },
      "fr": null,
      "label_only": true,
@@ -483,12 +557,20 @@
      "en": {
       "text": "Make the meshes of this net 1/8 wide.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The unit of the 1/8 is not written.",
+       "The edition prints a struck-out 'g' in italics; it is left out of the translations."
+      ]
      },
      "de": {
       "text": "Mache die Maschen dieses Netzes 1/8 weit.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The unit of the 1/8 is not written.",
+       "The edition prints a struck-out 'g' in italics; it is left out of the translations."
+      ]
      },
      "fr": {
       "text": "— Fais les mailles de ce filet larges d'1/8e."
@@ -520,12 +602,22 @@
      "en": {
       "text": "A shall be a board of fir, inerbata [?], with a fibrous grain [?], and light.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'inerbata' is not clear; Ravaisson renders 'en herbe [?]' (green, unseasoned?) and marks it doubtful. It is left in Italian.",
+       "'attiglio' is read as 'a tiglio' (with fibre, grain), as Ravaisson's 'qui a des filaments [?]'; 'tiglio' can also mean lime wood.",
+       "The struck-out 'chial' (italics in the edition) is left out."
+      ]
      },
      "de": {
       "text": "A sei ein Brett aus Tannenholz, inerbata [?], mit faseriger Maserung [?], und leicht.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'inerbata' is not clear; Ravaisson renders 'en herbe [?]' (green, unseasoned?) and marks it doubtful. It is left in Italian.",
+       "'attiglio' is read as 'a tiglio' (with fibre, grain), as Ravaisson's 'qui a des filaments [?]'; 'tiglio' can also mean lime wood.",
+       "The struck-out 'chial' (italics in the edition) is left out."
+      ]
      },
      "fr": {
       "text": "— A sera [en] bois de sapin en herbe [?], qui a des filaments [?], et est léger."
@@ -557,12 +649,18 @@
      "en": {
       "text": "B shall be fustian with down glued onto it, so that the way [?] does not easily escape.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'lavia' is printed as one word; Ravaisson reads 'la voie' (the way). Leonardo probably means that the air should not slip through, but the text does not say so."
+      ]
      },
      "de": {
       "text": "B sei Barchent, auf den Flaumfedern geklebt sind, damit der Weg [?] nicht leicht entweicht.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'lavia' is printed as one word; Ravaisson reads 'la voie' (the way). Leonardo probably means that the air should not slip through, but the text does not say so."
+      ]
      },
      "fr": {
       "text": "B sera de futaine, sur laquelle sera collée de la plume, afin que la voie ne fuie pas aisément."
@@ -594,12 +692,18 @@
      "en": {
       "text": "C shall be starched taffeta, and for a trial you will take thin sheets of paper.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'carte sottilj' may be thin paper or thin card; Ravaisson has 'minces cartons'."
+      ]
      },
      "de": {
       "text": "C sei gestärkter Taft, und für einen Versuch nimmst du dünne Papierbögen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'carte sottilj' may be thin paper or thin card; Ravaisson has 'minces cartons'."
+      ]
      },
      "fr": {
       "text": "C doit être de taffetas amidonné, et pour l'épreuve, tu prendras de minces cartons."
@@ -622,7 +726,7 @@
   },
   "FB15r": {
    "lead": 0,
-   "notes": null,
+   "notes": "Richter's 'Mz. 12a (16)' and Herzfeld's 'Fol. 16 r.' use Leonardo's own leaf number; today's foliation is 15r (Richter's Bibliography: '16 altered in 15'; facts-0929). Richter prints a bat and a bird drawn between the two paragraphs.",
    "passages": [
     {
      "index": 0,
@@ -668,7 +772,7 @@
   },
   "B.176": {
    "lead": 2,
-   "notes": null,
+   "notes": "Heading (the editor's): 'AILES MÉCANIQUES'. The Spanish note on this leaf, in another hand, is not in the printed text (Avant-propos p. 6). Footnote markers in the French are left out; the four footnotes point to Codex Atlanticus f. 15 and Saggio pl. VII (the man on a pile bridge), to folio 77 verso, gloss 'maîtresses' as 'planche sciée dans le long de l'arbre', and cite Saggio t. XVIII and the Trattato del moto e misura dell'acqua. The OCR's 'Jassci' is 'lassci' on the scan.",
    "passages": [
     {
      "index": 0,
@@ -683,12 +787,18 @@
      "en": {
       "text": "The same, below.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'di socto' can mean 'below' or 'seen from below'; Ravaisson has 'le même que ci-dessous' (the same as below)."
+      ]
      },
      "de": {
       "text": "Dasselbe, unten.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'di socto' can mean 'below' or 'seen from below'; Ravaisson has 'le même que ci-dessous' (the same as below)."
+      ]
      },
      "fr": {
       "text": "— Le même que ci-dessous."
@@ -757,12 +867,22 @@
      "en": {
       "text": "If you want to see the true test of the wings, make a wing of paper stiffened with netting, with the main ribs of cane, at least 20 braccia wide and long, and fix it on a plank weighing 200 pounds, and apply a sudden force, as drawn above. If the plank of 200 pounds rises before the wing comes down, the test is good. But make sure the force is sudden, and if the said effect does not follow, waste no more time on it.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'maesstre' (the masters) are read as the main ribs or spars of the wing, Ravaisson's 'maîtresses'.",
+       "'panchore', later 'pancone', is a heavy plank; Ravaisson's 'palplanche [?]' is his own guess.",
+       "'effa chome disopra sifigura vna forza presta' is read as 'apply a sudden force, as drawn above'; Ravaisson makes the wing the subject ('elle fera ... une force prompte')."
+      ]
      },
      "de": {
       "text": "Wenn du den wahren Versuch mit den Flügeln sehen willst, mache aus Papier, verstärkt mit einem Netz, und mit Hauptrippen aus Rohr einen Flügel von mindestens 20 Braccia Breite und Länge, befestige ihn auf einer Bohle von 200 Pfund Gewicht und übe, wie oben gezeichnet, eine rasche Kraft aus. Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt, ist der Versuch gut. Sorge aber dafür, dass die Kraft rasch ist, und wenn die genannte Wirkung nicht eintritt, verliere keine Zeit mehr damit.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'maesstre' (the masters) are read as the main ribs or spars of the wing, Ravaisson's 'maîtresses'.",
+       "'panchore', later 'pancone', is a heavy plank; Ravaisson's 'palplanche [?]' is his own guess.",
+       "'effa chome disopra sifigura vna forza presta' is read as 'apply a sudden force, as drawn above'; Ravaisson makes the wing the subject ('elle fera ... une force prompte')."
+      ]
      },
      "fr": {
       "text": "— Si tu veux voir la véritable épreuve des ailes, fais de carton armé de filet, et les maîtresses de canne [roseau], une aile de la largeur et longueur de 20 brasses au moins, et fixe-la sur une palplanche [?] du poids de 200 livres; elle fera, comme il est ci-dessus figuré, une force prompte [à agir]. Et si la palplanche des 200 livres s'élève avant que l'aile s'abaisse, l'épreuve est bonne, mais fais aussi que la force soit prompte [à agir], et si le susdit effet n'est pas obtenu, n'y perds pas plus de temps."
@@ -896,7 +1016,7 @@
   },
   "B.165": {
    "lead": 2,
-   "notes": null,
+   "notes": "Heading (the editor's): 'VOL À TIRE-D'AILE'. The French footnote cites Gerli, Disegni di L. da V., pl. XI (reading uncertain on the scan). Italics in 'it' mark letters Leonardo struck out.",
    "passages": [
     {
      "index": 0,
@@ -911,12 +1031,18 @@
      "en": {
       "text": "When the weight is close to the pulleys, it moves away by means of the poles or levers.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'sischosta' may mean 'moves away' or 'is pushed away'; Ravaisson reads 'il s'éloigne' and marks 'leviers' doubtful."
+      ]
      },
      "de": {
       "text": "Wenn das Gewicht nahe an den Rollen ist, rückt es mit den Stangen oder Hebeln ab.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sischosta' may mean 'moves away' or 'is pushed away'; Ravaisson reads 'il s'éloigne' and marks 'leviers' doubtful."
+      ]
      },
      "fr": {
       "text": "— Quand le poids est voisin des poulies, il s'éloigne avec les pieux ou leviers [?]."
@@ -948,12 +1074,18 @@
      "en": {
       "text": "M",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "A letter on the drawing; it names the pulley in the next block."
+      ]
      },
      "de": {
       "text": "M",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "A letter on the drawing; it names the pulley in the next block."
+      ]
      },
      "fr": {
       "text": "— M —"
@@ -985,12 +1117,26 @@
      "en": {
       "text": "This can be done with one pair of wings and also with 2. If you want to do it with one, the arms will raise it with a windlass, and a pair of kicks will bring it down with force, and it will be useful.\nAnd if you want to do it with 2 pairs, when one of the legs stretches out it will bring down one pair of wings, and the windlass of the hands will meanwhile raise the others, giving great help as well to those that come down; and turning with the hands now to the right, now to the left, it will help now the one, now the other. This instrument is like that large one on the back, except that this one turns the pull round the little wheel [?] M and goes to the feet. Instead of the feet you will make a ladder 'in terzo' [?] of 3 light, thin fir poles, as drawn here in front, and let it be 10 braccia long.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'rozella': the editor prints '[rotella ?]' (little wheel, pulley), and the translations follow him with [?].",
+       "'schala in terzo' is unclear, perhaps a ladder standing on three legs; Ravaisson has 'échelle en tiers [?]'. It is left in Italian.",
+       "'quelgrande darouescio' (that large one on the reverse): which drawing is meant is not certain; Ravaisson suggests folio 80 recto.",
+       "Two single letters 'l' printed in italics (struck out by Leonardo) are left out of the translations.",
+       "'un paro di chalci' (a pair of kicks): Ravaisson has 'une paire [un double coup] de talons [?]'."
+      ]
      },
      "de": {
       "text": "Dies kann man mit einem Flügelpaar machen und auch mit 2. Wenn du es mit einem machen willst, heben die Arme es mit einer Haspel, und ein Paar Fußstöße senkt es mit Wucht, und das wird nützlich sein.\nUnd wenn du es mit 2 Paaren machen willst: Wenn sich eines der Beine streckt, senkt es ein Flügelpaar, und die Haspel der Hände hebt unterdessen die anderen und hilft dabei noch sehr denen, die sich senken; und wenn man mit den Händen bald nach rechts, bald nach links dreht, hilft sie bald dem einen, bald dem anderen. Dieses Instrument ist wie jenes große auf der Rückseite, nur dass dieses den Zug um das Rädchen [?] M lenkt und zu den Füßen geht. Statt der Füße machst du eine Leiter 'in terzo' [?] aus 3 leichten, dünnen Tannenstangen, wie hier vorne gezeichnet, und sie sei 10 Braccia lang.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'rozella': the editor prints '[rotella ?]' (little wheel, pulley), and the translations follow him with [?].",
+       "'schala in terzo' is unclear, perhaps a ladder standing on three legs; Ravaisson has 'échelle en tiers [?]'. It is left in Italian.",
+       "'quelgrande darouescio' (that large one on the reverse): which drawing is meant is not certain; Ravaisson suggests folio 80 recto.",
+       "Two single letters 'l' printed in italics (struck out by Leonardo) are left out of the translations.",
+       "'un paro di chalci' (a pair of kicks): Ravaisson has 'une paire [un double coup] de talons [?]'."
+      ]
      },
      "fr": {
       "text": "— Ceci peut faire avec une paire d'ailes, et aussi avec deux. Si tu veux faire avec une, les bras l'élèveront avec un moulinet, et une paire [un double coup] de talons [?], avec de la furie [avec un mouvement violent], l'abaissera; et ce sera utile.\nEt si tu veux te servir de 2 paires, quand l'une des jambes se tendra, elle abaissera une paire d'ailes, et le moulinet des mains élèvera, dans le même temps, les autres, favorisant [aidant] encore grandement celles qui s'abaissent, et en tournant avec les mains, tantôt à droite, tantôt à gauche, tu favoriseras tantôt l'une, tantôt l'autre. Cet instrument est comme ce grand au revers [(à la page suivante, folio 80, recto?)], sauf que celui-ci tord la traction dans la poulie M, et va aux pieds. Au lieu des pieds, tu feras une échelle en tiers [?], de 3 bâtons de sapin, légers et minces, comme il est figuré ci-dessus, et qui devra être longue de 10 brasses."
@@ -1013,7 +1159,7 @@
   },
   "AshB.045": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed twice: Richter's Bibliography (vol. II p. 485, Ash. II) lists '13b 1382 Sketches of insects, a caricature &c.', and Ravaisson vol. VI prints the same line under Ms 2037 'FOLIO 10 (verso)' with the footnote 'J.-P. Richter, t. II, no 1382 (13b)'. Richter's 'Ash. II. 13b' is his count; the modern folio is 10 verso. Richter's footnote to 1382: 'Condotti d'acqua. Possibly a book, a MS. or a map.' Ravaisson reads the line on: 'amastro lodovicho ciedi licondotti dacqua elfornello lesta il moto continvo imantaci isoffioni' (French: 'A maître Ludovic, demande les conduits d'eau, et le fourneau; il s'y trouve le mouvement continu. Les soufflets grands et petits.'); Richter prints only the first clause, so only that is here with his English. Passage 2 is added from Ravaisson because it is the one full sentence beside the drawings of flying creatures; the page's other scraps (sums, 'trova lodouico mio della carne inello panetto il uicario', 'sorbire', 'ircumcluso') are left out. The curator's reason names the drawing, not a passage; lead 0 is Richter's passage.",
    "passages": [
     {
      "index": 0,
@@ -1033,7 +1179,10 @@
      "de": {
       "text": "Bitte Meister Lodovico um die Wasserleitungen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'li cōdotti d'acqua': Richter's footnote says this may name a book, a manuscript or a map, and his English sets it in quotation marks; the Italian has none, so the German keeps the plain words."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -1091,7 +1240,7 @@
   },
   "FB5r": {
    "lead": 0,
-   "notes": null,
+   "notes": "Richter's 'Mz. 3a (6)' and Herzfeld's 'Fol. 6 r.' use Leonardo's own leaf number; today's foliation is 5r (Sabachnikoff heads the leaf 'FOLIO 6 [5]'). Richter prints a small figure of a man in the machine beside the Italian. Not included: the 'Volo (cadendo)' paragraph on 5r, which neither Richter nor Herzfeld prints.",
    "passages": [
     {
      "index": 0,
@@ -1146,7 +1295,10 @@
      "en": {
       "text": "When the bird wants to turn to the right or the left side while beating its wings, it will beat lower with the wing on the side towards which it wants to turn; and so the bird will twist its movement behind the impetus of the wing that moved more,\n[continued on the verso:] and it makes the reflex movement under the wind, from the opposite side.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "AI translation, may contain errors",
+      "doubts": [
+       "The paragraph starts on today's 5r and ends on 5v (the clause after 'moved more'). Only the first part is on this page."
+      ]
      },
      "de": {
       "text": "Wenn der Vogel sich nach der rechten oder der linken Seite drehen will, beim Schlagen der Flügel, dann wird er dort den Flügel tiefer schlagen, wo er sich hinkehren will, und so wird der Vogel die Bewegung nach dem Antrieb (impeto) jenes Flügels drehen, der sich mehr bewegte, und macht die reflektierte Bewegung unter dem Wind, von der entgegengesetzten Seite.",
@@ -1179,7 +1331,7 @@
   },
   "B.156": {
    "lead": 1,
-   "notes": null,
+   "notes": "Heading (the editor's): 'VOL À TIRE-D'AILE'. Errata applied to the Italian (line 3). The French 'où, si tu veux' is printed with the accent, apparently a misprint for 'ou'; kept as printed. French footnote 2 cites Gerli, Disegni di L. da V., pl. XL to XLII, and Ravaisson's own Écrits de L. de V., p. 31. The OCR missed the last French line 'plus libres les mains', read from the scan.",
    "passages": [
     {
      "index": 0,
@@ -1194,12 +1346,18 @@
      "en": {
       "text": "M f a b c d",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Letters of the drawing; Ravaisson's footnote: M at the top of the figure, the other letters below."
+      ]
      },
      "de": {
       "text": "M f a b c d",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Letters of the drawing; Ravaisson's footnote: M at the top of the figure, the other letters below."
+      ]
      },
      "fr": {
       "text": "— M fabcd. —"
@@ -1231,12 +1389,26 @@
      "en": {
       "text": "a twists the wing, b turns it with the lever, c lowers it, d raises it from below upward; and the man who steers this instrument keeps his feet at f and d. The foot f lowers the wings, the foot d raises them. The pivot M should hang out of its perpendicular, so that the wings, as they come down, also come down towards the man's feet: that is the thing that will make the bird go forward.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Errata applied: line 3 'el [?] polo' is read 'ellpolo' (Errata du manuscrit B, p. 8).",
+       "'polo' is rendered 'pivot', as Ravaisson's 'pôle [pivot]'.",
+       "'in vero [inverso]': the translation follows the editor's bracket (towards).",
+       "The struck-out 'b' and 'ini' (italics in the edition) are left out.",
+       "'the bird' is Leonardo's word for the flying machine."
+      ]
      },
      "de": {
       "text": "a verdreht den Flügel, b dreht ihn mit dem Hebel, c senkt ihn, d hebt ihn von unten nach oben; und der Mann, der dieses Instrument lenkt, hat seine Füße in f und d. Der Fuß f senkt die Flügel, der Fuß d hebt sie. Der Drehpunkt M soll aus seiner Senkrechten heraushängen, damit die Flügel sich beim Senken auch zu den Füßen des Mannes hin senken: Das ist es, was den Vogel vorwärts bringen wird.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Errata applied: line 3 'el [?] polo' is read 'ellpolo' (Errata du manuscrit B, p. 8).",
+       "'polo' is rendered 'pivot', as Ravaisson's 'pôle [pivot]'.",
+       "'in vero [inverso]': the translation follows the editor's bracket (towards).",
+       "The struck-out 'b' and 'ini' (italics in the edition) are left out.",
+       "'the bird' is Leonardo's word for the flying machine."
+      ]
      },
      "fr": {
       "text": "— a tord l'aile, b la tourne avec le levier, c l'abaisse, d l'élève de bas en haut, et l'homme, guide de cet instrument, tient ses pieds en f d. Le pied f abaisse les ailes et le pied d les élève. Le pôle [pivot] M veut [doit] pendre [avoir son centre de gravité?] en dehors de sa perpendiculaire [de la verticale], afin que les ailes, en descendant, s'abaissent aussi vers les pieds de l'homme; car c'est cette chose qui fera [car c'est là ce qui fera] aller l'oiseau en avant."
@@ -1305,12 +1477,22 @@
      "en": {
       "text": "Further, the lowering of the wings should be done by the force of 2 feet at one time, so that you can pace your movement and balance yourself by lowering one faster than the other, as need requires, as you see the kite and the other birds do. And again, the lowering by 2 feet is twice as strong as with one; true, the motion is twice as slow. And the raising shall be by the force of a spring, or, if you like, by hand, or else by drawing the feet towards you, which is better, for then you have your hands free.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'piv forte altrettanto' and 'piv tardo altrettanto' (stronger, slower by as much again) are rendered 'twice as'.",
+       "'tenporegiare' (to temporize) is read as pacing or timing the stroke; Ravaisson glosses 'ralentir ton mouvement'.",
+       "'cai [che ai]': the translation follows the editor's bracket."
+      ]
      },
      "de": {
       "text": "Ferner soll das Senken der Flügel durch die Kraft von 2 Füßen zugleich geschehen, damit du dein Tempo bestimmen und dich im Gleichgewicht halten kannst, indem du je nach Bedarf den einen schneller senkst als den anderen, wie du es den Milan und die anderen Vögel tun siehst. Außerdem ist das Senken mit 2 Füßen doppelt so stark wie mit einem; freilich ist die Bewegung doppelt so langsam. Und das Heben geschehe durch die Kraft einer Feder, oder, wenn du willst, mit der Hand, oder indem du die Füße zu dir heranziehst, was besser ist, denn so hast du die Hände frei.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'piv forte altrettanto' and 'piv tardo altrettanto' (stronger, slower by as much again) are rendered 'twice as'.",
+       "'tenporegiare' (to temporize) is read as pacing or timing the stroke; Ravaisson glosses 'ralentir ton mouvement'.",
+       "'cai [che ai]': the translation follows the editor's bracket."
+      ]
      },
      "fr": {
       "text": "— Il faut encore que l'abaissement des ailes soit fait par la force des 2 pieds en un seul temps; afin que tu puisses temporiser [ralentir ton mouvement], et te maintenir en équilibre, en abaissant [une aile] plus vite l'une que l'autre, selon les besoins, comme tu vois faire au milan et aux autres oiseaux.\nEt encore, l'abaissement des 2 pieds est une fois plus fort que celui d'un seul; il est vrai que le mouvement est une fois plus lent. Quant à s'élever, on l'obtient par la force d'un ressort, où, si tu veux, avec la main; ou bien en tirant à toi les pieds, ce qui est mieux, parce que tu as alors plus libres les mains."
@@ -1333,7 +1515,7 @@
   },
   "B.157": {
    "lead": 3,
-   "notes": null,
+   "notes": "Heading (the editor's): 'VOL À TIRE-D'AILE'. The OCR's '1' for the letter 'l' is corrected from the scan in both languages. The French footnote places the letters on the figure: a to l on the right of the apparatus, k s above r, M g on the left of k, 4 and 5 a little lower, the rest below g.",
    "passages": [
     {
      "index": 0,
@@ -1385,12 +1567,18 @@
      "en": {
       "text": "ab cf nr ks Mg45 zyd",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Letters and numbers of the drawing. The French prints 'hl' as well, which the Italian line does not have; the footnote explains where each letter stands on the figure."
+      ]
      },
      "de": {
       "text": "ab cf nr ks Mg45 zyd",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Letters and numbers of the drawing. The French prints 'hl' as well, which the Italian line does not have; the footnote explains where each letter stands on the figure."
+      ]
      },
      "fr": {
       "text": "— ab cf nr hl ks Mg 45 zy d —"
@@ -1422,12 +1610,18 @@
      "en": {
       "text": "The tail, which is tied with a garland at the head, where the nape is.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'grilanda' (garland) is probably a ring or collar here; Ravaisson glosses '[une couronne]' and takes the tail as the rudder."
+      ]
      },
      "de": {
       "text": "Der Schwanz, der mit einem Kranz am Kopf festgebunden ist, an der Stelle des Nackens.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'grilanda' (garland) is probably a ring or collar here; Ravaisson glosses '[une couronne]' and takes the tail as the rudder."
+      ]
      },
      "fr": {
       "text": "— Queue [gouvernail], qui est attachée avec une guirlande [une couronne] à la tête, à la place de la nuque."
@@ -1459,12 +1653,22 @@
      "en": {
       "text": "The cord r s k z d l is one and the same, but one end, that is r, comes to one foot, and l comes to the other; and the cord l z lowers the wing, which is fixed at the point m; and in the same way one turns it with the lever g y and bends it with the cord b 4 5; and the cord k r raises the wing. But I do remind you that the wood of the pulleys k z should not stand in a perpendicular line; rather, z at the bottom should be much further towards your feet than k at the top.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The subject of 'gira' (turns) and 'piega' (bends) is not written; 'one' is supplied.",
+       "'che ferma nelpunto m' is read as 'which is fixed at the point m', as Ravaisson does.",
+       "The struck-out 'torcie...' (italics in the edition) is left out."
+      ]
      },
      "de": {
       "text": "Das Seil r s k z d l ist ein und dasselbe, aber ein Ende, nämlich r, kommt an den einen Fuß, und l kommt an den anderen; und das Seil l z senkt den Flügel, der im Punkt m befestigt ist; und ebenso dreht man ihn mit dem Hebel g y und beugt ihn mit dem Seil b 4 5; und das Seil k r hebt den Flügel. Aber ich erinnere dich wohl daran, dass das Holz der Rollen k z nicht in einer senkrechten Linie stehen soll; vielmehr soll z unten viel weiter zu deinen Füßen hin liegen als k oben.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The subject of 'gira' (turns) and 'piega' (bends) is not written; 'one' is supplied.",
+       "'che ferma nelpunto m' is read as 'which is fixed at the point m', as Ravaisson does.",
+       "The struck-out 'torcie...' (italics in the edition) is left out."
+      ]
      },
      "fr": {
       "text": "— La corde r s k, z d l, est une même, mais une tête [un de ses bouts], c'est-à-dire r, arrive à un pied, et l tombe à l'autre; et la corde l z abaisse l'aile qui est fixe au point m, et de même la ~~tord...~~ tourne avec le levier g y, et de même la ploie avec la corde b 4 5; la corde k r élève l'aile. Mais je te rappelle bien que le bois des poulies k z ne se trouve pas en ligne verticale, et par conséquent que z soit au pied [en bas] beaucoup plus vers tes pieds que k en tête [en haut]."

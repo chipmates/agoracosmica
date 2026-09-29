@@ -1,4 +1,741 @@
 {
  "topic": "the-earth-and-the-sky",
- "pages": {}
+ "pages": {
+  "AR1.119": {
+   "lead": 0,
+   "notes": "Richter prints both sections under 'Br. M. 28a' (the Arundel manuscript's leaf 28 recto); Herzfeld signs §876 'Fol. 28 r.'. Richter's §876 is split at his line 23 because Herzfeld translates only its first part. The letters r s in §895 and the spheres in §876 refer to the page's diagrams, which Richter reproduces.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §876 (Br. M. 28a), vol. II pp. 146-147, ll. 1-23; Herzfeld 1906 p. 53, XI",
+     "it": {
+      "text": "Īpossibile è che tanto quāto il sole allumina dello spechio sperico, tāto d'esso spechio abbia a risplendere, se già esso spechio non fusse ōdāte o globulēto;\n\nVedi qui il sole alluminare la luna, specchio sperico, e tanto quāto esso sole ne uede, tāto ne fa splēdere;\n\nQui si concluderà che ciò che della luna splende è acqua simile a quella degli nostri mari, e così inōdata, ciò che di lei non splende sone isole e terra ferma.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "It is impossible that the side of a spherical mirror, illuminated by the sun, should reflect its radiance unless this mirror were undulating or filled with bubbles.\n\nYou see here the sun which lights up the moon, a spherical mirror, and all of its surface, which faces the sun is rendered radiant.\n\nWhence it may be concluded that what shines in the moon is water like that of our seas, and in waves as that is; and that portion which does not shine consists of islands and terra firma.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Unmöglich ist es, daß so viel, als die Sonne vom sphärischen Spiegel beleuchtet, so viel von selbigem Spiegel zurückzuglänzen habe, wenn selbiger Spiegel nicht gewellt oder mit kleinen Erhabenheiten bedeckt wäre.\n\nSieh hier die Sonne einen sphärischen Spiegel, den Mond, beleuchten, und so viel selbige Sonne von ihm erblickt, so viel macht sie glänzen.\n\nHier wird man schließen, daß jenes, was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere; was von ihm nicht leuchtet, sind Inseln und festes Land.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 146",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n259/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 146",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n259/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 53",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n232/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §876 (Br. M. 28a), vol. II pp. 146-147, ll. 24-34",
+     "it": {
+      "text": "Questa dimostratione di tanti corpi sperici interposti infra l'ochio e 'l sole è fatta per mostrare che, siccome in ciascuno d'essi corpi si uede il simulacro del sole, così si può vedere esso simulacro in ciascuna globosità dell'onde del mare; come in molti di questi sperici si uedono molti soli, così in molte onde si uedono molti lustri, li quali in molta distanzia, ciascū lustro per se, si fanno grādi all' ochio e, così faciēdo ciascuna onda, si uengono a consumare gli spati interposti infra l'onde, e per questa tal cagione e' pare tutto vn sole continuato nelli molti soli spechiati nelle molte onde, e le parti onbrose miste colle spetie luminose fan che tale splendore non è lucido come quel del sole in esse ōde spechiato.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "This diagram, of several spherical bodies interposed between the eye and the sun, is given to show that, just as the reflection of the sun is seen in each of these bodies, in the same way that image may be seen in each curve of the waves of the sea; and as in these many spheres many reflections of the sun are seen, so in many waves there are many images, each of which at a great distance is much magnified to the eye. And, as this happens with each wave, the spaces interposed between the waves are concealed; and, for this reason, it looks as though the many suns mirrored in the many waves were but one continuous sun; and the shadows, mixed up with the luminous images, render this radiance less brilliant than that of the sun mirrored in these waves.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Diese Darstellung so vieler kugelförmiger Körper zwischen dem Auge und der Sonne ist gemacht, um zu zeigen: So wie man in jedem dieser Körper das Abbild der Sonne sieht, so kann man dieses Abbild auch in jeder Wölbung der Meereswellen sehen. Wie man in vielen dieser Kugeln viele Sonnen sieht, so sieht man in vielen Wellen viele Glanzlichter, die in großer Entfernung, jedes für sich, dem Auge groß erscheinen. Und weil jede Welle es so macht, werden die Zwischenräume zwischen den Wellen aufgezehrt, und aus diesem Grund scheinen die vielen Sonnen, die sich in den vielen Wellen spiegeln, eine einzige zusammenhängende Sonne zu sein. Und die schattigen Teile, vermischt mit den leuchtenden Abbildern, bewirken, dass dieser Glanz nicht so hell ist wie der der Sonne, die sich in diesen Wellen spiegelt.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'si fanno grādi all'ochio': each light 'becomes large to the eye' (Richter: 'is much magnified')."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 146-147",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n259/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 146-147",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n259/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §895 (Br. M. 28a), vol. II p. 156",
+     "it": {
+      "text": "O la luna à lume da se o no; s'ell' à lume da se, perchè non risplende sanza l'aiuto del sole? e s'ella non à lume da se, neciessità la fa spechio sperico; e se ella è spechio, non è provato in prospettiua ¶che 'l simulacro d'uno obbietto luminoso nō sarà mai equale alla parte di quello specchio che da esso luminoso è alluminato?¶ e se così è, come mostra qui la figura in r s, dōde uiē tanta quantità di splendore che à il plenilunio, che noi vediamo nella quinta decima della luna?",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Either the moon has intrinsic luminosity or not. If it has, why does it not shine without the aid of the sun? But if it has not any light in itself it must of necessity be a spherical mirror; and if it is a mirror, is it not proved in Perspective that the image of a luminous object will never be equal to the extent of surface of the reflecting body that it illuminates? And if it be thus, as is here shown at r s in the figure, whence comes so great an extent of radiance as that of the full moon as we see it, at the fifteenth day of the moon?",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Entweder hat der Mond Licht aus sich selbst, oder nicht. Hat er Licht aus sich selbst, warum leuchtet er dann nicht ohne die Hilfe der Sonne? Und hat er kein Licht aus sich selbst, so macht ihn die Notwendigkeit zu einem kugelförmigen Spiegel. Und wenn er ein Spiegel ist, ist dann nicht in der Perspektive bewiesen, dass das Abbild eines leuchtenden Gegenstands nie so groß sein wird wie der Teil jenes Spiegels, den dieses Leuchtende beleuchtet? Und wenn es so ist, wie hier die Figur bei r s zeigt, woher kommt dann die große Menge an Glanz, die der Vollmond hat, den wir am fünfzehnten Tag des Mondes sehen?",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la quinta decima della luna': the fifteenth day of the moon's age, the full moon."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 156",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n269/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 156",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n269/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "F.118": {
+   "lead": 1,
+   "notes": "Richter prints two passages from F 56a in different chapters: §617 (on making a stiff white paper) in vol. I and §866 (the earth a star) in vol. II; kept in his numbering order.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §617 (F. 56a), vol. I p. 316-317",
+     "it": {
+      "text": "Molto fia bella la carta biāca fissa fatta di mistura e latte di gichero colato, e fatta tal carta e poi inumidita e piegata e avviluppata a caso e mista colla misstura e così lasciata seccare; Ma se la rōpi auāti ch'ella invmidisca accade a modo di lasagne, e poi inumidisci e avviluppa e poi metti in mistura e lascia seccare; ancora se tal carta sarà vestita di biāco fisso e trasparēte e sardonio, e poi sia inumidita accio non faccia angoli, e poi sia avviluppata intrāsparēte forte, e come l'è ferma, sega la grossa 2 dita, e lascia seccare; Ancora se fai cartone fisso di sardonio, e seccalo e poi lo metti infra 2 carte di papiro e lo rōpi dentro cō martel di legno, col pugno, poi apri cō diligenza tenēdo ferma per piano la carta di sotto acciochè li pezzi rotti nō si sconpagnino, poi abbi vna carta incollata calda, e appicca la sopra tutti essi pezzi, e lascia fermare, poi la uolta sotto sopra e da di transparēte più volte nello spatio, ch'è tra li pezzi versādo ogni volta, poi di nero e poi di bianco fisso, e così lascia ogni volta seccare, poi la spiana e pulisci.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Very excellent will be a stiff white paper, made of the usual mixture and filtered milk of an herb called calves foot; and when this paper is prepared and damped and folded and wrapped up it may be mixed with the mixture and thus left to dry; but if you break it before it is moistened it becomes somewhat like the thin paste called lasagne and you may then damp it and wrap it up and put it in the mixture and leave it to dry; or again this paper may be covered with stiff transparent white and sardonio and then damped so that it may not form angles and then covered up with strong transparent size and as soon as it is firm cut it two fingers, and leave it to dry; again you may make stiff cardboard of sardonio and dry it and then place it between two sheets of papyrus and break it inside with a wooden mallet with a handle and then open it with care holding the lower sheet of paper flat and firm so that the broken pieces be not separated; then have a sheet of paper covered with hot glue and apply it on the top of all these pieces and let them stick fast; then turn it upside down and apply transparent size several times in the spaces between the pieces, each time pouring in first some black and then some stiff white and each time leaving it to dry; then smoothe it and polish it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Sehr schön wird festes weißes Papier, gemacht aus der Mischung und aus durchgeseihter Milch von Gichero [?]. Ist ein solches Papier gemacht, dann befeuchtet, gefaltet und aufs Geratewohl zusammengerollt und mit der Mischung vermengt, so lässt man es trocknen. Brichst du es aber, bevor es feucht wird, so wird es wie Lasagne. Dann befeuchte es, rolle es zusammen, gib es in die Mischung und lass es trocknen. Und wenn dieses Papier mit festem, durchscheinendem Weiß und mit Sardonio [?] überzogen wird, dann befeuchtet, damit es keine Ecken bildet, und dann in starkes Durchscheinendes eingehüllt wird: Sobald es fest ist, schneide es zwei Finger dick und lass es trocknen. Oder mach festen Karton aus Sardonio, trockne ihn, lege ihn zwischen zwei Blätter Papyrus und brich ihn darin mit einem Holzhammer mit Griff. Dann öffne sorgfältig und halte das untere Blatt flach und fest, damit die zerbrochenen Stücke nicht auseinandergehen. Dann nimm ein Blatt, das heiß mit Leim bestrichen ist, klebe es über alle diese Stücke und lass es fest werden. Dann dreh es um und gib mehrmals Durchscheinendes in die Zwischenräume zwischen den Stücken, jedes Mal hineingießend, erst Schwarz und dann festes Weiß, und lass es jedes Mal trocknen. Dann glätte und poliere es.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'latte di gichero' is a plant name Richter renders 'an herb called calves foot' (probably arum, Italian gigaro); kept as 'Gichero' with [?].",
+       "'sardonio' is left untranslated, as Richter does; the material is not certain.",
+       "'trāsparēte' used as a noun (a transparent size or varnish) is rendered 'Durchscheinendes'; Richter: 'transparent size'.",
+       "'la grossa 2 dita' read as 'two fingers thick'; Richter: 'cut it two fingers'.",
+       "'col pugno' (with a grip, or with the fist) read with Richter as 'mit Griff'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 316-317",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n431/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 316-317",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n431/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §866 (F. 56a), vol. II p. 139; Herzfeld 1906 p. 59, XXIII",
+     "it": {
+      "text": "Tu nel tuo discorso ài a cōcludere la terra essere vna stella quasi simile alla luna, e la nobiltà del nostro mōdo;\nE così farai vn discorso delle grādezze di molte stelle, secōdo li autori.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "In your discourse you must prove that the earth is a star much like the moon, and the glory of our universe; and then you must treat of the size of various stars, according to the authors.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Du in deiner Rede hast zu schließen, daß die Erde ein Stern ist, so ähnlich wie der Mond — und so wirst du den Adel unserer Welt beweisen — und dann wirst du einen Diskurs über die Größe vieler Sterne machen, nach den Autoren.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 139",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n252/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 139",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n252/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 59",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n238/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR1.327": {
+   "lead": 0,
+   "notes": "Richter prints the page's whole text as one section (§896, 'Br. M. 94b', the Arundel manuscript's leaf 94 verso), 72 lines on pp. 157-159. It is split here where Herzfeld's two entries begin and end (XIII = ll. 1-23, XIV = ll. 43-64, both signed 'R. 896, Ms. Br. M. Fol. 94 v.'); the two stretches she leaves out have our German. The letters a, b, d, n, m refer to the page's diagram, which Richter reproduces.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §896 (Br. M. 94b), vol. II pp. 157-159, ll. 1-23; Herzfeld 1906 pp. 54-55, XIII",
+     "it": {
+      "text": "DELLA LUNA.\n\nLa luna non à lume da se, se nō quāto ne vede il sole tanto l'allumina, della qual luminosità tanto ne vediamo quāto è quella che vede noi; E la sua notte ricieve tanto di splēdore, quāto è quello che li prestano le nostre acque nel refletterli il simulacro del sole, che in tutte quelle che vedono il sole e la luna, si spechia; La pelle over superfitie dell'acqua, di che si cōpone il mare della luna e il mare della nostra terra, è senpre rugoso, o poco o assai, o più, o meno, e tale rugosità è cavsa di dilatare l'innumerabili simulacri del sole, che nei colli e cōcavità e lati e frōti delle innumerabili rughe si spechiano, cioè in tāti vari siti di ciascuna ruga quāto son vari li siti che ànno li ochi che le vedono, jl che accadere nō potrebbe, se la spera dell' acqua, che ī grā parte di se veste la luna fusse d'uniforme spericità, perchè allora il simulacro del sole sarebbe uno a ciascuno occhio, e la sua reflessione sarebbe particulare e senpre sarebbe splēdore sperico, come manifestamēte ci assegnano le palle dorate, poste nelle sommità delli alti edifiti; Ma se tali palle dorate fussino rugose o globulēti come son le more, frutti neri conposti di minute globosità rotonde, allora ciascuna delle parti d'essa globosità, vedute dal sole e dall'ochio, mostrerà a esso ochio il lustro gienerato dal simulacro d'esso sole, e così in ū medesimo corpo si uedrebbero molti minimi soli, li quali spesse sō le volte che per lunga distātia si uniscono e paiono cōtinuati;",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE MOON.\n\nThe moon has no light in itself; but so much of it as faces the sun is illuminated, and of that illumined portion we see so much as faces the earth. And the moon's night receives just as much light as is lent it by our waters as they reflect the image of the sun, which is mirrored in all those waters which are on the side towards the sun. The outside or surface of the waters forming the seas of the moon and of the seas of our globe is always ruffled little or much, or more or less—and this roughness causes an extension of the numberless images of the sun which are repeated in the ridges and hollows, the sides and fronts of the innumerable waves; that is to say in as many different spots on each wave as our eyes find different positions to view them from. This could not happen, if the aqueous sphere which covers a great part of the moon were uniformly spherical, for then the images of the sun would be one to each spectator, and its reflections would be separate and independent and its radiance would always appear circular; as is plainly to be seen in the gilt balls placed on the tops of high buildings. But if those gilt balls were rugged or composed of several little balls, like mulberries, which are a black fruit composed of minute round globules, then each portion of these little balls, when seen in the sun, would display to the eye the lustre resulting from the reflection of the sun, and thus, in one and the same body many tiny suns would be seen; and these often combine at a long distance and appear as one.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Vom Mond\n\nDer Mond hat kein Licht von sich, aber so viel, als die Sonne von ihm sieht, so viel erleuchtet sie, von welchem Leuchtenden wir so viel erblicken, als es von uns sieht. Und seine Nacht empfängt so viel Glanz, als ihm unsere Gewässer leihen, indem sie ihm das Abbild der Sonne zurückwerfen, die in allen jenen (Gewässern), so Sonne und Mond sehen, sich spiegelt. Die Haut oder besser Oberfläche des Wassers, aus dem sich das Meer des Mondes und das Meer unserer Erde zusammensetzt, ist immer gerunzelt, wenig oder viel oder mehr oder weniger, und diese Runzeln sind der Grund, die zahllosen Scheinbilder der Sonne auszudehnen, die auf den Hügeln und Erhabenheiten und Seiten und Fronten der unzähligen Runzeln sich spiegeln, das heißt, an so viel verschiedenen Plätzen jeder Runzel als die Plätze verschieden sind, so die Augen innehaben, welche sie sehen, was nicht geschehen könnte, wenn die Sphäre von Wasser, welche den Mond zum großen Teil umkleidet, von gleichförmiger Rundung wäre, weil dann das Scheinbild der Sonne eins wäre für jedes Auge, und seine Reflexion einzeln abgesondert und wäre immer kugeliger Glanz, wie es uns deutlich die vergoldeten Bälle anzeigen, die auf den Spitzen der hohen Gebäude sind. Aber wenn selbige goldenen Bälle runzelig wären und höckerig, wie es die Maulbeeren sind, schwarze Früchte, zusammengesetzt aus winzigen runden Kügelchen, dann würde jeder von den Teilen selbiger Kugeligkeit, von der Sonne gesehen und dem Auge, selbigem Auge den Glanz zeigen, so das Scheinbild der Sonne hervorgerufen, und so sähe man in ein und demselben Körper viele winzige Sonnen, bei denen häufig jene Male sind, wo sie wegen langer Entfernung sich vereinigen und verschmolzen erscheinen . . .",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 157",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n270/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 157",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n270/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "pp. 54-55",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n233/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §896 (Br. M. 94b), vol. II pp. 157-159, ll. 23-42",
+     "it": {
+      "text": "E 'l lustro della luna nuova è più lucido e più potēte che quādo è in plenilunio, e questo si cavsa perchè l'angolo della incidētia è molto più ottuso nella luna nuova che nella vecchia, doue tali angoli sono acutissimi; e l'onde della luna spechiano il sole così nelle lor ualli come nelli colli, e li lati restano oscuri ·; ma ne' lati della luna li fondi dell'onde non vedono il sole, ma solo uedono le cime d'esse ōde, e per questo li simulacri son più rari e più misti coll'onbre delle valli, e tal mistione delle spetie ōbrose e luminose, così insieme infuse, vengono all'ochio cō poco splēdore, e nelli stremi sarā piv oscure per essere la curuità de' lati di tale ōde insuffitiēte a riflettere all'ochio li ricievuti razzi; La luna nova per natura riflette li razzi solari più inverso l'ochio per tali ōde streme, che per nessuno altro loco, come mostra la figura della luna che percuōtēdo con razzi a nell'onda b riflette in b d, dou' è situato l'ochio d; E questo accadere nō può nel plenilunio dove il razzo solare, stando all'occidēte, percuote l'onde streme della luna all'oriēte dal n in m, e non riflette inverso l'occhio occidētale, ma risalta all'oriēte, poco piegādo la rettitudine d'esso razzo solare, e così l'angolo della incidētia è grossissimo.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The lustre of the new moon is brighter and stronger, than when the moon is full; and the reason of this is that the angle of incidence is more obtuse in the new than in the full moon, in which the angles [of incidence and reflection] are highly acute. The waves of the moon therefore mirror the sun in the hollows of the waves as well as on the ridges, and the sides remain in shadow. But at the sides of the moon the hollows of the waves do not catch the sunlight, but only their crests; and thus the images are fewer and more mixed up with the shadows in the hollows; and this intermingling of the shaded and illuminated spots comes to the eye with a mitigated splendour, so that the edges will be darker, because the curves of the sides of the waves are insufficient to reflect to the eye the rays that fall upon them. Now the new moon naturally reflects the solar rays more directly towards the eye from the crests of the waves than from any other part, as is shown by the form of the moon, whose rays a strike the waves b and are reflected in the line b d, the eye being situated at d. This cannot happen at the full moon, when the solar rays, being in the west, fall on the extreme waters of the moon to the East from n to m, and are not reflected to the eye in the West, but are thrown back eastwards, with but slight deflection from the straight course of the solar ray; and thus the angle of incidence is very wide indeed.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Und der Glanz des neuen Mondes ist heller und kräftiger als beim Vollmond, und das kommt daher, dass der Einfallswinkel beim neuen Mond viel stumpfer ist als beim alten, wo diese Winkel sehr spitz sind. Und die Wellen des Mondes spiegeln die Sonne in ihren Tälern ebenso wie auf ihren Hügeln, und die Seiten bleiben dunkel. An den Rändern des Mondes aber sehen die Gründe der Wellen die Sonne nicht, sondern nur die Kämme dieser Wellen, und darum sind die Abbilder seltener und stärker mit den Schatten der Täler vermischt. Und diese Mischung der schattigen und der leuchtenden Bilder, so ineinander gegossen, kommt mit wenig Glanz zum Auge, und an den Rändern werden sie dunkler sein, weil die Krümmung der Seiten dieser Wellen nicht ausreicht, die empfangenen Strahlen zum Auge zurückzuwerfen. Der neue Mond wirft die Sonnenstrahlen von Natur aus über diese äußersten Wellen stärker zum Auge hin als über irgendeine andere Stelle, wie die Figur des Mondes zeigt: Die Strahlen a treffen die Welle b und werden nach b d zurückgeworfen, wo das Auge d steht. Und das kann beim Vollmond nicht geschehen, wo der Sonnenstrahl, der im Westen steht, die äußersten Wellen des Mondes im Osten von n bis m trifft und nicht zum Auge im Westen zurückgeworfen wird, sondern nach Osten abprallt und die gerade Richtung dieses Sonnenstrahls nur wenig beugt. Und so ist der Einfallswinkel sehr groß.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'nella vecchia' (in the old moon): Richter's English says 'the full moon'; kept literal as 'beim alten'.",
+       "'la figura della luna che percuōtēdo con razzi a nell'onda b riflette in b d': the grammatical subject of 'percuōtēdo' is unclear; rendered, as Richter does, as the rays a striking the wave b.",
+       "'sarā piv oscure' (they will be darker): the plural refers back to the mixed images; rendered 'werden sie dunkler sein'.",
+       "'grossissimo': literally 'very large'; Richter: 'very wide indeed'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 157-158",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n270/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 157-158",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n271/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §896 (Br. M. 94b), vol. II pp. 157-159, ll. 43-64; Herzfeld 1906 pp. 55-56, XIV",
+     "it": {
+      "text": "La luna è corpo opaco e solido, e se per lo aversario ella fusse trāsparente, ella nō ricieverebbe il lume del sole.\n\nIl rossume over tuorlo dell'ovo sta in mezzo al suo albume sanza discēdere d'alcuna parte, ed è piv lieve o più grave o equale d'esso albume; e s'elli è più lieve egli doverebbe surgiere sopra tutto l'albume e fermarsi in cōtatto della scorza d'esso uovo, e s'elli è più grave doverebbe disciēdere, e s'egli è equale così potrebbe stare nell'v̄ delli stremi, come in mezzo o disotto;",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The moon is an opaque and solid body and if, on the contrary, it were transparent, it would not receive the light of the sun.\n\nThe yellow or yolk of an egg remains in the middle of the albumen, without moving on either side; now it is either lighter or heavier than this albumen, or equal to it; if it is lighter, it ought to rise above all the albumen and stop in contact with the shell of the egg; and if it is heavier, it ought to sink, and if it is equal, it might just as well be at one of the ends, as in the middle or below.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Mond ist ein undurchsichtiger und fester Körper, und wenn er, im Gegenteil, durchsichtig wäre, nähme er nicht das Licht der Sonne in Empfang.\n\nDas Gelbe oder Dotter des Eies befindet sich inmitten seines Eiweiß, ohne in irgendwelchen Teil hinabzusinken; und ist leichter oder schwerer oder gleich schwer wie selbiges Eiweiß; und wäre es leichter, so müßte es über alles Eiweiß aufsteigen und bei der Berührung mit der Schale selbigen Eies stehen bleiben, und wäre es schwerer, so müßte es sinken, und ist es gleich schwer, so könnte es an einem der Enden stehen, ebenso wie in der Mitte oder darunter.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 158-159",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n271/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 158-159",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n271/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "pp. 55-56",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n234/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 3,
+     "ref": "Richter 1883 §896 (Br. M. 94b), vol. II pp. 157-159, ll. 65-72",
+     "it": {
+      "text": "L'īnvmerabili simulacri che dalle innumerabili onde del mare reflettono li solari razzi, in esse onde percossi, son causa di rēdere cōtinuato e larghissimo splēdore sopra la superfitie del mare.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The innumerable images of the solar rays reflected from the innumerable waves of the sea, as they fall upon those waves, are what cause us to see the very broad and continuous radiance on the surface of the sea.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die unzähligen Abbilder, die die unzähligen Wellen des Meeres von den Sonnenstrahlen zurückwerfen, wenn diese auf die Wellen treffen, bewirken einen zusammenhängenden und sehr breiten Glanz auf der Oberfläche des Meeres.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 159",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n272/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 159",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n272/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "F.089": {
+   "lead": 0,
+   "notes": "",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §858 (F. 41b), vol. II p. 137; Herzfeld 1906 p. 59, XXII",
+     "it": {
+      "text": "Come la terra non è nel mezzo del cerchio del sole, nè nel mezzo del mōdo, ma è ben nel mezzo de' sua elemēti, conpagni e vniti cō lei, e chi stesse nella luna, quād'ella insieme col sole è sotto a noi, questa nostra terra coll'elemento dell'acqua parrebbe e farebbe ofitio tal qual fa la luna a noi.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The earth is not in the centre of the Sun's orbit nor at the centre of the universe, but in the centre of its companion elements, and united with them. And any one standing on the moon, when it and the sun are both beneath us, would see this our earth and the element of water upon it just as we see the moon, and the earth would light it as it lights us.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wie die Erde nicht inmitten des Sonnenkreises, noch im Mittelpunkt der Welt ist, aber wohl in der Mitte ihrer Elemente, die ihre Gefährten und mit ihr verbunden sind; und wer auf dem Mond stünde, — so sehr als dieser samt der Sonne unter uns ist, so würde diese unsere Erde mit dem Element des Wassers erscheinen und den gleichen Dienst tun, den der Mond uns tut.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 137",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n250/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 137",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n250/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 59",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n238/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR.186": {
+   "lead": 0,
+   "notes": "The opening shows two leaves: 155 verso (left, §1218) and 156 recto (right, §1217). Passages follow Richter's order. Richter's 'Br. M. 155b' and '156a' are the Arundel manuscript's leaves 155 verso and 156 recto; Herzfeld cites his numbers and signs the same folios.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1217 (Br. M. 156a), vol. II pp. 309-310; Herzfeld 1906 p. 85, LXIII",
+     "it": {
+      "text": "ESEMPLO DELLA SAETTA FRA NUVOLI.\n\n[O potente e già animato strumento dell'artificiosa natura, a te nō valēdo le tue grā forze ti cōuiene abbādonare la trāquilla vita e obbedire alla legie, che Iddio e 'l tēpo diede alla gienitrice natura.]\n\nO quāte volte furono vedute le īpavrite schiere de' delfini e de' grā tonni fugire dal inpia tua furia, e tu, che . . . fulminando gienerasti nel mare subita tēpesta con grā busse e sommersione di navili cō grāde ōdamēto, ēpiēdo gli scoperti liti degli īpavriti e sbigottiti pesci, togliēdosi a te per lasciato mare rimasi in loco divenivano soperchia e abbondante preda de' vicini popoli;\n\nO tēpo, velocie predatore delle create cose, quāti rè, quāti popoli ài tu disfatti, e quāte mutazioni di stati e vari casi sono seguite dopo che la maravigliosa forma di questo pescie qui morì per le caverne e ritorte interiora; ora disfatto dal tēpo patiēte giacci ī questo chiuso loco; colle spolpate e ignivde ossa ài fatto armadura e sostegnio al sopra posto mōte.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "EXAMPLE OF THE LIGHTNING IN CLOUDS.\n\n[O mighty and once living instrument of formative nature. Incapable of availing thyself of thy vast strength thou hast to abandon a life of stillness and to obey the law which God and time gave to procreative nature.]\n\nAh! how many a time the shoals of terrified dolphins and the huge tunny-fish were seen to flee before thy cruel fury, to escape; whilst thy fulminations raised in the sea a sudden tempest with buffeting and submersion of ships in the great waves; and filling the uncovered shores with the terrified and desperate fishes which fled from thee, and left by the sea, remained in spots where they became the abundant prey of the people in the neighbourhood.\n\nO time, swift robber of all created things, how many kings, how many nations hast thou undone, and how many changes of states and of various events have happened since the wondrous forms of this fish perished here in this cavernous and winding recess. Now destroyed by time thou liest patiently in this confined space with bones stripped and bare; serving as a support and prop for the superimposed mountain.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Beispiel des Blitzes aus den Wolken\n\nO mächtiges und einst belebtes Instrument der kunstreichen Natur, da dir selbst deine großen Kräfte nichts taugen, schickt es sich dir, das stille Dasein zu verlassen, und dem Gesetze zu gehorchen, welches Gott der schaffenden Natur gegeben und . . . (unverständlich).\n\nO wie viele Male sah man die erschreckten Scharen der Delphine und große Thunfische vor deiner ruchlosen Wut entfliehen, und du, so mit wechselnder Bewegung der Flügel, mit dem gegabelten Schwanz blitzschnell im Meere plötzliches Unwetter erzeugtest, mit großen Schlägen und mit Untertauchen von Schiffen, mit großem Gewoge, die bloßgelegten Gestade mit entsetzten und verwirrten Fischen füllend, die sich dir entrissen und durch das Verlassen der See an Ort und Stelle geblieben, übermäßige und reichliche Beute der benachbarten Völker wurden!\n\nO Zeit, schneller Erbeuter der geschaffenen Dinge, wie viele Könige, wie viele Völker hast du vernichtet, und wie viele Änderungen von Staaten und verschiedenen Umständen sind erfolgt, seit die wunderbare Form dieses Fisches in dem ausgehöhlten und verschlungenen Innern hier starb; von der Zeit zerstört, liegst du nun geduldig in diesem verschlossenen Ort; mit dem fleischentblößten und nackten Gerippe hast du die Armatur gebildet und die Stütze dem darüber ruhenden Berge.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 309-310",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n444/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 309-310",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n444/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 85",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n264/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1218 (Br. M. 155b), vol. II p. 310; Herzfeld 1906 p. 87, LXV",
+     "it": {
+      "text": "Rimase lo elemēto dell'acqua rīchiuso īfra li crescivti argini de' fiumi, e si vede 'l mare j̄fra la crescivta terra e la circundatricie aria, avēdo a fasciare e circonscrivere la moltificata machina della terra, e la sua grossezza, che staua fra l'acqua e lo elemēto del fuoco, rimāga molto ristretta e privata dalla bisogniosa acqua; i fivmi rimarrāno senza le loro acque, la fertile terra nō māderà piv leggieri frōde, nō fieno piv i cāpi adornití dalle ricascāti piāte; tutti li animali nō trovādo da pasciere le fresche erbe, morranno, e mācherà il cibo ai rapaci lioni e lupi e altri animali che vivono di ratto, e agli omini dopo molti ripari cōverrà abādonare la loro vita, e mācherà la gienerazione vmana; a questo modo la fertile e fruttuosa terra abandonata rimarrà arida e sterile e per rīchivso omore della acqua, rīchivsa nel suo ventre, e per la vivace natura osserverà alquāto dello suo accrescimēto, tāto che passata la fredda e sottile aria fia costretta a terminare collo elemēto del fuoco; allora la sua superfice rimarrà in riarsa cienere, e questo fia il termine della terrestre natura.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The watery element was left enclosed between the raised banks of the rivers, and the sea was seen between the uplifted earth and the surrounding air which has to envelope and enclose the complicated machine of the earth, and whose mass, standing between the water and the element of fire, remained much restricted and deprived of its indispensable moisture; the rivers will be deprived of their waters, the fruitful earth will put forth no more her light verdure; the fields will no more be decked with waving corn; all the animals, finding no fresh grass for pasture, will die and food will then be lacking to the lions and wolves and other beasts of prey, and to men who after many efforts will be compelled to abandon their life, and the human race will die out. In this way the fertile and fruitful earth will remain deserted, arid and sterile from the water being shut up in its interior, and from the activity of nature it will continue a little time to increase until the cold and subtle air being gone, it will be forced to end with the element of fire; and then its surface will be left burnt up to cinder and this will be the end of all terrestrial nature.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Es blieb das Element des Wassers innerhalb der emporgewachsenen Ufer der Flüsse eingeschlossen, und man sieht das Meer zwischen der aufgestiegenen Erde, und die umgebende Luft, welche die vermehrte (vergrößerte) Maschine der Erde einzuwickeln und zu umgrenzen hat, — ihre Dichtigkeit, die zwischen dem Wasser und dem Element des Feuers stand, wird sich dann wohl sehr vermindert haben und des notwendigen Wassers beraubt bleiben; die Flüsse werden ohne ihre Gewässer sein, die fruchtbare Erde wird nicht mehr leichtes Blattwerk hervorsenden, die Felder werden nicht mehr von überhängenden Bäumen geschmückt werden; alle Tiere, so nicht mehr frische Kräuter zu weiden fänden, werden sterben, und es wird die Speise fehlen den räuberischen Löwen und Wölfen und anderen Tieren, die von Beute leben; und den Menschen, nach vielen Aushilfsmitteln, wird es notwendig sein, ihr Leben zu verlassen und das menschliche Geschlecht wird nicht da sein. Auf diese Art wird die ergiebige und fruchtreiche Erde verlassen, dürr und unfruchtbar werden, und durch die eingeschlossene Feuchtigkeit des Wassers, das in ihrem Bauch versperrt, und durch die lebendige Natur wird sie noch ein wenig bei ihrem Wachstum verbleiben, bis die kalte und dünne Luft ganz vergangen und sie gezwungen ist, mit dem Element des Feuers zu enden: dann wird ihre Oberfläche zu verbrannter Asche werden, und dies wäre das Ende der irdischen Natur.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 310",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n445/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 310",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n445/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 87",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n266/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "F.016": {
+   "lead": 0,
+   "notes": "The passage breaks off at the foot of 5r ('e le ragi-') and continues on 4v (Richter §880, on Socrates and the worship of the sun). Both editions follow the manuscript here; the break is Leonardo's page turn.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §879 (F. 5a), vol. II p. 148; Herzfeld 1906 p. 48, I (the part on MS. F. FOL. 5 r.)",
+     "it": {
+      "text": "LAUDE DEL SOLE.\n\nSe guarderai le stelle sanza razzi (come si fa a vederle per un piccolo foro fatto colla strema pūta dalla sottile aguglia, e questo posto quasi a toccare l'ochio), tu uedrai esse stelle essere tanto minime che nulla cosa pare essere minore, e ueramēte la lūga distātia le fa ragionevolmente diminuire, ancorachè molte vi sono che son moltissime volte maggiori che la stella cioè la terra coll'acqua ·; ora pensa quel che parrebbe essa nostra stella in tāta distantia, e considera poi, quāte stelle si metterebbero e per longitudine e latitudine infra esse stelle, le quali sono seminate per esso spatio tenebroso; mai nō posso fare ch'io non biasimi molti di quelli antichi, li quali dissero che 'l sole non avea altra grādezza che quella che mostra, īfra quali fu Epicuro, e credo che cauasi tale ragione da vn lume posto in questa nostra aria, equidistāte al cētro; chi lo uede, non lo uede mai diminuito di grādezza in nessuna distātia; e le ragi-",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "IN PRAISE OF THE SUN.\n\nIf you look at the stars, cutting off the rays (as may be done by looking through a very small hole made with the extreme point of a very fine needle, placed so as almost to touch the eye), you will see those stars so minute that it would seem as though nothing could be smaller; it is in fact their great distance which is the reason of their diminution, for many of them are very many times larger than the star which is the earth with water. Now reflect what this our star must look like at such a distance, and then consider how many stars might be added—both in longitude and latitude—between those stars which are scattered over the darkened sky. But I cannot forbear to condemn many of the ancients, who said that the sun was no larger than it appears; among these was Epicurus, and I believe that he founded his reason on the effects of a light placed in our atmosphere equidistant from the centre of the earth. Any one looking at it never sees it diminished in size at whatever distance; and the rea-",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Lob der Sonne\n\nWenn du die Sterne anschaust, ohne Strahlen — wie man es tut, wenn man sie durch ein kleines Loch ansieht, das mit der äußersten Spitze der feinen Nadel gemacht ist und welches so gestellt ist, das es fast das Auge berührt, — wirst du selbige Sterne so winzig finden, daß keine Sache kleiner zu sein scheint: und wahrhaftig, die weite Entfernung leiht ihnen vernunftgemäße Verringerung, obschon es viele gibt, die vielmalig größer sind als jener Stern, so die Erde mit dem Wasser ist. Nun denke, was dieser unser Stern in solcher Entfernung scheinen müßte, und überlege dann, wie viele Sterne man sowohl in der Länge als in der Breite zwischen selbige Sterne legte, die im finstern Raum ausgesät sind. Aber ich bin außerstande, nicht zu tadeln viele von den Alten, welche sagen, daß die Sonne keine andere Größe habe als die, welche sie zeigt: unter denen Epikur war, und ich glaube, sie nahmen solchen Grund von einem Licht, das in diese unsre Luft gesetzt wäre, die in stets gleicher Entfernung vom Zentrum ist: wer es sieht, sieht es nie verkleinert an Größe, in keiner Entfernung, und die Gründe ihrer Größe und",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 148",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n261/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 148",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n261/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 48",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n227/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR3.29": {
+   "lead": 0,
+   "notes": "The only text on the leaf is the question about the bending timber, written beside the four small frames; it does not describe the mountain drawings the curator names, so no passage is the lead. FOR THE CURATOR: see passage 2; the stage-set reading is unconfirmed by the printed edition. Page match: the SET image is this edition's plate of fol. 224 recto (p0029 of the same scan), and the diplomatic page facing it is headed 'Fol. 224 recto'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Codice Arundel 263, part 3 (1928), fol. 224 recto, trascrizione critica, passage 1 of 2",
+     "it": {
+      "text": "S'egli è possibile che 'l legnio a b c, essendo superato dal peso n, si possi piegare per altra linia, che per quella che è figurata, cioè a destra, o a sinistra, o innanti, o indirieto.\nProvasi di no, se già e' non fussi più debole per quel verso (1).",
+      "label": {
+       "en": "Transcription: the printed Arundel edition, 1923",
+       "de": "Umschrift: die gedruckte Arundel-Ausgabe, 1923"
+      }
+     },
+     "en": {
+      "text": "Whether it is possible that the timber a b c, when overcome by the weight n, may bend along another line than the one drawn, that is, to the right, or to the left, or forwards, or backwards.\nIt is proved not, unless it were weaker in that direction.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of the printed Arundel edition, 1923. It may contain errors.",
+      "doubts": [
+       "'legnio' (wood, timber) is the beam a b c of the small frame drawings; the weight n hangs from its end in the last of them.",
+       "The edition's footnote (1) is not about this sentence: it says that on the next leaf, 225 recto, Leonardo wrote a few lines in chalk that have almost vanished. The marker is kept in the Italian and left out of the translations."
+      ]
+     },
+     "de": {
+      "text": "Ob es möglich ist, dass sich das Holz a b c, wenn es vom Gewicht n überwältigt wird, nach einer anderen Linie biegt als nach der gezeichneten, also nach rechts, nach links, nach vorn oder nach hinten.\nMan beweist: nein, es sei denn, es wäre nach jener Seite schwächer.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von die gedruckte Arundel-Ausgabe, 1923 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'legnio' (wood, timber) is the beam a b c of the small frame drawings; the weight n hangs from its end in the last of them.",
+       "The edition's footnote (1) is not about this sentence: it says that on the next leaf, 225 recto, Leonardo wrote a few lines in chalk that have almost vanished. The marker is kept in the Italian and left out of the translations."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "I manoscritti e i disegni di Leonardo da Vinci, pubblicati dalla Reale Commissione Vinciana, vol. I: Il Codice Arundel 263 nel Museo Britannico. Riproduzione fototipica con trascrizioni diplomatica e critica. Parte terza (da fol. 221 a fol. 283), Roma: Danesi, 1928",
+       "page": "Parte terza, trascrizione critica, p. 259* (margin: f. 224 r); archive.org viewer page n225",
+       "url": "https://archive.org/details/pbc.gda.pl.503231_01_03_01_1928_10290/page/n225/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Codice Arundel 263, part 3 (1928), fol. 224 recto: the drawings without words",
+     "missing": true,
+     "note": "The mountain landscape and the mountain opened round a domed hall at the foot of the leaf carry no words in the edition's diplomatic or critical transcription, and the edition prints no note on them. The curator's guess that they are a stage set is not supported by this printed page; if it is to be shown, it needs a printed scholarly source, not memory."
+    }
+   ]
+  },
+  "F.195": {
+   "lead": 0,
+   "notes": "The '2 . . . .' where the thought breaks off is printed so by Richter (and '. . .' by Herzfeld): Leonardo left the sentence unfinished.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §874 (F. 94b), vol. II p. 144; Herzfeld 1906 p. 58-59, XXI",
+     "it": {
+      "text": "Il libro mio s'astēde a mostrare, come l'oceā colli altri mari fa mediāte il sole splēdere il nostro mōdo a modo di luna e a più remoti pare stella e questo provo;\n\nDimostra prima come ogni lume remoto dall'ochio fa razzi, li quali pare che accrescino la figura di tal corpo luminoso e di questo ne seguita che 2 . . . .\n\nLuna frigida e vmida.\nL'acqua è frigida e vmida; tale influētia da il nostro mare alla luna qual la luna a noi.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "In my book I propose to show, how the ocean and the other seas must, by means of the sun, make our world shine with the appearance of a moon, and to the remoter worlds it looks like a star; and this I shall prove.\n\nShow, first that every light at a distance from the eye throws out rays which appear to increase the size of the luminous body; and from this it follows that 2 . .\n\nThe moon is cold and moist. Water is cold and moist. Thus our seas must appear to the moon as the moon does to us.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Mein Buch strebt zu zeigen, wie der Ozean mit den andern Meeren vermittels der Sonne unsere Welt gleich dem Monde leuchten macht, und daß sie den Entfernten ein Stern scheint, und dies beweise ich.\n\nZeige erst, wie jedes Licht, vom Auge entfernt, Strahlen macht, welche scheinbar die Figur solchen leuchtenden Körpers vergrößern, und daraus folgt, daß . . .\n\n(Auf dem Rand.) Der Mond, kalt und feucht. Das Wasser ist kalt und feucht. Solchen Einfluß hat unser Meer auf den Mond, wie der Mond auf uns.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 144",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n257/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 144",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n257/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 58-59",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n237/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR1.95": {
+   "lead": 0,
+   "notes": "Richter's 'Br. M. 19a' is the Arundel manuscript's leaf 19 recto; Herzfeld cites his number and signs 'Fol. 19 r.'. Same text in both editions.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §906 (Br. M. 19a), vol. II p. 167; Herzfeld 1906 p. 57, XVI",
+     "it": {
+      "text": "Se terrai osseruate le particule delle machie della luna, tu troverai in quelle spesse uolte gran varietà, e di questo ò fatto pruova io · medesimo disegnādole; E questo nasce da nuvoli che si leuano dall'acque d'essa luna, li quali s'interpongono infra 'l sole e essa acqua, e colla loro onbra tolgono i razzi del sole a tale acqua, onde essa acqua viene a rimanere oscura, per non potere spechiare il corpo solare.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "If you keep the details of the spots of the moon under observation you will often find great variation in them, and this I myself have proved by drawing them. And this is caused by the clouds that rise from the waters in the moon, which come between the sun and those waters, and by their shadow deprive these waters of the sun's rays. Thus those waters remain dark, not being able to reflect the solar body.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wenn du die Einzelheiten der Flecken des Mondes unter Beobachtung hältst, wirst du in ihnen oftmals großen Unterschied finden, und davon habe ich selbst Proben gemacht, indem ich sie zeichnete. Und dies kommt von Wolken, die sich aus den Wassern dieses Mondes heben, so sich zwischen die Sonne und selbige Wasser schieben und mit ihrem Schatten die Strahlen der Sonne solchem Wasser rauben, wodurch jenes Wasser dazu kommt, dunkel zu bleiben, weil es den Sonnenkörper nicht spiegeln kann.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 167",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n280/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 167",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n280/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 57",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n236/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "TR.49": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this page. His margin reads 'Tr. 12', his Reference Table 'T. 12' (Beltrami 1891's page 12, Tavola 10). The heading in small caps is Leonardo's. Richter prints the little drawing (sun, a disc, the pierced sheet, the eye) between the columns; it is not text.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §891 (Tr. 12), vol. II p. 153",
+     "it": {
+      "text": "MODO DI VEDERE · IL SOLE ECLISSATO SANZA · PASSIONE · DELL'OCHIO.\n\nTolli · vna carta · e falle busi con una agucchia, e per essi busi · riguarda · il sole.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A METHOD OF SEEING THE SUN ECLIPSED WITHOUT PAIN TO THE EYE.\n\nTake a piece of paper and pierce holes in it with a needle, and look at the sun through these holes.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "WIE MAN DIE VERFINSTERTE SONNE SIEHT, OHNE DASS DAS AUGE LEIDET.\n\nNimm ein Blatt Papier, stich mit einer Nadel Löcher hinein und schau durch diese Löcher auf die Sonne.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sanza passione dell'ochio': literally 'without suffering of the eye'; Richter renders 'without pain to the eye'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 153",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n266/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 153",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n266/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
 }

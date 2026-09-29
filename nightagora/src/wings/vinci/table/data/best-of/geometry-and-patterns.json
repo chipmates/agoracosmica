@@ -3,7 +3,7 @@
  "pages": {
   "H.128": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): '[PALMETTES ET ENTRELACS. — EAU ET AIR]'. Ravaisson notes that the writing runs upside down ('[Sens dessus dessous :]') relative to the four red chalk rosettes. The sentence is about water and air, not about the rosettes, so no passage is the lead. Ravaisson's '[11]' is the second part's own leaf number; 59 is the current foliation. Page match checked: his phototype plate (archive.org viewer n74) shows the same rosettes and three lines of writing as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -18,12 +18,18 @@
      "en": {
       "text": "That thing which has a greater share of itself in the air than in the water will move with the course of the air.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'aradise' is read as 'arà di sé' (will have of itself), as in Ravaisson's French ('aura ... de soi'). 'magiore somma' is literally 'a greater sum'; it is rendered as a greater share of itself, meaning a body that stands more in the air than in the water."
+      ]
      },
      "de": {
       "text": "Ein Ding, das einen größeren Teil seiner selbst in der Luft hat als im Wasser, wird sich mit dem Lauf der Luft bewegen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'aradise' is read as 'arà di sé' (will have of itself), as in Ravaisson's French ('aura ... de soi'). 'magiore somma' is literally 'a greater sum'; it is rendered as a greater share of itself, meaning a body that stands more in the air than in the water."
+      ]
      },
      "fr": {
       "text": "La chose qui aura une plus grande somme de soi dans l'air que dans l'eau se mouvra avec le cours de l'air."

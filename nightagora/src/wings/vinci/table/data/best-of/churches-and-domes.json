@@ -3,7 +3,7 @@
  "pages": {
   "B.042": {
    "lead": 5,
-   "notes": null,
+   "notes": "Heading (the editor's): 'TAILLE D'ARBRES, ARCHITECTURE'. The page's text is mostly about trees and timber; only the last line concerns the churches the curator chose, so it is the lead. 'anello' is printed with a broken final letter on the Polona copy; the OCR's 'chelia' is 'chefia' on the scan. The French 'vivace..' has two dots as printed.",
    "passages": [
     {
      "index": 0,
@@ -92,12 +92,20 @@
      "en": {
       "text": "From the tree c you will get only one good lance that will never bend, and it will be taken from the part that faces north; and all the others will warp because of the humours, which always move with the sun.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The struck-out 'nv' (italics in the edition) is left out.",
+       "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
+      ]
      },
      "de": {
       "text": "Aus dem Baum c gewinnst du nur eine gute Lanze, die sich nie biegen wird, und sie wird aus dem Teil genommen, der nach Norden gewandt ist; alle anderen werden sich verziehen wegen der Säfte, die sich immer mit der Sonne bewegen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The struck-out 'nv' (italics in the edition) is left out.",
+       "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
+      ]
      },
      "fr": {
       "text": "— De l'arbre c, tu ne tireras qu'une bonne lance qui ne se ploiera jamais; elle se tirera de la partie qui est tournée au nord. Toutes les autres se tordront, par les humeurs qui se meuvent toujours avec le soleil."
@@ -129,12 +137,20 @@
      "en": {
       "text": "If you take a ring of bark off the tree d, it will dry out from the ring upward and stay alive from there downward. And if you make the said ring at a bad moon and then cut the plant at the foot at a good moon, what belongs to the good moon will keep and the rest will spoil.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'pelle' (skin) is the bark.",
+       "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
+      ]
      },
      "de": {
       "text": "Wenn du dem Baum d einen Ring Rinde abnimmst, vertrocknet er vom Ring aufwärts und bleibt von dort abwärts lebendig. Und wenn du diesen Ring bei schlechtem Mond machst und dann die Pflanze am Fuß bei gutem Mond fällst, hält sich, was zum guten Mond gehört, und der Rest verdirbt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'pelle' (skin) is the bark.",
+       "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
+      ]
      },
      "fr": {
       "text": "— Si tu enlèves un anneau d'écorce à l'arbre d, il se séchera au-dessus de l'anneau et tout au-dessous restera vivace.. Si tu fais ledit anneau à mauvaise lune, et puis que tu tailles la plante au pied à bonne lune, ce qui est de la bonne lune se conservera et le reste se gâtera."
@@ -203,12 +219,18 @@
      "en": {
       "text": "It would also be good to build this edifice from the line a b c d upward.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
+      ]
      },
      "de": {
       "text": "Auch wäre es gut, dieses Gebäude von der Linie a b c d an aufwärts zu bauen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
+      ]
      },
      "fr": {
       "text": "— Pour cet édifice, il serait encore bien de l'élever selon la ligne a b c d."
@@ -231,7 +253,7 @@
   },
   "AshB.035": {
    "lead": 1,
-   "notes": null,
+   "notes": "Placement confirmed twice: Richter's Bibliography (vol. II p. 485, Ash. II) lists '8b Pl. XCI, No. 2, 754', and Ravaisson vol. VI prints the passage under Ms 2037 'FOLIO 5 (verso)' with the footnote 'J.-P. Richter, t. II, no 754 (8b), et pl. XCI, no 2'. Richter's 'Ash. II. 8b' is his count; the modern folio is 5 verso. Richter's footnotes: 'This text is written by the side of the plan given on Pl. XCI. No. 2.' and, on Chiaravalle: 'The Abbey of Chiaravalle, a few miles from Milan, has a central tower on the intersection of the cross in the style of that of the Certosa of Pavia, but the style is mediaeval (A. D. 1330). Leonardo seems here to mean, that in a building, in which the circular form is strongly conspicuous, the campanile must either be separated, or rise from the centre of the building and therefore take the form of a lantern.' Passage 2 is Ravaisson's reading of the short line above the passage, which Richter does not print; it names the eight domes of the drawing. Both are given in the manuscript's order (Ravaisson prints the line above the passage). The curator's reason names the drawing, not a passage; lead 1 points to Richter's passage, the page's main text with printed English.",
    "passages": [
     {
      "index": 0,
@@ -246,12 +268,20 @@
      "en": {
       "text": "This is how the 8 domes of the neighbouring temple should stand.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'tiburi': a tiburio is the tower or lantern dome over a crossing; Ravaisson renders 'dômes'.",
+       "'vissino' read as 'vicino' (near, neighbouring), as Ravaisson reads it ('voisin')."
+      ]
      },
      "de": {
       "text": "So sollen die 8 Kuppeln des benachbarten Tempels stehen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'tiburi': a tiburio is the tower or lantern dome over a crossing; Ravaisson renders 'dômes'.",
+       "'vissino' read as 'vicino' (near, neighbouring), as Ravaisson reads it ('voisin')."
+      ]
      },
      "fr": {
       "text": "Ainsi doivent se trouver les 8 dômes du temple voisin."
@@ -288,7 +318,10 @@
      "de": {
       "text": "Hier kann und soll kein Glockenturm gebaut werden. Er muss vielmehr getrennt stehen, wie beim Dom und bei San Giovanni in Florenz, und ebenso beim Dom von Pisa, wo der Glockenturm für sich steht, rundum frei, und ebenso der Dom, und jedes kann für sich seine Vollkommenheit zeigen. Und wer ihn dennoch mit der Kirche verbinden will, der lasse die Laterne als Glockenturm dienen, wie bei der Kirche von Chiaravalle.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'faccia la lāterna scusare cāpanile': 'scusare' in the sense of standing in for something; read as 'let the lantern serve as the campanile', as Richter does."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -309,13 +342,13 @@
   },
   "AshB.032": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed twice: Richter's Bibliography (vol. II p. 485, Ash. II) lists '7a 756, Pl. XCI, No. 1', and Ravaisson vol. VI prints the passage under Ms 2037 'FOLIO 4 (recto)' with the footnote 'J.-P. Richter, t. II, no 756 (7a), et pl. XCI, no 1'. Richter's 'Ash. II. 7a' is his count; the modern folio is 4 recto. Richter's footnote: 'The church of San Sepolcro at Milan, founded in 1030 and repeatedly rebuilt after the middle of the XVIth century, still stands over the crypt of the original structure.' His commentary: 'Above the plan on the same sheet is a view of the exterior. By the aid of these two figures and the description, sections of the edifice may easily be reconstructed. But the section drawn on the left side of the building seems not to be in keeping with the same plan, notwithstanding the explanatory note written underneath it', which is passage 2. Ravaisson notes that this leaf was folio 94 recto of Paris B. The curator's reason names the drawing; lead 0 is the main passage.",
    "passages": [
     {
      "index": 0,
      "ref": "Richter 1883 §756 (Ash. II. 7a), vol. II pp. 50-51",
      "it": {
-      "text": "Questo edifitio è abitato di sotto · e di sopra come · è san Sepulcro, ed è sopra come sotto, saluo che 'l di sopra · al tiburio · c · d · e'l di sotto al tiburio a · b · e quādo entri nella chiesa di sotto, tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini, che a 1/3 l'uno fāno 10 braccia, e questo è lo spatio ch'è īnfra i piani dell'una e l'altra chiesa.",
+      "text": "Questo edifitio è abitato di sotto · e di sopra come · è san Sepulcro, ed è sopra come sotto, saluo che 'l di sopra · al tiburio · c · d · e'l di sotto al tiburio a · b · e quādo entri nella chiesa di sotto, tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini, che a 1/3 l'uno fāno 10 braccia, e questo è lo spatio ch'è in̄fra i piani dell'una e l'altra chiesa.",
       "label": {
        "en": "Transcription: Jean Paul Richter, 1883",
        "de": "Umschrift: Jean Paul Richter, 1883"
@@ -329,7 +362,12 @@
      "de": {
       "text": "Dieses Gebäude ist unten und oben bewohnt, wie San Sepolcro, und es ist oben wie unten, nur dass das obere die Kuppel c d hat und das untere die Kuppel a b. Und wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf, die zu je 1/3 Elle 10 Ellen ergeben. Und das ist der Abstand zwischen den Böden der einen und der anderen Kirche.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'abitato': literally 'inhabited'; kept as 'bewohnt'. Richter adds the gloss '[accessible]', which is his and not in the Italian.",
+       "'al tiburio': the tiburio is the dome or lantern tower over the centre; rendered 'Kuppel', as Richter renders 'dome'.",
+       "'che a 1/3 l'uno fāno 10 braccia': the 30 steps together, at a third of a braccio each, make 10 braccia; braccio rendered 'Elle', the usual German for the old measure."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -364,7 +402,10 @@
      "de": {
       "text": "Innen das obere Gebäude",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "A label of three words under the section drawing; 'dentro' read as 'inside'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -383,9 +424,60 @@
     }
    ]
   },
+  "AshB.031": {
+   "lead": 0,
+   "notes": "FOLIO CORRECTION: the SET row gives 3 recto; the page is Ms 2037 (now Institut Ms 2184) fol. 3 verso (see folio_check). Heading (the editor's): '[ARCHITECTURE D'ÉGLISES]'. The only writing is a note on the small capital at the lower left; the church drawings carry no words, so no passage is the lead. Ravaisson's note 1: J.-P. Richter, vol. II, p. 74, lines 1 and 2 ('6b'), pl. LXXXV no. 6, and the third figure on the left, vol. II, p. 45, fig. 3. Richter cites the leaf as 'MS. Ash. II 6b' (his numbering of this manuscript), prints the Italian as 'I chorni del capitelo deono essere la quarta parte d'uno quadro' and glosses it in English; that gloss is a printed English for this line and may serve instead of ours.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 3v, block 1 of 1",
+     "it": {
+      "text": "ichorni del capite lo. deono essere la quarta parte duno. quadro",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "The horns of the capital must be the fourth part of a square.",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'chorni' (corni, horns) are the corners of the capital, the projecting tips of the abacus; Ravaisson: 'coins'. English keeps 'horns', the architects' word; German uses 'Ecken'.",
+       "The printed line breaks 'capite / lo' (capitello) as the manuscript does; joined in the translations."
+      ]
+     },
+     "de": {
+      "text": "Die Ecken des Kapitells müssen der vierte Teil eines Quadrats sein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'chorni' (corni, horns) are the corners of the capital, the projecting tips of the abacus; Ravaisson: 'coins'. English keeps 'horns', the architects' word; German uses 'Ecken'.",
+       "The printed line breaks 'capite / lo' (capitello) as the manuscript does; joined in the translations."
+      ]
+     },
+     "fr": {
+      "text": "Les coins du chapiteau doivent être la quatrième partie d'un carré."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), transcription (under the heading [ARCHITECTURE D'ÉGLISES]); archive.org viewer page n307",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 3 (verso), French translation (below the Italian); archive.org viewer page n307",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n307/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "B.055": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '24a Pl. XCVI, No. 2, 757', his only passage from this side. Richter introduces it: 'On the left is a view of the exterior of the preceding plan. It is accompanied by the following note' (Pl. XCVI No. 2). Ravaisson vol. II prints the same passage under 'FOLIO 24 (recto)' and two more notes on the side, on scythes for ships ('la falce sia lunga braccia 8 ... siano tratte da 2 cortaldi', 'questa si debe trare alle chorde delle navi ...'; Polona scan 100, i.e. archive.org lesmanuscritsdel02lo leaf n102 by the facts-0929 rule; OCR not proofread here). Richter prints neither; they are not in this record. Ravaisson's footnote says the top of this page was reproduced in facsimile by Geymüller (Les projets primitifs, pl. 43, fig. 2). The curator's reason names the drawing; lead 0.",
    "passages": [
     {
      "index": 0,
@@ -405,7 +497,12 @@
      "de": {
       "text": "Dieses Gebäude ist oben und unten bewohnt. Nach oben geht man über die Glockentürme, und man steigt hinauf über die Plattform, auf der die 4 Kuppeln gegründet sind, und diese Plattform hat vorn eine Brüstung. Und keine dieser Kuppeln öffnet sich zur Kirche, vielmehr sind sie ganz getrennt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'abitato': literally 'inhabited', kept as 'bewohnt' (in use on both levels).",
+       "'tiburi': the tiburio is the dome or its drum over a centre; rendered 'Kuppeln'. Richter: 'the drums of the four domes'.",
+       "'nessuno ne riesce in chiesa': literally 'none comes out into the church'; read as none opening into the church (Richter: 'none of these domes communicate with the church')."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -424,9 +521,60 @@
     }
    ]
   },
+  "AshB.034": {
+   "lead": 0,
+   "notes": "Heading (the editor's): '[POUR PRÊCHER]'. His notes: (1) the leaf was folio 92 [?] recto of Ms B; under the figures, a few lines in stylus; (2) J.-P. Richter, vol. II, pp. 55, 56, fig. 2, 57, figures 3 and 4 ('8a'). FOR THE CURATOR: Leonardo's own label calls the building a 'place where one preaches', not a tomb; Richter describes it as 'a most singular plan for a building', a theatre for preaching with the pulpit on a column at the centre. The curator's reason ('a great tomb in perspective') should be corrected before the words go up. Richter's glosses are a printed English for these two labels and may serve instead of ours. Page match checked: Ravaisson's phototype plate of 5 recto (archive.org viewer n314) shows the same leaf as the SET image (it reads 5 in the corner).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. VI (1891), Ms 2037 (Ashburnham, B complement) fol. 5r, block 1 of 1",
+     "it": {
+      "text": "[1re fig. :] locho. dove sipredicha\n[3e fig. :] fondamento",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "[First figure:] Place where one preaches.\n[Third figure:] Foundation",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
+       "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
+      ]
+     },
+     "de": {
+      "text": "[Erste Figur:] Ort, an dem gepredigt wird.\n[Dritte Figur:] Grundriss",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
+       "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
+      ]
+     },
+     "fr": {
+      "text": "[1re fig. :] Lieu où on prêche.\n[3e fig. :] Fondement."
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), transcription (under the heading [POUR PRÊCHER]); archive.org viewer page n313",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. VI]: Manuscrits H de la Bibliothèque de l'Institut, Ash. 2038 et 2037 de la Bibliothèque nationale, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, suivis d'un appendice, Paris: Maison Quantin, 1891",
+       "page": "Ms 2037 (Ashburnham, B complement), FOLIO 5 (recto), French translation (below the Italian); archive.org viewer page n313",
+       "url": "https://archive.org/details/lesmanuscritsdel06lo/page/n313/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "B.044": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed: Richter's Bibliography (vol. II p. 485, MS. B) lists '18b Pl. LXXXVII, No. 2, 755, Fo', his only passage from this side. Richter's footnote: 'This text is to the left of the domed church reproduced on Pl. LXXXVII, No. 2.' Ravaisson vol. II prints this side as 'FOLIO 18 (verso)' with more notes that Richter does not print: the night watch of fortresses ('leguardie delle roche si debon fare notte per notte ...'), the centre of a hanging weight ('il cientro di ciascuno peso sospeso si stabilisce sotto il suo sostentaculo'), a fortress that sweeps the ditches, and a fortress with three gates and a portcullis (Polona scan 78, i.e. archive.org lesmanuscritsdel02lo leaf n80 by the facts-0929 rule; OCR not proofread here). They are not in this record. The curator's reason names the drawing; lead 0.",
    "passages": [
     {
      "index": 0,
@@ -446,7 +594,11 @@
      "de": {
       "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht. Vielmehr soll das Dach eingeebnet sein, und das Wasser soll durch Rinnen zu den Leitungen hinablaufen, die im Fries angelegt sind.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sia rappianato': the subject is not stated; read as the roof, as Richter reads it ('they should rather be flat').",
+       "'fregiō': Richter prints a macron over the final o; Ravaisson reads the manuscript as 'fregiona'. Neither changes the sense 'frieze'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -467,7 +619,7 @@
   },
   "B.051": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): 'ARCHITECTURE — MÉCANIQUE'. The page's text is about a machine with a box, levers and screws that is heated; nothing in it refers to the domed church the curator chose, so 'lead' is null. Italian and French Errata applied. A mark before the second block's dash on the Polona copy is not a letter.",
    "passages": [
     {
      "index": 0,
@@ -482,12 +634,22 @@
      "en": {
       "text": "The moving of m between s and n is done because, if g touched h, the box would touch the wall and the lever m could not stay inside; and I conclude that the angle [of the box] under g should touch the 2 faces of g that are turned towards it. And do not move it unless the box looks somewhat red-hot.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
+       "'[della cassa]' is the editor's insertion, kept in brackets.",
+       "What the box and the heat are for is not said on this page."
+      ]
      },
      "de": {
       "text": "Das Versetzen von m zwischen s und n geschieht, weil der Kasten, wenn g an h stieße, an die Mauer stoßen würde und der Hebel m nicht darin bleiben könnte; und ich schließe, dass die Ecke [des Kastens] unter g die 2 Seiten von g berühren soll, die ihr zugewandt sind. Und bewege ihn nicht, solange der Kasten nicht etwas glühend aussieht.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
+       "'[della cassa]' is the editor's insertion, kept in brackets.",
+       "What the box and the heat are for is not said on this page."
+      ]
      },
      "fr": {
       "text": "— La transmission de m en s n se fait, parce que quand [si] g touchait h, la caisse toucherait le mur et le levier m ne pourrait rester dedans; je conclus que l'angle (de la caisse) sous g touche les 2 faces [côtés] de g qui sont tournées vers lui, et il n'y aura pas de déplacement si la caisse n'en apparaît pas un peu embrasée."
@@ -519,12 +681,26 @@
      "en": {
       "text": "Make the lever m m a female with its son in its body; and when the other female n has moved as far from its companion as the female m is thick, detach the whole instrument and take out the female lever m, then remove the female n and put m in the space that will have been made between n and s, then put n back in its place, and use the female lever as you please. a is an iron that stands between the mould and the iron, so that b heats better; and when you do this work, take it apart [?].",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
+       "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
+       "'dismonta' may mean 'take it apart' or 'get down'; Ravaisson marks 'démonte [?]'.",
+       "Struck-out words printed in italics ('e in e trai', 'me e') are left out.",
+       "'forma' (mould or form) is not explained; Ravaisson marks 'la forme [?]'."
+      ]
      },
      "de": {
       "text": "Mache den Hebel m m zu einer Mutter mit ihrem Sohn im Leib; und wenn sich die andere Mutter n so weit von ihrer Gefährtin entfernt hat, wie die Mutter m dick ist, dann löse das ganze Instrument, zieh den Mutterhebel m heraus, nimm dann die Mutter n weg und setze m in den Raum, der zwischen n und s entstanden ist; dann setze n wieder an seinen Platz und gebrauche den Mutterhebel nach deinem Belieben. a ist ein Eisen, das zwischen der Form und dem Eisen steht, damit sich b besser erhitzt; und wenn du diese Arbeit machst, nimm es auseinander [?].",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
+       "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
+       "'dismonta' may mean 'take it apart' or 'get down'; Ravaisson marks 'démonte [?]'.",
+       "Struck-out words printed in italics ('e in e trai', 'me e') are left out.",
+       "'forma' (mould or form) is not explained; Ravaisson marks 'la forme [?]'."
+      ]
      },
      "fr": {
       "text": "— Fais que le levier m m soit femme avec son fils dans le corps; quand l'autre femme n s'est autant éloignée de sa compagne qu'est grosse la femme m, tu détaches tout l'instrument et tires au dehors le levier femme m, puis tu enlèves la femme n et tu mets m dans l'espace qui sera fait entre n et s et puis tu remets n à sa place, et tu emploies le levier femme à ta guise — a est un fer qui se trouve entre la forme [?] et le fer, afin que b s'échauffe mieux, et quand tu fais cet office [cette opération], démonte [?]."
@@ -547,7 +723,7 @@
   },
   "B.120": {
    "lead": 1,
-   "notes": null,
+   "notes": "Heading (the editor's): 'ARCHITECTURE D'ÉGLISE'. Italian Errata applied. The note asks for 12 faces and 12 tabernacles, while the curator's reason describes a plan with eight lobed chapels; the note may belong to the small round temple (Ravaisson places a b at the top of the last figure). A broken letter in 'tabernaculi' on the Polona copy is read from the context.",
    "passages": [
     {
      "index": 0,
@@ -562,12 +738,18 @@
      "en": {
       "text": "a b",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Letters of the drawing; Ravaisson's footnote puts them at the top of the last figure."
+      ]
      },
      "de": {
       "text": "a b",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Letters of the drawing; Ravaisson's footnote puts them at the top of the last figure."
+      ]
      },
      "fr": {
       "text": "— a b. —"
@@ -599,12 +781,20 @@
      "en": {
       "text": "This one should have 12 faces, with 12 tabernacles, like a b.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Errata applied: line 2, 'come' is to be read 'come. a. b.' (Errata du manuscrit B, p. 7).",
+       "'tabernaculi' are small shrines or chapels; Ravaisson glosses '[chapelles à coupoles]' (domed chapels)."
+      ]
      },
      "de": {
       "text": "Dieser soll 12 Seiten haben, mit 12 Tabernakeln, wie a b.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Errata applied: line 2, 'come' is to be read 'come. a. b.' (Errata du manuscrit B, p. 7).",
+       "'tabernaculi' are small shrines or chapels; Ravaisson glosses '[chapelles à coupoles]' (domed chapels)."
+      ]
      },
      "fr": {
       "text": "— Ceci veut avoir 12 façades, avec 12 tabernacles [chapelles à coupoles], comme a b."

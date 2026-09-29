@@ -3,7 +3,7 @@
  "pages": {
   "B.105": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): 'COURTAUDS POUR NAVIRES'. The only text on the page belongs to the lower drawing, the long curved blade, which the curator's reason calls 'a hinged scoop'; text and edition make it a scythe to be fired from ships. The revolving crane, the curator's lead drawing, has no text on this page, so 'lead' is null. Checked on the edition's plate (Polona scan 200).",
    "passages": [
     {
      "index": 0,
@@ -18,12 +18,22 @@
      "en": {
       "text": "These short cannons must stand on strong ships, and these 2 short cannons shall have, on a strong chain or a new wet rope, a scythe 12 braccia long, one foot wide in the middle, one finger thick at the back; and they must be fired at the same moment.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'chortaldi' (cortaldi, French 'courtauds') are short, wide-bored cannons; 'short cannons' is a plain gloss.",
+       "'arano con forte chatena ... vna falce' is read as the scythe being fastened to the guns by the chain or rope; the Italian only says the guns 'shall have, with a strong chain or rope, a scythe'.",
+       "The struck-out 'bo' (italics in the edition) is left out; 'grssa [grossa]' follows the editor's bracket."
+      ]
      },
      "de": {
       "text": "Diese kurzen Kanonen müssen auf starken Schiffen stehen, und diese 2 kurzen Kanonen sollen an einer starken Kette oder einem neuen, nassen Seil eine Sense tragen, 12 Braccia lang, in der Mitte einen Fuß breit, am Rücken einen Finger dick; und man muss sie im selben Augenblick abfeuern.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'chortaldi' (cortaldi, French 'courtauds') are short, wide-bored cannons; 'short cannons' is a plain gloss.",
+       "'arano con forte chatena ... vna falce' is read as the scythe being fastened to the guns by the chain or rope; the Italian only says the guns 'shall have, with a strong chain or rope, a scythe'.",
+       "The struck-out 'bo' (italics in the edition) is left out; 'grssa [grossa]' follows the editor's bracket."
+      ]
      },
      "fr": {
       "text": "— Ces courtauds doivent être placés sur de forts navires; et ces 2 courtauds auront, avec une forte chaîne ou une corde neuve mouillée, une faux longue de 12 brasses, large au milieu d'un pied, épaisse au dos de sa lame d'un doigt; on doit donner [mettre] le feu en un temps."
@@ -46,7 +56,7 @@
   },
   "L.077": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): '[MOULIN]'. The two lines are the measures written under the windmill drawing. Ravaisson prints the fractions stacked; they are written here as 1/2 and 1/4. The facing page, fol. 36 recto (next leaf, heading [CONSTRUCTION]), carries 'il tetto eposato sulla rota' (Le toit est posé sur la roue: the roof rests on the wheel), which belongs to the same windmill idea but is not on this page. Page match checked: Ravaisson's phototype plate of 35 verso (archive.org viewer n246) shows the same windmill as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -61,12 +71,22 @@
      "en": {
       "text": "Clear space: 7 1/2 braccia   1/4 . . [?]\nThickness of the wall: one braccio and . . [?]",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'vano' is the empty space inside the walls (Ravaisson: 'Vide'); read here as the inner width of the round tower.",
+       "The fraction 1/4 stands apart on the line, and the edition marks what follows it, and the end of the second line, as unread ('. . [?]'). The measures are incomplete and are left so.",
+       "braccio (plural braccia): the Italian arm's-length unit, left untranslated."
+      ]
      },
      "de": {
       "text": "Lichte Weite: 7 1/2 Braccia   1/4 . . [?]\nMauerstärke: ein Braccio und . . [?]",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'vano' is the empty space inside the walls (Ravaisson: 'Vide'); read here as the inner width of the round tower.",
+       "The fraction 1/4 stands apart on the line, and the edition marks what follows it, and the end of the second line, as unread ('. . [?]'). The measures are incomplete and are left so.",
+       "braccio (plural braccia): the Italian arm's-length unit, left untranslated."
+      ]
      },
      "fr": {
       "text": "Vide : 7 brasses et 1/2   1/4 . . [?]\nÉpaisseur de mur : une brasse et . . [?]"
@@ -89,7 +109,7 @@
   },
   "B.110": {
    "lead": 3,
-   "notes": null,
+   "notes": "Heading (the editor's): 'DIGUES. — TRAVAUX DIVERS'. On the edition's plate the last line stands by the digging men, so it is the lead; that placement is read from the plate, not stated by the edition. The device the curator's reason calls a grindstone is labelled 'afforare vna pietra' (to bore a stone), a drill kept wet. In the French the second block leaves a blank before '? l'écorce (le revêtement) ?]'; kept as printed. A speck inside 'natura' on the Polona copy is not a letter.",
    "passages": [
     {
      "index": 0,
@@ -104,12 +124,18 @@
      "en": {
       "text": "A spur against the onrush of a river.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "A 'sprone' (spur) is a wedge-shaped bank or breakwater that turns the current."
+      ]
      },
      "de": {
       "text": "Ein Sporn gegen den Ansturm eines Flusses.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "A 'sprone' (spur) is a wedge-shaped bank or breakwater that turns the current."
+      ]
      },
      "fr": {
       "text": "— Éperon contre l'impétuosité d'un fleuve."
@@ -141,12 +167,20 @@
      "en": {
       "text": "The facing [?] of the weirs ought to be of this kind.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'shorza [scorza?]': the editor's bracket suggests 'scorza' (bark, rind), which Ravaisson takes as the facing ('le revêtement') and marks doubtful.",
+       "'pescaie' are weirs or dams across a river; Ravaisson has 'épis' (groynes)."
+      ]
      },
      "de": {
       "text": "Von dieser Art sollte die Verkleidung [?] der Wehre sein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'shorza [scorza?]': the editor's bracket suggests 'scorza' (bark, rind), which Ravaisson takes as the facing ('le revêtement') and marks doubtful.",
+       "'pescaie' are weirs or dams across a river; Ravaisson has 'épis' (groynes)."
+      ]
      },
      "fr": {
       "text": "— De cette nature voudrait [devrait] être ? l'écorce (le revêtement) ?] des épis [opposés au cours de l'eau]."

@@ -77,7 +77,9 @@ import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStat
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
-import { CODEX_ABSENCES, CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
+import { CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate, shownAbsences } from './table/codex-shelf'
+import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, isTopicExhibit, topicExhibit, topicPages } from './table/best-of'
+import { createBestOfLook } from './table/best-of-look'
 import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
 import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
@@ -676,7 +678,11 @@ export function createWing():VinciWingModule {
   /** A BOOK CHOSEN FROM THE RECORD OPENS WITH ITS OWN RECORD: the reading of
    * the sources goes on with the book the visitor turned to. */
   let recordNext=false
-  const openFromRecord=(id:string):void=>{recordNext=mode===2;openExhibit(id,null)}
+  const openFromRecord=(id:string):void=>{recordNext=mode===2;if(id===EDITION_EXHIBIT)wholeEdition=true;openExhibit(id,null)}
+  /** THE BOOK ON THE TABLE OPENS THE BEST-OF; the whole edition is one of
+   * the shelf's sources, asked for by name from the shelf's row or a record. */
+  let wholeEdition=false
+  const EDITION_WHOLE='codex/edition'
   /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
    * the walk, so it is held here and never written down. */
   let sheetOpen=false
@@ -957,24 +963,29 @@ export function createWing():VinciWingModule {
 
       // desk.overview: its host fields
       overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
-        sub:shelfBook(cell.id)?text(shelfBook(cell.id)!.official):null,
-        certainty:pictureCertainty(cell.colour),kind:picks.find(pick=>pick.id===cell.id)?.kind??'picture',
+        sub:shelfBook(cell.id)?text(shelfBook(cell.id)!.official):isTopicExhibit(cell.id)?topicCount(cell.id):null,
+        certainty:pictureCertainty(cell.colour),kind:isTopicExhibit(cell.id)?'manuscript':picks.find(pick=>pick.id===cell.id)?.kind??'picture',
         preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
         open:id=>openExhibit(id,null),room:roomName,
         // THE SHELF NAMES ITSELF, and the books it cannot show stand on it by
         // name with the reason, never opened
         name:()=>hereContent().id==='reading-table'?{en:SHELF_UI.en.shelf,de:SHELF_UI.de.shelf}:null,
-        // the shelf's eight books stand in two rows of four, none alone
-        columns:()=>hereContent().id==='reading-table'?4:null,
+        // the seventeen topics stand in three rows of six
+        columns:()=>hereContent().id==='reading-table'?6:null,
         absent:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].absent,
-          items:CODEX_ABSENCES.map(absence=>({title:lang()==='de'?absence.de:absence.en,
-            reason:lang()==='de'?absence.reason_de:absence.reason_en}))},
+          items:shownAbsences(lang()).map(absence=>({title:absence.title,reason:absence.reason}))},
+        // every whole book stays one press away, as a source under the topics
+        books:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].codices,
+          items:SHELF_BOOKS.map(book=>({id:book.entry?book.id:EDITION_WHOLE,title:text(book.official),
+            preview:book.entry?shelfPlate(book.entry):editionPlate()}))},
         // the three rooms whose set the card data measures: the hang, the
         // machine hall, and the leaves
         measure:()=>{const here=hereContent().id
           const key=here==='picture-room'||here==='picture-room-west'?'measure_wall'
             :here==='flight'||here==='works'?'measure_hall':here==='body'?'measure_book':''
-          if(here==='reading-table')return {en:SHELF_UI.en.measure,de:SHELF_UI.de.measure}
+          // the best-of is measured by its pages, never by its topics
+          if(here==='reading-table'){const pages=String(bestOfCount())
+            const said=deskControl('overview','measure_book');return {en:said.en.replace('{n}',pages),de:said.de.replace('{n}',pages)}}
           return key?deskControl('overview',key):null}},
 
       // desk.sheet: its host fields
@@ -2556,17 +2567,14 @@ export function createWing():VinciWingModule {
           preview:numeral?null:plate?assetAddress(validatePaintingRecord(plate.entry.preview,'painting-preview').entry):exhibitPreview(pick)}})
       }
     }
-    // THE SHELF IS THE READING TABLE'S SET: the volume on the table under its
-    // plain title, then every book of the collection, each opened on the table
-    if(here==='reading-table')for(const [at,book] of SHELF_BOOKS.entries()){
-      // the volume stands on the shelf by the page it lies open at, as every
-      // other book there stands by one of its pages
-      const own=row.find(item=>item.entry.id===book.id), cover=studyLeafPage()
-      const thumb=cover?assets?.byId.get(`vinci/ms-thumb/${leafStem(cover)}`):undefined
-      if(own){own.entry={...own.entry,title:text(book.title),preview:thumb?assetAddress(thumb):own.entry.preview};continue}
-      if(book.entry)row.push({order:1+at,entry:{id:book.id,openable:true,title:text(book.title),
-        colour:certaintyColour('documented'),preview:shelfPlate(book.entry)}})
-    }
+    // THE READING TABLE'S SET IS THE BEST-OF BY TOPIC: seventeen topics, each
+    // by its opening page; the book on the table opens the first of them, and
+    // the whole books stand under the set as its sources
+    if(here==='reading-table')return BEST_OF_TOPICS.map(topic=>{
+      const first=topicPages(topic.slug).find(page=>assets&&bestOfSource(page,assets))
+      return {id:topicExhibit(topic.slug),openable:Boolean(first),title:text(topic.title??{en:'',de:''}),
+        colour:certaintyColour('documented'),preview:first&&assets?bestOfSource(first,assets)?.thumb??null:null}
+    })
     return row.sort((a,b)=>a.order-b.order).map(item=>item.entry)
   }
   /** THE PLATE AT REST FOR AN EXHIBIT THAT HAS NO PLATE OF ITS OWN: a machine,
@@ -2765,6 +2773,43 @@ export function createWing():VinciWingModule {
     openMode='auto'
     if(recordNext){recordNext=false;openRecord()}
   }
+  /** ONE TOPIC OF THE BEST-OF, OPENED WHERE THE VISITOR STANDS: no walk, the
+   * reader takes the window at once, and its gold walks topic to topic. */
+  function openTopic(slug:string,start:string|undefined,from:HTMLElement|null,how:'auto'|'walk'|'cut'):void {
+    if(!closeLook||!hosts)return
+    const id=topicExhibit(slug)
+    const look=createBestOfLook({slug,start,manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
+      tier:()=>hosts?.world.stack.tierName()??'standard',
+      openTopic:(next,button)=>openTopic(next,undefined,button,'auto'),
+      openRecord:(record,title,render)=>{
+        exhibitSources={id:record,title,certainty:'documented',renderStation(host){render(host)}}
+        sources.resetScroll();sources.select('station');mode=2;paintDock()
+      },
+      openBook:openFromRecord,
+      // the phone's count goes back to the station, whose row is the set
+      openShelf:()=>closeLook?.close(),
+      close:()=>closeLook?.close(),
+      changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
+    const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
+    openMode=how
+    closeLook.open(look.exhibit,from,how_)
+    openMode='auto'
+  }
+  /** The best-of's pages the store admits, which is what its measure counts. */
+  function bestOfCount():number {
+    return BEST_OF_TOPICS.reduce((sum,topic)=>sum+topicPages(topic.slug).filter(page=>assets&&bestOfSource(page,assets)).length,0)
+  }
+  /** A topic cell's count, where the words pass has written the word for it. */
+  function topicCount(id:string):string|null {
+    const pages=topicPages(id.slice('topic/'.length)).filter(page=>assets&&bestOfSource(page,assets)).length
+    return bestOfKey('topic_pages',lang())?.replace('{n}',String(pages))??null
+  }
+  /** The edition's plate on the shelf's row: the page the volume lies open at. */
+  function editionPlate():string|null {
+    const cover=studyLeafPage()
+    const thumb=cover?assets?.byId.get(`vinci/ms-thumb/${leafStem(cover)}`):undefined
+    return thumb?assetAddress(thumb):null
+  }
   /** THE PAGE ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side, the
    * admitted leaf's own, read from its pyramid where the store has cut one.
    * Its words are the edition's own record and the sheet's licence line. */
@@ -2896,6 +2941,11 @@ export function createWing():VinciWingModule {
    * the module's own card in the page's language only, the payload, the
    * record behind one control, Close, and the wall walked from inside it. */
   function openExhibit(id:string,from:HTMLElement|null,how:'auto'|'walk'|'cut'='auto'):void {
+    if(id===EDITION_WHOLE){wholeEdition=true;id=EDITION_EXHIBIT}
+    if(isTopicExhibit(id)){openTopic(id.slice('topic/'.length),undefined,from,how);return}
+    // the book on the table opens the best-of at the leaf it lies open at
+    if(id===EDITION_EXHIBIT&&!wholeEdition&&!leafAt){openTopic(BEST_OF_OPENING.topic,BEST_OF_OPENING.page,from,how);return}
+    wholeEdition=false
     if(isCollectionBook(id)){openCodexBook(id,from,how);return}
     const entry=picks.find(pick=>pick.id===id)
     if(!entry||!hosts||!closeLook)return

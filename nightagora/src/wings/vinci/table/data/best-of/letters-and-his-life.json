@@ -1,4 +1,487 @@
 {
  "topic": "letters-and-his-life",
- "pages": {}
+ "pages": {
+  "AR1.33": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §4 = Br. M. 1a). The Italian here is Richter's printed text, as the brief asks for this class; the Arundel facsimile edition's transcription (1923), which text_source names, was not used. Richter's side heading 'The disorder in the MSS.' is left out. The date is given as Leonardo wrote it.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §4 (Br. M. 1a), vol. I p. 12",
+     "it": {
+      "text": "Comīciato in Firenze in casa Piero di Braccio Martelli addi 22 di marzo 1508: e questo fia vn racolto sanza ordine, tratto di molte carte le quali io ho qui copiate sperando poi metterle per ordine alli lochi loro, secondo le materie di che esse tratteranno, e credo che auānti ch'io sia al fine di questo, io ci avrò a riplicare vna medesima cosa più volte, si chè lettore nō mi biasimare, perchè le cose son molte e la memoria nō le può riseruare e dire, questa non voglio scriuere perchè dinanzi la scrissi; e se io nō uolessi cadere in tale errore, sarebbe necessario che per ogni caso ch'io uolessi copiare, sicchè per nō replicarlo, io auessi senpre a rilegere tutto il passato, e massime stante co' lunghi interualli di tenpo allo scriuere da una volta a un altra.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Begun at Florence, in the house of Piero di Braccio Martelli, on the 22nd day of March 1508. And this is to be a collection without order, taken from many papers which I have copied here, hoping to arrange them later each in its place, according to the subjects of which they may treat. But I believe that before I am at the end of this [task] I shall have to repeat the same things several times; for which, O reader! do not blame me, for the subjects are many and memory cannot retain them [all] and say: 'I will not write this because I wrote it before.' And if I wished to avoid falling into this fault, it would be necessary in every case when I wanted to copy [a passage] that, not to repeat myself, I should read over all that had gone before; and all the more since the intervals are long between one time of writing and the next.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Begonnen in Florenz, im Haus des Piero di Braccio Martelli, am 22. März 1508. Und dies wird eine Sammlung ohne Ordnung sein, gezogen aus vielen Blättern, die ich hier abgeschrieben habe, in der Hoffnung, sie später an ihren Platz zu ordnen, nach den Gegenständen, die sie behandeln. Und ich glaube, bevor ich hiermit am Ende bin, werde ich ein und dieselbe Sache mehrmals wiederholen müssen. Darum, Leser, tadle mich nicht, denn der Dinge sind viele, und das Gedächtnis kann sie nicht bewahren und sagen: Dies will ich nicht schreiben, weil ich es früher schon geschrieben habe. Und wollte ich nicht in diesen Fehler fallen, so müsste ich bei jedem Stück, das ich abschreiben wollte, um es nicht zu wiederholen, immer das ganze Vorige wieder lesen, zumal bei den langen Zeitabständen zwischen einem Schreiben und dem nächsten.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'per ogni caso ch'io uolessi copiare': literally 'for every case I wished to copy'; Richter supplies '[a passage]', we write 'Stück'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 12",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n49/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 12",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n49/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "ATL.0372.1": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §1363 = C. A. 65b; 199b, today's folio 186 verso by the catalogue's concordance). Richter's footnote: the note probably refers to his No. 1221 (the kite in the bestiary).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1363 (C. A. 65b; 199b), vol. II p. 414",
+     "it": {
+      "text": "Questo scriuersi distintamēte del nibbio par che sia mio destino, perchè nella prima ricordatione della mia infantia e' mi parea che, essendo io in culla, che vn nibbio venisse a me e mi aprisse la bocca colla sua coda, e molte volte mi percuotesse cō tal coda dentro alle labra.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "This writing distinctly about the kite seems to be my destiny, because among the first recollections of my infancy, it seemed to me that, as I was in my cradle, a kite came to me and opened my mouth with its tail, and struck me several times with its tail inside my lips.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Dass ich so eingehend über den Milan schreibe, scheint mein Schicksal zu sein, denn in der ersten Erinnerung meiner Kindheit kam es mir vor, als ich in der Wiege lag, als ob ein Milan zu mir käme, mir mit seinem Schwanz den Mund öffnete und mich viele Male mit diesem Schwanz innen an die Lippen schlüge.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'nibbio' is the kite (German 'Milan'), not a vulture.",
+       "'Questo scriuersi distintamēte del nibbio': literally 'this writing oneself so distinctly about the kite'; we write 'Dass ich so eingehend über den Milan schreibe'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 414",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n563/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 414",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n563/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AR3.181": {
+   "lead": 0,
+   "notes": "Placement confirmed (facts-0929 Q1): Richter prints 'Br. M. 272a]' (British Museum, Arundel 263, fol. 272 recto), his Bibliography (vol. II p. 492) lists '272a 1372', and the Reale Commissione Vinciana edition of 1923 prints it under 'Fol. 272 recto', p. 438. Richter's footnote begins: 'This statement of Ser Piero's age contradicts that of the Riassunto della portata di Antonio da Vinci (Leonardo's grandfather), who speaks of Ser Piero as being thirty years old in 1457; and that of the Riassunto della portata di Ser Piero e Francesco, sons of Antonia da Vinci, where Ser Piero is mentioned as being forty in 1469. These documents were published by G. Uzielli, Ricerche intorno a L. da Vinci, Firenze, 1872, pp. 144 and 146.' Any displayed caption should not present the age 80 as fact. A second note of the same death, on another sheet, is Richter's §1373, from a sheet of the Codex Atlanticus; it is not on this page. The curator's reason points to this passage: lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1372 (Br. M. 272a), vol. II p. 416",
+     "it": {
+      "text": "A dì 9 di luglio 1504, mercoledì a ore 7 morì Ser Piero da Vinci, notaio al Palazzo del Podestà, mio padre, a ore 7, era d'età d'anni 80, lasciò 10 figlioli maschi e 2 femmine.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci, notary at the Palazzo del Podestà, my father,—at seven o'clock, being eighty years old, leaving behind ten sons and two daughters.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci, Notar am Palazzo del Podestà, mein Vater, zur 7. Stunde. Er war 80 Jahre alt und hinterließ 10 Söhne und 2 Töchter.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'a ore 7': literally 'at hour 7'; kept literal ('zur 7. Stunde'). Richter: 'at seven o'clock'.",
+       "Leonardo repeats the hour ('a ore 7' twice); the repetition is kept.",
+       "'era d'età d'anni 80' is Leonardo's statement; Richter's footnote says it contradicts the family tax returns (see notes). The translation keeps Leonardo's number."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 416",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n565/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 416",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n565/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "ATL.1117.1": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §1469 = C. A. 207a; 609a, today's folio 559 recto by the catalogue's concordance): Leonardo's list of his books, 25 printed rows over pp. 442-445. Richter's long footnotes (bibliographical notes from Girolamo d'Adda, 1873, and his manuscript additions, identifying possible editions) are left out; they are editor's commentary, not Leonardo's text. Richter's side heading 'Quotations and notes on books and authors (1469-1508)' is left out.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1469 (C. A. 207a; 609a), vol. II pp. 442-445",
+     "it": {
+      "text": "L' Abbaco, Fiore di Virtù,\nPlinio, Vita de' Filosofi,\nBibbia, Lapidario,\nDe re militari, Pistole del Filelfo,\nDeca prima, Della cōseruatiō della sanità,\nDeca terza, Ciecco d'Ascoli,\nDeca quarta, Alberto Magno,\nGuidone, Retorica nova,\nPiero Cresciētio, Cibaldone,\nQuadriregio, Esopo,\nDonato, Salmi,\nIvstino, De Immortalità d'anima,\nGuidone, Burchiello,\nDottrinale, Driadeo,\nMorgāte, Petrarca,\nGiovā di Mādiuilla,\nDe onesta voluttà,\nMāganello,\nCronica d'Isidoro,\nPistole d'Ouidio,\nPistole del Filelfo,\nSpera,\nFacietie di Poggio,\nDe chiromātia,\nFormulario di pistole.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Book on Arithmetic, 'Flowers of Virtue',\nPliny, 'Lives of the Philosophers',\nThe Bible, 'Lapidary',\n'On warfare' 'Epistles of Filelfo',\nThe first decade, 'On the preservation of health',\nThe third decade, Ciecho d'Ascoli,\nThe fourth decade, Albertus Magnus,\nGuido, New treatise on rhetorics,\nPiero Crescentio, Cibaldone,\n'Quadriregio', Æsop,\nDonato, Psalms,\nJustinus, 'On the immortality of the soul,\nGuido Burchiello,\n'Doctrinale' Driadeo,\nMorgante Petrarch.\nJohn de Mandeville\n'On honest recreation'\nManganello,\nThe Chronicle of Isidoro,\nThe Epistles of Ovid,\nEpistles of Filelfo,\nSphere,\nThe Jests of Poggio\nChiromancy,\nFormulary of letters,",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Das Rechenbuch, Die Blume der Tugend,\nPlinius, Das Leben der Philosophen,\nDie Bibel, Das Steinbuch,\nÜber das Kriegswesen, Die Briefe des Filelfo,\nDie erste Dekade, Über die Erhaltung der Gesundheit,\nDie dritte Dekade, Ciecco d'Ascoli,\nDie vierte Dekade, Albertus Magnus,\nGuido, Die neue Rhetorik,\nPiero Crescentio, Cibaldone,\nDas Quadriregio, Äsop,\nDonato, Die Psalmen,\nJustinus, Über die Unsterblichkeit der Seele,\nGuido, Burchiello,\nDas Doctrinale, Driadeo,\nMorgante, Petrarca,\nJohann von Mandeville,\nÜber die ehrbare Lust,\nManganello,\nDie Chronik des Isidor,\nDie Briefe des Ovid,\nDie Briefe des Filelfo,\nDie Sphäre,\nDie Schwänke des Poggio,\nÜber die Handlesekunst,\nEin Formelbuch für Briefe.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Titles are put into German where they describe a book (Rechenbuch, Steinbuch, Die neue Rhetorik); names stay in Leonardo's or Richter's form (Ciecco d'Ascoli, Piero Crescentio, Cibaldone, Driadeo, Morgante, Burchiello, Manganello). Which editions Leonardo owned is Richter's footnote matter and is not added.",
+       "'Deca prima, terza, quarta': the first, third and fourth 'decade'; the list does not name the author.",
+       "'Pistole del Filelfo' appears twice in the list (rows 4 and 21), as printed."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 442-445",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n591/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II pp. 442-445",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n591/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "ATL.1775.1": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §680 = C. A. 317a; 959a, today's folio 888 recto by the catalogue's concordance): Leonardo's list of his drawings, 34 entries. Richter's apparatus: lines 1 and 2 (the young man's head) are written from left to right and upside down. His footnote: Amoretti published the list earlier with some different readings (lines 5-6 'Certi Sangirolami in su d'una figura', line 13 'Un San Bastiano'). The caricature heads at the foot of the sheet are not text.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §680 (C. A. 317a; 959a), vol. I pp. 355-356",
+     "it": {
+      "text": "Una testa in faccia di giouane cō una bella capellatura,\nMolti fiori ritratti di naturale,\nvna testa ī faccia riccivta,\ncierti sā Girolami,\nmisure d'una figura,\ndisegni di fornegli,\nvna testa del Duca,\nMolti disegni di gruppi,\n4 disegni della tavola di sāto angielo,\nvna storietta di Girolamo da Fegline,\nvna testa di Cristo fatta di penna,\n8 sā Bastiani,\nMolti cōponimēti d'āgioli,\nvn calcidonio,\nvna testa ī proffilo cō bella capellatura,\ncierti coppi di prospettiva,\ncierti strumēti per navili,\ncierti strumēti d'acqua,\nvna testa ritratta d'Atalāta che alzava il uolto,\nla testa di Geronimo da Fegline,\nla testa di Giā Francesco Borso,\nmolte gole di vechie,\nmolte teste di vechi,\nmolti nvdi īteri,\nmolte bracia ganbe piedi e attitudini,\nvna nostra donna finita,\nvn' altra quasi ch'è in proffilo,\nla testa di nostra donna che va in cielo,\nvna testa d'ū uechio col mēto lūgo,\nuna testa di zīgana\nvna testa col capello ī capo,\nvna storia di passione fatta in forma,\nvna testa di putta cō treccie rānodate,\nvna testa con bruna cōciatura.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A head, full face, of a young man with fine flowing hair,\nMany flowers drawn from nature,\nA head, full face, with curly hair,\nCertain figures of Saint Jerome,\nThe measurements of a figure,\nDrawings of furnaces.\nA head of the Duke,\nmany designs for knots,\n4 studies for the panel of Saint Angelo\nA small composition of Girolamo da Fegline,\nA head of Christ done with the pen,\n8 Saint Sebastians,\nSeveral compositions of Angels,\nA chalcedony,\nA head in profile with fine hair,\nSome pitchers seen in(?) perspective,\nSome machines for ships,\nSome machines for waterworks,\nA head, a portrait of Atalanta raising her face;\nThe head of Geronimo da Fegline,\nThe head of Gian Francisco Borso,\nSeveral throats of old women,\nSeveral heads of old men,\nSeveral nude figures, complete,\nSeveral arms, eyes, feet, and positions,\nA Madonna, finished,\nAnother, nearly in profile,\nHead of Our Lady ascending into Heaven,\nA head of an old man with long chin,\nA head of a gypsy girl,\nA head with a hat on,\nA representation of the Passion, a cast,\nA head of a girl with her hair gathered in a knot,\nA head, with the brown hair dressed.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Ein Kopf von vorn, ein junger Mann mit schönem Haar,\nViele Blumen, nach der Natur gezeichnet,\nein Kopf von vorn, lockig,\neinige heilige Hieronymus,\nMaße einer Figur,\nZeichnungen von Öfen,\nein Kopf des Herzogs,\nviele Zeichnungen von Knoten,\n4 Zeichnungen für die Tafel von Sant'Angelo,\neine kleine Szene von Girolamo da Fegline,\nein Christuskopf, mit der Feder gemacht,\n8 heilige Sebastiane,\nviele Kompositionen von Engeln,\nein Chalzedon,\nein Kopf im Profil mit schönem Haar,\neinige Gefäße in Perspektive [?],\neinige Geräte für Schiffe,\neinige Geräte für das Wasser,\nein Kopf, Bildnis der Atalanta, die das Gesicht hebt,\nder Kopf des Geronimo da Fegline,\nder Kopf des Gian Francesco Borso,\nviele Hälse alter Frauen,\nviele Köpfe alter Männer,\nviele ganze Akte,\nviele Arme, Beine, Füße und Haltungen,\neine vollendete Madonna,\neine andere, fast im Profil,\nder Kopf Unserer Lieben Frau, die in den Himmel fährt,\nein Kopf eines alten Mannes mit langem Kinn,\nein Kopf einer Zigeunerin,\nein Kopf mit dem Hut auf dem Kopf,\neine Passionsszene, in einer Form gemacht,\nein Mädchenkopf mit geknoteten Zöpfen,\nein Kopf mit brauner Haartracht.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'ganbe' means legs; Richter's English prints 'eyes'. The German follows the Italian.",
+       "'coppi': vessels, jars or roof tiles; Richter reads 'pitchers' with a question mark. We write 'Gefäße' and mark it.",
+       "'gruppi': knots, interlaced patterns; Richter's footnote links them to the knot designs Vasari describes.",
+       "'zīgana': we keep the historical word as 'Zigeunerin', as Richter keeps 'gypsy girl'; the museum may want to gloss it.",
+       "'gole di vechie': throats or necks of old women; Richter reads 'throats'.",
+       "'fatta in forma': made in a mould; Richter reads 'a cast'.",
+       "'Atalāta che alzava il uolto': the tense is past ('was raising'); the German uses the present, as a picture title would."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 355-356",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n520/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I pp. 355-356",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n520/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.007": {
+   "lead": 2,
+   "notes": "Placement confirmed (facts-0929 Q1 and Ravaisson): all three passages carry 'L. o']' (Richter's key: o' is inside the front cover); his Bibliography (vol. II p. 490, L) lists 'o' 1414, 1323, 1102'; Ravaisson vol. V prints all three under 'Ms L, 1er VERSO DE LA COUVERTURE' with footnotes to Richter nos. 1414, 1323 and 1102 (the Rhodes line is written in the margin) (https://archive.org/details/lesmanuscritsdel05lo/page/n207/mode/1up). Given in the edition's order (§1102, §1323, §1414); on the cover the pen and penknife note stands among the lines of §1414. Richter's footnote to §1414: '4-10. This passage evidently refers to events in Milan at the time of the overthrow of Ludovico il Moro. Amoretti published it in the Memorie Storiche and added copious notes.' His notes 6 and 8 quote Amoretti in Italian on the Visconti and on Borgonzio Botta. Ravaisson's note: 'Note en souvenir des événements qui accompagnèrent la chute du duc de Milan, Ludovic le More, en 1499-1500.' The cover also carries sums (3, 100, 77; 72, 2, 144; 5500, 7500, 13000) that Richter does not print. The curator's reason points to the note on the fall of Ludovico il Moro: lead 2.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1102 (L. o'), vol. II p. 266",
+     "it": {
+      "text": "Rodi à dētro 5000 case.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Rhodes has in it 5000 houses.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Rhodos hat darin 5000 Häuser.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'à dētro': 'has within', perhaps within its walls; Richter: 'has in it'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 266",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n401/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 266",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n401/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1323 (L. o'), vol. II p. 375",
+     "it": {
+      "text": "¶Neciessaria cōpagnia à la penna col tenperatoio, e similemēte vtile cōpagnia, perchè l'ū sanza l'altro nō vale troppo.¶",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The pen must necessarily have the penknife for a companion, and it is a useful companionship, for one is not good for much without the other.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Feder hat im Federmesser einen notwendigen Gefährten, und ebenso einen nützlichen, denn das eine ist ohne das andere nicht viel wert.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'tenperatoio': the small knife for cutting and sharpening a quill; rendered 'Federmesser'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 375",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n510/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 375",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n510/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §1414 (L. o'), vol. II p. 427",
+     "it": {
+      "text": "Paolo di Vannoccio in Siena.\nLa saletta di sopra per li apostoli;\nEdifiti di Bramāte;\nIl castellano fatto prigione;\nIl Visconte strascinato e poi morto il figliuolo;\nGian della Rosa toltoli i danari;\nBorgonzo principiò e nol volle, e però fuggì le fortune;\nIl duca perso lo stato e la roba e liertà, e nessuna sua opera si finì per lui.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Paul of Vannochio at Siena . . . . . . . .\nThe upper chamber for the apostles.\nBuildings by Bramante.\nThe governor of the castle made a prisoner,\nVisconti carried away and his son killed.\nGiovanni della Rosa deprived of his money.\nBorgonzio began . . . .; and moreover his fortunes fled.\nThe Duke has lost the state, property and liberty and none of his entreprises was carried out by him.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Paolo di Vannoccio in Siena.\nDer kleine Saal oben für die Apostel.\nBauten von Bramante.\nDer Kastellan gefangen genommen.\nDer Visconti fortgeschleift, und danach sein Sohn tot.\nGian della Rosa, dem man sein Geld genommen hat.\nBorgonzo fing an und wollte es nicht, und darum entging ihm das Glück [?].\nDer Herzog hat seinen Staat, seine Habe und seine Freiheit verloren, und keines seiner Werke wurde von ihm vollendet.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The German reads 'libertà' (Freiheit): Richter's 1883 page prints 'li-' / 'ertà' across a line break, the b missing (checked in a second copy, archive.org literaryworksofl02leon, which has the same misprint); his own variant note reads 'elliberta' and Ravaisson prints 'elliberta'.",
+       "Richter's semicolons are turned into full stops; the notes are a list, one item per line as he prints them.",
+       "'Il Visconte': Richter reads a member of the Visconti family (his footnote quotes Amoretti: which Visconti is not known); it could also be read as 'the viscount'. Kept as 'der Visconti'.",
+       "'e poi morto il figliuolo': 'morto' can mean dead or killed; Richter: 'his son killed'. Kept open as 'tot'.",
+       "'Borgonzo principiò e nol volle, e però fuggì le fortune': the sense is unclear, marked [?]. Richter leaves a gap ('Borgonzio began . . . .; and moreover his fortunes fled'); Ravaisson: 'Borgonzo commença et ne le voulut plus, et pour cela ses chances lui échappèrent'. Richter's footnote (after Amoretti): Borgonzio Botta was in charge of the duke's revenues under il Moro, and his house was sacked by the French party after il Moro fled.",
+       "'nessuna sua opera si finì per lui': 'per lui' can mean 'by him' or 'for him'; read as 'by him', with Richter ('none of his entreprises was carried out by him')."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 427",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n576/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 427",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n576/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "I.288": {
+   "lead": 0,
+   "notes": "Richter prints the three notes as one section (§672); split here by his line numbers because Herzfeld gives them as three entries. 'I.2 90b' = 138v in the continuous foliation.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §672 (I.2 90b), vol. I p. 350, ll. 1-10; Herzfeld 1906 p. 150, XC",
+     "it": {
+      "text": "Il Moro in figura di uētura colli capelli e panni e mani ināzi, e messer Gualtieri cō riverēte atto lo piglia per li panni d'abasso, venēdoli dalla parte dināzi.\n\nācora la povertà in figura spaventevole corra dirieto a vn giovanetto e'l Moro lo copra col lembo della vesta, e colla verga dorata minacia tale mostro.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Il Moro as representing Good Fortune, with hair, and robes, and his hands in front, and Messer Gualtieri taking him by the robes with a respectful air from below, having come in from the front.\n\nAgain, Poverty in a hideous form running behind a youth. Il Moro covers him with the skirt of his robe, and with his gilt sceptre he threatens the monster.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Moro in Figur des Glücks, mit Haaren und Gewändern und Händen nach vorwärts, und Messer Gualtieri, der mit ehrerbietiger Gebärde ihn am Zipfel des Kleides faßt, indem er von vorn her kommt. —\n\nFerner, die Armut in erschreckender Gestalt läuft hinter einem Jüngling her, und der Moro deckt ihn mit dem Saum des Kleides und mit dem vergoldeten Stabe bedroht er selbiges Ungetüm.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 150",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n329/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §672 (I.2 90b), vol. I p. 350, ll. 11-16; Herzfeld 1906 p. 150, XCI",
+     "it": {
+      "text": "Erba colle radici in sù per uno che fusse in sul finire; la roba e la gratia.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A plant with its roots in the air to represent one who is at his last;—a robe and Favour.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Pflanze mit den Wurzeln nach oben\n\nAuf jemanden, der im Begriffe stünde, Gut und Gnade zu verlieren.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 150",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n329/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §672 (I.2 90b), vol. I p. 350, ll. 17-26; Herzfeld 1906 p. 283, XVI",
+     "it": {
+      "text": "Delle taccole e stornelli.\n\nQuelli che si fideranno abitare appresso di lui, che sarāno grā turbe, questi tutti morirāno di crudele morte, e si vedrā i padri e le madri d'insieme colle sue famiglie esser da crudeli animali divorati e morti.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Of tricks [or of magpies] and of burlesque poems [or of starlings].\n\nThose who trust themselves to live near him, and who will be a large crowd, these shall all die cruel deaths; and fathers and mothers together with their families will be devoured and killed by cruel creatures.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Elstern und Stare\n\nWer sich getrauen wird, neben ihnen zu wohnen, — es werden große Schwärme sein, — fast alle werden eines grausamen Todes sterben, und man wird die Väter, die Mütter und zugleich deren Familien von grausamen Tieren verzehrt und getötet sehen.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 350",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n497/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 283",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n462/mode/1up"
+      }
+     ]
+    }
+   ]
+  }
+ }
 }

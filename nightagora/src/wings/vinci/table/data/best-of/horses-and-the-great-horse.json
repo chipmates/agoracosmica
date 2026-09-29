@@ -1,9 +1,50 @@
 {
  "topic": "horses-and-the-great-horse",
  "pages": {
+  "H.275": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side. His margin reads 'H. 3. 85a'; his Reference Table (vol. I p. 363) prints 'H.2 85a'. Both give folio 85 of the part numbering, the number the leaf itself carries (= H 133 recto). The sentence is about seeing, not about the horse in its sling that the curator names; Richter groups it under 'Differences of perception by one eye and by both eyes (26-29)'.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §27 (H. 3. 85a), vol. I p. 20",
+     "it": {
+      "text": "Le cose · vedute da uno medesimo ochio paranno alcuna volta · grāde alcuna volta · picole.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Objects seen by one and the same eye appear sometimes large, and sometimes small.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Dinge, die ein und dasselbe Auge sieht, erscheinen manchmal groß, manchmal klein.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 20",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n57/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 20",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n57/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "A.134": {
    "lead": 1,
-   "notes": null,
+   "notes": "Ravaisson's page heading (the editor's): 'DESSIN (PROPORTIONS DE LA FIGURE HUMAINE ET DE LA TÊTE DU CHEVAL) — MOUFLES'. On the leaf the first two lines run along the top edge and concern the human face; the last two stand beside the horse's heads in their grids, so passage 2 is the lead. The red chalk pulley studies carry no words. Page match checked: the plate above the transcription (archive.org viewer n283) shows the same leaf as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -18,12 +59,22 @@
      "en": {
       "text": "It is as far from where one ear is attached to the other as from the meeting of the eyebrows to the chin.\nThe mouth of a handsome face is as wide as it is from the parting of the lips to the underside of the chin.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'apichatura' (appiccatura) is where the ear is attached to the head; 'le givnture dele ciglia' (the joining of the brows) is the point between the eyebrows, Ravaisson's 'l'intervalle des sourcils'.",
+       "The edition prints 'pi' in italics, a word Leonardo struck out; it is left out of the translations.",
+       "'grande' is literally 'large'; for a mouth measured against a distance it means its width."
+      ]
      },
      "de": {
       "text": "Vom Ansatz des einen Ohrs bis zum anderen ist es so weit wie von der Stelle, wo die Brauen zusammentreffen, bis zum Kinn.\nDer Mund eines schönen Gesichts ist so breit, wie es von der Trennlinie der Lippen bis unter das Kinn ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'apichatura' (appiccatura) is where the ear is attached to the head; 'le givnture dele ciglia' (the joining of the brows) is the point between the eyebrows, Ravaisson's 'l'intervalle des sourcils'.",
+       "The edition prints 'pi' in italics, a word Leonardo struck out; it is left out of the translations.",
+       "'grande' is literally 'large'; for a mouth measured against a distance it means its width."
+      ]
      },
      "fr": {
       "text": "— Il y a autant de l'attache d'une oreille à l'attache de l'autre, que de l'intervalle des sourcils au menton.\n— La grandeur de la bouche d'un beau visage est égale à la distance qu'il y a de la division des lèvres au-dessous du menton."
@@ -55,12 +106,18 @@
      "en": {
       "text": "It shall be as far from one ear to the other as the ear itself is long.\nThe ear must be a quarter of the face in length.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The Italian does not name the horse. Ravaisson adds '[du cheval]' in his French because these two lines stand beside the two horse's heads; 'volto' (face) is then the horse's head."
+      ]
      },
      "de": {
       "text": "Von einem Ohr zum anderen soll es so weit sein, wie das Ohr selbst lang ist.\nDas Ohr muss ein Viertel des Gesichts lang sein.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The Italian does not name the horse. Ravaisson adds '[du cheval]' in his French because these two lines stand beside the two horse's heads; 'volto' (face) is then the horse's head."
+      ]
      },
      "fr": {
       "text": "— Il doit y avoir d'une oreille [du cheval] à l'autre la longueur d'une de ces oreilles.\n— La longueur de l'oreille doit être égale au quart du visage."
@@ -76,6 +133,50 @@
        "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
        "page": "Ms A, FOLIO 62 (verso), French translation (the page after the plate, headed DESSIN (PROPORTIONS DE LA FIGURE HUMAINE ET DE LA TÊTE DU CHEVAL) — MOUFLES); archive.org viewer page n284",
        "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n284/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "ATL.1154.1": {
+   "lead": 0,
+   "notes": "Placement: Richter prints 'C. A. 213b; 628b]' and his Bibliography (vol. II p. 498) lists '213b 628b 712, Pl. LXXVI'; the modern folio 577 verso rests on the Leonardo//thek@ catalogue record for this sheet (ATL.1154.1: 'the well known representation of the Sforza horse shown packed for transportation'), as MAP2 has it. Richter's footnote: 'See Pl. LXXVI, No. 1. This drawing has already been published in the Saggio delle Opere di L. da Vinci, Milano 1872, Pl. XXIV, No. 1. But, for various reasons I cannot regard the editor's suggestions as satisfactory. He says: \"Veggonsi le armature di legname colle quali forse venne sostenuto il modello, quando per le nozze di Bianca Maria Sforza con Massimiliano imperatore, esso fu collocato sotto un arco trionfale davanti al Castello.\"' The curator's reason points to this passage: lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §712 (C. A. 213b; 628b), vol. II p. 12",
+     "it": {
+      "text": "Tutti · i capi delle chiavarde.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "All the heads of the large nails.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Alle Köpfe der Bolzen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'chiavarde': bolts with heads, iron pins that fasten a frame; Richter: 'large nails'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 12",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n45/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 12",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n45/mode/1up"
       }
      ]
     }

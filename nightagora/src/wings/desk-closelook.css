@@ -125,6 +125,17 @@
   color: var(--desk-title);
   text-wrap: pretty;
 }
+/* THE SOURCE ROW: whose words the line is, one small row under it in the
+   register's own colour, never a badge. It stands down with the line when
+   the drawer takes the line's place. */
+#wing[data-desk~='closelook'] .desk-clb-note {
+  margin: 2px 0 0;
+  font: 400 0.875rem/1.375rem var(--sans);
+  color: var(--desk-quiet);
+  text-wrap: pretty;
+}
+#wing[data-desk~='closelook'] .desk-clb-note[hidden],
+#wing[data-desk~='closelook'] .desk-clb[data-drawer='open'] .desk-clb-note { display: none; }
 #wing[data-desk~='closelook'] .desk-clb-foot {
   margin-top: 5px;
   gap: 30px;
@@ -452,3 +463,26 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
 /* the key beside Close is the sheet's alone; every other window keeps its word */
 .vinci-sources-close .desk-key { display: none; }
 #wing[data-desk~='closelook']:has(.vitrine .desk-clb) .vinci-sources-close .desk-key { display: inline-block; }
+
+/* THE WHOLE TEXT OF A PAGE, beside it: every passage in the edition's order,
+   the lead marked by a gold rule, bare labels small and inline, each passage
+   with its source under it, and the Italian one control away. */
+#wing[data-desk~='closelook'] .reader-beside .reader-italian { margin: 0 0 18px; }
+#wing[data-desk~='closelook'] .reader-beside .reader-passage + .reader-passage {
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px solid color-mix(in srgb, var(--na-starlight) 12%, transparent);
+}
+#wing[data-desk~='closelook'] .reader-beside .reader-passage[data-lead='true'] {
+  padding-left: 14px;
+  box-shadow: inset 2px 0 0 color-mix(in srgb, var(--na-gold) 70%, transparent);
+}
+#wing[data-desk~='closelook'] .reader-beside .reader-passage[data-label='true'] .vitrine-source-text {
+  font: 400 0.9375rem/1.5rem var(--sans);
+  color: var(--desk-quiet);
+}
+#wing[data-desk~='closelook'] .reader-beside .reader-passage .vitrine-meta { margin: 6px 0 0; }
+#wing[data-desk~='closelook'] .reader-beside .vitrine-source-text s { text-decoration-thickness: 1px; opacity: .8; }
+/* the key that opens the whole text says when it stands */
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control[aria-pressed='true'] { color: var(--desk-title); }
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control[aria-pressed='true']::after { height: 1.5px; background: var(--na-gold); }

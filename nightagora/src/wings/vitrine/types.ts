@@ -52,7 +52,20 @@ export interface VitrinePayloadHost {
    * to has its own certainty. The words are the caller's, as every word
    * here is. */
   rename?(title: string, head?: string | null, certainty?: string | null,
-    place?: { at: number; of: number; leaf?: string } | null): void
+    place?: VitrinePlace | null, note?: string | null): void
+}
+
+/** WHERE A WORK STANDS IN ITS SET: counted from one; a book that reads by its
+ * leaves names the leaf in the count's place; a book of pages by topic names
+ * the folio where a catalogue puts a date, and says its own count. */
+export interface VitrinePlace {
+  at: number
+  of: number
+  leaf?: string
+  /** what stands in the date's seat of the name row */
+  seat?: string
+  /** the count as the set says it, `Flight, 2 of 18` */
+  said?: string
 }
 
 export interface VitrinePayload {
@@ -92,7 +105,13 @@ export interface VitrineExhibit {
   /** The two that walk the station's own row, at the card's two ends. */
   walk?: readonly HTMLElement[]
   /** Where the work stands in the set it belongs to, counted from one. */
-  set?: { at: number; of: number; leaf?: string } | null
+  set?: VitrinePlace | null
+  /** THE SOURCE ROW: who the line's words are, small under the line. */
+  note?: string | null
+  /** the gold control's own word where the set names its next object itself */
+  onKicker?: string | null
+  /** the count, pressed on the phone, opens the set it counts */
+  onCount?: () => void
   /** The number on the work's frame, its date, and where the original is,
    * for a work the room hangs under a number. */
   catalogue?: { number: string; date: string; where: string } | null

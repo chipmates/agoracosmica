@@ -3,7 +3,7 @@
  "pages": {
   "TR.22": {
    "lead": 0,
-   "notes": null,
+   "notes": "Richter prints three passages from this page (Reference Table: §§1189, 1332, 1493 = Tr. 2, the page number of Beltrami 1891, Tavola 1), in his order. The curator's reason names all three; lead 0 is set to the maxim because §1332 is, by Richter's own footnote, a contemporary poet's verse that Leonardo copied. Richter's footnote to §1493: Ammianus Marcellinus' histories were printed at Rome in 1474. The Gutenberg index file maps §1493 to the wrong text; the English here is taken from the Gutenberg text at the right place and read on the 1883 page.",
    "passages": [
     {
      "index": 0,
@@ -23,7 +23,10 @@
      "de": {
       "text": "Wild ist, wer sich rettet.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "A play on 'saluatico' (wild, savage) and 'si salua' (saves himself); German cannot keep the sound, only the sense."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -58,7 +61,11 @@
      "de": {
       "text": "Wenn Petrarca den Lorbeer so sehr liebte, dann weil er gut zwischen Wurst und Thunfisch schmeckt; aus ihrem Geschwätz kann ich keinen Schatz machen.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'buon fralla salsiccia e tonno': literally 'good between the sausage and tuna'; we read it as a kitchen herb that tastes good there, as Richter does.",
+       "Richter's footnote: these lines are known to be by a contemporary poet (so he was told by Senatore Morelli), so Leonardo copied them rather than wrote them; Conte Porro read the last line 'I no posso di loro gia (sic) co' far tesauro'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -93,7 +100,10 @@
      "de": {
       "text": "Ammianus Marcellinus versichert, dass im Kampf um Alexandria, zur Zeit von Julius Cäsar, siebenhunderttausend Bände Bücher verbrannt seien.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'nella pugnia Alessādrina': literally 'in the Alexandrian fight'; Richter renders 'in the siege of Alexandria'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -114,7 +124,7 @@
   },
   "K.231": {
    "lead": 0,
-   "notes": null,
+   "notes": "Both passages Richter prints from this side (Reference Table: §824 and §1501 = K.3 29b), in his order. The lead is §824, the note on comparing man and horse, which sits with the drawing of the leg; Richter's footnote to it: see Pl. CVIII, No. 2. §1501 is a memorandum about who holds a copy of Vitruvius.",
    "passages": [
     {
      "index": 0,
@@ -134,7 +144,12 @@
      "de": {
       "text": "Hier halte ich fest, dass ich den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht, und ebenso bei den anderen Tieren. Zuerst beginne ich mit den Knochen, dann gehe ich alle Muskeln durch, die ohne Sehnen an den Knochen entspringen und enden, dann die, die mit Sehne an den Knochen entspringen und enden, und dann die, die mit einer einzigen Sehne an einem Ende.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The last clause has no verb in the Italian ('e poi di quelle che con una sola corda da v̄ canto'); Richter supplies 'start'. We leave it unfinished, as printed.",
+       "Richter's English passes over the middle clause ('e poi di quelli che cō corda nascono e finiscono nell'ossa', those that spring from and end in the bones with a tendon); our German keeps it.",
+       "'v̄': Richter's abbreviation for 'un'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -169,7 +184,10 @@
      "de": {
       "text": "Messer Vincenzio Aliprando, der beim Gasthaus zum Bären wohnt, hat den Vitruv von Giacomo Andrea.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'Iacomo Andrea' is written 'Giacomo Andrea' in the German, as in Richter's English."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -190,7 +208,7 @@
   },
   "L.014": {
    "lead": null,
-   "notes": null,
+   "notes": "Heading (the editor's): '[PERSONNAGE ARMÉ A GENOUX]'; his footnote: 'Au crayon rouge.' The page is a drawing; the only writing is the doubtful 'abe'. Page match checked: his phototype plate of 4 recto (archive.org viewer n212) shows the same kneeling figure as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -205,12 +223,18 @@
      "en": {
       "text": "abe [?]",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "Ravaisson reads the few letters at the upper left of the leaf as 'abe' with a query, and gives no French for them ('. . . [?]'). The meaning is unknown, so the letters stay as printed, untranslated."
+      ]
      },
      "de": {
       "text": "abe [?]",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "Ravaisson reads the few letters at the upper left of the leaf as 'abe' with a query, and gives no French for them ('. . . [?]'). The meaning is unknown, so the letters stay as printed, untranslated."
+      ]
      },
      "fr": {
       "text": ". . . [?]"
@@ -233,7 +257,7 @@
   },
   "L.012": {
    "lead": null,
-   "notes": null,
+   "notes": "Heading (the editor's): '[PLANS ET NOTES. — PERSONNAGE]'; his footnote: 'Le personnage au crayon rouge. Voir folio 9 recto.' The writing belongs to the small ink plan below the head and is written upside down relative to it; the red chalk head carries no words. Ravaisson prints 'tramontana' vertically, as it runs in the manuscript. Page match checked: his phototype plate of 3 recto (archive.org viewer n210) shows the same head and plan as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -248,12 +272,18 @@
      "en": {
       "text": "[Upside down:] c\nNorth b\na\na b: 950\nb c: 2100",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'tramontana' is the north wind, used on plans for the north; it is written along the line a c of the small plan. The unit of 950 and 2100 is not written (on the facing page, fol. 2 verso, a similar plan is measured in 'pass[i]', paces)."
+      ]
      },
      "de": {
       "text": "[Auf dem Kopf stehend:] c\nNorden b\na\na b: 950\nb c: 2100",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'tramontana' is the north wind, used on plans for the north; it is written along the line a c of the small plan. The unit of 950 and 2100 is not written (on the facing page, fol. 2 verso, a similar plan is measured in 'pass[i]', paces)."
+      ]
      },
      "fr": {
       "text": "[Sens dessus dessous :] c\nTramontane b\na\nA b : 950.\nB c : 2100."
@@ -274,9 +304,135 @@
     }
    ]
   },
+  "H.097": {
+   "lead": 0,
+   "notes": "The only passage Richter prints from this side (Reference Table: §1319 = H.1 44a). The heading 'Favola' is Leonardo's (Richter prints it in small caps). It does not describe the drawing of the arm and pulleys the curator names.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §1319 (H.1 44a), vol. II p. 374",
+     "it": {
+      "text": "FAVOLA.\n\nIl giglio si pose sopra la ripa di · Tesino, e la corrēte tirò la ripa īsieme col lilio.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A FABLE.\n\nThe lily set itself down by the shores of the Ticino, and the current carried away bank and the lily with it.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "FABEL.\n\nDie Lilie ließ sich am Ufer des Tessin nieder, und die Strömung riss das Ufer mitsamt der Lilie fort.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'giglio' and 'lilio' are both 'lily'; Leonardo uses both words in one sentence, the German has one."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 374",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n509/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 374",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n509/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "L.010": {
+   "lead": 0,
+   "notes": "Both passages Richter prints from this side (Reference Table: §648 and §1417 = L. 2a), in his order. Neither describes the kneeling young man the curator names; lead 0 is set by Richter's order. Richter's footnotes to §1417: Borges is a Spanish name; Borgo a San Sepolcro is where Luca Paciolo, Leonardo's friend, was born.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §648 (L. 2a), vol. I p. 324",
+     "it": {
+      "text": "Il cavallo bianco si può ismachiare col ferretto di spagna o acqua forte overo col merdocco leuare il pelo nero al bianco cō rottorio, forzare a terra.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "A white horse may have the spots removed with the spanish haematite or with aqua fortis or with . . . . Removes the black hair on a white horse with the singeing iron. Force him to the ground.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Ein weißes Pferd kann man mit spanischem Blutstein oder mit Scheidewasser oder mit Merdocco [?] von Flecken befreien. Das schwarze Haar am Weißen mit einem Ätzmittel [?] entfernen, zu Boden zwingen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'merdocco': Richter leaves the word untranslated (his English has dots). We keep the word and mark it.",
+       "'rottorio': in older Italian a caustic that breaks the skin; Richter reads 'singeing iron'. We write 'Ätzmittel' and mark it.",
+       "'forzare' is printed in smaller type than the rest of the line; Richter gives no reason here. Read as 'force (him) to the ground', as Richter does.",
+       "Where 'overo col merdocco' belongs is open: we follow Richter and read it with the first sentence."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 324",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n441/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 324",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n441/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1417 (L. 2a), vol. II p. 428",
+     "it": {
+      "text": "Borges ti farà avere Archimede del vescouo di Padova, e Vitellozzo quello dal Borgo a San Sepolcro.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Borges shall get for you the Archimedes from the bishop of Padua, and Vitellozzo the one from Borgo a San Sepolcro.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Borges wird dir den Archimedes vom Bischof von Padua besorgen, und Vitellozzo den aus Borgo San Sepolcro.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 428",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n577/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 428",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n577/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
   "A.135": {
    "lead": 2,
-   "notes": null,
+   "notes": "Ravaisson's page heading (the editor's): 'PROPORTIONS DU VISAGE'. His notes: (1) the second paragraph belongs to the small face seen from the front at the right of the page, and the profile at the left also shows squares; (2) from the third paragraph on the lines apply to the young man's profile, with the letters placed so: a behind the head, b between the eyebrows, c at the hairline above the forehead, d at the tip of the chin, e at the parting of the hair behind, h at the neck, k where the underside of the chin meets the throat, n at the middle of the nose, p at the mouth, q at the jawbone, r above the nostril, s at the ear hole, x behind, at the base of the skull, 4 above the upper eyelid, 5 below the lower eyelid. Passages 3 to 5 measure the profile head the curator names; the lead is the first of them. Italics in 'it' and 'fr' mark words Leonardo struck out. Page match checked: the plate above the transcription (archive.org viewer n285) shows the same leaf as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -291,12 +447,20 @@
      "en": {
       "text": "The cut, or edge, of the lower lip of the mouth is the midpoint between the underside of the nose and the underside of the chin.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'63' is the leaf number, which Ravaisson prints in the margin before the first line; it is left out of the translations.",
+       "'lalarg' (la larg[hezza], the width) is printed in italics, begun and struck out by Leonardo; it is left out of the translations."
+      ]
      },
      "de": {
       "text": "Der Schnitt oder die Kante der Unterlippe des Mundes liegt in der Mitte zwischen der Unterseite der Nase und der Unterseite des Kinns.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'63' is the leaf number, which Ravaisson prints in the margin before the first line; it is left out of the translations.",
+       "'lalarg' (la larg[hezza], the width) is printed in italics, begun and struck out by Leonardo; it is left out of the translations."
+      ]
      },
      "fr": {
       "text": "63 — La coupure ou l'angle de la lèvre inférieure est le milieu entre le dessous du nez et le dessous du menton — ~~la largeur~~...."
@@ -328,12 +492,20 @@
      "en": {
       "text": "The face makes a square within itself: its width runs from one end of the eyes to the other, and its height from the top end of the nose to the underside of the lower lip of the mouth. Then what remains above and below this square makes the height of one more such square.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'daluno alaltro stremo delochio' is literally 'from one to the other end of the eye'; Ravaisson adds '[des yeux]' (of the eyes), and the translation follows him.",
+       "Ravaisson's note 1 says these lines belong to the small face seen from the front at the right of the page."
+      ]
      },
      "de": {
       "text": "Das Gesicht bildet in sich ein Quadrat: Seine Breite reicht von einem Ende der Augen zum anderen, seine Höhe vom oberen Ende der Nase bis unter die Unterlippe des Mundes. Was dann über und unter diesem Quadrat übrig bleibt, ergibt die Höhe eines gleichen Quadrats.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'daluno alaltro stremo delochio' is literally 'from one to the other end of the eye'; Ravaisson adds '[des yeux]' (of the eyes), and the translation follows him.",
+       "Ravaisson's note 1 says these lines belong to the small face seen from the front at the right of the page."
+      ]
      },
      "fr": {
       "text": "— Le visage fait en lui un carré, dont la largeur est de l'une à l'autre extrémité de l'œil [des yeux] et la hauteur est de l'extrémité supérieure du nez au-dessous de la lèvre inférieure, puis ce qui reste au-dessus et au-dessous de ce carré fait la hauteur d'un pareil carré."
@@ -365,12 +537,20 @@
      "en": {
       "text": "a b is equal to the space between c d. d n, and so n c, and likewise s r, q p, h k are equal to one another. It is as far from m to s as from the underside of the nose to the chin.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'simile' (alike) is used here for equal lengths, as Ravaisson renders it ('égal', 'semblables').",
+       "The letters are placed on the profile head; Ravaisson's note 2 lists where each stands (see the notes)."
+      ]
      },
      "de": {
       "text": "a b ist gleich dem Abstand zwischen c d. d n und ebenso n c, und gleichermaßen s r, q p, h k sind untereinander gleich. Von m bis s ist es so weit wie von der Unterseite der Nase bis zum Kinn.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'simile' (alike) is used here for equal lengths, as Ravaisson renders it ('égal', 'semblables').",
+       "The letters are placed on the profile head; Ravaisson's note 2 lists where each stands (see the notes)."
+      ]
      },
      "fr": {
       "text": "— a b est égal à l'espace qu'il y a entre c d [La distance a b est égale à la distance c d]. — d n, ainsi que n c et pareillement s r, q p, h k, sont [des espaces semblables entre eux.\n— Il y a autant de m à s que du dessous du nez au menton [au dessous du menton, en k]."
@@ -402,12 +582,20 @@
      "en": {
       "text": "The ear is exactly as long as the nose. It is as far from x to s as from the nose to the chin. The line of the mouth, in profile, points to the angle of the jaw. The ear must be as high as it is from the underside of the nose to the top of the eyelid.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'coperchio dellochio' (the lid of the eye) is read as the upper eyelid, with Ravaisson's '[de la paupière supérieure]'.",
+       "Ravaisson's French fills 'from the nose to the chin' as '[du dessous] du nez au [dessous du] menton [en k]'; the Italian says only 'dal naso al mento', and the translations keep that."
+      ]
      },
      "de": {
       "text": "Das Ohr ist genau so lang wie die Nase. Von x bis s ist es so weit wie von der Nase bis zum Kinn. Die Linie des Mundes zielt im Profil auf den Winkel des Kiefers. Das Ohr muss so hoch sein, wie es von der Unterseite der Nase bis zur Oberkante des Augenlids ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'coperchio dellochio' (the lid of the eye) is read as the upper eyelid, with Ravaisson's '[de la paupière supérieure]'.",
+       "Ravaisson's French fills 'from the nose to the chin' as '[du dessous] du nez au [dessous du] menton [en k]'; the Italian says only 'dal naso al mento', and the translations keep that."
+      ]
      },
      "fr": {
       "text": "— L'oreille est précisément de la même longueur que le nez.\n— Il y a autant de x à s que [du dessous] du nez au [dessous du] menton [en k].\n— La coupure de la bouche en profil se dirige à l'angle de la mâchoire.\n— La hauteur de l'oreille doit être égale à la distance qu'il y a du dessous du nez au-dessus du couvercle [de la paupière supérieure] de l'œil."
@@ -439,12 +627,22 @@
      "en": {
       "text": "The space between the eyes is as large as one eye. The ear falls over the middle of the neck, in profile. It is as far from 4 to 5 as from 5 to r.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'quanda' is Leonardo's slip; Ravaisson prints his correction '[quanta e]' (as much as is) in the Italian, and the translations follow it.",
+       "'chade nel mezo delchollo' is literally 'falls in the middle of the neck'; it is read as the ear standing above the middle of the neck when the head is seen in profile.",
+       "The print breaks 'del-chollo' across two lines; it is joined here."
+      ]
      },
      "de": {
       "text": "Der Abstand zwischen den Augen ist so groß wie ein Auge. Das Ohr liegt im Profil über der Mitte des Halses. Von 4 bis 5 ist es so weit wie von 5 bis r.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'quanda' is Leonardo's slip; Ravaisson prints his correction '[quanta e]' (as much as is) in the Italian, and the translations follow it.",
+       "'chade nel mezo delchollo' is literally 'falls in the middle of the neck'; it is read as the ear standing above the middle of the neck when the head is seen in profile.",
+       "The print breaks 'del-chollo' across two lines; it is joined here."
+      ]
      },
      "fr": {
       "text": "— L'espace qu'il y a entre les yeux est égal à la grandeur d'un œil.\n— L'oreille tombe au milieu du cou, en profil.\n— Il y a autant de 4 à 5 que de 5 à r."
@@ -460,6 +658,137 @@
        "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. I]: Le manuscrit A de la Bibliothèque de l'Institut, publié en fac-similés (procédé Arosa) avec transcription littérale, traduction française, préface et table méthodique, Paris: A. Quantin, 1881",
        "page": "Ms A, FOLIO 63 (recto), French translation (the page after the plate, headed PROPORTIONS DU VISAGE); archive.org viewer page n286",
        "url": "https://archive.org/details/lesmanuscritsdel01lo/page/n286/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "H.136": {
+   "lead": 0,
+   "notes": "Placement confirmed: both passages carry 'H.2 15b]' (Leonardo's own number 15 in the second part of MS H; the library's folio 63 verso); Richter's Bibliography (vol. II p. 487, H.2) lists '15b 694, 1316'; Ravaisson vol. VI prints both under Ms H 'FOLIO 63 [15] (verso)' with the notes '(Oiseau lâché, sur lequel se jettent aussitôt un chien et un oiseau de proie). J.-P. Richter, t. I, no 694' and 'Idem, t. II, no 1316' (https://archive.org/details/lesmanuscritsdel06lo/page/n77/mode/1up; the page is in red chalk by his note). Richter's footnote to 1316: 'Above this text is another note, also referring to liberty; see No. 694.' Given in the edition's order (§694 in vol. I, §1316 in vol. II), which is also their order on the page. Ravaisson prints one more note on this side, on sand moved by two light currents of water ('larena mossa da 2 lievi corsi dacqua ...'); Richter does not print it, and it is not in this record. The curator's reason names the drawing (the running youth, the bird leaving his hand, the dog), which is the emblem of §694; lead 0.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §694 (H.2 15b), vol. I p. 359",
+     "it": {
+      "text": "Corta libertà.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "Short liberty.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Kurze Freiheit.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 359",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n528/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 359",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n528/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §1316 (H.2 15b), vol. II p. 374",
+     "it": {
+      "text": "Il calderugio dà la vittouaglia ai figliuoli ingabbiati; — prima morte che perdere libertà.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "The goldfinch gives victuals to its caged young. Death rather than loss of liberty.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Stieglitz gibt seinen Jungen im Käfig Futter [?]. Lieber den Tod, als die Freiheit zu verlieren.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la vittouaglia' (food, victuals) is Richter's reading; his own note gives the manuscript as 'calderigio da il arouialio'. Ravaisson reads the same words as 'ilcalderigio da iltortomalio a figlioli ingabiati' and translates 'le chardonneret donne le tithymale aux petits en cage' (spurge, a poisonous plant); his note quotes Richter's 'vittouaglia ... gives victuals' and points to the word 'tutto maglio [tortomaglio, utumaglio]' on folio 65 [17] recto. The German follows Richter's printed Italian and marks the word [?]; with Ravaisson's reading the goldfinch gives its caged young spurge.",
+       "'prima morte che perdere libertà': literally 'death first, rather than losing liberty'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 374",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n509/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. II",
+       "page": "vol. II p. 374",
+       "url": "https://archive.org/details/literaryworksofl02leonuoft/page/n509/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "K.216": {
+   "lead": 0,
+   "notes": "Heading (the editor's): '[ANATOMIE. CHEVAL]'. His note: 'Page au crayon rouge; la figure en bas reprise à l'encre. Une croix devant le texte.' (red chalk page, the lower figure gone over in ink, a cross before the text). The word 'cavallo' names the animal of the leg skeleton the curator describes; the page is from Ms K, whose third part numbers this leaf 22 (Ravaisson's '[22]'). Page match checked: his phototype plate of 102 [22] recto (archive.org viewer n398) shows the same leaf as the SET image.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Ravaisson-Mollien vol. III (1888), Ms K fol. 102r, block 1 of 1",
+     "it": {
+      "text": "de muss coli chessa pichano su llosso —\n[Au-dessus de la 3e figure :] cavallo",
+      "label": {
+       "en": "Transcription: Charles Ravaisson-Mollien, 1881 to 1891",
+       "de": "Umschrift: Charles Ravaisson-Mollien, 1881 bis 1891"
+      }
+     },
+     "en": {
+      "text": "Of the muscles that attach onto the bone.\n[Above the third figure:] horse",
+      "kind": "ours",
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'chessa pichano' is read as 'che s'appiccano' (that attach themselves), as Ravaisson's 's'attachent'.",
+       "The edition places 'cavallo' above the third figure; on the leaf the word stands at the upper left, over the red chalk hind leg and pelvis. The bracketed placing is the editor's."
+      ]
+     },
+     "de": {
+      "text": "Von den Muskeln, die am Knochen ansetzen.\n[Über der dritten Figur:] Pferd",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'chessa pichano' is read as 'che s'appiccano' (that attach themselves), as Ravaisson's 's'attachent'.",
+       "The edition places 'cavallo' above the third figure; on the leaf the word stands at the upper left, over the red chalk hind leg and pelvis. The bracketed placing is the editor's."
+      ]
+     },
+     "fr": {
+      "text": "Des muscles qui s'attachent sur l'os.\n[Au-dessus de la 3e figure :] Cheval :"
+     },
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms K, FOLIO 102 [22] (recto), transcription (upper right column, under the heading [ANATOMIE. CHEVAL]); archive.org viewer page n397",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n397/mode/1up"
+      },
+      {
+       "edition": "Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci [vol. III]: Manuscrits C, E & K de la Bibliothèque de l'Institut, publiés en fac-similés phototypiques avec transcriptions littérales, traductions françaises, avant-propos et tables méthodiques, Paris: Maison Quantin, 1888",
+       "page": "Ms K, FOLIO 102 [22] (recto), French translation (upper right column, below the Italian); archive.org viewer page n397",
+       "url": "https://archive.org/details/lesmanuscritsdel03lo/page/n397/mode/1up"
       }
      ]
     }

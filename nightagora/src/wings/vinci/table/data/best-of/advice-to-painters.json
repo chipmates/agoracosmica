@@ -3,7 +3,7 @@
  "pages": {
   "AshA.057": {
    "lead": 2,
-   "notes": null,
+   "notes": "Richter cites the leaf as 'Ash. I. 13a'; Herzfeld and the Institut use the later red foliation, 22v (the map's concordance, checked on shared passages). Passages in Richter's numbering order. Herzfeld prints Leonardo's own chapter titles as the first line of her text; her side headings are kept apart.",
    "passages": [
     {
      "index": 0,
@@ -63,7 +63,11 @@
      "de": {
       "text": "WIE DER MALER DIE PERSPEKTIVE DER FARBEN IN DIE PRAXIS UMSETZEN SOLL.\n\nWillst du diese Perspektive vom Wechsel, vom Verlust oder vom Schwinden der eigenen Art der Farben in die Praxis umsetzen, dann nimm dir alle hundert Braccia Dinge vor, die in der Landschaft stehen, wie Bäume, Häuser, Menschen und Orte. Vor den ersten Baum stellst du eine gut befestigte Glasscheibe, und ebenso fest halte dein Auge. Auf diese Scheibe zeichnest du einen Baum, genau über die Form jenes Baumes. Dann rücke so weit zur Seite, dass der wirkliche Baum fast an deine Zeichnung grenzt. Nun male deine Zeichnung so aus, dass beide sich in Farbe und Form die Waage halten und dass beide, wenn du ein Auge schließt, in derselben Entfernung auf die Scheibe gemalt scheinen. Nach derselben Regel verfahre mit dem zweiten und dem dritten Baum, von hundert zu hundert Braccia, einen nach dem anderen. Diese sollen dir als Autoren und Lehrmeister dienen, immer wenn du an deinen Werken arbeitest, wo sie hingehören, und sie lassen das Werk gut in die Tiefe fliehen. Ich finde aber als Regel, dass der zweite um 4/5 [?] gegenüber dem ersten abnimmt, wenn er 20 Braccia vom ersten entfernt ist.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'diminviscie 4/5 del primo' can mean the second loses 4/5 of the first or keeps 4/5 of it; Richter reads 'is 4/5 of the first', and his footnote cites Ludwig's 'decreases by four fifths'. Marked [?].",
+       "'faranno bene fuggir l'opera' (they will make the work recede well) rendered 'lassen das Werk gut in die Tiefe fliehen'; Richter: 'give due distance in those works'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -164,7 +168,7 @@
   },
   "AshA.074": {
    "lead": 1,
-   "notes": null,
+   "notes": "Richter cites this side as 'Ash. I. 4b' (red foliation 31r, matched by Herzfeld's 'Fol. 31 r.' for the battle). Left out: §504 ('How something may be learnt everywhere'), which MAP2 lists for this page but which Richter prints under 'Ash. I. 4a' (checked on the scan), the other side of the leaf. The battle description continues on the next leaf (Richter §602).",
    "passages": [
     {
      "index": 0,
@@ -184,7 +188,11 @@
      "de": {
       "text": "WIE HOCH MAN DEN AUGENPUNKT SETZEN SOLL.\n\nDer Augenpunkt muss so hoch liegen wie das Auge eines Menschen von gewöhnlicher Größe. Und das Ende der Ebene, wo sie an den Himmel grenzt, muss auf der Höhe dieser Grenze zwischen Erde und Himmel gemacht werden, ausgenommen die Berge, die frei davon sind.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'all'altezza d'esso termine della terra col cielo' is read with Richter as the line where earth and sky meet; 'esso' may also point back to the point of sight.",
+       "'le mōtagnie che sono libere' (the mountains, which are free) rendered 'die frei davon sind'; Richter: 'which are independent of it'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -245,7 +253,7 @@
   },
   "G.019": {
    "lead": 0,
-   "notes": null,
+   "notes": "",
    "passages": [
     {
      "index": 0,
@@ -291,7 +299,7 @@
   },
   "AshA.054": {
    "lead": 1,
-   "notes": null,
+   "notes": "Richter cites the side as 'Ash. I. 14b'; Herzfeld as 'Fol. 21 r.' (red foliation). Richter's page with §594 carries a facsimile of a Louvre pen drawing he connects with the Last Supper; it is his illustration, not part of this manuscript page.",
    "passages": [
     {
      "index": 0,
@@ -377,7 +385,7 @@
   },
   "AshA.061": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement of §656: Richter prints 'Ash. I. 11b' (the other side of his 11a, which carries §529), but Herzfeld signs it 24v and Ravaisson-Mollien 1891 (vol. VI, 'Ms 2038 — FOLIO 24 (verso)', archive.org lesmanuscritsdel06lo, hOCR leaf 272) prints both texts on 24 verso, under the note '[Suite du folio 25 recto]'. The facsimile edition decides: both passages are on this page. Richter's numbering order is kept (§529, §656); on the page the sculpture text comes first.",
    "passages": [
     {
      "index": 0,
@@ -456,6 +464,431 @@
        "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
        "page": "p. 158-159",
        "url": "https://archive.org/details/leonardodavincid00leon/page/n337/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.049": {
+   "lead": 2,
+   "notes": "Richter cites all three as 'Ash. I. 17a'; Herzfeld signs the night scene 'Fol. 18 v.' (red foliation).",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §145 (Ash. I. 17a), vol. I p. 85",
+     "it": {
+      "text": "DELLA DISCRETIONE DEL'ONBRE DE' SITI E DELLE COSE POSTE Ī QUELLI.\n\nSe il sole fia · nel'oriēte e guarderai īuerso · occidēte · vedrai tutte le cose luminate essere īteramēte private d'ōbra perchè vedi ciò che vede 'l sole, e se riguardi a mezzodì e tramōtana · vedrai tutt'i corpi essere circūdati da ōbra · e lume perchè vedi quello che nō vede · e vede il sole e se riguarderai īverso il cāmino del sole, tutti i corpi ti mostreranno la loro parte av̄brata, perchè quella parte nō può essere veduta dal sole.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE DIFFERENT LIGHT AND SHADE IN VARIOUS ASPECTS AND OF OBJECTS PLACED IN THEM.\n\nIf the sun is in the East and you look towards the West you will see every thing in full light and totally without shadow because you see them from the same side as the sun: and if you look towards the South or North you will see all objects in light and shade, because you see both the side towards the sun and the side away from it; and if you look towards the coming of the sun all objects will show you their shaded side, because on that side the sun cannot fall upon them.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VON DER UNTERSCHEIDUNG DER SCHATTEN NACH DEN HIMMELSRICHTUNGEN UND VON DEN DINGEN, DIE DARIN STEHEN.\n\nSteht die Sonne im Osten und du schaust nach Westen, so siehst du alle beleuchteten Dinge ganz ohne Schatten, denn du siehst, was die Sonne sieht. Schaust du nach Süden und Norden, so siehst du alle Körper von Schatten und Licht umgeben, denn du siehst das, was die Sonne nicht sieht, und das, was sie sieht. Und schaust du in die Richtung, aus der die Sonne kommt, zeigen dir alle Körper ihre beschattete Seite, denn diese Seite kann von der Sonne nicht gesehen werden.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'se riguardi a mezzodì e tramōtana ... vedi quello che nō vede · e vede il sole': literally 'you see what [the sun] does not see and [what it] sees'; Richter smooths it to 'both the side towards the sun and the side away from it'. Our German keeps the literal form.",
+       "'īverso il cāmino del sole' (towards the sun's path, i.e. looking into the sun); Richter: 'towards the coming of the sun'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 85",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n124/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 85",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n124/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §298 (Ash. I. 17a), vol. I p. 160",
+     "it": {
+      "text": "COME L'ARIA SI DEBE PIV FARE CHIARA QUĀTO PIV LA FAI FINIRE BASSA.\n\nPerchè quest'aria è grossa presso alla terra · e quāto piv si leua piv s'assottiglia; quādo · il sole · è per leuāte, e tu riguarderai il ponēte participāte di mezzodì e tramōtana, vedrai quel'aria grossa ricievere piv lume dal sole che la sottile, perchè i razzi trovano più resistētia; e se il cielo a la vista tua terminerà colla bassa pianvra, quella parte vltima del cielo · fia veduta per quella aria · piv grossa e piv bianca, la quale · corromperà la verità del colore che si vedrà pel suo · mezzo, e parrà lì · il cielo piv biāco che sopra te, che la linia visuale passa · per meno quātità d'aria corrotta da grossi umori; e se riguarderai inverso · leuāte ·, l'aria ti parrà piv scura, quāto piv s'abbassa, perchè in detta aria bassa i razzi luminosi meno passano.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "WHY THE ATMOSPHERE MUST BE REPRESENTED AS PALER TOWARDS THE LOWER PORTION.\n\nBecause the atmosphere is dense near the earth, and the higher it is the rarer it becomes. When the sun is in the East if you look towards the West and a little way to the South and North, you will see that this dense atmosphere receives more light from the sun than the rarer; because the rays meet with greater resistance. And if the sky, as you see it, ends on a low plain, that lowest portion of the sky will be seen through a denser and whiter atmosphere, which will weaken its true colour as seen through that medium, and there the sky will look whiter than it is above you, where the line of sight travels through a smaller space of air charged with heavy vapour. And if you turn to the East, the atmosphere will appear darker as you look lower down because the luminous rays pass less freely through the lower atmosphere.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "WARUM MAN DIE LUFT UMSO HELLER MACHEN MUSS, JE TIEFER MAN SIE ENDEN LÄSST.\n\nDenn diese Luft ist dicht nahe der Erde, und je höher sie steigt, desto dünner wird sie. Steht die Sonne im Osten und du schaust nach Westen, ein wenig nach Süden und Norden hin, so siehst du, dass jene dichte Luft mehr Licht von der Sonne empfängt als die dünne, weil die Strahlen dort mehr Widerstand finden. Und wenn der Himmel für dein Auge an der tiefen Ebene endet, wird dieser letzte Teil des Himmels durch jene dichtere und weißere Luft gesehen. Sie verdirbt die wahre Farbe dessen, was man durch sie hindurch sieht, und der Himmel erscheint dort weißer als über dir, wo die Sehlinie durch weniger Luft geht, die von dicken Dünsten getrübt ist. Und schaust du nach Osten, erscheint dir die Luft umso dunkler, je tiefer sie hinabreicht, denn durch diese tiefe Luft dringen die Lichtstrahlen weniger hindurch.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'participāte di mezzodì e tramōtana' (partaking of south and north) read with Richter as 'a little way to the south and north'.",
+       "'quāto piv s'abbassa' (the lower it goes) rendered as the air reaching lower; Richter: 'as you look lower down'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 160",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n207/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 160",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n207/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §604 (Ash. I. 17a), vol. I p. 304-305; Herzfeld 1906 p. 184-185, LX",
+     "it": {
+      "text": "DEL MODO DEL FIGURARE UNA NOTTE.\n\nQuella cosa che è priuata īteramēte di luce è tutta tenebre; essendo la notte · ī simile cōditione se tu vi vogli figurare una storia farai · che, essēdovi uno grāde fuoco, che quella cosa ch'è più propīqua a detto fuoco piv si tīga nel suo colore ·, perchè quella cosa ch'è piv vicina all'obietto piv partecipa della sua · natura ·, e faciēdo · il foco pēdere ī color rosso farai tutte le cose ·, alluminate da quello, ancora loro rosseggiare, e quelle che sono piv lontane · a detto fuoco piv siē tīte dal colore nero della notte ·; le figure che sono tratte al fuoco · appariscono · scure nella chiarezza d'esso foco, perchè quella parte d'essa cosa che vedi · è tinta dalla oscurità della notte e nō dalla chiarezza del foco ·, e quelli che si trovano dai lati sieno mezzi oscuri · e mezzi rosseggiāti, e quelli che si possono vedere dopo e' termini delle fiāme · saranno tutti alluminati · di rosseggiāte lume ī cāpo nero ·; in quāto a li atti farai quelli che lì sono presso farsi scudo colle mani e cō mātelli riparo del superchio · calore · e torti col uolto ī cōtraria parte mostrare fugire quelli piv lōtani farai grā parte di loro farsi colle mani alli ochi, offesi dal superchio splēdore.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF THE WAY TO REPRESENT A NIGHT [SCENE].\n\nThat which is entirely bereft of light is all darkness; given a night under these conditions and that you want to represent a night scene,—arrange that there shall be a great fire, then the objects which are nearest to this fire will be most tinged with its colour; for those objects which are nearest to a coloured light participate most in its nature; as therefore you give the fire a red colour, you must make all the objects illuminated by it ruddy; while those which are farther from the fire are more tinted by the black hue of night. The figures which are seen against the fire look dark in the glare of the firelight because that side of the objects which you see is tinged by the darkness of the night and not by the fire; and those who stand at the side are half dark and half red; while those who are visible beyond the edges of the flame will be fully lighted by the ruddy glow against a black background. As to their gestures, make those which are near it screen themselves with their hands and cloaks as a defence against the intense heat, and with their faces turned away as if about to retire. Of those farther off represent several as raising their hands to screen their eyes, hurt by the intolerable glare.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Von der Art, eine Nacht darzustellen\n\nWas gänzlich des Lichtes beraubt ist, ist völlige Dunkelheit. Da die Nacht in diesen Umständen ist, und du in ihr eine Geschichte darstellen willst, wirst du es so machen, daß, nachdem ein großes Feuer sich in dieser Nacht befindet, daß alles, was mehr in der Nachbarschaft besagten Feuers ist, sich mehr in dessen Farbe kleide, weil die Sache, die einem Gegenstand näher ist, auch mehr an dessen Natur teilnimmt. Und da du das Feuer zur roten Farbe wirst hinneigen lassen, wirst du alle von diesem erleuchteten Sachen auch rötlich machen, und die von jenem Feuer mehr entfernt sind, müssen mehr die schwarze Farbe der Nacht tragen. Die Figuren, die zwischen dir und dem Feuer sind, erscheinen dunkel in der Dunkelheit der Nacht und nicht von der Helligkeit des Feuers, und die sich auf den Seiten befinden, seien zur Hälfte dunkel und zur Hälfte rötlich. Die man jenseits der Flammengrenzen sehen kann, werden in schwarzem Felde ganz von rötlichem Licht erleuchtet sein.\n\nWas die Gebärden anlangt, wirst du jene, die ihm ganz nahe sind, mit den Händen und den Mänteln zum Schutz gegen die übermäßige Hitze sich einen Schild machen lassen und, mit dem Gesicht nach der entgegengesetzten Seite abgewendet, scheinbar zu jenen weiter Entfernten fliehen; du wirst einen großen Teil von ihnen sich die Augen mit den Händen vor dem überstarken Lichtglanz schirmen lassen, der sie verletzt.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 304-305",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n405/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 304-305",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n405/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 184-185",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n363/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.016": {
+   "lead": 0,
+   "notes": "Richter cites 'Ash. I. 31b'; Herzfeld signs the same passage 'Fol. 2 r.' (red foliation), which is this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §506 (Ash. I. 31b), vol. I p. 253; Herzfeld 1906 p. 182, LVI",
+     "it": {
+      "text": "PITTURA.\n\nLo ingiegnio del pittore vol essere a similitudine · dello · spechio ·, jl quale · senpre si trasmuta nel colore · di quella · cosa ch'eli à per obietto ·, e di tāte similitudini s'enpie · quāte sono le cose che li sono contraposte; Adūque conosciēdo · tu · pittore nō potere esser · bono · se nō sei · vniversale · maestro di cōtrafare · colla · tua · arte · tutte le qualità · delle · forme · che produce la natura, le quali nō saprai · fare, se nō le vedi ·, e ritenerle nella mēte; Onde andādo tu per cāpagnie · fa che 'l tuo givditio si uolti a vari obietti e di mano ī mano riguardare or questa cosa ora quell'altra, faciēdo vn fascio di uarie cose · elette e scielte infra le mē bone; E nō facci come alcuni pittori, i quali ·, stāchi colla lor fantasia, dismettono l'opera e fāno esercitio col andare · a sollazzo, riserbandosi vna stāchezza nella mente, la quale, nō cheveghino, non porgono ī mente · varie cose, ma spesse volte scontrādo li amici e parēti, essendo · da quelli salutati ·, nō che li vedino · o sentino, e non altrementi sono cognioscivti ·, come se vi scontrassino altre tāt'aria.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "PAINTING.\n\nThe mind of the painter must resemble a mirror, which always takes the colour of the object it reflects and is completely occupied by the images of as many objects as are in front of it. Therefore you must know, Oh Painter! that you cannot be a good one if you are not the universal master of representing by your art every kind of form produced by nature. And this you will not know how to do if you do not see them, and retain them in your mind. Hence as you go through the fields, turn your attention to various objects, and, in turn look now at this thing and now at that, collecting a store of divers facts selected and chosen from those of less value. But do not do like some painters who, when they are wearied with exercising their fancy dismiss their work from their thoughts and take exercise in walking for relaxation, but still keep fatigue in their mind which, though they see various objects [around them], does not apprehend them; but, even when they meet friends or relations and are saluted by them, although they see and hear them, take no more cognisance of them than if they had met so much empty air.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Der Geist des Malers will dem Spiegel gleichen, der sich immer in die Farbe jener Sache verwandelt, so er zu seinem Gegenstand hat, und sich mit so viel Abbildern füllt, als der Dinge sind, die man ihm gegenüberstellt. Also du, Maler, wohl bewußt, daß du nicht gut sein kannst, wenn du nicht universaler Meister darin bist, mit deiner Kunst alle Eigenschaften der Formen nachzumachen, so die Natur hervorbringt, welche Formen du nicht wirst zu machen wissen, außer du siehst sie und behältst sie im Gedächtnis zurück; — wenn du über die Fluren gehst, trachte daher, daß dein Urteil sich zu verschiedenen Gegenständen wende und nachderhand jetzt diese Sache beschaue, und jetzt jene andere, indem es so aus den mannigfachen erlesenen und unter minder guten herausgewählten Sachen einen Strauß windet. Und tue nicht wie so mancher Maler, der müde in der Phantasie sein Werk stehen läßt und, um sich Bewegung zu machen, auf Kurzweil ausgeht, wobei er seine Müdigkeit im Geiste weiter bewahrt, durch die er nichts sehen noch die verschiedenen Sachen ins Gemüt aufnehmen kann, dagegen häufige Male die Freunde und Verwandten treffend und von ihnen begrüßt, so wenig etwas sieht und hört und nicht anders erkennt, als ob er ebensovieler Luft begegnet wäre.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 253",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n348/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 253",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n348/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 182",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n361/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.050": {
+   "lead": 1,
+   "notes": "Richter cites both passages as 'Ash. I. 16b'; Herzfeld signs the painting and poetry text 'Fol. 19 r.' (red foliation), this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §535 (Ash. I. 16b), vol. I p. 268-269",
+     "it": {
+      "text": "PERCHÈ DI 2 COSE DI PARI GRĀDEZZA PARRÀ MAGGIORE LA DIPĪTA CHE QUELLA DI RILIEUO.\n\nQuesta · ragione · nō fia di facile dimostratione · come molte altre, ma pure m'īgiegnierò di sadisfare, se nō in tutto, in qualche parte; la prospettiva diminvita · ci dimostra per ragione ·, che le cose quāto · piv alōtanono dal'ochio piv diminviscono ·, e queste ragioni bē sono cōferme dalla · esperiēza; adūque · le linie visuali che si trouano īfra l'obietto · e l'occhio ·, quādo s'astēdono alla superfitie della · pittura ·, tutte si tagliano · a uno medesimo termine; E le linie che si truovano īfra l'ochio · e la scoltura · sono di uari termini e lūghezze: quella linia ch'è piv · lūga · s'astēde sopra uno mēbro piv · lōtano che li altri e però quel mēbro pare minore ·, essēdoui molte linie più lūghe che l'altre, e per cagione che le molte particule piv lōtane l'una che l'altra essēdo piv lontane, cōuiene che apparischino minori, apparēdo minori, vēgono a fare per loro diminvire minore tutta la sōma dello obietto; E questo nō accadēdo nella pittura per le linie terminate a vna medesima distātia cōuiene che sieno sāza diminvtione; adūque le particule nō diminvite · nō diminviscono · la sōma dello obbietto, e per questo nō diminuiscie la pittura come la scoltura.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "WHY OF TWO OBJECTS OF EQUAL SIZE A PAINTED ONE WILL LOOK LARGER THAN A SOLID ONE.\n\nThe reason of this is not so easy to demonstrate as many others. Still I will endeavour to accomplish it, if not wholly, at any rate in part. The perspective of diminution demonstrates by reason, that objects diminish in proportion as they are farther from the eye, and this reasoning is confirmed by experience. Hence, the lines of sight that extend between the object and the eye, when they are directed to the surface of a painting are all intersected at uniform limits, while those lines which are directed towards a piece of sculpture are intersected at various limits and are of various lengths. The lines which are longest extend to a more remote limb than the others and therefore that limb looks smaller. As there are numerous lines each longer than the others—since there are numerous parts, each more remote than the others and these, being farther off, necessarily appear smaller, and by appearing smaller it follows that their diminution makes the whole mass of the object look smaller. But this does not occur in painting; since the lines of sight all end at the same distance there can be no diminution, hence the parts not being diminished the whole object is undiminished, and for this reason painting does not diminish, as a piece of sculpture does.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "WARUM VON ZWEI DINGEN GLEICHER GRÖSSE DAS GEMALTE GRÖSSER ERSCHEINT ALS DAS PLASTISCHE.\n\nDiese Begründung ist nicht so leicht zu beweisen wie viele andere, doch will ich versuchen, ihr Genüge zu tun, wenn nicht ganz, so doch zum Teil. Die Perspektive der Verkleinerung zeigt uns mit Gründen, dass die Dinge umso kleiner werden, je weiter sie sich vom Auge entfernen, und diese Gründe werden von der Erfahrung gut bestätigt. Die Sehlinien zwischen dem Gegenstand und dem Auge werden also, wenn sie bis zur Fläche des Gemäldes reichen, alle an derselben Grenze geschnitten. Die Linien zwischen dem Auge und der Skulptur aber haben verschiedene Enden und Längen: Die längere Linie reicht zu einem Glied, das weiter entfernt ist als die anderen, und darum erscheint dieses Glied kleiner. Da es viele Linien gibt, die länger sind als die anderen, und da die vielen Teile, einer weiter entfernt als der andere, weiter weg liegen, müssen sie kleiner erscheinen. Und indem sie kleiner erscheinen, lassen sie durch ihre Verkleinerung die ganze Masse des Gegenstandes kleiner werden. Beim Gemälde geschieht das nicht, weil die Linien dort in derselben Entfernung enden, und so kann es keine Verkleinerung geben. Die nicht verkleinerten Teile verkleinern also die Masse des Gegenstandes nicht, und darum wird das Gemälde nicht kleiner wie die Skulptur.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la prospettiva diminvita' (the diminishing perspective) rendered 'die Perspektive der Verkleinerung', as Richter ('the perspective of diminution').",
+       "'tutte si tagliano · a uno medesimo termine' (all are cut at one and the same limit): Richter 'intersected at uniform limits'; kept literal."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 268-269",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n365/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 268-269",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n365/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §653 (Ash. I. 16b), vol. I p. 327; Herzfeld 1906 p. 154-155, II (the part signed MS. ASH. I. FOL. 19 r.)",
+     "it": {
+      "text": "COME LA PITTURA AVĀZA TUTTE L'OPERE VMANE PER SOTTILE SPECULATIONI APPARTENENTI · A QUELLA.\n\nL'occhio · che si dice finestra dell'anima è la prīcipale · via, dōde il comvne · sēso può piv copiosa- e magīficamēte · cōsiderare · le īfinite opere di natura ·, e l'orechio è il secōdo il quale si fa nobile · per le cose racōte, le quali à veduto l'ochio ·; se uoi istoriografi o poeti · o altri mattematici nō ui aveste col'ochio viste le cose, male le potreste riferire per le scritture, e se tu poeta figurerai · una storia colla pittura della penna, el pittore col pennello la farà di piv facile sadisfatione e mē tediosa a essere cōpresa: se tu dimāderai la pittura muta poesia, ācora il pittore potrà dire del poeta · orba pittura ·; or guarda quale è più dannoso morbo o cieco o mvto; se 'l poeta è libero come 'l pittore nelle īuētioni, le sua fintioni · nō sono di tāta sadisfatione ali omini quāto le pitture, perchè se la poesia s'astēde colle parole a figvrare forme, atti e siti, il pittore si move colle propie similitudini delle forme a cōtrafare esse forme; or guarda qual'è piv propīquo all'omo · o 'l nome d'omo o la similitudine d'esso omo; il nome dell'omo si uaria ī uari paesi e la forma non è mvtata se nō da morte.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "THAT PAINTING SURPASSES ALL HUMAN WORKS BY THE SUBTLE CONSIDERATIONS BELONGING TO IT.\n\nThe eye, which is called the window of the soul, is the principal means by which the central sense can most completely and abundantly appreciate the infinite works of nature; and the ear is the second, which acquires dignity by hearing of the things the eye has seen. If you, historians, or poets, or mathematicians had not seen things with your eyes you could not report of them in writing. And if you, O poet, tell a story with your pen, the painter with his brush can tell it more easily, with simpler completeness and less tedious to be understood. And if you call painting dumb poetry, the painter may call poetry blind painting. Now which is the worse defect? to be blind or dumb? Though the poet is as free as the painter in the invention of his fictions they are not so satisfactory to men as paintings; for, though poetry is able to describe forms, actions and places in words, the painter deals with the actual similitude of the forms, in order to represent them. Now tell me which is the nearer to the actual man: the name of man or the image of the man. The name of man differs in different countries, but his form is never changed but by death.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wieso die Malerei alles Menschenwerk durch die feine Überlegung, die ihr eigen ist, übertrifft\n\nDas Auge, das man Fenster der Seele nennt, ist der hauptsächliche Weg, auf dem der allgemeine Sinn reichlich und prachtvoll die unendlichen Werke der Natur betrachten kann, und das Ohr ist der zweitnächste, der sich Adel erwirbt durch die erzählten Dinge, die das Auge wahrgenommen hat. Wenn ihr, Geschichtschreiber oder Poeten oder sonstige Mathematiker, nicht die Dinge mit dem Auge gesehen hättet, schlecht würdet ihr sie durch die Schriften berichten. Und wenn du, Poet, eine Geschichte mit der Malerei der Feder darstellen wirst, so wird der Maler sie mit dem Pinsel zu leichterer Befriedigung (der anderen) machen und minder langweilig, zu verstehen. Wenn du die Malerei stumme Poesie nennst, würde der Maler von der Schrift des Poeten sagen können: blinde Malerei. Jetzt schau: — welcher Spott ist beißender: blind oder stumm?\n\nWenn der Dichter frei ist wie der Maler, in seinen Erfindungen, so sind doch seine Fiktionen nicht von solcher Zufriedenstellung für die Menschen wie die Gemälde; denn strebt die Poesie mit Worten an, Formen, Handlungen und Orte darzustellen, so bewegt der Maler sich darin, mit den Abbildern der Formen selbst die Formen nachzuahmen. Nun sieh, was dem Menschen näher steht, der Name des Menschen oder das Bildnis dieses Menschen. Der Name Mensch wechselt mit den wechselnden Ländern; die Form wird nicht verändert, außer durch den Tod,",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 327",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n446/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 327",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n446/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 154-155",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n333/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "AshA.063": {
+   "lead": 2,
+   "notes": "Richter cites all three as 'Ash. I. 10a'; Herzfeld signs §500 'Fol. 25 v.' (red foliation), this page.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §295 (Ash. I. 10a), vol. I p. 159",
+     "it": {
+      "text": "DELLA PROSPETTIVA AEREA.\n\nÈ ci una altra · prospectiva · la quale chiamo aerea, īperochè per la uarietà dell'aria · si può conosciere le diverse distātie di uari edifiti, terminati ne' lor nascimēti da una sola linia, come sarebbe il uedere molti edifiti di là da uno muro, che tutti apparischino sopra alla stremità di detto mvro d'una medesima grādezza, e tu volessi in pittura · fare parere piv lontano l'uno che l'altro e da figurare una aria vn poco grossa; Tu sai che ī simili arie l'ultime cose viste ī quella, come sono le mōtagnie · per la grā quātità dell'aria · che si truova infra l'ochio tuo · e la mōtagnia · quella pare azzurra quasi del colore dell'aria quādo il sole è per leuāte; Adūque farai sopra · detto mvro il primo edificio del suo colore, il · piv lōtano fa lo meno profilato e piv azzurro; quello · che tu vuo che sia piv in là · altrettāto ·, fa lo · altrettāto · piv · azzuro: quello che voi che sia cīque volte piv lōtano ·, fallo · 5 volte più azzuro; e questa regola farà che li edifiti che sopra una linia paiono d'una · medesima grādezza, chiaramēte si conoscierà qual è piv distāte e quale è maggiore che li altri.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF AERIAL PERSPECTIVE.\n\nThere is another kind of perspective which I call Aerial Perspective, because by the atmosphere we are able to distinguish the variations in distance of different buildings, which appear placed on a single line; as, for instance, when we see several buildings beyond a wall, all of which, as they appear above the top of the wall, look of the same size, while you wish to represent them in a picture as more remote one than another and to give the effect of a somewhat dense atmosphere. You know that in an atmosphere of equal density the remotest objects seen through it, as mountains, in consequence of the great quantity of atmosphere between your eye and them—appear blue and almost of the same hue as the atmosphere itself when the sun is in the East. Hence you must make the nearest building above the wall of its real colour, but the more distant ones make less defined and bluer. Those you wish should look farthest away you must make proportionately bluer; thus, if one is to be five times as distant, make it five times bluer. And by this rule the buildings which above a [given] line appear of the same size, will plainly be distinguished as to which are the more remote and which larger than the others.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VON DER LUFTPERSPEKTIVE.\n\nEs gibt noch eine andere Perspektive, die ich Luftperspektive nenne, denn an den Unterschieden der Luft kann man die verschiedenen Entfernungen verschiedener Gebäude erkennen, die unten an einer einzigen Linie enden. So ist es, wenn man viele Gebäude jenseits einer Mauer sieht, die alle über dem Rand dieser Mauer gleich groß erscheinen, und du willst im Gemälde das eine weiter entfernt erscheinen lassen als das andere und eine etwas dichte Luft darstellen. Du weißt, dass in solcher Luft die fernsten Dinge, die man durch sie sieht, wie die Berge, wegen der großen Menge Luft zwischen deinem Auge und dem Berg blau erscheinen, fast in der Farbe der Luft, wenn die Sonne im Osten steht. Also mach über dieser Mauer das erste Gebäude in seiner eigenen Farbe, das entferntere mach weniger scharf umrissen und blauer. Das, von dem du willst, dass es noch einmal so weit dahinter liegt, mach noch einmal so blau. Das, was fünfmal weiter entfernt sein soll, mach fünfmal blauer. Und diese Regel bewirkt, dass man bei den Gebäuden, die über einer Linie gleich groß erscheinen, klar erkennt, welches weiter entfernt und welches größer ist als die anderen.",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'terminati ne' lor nascimēti da una sola linia' (ending at their base on a single line) rendered 'die unten an einer einzigen Linie enden'; Richter: 'which appear placed on a single line'.",
+       "'ī simili arie' (in such air) rendered 'in solcher Luft'; Richter reads 'in an atmosphere of equal density'.",
+       "'quello che tu vuo che sia piv in là altrettāto, fa lo altrettāto piv azzuro' is rendered literally (as far again, as blue again); Richter paraphrases 'proportionately bluer'."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 159",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n206/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 159",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n206/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 1,
+     "ref": "Richter 1883 §486 (Ash. I. 10a), vol. I p. 244",
+     "it": {
+      "text": "DEL RITRARE.\n\nQual è meglio o ritrare di naturale o d'ātico, o qual è piv fatica o i proffili o l'onbra · e' lumi?",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF DRAWING.\n\nWhich is best, to draw from nature or from the antique? and which is more difficult to do outlines or light and shade?",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "VOM ZEICHNEN.\n\nWas ist besser, nach der Natur zu zeichnen oder nach der Antike? Und was ist mühsamer, die Umrisse oder Schatten und Lichter?",
+      "kind": "ours",
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'ritrare' (to portray, to draw from a model) rendered 'zeichnen'; 'i proffili o l'onbra e' lumi' as 'die Umrisse oder Schatten und Lichter', as Richter."
+      ]
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 244",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n337/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 244",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n337/mode/1up"
+      }
+     ]
+    },
+    {
+     "index": 2,
+     "ref": "Richter 1883 §500 (Ash. I. 10a), vol. I p. 250-251; Herzfeld 1906 p. 161-162, XI",
+     "it": {
+      "text": "COME IL PITTORE NON È LAUDABILE SE QUELLO NON È UNIVERSALE.\n\nD'alcuni · si può chiaramēte dire · che si ingānano ·, i quali chiamano bono maestro quello pittore, jl quale sol fa bene · una testa · o vna · figura: Cierto non è grā fatto · che studiādo una sola cosa · il tēpo · della · sua vita · che non vēghi a qualche perfectione ·, ma conosciēdo noi · che la · pittura · abraccia e contiene · in se · tutte le cose che produce la natura ·, e che cōduce l'accidētale operatione delli omini e in vltimo · ciò che si può cōprendere cogli ochi, mi pare uno tristo maestro quello · che solo una figura fa bene: Or nō vedi tu quāti e quali atti sieno solo facti da li omini · Nō vedi quāti diuersi animali e così albori, erbe, fiori, varietà di siti mōtuosi e piani ·, fōti, fiumi ·, città, edifiti publici e privati, strumēti opportuni all'vso vmano ·, vari abiti e ornamēti · e arti; tutte queste cose appartēgono d'essere di pari operazione e bontà vsate da quello che tu vogli chiamare bō pittore.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "THAT A PAINTER IS NOT ADMIRABLE UNLESS HE IS UNIVERSAL.\n\nSome may distinctly assert that those persons are under a delusion who call that painter a good master who can do nothing well but a head or a figure. Certainly this is no great achievement; after studying one single thing for a life-time who would not have attained some perfection in it? But, since we know that painting embraces and includes in itself every object produced by nature or resulting from the fortuitous actions of men, in short, all that the eye can see, he seems to me but a poor master who can only do a figure well. For do you not perceive how many and various actions are performed by men only; how many different animals there are, as well as trees, plants, flowers, with many mountainous regions and plains, springs and rivers, cities with public and private buildings, machines, too, fit for the purposes of men, divers costumes, decorations and arts? And all these things ought to be regarded as of equal importance and value, by the man who can be termed a good painter.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Wie der Maler nicht lobenswürdig ist, wenn er nicht allseitig ist\n\nVon einigen kann man klar heraussagen, daß sie irren, wenn sie einen guten Meister den Maler nennen, der nur einen Kopf gut macht oder eine Figur. Sicherlich ist es nichts Großes, daß einer, wenn er die Zeit seines Lebens eine einzige Sache studiert, darin schließlich zu einiger Vollendung kommt; mir aber, wissend, daß die Malerei in sich alle Dinge umfaßt und enthält, so die Natur hervorbringt und das gelegentliche Wirken des Menschen ausführt, und endlich alles, was sich mit den Augen verstehen läßt, — mir scheint ein trauriger Meister, der nichts als eine Figur gut macht. Ja, siehst du denn nicht, wie viele und was für Bewegungen nur allein vom Menschen gemacht werden? Siehst du nicht die vielen verschiedenen Tiere, und ebenso Bäume, Kräuter, Blumen, die Mannigfaltigkeit von Gegenden, gebirgigen und flachen, — von Quellen, Flüssen, Städten, öffentlichen Bauwerken und privaten, Werkzeugen, geschickt zum menschlichen Gebrauche, verschiedenartigen Trachten und Ornamenten und Künsten? Von allen diesen Sachen gehört es sich, daß sie von gleicher Wirksamkeit und Güte in der Anwendung jener seien, so du gute Maler nennen willst.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 250-251",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n345/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 250-251",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n345/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 161-162",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n340/mode/1up"
+      }
+     ]
+    }
+   ]
+  },
+  "K.233": {
+   "lead": 0,
+   "notes": "Richter cites 'K.3 30b' (the third part of MS K, his own count); Herzfeld and the Institut: K 110v.",
+   "passages": [
+    {
+     "index": 0,
+     "ref": "Richter 1883 §657 (K.3 30b), vol. I p. 331; Herzfeld 1906 p. 159-160, VII",
+     "it": {
+      "text": "PITTURA.\n\nLi omini e le parole son fatti, e tu pittore nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
+      "label": {
+       "en": "Transcription: Jean Paul Richter, 1883",
+       "de": "Umschrift: Jean Paul Richter, 1883"
+      }
+     },
+     "en": {
+      "text": "OF PAINTING.\n\nMen and words are ready made, and you, O Painter, if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
+      "kind": "printed",
+      "label": "Translation: Jean Paul Richter, 1883"
+     },
+     "de": {
+      "text": "Die Menschen und die Worte sind etwas Wirkliches, und wenn du, o Maler, deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
+      "kind": "printed",
+      "label": "Übersetzung: Marie Herzfeld, 1906"
+     },
+     "fr": null,
+     "label_only": false,
+     "sources": [
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 331",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n454/mode/1up"
+      },
+      {
+       "edition": "J. P. Richter (ed.), The Literary Works of Leonardo da Vinci, London: Sampson Low, Marston, Searle & Rivington, 1883, vol. I",
+       "page": "vol. I p. 331",
+       "url": "https://archive.org/details/literaryworksofl01leonuoft/page/n454/mode/1up"
+      },
+      {
+       "edition": "Marie Herzfeld (ed. and trans.), Leonardo da Vinci, der Denker, Forscher und Poet, 2nd enlarged ed., Jena: Eugen Diederichs, 1906",
+       "page": "p. 159-160",
+       "url": "https://archive.org/details/leonardodavincid00leon/page/n338/mode/1up"
       }
      ]
     }

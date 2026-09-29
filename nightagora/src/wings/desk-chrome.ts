@@ -93,6 +93,7 @@ export interface DeskChromeHost {
     name?: () => VinciText | null
     columns?: () => number | null
     absent?: () => { heading: string; items: readonly { title: string; reason: string }[] } | null
+    books?: () => { heading: string; items: readonly { id: string; title: string; preview: string | null }[] } | null
   }
 
   // desk.sheet: the host fields its step needs stand here
@@ -722,7 +723,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     if (words && set) {
       let overview: DeskOverview | null = createDeskOverview({
         lang: host.lang, cells: set.cells, open: set.open, room: set.room, measure: set.measure,
-        name: set.name, columns: set.columns, absent: set.absent, mark: deskMark,
+        name: set.name, columns: set.columns, absent: set.absent, books: set.books, mark: deskMark,
       })
       host.stage.append(overview.element)
       /* THE FOOT ROW IS BUILT AGAIN AT EVERY PAINT, so the one word joins it

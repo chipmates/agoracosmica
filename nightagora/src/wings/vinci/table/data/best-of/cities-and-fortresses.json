@@ -3,7 +3,7 @@
  "pages": {
   "B.039": {
    "lead": 0,
-   "notes": null,
+   "notes": "The only passage Richter prints from this side (Reference Table: §741 = B. 16a). It starts on p. 27 (the chapter's first page, no running number; p. 28 follows) and ends mid-sentence; the sentence runs on in §742 from B. 15b. Richter's plate note (vol. II p. 27): Pl. LXXVII, No. 3 reproduces this sketch of the two-level town.",
    "passages": [
     {
      "index": 0,
@@ -23,7 +23,11 @@
      "de": {
       "text": "Die Straßen m liegen 6 Braccia höher als die Straßen p s, und jede Straße soll 20 Braccia breit sein und von den Rändern zur Mitte hin 1/2 Braccio Gefälle haben. In dieser Mitte soll bei jedem Braccio ein Spalt sein, ein Braccio lang und einen Finger breit, durch den das Regenwasser in die Gruben ablaufen soll, die auf gleicher Höhe mit p s angelegt sind. Und an beiden Rändern dieser Straße soll ein Laubengang von 6 Braccia Breite auf Säulen stehen. Und wisse: Wer durch die ganze Stadt über die hohen Straßen gehen will, kann sie nach Belieben benutzen, und wer über die niedrigen gehen will, ebenso. Auf den hohen Straßen sollen keine Karren und ähnliche Dinge fahren, sie sollen allein den Edelleuten dienen. Über die niedrigen sollen die Karren und die anderen Lasten fahren, zum Gebrauch und zur Bequemlichkeit des Volkes. Ein Haus soll dem anderen den Rücken zukehren, so dass die niedrige Straße dazwischen bleibt, und durch die Türen n bringt man die Vorräte hinein, wie Holz, Wein und ähnliche Dinge. Durch die unterirdischen Gänge soll man Aborte, Ställe und ähnliche übelriechende Dinge leeren. Von einem Bogen zum anderen",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'sul · le colonne': Richter prints a raised point after 'sul' at the line end; read as 'sulle colonne' (on the columns).",
+       "The last sentence breaks off: Richter continues it in §742 (from B. 15b, another leaf): 'de' essere braccia 300', 'must be 300 braccia'. We end where his §741 ends."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -44,7 +48,7 @@
   },
   "B.144": {
    "lead": 0,
-   "notes": null,
+   "notes": "Heading (the editor's): 'ESCALIERS DE CHÂTEAU FORT'. One line only. The French footnote refers to folio 48 recto and verso.",
    "passages": [
     {
      "index": 0,
@@ -59,12 +63,18 @@
      "en": {
       "text": "Double stairs: one for the castellan, the other for the paid soldiers.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'prouisionati' (provvisionati) are soldiers on a salary, the garrison; Ravaisson keeps the Italian word."
+      ]
      },
      "de": {
       "text": "Doppelte Treppen: eine für den Kastellan, die andere für die Söldner.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'prouisionati' (provvisionati) are soldiers on a salary, the garrison; Ravaisson keeps the Italian word."
+      ]
      },
      "fr": {
       "text": "— Escaliers doubles; un pour le châtelain, l'autre pour les provisionati."
@@ -87,7 +97,7 @@
   },
   "L.108": {
    "lead": null,
-   "notes": null,
+   "notes": "Heading (the editor's): '[FORTIFICATIONS]'. A drawing page with a single number on it; nothing on the page explains the fortress in words. Page match checked: Ravaisson's phototype plate of 51 recto (archive.org viewer n260) shows the same fortress drawing as the SET image.",
    "passages": [
     {
      "index": 0,
@@ -102,12 +112,18 @@
      "en": {
       "text": "[Figure upside down. At the top, on the left:] 20",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The only writing Ravaisson prints for this side is the number 20 on the drawing; the bracketed words are his description of where it stands (the figure is upside down), translated here. The faint letters at the upper left of the leaf are not in his transcription and are not read here."
+      ]
      },
      "de": {
       "text": "[Figur auf dem Kopf stehend. Oben links:] 20",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The only writing Ravaisson prints for this side is the number 20 on the drawing; the bracketed words are his description of where it stands (the figure is upside down), translated here. The faint letters at the upper left of the leaf are not in his transcription and are not read here."
+      ]
      },
      "fr": {
       "text": "[Figure sens dessus dessous. En haut, à gauche :] 20."
@@ -130,7 +146,7 @@
   },
   "CA.16": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed (facts-0929 Q1): Richter prints 'C. A. 72b; 211b]', his Pl. CIX is the same drawing as our image, and his Bibliography (vol. II p. 498) lists '72b 211b 1016 Pl. CIX'; Leonardo//thek@ ATL.0398.1 gives the older numbers (Govi 72 v., Hoepli 73 v-a). Richter's footnote: 'See Pl. CIX. The original sketch is here reduced to about half its size. The gates of the town are here named, beginning at the right hand and following the curved line. In the bird's eye view of Milan below, the cathedral is plainly recognisable in the middle; to the right is the tower of San Gottardo. The square, above the number 9147, is the Lazzaretto, which was begun in 1488. On the left the group of buildings of the Castello will be noticed.' The curator's reason points to this passage: lead 0.",
    "passages": [
     {
      "index": 0,
@@ -148,9 +164,13 @@
       "label": "Translation: Jean Paul Richter, 1883"
      },
      "de": {
-      "text": "Setze die wahre Mitte von Mailand.\nMōforte, porta rēsa, porta nova, strada nova, navilio, porta cumana, barco, porta giovia, porta vercellina, porta sco Anbrogio, porta Tesinese, torre dell'Imperatore, porta Lodovica, acqua.",
+      "text": "Trage die wahre Mitte von Mailand ein.\nMōforte, porta rēsa, porta nova, strada nova, navilio, porta cumana, barco, porta giovia, porta vercellina, porta sco Anbrogio, porta Tesinese, torre dell'Imperatore, porta Lodovica, acqua.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'Poni': literally 'put' or 'place'; Richter: 'Indicate'. Rendered 'Trage ... ein' (enter it on the plan).",
+       "The names round the wall are left in Italian, as Richter leaves them; Richter's dashes become commas. 'navilio' is the canal, 'barco' the ducal park, 'torre dell'Imperatore' the Emperor's tower, 'acqua' water; 'sco' stands for 'santo'."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -171,7 +191,7 @@
   },
   "B.079": {
    "lead": 0,
-   "notes": null,
+   "notes": "Placement confirmed: Richter prints 'B. 36a]', his plate note reads 'Pl. LXXIX, 1. and 2, (MS. B, 37b, see No. 745, and MS. B. 36a, see No. 746). A Plan for streets and canals inside a town, by which the cellars of the houses are made accessible in boats.' (vol. II p. 30), and his Bibliography (vol. II p. 485) lists '36a Pl. LXXIV [sic], No. 2, 746, Mn', his only passage from this side. Ravaisson vol. II prints this side as 'FOLIO 36 (recto)' with further notes Richter does not print: 'lieva' (lever), how the cranks for raising great weights should be set, a balance of 10 pounds against 10 pounds and an ounce, and 'Esemplo del chorso che si fa sul diaccio' (example of the run made on ice) (Polona scan 148, i.e. archive.org lesmanuscritsdel02lo leaf n150 by the facts-0929 rule; OCR not proofread here). They are not in this record. The curator's reason points to this passage: lead 0.",
    "passages": [
     {
      "index": 0,
@@ -191,7 +211,10 @@
      "de": {
       "text": "Die Straße soll so breit sein, wie die Häuser im Allgemeinen hoch sind.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'la universale altezza delle case': literally 'the universal height of the houses', read as their general or usual height (Richter: 'the average height')."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -212,7 +235,7 @@
   },
   "B.085": {
    "lead": 0,
-   "notes": null,
+   "notes": "The only passage Richter prints from this side (Reference Table: §761 = B. 39a). The heading in small caps is Leonardo's own (Richter's line 1); Richter's side heading 'On the dispositions of a stable' is left out. Richter's English adds '[cisterns of]' in brackets; the Italian has only 'l'acqua'.",
    "passages": [
     {
      "index": 0,
@@ -232,7 +255,12 @@
      "de": {
       "text": "UM EINEN SAUBEREN STALL ZU BAUEN.\n\nWie man einen Stall anlegen soll: Du teilst zuerst seine Breite in 3 Teile, seine Länge ist frei, und die 3 genannten Abteilungen sollen gleich sein, jede 6 Braccia breit und 10 hoch. Der mittlere Teil soll den Stallmeistern dienen, die 2 seitlichen den Pferden, von denen jedes 6 Braccia in der Breite und 6 Braccia in der Länge einnehmen soll, vorn um 1/2 Braccio höher als hinten. Die Krippe soll 2 Braccia über dem Boden stehen, der Anfang der Raufe bei 3 Braccia und ihr oberes Ende bei 4 Braccia. Nun, um zu halten, was ich verspreche, nämlich diesen Ort gegen den allgemeinen Brauch sauber und reinlich zu machen: Was den oberen Teil des Stalles angeht, also dort, wo das Heu liegt, so soll dieser Raum an seiner Stirnseite nach außen ein Fenster haben, 6 hoch und 6 breit, durch das man das Heu auf einfache Weise auf diesen Boden bringt, wie es die Vorrichtung E zeigt. Und sie soll an einer Stelle liegen, die 6 Braccia breit und so lang wie der Stall ist, wie man bei k p sieht. Die anderen 2 Teile, die diesen zwischen sich nehmen, sollen jeder in 2 Teile geteilt werden. Die beiden zum Heu hin sollen 4 Braccia messen, p s, und allein dem Dienst und dem Gang der Stallknechte dienen. Die anderen 2, die an die Außenmauern grenzen, sollen 2 Braccia messen, wie man bei s k sieht, und sie sollen dazu dienen, das Heu den Krippen zuzuführen, durch Schächte, die oben eng und über den Krippen weit sind, damit das Heu unterwegs nicht stecken bleibt. Sie sollen gut verputzt und glatt sein und sind dort gezeichnet, wo 4 f s steht. Was das Tränken angeht, sollen die Krippen aus Stein sein und das Wasser über ihnen, so dass man die Krippen aufdecken kann, wie man Truhen aufdeckt, indem man ihre Deckel hebt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Jean Paul Richter, 1883 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'e sia collocata': the feminine may refer to the window or to the hay store; Richter reads 'let this be erected'. Our 'sie' keeps the Italian's ambiguity.",
+       "'si chè': printed 'si' at a line end and 'chè' on the next line, read as 'so that'.",
+       "'4 · f · s ·': the '4' is printed as a figure mark of the drawing; kept as printed."
+      ]
      },
      "fr": null,
      "label_only": false,
@@ -253,7 +281,7 @@
   },
   "B.054": {
    "lead": 2,
-   "notes": null,
+   "notes": "Heading (the editor's): 'TRAVAUX D'ARCHITECTE ET D'INGÉNIEUR'. On the edition's plate the tall tower with its lantern has no text; the line on the garden wall runs just above the wall with corner towers, so it is the lead. The counterweight and pulley notes sit by the drawings at the top left, the fireplace note at the bottom left.",
    "passages": [
     {
      "index": 0,
@@ -305,12 +333,18 @@
      "en": {
       "text": "The logietto [?] of the pulley that gathers the rope is hidden in a hollow in the overhang of the cornice.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'logietto' is unclear: Ravaisson reads 'l'objet' (the object); it may also be a small housing. The word is left in Italian."
+      ]
      },
      "de": {
       "text": "Das logietto [?] der Rolle, die das Seil aufnimmt, verbirgt sich in einer Höhlung im Vorsprung des Kranzgesimses.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'logietto' is unclear: Ravaisson reads 'l'objet' (the object); it may also be a small housing. The word is left in Italian."
+      ]
      },
      "fr": {
       "text": "— L'objet de la poulie qui recueille la corde se cache dans un creux qui se trouve dans la saillie de la grande corniche [?]."
@@ -342,12 +376,18 @@
      "en": {
       "text": "A way to make a coping for a garden wall that cannot come apart [?].",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "'isconvienere' is read as 'come apart', with Ravaisson's 'se disjoindre [?]'; the verb is uncertain."
+      ]
      },
      "de": {
       "text": "Wie man eine Abdeckung für eine Gartenmauer macht, die sich nicht lösen [?] kann.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "'isconvienere' is read as 'come apart', with Ravaisson's 'se disjoindre [?]'; the verb is uncertain."
+      ]
      },
      "fr": {
       "text": "— Manière de faire une couverture à un mur de jardin qui ne puisse pas se disjoindre [?]."
@@ -379,12 +419,20 @@
      "en": {
       "text": "A fireplace that fills itself with wood and fire, because the logs come through the ... [?] that drops straight down onto the middle of the hearth.",
       "kind": "ours",
-      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors."
+      "label": "Translated by AI from the printed text of Charles Ravaisson-Mollien, 1881 to 1891. It may contain errors.",
+      "doubts": [
+       "The edition prints a row of dots and [?] where a word could not be read; the translations keep the gap. Ravaisson's French guesses 'le tube [?]'.",
+       "'des focholare' is printed so; read as 'del focolare' (of the hearth)."
+      ]
      },
      "de": {
       "text": "Ein Kamin, der sich selbst mit Holz und Feuer füllt, weil die Scheite durch das ... [?] kommen, das senkrecht auf die Mitte der Feuerstelle fällt.",
       "kind": "ours",
-      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten."
+      "label": "Von einer KI aus dem gedruckten Text von Charles Ravaisson-Mollien, 1881 bis 1891 übersetzt. Sie kann Fehler enthalten.",
+      "doubts": [
+       "The edition prints a row of dots and [?] where a word could not be read; the translations keep the gap. Ravaisson's French guesses 'le tube [?]'.",
+       "'des focholare' is printed so; read as 'del focolare' (of the hearth)."
+      ]
      },
      "fr": {
       "text": "— Cheminée qui s'emplit de bois et de feu, parce que les bois viennent par le tube [?] qui surplombe [tombe à plomb] sur le milieu du foyer [?]"

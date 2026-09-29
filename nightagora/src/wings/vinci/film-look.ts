@@ -29,9 +29,21 @@ import studyPageMap from './table/data/msb-pages.json?raw'
 import { assetAddress } from '../../stack/materials'
 import { loadManifest, type ManifestIndex } from '../../manifest'
 import type { DeskOverviewCell } from '../overview'
+import { deskControl } from '../desk-story'
+import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, topicExhibit, topicPages } from './table/best-of'
+import { createBestOfLook } from './table/best-of-look'
+import { EDITION_EXHIBIT, isCollectionBook, SHELF_BOOKS, shelfBook, shelfPlate, shownAbsences } from './table/codex-shelf'
+import { createCodexReaderPayload } from './table/codex-reader'
+import { createReaderPayload as createEditionReader } from './table/reader'
+import type { ReadingTable } from './table'
+import { SHELF_UI, TABLE_UI } from './table/content'
 
 /** the card every mark names with aria-controls */
 export const FILM_LOOK_CARD = VINCI_EXHIBIT_CARD
+/** the whole edition of 1883, asked for by name from the shelf's row */
+const EDITION_WHOLE = 'codex/edition'
+/** the reading table's set: the seventeen topics of the best-of */
+export const filmTableSet = (): string[] => BEST_OF_TOPICS.map(topic => topicExhibit(topic.slug))
 
 export interface FilmLookHost {
   host: HTMLElement
@@ -107,6 +119,11 @@ export function createFilmLook(h: FilmLookHost) {
   async function open(id: string, from: HTMLElement | null): Promise<void> {
     const asked = performance.now()
     assets ??= await loadManifest()
+    // THE BOOK ON THE TABLE OPENS THE BEST-OF at the leaf it lies open at
+    if (id === EDITION_EXHIBIT) { openTopic(BEST_OF_OPENING.topic, BEST_OF_OPENING.page, from); return }
+    if (id.startsWith('topic/')) { openTopic(id.slice('topic/'.length), undefined, from); return }
+    if (id === EDITION_WHOLE) { openEdition(from); return }
+    if (isCollectionBook(id)) { openBook(id, from); return }
     if (id.startsWith('sheet/')) {
       // a sheet whose film the store carries opens as that film
       const show = vinciShowpiece(id, assets)
@@ -289,6 +306,82 @@ export function createFilmLook(h: FilmLookHost) {
     })()
   }
 
+  /* ---- the reading table: the best-of by topic, and its whole books ---- */
+
+  const recordOf = (id: string, title: VinciText, render: (host: HTMLElement) => void): void => h.openRecord(id, title, 'documented', render)
+  /** ONE TOPIC, in the window where the visitor stands; the gold walks topic to topic. */
+  function openTopic(slug: string, start: string | undefined, from: HTMLElement | null): void {
+    const look = createBestOfLook({ slug, start, manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
+      tier: () => 'standard', openTopic: (next, button) => openTopic(next, undefined, button),
+      openRecord: recordOf, openBook: book => void open(book === EDITION_EXHIBIT ? EDITION_WHOLE : book, null),
+      openShelf: () => closeLook.close(), close: () => closeLook.close() })
+    h.standDown(true)
+    closeLook.open(look.exhibit, from, closeLook.id ? 'advance' : 'enter')
+  }
+  /** A WHOLE BOOK OF THE SHELF, as a source: its own reader, walked book to book. */
+  function bookWalk(id: string): HTMLElement[] {
+    const at = SHELF_BOOKS.findIndex(book => (book.entry ? book.id : EDITION_WHOLE) === id)
+    return [-1, 1].map(by => {
+      const target = SHELF_BOOKS[at + by]
+      const button = make('button', 'vitrine-control vitrine-step', by < 0 ? '\u2039' : '\u203a')
+      button.type = 'button'
+      button.disabled = !target
+      if (target) {
+        button.setAttribute('aria-label', text(target.title))
+        button.addEventListener('click', () => void open(target.entry ? target.id : EDITION_WHOLE, button))
+      }
+      return button
+    })
+  }
+  function openBook(id: string, from: HTMLElement | null): void {
+    const book = shelfBook(id)
+    if (!book) return
+    const reader = createCodexReaderPayload({ book, manifest: loadManifest(), words: vinciManuscriptWords(),
+      more: text(VINCI_VITRINE_WORDS.more), colour: certaintyColour('documented'), tier: () => 'standard', changed: () => undefined,
+      openBook: next => void open(next, null), openLeaf: () => void open(EDITION_WHOLE, null) })
+    h.standDown(true)
+    closeLook.open({ id, title: text(book.title), line: text(book.title), card: [], payload: reader,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, () => recordOf(id, book.title, host => reader.renderRecord(host)), 'record'), shut()],
+      walk: bookWalk(id), set: null, certainty: 'documented' }, from, closeLook.id ? 'advance' : 'enter')
+  }
+  /** THE EDITION OF 1883 WHOLE: the film holds no table to turn, so its pages
+   * are read from the edition's own map, the book standing where it lies. */
+  function openEdition(from: HTMLElement | null): void {
+    const pages = (JSON.parse(studyPageMap) as { pages: PageRecord[] }).pages
+    const open83 = screwLeaf()?.edition_index ?? 0
+    const table = { pages, at: () => open83, turning: () => false, pending: () => 0,
+      flipLeaf: () => undefined, paperOnly: () => undefined, open: async () => undefined } as unknown as ReadingTable
+    const reader = createEditionReader({ table, manifest: loadManifest(), walked: () => false, standing: () => true,
+      more: text(VINCI_VITRINE_WORDS.more), honesty: text(VINCI_PAGE_HONESTY), words: vinciManuscriptWords(),
+      colour: certaintyColour('documented'), tier: () => 'standard', changed: () => undefined,
+      openBook: next => void open(next, null) })
+    const title = text(SHELF_BOOKS[0]?.official ?? { en: SHELF_UI.en.edition, de: SHELF_UI.de.edition })
+    h.standDown(true)
+    closeLook.open({ id: EDITION_WHOLE, title, line: null, card: [], payload: reader,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, () => recordOf(EDITION_WHOLE, { en: title, de: title }, host => reader.renderRecord(host)), 'record'), shut()],
+      walk: bookWalk(EDITION_WHOLE), set: null, certainty: 'documented' }, from, closeLook.id ? 'advance' : 'enter')
+  }
+  /** The best-of's pages the store admits, which is what the shelf's measure counts. */
+  function admitted(slug: string): number {
+    return assets ? topicPages(slug).filter(page => bestOfSource(page, assets!)).length : 0
+  }
+  /** THE SHELF'S OWN WORDS at the reading table: its name, its measure, its
+   * columns, its whole books and its absences, for the overview. */
+  function shelf() {
+    const language = lang()
+    const pages = String(BEST_OF_TOPICS.reduce((sum, topic) => sum + admitted(topic.slug), 0))
+    const measure = deskControl('overview', 'measure_book')
+    const plate = (() => { const leaf = screwLeaf(); const stem = leaf?.file.replace(/^.*\//, '').replace(/\.[a-z]+$/, ''); const entry = stem ? assets?.byId.get(`vinci/ms-thumb/${stem}`) : undefined; return entry ? assetAddress(entry) : null })()
+    return {
+      name: { en: SHELF_UI.en.shelf, de: SHELF_UI.de.shelf },
+      measure: { en: measure.en.replace('{n}', pages), de: measure.de.replace('{n}', pages) },
+      columns: 6,
+      absent: { heading: TABLE_UI[language].absent, items: shownAbsences(language).map(absence => ({ title: absence.title, reason: absence.reason })) },
+      books: { heading: TABLE_UI[language].codices, items: SHELF_BOOKS.map(book => ({ id: book.entry ? book.id : EDITION_WHOLE,
+        title: text(book.official), preview: book.entry ? shelfPlate(book.entry) : plate })) },
+    }
+  }
+
   /** THE OVERVIEW'S CELLS for a set: each work's name, mark and plate at rest,
       from the registers the live row reads; a cell exists only where a plate resolves */
   async function cells(exhibits: readonly string[]): Promise<DeskOverviewCell[]> {
@@ -309,6 +402,15 @@ export function createFilmLook(h: FilmLookHost) {
           short: face === 'front' && names.short_title_en && names.short_title_de ? text({ en: names.short_title_en, de: names.short_title_de }) : null,
           certainty: ORDER[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed',
           preview: assetAddress(validatePaintingRecord(plate.preview, 'painting-preview').entry) })
+      } else if (id.startsWith('topic/')) {
+        const slug = id.slice('topic/'.length)
+        const topic = BEST_OF_TOPICS.find(entry => entry.slug === slug)
+        const first = topicPages(slug).find(page => bestOfSource(page, assets!))
+        if (!topic || !first) continue
+        const count = bestOfKey('topic_pages', lang())
+        out.push({ id, kind: 'manuscript', openable: true, title: text(topic.title ?? { en: '', de: '' }),
+          sub: count ? count.replace('{n}', String(admitted(slug))) : null, certainty: 'documented',
+          preview: bestOfSource(first, assets)?.thumb ?? null })
       } else if (id.startsWith('machine/')) {
         const slug = id.slice('machine/'.length) as MachineSlug
         const entry = assets.byId.get(`vinci/exhibit-preview/machine/${slug}`)
@@ -321,6 +423,8 @@ export function createFilmLook(h: FilmLookHost) {
 
   return {
     cells,
+    shelf,
+    tableSet: filmTableSet,
     get id(): string | null { return closeLook.id },
     get surface() { return closeLook.surface },
     open,

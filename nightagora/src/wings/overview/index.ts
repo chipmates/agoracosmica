@@ -49,6 +49,9 @@ export interface DeskOverviewHost {
   /** what the set names and cannot show: each by name with its reason,
       after the cells, never a cell and never counted */
   absent?: () => { heading: string; items: readonly { title: string; reason: string }[] } | null
+  /** THE WHOLE BOOKS under the set, as sources: each opens where a cell
+      would, and none is a cell or counted */
+  books?: () => { heading: string; items: readonly { id: string; title: string; preview: string | null }[] } | null
   /** the museum's certainty mark, handed in so this view draws the same one */
   mark: (certainty: VinciCertainty) => SVGSVGElement
 }
@@ -150,6 +153,8 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   grid.setAttribute('role', 'list')
   const absent = make('section', 'desk-ov-absent')
   absent.hidden = true
+  const books = make('section', 'desk-ov-books')
+  books.hidden = true
   const foot = make('div', 'desk-ov-foot')
   const named = make('div', 'desk-ov-named')
   const said = make('div', 'desk-ov-said')
@@ -165,7 +170,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   onArrow.append(icon(ARROW_ON))
   on.append(onWords, onArrow)
   foot.append(named, on)
-  view.append(stepBack, shut, title, sub, grid, absent, foot)
+  view.append(stepBack, shut, title, sub, grid, books, absent, foot)
 
   let shown: DeskOverviewCell[] = []
   let buttons: HTMLButtonElement[] = []
@@ -250,9 +255,39 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
       item.append(button)
       grid.append(item)
     })
+    fillBooks()
     fillAbsent()
     select(at, false)
     layout()
+  }
+
+  /** The whole books, one row of small plates after the cells. */
+  function fillBooks(): void {
+    const said_ = host.books?.() ?? null
+    books.textContent = ''
+    books.hidden = !said_?.items.length
+    if (!said_?.items.length) return
+    books.append(make('h3', 'desk-ov-absent-head', said_.heading))
+    const list = make('ul', 'desk-ov-books-list')
+    for (const item of said_.items) {
+      const row = document.createElement('li')
+      const button = make('button', 'desk-ov-book')
+      button.type = 'button'
+      button.dataset['exhibit'] = item.id
+      if (item.preview) {
+        const thumb = document.createElement('img')
+        thumb.className = 'desk-ov-book-thumb'
+        thumb.alt = ''
+        thumb.decoding = 'async'
+        thumb.src = item.preview
+        button.append(thumb)
+      }
+      button.append(make('span', 'desk-ov-book-name', item.title))
+      button.addEventListener('click', () => { close(false); holdTheHand(); host.open(item.id) })
+      row.append(button)
+      list.append(row)
+    }
+    books.append(list)
   }
 
   /** THE NAMES OF WHAT IS NOT HERE stand after the cells, each with its

@@ -15,9 +15,9 @@ import { deskAny, deskOn } from '../desk-switches'
 import { createCloseLookBand, type CloseLookBand } from '../desk-closelook'
 import { noteOpened } from '../visit'
 import css from './vitrine.css?inline'
-import type { VitrineExhibit, VitrinePayloadHost, VitrineRect, VitrineSurface } from './types'
+import type { VitrineExhibit, VitrinePayloadHost, VitrinePlace, VitrineRect, VitrineSurface } from './types'
 
-export type { VitrineExhibit, VitrinePayload, VitrinePayloadHost, VitrineRect, VitrineSurface } from './types'
+export type { VitrineExhibit, VitrinePayload, VitrinePayloadHost, VitrinePlace, VitrineRect, VitrineSurface } from './types'
 
 export interface Vitrine {
   /** The exhibit standing open, or null. */
@@ -140,11 +140,21 @@ export function createVitrine(options: {
   entryRow.hidden = true
   const line = make('p', 'vitrine-line')
   setRegister(line, 'label')
+  /* THE SOURCE ROW under the line, and on the phone the leaf's mark with the
+     count beside it, where a set counts its pages by topic */
+  const note = make('p', 'vitrine-note')
+  note.hidden = true
+  const seat = make('p', 'vitrine-seat')
+  seat.hidden = true
+  const seatWords = make('span', 'vitrine-seat-words')
+  const countButton = make('button', 'vitrine-count')
+  countButton.type = 'button'
+  seat.append(seatWords, countButton)
   const body = make('div', 'vitrine-body')
   const words = make('div', 'vitrine-words')
   const aside = make('div', 'vitrine-aside')
   const after = make('div', 'vitrine-words vitrine-after')
-  body.append(naming, entryRow, line, words, aside, after)
+  body.append(naming, seat, entryRow, line, note, words, aside, after)
   const controls = make('div', 'vitrine-controls')
   const foot = make('div', 'vitrine-foot')
   /** THE CARD IS A SHEET ON THE PHONE. The grabber raises it over the work
@@ -350,7 +360,7 @@ export function createVitrine(options: {
     if (options.narrow() && root.dataset['peek'] === 'true') layout()
     else { fadeWords(); markMore() }
   })
-  for (const part of [naming, entryRow, line, words, aside, after]) wordsResized.observe(part)
+  for (const part of [naming, seat, entryRow, line, note, words, aside, after]) wordsResized.observe(part)
 
   /** The name at the head of the card, and the card's accessible name with
    * it: a window that named itself twice would be read twice. The mark
@@ -371,6 +381,23 @@ export function createVitrine(options: {
     card.setAttribute('aria-label', title)
     card.removeAttribute('aria-labelledby')
   }
+
+  /** The folio and the count a set of pages by topic says, the count a
+   * control where the exhibit opens its set from it; and the source row. */
+  function paintPlace(place: VitrinePlace | null | undefined, said: string | null | undefined): void {
+    note.textContent = said ?? ''
+    note.hidden = !said
+    note.lang = options.lang()
+    const count = place?.said ?? ''
+    seat.hidden = !place?.seat && !count
+    seat.lang = options.lang()
+    seatWords.textContent = place?.seat ?? ''
+    seatWords.hidden = !place?.seat
+    countButton.textContent = count
+    countButton.hidden = !count
+    countButton.disabled = !exhibit?.onCount
+  }
+  countButton.addEventListener('click', () => exhibit?.onCount?.())
 
   /** The grabber says which way it goes, in the payload's own words where
    * it has them. */
@@ -405,13 +432,15 @@ export function createVitrine(options: {
     raise: open => setRaised(open),
     peeked: () => !raised,
     step: (at, of) => band?.step(at, of),
-    rename: (title, head, certainty, place) => {
+    rename: (title, head, certainty, place, said) => {
       nameIt(title, certainty)
       if (head !== undefined) {
         line.textContent = head ?? ''
         line.hidden = !head
       }
-      if (exhibit && inBand()) showInBand({ ...exhibit, title, line: head ?? exhibit.line, set: place ?? exhibit.set })
+      if (said !== undefined) paintPlace(place, said)
+      if (exhibit && inBand()) showInBand({ ...exhibit, title, line: head ?? exhibit.line, set: place ?? exhibit.set,
+        note: said === undefined ? exhibit.note : said })
     },
   })
 
@@ -451,6 +480,7 @@ export function createVitrine(options: {
       // walks its own sides has already renamed
       title: namingText.textContent || next.title,
       line: line.textContent || next.line,
+      note: next.note ?? null,
       kind: next.payload?.kind ?? '',
       certainty: next.certainty ?? null,
       set: next.set ?? null,
@@ -458,12 +488,14 @@ export function createVitrine(options: {
       room: next.upLabel ?? options.room?.() ?? '',
       words: [...next.card, ...(paged ? [aside] : []), ...(next.after ?? [])],
       record: roles.get('record') ?? null,
+      text: roles.get('text') ?? null,
       back,
       on,
       // the work the way on leads to, where the set knows its name
       onTitle: on && walk.includes(on) ? on.getAttribute('aria-label') : null,
       // no walk of the wing's: the way on is the payload's own page, or none
       paging: !walk[1],
+      onKicker: next.onKicker ?? null,
     })
   }
 
@@ -600,6 +632,7 @@ export function createVitrine(options: {
       line.textContent = next.line ?? ''
       line.hidden = !next.line
       line.lang = options.lang()
+      paintPlace(next.set?.said || next.set?.seat ? next.set : null, next.note)
       words.replaceChildren(...next.card)
       after.replaceChildren(...next.after ?? [])
       body.scrollTop = 0

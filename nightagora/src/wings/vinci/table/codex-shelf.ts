@@ -3,6 +3,7 @@ import sidesText from './data/codex-sides.json?raw'
 import { loadManifest, type ManifestEntry } from '../../../manifest'
 import { assetAddress } from '../../../stack/materials'
 import { CODEX_TITLES, SHELF_UI, TABLE_UI, type Language } from './content'
+import { bestOfKey, type BestOfKey } from './best-of'
 
 /** The shelf's register of codices. Counts are scans or edition pages, never
  * manuscript folio totals. */
@@ -33,6 +34,10 @@ export interface CodexAbsence {
   holder_de: string
   reason_en: string
   reason_de: string
+  /** an absence the admission of the Institut's and the British Library's
+   * own views overtook: its reason is this key's, and it stands down until
+   * the key is written */
+  words_key?: BestOfKey
 }
 
 /** One side of a codex the reader turns, as the table read it off the scans:
@@ -52,6 +57,13 @@ export interface CodexSide {
 const register = JSON.parse(shelfText) as { entries: CodexEntry[]; absences: CodexAbsence[] }
 export const CODEX_ENTRIES: readonly CodexEntry[] = register.entries
 export const CODEX_ABSENCES: readonly CodexAbsence[] = register.absences
+/** The absences as they stand now, each with its reason in one language. */
+export function shownAbsences(lang: Language): { title: string; holder: string; reason: string }[] {
+  return CODEX_ABSENCES.flatMap(absence => {
+    const reason = absence.words_key ? bestOfKey(absence.words_key, lang) : lang === 'de' ? absence.reason_de : absence.reason_en
+    return reason ? [{ title: lang === 'de' ? absence.de : absence.en, holder: lang === 'de' ? absence.holder_de : absence.holder_en, reason }] : []
+  })
+}
 const SIDES = (JSON.parse(sidesText) as { codices: Record<string, { sides: CodexSide[] }> }).codices
 
 /** The sides of one codex of the collection, in the order the reader turns them. */
@@ -192,12 +204,12 @@ export function buildAbsences(lang: Language): HTMLElement {
   const section = node('section', 'vt-absence-section')
   section.append(node('p', 'vt-absence-status', copy.absent))
   const list = node('ul', 'vt-absence-list')
-  for (const absence of CODEX_ABSENCES) {
+  for (const absence of shownAbsences(lang)) {
     const item = node('li', 'vt-absence-item')
     item.append(
-      node('span', 'vt-absence-name', lang === 'de' ? absence.de : absence.en),
-      node('span', 'vt-absence-holder', lang === 'de' ? absence.holder_de : absence.holder_en),
-      node('span', 'vt-source-note', lang === 'de' ? absence.reason_de : absence.reason_en),
+      node('span', 'vt-absence-name', absence.title),
+      node('span', 'vt-absence-holder', absence.holder),
+      node('span', 'vt-source-note', absence.reason),
     )
     list.append(item)
   }
