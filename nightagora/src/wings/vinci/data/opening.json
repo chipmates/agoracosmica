@@ -3,18 +3,18 @@
   "provenance": {
     "scope": "the wing's opening card, words by key",
     "status": "written",
-    "rule": "The line opens with his birth and keeps the facts sheet's limits: born 15 April 1452 in Vinci (the town and its country, never a house or Anchiano); earliest DATED drawing, never 'first'; his age at it, 21; the Arno valley country near Vinci where he grew up, never a named viewpoint or 'the view of his birthplace'. The birth outside marriage stays with the doors. The start word is the owner's own. No-break spaces stand inside every date and inside the German closing sentence, so neither splits across rows.",
+    "rule": "The line opens with his birth and keeps the facts sheet's limits: born 15 April 1452 in Vinci (the town and its country, never a house or Anchiano); earliest DATED drawing, never 'first'; his age at it, 21; the Arno valley country near Vinci, his home town, never a valley he grew up in, a named viewpoint or 'the view of his birthplace'. The birth outside marriage stays with the doors. The start word is the owner's own. No-break spaces stand inside every date, in 'in Vinci' and in the German closing sentence, so none splits across rows.",
     "facts": "briefs/walk-monday-0928/FACTS-PICTURE-ROOM.md section 5; the birth facts in briefs/walk-monday-0928/BRIEF-ARNO-BIRTH.md",
     "start_word": "the owner's own words from the walk (FINDINGS item 23)",
-    "written": "2026-09-28, the wave 4 words round after the owner's walk; the birth sentence added 2026-09-29 on the owner's ask, then revised the same day after the blind judge's read (a verb in the drawing's sentence, Vinci named once, the German written as German with 'vom'). The German says 'Blatt' for the sheet, the wing's own word, because 'Zeichnung' takes a third row on the desktop. Measured on the card: 4/4/2 rows EN and 5/4/2 rows DE at 360/390/1440."
+    "written": "2026-09-28, the wave 4 words round after the owner's walk; the birth sentence added 2026-09-29 on the owner's ask, revised the same day after two blind reads (a verb in the drawing's sentence, Vinci named once, the German written as German with 'vom', then the valley anchored to his home town rather than his childhood to the valley). The German says 'Blatt' for the sheet, the wing's own word, because 'Zeichnung' takes a third row on the desktop. Measured on the card: 4/4/2 rows EN and 5/4/2 rows DE at 360/390/1440."
   },
   "opening": {
     "arno": {
       "line": {
-        "en": "Born 15 April 1452 in Vinci. At 21 he drew the Arno valley where he grew up: his earliest dated drawing, 5 August 1473.",
-        "de": "Geboren am 15. April 1452 in Vinci. Sein frühestes datiertes Blatt vom 5. August 1473 zeigt das Arnotal, wo er aufwuchs. Er war 21.",
+        "en": "Born 15 April 1452 in Vinci. At 21 he drew the Arno valley near his home town: his earliest dated drawing, 5 August 1473.",
+        "de": "Geboren am 15. April 1452 in Vinci. Sein frühestes datiertes Blatt vom 5. August 1473 zeigt das Arnotal seiner Heimat. Er war 21.",
         "certainty": "documented",
-        "certainty_note": "The birth date is documented: his grandfather Antonio recorded it in the family's notarial book (15 April 1452, a Saturday, three hours into the night), and the baptism in Santa Croce at Vinci. The place is likely when said loosely: 'in Vinci' means the town and its country; the house at Anchiano is tradition only and a birth elsewhere is not ruled out. That he grew up in Vinci is documented from 1457 (the tax record of his grandfather's household); 'the Arno valley where he grew up' is the holder's Arno valley near Vinci, said loosely. The date and 'earliest dated' are documented by the holder; his age, 21, follows from the two dates; the exact viewpoint is disputed and is not named.",
+        "certainty_note": "The birth date is documented: his grandfather Antonio recorded it in the family's notarial book (15 April 1452, a Saturday, three hours into the night), and the baptism in Santa Croce at Vinci. The place is likely when said loosely: 'in Vinci' means the town and its country; the house at Anchiano is tradition only and a birth elsewhere is not ruled out. That he grew up in Vinci is documented from 1457 (the tax record of his grandfather's household), so 'his home town' and 'seine Heimat' are Vinci; the view is the holder's Arno valley near Vinci, never a valley he grew up in. The date and 'earliest dated' are documented by the holder; his age, 21, follows from the two dates; the exact viewpoint is disputed and is not named.",
         "sources": [
           "https://it.wikipedia.org/wiki/Leonardo_da_Vinci",
           "https://en.wikipedia.org/wiki/Leonardo_da_Vinci",
