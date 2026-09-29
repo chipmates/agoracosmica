@@ -91,6 +91,7 @@ import { SOURCE_READINGS } from './line/bench/visitor-sources'
 import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
+import { GRAVE_COURT_ORIGIN, LEAF } from './grave/court-plan'
 import { loadManifest, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciPaintingView } from './collection/deep-plate'
@@ -2040,17 +2041,28 @@ export function createWing():VinciWingModule {
     addEventListener('keydown',drop,{signal})
     signal.addEventListener('abort',()=>{cancelAnimationFrame(queued);chip.remove();stage.style.cursor=''})
   }
+  /** Whether the eye stands inside the grave court's walls. */
+  const inGraveCourt=(p:Vector3):boolean=>{
+    const east=p.x-GRAVE_COURT_ORIGIN.east, north=-p.z-GRAVE_COURT_ORIGIN.north
+    return east>LEAF.backFace&&east<LEAF.returnEnd&&Math.abs(north)<LEAF.returnFace
+  }
   /** THE WORDS THE OBJECTS CARRY, laid on their stones by the page at rest:
    * taken down for a leg, and drawn again once the eye has stood still for a
-   * moment, through the camera the frame was drawn with. */
+   * moment, through the camera the frame was drawn with. Inside the grave
+   * court they stay with their stones on every walk to its three places and
+   * back: no wall stands between the court's eye and its stones, and the
+   * year is cut into the stone, so a walk without its words showed the year
+   * alone. They follow the eye in every frame there. */
   function paintPictureWords():void {
     if(!pictureWordsLayer||!hosts)return
-    const nav=rail.navigation
-    if(!standing||nav.active||nav.approaching){if(wordsPrint){pictureWordsLayer.hide();wordsPrint='';wordsDrawn=''}return}
-    const cam=hosts.world.camera,now=performance.now(),station=hereContent().id
+    const nav=rail.navigation,cam=hosts.world.camera,station=hereContent().id
+    const walksWithStones=standing&&station==='grave'&&inGraveCourt(cam.position)
+    if(!walksWithStones&&(!standing||nav.active||nav.approaching)){if(wordsPrint){pictureWordsLayer.hide();wordsPrint='';wordsDrawn=''}return}
+    const now=performance.now()
     const print=`${cam.position.toArray().map(v=>v.toFixed(4))}|${cam.quaternion.toArray().map(v=>v.toFixed(5))}|${cam.fov}|${innerWidth}x${deskStageHeight()}|${lang()}|${station}`
-    if(print!==wordsPrint){wordsPrint=print;wordsSince=now;wordsDrawn='';pictureWordsLayer.hide();return}
-    if(wordsDrawn===print||now-wordsSince<80)return
+    if(print!==wordsPrint&&!walksWithStones){wordsPrint=print;wordsSince=now;wordsDrawn='';pictureWordsLayer.hide();return}
+    if(walksWithStones)wordsPrint=print
+    if(wordsDrawn===print||(!walksWithStones&&now-wordsSince<80))return
     cam.updateMatrixWorld()
     const width=innerWidth,height=deskStageHeight(),v=new Vector3()
     // the live camera is always known: what it cannot project is behind it
