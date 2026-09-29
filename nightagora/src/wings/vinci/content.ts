@@ -1195,7 +1195,7 @@ export const vinciSourcesHeadings = {
   classUnderReview: { en: 'class under review', de: 'Einstufung in Prüfung' },
   classShown: { en: 'shown from a public reproduction', de: 'aus einer öffentlichen Reproduktion gezeigt' },
   // placeholder words until the words round sets them
-  classPublicReproduction: { en: 'shown from a public reproduction', de: 'gezeigt nach einer gemeinfreien Reproduktion' },
+  classPublicReproduction: { en: 'public-domain work, public reproduction', de: 'gemeinfreies Werk, öffentliche Reproduktion' },
   classReference: { en: 'reference only, never displayed', de: 'nur als Vorlage, nie ausgestellt' },
 } satisfies Record<string, VinciText>
 
