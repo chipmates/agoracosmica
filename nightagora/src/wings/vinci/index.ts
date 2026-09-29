@@ -669,6 +669,8 @@ export function createWing():VinciWingModule {
   const DOTS_PER_TIER:Record<string,number>={hero:8,standard:6,calm:3}
   /** The one mode a press opens in, set by the caller the press came from. */
   let openMode:'auto'|'walk'|'cut'='auto', exhibitAway=false
+  /** A topic of the best-of is opening: it opens where the visitor stands, under the book's id too. */
+  let topicOpening=false
   /** THE ADDRESS OF ONE DATE. `#s=<station>&d=<date>` opens the life view at
    * that date once the station carrying its floor is stood in. */
   let pendingDate=/(?:^|[#&])d=(life-\d{2})(?:&|$)/.exec(location.hash)?.[1]??null
@@ -1217,6 +1219,8 @@ export function createWing():VinciWingModule {
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
         yieldEye()
+        // its reader holds the stage at once, so a walk to the book would never land
+        if(topicOpening)return false
         // ON THE WALL A PRESS IS A RUN. A stop is a vertex of the room's own
         // certified line, so the eye slides along the hang to the work asked
         // for instead of returning to a station between two neighbours. It
@@ -2791,9 +2795,8 @@ export function createWing():VinciWingModule {
       close:()=>closeLook?.close(),
       changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
-    openMode=how
-    closeLook.open(look.exhibit,from,how_)
-    openMode='auto'
+    openMode=how;topicOpening=true
+    try{closeLook.open(look.exhibit,from,how_)}finally{topicOpening=false;openMode='auto'}
   }
   /** The best-of's pages the store admits, which is what its measure counts. */
   function bestOfCount():number {
