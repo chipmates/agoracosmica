@@ -57,8 +57,8 @@ export const WING_TEXT = {
   },
   /** the no-signup case, in the app's own words for its daily free messages */
   doorNote: {
-    en: 'Opens the library in a new tab. Free messages every day, no signup needed.',
-    de: 'Öffnet die Bibliothek in einem neuen Tab. Kostenlose Nachrichten jeden Tag, ohne Anmeldung.',
+    en: 'Opens the library in a new tab. 30 free messages a day. No signup needed.',
+    de: 'Öffnet die Bibliothek in einem neuen Tab. 30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
   },
   /* THE DOOR'S OWN PLATE. A first time visitor has never heard of the
      library, so the door says what it leads to before it opens. The name in
@@ -70,12 +70,12 @@ export const WING_TEXT = {
   },
   /** one row on the desktop's band, German included */
   doorLead: {
-    en: 'Behind this door is the Agora Cosmica library: thirty lives in chapters, and AI Echoes to talk with.',
-    de: 'Die Tür führt zur Bibliothek Agora Cosmica: dreißig Leben in Kapiteln und KI-Echos zum Gespräch.',
+    en: 'Behind this door is the Agora Cosmica library: learn from thirty lives, in chapters and conversations.',
+    de: 'Die Tür führt zur Bibliothek Agora Cosmica: Lerne aus dreißig Leben, in Kapiteln und Gesprächen.',
   },
   doorTerms: {
-    en: 'Nonprofit and Open Source. Opens in a new tab. Free messages every day, no signup needed.',
-    de: 'Non-Profit und Open Source. Öffnet sich in einem neuen Tab. Kostenlose Nachrichten jeden Tag, ohne Anmeldung.',
+    en: 'Nonprofit and Open Source. Opens in a new tab. 30 free messages a day. No signup needed.',
+    de: 'Non-Profit und Open Source. Öffnet sich in einem neuen Tab. 30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
   },
   /** the plate's way in, which carries the station's own question */
   doorAsk: {

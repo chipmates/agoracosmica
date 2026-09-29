@@ -280,6 +280,8 @@
   max-width: 860px;
   font: 400 28px/38px var(--serif);
   letter-spacing: .01em;
+  /* the same rows, evened out, so no word of the question stands alone */
+  text-wrap: balance;
   color: var(--desk-title, #fff5e3);
 }
 #wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-word {
