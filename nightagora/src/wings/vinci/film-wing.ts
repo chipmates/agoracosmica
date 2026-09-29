@@ -676,8 +676,8 @@ export function createWing(): WingModule {
     if (above) { picture?.ahead([stopNode(LIFE[0]!.id)]); return }
     const next = nextIndex()
     if (next !== null) picture?.ahead([stopNode(LIFE[next]!.id)])
-    // at the last stop the way on is the look up: its evening is fetched while the visitor reads
-    else if (evening?.here()) evening.ahead()
+    // at the last stop the way on is the look up: its evening is fetched while the visitor reads, unless reduced motion sends the press home
+    else if (evening?.here() && !matchMedia('(prefers-reduced-motion: reduce)').matches) evening.ahead()
   }
 
   /* ---- the grave's look up ---- */
