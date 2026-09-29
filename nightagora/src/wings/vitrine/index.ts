@@ -193,8 +193,9 @@ export function createVitrine(options: {
   let exhibit: VitrineExhibit | null = null
   let surface: VitrineSurface = 'room', resizeFrames = 0, laidNarrow: boolean | null = null
   let raised = false
-  /** THE LINE THE CARD SAYS, whole, and its source row; the peek may show the short one. */
-  let spoken: { head: string | null; note: string | null; short: string | null } = { head: null, note: null, short: null }
+  /** THE LINE THE CARD SAYS, whole, and its source row; the peek may say its own. */
+  let spoken: { head: string | null; note: string | null; short: string | null; restNote: string | null } =
+    { head: null, note: null, short: null, restNote: null }
   const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
   const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect }
 
@@ -266,7 +267,14 @@ export function createVitrine(options: {
         place(sheet, { left, top: at, width: right - left, height })
         place(card, { left, top: at, width: right - left, height })
       }
-      if (fill && !raised) {
+      const lined = Boolean(exhibit?.payload?.lined)
+      if (fill && !raised && lined) {
+        // ONE REST HEIGHT FOR EVERY PAGE of a lined book, never over a third
+        // of the screen: a page with less to say leaves its room empty
+        peek = Math.max(0, Math.min(restHeight(place2), bottom - Math.ceil(height * WORK_AT_REST)))
+        place2(peek)
+        paintLine(() => body.scrollHeight <= body.clientHeight + 1)
+      } else if (fill && !raised) {
         place2(peek)
         paintLine(peekRoom)
         peek = Math.min(Math.max(peek, peekAsked()), Math.round(tall * PEEK_MOST))
@@ -275,7 +283,9 @@ export function createVitrine(options: {
       // the stage, so the work is seen and not a shade through a panel.
       place2(fill ? (raised ? Math.round(tall * RAISED_SHARE) : peek) : bottom - top - viewHeight)
       payloadControls.style.cssText = ''
-      place(shutMark, { left: right - 50, top: top + 6, width: 44, height: 44 })
+      // a lined book's page runs to the stage's top corner, where its folio
+      // stands: the mark waits above the stage there
+      place(shutMark, { left: right - 50, top: lined ? Math.max(4, top - 51) : top + 6, width: 44, height: 44 })
       // The peek is what the payload keeps clear of the card, raised or not:
       // a card that rises stands OVER the work rather than resizing it.
       root.style.setProperty('--vitrine-peek', `${fill ? peek : 0}px`)
@@ -422,6 +432,32 @@ export function createVitrine(options: {
   /** The peek the words ask for keeps the work its share above the sheet. */
   const peekRoom = (): boolean => view.innerHeight - 10 - peekAsked() >= Math.ceil(view.innerHeight * WORK_AT_REST)
 
+  /** THE REST HEIGHT OF A LINED BOOK: what a one-row name, a one-row place,
+   * a two-row line and a one-row source row ask for in the card's own
+   * type, measured once per screen with stand-in words. */
+  let restKey = '', restIdeal = 0
+  function restHeight(placeAt: (height: number) => void): number {
+    const key = [view.innerWidth, view.innerHeight, view.getComputedStyle(document.documentElement).fontSize,
+      Math.round(payloadControls.getBoundingClientRect().height)].join('/')
+    if (key === restKey) return restIdeal
+    const kept = { name: namingText.textContent, seat: seat.hidden, words: seatWords.textContent, wordsHidden: seatWords.hidden,
+      count: countButton.textContent, countHidden: countButton.hidden }
+    namingText.textContent = 'M'
+    seat.hidden = false; seatWords.hidden = false; seatWords.textContent = 'M'; countButton.hidden = false; countButton.textContent = 'M'
+    line.hidden = false; line.replaceChildren('M', document.createElement('br'), 'M')
+    note.hidden = false; note.textContent = 'M'
+    // the card at no height, so the body's scroll height is its words' own
+    placeAt(1)
+    const own = view.getComputedStyle(card)
+    restIdeal = Math.ceil(body.getBoundingClientRect().top - card.getBoundingClientRect().top + body.scrollHeight
+      + payloadControls.getBoundingClientRect().height + parseFloat(own.paddingBottom) + 2)
+    namingText.textContent = kept.name
+    seat.hidden = kept.seat; seatWords.textContent = kept.words; seatWords.hidden = kept.wordsHidden
+    countButton.textContent = kept.count; countButton.hidden = kept.countHidden
+    restKey = key
+    return restIdeal
+  }
+
   /** Rows the line takes at its own width, by the font it is set in. */
   function rowsOf(el: HTMLElement): number {
     const range = document.createRange()
@@ -432,12 +468,12 @@ export function createVitrine(options: {
   }
 
   /** THE LINE AT THE PEEK IS NEVER CUT. Whole on the raised card and on a
-   * wide stage; at a peek that shows it, the line where it keeps two rows
-   * and the work its share of the screen, else the short line where that
-   * does, else the name row stands alone. `room` says whether the peek the
-   * words ask for still keeps the work its share; null off the peek. */
+   * wide stage; at a peek that shows it, the line with the peek's own source
+   * row where it keeps two rows and the words fit the peek, else the short
+   * line where that does, else the name row stands alone. `room` says
+   * whether the words fit the peek; null off the peek. */
   function paintLine(room: (() => boolean) | null): void {
-    const choices: Array<[string | null, string | null]> = [[spoken.head, spoken.note]]
+    const choices: Array<[string | null, string | null]> = [[spoken.head, room ? spoken.restNote ?? spoken.note : spoken.note]]
     if (room) choices.push([spoken.short, null], [null, null])
     for (const [head, row] of choices) {
       line.textContent = head ?? ''
@@ -482,14 +518,14 @@ export function createVitrine(options: {
     raise: open => setRaised(open),
     peeked: () => !raised,
     step: (at, of) => band?.step(at, of),
-    rename: (title, head, certainty, place, said, short) => {
+    rename: (title, head, certainty, place, said, peek) => {
       nameIt(title, certainty)
       const was = { ...spoken }
-      if (head !== undefined) spoken = { ...spoken, head, short: short ?? null }
+      if (head !== undefined) spoken = { ...spoken, head, short: peek?.line ?? null, restNote: peek?.note ?? null }
       if (said !== undefined) paintPlace(place, said)
       // a new line at the peek is chosen by the peek's own layout, which
       // measures it from the peek's least height; the same line stays as chosen
-      const changed = was.head !== spoken.head || was.short !== spoken.short || was.note !== spoken.note
+      const changed = was.head !== spoken.head || was.short !== spoken.short || was.note !== spoken.note || was.restNote !== spoken.restNote
       if (changed) {
         if (options.narrow() && root.dataset['peek'] === 'true' && !laying) layout()
         else paintLine(null)
@@ -684,7 +720,7 @@ export function createVitrine(options: {
       entryRow.textContent = entry ? [entry.date, entry.where].filter(Boolean).join(' · ') : ''
       entryRow.hidden = !entry
       entryRow.lang = options.lang()
-      spoken = { head: next.line ?? null, note: null, short: next.short ?? null }
+      spoken = { head: next.line ?? null, note: null, short: next.peek?.line ?? null, restNote: next.peek?.note ?? null }
       line.lang = options.lang()
       paintPlace(next.set?.said || next.set?.seat ? next.set : null, next.note)
       paintLine(null)

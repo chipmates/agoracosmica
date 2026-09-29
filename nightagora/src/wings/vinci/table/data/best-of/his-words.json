@@ -18,12 +18,14 @@
      "en": {
       "text": "A SIMILE.\n\nA vase of unbaked clay, when broken, may be remoulded, but not a baked one.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Vergleich\n\nEin rohes Gefäß, wenn zerbrochen, ist wieder herzustellen; ein gebranntes nie.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -64,12 +66,14 @@
      "en": {
       "text": "Science is the captain, and practice the soldiers.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Wissenschaft ist der Kapitän, die Praxis, das sind Soldaten.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -110,12 +114,14 @@
      "en": {
       "text": "OF THE MISTAKES MADE BY THOSE WHO PRACTISE WITHOUT KNOWLEDGE.\n\nThose who are in love with practice without knowledge are like the sailor who gets into a ship without rudder or compass and who never can be certain whether he is going. Practice must always be founded on sound theory, and to this Perspective is the guide and the gateway; and without this nothing can be done well in the matter of drawing.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Vom Irrtum jener, so die Praxis ohne Wissenschaft anwenden\n\nJene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt: welcher dann nie Sicherheit besitzt, wohin es geht.\n\nImmer muß die Praxis auf die gute Theorie gebaut sein, zu der die Perspektive Führerin und Pforte ist, und ohne sie macht man nichts gut in den Vorfällen der Malerei.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -150,12 +156,14 @@
      "en": {
       "text": "Young plants have more transparent leaves and a more lustrous bark than old ones; and particularly the walnut is lighter coloured in May than in September.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Junge Pflanzen haben durchscheinendere Blätter und eine glattere Rinde als die alten, und besonders der Nussbaum ist im Mai heller als im September.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'è in ispecie' ist mit Akzent auf dem ersten 'è' gedruckt; gelesen als 'e' (und), wie in Richters Englisch.",
        "'polita scorza': polierte, glatte Rinde (Richter: 'more lustrous'); übersetzt mit 'glattere Rinde'."
@@ -189,12 +197,14 @@
      "en": {
       "text": "The shadows of plants are never black, for where the atmosphere penetrates there can never be utter darkness.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Schatten der Pflanzen sind nie schwarz, denn wo die Luft eindringt, kann keine Finsternis sein.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -224,12 +234,14 @@
      "en": {
       "text": "OF THE ERRORS OF THOSE WHO DEPEND ON PRACTICE WITHOUT SCIENCE.\n\nThose who fall in love with practice without science are like a sailor who enters a ship without a helm or a compass, and who never can be certain whither he is going.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Vom Irrtum jener, so die Praxis ohne Wissenschaft anwenden\n\nJene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt: welcher dann nie Sicherheit besitzt, wohin es geht.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -264,12 +276,14 @@
      "en": {
       "text": "Of the error of those who practice without knowledge;—See first the 'Ars poetica' of Horace.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Vom Irrtum derer, die die Praxis ohne Wissenschaft betreiben. Sieh zuerst die Poetik des Horaz.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'la poetica d'Oratio': die Ars poetica des Horaz, wie Richter es liest."
       ]
@@ -308,12 +322,14 @@
      "en": {
       "text": "OF MECHANICS.\n\nMechanics are the Paradise of mathematical science, because here we come to the fruits of mathematics.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Mechanik ist das Paradies der mathematischen Wissenschaften; denn durch sie kommt man zur mathematischen Frucht.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -354,12 +370,14 @@
      "en": {
       "text": "INTRODUCTION.\n\nSeeing that I can find no subject specially useful or pleasing—since the men who have come before me have taken for their own every useful or necessary theme—I must do like one who, being poor, comes last to the fair, and can find no other way of providing himself than by taking all the things already seen by other buyers, and not taken but refused by reason of their lesser value. I, then, will load my humble pack with this despised and rejected merchandise, the refuse of so many buyers; and will go about to distribute it, not indeed in great cities, but in the poorer towns, taking such a price as the wares I offer may be worth.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "VORREDE.\n\nDa ich sehe, dass ich keinen Stoff von großem Nutzen oder Vergnügen wählen kann, weil die Menschen, die vor mir geboren sind, alle nützlichen und notwendigen Themen für sich genommen haben, will ich es machen wie einer, der aus Armut als Letzter auf den Markt kommt. Da er sich mit nichts anderem versorgen kann, nimmt er alles, was andere schon gesehen und nicht genommen, sondern wegen seines geringen Wertes zurückgewiesen haben. Diese verachtete und zurückgewiesene Ware, die von den vielen Käufern übrig blieb, werde ich auf meine schwache Traglast laden und damit nicht durch die großen Städte, sondern durch die armen Dörfer ziehen und sie verteilen, und ich nehme dafür den Lohn, den die Sache verdient, die ich gebe.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'metterò sopra la mia debole soma': wörtlich 'ich werde auf meine schwache Last legen'; Richter übersetzt 'my humble pack' (mein bescheidenes Bündel)."
       ]
@@ -392,12 +410,14 @@
      "en": {
       "text": "INTRODUCTION.\n\nI know that many will call this useless work; and they will be those of whom Demetrius declared that he took no more account of the wind that came out their mouth in words, than of that they expelled from their lower parts: men who desire nothing but material riches and are absolutely devoid of that of wisdom, which is the food and the only true riches of the mind. For so much more worthy as the soul is than the body, so much more noble are the possessions of the soul than those of the body. And often, when I see one of these men take this work in his hand, I wonder that he does not put it to his nose, like a monkey, or ask me if it is something good to eat.\n\nINTRODUCTION.\n\nI am fully concious that, not being a literary man, certain presumptuous persons will think that they may reasonably blame me; alleging that I am not a man of letters. Foolish folks! do they not know that I might retort as Marius did to the Roman Patricians by saying: That they, who deck themselves out in the labours of others will not allow me my own. They will say that I, having no literary skill, cannot properly express that which I desire to treat of; but they do not know that my subjects are to be dealt with by experience rather than by words; and [experience] has been the mistress of those who wrote well. And so, as mistress, I will cite her in all cases.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "VORREDE.\n\nIch weiß, dass viele sagen werden, dies sei ein nutzloses Werk. Und das werden jene sein, von denen Demetrius sagte, er gebe auf den Wind, der in ihrem Mund die Worte machte, nicht mehr als auf den Wind, der aus ihren unteren Teilen kam: Menschen, die nur nach körperlichem Reichtum verlangen und ganz ohne das Verlangen nach Weisheit sind, der Speise und dem wahrhaft sicheren Reichtum der Seele. Denn so viel würdiger die Seele ist als der Körper, so viel würdiger sind die Reichtümer der Seele als die des Körpers. Und oft, wenn ich einen von ihnen dieses Werk in die Hand nehmen sehe, fürchte ich, sie machen es wie der Affe und halten es an die Nase oder fragen mich, ob es etwas zum Essen sei.\n\nVORREDE.\n\nIch weiß wohl, dass manchem Anmaßenden, weil ich kein Gelehrter bin, scheinen wird, er könne mich mit gutem Grund tadeln, indem er anführt, ich sei ein Mann ohne gelehrte Bildung. Törichte Leute! Wissen sie nicht, dass ich ihnen antworten könnte, wie Marius den römischen Patriziern antwortete, und sagen: Die sich mit fremder Mühe schmücken, wollen mir meine eigene nicht zugestehen. Sie werden sagen, ich könne, weil ich keine gelehrte Bildung habe, nicht gut sagen, was ich behandeln will. Wissen sie denn nicht, dass meine Dinge mehr aus der Erfahrung zu gewinnen sind als aus fremden Worten [?]? Sie [die Erfahrung] war die Lehrmeisterin derer, die gut schrieben, und so werde ich sie als Lehrmeisterin in allen Fällen anführen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Richter druckt unter dieser einen Nummer zwei Vorreden, jede mit der Überschrift 'Proemio'; beide bleiben erhalten, in seiner Reihenfolge.",
        "'homo sanza lettere' und 'lettere': 'lettere' im Sinn gelehrter, lateinischer Schulbildung; wir schreiben 'gelehrte Bildung'.",
@@ -434,12 +454,14 @@
      "en": {
       "text": "Many will think they may reasonably blame me by alleging that my proofs are opposed to the authority of certain men held in the highest reverence by their inexperienced judgments; not considering that my works are the issue of pure and simple experience, who is the one true mistress. These rules are sufficient to enable you to know the true from the false—and this aids men to look only for things that are possible and with due moderation—and not to wrap yourself in ignorance, a thing which can have no good result, so that in despair you would give yourself up to melancholy.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Viele werden glauben, sie könnten mich mit gutem Grund tadeln, indem sie anführen, meine Beweise stünden gegen die Autorität einiger Männer, die bei ihrem unerfahrenen Urteil in großem Ansehen stehen. Sie bedenken nicht, dass meine Dinge aus der einfachen und reinen Erfahrung entstanden sind, die die wahre Lehrmeisterin ist. Diese Regeln lassen dich das Wahre vom Falschen unterscheiden. Das bewirkt, dass die Menschen sich mögliche Dinge vornehmen, und das mit mehr Maß, und dass du dich nicht in Unwissenheit hüllst, was [?] dazu führt, dass du, wenn etwas nicht gelingt, verzweifelt in Schwermut verfällst.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'si promettano · le cose possibili': 'sich mögliche Dinge versprechen' (sich vornehmen); Richter fügt 'only' (nur) hinzu, das im Italienischen nicht steht.",
        "'cosa tale · che non avendo · effetto, tu abbi con disperatione · a darti malinconia': Die Konstruktion ist locker; wir lesen sie mit Richter so, dass Unwissenheit zur Verzweiflung führt, wenn etwas misslingt."
@@ -473,12 +495,14 @@
      "en": {
       "text": "INTRODUCTION TO PERSPECTIVE:—THAT IS OF THE FUNCTION OF THE EYE.\n\nBehold here O reader! a thing concerning which we cannot trust our forefathers, the ancients, who tried to define what the Soul and Life are—which are beyond proof, whereas those things, which can at any time be clearly known and proved by experience, remained for many ages unknown or falsely understood. The eye, whose function we so certainly know by experience, has, down to my own time, been defined by an infinite number of authors as one thing; but I find, by experience, that it is quite another.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "VORREDE ZUR PERSPEKTIVE, DAS HEISST ÜBER DIE AUFGABE DES AUGES.\n\nNun sieh, Leser, was wir unseren Alten nicht glauben können. Sie wollten bestimmen, was Seele und Leben sei, Dinge, die sich nicht beweisen lassen, während die Dinge, die man jederzeit durch Erfahrung klar erkennen und beweisen kann, so viele Jahrhunderte lang unbekannt geblieben oder falsch verstanden worden sind! Das Auge, dessen Aufgabe man so klar erfahren kann, ist bis in meine Zeit von unzähligen Autoren auf eine Weise bestimmt worden. Ich finde durch Erfahrung, dass es eine andere ist.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'(cose)' ist Richters Einfügung in runden Klammern; das Deutsche braucht das Wort ohnehin.",
        "'che cosi chiaramēte fa speriētia del suo · ofitio': wörtlich 'das so klar Erfahrung von seiner Aufgabe gibt'."
@@ -518,12 +542,14 @@
      "en": {
       "text": "There can be no voice where there is no motion or percussion of the air; there can be no percussion of the air where there is no instrument, there can be no instrument without a body; and this being so, a spirit can have neither voice, nor form, nor strength. And if it were to assume a body it could not penetrate nor enter where the passages are closed. And if any one should say that by air, compressed and compacted together, a spirit may take bodies of various forms and by this means speak and move with strength—to him I reply that when there are neither nerves nor bones there can be no force exercised in any kind of movement made by such imaginary spirits.\n\nBeware of the teaching of these speculators, because their reasoning is not confirmed by experience.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Es kann keine Stimme sein, wo nicht Bewegung und Erschütterung der Luft ist; es kann keine Erschütterung der Luft sein, wo kein Instrument ist; es kann kein Instrument unkörperlich sein; wenn dem so ist, so vermag ein Geist weder Stimme, noch Form, noch Kraft zu haben, und wenn er Körper annimmt, so wird er nicht eindringen noch eintreten können, wo die Eingänge versperrt sind; und wenn jemand sagte: „durch verdichtete und zusammengepreßte Luft nimmt der Geist Körper von verschiedenen Formen an und durch dieses Instrument spricht er und bewegt sich mit Kraft“, auf dies Teil sage ich, wo keine Sehnen und Knochen sind, kann nicht Kraft sein, ausgeübt in irgendeiner Bewegung von den eingebildeten Geistern.\n\nFliehe die Lehren jener Spekulatoren, denn ihre Gründe werden von der Erfahrung nicht bestätigt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -564,12 +590,14 @@
      "en": {
       "text": "Instrumental or mechanical science is of all the noblest and the most useful, seeing that by means of this all animated bodies that have movement perform all their actions; and these movements are based on the centre of gravity which is placed in the middle deviding unequal weights, and it has dearth and wealth of muscles and also lever and counter-lever.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die instrumentale oder mechanische Wissenschaft ist höchst edel und über alle andern äußerst nützlich, nachdem vermittels ihrer alle belebten Körper, die Bewegung haben, ihre verschiedenen Operationen machen, welche Bewegungen im Zentrum ihrer Schwere entstehen, das sich in der seitlichen Mitte ungleicher Gewichte befindet: und besitzen (diese Körper) Armut und Reichtum der Muskeln, und gleicherweise Hebel und Gegenhebel.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -610,12 +638,14 @@
      "en": {
       "text": "The senses are of the earth; Reason, stands apart in contemplation.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Sinne sind irdisch, die Vernunft steht außerhalb von ihnen, wenn sie betrachtet.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -656,12 +686,14 @@
      "en": {
       "text": "To lie is so vile, that even if it were in speaking well of godly things it would take off something from God's grace; and Truth is so excellent, that if it praises but small things they become noble.\n\nBeyond a doubt truth bears the same relation to falsehood as light to darkness; and this truth is in itself so excellent that, even when it dwells on humble and lowly matters, it is still infinitely above uncertainty and lies, disguised in high and lofty discourses; because in our minds, even if lying should be their fifth element, this does not prevent that the truth of things is the chief nutriment of superior intellects, though not of wandering wits.\n\nBut you who live in dreams are better pleased by the sophistical reasons and frauds of wits in great and uncertain things, than by those reasons which are certain and natural and not so far above us.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Es ist von solcher Verächtlichkeit die Lüge, daß, wenn sie von Gott selber große Dinge sagte, sie seiner Göttlichkeit die Gnade raubte, und es ist von solcher Fürtrefflichkeit die Wahrheit, daß, wenn sie ganz geringe Dinge lobt, dieselbigen edel werden.\n\nOhne Zweifel, solcher Abstand ist zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist, und es ist die Wahrheit an sich von solcher Vorzüglichkeit, daß sogar, wenn sie sich über bescheidene und niedrige Materien verbreitet, sie ohne Vergleich die Ungewißheiten und Lügen übertrifft, die sich über die großartigen und erhabensten Gegenstände auslassen, weil, besäße unser Geist auch die Lüge zum fünften Element, es dennoch nicht hintanbleibt, daß die Wahrheit der Dinge die höchste Nahrung der feinen Intellekte, aber nicht der schweifenden Ingenien ist.\n\n(Randnote). Aber du, so du von Träumen lebst, dir gefallen besser die sophistischen Gründe und die Spitzbübereien von Ballaufbläsern in grandiosen und ungewissen Sachen, als sichere, natürliche, und nicht von solcher Höhe.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -702,12 +734,14 @@
      "en": {
       "text": "Moderation checks all the vices.\nThe ermine will die rather than besmirch itself.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Mäßigkeit zügelt alle Laster.\nDer Hermelin — eher sterben als sich beschmutzen.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -742,12 +776,14 @@
      "en": {
       "text": "OF FORESIGHT.\n\nThe cock does not crow till it has thrice flapped its wings; the parrot in moving among boughs never puts its feet excepting where it has first put its beak.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "VOM VORAUSSEHEN.\n\nDer Hahn kräht nicht, ehe er nicht dreimal mit den Flügeln geschlagen hat. Der Papagei setzt, wenn er von Ast zu Ast wechselt, die Füße nirgends hin, wo er nicht zuvor den Schnabel hingesetzt hat.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -777,12 +813,14 @@
      "en": {
       "text": "Vows are not made till Hope is dead.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Es entsteht Leere, wo die Hoffnung stirbt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -817,12 +855,14 @@
      "en": {
       "text": "Motion tends towards the centre of gravity.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Bewegung folgt dem Schwerpunkt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'il ciētro del peso' (der Mittelpunkt des Gewichts) übersetzt mit 'Schwerpunkt', wie Richters 'centre of gravity'."
       ]
@@ -861,12 +901,14 @@
      "en": {
       "text": "The length of the foot from the end of the toes to the heel goes twice into that from the heel to the knee, that is where the leg bone [fibula] joins the thigh bone [femur].",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Der Fuß, von der Spitze bis zur Ferse, geht zweimal in die Strecke von der Ferse bis zum Knie, das heißt bis dorthin, wo der Knochen des Unterschenkels mit dem des Oberschenkels zusammentrifft.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -896,12 +938,14 @@
      "en": {
       "text": "The hand from the longest finger to the wrist joint goes 4 times from the tip of the longest finger to the shoulder joint.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Hand, bis dorthin, wo sie mit dem Knochen des Arms zusammentrifft, geht viermal in die Strecke von der Spitze des längsten Fingers bis zum Schultergelenk.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'La mano īsino doue si cōgivgnie col osso del braccio': die Hand bis dorthin, wo sie mit dem Knochen des Arms zusammentrifft; Richters Englisch sagt 'from the longest finger to the wrist joint'. Dasselbe Maß, anders gesagt."
       ]
@@ -934,12 +978,14 @@
      "en": {
       "text": "Note how aqua vitae absorbs into itself all the colours and smells of flowers. If you want to make blue put iris flowers into it and for red solanum berries (?)",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Merke, wie der Branntwein alle Farben und Düfte der Blumen in sich aufnimmt. Willst du Blau machen, gib Schwertlilien [?] hinein, und für Rot Nachtschatten [?].",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'fiordalisi': Richter liest Schwertlilien; im heutigen Italienisch ist 'fiordaliso' die Kornblume, und Ravaissons Französisch hat 'bleuets [?]' (Kornblumen).",
        "'e per rosso solani': Richters Lesart, die er in seinem Englisch mit '(?)' markiert; Ravaisson liest dieselben Wörter als 'e presso rosolaci' (und dann Mohn). Die rote Pflanze ist unsicher."
@@ -973,12 +1019,14 @@
      "en": {
       "text": "Fame should be depicted as covered all over with tongues instead of feathers, and in the figure of a bird.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Fama soll man am ganzen Körper voller Zungen statt Federn malen, und in Gestalt eines Vogels.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'la fama': der Ruhm (auch das Gerücht) als Personifikation; beibehalten als 'die Fama'."
       ]
@@ -1011,12 +1059,14 @@
      "en": {
       "text": "If you governed your body by the rules of virtue you would not walk on all fours in this world.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Wenn du den Leib der Tugend gemäß hättest, begehrtest du nicht in dieser Welt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1051,12 +1101,14 @@
      "en": {
       "text": "You grow in reputation like bread in the hands of a child.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Du wächst an Ruf wie Brot den Kindern auf der flachen Hand wächst.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1097,12 +1149,14 @@
      "en": {
       "text": "A point is not part of a line.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Ein Punkt ist nicht Teil einer Linie.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -1132,12 +1186,14 @@
      "en": {
       "text": "The water you touch in a river is the last of that which has passed, and the first of that which is coming. Thus it is with time present.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Das Wasser, das von den Flüssen du berührst, ist das letzte von jenem, das ging, und das erste von jenem, das kommt: also auch die gegenwärtige Zeit.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1172,12 +1228,14 @@
      "en": {
       "text": "Life if well spent, is long.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Wohl angewendetes Leben ist lang.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1212,12 +1270,14 @@
      "en": {
       "text": "Pharisees—that is to say, friars.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Pharisäer, will sagen: heilige Klosterbrüder.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1258,12 +1318,14 @@
      "en": {
       "text": "PROPHECIES.\n\nThere will be many which will increase in their destruction.\n⸨The Ball of Snow rolling over Snow.⸩\n\nThere will be many who, forgetting their existence and their name, will lie as dead on the spoils of other dead creatures.\n⸨Sleeping on the Feathers of Birds.⸩\n\nThe East will be seen to rush to the West and the South to the North in confusion round and about the universe, with great noise and trembling or fury.\n⸨In the East wind which rushes to the West.⸩",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Viele werden jene sein, so in den eigenen Ruinen wachsen.\nDer Schneeball, der über den Schnee hinrollt.\nGroß wird die Schar jener sein, die, in Vergessenheit ihres Namens und Daseins, wie Tote auf den Beutestücken von anderen Toten liegen werden.\nDas Schlafen auf den Federn von Vögeln.\nMan wird die östlichen Teile zu den westlichen fliehen sehen, und die südlichen nach dem Norden, im ganzen Weltall mit großem Lärm und Erschütterung und Wut durcheinander geratend.\nDer Ostwind, der nach Westen fuhr.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1298,12 +1360,14 @@
      "en": {
       "text": "The solar rays will kindle fire on the earth, by which a thing that is under the sky will be set on fire, and, being reflected by some obstacle, it will bend downwards.\n⸨The Concave Mirror kindles a Fire, with which we heat the oven, and this has its foundation beneath its roof.⸩",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Sonnenstrahlen werden auf der Erde Feuer entzünden, an dem sich entflammen wird, was unter dem Himmel ist, und von ihrem Hindernis zurückgeworfen, werden sie nach unten zurückkehren.\n⸨Der Hohlspiegel entzündet das Feuer, mit dem man den Ofen heizt, dessen Boden unter seinem Himmel [dem Gewölbe] liegt.⸩",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'cielo' ist sowohl der Himmel als auch das Gewölbe eines Ofens; das Rätsel spielt mit dem doppelten Sinn, übersetzt mit 'Himmel' in beiden Zeilen, in der Antwort ergänzt um '[dem Gewölbe]'.",
        "'ripercossi nel suo inpedimēto': von (oder an) ihrem Hindernis zurückgeworfen; Richter: 'being reflected by some obstacle'."
@@ -1337,12 +1401,14 @@
      "en": {
       "text": "A great part of the sea will fly towards heaven and for a long time will not return. ⸨That is, in Clouds.⸩\n\nThere remains the motion which divides the mover from the thing moved.\n\nThose who give light for divine service will be destroyed. ⸨The Bees which make the Wax for Candles.⸩\n\nDead things will come from underground and by their fierce movements will send numberless human beings out of the world.\n⸨Iron, which comes from under ground is dead but the Weapons are made of it which kill so many Men.⸩\n\nThe greatest mountains, even those which are remote from the sea shore, will drive the sea from its place.\n⸨This is by Rivers which carry the Earth they wash away from the Mountains and bear it to the Sea-shore; and where the Earth comes the sea must retire.⸩",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Ein großer Teil des Meeres wird sich gegen den Himmel flüchten und durch lange Zeit nicht zurückkehren. — Das ist, als Wolken.\nBleibt uns die Bewegung, die den Motor vom Bewegten trennt.\nEs wird vernichtet werden, wer das Licht für den Dienst Gottes bereitet. Die Bienen, die das Wachs für die Kerzen machen.\nDie Toten werden unter der Erde hervorkommen, und durch ihre wilden Bewegungen werden sie ungezählte menschliche Geschöpfe aus der Welt jagen.\nDas Eisen, welches man unter der Erde hervorzieht, ist tot, und man macht daraus Waffen, die so viele Menschen töten.\nDie größten Berge, wenn sie auch vom Meeresstrand noch so weit entfernt sind, werden das Meer von seinem Platz vertreiben.\nEs sind das die Flüsse, welche die Erde bringen, so sie von den Bergen weggenommen haben, und sie am Merresstrand abladen; und wo diese Erde hinkommt, flieht das Meer.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1377,12 +1443,14 @@
      "en": {
       "text": "The water dropped from the clouds still in motion on the flanks of mountains will lie still for a long period of time without any motion whatever; and this will happen in many and divers lands.\n⸨Snow, which falls in flakes and is Water.⸩\n\nThe great rocks of the mountains will throw out fire; so that they will burn the timber of many vast forests, and many beasts both wild and tame.\n⸨The Flint in the Tinder-box which makes a Fire that consumes all the loads of Wood of which the Forests are despoiled and with this the flesh of Beasts is cooked.⸩\n\nOh! how many great buildings will be ruined by reason of Fire.\n⸨The Fire of great Guns.⸩\n\nOxen will be to a great extent the cause of the destruction of cities, and in the same way horses and buffaloes\n⸨by drawing Guns⸩.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Das Wasser, welches aus den Wolken gefallen, so noch über den Abhängen der Berge in Bewegung sind, wird für lange Zeit sich aufhalten, ohne sich irgendwie zu rühren, und das wird in vielen und verschiedenen Provinzen geschehen.\nDer Schnee, so in Flocken fällt, und Wasser ist.\nDie großen Steine der Berge werden Feuer auswerfen, so daß sie das Holz von vielen und sehr großen Wäldern und viele wilde und zahme Tiere verbrennen werden.\nDer Flintenstein, der Feuer macht, welches alle die Ladungen von Holz verbrennen wird, und so die Wälder verwüsten. Und man wird damit das Fleisch der Tiere braten.\nO, wie viele große Gebäude werden wegen des Feuers zerstört!\nVom Feuer der Bombarden.\nDie Ochsen werden zum großen Teil Ursache sein des Ruines der Städte, und gleicherweise Pferde und Büffel.\nSie ziehen die Bombarden.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1417,12 +1485,14 @@
      "en": {
       "text": "A FABLE.\n\nThe crab standing under the rock to catch the fish which crept under it, it came to pass that the rock fell with a ruinous downfall of stones, and by their fall the crab was crushed.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Fabel\n\nAls der Krebs unter dem Felsblock sich aufhielt, um die Fische zu fangen, die unter jenen hineingingen, kam das Hochwasser mit verderblichem Herabsturz von Steinen, und mit ihrem Kollern zerschmetterten sie selbigen Krebs.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1457,12 +1527,14 @@
      "en": {
       "text": "THE SAME.\n\nThe spider, being among the grapes, caught the flies which were feeding on those grapes. Then came the vintage, and the spider was cut down with the grapes.\n\nThe vine that has grown old on an old tree falls with the ruin of that tree, and through that bad companionship must perish with it.\n\nThe torrent carried so much earth and stones into its bed, that it was then constrained to change its course.\n\nThe net that was wont to take the fish was seized and carried away by the rush of fish.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Die Spinne, zwischen den Trauben befindlich, fing die Fliegen ab, so auf selbigen Trauben sich nährten; kam die Weinlese, und wurde die Spinne mitsamt den Trauben zerstampft.\n\nDie Rebe, auf dem bejahrten Baum alt geworden, fiel zugleich mit der Zerstörung des Baumes und mußte, wegen der schlechten Gesellschaft, mit jenem zugrunde gehen.\n\nDer Wildbach führte so viele Erde und Steine in seinem Bett mit, daß er gezwungen wurde, seinen Lauf zu verändern.\n\nDas Netz, so die Fische zu fangen pflegte, wurde gefangen und fortgetragen vom Furor der Fische.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1497,12 +1569,14 @@
      "en": {
       "text": "The ball of snow when, as it rolls, it descends from the snowy mountains, increases in size as it falls.\n\nThe willow, which by its long shoots hopes as it grows, to outstrip every other plant, from having associated itself with the vine which is pruned every year was always crippled.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Der Schneeball, je mehr er rollend von den Bergen Schnee hinabtrug, desto mehr wuchs seine Größe.\n\nDie Weide, welche mit ihren langen Schößlingen gewillt ist zu wachsen und jeden andern Baum zu überragen, — weil sie mit der Weinrebe Gesellschaft schloß, die jedes Jahr beschnitten wird, wurde auch sie immer wieder verkrüppelt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1537,12 +1611,14 @@
      "en": {
       "text": "Two large hatchets and one very small one, 8 brass spoons, 4 tablecloths, 2 towels, 15 small napkins, 2 coarse napkins, 2 coarse cloths, 2 wrappers, 3 pairs of sheets, 2 pairs new and 1 old.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Zwei große Beile und ein kleines, 8 Löffel aus Messing; 4 Tischtücher, 2 Handtücher [?], 15 kleine Servietten, 2 kleine Tischtücher [?], 2 Stück Hanftuch, 2 Packtücher, 3 Paar Leintücher, 2 Paar neu und eines alt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'guardanappe': ein Tuch für den Tisch oder die Hände; Richter: 'towels' (Handtücher).",
        "'tovagliole': Richter: 'coarse napkins' (grobe Servietten); das italienische Wort sagt nur: kleine Tücher.",
@@ -1584,12 +1660,14 @@
      "en": {
       "text": "Feathers will raise men, as they do birds, towards heaven ⸨that is, by the letters which are written with quills.⸩\nThe works of men's hands will occasion their death. ⸨Swords and Spears.⸩\nMen out of fear will cling to the thing they most fear. ⸨That is they will be miserable lest they should fall into misery.⸩\nThings that are separate shall be united and acquire such virtue that they will restore to man his lost memory; that is papyrus [sheets] which are made of separate strips and have preserved the memory of the things and acts of men.\nThe bones of the Dead will be seen to govern the fortunes of him who moves them. ⸨By Dice.⸩\nCattle with their horns protect the Flamme from its death. ⸨In a Lantern.⸩\nThe Forests will bring forth young which will be the cause of their death. ⸨The handle of the hatchet.⸩",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "[VII. MS. J. FOL. 65 r.]\n— Die Federn werden die Menschen gleichwie Vögel gegen Himmel heben — nämlich durch die Bücher, so diese Federn gemacht.\n— Die Werke der Menschen werden Ursachen ihres Todes sein: die Schwerter und Lanzen.\n— Die Menschen werden jene Sache verfolgen, vor der sie sich am meisten fürchten, d. h. sie werden elend sein, um nicht ins Elend zu geraten.\n— Die getrennten Sachen werden sich vereinigen, und in sich solche Kraft bekommen, daß sie den Menschen das verlorene Gedächtnis wiedergeben werden. — Nämlich, die Papyrus, welche aus zertrennten Fasern gemacht sind und die menschlichen Dinge und Taten der Erinnerung aufbewahren.\n— Man wird die Gebeine der Toten mit hurtiger Bewegung das Glück derer behandeln sehen, die sie\n[VIII. MS. J. FOL. 64 v.]\nin Bewegung setzen. — Die Würfel.\n— Die Rinder werden mit ihren Hörnern das Feuer gegen den Tod verteidigen. — Die Laternen.\n— Die Wälder werden Kinder gebären, die die Ursache ihres Todes sein werden. — Den Stiel der Axt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1630,12 +1708,14 @@
      "en": {
       "text": "Our life is made by the death of others.\nIn dead matter insensible life remains, which, reunited to the stomachs of living beings, resumes life, both sensual and intellectual.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Wir machen unser Leben mit dem Tode anderer. In dem toten Gegenstand bleibt bewußtloses Leben zurück, das, dem Magen der Lebenden neu einverleibt, sinnliches und verstehendes Leben wiedergewinnt.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -1676,12 +1756,14 @@
      "en": {
       "text": "As a day well spent procures a happy sleep, so a life well employed procures a happy death.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Nacht\n\nSo wie ein gut verbrachtes Tageswerk ein frohes Schlafen gibt, so gibt ein wohl angewandtes Leben einen heiteren Tod.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,

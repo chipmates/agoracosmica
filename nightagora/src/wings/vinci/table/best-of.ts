@@ -12,7 +12,10 @@ import type { DeepPlateSource } from '../../vitrine/deep-plate'
 export type BestOfLang = 'en' | 'de'
 export interface BestOfWords { en: string; de: string }
 /** One translation or printed text, with the label that says whose it is. */
-export interface BestOfText { text: string; kind: 'printed' | 'ours' | null; label: string | null; doubts?: readonly string[] }
+export interface BestOfText { text: string; kind: 'printed' | 'ours' | null; label: string | null
+  /** the label in one row, for the phone's card at rest */
+  rest?: string | null
+  doubts?: readonly string[] }
 export interface BestOfItalian { text: string; label: { en: string | null; de: string | null } }
 export interface BestOfLead {
   passage: number
@@ -99,6 +102,7 @@ export interface BestOfPageTexts { lead: number | null; passages: readonly BestO
 export type BestOfKey = 'next_topic' | 'previous_topic' | 'full_text' | 'full_record' | 'ai_short' | 'italian' | 'the_page'
   | 'mirror_ordinary' | 'mirror_plate' | 'kind_leaf' | 'kind_plate' | 'kind_facsimile' | 'topic_pages' | 'topic_count'
   | 'absence_paris_rest' | 'absence_ashburnham' | 'absence_arundel_middle'
+  | 'credit_rest_ai' | 'credit_rest_richter' | 'picture_leaf' | 'picture_facsimile' | 'way_hand'
 interface BestOfIndex {
   draft: boolean
   keys: Record<BestOfKey, BestOfWords | null>

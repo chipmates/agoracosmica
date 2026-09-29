@@ -18,12 +18,14 @@
      "en": {
       "text": "To make the great canal, first make the smaller one and conduct into it the waters which by a wheel will help to fill the great one.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Um den großen Kanal zu bauen, mach zuerst den kleinen und gib ihm das Wasser, das mit dem Rad den großen machen wird.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'che colla rota farà il grāde': wörtlich 'das mit dem Rad den großen machen wird'; Richter liest 'will help to fill the great one' (wird helfen, den großen zu füllen). Wir behalten den wörtlichen Sinn."
       ]
@@ -62,12 +64,14 @@
      "en": {
       "text": "For raising water.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Um Wasser zu heben.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Pour élever de l'eau. —"
@@ -100,6 +104,7 @@
       "text": "The same. And it can be done with ropes as with a toothed wheel.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The sentence division follows the Errata: 'quel medesimo' (the same) stands alone, then 'e possi fare' (and one can do it)."
       ]
@@ -108,6 +113,7 @@
       "text": "Dasselbe. Und man kann es mit Seilen machen wie mit einem Zahnrad.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Satzteilung folgt den Errata: 'quel medesimo' (dasselbe) steht allein, dann 'e possi fare' (und man kann es machen)."
       ]
@@ -143,6 +149,7 @@
       "text": "m n a s. Pipe. Let there be a valve in the mouth a, on the outside.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'animella' is a flap valve; Ravaisson keeps the word as 'animelle'."
       ]
@@ -151,6 +158,7 @@
       "text": "m n a s. Rohr. In der Mündung a sitze außen ein Ventil.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'animella' ist ein Klappenventil; Ravaisson behält das Wort als 'animelle'."
       ]
@@ -185,12 +193,14 @@
      "en": {
       "text": "Let the water that is between m and n be 25 pounds, and the water that acts as counterweight 1000 pounds.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Das Wasser zwischen m und n wiege 25 Pfund, und das Wasser, das als Gegengewicht wirkt, 1000 Pfund.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Que l'eau qui est entre m [et] n soit de 25 livres, et que l'eau qui fera contrepoids soit de 1,000 livres."
@@ -229,6 +239,7 @@
       "text": "INSTRUMENT FOR DIGGING EARTH\n[Figure:] m b f n\nHere the calculation of the power is not given for the present. But you, reader, must understand that this has a usefulness which comes from shortening the time. This shortening comes about because the instrument that carries the earth upward from p below is always at the work of carrying it and never goes back. The opponent says that in this case the tipping out and going round in a circle to no use comes to as much as going back, in the same time as going forward [?]. But since the extra stretches of time set between the stretches of useful time are equal in this and in all other inventions, one must look here for a way to spend the time on as effective and useful a work as possible. And that will be to find an instrument that takes up more earth, as will be shown here on the back of this face.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The heading 'STRUMENTO DACHAVARE TERRA' is Leonardo's own; the edition sets his titles in small capitals. The bracketed heading [DRAGUEUR — INVENTIONS] is the editor's.",
        "The opponent's sentence is compressed: 'tanto e a versare e andare in circulo sanza vtilita quanto il ritornare indirieto nel medesimo tenpo d'esso andare innanti'. It is read as the objection that the idle half-turn of the wheel (tipping out the earth and coming round empty) costs as much time as the return stroke of a back-and-forth machine. Ravaisson reads it the same way; marked [?].",
@@ -242,6 +253,7 @@
       "text": "GERÄT ZUM AUSHEBEN VON ERDE\n[Figur:] m b f n\nDie Berechnung der Kraft wird hier vorerst nicht angegeben. Du aber, Leser, musst verstehen, dass dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt. Diese Verkürzung entsteht, weil das Gerät, das die Erde von p unten nach oben trägt, immer bei der Arbeit des Tragens ist und nie zurückläuft. Der Gegner sagt, in diesem Fall komme das Ausschütten und das nutzlose Kreisen auf ebenso viel hinaus wie das Zurücklaufen, in derselben Zeit wie das Vorwärtsgehen [?]. Da aber die zusätzlichen Zeitspannen, die zwischen den Spannen nützlicher Zeit liegen, bei diesem und bei allen anderen Erfindungen gleich sind, muss man hier eine Weise suchen, die Zeit auf eine möglichst wirksame und nützliche Arbeit zu verwenden. Und das heißt, ein Gerät zu finden, das mehr Erde fasst, wie sich hier auf der Rückseite dieser Seite zeigen wird.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Überschrift 'STRUMENTO DACHAVARE TERRA' stammt von Leonardo selbst; die Ausgabe setzt seine Titel in Kapitälchen. Die Überschrift in eckigen Klammern, aus den Wörtern DRAGUEUR und INVENTIONS, stammt vom Herausgeber.",
        "Der Satz des Gegners ist gedrängt: 'tanto e a versare e andare in circulo sanza vtilita quanto il ritornare indirieto nel medesimo tenpo d'esso andare innanti'. Er wird als Einwand gelesen, dass die nutzlose halbe Drehung des Rades (die Erde ausschütten und leer herumkommen) so viel Zeit kostet wie der Rückhub einer Maschine, die hin und her arbeitet. Ravaisson liest es ebenso; mit [?] markiert.",
@@ -282,6 +294,7 @@
       "text": "Turning the crank n turns a small wheel, and this small wheel turns the toothed wheel f. And this wheel f is joined to the cross of the boxes that carry the earth of the marsh, which is unloaded onto the boats. But the two ropes m f and m b wind round the axle f and make the machine travel with the 2 boats towards m, and these ropes are most useful for this work, etc.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'manio' is read as 'manico' (crank handle), Ravaisson's 'manivelle'; 'rochetta' is a small toothed wheel (a pinion).",
        "'polo' (pole) is read as the axle at f round which the ropes wind; Ravaisson keeps 'pôle'.",
@@ -293,6 +306,7 @@
       "text": "Das Drehen der Kurbel n dreht ein kleines Rad, und dieses kleine Rad dreht das Zahnrad f. Und dieses Rad f ist mit dem Kreuz der Kästen verbunden, die die Erde des Sumpfes tragen, die auf die Boote entladen wird. Die beiden Seile m f und m b aber wickeln sich um die Achse f und lassen das Gerät mit den 2 Booten gegen m vorrücken, und diese Seile sind für diese Arbeit sehr nützlich usw.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'manio' wird als 'manico' (Kurbelgriff) gelesen, Ravaissons 'manivelle'; 'rochetta' ist ein kleines Zahnrad (ein Ritzel).",
        "'polo' (Pol) wird als die Achse bei f gelesen, um die sich die Seile wickeln; Ravaisson behält 'pôle'.",
@@ -331,6 +345,7 @@
       "text": "[In the margin:] The axle can conveniently be let down as low as the wheel must go down to deepen the water of the marsh.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'ch.' inside 'basseza' is printed in italics, struck out by Leonardo.",
        "'padule' is a marsh or fen; 'profondare l'acqua' is to make the water deeper, that is, to dredge."
@@ -340,6 +355,7 @@
       "text": "[Am Rand:] Die Achse lässt sich bequem so tief absenken, wie das Rad hinabreichen muss, um das Wasser des Sumpfes zu vertiefen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'ch.' mitten in 'basseza' ist kursiv gedruckt, von Leonardo gestrichen.",
        "'padule' ist ein Sumpf oder Moor; 'profondare l'acqua' heißt das Wasser tiefer machen, also ausbaggern."
@@ -382,6 +398,7 @@
       "text": "1/2 SE   400   3/4 SE [?]   400\n1/2 SE [?]   400   NE 4 8° [?]\nSE 660\n1/2 to SW\n700\n200, 1/2 to SW\nSE\n130\n550\nNE\n400",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part three, 1928). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The page carries no sentences, only measurements and wind names written along the river course, many of them sideways or upside down; the edition prints them where they stand, turned as on the leaf. They are listed here from top to bottom as printed; the line breaks are not Leonardo's.",
        "The wind names are read as compass bearings: 'sci' and 'sc' as scirocco (south-east), 'gre' and 'greco' as greco (north-east), 'libe' as libeccio (south-west). 'sc' alone is a shorter form and marked [?]. The numbers are most likely lengths in braccia, but no unit is written.",
@@ -393,6 +410,7 @@
       "text": "1/2 SO   400   3/4 SO [?]   400\n1/2 SO [?]   400   NO 4 8° [?]\nSO 660\n1/2 nach SW\n700\n200, 1/2 nach SW\nSO\n130\n550\nNO\n400",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, dritter Teil, 1928). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Seite enthält keine Sätze, nur Maße und Windnamen entlang des Flusslaufs, viele davon quer oder auf dem Kopf; die Ausgabe druckt sie dort, wo sie stehen, so gedreht wie auf dem Blatt. Hier sind sie von oben nach unten aufgeführt, wie gedruckt; die Zeilenumbrüche stammen nicht von Leonardo.",
        "Die Windnamen werden als Himmelsrichtungen gelesen: 'sci' und 'sc' als Scirocco (Südost), 'gre' und 'greco' als Greco (Nordost), 'libe' als Libeccio (Südwest). 'sc' allein ist eine kürzere Form und mit [?] markiert. Die Zahlen sind höchstwahrscheinlich Längen in Braccia, aber eine Einheit steht nicht da.",
@@ -429,12 +447,14 @@
      "en": {
       "text": "GERMANY.\na. Austria.\nb. Saxony.\nc. Nuremberg.\nd. Flanders.\nFRANCE.\na. Picardy.\nb. Normandy.\nc. Dauphiné.\nSPAIN.\na. Biscay.\nb. Castille.\nc. Galicia.\nd. Portugal.\ne. Taragona.\nf. Granada.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "DEUTSCHLAND.\na. Österreich,\nb. Sachsen,\nc. Nürnberg,\nd. Flandern.\nFRANKREICH.\na. Picardie,\nb. Normandie,\nc. Dauphiné,\nd.\nSPANIEN.\na. Biskaya,\nb. Kastilien,\nc. Galicien,\nd. Portugal,\ne. Tarragona,\nf. Granada.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Alemagnia' ist der alte italienische Name für die deutschen Länder; übersetzt mit 'Deutschland', wie Richter 'Germany' schreibt.",
        "Unter 'Francia' steht der Buchstabe 'd.' ohne Namen dahinter, wie gedruckt; die Stelle bleibt leer.",
@@ -475,12 +495,14 @@
      "en": {
       "text": "A building should always be detached on all sides so that its form may be seen.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Ein Gebäude soll immer ringsum frei stehen, damit es seine wahre Gestalt zeigen kann.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'a volere dimostrare': wörtlich 'um zeigen zu wollen'; gelesen als Zwecksatz, wie bei Richter ('so that its form may be seen')."
       ]

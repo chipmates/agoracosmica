@@ -158,21 +158,42 @@
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line[hidden] {display:none;}
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:-4px 0 6px;}
 .vitrine:not([data-peek='true']) .vitrine-note {margin-top:-4px;}
-/* the peek holds the page's name, its place, the line and the strip under
-   a third of the screen: the place sits beside the name where it fits, and
-   the line keeps two rows until the card rises */
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {display:inline-flex;margin:0 12px 0 0;vertical-align:middle;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {display:inline-flex;margin:0;vertical-align:middle;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat[hidden] {display:none;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {margin-bottom:0;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-card {padding-top:0;padding-bottom:8px;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-payload-controls {padding-top:2px;row-gap:4px;}
+/* A LINED BOOK ON THE PHONE. At rest one height for every page: the name,
+   the leaf and its place in the topic, the line in two rows with its source
+   row in one, the ways and the pinch's steps, and the strip with the page's
+   steps at its ends. No word under 14 px, raised or at rest. */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-card {padding-top:0;padding-bottom:8px;}
+/* the grab's 44 px reach over the name, which raises the card as the grab does */
+.vitrine[data-narrow='true'][data-fill='true']:has(.reader[data-lined='true']) .vitrine-grab {position:relative;z-index:1;
+  align-items:flex-start;padding-top:10px;margin-bottom:-22px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {margin:0;font-size:17px;line-height:22px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {margin:2px 0 0;font:400 14px/20px var(--sans);column-gap:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat:has(.vitrine-count:not([hidden])) .vitrine-seat-words:not([hidden])::after {
+  content:'\00b7';margin:0 8px;}
+/* the count keeps its 44 px reach over the rows beside it, which carry no control */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-count {position:relative;z-index:1;margin:-12px 0;font-size:14px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-line {font-size:17px;line-height:22px;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {margin:6px 0 0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-note {font-size:14px;line-height:20px;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:2px 0 0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-control {font-size:14px;}
+/* the pinch's two steps stay marks, their words kept for a reader of the screen */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .reader-zoom .vitrine-control {font-size:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) :is(.vitrine-words, .vitrine-aside) :is(p, li) {font-size:14px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-payload-controls {position:relative;padding-top:6px;row-gap:10px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step {position:absolute;bottom:0;width:44px;height:44px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step:first-child {left:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step:last-child {right:0;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-payload-controls .reader-shelf {margin:0 50px;}
+/* the raised card's foot row: the topic steps as marks, the two words
+   between them, and no second close where the mark above the page stands */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-controls .vitrine-step {flex:0 0 44px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-controls .vitrine-control {padding:10px 6px;line-height:18px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-controls [data-role='close'] {display:none;}
+/* the seat row names the page's place in its topic */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-place {display:none;}
 /* the grab raises the card, so the peek carries no second raise */
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .reader-raise {display:none;}
-/* at the peek the count stands beside the name; the folio rises with the card */
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-seat-words {display:none;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0;font-size:12px;line-height:1.35;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-name {margin-bottom:0;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the

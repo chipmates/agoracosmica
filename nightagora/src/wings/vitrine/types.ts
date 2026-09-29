@@ -52,7 +52,7 @@ export interface VitrinePayloadHost {
    * to has its own certainty. The words are the caller's, as every word
    * here is. */
   rename?(title: string, head?: string | null, certainty?: string | null,
-    place?: VitrinePlace | null, note?: string | null, short?: string | null): void
+    place?: VitrinePlace | null, note?: string | null, peek?: VitrinePeek | null): void
 }
 
 /** WHERE A WORK STANDS IN ITS SET: counted from one; a book that reads by its
@@ -68,8 +68,20 @@ export interface VitrinePlace {
   said?: string
 }
 
+/** WHAT A FOLDED CARD SAYS AT REST, where the raised card says more. */
+export interface VitrinePeek {
+  /** the source row at rest, one row where the raised card's runs longer; empty for none */
+  note?: string | null
+  /** the line a peek shows where the card's own would take more than its
+   * two rows there, without a source row; none, and the name row stands alone */
+  line?: string | null
+}
+
 export interface VitrinePayload {
   readonly kind: string
+  /** A BOOK WHOSE PAGES EACH CARRY A LINE: its folded card rests at one
+   * height for every page, and the words at rest are chosen to fit it. */
+  readonly lined?: boolean
   /** THE WORK TAKES THE SCREEN. On the narrow stage the viewport runs from
    * under the brand line to the bar and the card folds to a peek over its
    * foot. A payload that does not ask for it is laid out as before. */
@@ -108,9 +120,8 @@ export interface VitrineExhibit {
   set?: VitrinePlace | null
   /** THE SOURCE ROW: who the line's words are, small under the line. */
   note?: string | null
-  /** The line a peek shows where `line` would take more than its two rows
-   * there, without the source row; none, and the name row stands alone. */
-  short?: string | null
+  /** What a folded card says at rest where it differs from the raised one. */
+  peek?: VitrinePeek | null
   /** the gold control's own word where the set names its next object itself */
   onKicker?: string | null
   /** the count, pressed on the phone, opens the set it counts */

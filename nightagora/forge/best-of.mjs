@@ -153,15 +153,37 @@ export const KEYS = {
   absence_paris_rest: 'the new reason for Paris manuscripts C and E to M, now that the Institut\'s own views are admitted; until written, the absence is not shown',
   absence_ashburnham: 'the new reason for the Ashburnham leaves, likewise; until written, not shown',
   absence_arundel_middle: 'the new reason for Codex Arundel ff. 117 to 220, now that the British Library\'s views are admitted; until written, not shown',
+  credit_rest_ai: 'the phone\'s one-row source row at rest under an AI translation; until written, the drafted label',
+  credit_rest_richter: 'the phone\'s one-row source row at rest under Richter\'s translation; until written, the drafted label',
+  picture_leaf: 'the picture credit of a photograph of the leaf ("{holder}, photograph"); until written, the drafted label',
+  picture_facsimile: 'the picture credit of a printed facsimile ("{holder}, facsimile of {year}"); until written, the drafted label',
+  way_hand: 'the first way\'s key, sized to its key on a 360 phone; until written, the drafted label',
+}
+/** LABELS THE LAYOUT DRAFTED after the band's blind read (2026-09-29): each
+ * stands until the words pass writes its own under the same key. */
+const DRAFTED = {
+  credit_rest_ai: { en: 'AI translation. It may contain errors.', de: 'KI-Übersetzung. Sie kann Fehler enthalten.' },
+  credit_rest_richter: { en: 'Translation: J. P. Richter, 1883', de: 'Übersetzung: J. P. Richter, 1883' },
+  picture_leaf: { en: '{holder}, photograph', de: '{holder}, Fotografie' },
+  picture_facsimile: { en: '{holder}, facsimile of {year}', de: '{holder}, Faksimile von {year}' },
+  way_hand: { en: 'His hand', de: 'Handschrift' },
 }
 /** The names the words pass wrote some keys under. */
 const KEY_NAMES = { full_text: 'the_full_text', full_record: 'the_full_record', ai_short: 'ai_label_short', mirror_ordinary: 'mirror_note_ltr' }
 /** Two labels of printed transcriptions the notices lack, written as keys. */
 const LABEL_KEYS = { richter: 'label_richter_italian', sabachnikoff: 'label_flight_1893' }
+const drafted = new Set()
 const keysOut = Object.fromEntries(Object.keys(KEYS).map(key => {
   const said = KEYS_WRITTEN[key] ?? KEYS_WRITTEN[KEY_NAMES[key]]
+  if (!(said?.en && said?.de) && DRAFTED[key]) { drafted.add(key); return [key, DRAFTED[key]] }
   return [key, said?.en && said?.de ? { en: said.en, de: said.de } : null]
 }))
+/** The source row at rest on the phone: one row, the whole label on the raised card. */
+function restCredit(kind, edition, lang, label) {
+  if (kind === 'ours') return keysOut.credit_rest_ai?.[lang] ?? label
+  if (edition === 'richter') return keysOut.credit_rest_richter?.[lang] ?? label
+  return label
+}
 const READ_KEYS = new Set([...Object.keys(KEYS), ...Object.values(KEY_NAMES), ...Object.values(LABEL_KEYS), 'codex_short'])
 for (const key of Object.keys(KEYS_WRITTEN)) if (!READ_KEYS.has(key)) warn(`words/keys.json carries ${key}, which the room does not read`)
 /** Pages whose caption names writing although no edition prints a word of
@@ -328,7 +350,8 @@ function passagesOf(record) {
       if (!t?.text || t.kind === 'missing') { out[lang] = null; continue }
       const kind = t.kind === 'printed' ? 'printed' : 'ours'
       const edition = kind === 'printed' ? editionOf(t.edition) : editionOf(t.basis) ?? itEdition
-      out[lang] = { text: struck(t.text), kind, label: translationLabel(kind, edition, lang, t, page) }
+      const label = translationLabel(kind, edition, lang, t, page)
+      out[lang] = { text: struck(t.text), kind, label, rest: restCredit(kind, edition, lang, label) }
       // what the translator could not settle goes on the record; `doubts` is
       // English on every block, so a German page shows only `doubts_de`,
       // and nothing where that is not written, never the English
@@ -385,8 +408,8 @@ function leadOf(id, passages, record) {
     return {
       lead: {
         passage: written.passage, placeholder: false,
-        en: { text: written.en, kind: p.en?.kind ?? null, label: p.en?.label ?? null },
-        de: { text: written.de, kind: p.de?.kind ?? null, label: p.de?.label ?? null },
+        en: { text: written.en, kind: p.en?.kind ?? null, label: p.en?.label ?? null, rest: p.en?.rest ?? null },
+        de: { text: written.de, kind: p.de?.kind ?? null, label: p.de?.label ?? null, rest: p.de?.rest ?? null },
         it: { text: written.it, label: p.it?.label ?? null },
       },
       none: false,
@@ -399,7 +422,7 @@ function leadOf(id, passages, record) {
   if (!usable.length) return { lead: null, none: false, placeholder: true }
   const named = passages[record?.lead ?? 0]
   const p = named && usable.includes(named) ? named : usable[0]
-  const pick = t => t ? { text: firstSentence(t.text), kind: t.kind ?? null, label: t.label ?? null } : null
+  const pick = t => t ? { text: firstSentence(t.text), kind: t.kind ?? null, label: t.label ?? null, rest: t.rest ?? null } : null
   return { lead: { passage: p.index, placeholder: true, en: pick(p.en), de: pick(p.de), it: p.it ? { text: firstSentence(p.it.text), label: p.it.label } : null }, none: false, placeholder: true }
 }
 
@@ -849,6 +872,7 @@ if (staged) console.log(`  staged ${staged} files into ${option('--stage')}`)
 for (const word of missing) console.log(`  missing word: ${word}`)
 for (const line of warnings) console.log(`  ${line}`)
 for (const [key, said] of Object.entries(keysOut)) if (!said) console.log(`  key not written yet: ${key} (${KEYS[key]})`)
+for (const key of drafted) console.log(`  key drafted by the layout, for the words pass: ${key} (${DRAFTED[key].en} / ${DRAFTED[key].de})`)
 for (const line of refused) console.log(`  REFUSED ${line}`)
 if (flag('--check')) { console.log(drift ? `${drift} file(s) would change` : 'up to date'); process.exit(drift || gaps ? 1 : 0) }
 if (gaps) console.log(`${gaps} gap(s) written as a draft (--draft): the module is not final`)

@@ -70,7 +70,27 @@
   },
   "absence_paris_rest": null,
   "absence_ashburnham": null,
-  "absence_arundel_middle": null
+  "absence_arundel_middle": null,
+  "credit_rest_ai": {
+   "en": "AI translation. It may contain errors.",
+   "de": "KI-Übersetzung. Sie kann Fehler enthalten."
+  },
+  "credit_rest_richter": {
+   "en": "Translation: J. P. Richter, 1883",
+   "de": "Übersetzung: J. P. Richter, 1883"
+  },
+  "picture_leaf": {
+   "en": "{holder}, photograph",
+   "de": "{holder}, Fotografie"
+  },
+  "picture_facsimile": {
+   "en": "{holder}, facsimile of {year}",
+   "de": "{holder}, Faksimile von {year}"
+  },
+  "way_hand": {
+   "en": "His hand",
+   "de": "Handschrift"
+  }
  },
  "topics": [
   {
@@ -562,12 +582,14 @@
     "en": {
      "text": "…and is turned swiftly, the said screw will make its nut in the air and will rise high.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "…und schnell gedreht wird, dann macht sich die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…e voltato con presteza. che dettavite. sifa. la femina. nellaria e montera inalto…",
@@ -675,12 +697,14 @@
     "en": {
      "text": "If the plank of 200 pounds rises before the wing comes down, the test is good.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt, ist der Versuch gut.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…esse il pancone delle 200 libbre. si leua prima. innalto. chellalia sabassi la pruova e bona…",
@@ -828,12 +852,14 @@
     "en": {
      "text": "…you will wear a long wineskin tied round your waist, so that if you fall you do not drown.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "…du wirst einen langen Lederschlauch um den Leib gebunden tragen, damit du nicht ertrinkst, wenn du fällst.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…porterai. cinto. vnotro lungo acio chenelchadere. tu nonanegassi.",
@@ -955,12 +981,14 @@
     "en": {
      "text": "The beating of the wings will be crosswise, like the gait of the horse.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Das Schlagen der Flügel wird über Kreuz gehen, so wie der Gang des Pferdes.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…elmenare dellali sari in croce simile allo andare delcavallo",
@@ -1028,12 +1056,14 @@
     "en": {
      "text": "…when one of the legs stretches out it will bring down one pair of wings…",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "…Wenn sich eines der Beine streckt, senkt es ein Flügelpaar…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…quando luna delleganbe sidistendera quellachalera vnparo dalie…",
@@ -1141,12 +1171,14 @@
     "en": {
      "text": "An object offers as much resistance to the air as the air does to the object.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "So viel Kraft übt ein Ding gegen die Luft aus, wie die Luft gegen das Ding.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Tāta forza si fa colla cosa īcōtro all'aria, quāto l'aria alla cosa…",
@@ -1244,12 +1276,14 @@
     "en": {
      "text": "A way to make the wing stay perforated when it rises, and all closed when it comes down.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Ein Verfahren, damit der Flügel durchbrochen bleibt, wenn er sich hebt, und ganz geschlossen ist, wenn er sich senkt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "modo. chequando. lalja. sileua. inalto rimanghi traforata ecquando ella. chala. sia tucta. vnita…",
@@ -1371,12 +1405,14 @@
     "en": {
      "text": "Remember that your flying machine must imitate no other than the bat…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Erinnere dich, daß dein Vogel nichts anderes nachahmen darf als die Fledermaus…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Ricordati siccome jl tuo vccello non debbe imitare altro che 'l pipistrello…",
@@ -1434,12 +1470,14 @@
     "en": {
      "text": "How the bird rises by means of the wind without beating its wings.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Wie der Vogel sich mit Hilfe des Windes erhebt, ohne die Flügel zu schlagen.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "CHOMELLUCCIELLO SINALZA MEDIANTE ILUENTA SANZA BATTI MENTO DALIE",
@@ -1552,12 +1590,14 @@
     "en": {
      "text": "…must stand free from the waist upwards so as to be able to balance himself as he does in a boat…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…hat sich vom Gürtel aufwärts frei zu halten, um zu balancieren, wie er es im Boote tat…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…à a stare libero dalla cintura insù per potersi bilicare, come fa in barca…",
@@ -2213,12 +2253,14 @@
     "en": {
      "text": "A way to get a piece of work done quickly.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Wie man eine Arbeit rasch erledigt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Modo difare una opera chomprestezza",
@@ -2861,12 +2903,14 @@
     "en": {
      "text": "A ship of scorpions, good for cutting the ropes of the great ships.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Ein Schiff mit Skorpionen, gut, um die Seile der großen Schiffe zu durchschneiden.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "nave di scorpioni bone attagliare le corde delle gran navi…",
@@ -3148,12 +3192,14 @@
     "en": {
      "text": "This bridge could have 2 passages, one above the other.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Diese Brücke könnte 2 Übergänge haben, einen über dem anderen.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "potrebe questo ponte avere 2 transiti uno sopra laltro",
@@ -3449,12 +3495,14 @@
     "en": {
      "text": "The man who is in league with the climber, when he takes service with the castellan, should carry with him a ball of strong thread.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Wer mit dem Kletterer im Bund ist, soll, wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "quello chedachordo chollo scalatore porti quando saconcia colcastellano. con seco uno gomitolo di forterefe.",
@@ -3522,12 +3570,14 @@
     "en": {
      "text": "How all the air that rises again with the water does not stay on the surface…",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Wie die ganze Luft, die mit dem Wasser wieder aufsteigt, nicht an der Oberfläche bleibt…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Come tutta laria cheresurge collacqua nonresta in superfitie…",
@@ -3703,12 +3753,14 @@
     "en": {
      "text": "Such overturnings of the currents are made by the impetus of the water beneath the other water.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Solche Umwälzungen der Strömungen entstehen durch den Antrieb des Wassers unter dem anderen Wasser.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "tali ra voltamen ti dicorsi so fatti dalenpeto dellacqua sottolal tra acqua",
@@ -3781,12 +3833,14 @@
     "en": {
      "text": "…displays of water in thin films, by placing many different objects in a shallow, even and swift current.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "…Schauspiele von Wasser in dünnen Häutchen zu erzeugen, indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "espectaculi dacqua panniculata ponendo molti vari obietti nuna conrente bassa equale eveloce",
@@ -3913,12 +3967,14 @@
     "en": {
      "text": "I ask, if the current makes a bend, whether it will dig at the bottom, or in the middle, or at the top.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Ich frage, ob die Strömung, wenn sie eine Biegung macht, am Grund, in der Mitte oder oben aushöhlen wird.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Domando sella corrente fara alcuno gomito sella cavera infondo oinmezo odisopra…",
@@ -4026,12 +4082,14 @@
     "en": {
      "text": "But when the river is very full it flows all in one channel…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…ma quādo il fiume è grosso, allora elli corre tutto per uno solo verso…",
@@ -4089,12 +4147,14 @@
     "en": {
      "text": "Tell me which eddies are wide below and not above.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Sag mir, welche Wirbel unten breit sind und oben nicht.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "dimi quali re trosi sono lar ghi di sotto enon disopra",
@@ -4167,12 +4227,14 @@
     "en": {
      "text": "To make the great canal, first make the smaller one…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Um den großen Kanal zu bauen, mach zuerst den kleinen…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Per fare il grā canale, fa prima il piccolo…",
@@ -4449,12 +4511,14 @@
     "en": {
      "text": "But you, reader, must understand that this has a usefulness which comes from shortening the time.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Du aber, Leser, musst verstehen, dass dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…Mattu lectore ai aintendere quessto a vere vtilita laqual nasscie mediante loabbre viamento deltenpo…",
@@ -4822,12 +4886,14 @@
     "en": {
      "text": "A building should always be detached on all sides so that its form may be seen.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Ein Gebäude soll immer ringsum frei stehen, damit es seine wahre Gestalt zeigen kann.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Senpre vno edifitio vole · essere spiccato dintorno a volere dimostrare la sua vera forma.",
@@ -4895,12 +4961,14 @@
     "en": {
      "text": "Here there cannot and ought not to be any campanile…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Hier kann und soll kein Glockenturm gebaut werden.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Qui nō si può nè si debe fare cāpanile…",
@@ -5126,12 +5194,14 @@
     "en": {
      "text": "…when you enter into the crypt, you descend 10 steps, and when you mount into the upper you ascend 20 steps…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…quādo entri nella chiesa di sotto, tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini…",
@@ -5307,12 +5377,14 @@
     "en": {
      "text": "This building is inhabited below and above; the way up is by the campaniles…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Dieses Gebäude ist oben und unten begehbar. Nach oben geht man über die Glockentürme…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Questo · edifitio è abitato di sopra e di sotto; di sopra · si va · per li campanili…",
@@ -5478,12 +5550,14 @@
     "en": {
      "text": "It never looks well to see the roofs of a church…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "A nessuna chiesa sta bene vedere tetti…",
@@ -5551,12 +5625,14 @@
     "en": {
      "text": "One house must turn its back to the other, leaving the lower streets between them.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Ein Haus soll dem anderen den Rücken zukehren, so dass die niedrige Straße dazwischen bleibt…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…l'una casa de' volgiere le schiene all'altra ·, lasciādo la strada bassa in mezzo…",
@@ -5624,12 +5700,14 @@
     "en": {
      "text": "Let the width of the streets be equal to the average height of the houses.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Straße soll so breit sein, wie die Häuser im Allgemeinen hoch sind.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Tanto sia larga la strada ·, quanto è la universale altezza delle case.",
@@ -5697,12 +5775,14 @@
     "en": {
      "text": "…to make this place, contrary to the general custom, clean and neat…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…diesen Ort gegen den allgemeinen Brauch sauber und reinlich zu machen…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…fare detto sito cōtro allo universale vso · pulito e netto…",
@@ -5909,12 +5989,14 @@
     "en": {
      "text": "Double stairs: one for the castellan, the other for the paid soldiers.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Doppelte Treppen: eine für den Kastellan, die andere für die Söldner.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "schale. docpie. una perlochastellano. laltra. periprouisionati",
@@ -6062,12 +6144,14 @@
     "en": {
      "text": "A fireplace that fills itself with wood and fire…",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Ein Kamin, der sich selbst mit Holz und Feuer füllt…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "cammino chesenpie di legnie. effocho…",
@@ -6135,12 +6219,14 @@
     "en": {
      "text": "Indicate the centre of Milan.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Trage die wahre Mitte von Mailand ein.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Poni il uero mezzo di Milano.",
@@ -6198,12 +6284,14 @@
     "en": {
      "text": "…both the light and the shadow form pyramids.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…das Licht oder die Schatten tun ihr Werk durch Pyramiden.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…il lume · o l'onbre faño loro · ofitio per piramide…",
@@ -6311,12 +6399,14 @@
     "en": {
      "text": "As to the colours of objects: at long distances no difference is perceptible in the parts in shadow.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Zwischen den Farben der Körper wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Infra i colori · de' corpi nō fia · differentia · in lunga · distantia · nelle · loro · parti onbrose.",
@@ -6384,12 +6474,14 @@
     "en": {
      "text": "And in proportion as one body is better illuminated than another its shadow will be shorter than another.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Und so viel heller der eine Körper beleuchtet ist als der andere, so viel kürzer wird sein Schatten sein als der andere.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…e tāto fia più · luminoso · l'ū che l'altro corpo, quāto l'ombra sua fia piv · corta · che l'altra.",
@@ -6511,12 +6603,14 @@
     "en": {
      "text": "Just as an object which is lighted up by a greater quantity of luminous rays becomes brighter…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "So wie ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Siccome vna · cosa toccata · da maggior sōma · di razzi luminosi · si fa piv chiara…",
@@ -6584,12 +6678,14 @@
     "en": {
      "text": "Where the shadow is larger, or smaller, or equal the body which casts it.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Wo der Schatten größer oder kleiner ist als der schattende Körper, von dem er ausgeht, oder ebenso groß wie er.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Doue l'ōbra è maggiore o minore o equale al corpo ōbroso sua origine.",
@@ -6647,12 +6743,14 @@
     "en": {
      "text": "The form of the shadow cast by any body of uniform density can never be the same as that of the body producing it.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo donde ella nasce.",
@@ -6720,12 +6818,14 @@
     "en": {
      "text": "See here how the concave mirror made of half a spherical body has curved hypotenuses…",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors."
+     "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Sieh hier, wie der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Ecco qui che lo spechio concavo di mezo corpo sperico ha le ipotemisse curve…",
@@ -6827,12 +6927,14 @@
     "en": {
      "text": "The flatter the common concave mirror, the greater the sum of reflected rays it will bring to the same place.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors."
+     "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen, die er an dieselbe Stelle führt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi conducerà nel medesimo sito.",
@@ -6890,12 +6992,14 @@
     "en": {
      "text": "…by some small round hole penetrate the images of illuminated objects into a very dark chamber.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…durch ein kleines rundes Loch die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…per alcuno piccolo spiraculo rotōdo penetrāno le spetie delli obbietti alluminati in abitatione fortemente oscura…",
@@ -6963,12 +7067,14 @@
     "en": {
      "text": "…that all objects transmit their image to the eye by a pyramid of lines.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…daß alle Dinge ihr Abbild mittels pyramidaler Linien ins Auge senden.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…tutte · le cose · mādare · all'occhio · per linie piramidali · la loro · similitudine…",
@@ -7036,12 +7142,14 @@
     "en": {
      "text": "The art of perspective is of such a nature as to make what is flat appear in relief and what is in relief flat.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Perspektive ist von solcher Natur, dass sie das Flache plastisch und das Plastische flach erscheinen lässt.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "La prospettiva · è di tale · natura · ch'ella fa · parere · il piano · rilievo e 'l rilievo piano.",
@@ -7109,12 +7217,14 @@
     "en": {
      "text": "The mind of the painter must resemble a mirror…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Der Geist des Malers will dem Spiegel gleichen…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Lo ingiegnio del pittore vol essere a similitudine · dello · spechio…",
@@ -7182,12 +7292,14 @@
     "en": {
      "text": "…like the sound of bells in whose jangle you may find any name or word you choose to imagine.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…wie mit dem Klang von Glocken, daß du in ihren Schlägen jeden Namen und jedes Vokabel finden kannst, so du auszudenken vermagst.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo che tu īmaginerai.",
@@ -7255,12 +7367,14 @@
     "en": {
      "text": "The air must be full of arrows in every direction, some shooting upwards, some falling, some flying level.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Luft sei voller Pfeilschwärme verschiedener Gattung: die einen steigen, die anderen fallen, manche fliegen in ebener Linie…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…L'aria sia · piena · di saettume di diverse ragioni: chi mōti ·, chi discēda, qual sia · per linia piana…",
@@ -7328,12 +7442,14 @@
     "en": {
      "text": "Let the sea be rough and tempestuous and full of foam whirled among the lofty waves…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Das aufgewühlte und stürmische Meer sei voller wirbelnden Gischtes zwischen den sich aufbäumenden Wogen…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…Il mare, turbato e tēpestoso, sia pieno di ritrosa schivma īfra l'eleuate ōde…",
@@ -7401,12 +7517,14 @@
     "en": {
      "text": "That which is entirely bereft of light is all darkness…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Was gänzlich des Lichtes beraubt ist, ist völlige Dunkelheit.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Quella cosa che è priuata īteramēte di luce è tutta tenebre…",
@@ -7474,12 +7592,14 @@
     "en": {
      "text": "Men and birds might be seen crowded on the tall trees which remained uncovered by the swelling waters…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Man sah die Menschen und die Vögel, die mit sich die großen Bäume füllten, so von den ausgeweiteten Wogen bloß gelassen…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…vedeasi li omini e vccielli che riēpievā di se li grandi alberi, che scoperti dalle dilatate onde…",
@@ -7552,12 +7672,14 @@
     "en": {
      "text": "…take a mirror and look in that at the reflection of the real things…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…nimm einen Spiegel, laß darin den lebendigen Gegenstand sich spiegeln…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…abbi vno spechio · e favi dētro specchiare la cosa viua…",
@@ -7625,12 +7747,14 @@
     "en": {
      "text": "…he seems to me but a poor master who can only do a figure well.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…mir scheint ein trauriger Meister, der nichts als eine Figur gut macht.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…mi pare uno tristo maestro quello · che solo una figura fa bene…",
@@ -7698,12 +7822,14 @@
     "en": {
      "text": "…you, O Painter, if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…wenn du, o Maler, deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…tu pittore nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
@@ -7771,12 +7897,14 @@
     "en": {
      "text": "The name of man differs in different countries, but his form is never changed but by death.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Der Name Mensch wechselt mit den wechselnden Ländern; die Form wird nicht verändert, außer durch den Tod…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…il nome dell'omo si uaria ī uari paesi e la forma non è mvtata se nō da morte.",
@@ -7844,12 +7972,14 @@
     "en": {
      "text": "Savage he is who saves himself.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Wild ist, wer sich rettet.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Saluatico è quel che si salua.",
@@ -8031,12 +8161,14 @@
     "en": {
      "text": "The ear is exactly as long as the nose.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Das Ohr ist genau so lang wie die Nase.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "lorechio. eapunto tanto lungo quanto ilnaso…",
@@ -8252,12 +8384,14 @@
     "en": {
      "text": "Borges shall get for you the Archimedes from the bishop of Padua…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Borges wird dir den Archimedes vom Bischof von Padua besorgen…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Borges ti farà avere Archimede del vescouo di Padova…",
@@ -8419,12 +8553,14 @@
     "en": {
      "text": "Here I make a note to demonstrate the difference there is between man and the horse…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Hier halte ich fest, dass ich den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Qui fo ricordo di dimostrare la differentia ch'è dall'omo al cauallo…",
@@ -8492,12 +8628,14 @@
     "en": {
      "text": "Of the muscles that attach onto the bone.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Von den Muskeln, die am Knochen ansetzen.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "de muss coli chessa pichano su llosso",
@@ -8565,12 +8703,14 @@
     "en": {
      "text": "The lily set itself down by the shores of the Ticino, and the current carried away bank and the lily with it.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Lilie ließ sich am Ufer des Tessin nieder, und die Strömung riss das Ufer mitsamt der Lilie fort.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Il giglio si pose sopra la ripa di · Tesino, e la corrēte tirò la ripa īsieme col lilio.",
@@ -8643,12 +8783,14 @@
     "en": {
      "text": "The ear must be a quarter of the face in length.",
      "kind": "ours",
-     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors."
+     "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+     "rest": "AI translation. It may contain errors."
     },
     "de": {
      "text": "Das Ohr muss ein Viertel des Gesichts lang sein.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "lorechio. deessere. lungo. la. quarta. parte. deluolto",
@@ -9099,12 +9241,14 @@
     "en": {
      "text": "There is no boss on branches which has not been produced by some branch which has failed.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Es gibt keinen Knorren an den Ästen, an dem nicht ein Zweig ausgetrieben hat, der eingegangen ist.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Nessū gobbo è ne rami, che nō ui sia dato alcun ramo, il quale è mācato…",
@@ -9276,12 +9420,14 @@
     "en": {
      "text": "…they will have made, when put together, a thickness equal to that of the main stem…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…essi ànno cōposto, givti insieme, altrettanta grossezza, quāto è la grossezza del suo pedale…",
@@ -9517,12 +9663,14 @@
     "en": {
      "text": "Not to disobey.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Um nicht ungehorsam zu sein.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Per nō disobbidire.",
@@ -9595,12 +9743,14 @@
     "en": {
      "text": "The moon has no light in itself; but so much of it as faces the sun is illuminated…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Der Mond hat kein Licht von sich, aber so viel, als die Sonne von ihm sieht, so viel erleuchtet sie…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "La luna non à lume da se, se nō quāto ne vede il sole tanto l'allumina…",
@@ -9658,12 +9808,14 @@
     "en": {
      "text": "Whence it may be concluded that what shines in the moon is water like that of our seas…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Hier wird man schließen, daß jenes, was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Qui si concluderà che ciò che della luna splende è acqua simile a quella degli nostri mari…",
@@ -9721,12 +9873,14 @@
     "en": {
      "text": "…this is caused by the clouds that rise from the waters in the moon…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…dies kommt von Wolken, die sich aus den Wassern dieses Mondes heben…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…questo nasce da nuvoli che si leuano dall'acque d'essa luna…",
@@ -9784,12 +9938,14 @@
     "en": {
      "text": "Construct glasses to see the moon magnified.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Mache Gläser für die Augen, um den Mond groß zu sehen.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Fa ochiali da vedere la luna grande.",
@@ -9847,12 +10003,14 @@
     "en": {
      "text": "The earth is not in the centre of the Sun's orbit nor at the centre of the universe…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Wie die Erde nicht inmitten des Sonnenkreises, noch im Mittelpunkt der Welt ist…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Come la terra non è nel mezzo del cerchio del sole, nè nel mezzo del mōdo…",
@@ -9925,12 +10083,14 @@
     "en": {
      "text": "In your discourse you must prove that the earth is a star much like the moon…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Du in deiner Rede hast zu schließen, daß die Erde ein Stern ist, so ähnlich wie der Mond…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Tu nel tuo discorso ài a cōcludere la terra essere vna stella quasi simile alla luna…",
@@ -10003,12 +10163,14 @@
     "en": {
      "text": "…how the ocean and the other seas must, by means of the sun, make our world shine with the appearance of a moon…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…wie der Ozean mit den andern Meeren vermittels der Sonne unsere Welt gleich dem Monde leuchten macht…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…come l'oceā colli altri mari fa mediāte il sole splēdere il nostro mōdo a modo di luna…",
@@ -10076,12 +10238,14 @@
     "en": {
      "text": "But I cannot forbear to condemn many of the ancients, who said that the sun was no larger than it appears…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten, welche sagen, daß die Sonne keine andere Größe habe als die, welche sie zeigt…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…mai nō posso fare ch'io non biasimi molti di quelli antichi, li quali dissero che 'l sole non avea altra grādezza che quella che mostra…",
@@ -10242,12 +10406,14 @@
     "en": {
      "text": "O time, swift robber of all created things, how many kings, how many nations hast thou undone…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "O Zeit, schneller Erbeuter der geschaffenen Dinge, wie viele Könige, wie viele Völker hast du vernichtet…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "O tēpo, velocie predatore delle create cose, quāti rè, quāti popoli ài tu disfatti…",
@@ -10694,12 +10860,14 @@
     "en": {
      "text": "A vase of unbaked clay, when broken, may be remoulded, but not a baked one.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Ein rohes Gefäß, wenn zerbrochen, ist wieder herzustellen; ein gebranntes nie.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Vn vaso crudo rotto si può riformare, ma il cotto no.",
@@ -10757,12 +10925,14 @@
     "en": {
      "text": "Science is the captain, and practice the soldiers.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Wissenschaft ist der Kapitän, die Praxis, das sind Soldaten.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "La sciētia è il capitano, e la pratica sono i soldati.",
@@ -10835,12 +11005,14 @@
     "en": {
      "text": "Those who are in love with practice without knowledge are like the sailor who gets into a ship without rudder or compass…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Quelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere che ētra navilio sanza timone o bussola…",
@@ -10913,12 +11085,14 @@
     "en": {
      "text": "Mechanics are the Paradise of mathematical science, because here we come to the fruits of mathematics.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Mechanik ist das Paradies der mathematischen Wissenschaften; denn durch sie kommt man zur mathematischen Frucht.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "La meccanica è il paradiso delle sciētie matematiche, perchè cō quella si viene al frutto matematico.",
@@ -10991,12 +11165,14 @@
     "en": {
      "text": "I know that many will call this useless work…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Ich weiß, dass viele sagen werden, dies sei ein nutzloses Werk.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "So che molti diranno · questa · essere opera invtile…",
@@ -11054,12 +11230,14 @@
     "en": {
      "text": "Beware of the teaching of these speculators, because their reasoning is not confirmed by experience.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Fliehe die Lehren jener Spekulatoren, denn ihre Gründe werden von der Erfahrung nicht bestätigt.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "fuggi i precetti · di quelli · speculatori, chè le loro ragioni · nō son · confermate · dalla · speriēza.",
@@ -11127,12 +11305,14 @@
     "en": {
      "text": "Instrumental or mechanical science is of all the noblest and the most useful…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die instrumentale oder mechanische Wissenschaft ist höchst edel und über alle andern äußerst nützlich…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "La scientia strumentale over machinale è nobilissima e sopra tutte l'altre vtilissima…",
@@ -11190,12 +11370,14 @@
     "en": {
      "text": "The senses are of the earth; Reason, stands apart in contemplation.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Sinne sind irdisch, die Vernunft steht außerhalb von ihnen, wenn sie betrachtet.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "I sensi sono terrestri, la ragione sta fuor di quelli, quādo cōtenpla.",
@@ -11253,12 +11435,14 @@
     "en": {
      "text": "…truth bears the same relation to falsehood as light to darkness…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…solcher Abstand ist zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…tal proportione è dalla verità alla bugia, qual è dalla luce alle tenebre…",
@@ -11375,12 +11559,14 @@
     "en": {
      "text": "You grow in reputation like bread in the hands of a child.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Du wächst an Ruf wie Brot den Kindern auf der flachen Hand wächst.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Tu cresci ī reputatione come il pane ī mano a' putti.",
@@ -11448,12 +11634,14 @@
     "en": {
      "text": "The water you touch in a river is the last of that which has passed, and the first of that which is coming.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Das Wasser, das von den Flüssen du berührst, ist das letzte von jenem, das ging, und das erste von jenem, das kommt…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "L'acqua che tochi de' fivmi, è l'ultima di quella · che ādò, e la prima di quelle · che viene…",
@@ -11511,12 +11699,14 @@
     "en": {
      "text": "The net that was wont to take the fish was seized and carried away by the rush of fish.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Das Netz, so die Fische zu fangen pflegte, wurde gefangen und fortgetragen vom Furor der Fische.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "La rete che soleua pigliare li pesci fu presa e portata via dal furor de' pesci.",
@@ -11574,12 +11764,14 @@
     "en": {
      "text": "The Forests will bring forth young which will be the cause of their death.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Die Wälder werden Kinder gebären, die die Ursache ihres Todes sein werden.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Le selue partorirāno figlioli che fiano causa della lor morte…",
@@ -11647,12 +11839,14 @@
     "en": {
      "text": "Our life is made by the death of others.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Wir machen unser Leben mit dem Tode anderer.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Facciamo nostra vita coll'altrui · morte.",
@@ -11725,12 +11919,14 @@
     "en": {
      "text": "As a day well spent procures a happy sleep, so a life well employed procures a happy death.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "So wie ein gut verbrachtes Tageswerk ein frohes Schlafen gibt, so gibt ein wohl angewandtes Leben einen heiteren Tod.",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "Siccome · vna · giornata · bene spesa dà lieto dormire, così vna vita · bene · vsata · dà lieto morire.",
@@ -11788,12 +11984,14 @@
     "en": {
      "text": "Begun at Florence, in the house of Piero di Braccio Martelli, on the 22nd day of March 1508.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Begonnen in Florenz, im Haus des Piero di Braccio Martelli, am 22. März 1508.",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Comīciato in Firenze in casa Piero di Braccio Martelli addi 22 di marzo 1508…",
@@ -11851,12 +12049,14 @@
     "en": {
      "text": "I will make covered chariots, safe and unattackable…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…werde ich Wagen machen, bedeckt und sicher, unangreifbar…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "…farò carri coperti e sicuri īoffensibili…",
@@ -12002,12 +12202,14 @@
     "en": {
      "text": "Again, Poverty in a hideous form running behind a youth.",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Ferner, die Armut in erschreckender Gestalt läuft hinter einem Jüngling her…",
      "kind": "printed",
-     "label": "Übersetzung: Marie Herzfeld, 1906"
+     "label": "Übersetzung: Marie Herzfeld, 1906",
+     "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
      "text": "ācora la povertà in figura spaventevole corra dirieto a vn giovanetto…",
@@ -12075,12 +12277,14 @@
     "en": {
      "text": "The Duke has lost the state, property and liberty…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Der Herzog hat seinen Staat, seine Habe und seine Freiheit verloren…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "Il duca perso lo stato e la roba e liertà…",
@@ -12143,12 +12347,14 @@
     "en": {
      "text": "…it seemed to me that, as I was in my cradle, a kite came to me and opened my mouth with its tail…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "…kam es mir vor, als ich in der Wiege lag, als ob ein Milan zu mir käme, mir mit seinem Schwanz den Mund öffnete…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "…e' mi parea che, essendo io in culla, che vn nibbio venisse a me e mi aprisse la bocca colla sua coda…",
@@ -12206,12 +12412,14 @@
     "en": {
      "text": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci, notary at the Palazzo del Podestà, my father…",
      "kind": "printed",
-     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+     "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+     "rest": "Translation: J. P. Richter, 1883"
     },
     "de": {
      "text": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci, Notar am Palazzo del Podestà, mein Vater…",
      "kind": "ours",
-     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten."
+     "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
     },
     "it": {
      "text": "A dì 9 di luglio 1504, mercoledì a ore 7 morì Ser Piero da Vinci, notaio al Palazzo del Podestà, mio padre…",

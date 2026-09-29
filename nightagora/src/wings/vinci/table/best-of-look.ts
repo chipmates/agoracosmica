@@ -14,11 +14,11 @@ import type { ManifestIndex } from '../../../manifest'
 import { assetAddress } from '../../../stack/materials'
 import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload, type ReaderBook, type ReaderPayload, type ReaderSide, type ReaderWay } from '../../vitrine/reader'
-import type { VitrineExhibit } from '../../vitrine/types'
+import type { VitrineExhibit, VitrinePeek } from '../../vitrine/types'
 import { vinciManuscriptWords, VINCI_VITRINE_WORDS } from '../collection/close-look'
 import type { VinciText } from '../content'
 import { BEST_OF_NOTICES, BEST_OF_TOPICS, bestOfKey, bestOfRecord, bestOfSource, bestOfTopic, topicExhibit, topicPages,
-  topicTexts, type BestOfLang, type BestOfPage, type BestOfPageTexts, type BestOfPassage } from './best-of'
+  topicTexts, type BestOfLang, type BestOfPage, type BestOfPageTexts, type BestOfPassage, type ScanRecord } from './best-of'
 import { SHELF_BOOKS } from './codex-shelf'
 import { MIRROR_EXPLANATION, TABLE_UI } from './content'
 
@@ -67,6 +67,15 @@ const node = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?:
 /** His words stand in quotation marks, the page's language's own. */
 const quoted = (text: string, language: BestOfLang): string => language === 'de' ? `„${text}“` : `“${text}”`
 
+/** The holders by a name a credit row holds in one row; any other by its
+ * name before the first comma. */
+const HOLDER_SHORT: Record<string, string> = {
+  'Bibliothèque de l’Institut de France, Paris': 'Institut de France',
+  'Veneranda Biblioteca Ambrosiana, Milan': 'Biblioteca Ambrosiana',
+  'Biblioteca Trivulziana, Castello Sforzesco, Milan': 'Biblioteca Trivulziana',
+  'Biblioteca Reale, Turin': 'Biblioteca Reale, Turin',
+}
+
 /** The shelf's whole book a page's codex belongs to, where there is one. */
 function bookOf(page: BestOfPage): string | null {
   const key: Record<string, string> = {
@@ -97,16 +106,36 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   const noWords = (page: BestOfPage): string =>
     (page.drawing_only ? BEST_OF_NOTICES.no_words_drawing_only?.[language] : null) ?? BEST_OF_NOTICES.no_words[language] ?? ''
 
-  /** The lead in his words, with whose words they are; the caption where the
-   * page has no lead, and where the lead is too long for the phone's peek. */
-  function lineOf(page: BestOfPage): { head: string | null; note: string | null; short: string | null } {
+  /** THE PICTURE'S OWN CREDIT: where the original is, and what the picture
+   * is of it, a photograph or a printed facsimile of its year. */
+  function pictureCredit(page: BestOfPage): string | null {
+    const record = index ? bestOfSource(page, index)?.record as (ScanRecord & { holder?: string }) | undefined : undefined
+    const holder = record?.holder
+    if (!holder) return null
+    const short = HOLDER_SHORT[holder] ?? holder.split(',')[0]!.trim()
+    if (page.picture === 'leaf') return key('picture_leaf')?.replace('{holder}', short) ?? null
+    const year = /facsimile\b[^.]*?(\d{4}(?:-\d{2})?)/i.exec(record?.honesty_en ?? '')?.[1]
+    return year ? key('picture_facsimile')?.replace('{holder}', short).replace('{year}', year) ?? null : null
+  }
+
+  /** The lead in his words, with whose words they are and whose picture it
+   * is; the caption where the page has no lead. At rest on the phone the
+   * lead's credit takes one row, and the caption stands in where the lead is
+   * too long for the peek. */
+  function lineOf(page: BestOfPage): { head: string | null; note: string | null; peek: VitrinePeek; label: string | null } {
     const lead = page.lead?.[language]
     const caption = page.caption?.[language] || null
+    const row = (...parts: (string | null | undefined)[]): string | null => parts.filter(Boolean).join(' · ') || null
+    const picture = pictureCredit(page)
     if (lead?.text) {
-      const note = lead.kind === 'ours' ? key('ai_short') ?? lead.label : lead.label
-      return { head: quoted(lead.text, language), note: note ?? null, short: caption }
+      const said = lead.kind === 'ours' ? key('ai_short') ?? lead.label : lead.rest ?? lead.label
+      // the band's source row keeps one row; the phone's raised card has room for the whole credit
+      const credit = options.narrow() ? lead.label ?? said : said
+      return { head: quoted(lead.text, language), note: row(credit, picture), peek: { note: lead.rest ?? said ?? '', line: caption },
+        label: lead.label && lead.label !== credit ? lead.label : null }
     }
-    return { head: caption, note: null, short: null }
+    // the caption is the museum's own words: at rest no row stands under it
+    return { head: caption, note: row(picture), peek: { note: '', line: null }, label: null }
   }
   const pictureWord = (page: BestOfPage): string | null =>
     page.picture === 'leaf' ? key('kind_leaf') : page.picture === 'plate' ? key('kind_plate') : page.picture === 'facsimile' ? key('kind_facsimile') : null
@@ -116,7 +145,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
    * licence keeps the scan as it is, the printed plate of the same page. */
   function waysOf(page: BestOfPage): ReaderWay[] {
     const own = { ceiling: words.ceiling }
-    const first = page.hand === 'copy' ? key('the_page') : words.hand
+    const first = page.hand === 'copy' ? key('the_page') : key('way_hand') ?? words.hand
     if (!first) return []
     const note = page.direction === 'ordinary' ? key('mirror_ordinary') ?? MIRROR_EXPLANATION[language].documented
       : MIRROR_EXPLANATION[language].documented
@@ -141,7 +170,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     if (!index) return null
     const found = bestOfSource(page, index)
     if (!found) return null
-    const { head, note, short } = lineOf(page)
+    const { head, note, peek, label } = lineOf(page)
     // ONE HALF OF AN OPENING shows the open spread on the desktop, both
     // sides whole, where the store holds the pair as one picture
     const spread = page.spread && !options.narrow() ? bestOfRecord(index, page.spread.file) : undefined
@@ -151,7 +180,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       id: page.id,
       label: page.name?.[language] ?? page.seat[language],
       shows: page.caption?.[language] ?? '',
-      notes: [topic?.line?.[language] ?? '', pictureWord(page) ?? '', !page.words ? noWords(page) : ''],
+      // the translation's whole credit, where the source row says it short
+      notes: [topic?.line?.[language] ?? '', pictureWord(page) ?? '', !page.words ? noWords(page) : '', label ?? ''],
       source: opening ?? found.source,
       // the leaf, framed, where its photograph shows a ground around it: a
       // zoom state, with the whole photograph one step further out
@@ -162,7 +192,7 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       named: null,
       head,
       note,
-      short,
+      peek,
       seat: page.name ? page.seat[language] : '',
       count: countOf(place, count),
       volume: options.slug,
@@ -265,8 +295,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   function paintText(): void {
     text.setAttribute('aria-pressed', String(payload.columnOpen()))
   }
-  const recordWord: VinciText = { en: bestOfKey('full_record', 'en') ?? VINCI_VITRINE_WORDS.provenance.en,
-    de: bestOfKey('full_record', 'de') ?? VINCI_VITRINE_WORDS.provenance.de }
+  // the record holds the page's source first: it is named after that
+  const recordWord: VinciText = VINCI_VITRINE_WORDS.provenance
   const id = options.id ?? topicExhibit(options.slug)
   const record = control(recordWord[language], () => options.openRecord(id, recordWord, renderRecord), 'record')
   const shut = control(VINCI_VITRINE_WORDS.close[language], () => options.close(), 'close')
@@ -347,13 +377,13 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   }
 
   const first = pages.find(page => page.id === (options.start ?? LEFT.get(options.slug))) ?? pages[0]
-  const opening = first ? lineOf(first) : { head: null, note: null, short: null }
+  const opening = first ? lineOf(first) : { head: null, note: null, peek: { note: '', line: null }, label: null }
   const exhibit: VitrineExhibit = {
     id,
     title: first ? first.name?.[language] ?? first.seat[language] : title,
     line: opening.head,
     note: opening.note,
-    short: opening.short,
+    peek: opening.peek,
     card: [],
     controls: [text, record, shut],
     walk: [back, on],

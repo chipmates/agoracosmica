@@ -18,12 +18,14 @@
      "en": {
       "text": "Savage he is who saves himself.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Wild ist, wer sich rettet.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Ein Wortspiel mit 'saluatico' (wild) und 'si salua' (rettet sich); das Deutsche kann den Klang nicht halten, nur den Sinn."
       ]
@@ -56,12 +58,14 @@
      "en": {
       "text": "If Petrarch was so fond of bay, it was because it is of a good taste in sausages and with tunny; I cannot put any value on their foolery.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Wenn Petrarca den Lorbeer so sehr liebte, dann weil er gut zwischen Wurst und Thunfisch schmeckt; aus ihrem Geschwätz kann ich keinen Schatz machen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'buon fralla salsiccia e tonno': wörtlich 'gut zwischen der Wurst und Thunfisch'; wir lesen es wie Richter als Küchenkraut, das dort gut schmeckt.",
        "Richters Fußnote: Diese Verse stammen bekanntlich von einem zeitgenössischen Dichter (so sagte es ihm Senatore Morelli), Leonardo hat sie also abgeschrieben, nicht selbst verfasst; Conte Porro las die letzte Zeile 'I no posso di loro gia (sic) co' far tesauro'."
@@ -95,12 +99,14 @@
      "en": {
       "text": "Ammianus Marcellinus asserts that seven hundred thousand volumes of books were burnt in the siege of Alexandria in the time of Julius Cesar.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Ammianus Marcellinus versichert, dass im Kampf um Alexandria, zur Zeit von Julius Cäsar, siebenhunderttausend Bände verbrannt seien.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'nella pugnia Alessādrina': wörtlich 'im alexandrinischen Kampf'; Richter übersetzt 'in the siege of Alexandria' (bei der Belagerung von Alexandria)."
       ]
@@ -141,6 +147,7 @@
       "text": "The floor of the furnace: 3 courses of unfired bricks of common earth and 1½ fingers of ash. The vault: 1 single layer of unfired bricks of Valenza [?] and 1 more single layer of fired bricks.\nThe calossi [?] are to be set with the ash.\nThe wood of the core [?] of the bombards is coated with ash [?] 1 finger thick.\nThe mouth of the furnace, that is, where the flame enters, must be of large bricks of Valenza [?].\nEach of the 2 flues must be half the window through which the flame enters.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Beltrami, 1891). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'ualenza' is read as the place name Valenza (on the Po, north of Alessandria). Richter 1883 §740, on luting the furnace, prints 'Terra di Valenza' with that footnote (read in the Project Gutenberg e-text only). Beltrami prints it lower case.",
        "'calossi': Beltrami's own note (p. 307) confirms this reading against an earlier 'ta lossi', but no meaning is given. Left untranslated.",
@@ -156,6 +163,7 @@
       "text": "Der Boden des Ofens: 3 Lagen ungebrannter Ziegel aus gewöhnlicher Erde und 1½ Finger Asche. Das Gewölbe: 1 einzige Schicht ungebrannter Ziegel aus Valenza [?] und noch 1 einzige Schicht gebrannter Ziegel.\nDie calossi [?] sollen mit der Asche gesetzt werden.\nDas Holz des Kerns [?] der Bombarden wird 1 Finger dick mit Asche überzogen [?].\nDie Mündung des Ofens, also dort, wo die Flamme eintritt, muss aus großen Ziegeln aus Valenza [?] sein.\nJeder der 2 Abzüge muss die Hälfte des Fensters betragen, durch das die Flamme eintritt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Beltrami, 1891). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'ualenza' wird als der Ortsname Valenza gelesen (am Po, nördlich von Alessandria). Richter 1883 §740, über das Abdichten des Ofens, druckt 'Terra di Valenza' mit dieser Fußnote (nur im E-Text von Project Gutenberg gelesen). Beltrami druckt es mit kleinem Anfangsbuchstaben.",
        "'calossi': Beltramis eigene Anmerkung (S. 307) bestätigt diese Lesart gegen ein früheres 'ta lossi', gibt aber keine Bedeutung an. Unübersetzt gelassen.",
@@ -192,6 +200,7 @@
       "text": "cut through [?]\nto confirm\nto imagine\nwill\nintellect\nto conform oneself\nreason\nappetite\ninclination\nto leave\nweighing\nlowest [?]\nbodily\nlight\nsound [?]\ndifference\ndelightful\ndifficult\ndimanta [?]\nquestion\nto contrive\nparticipation\nravenous [?]\nunbridled\nnevertheless\nvisible\nmotion\nfirst\nconcept\nobscene\nsublime [?]\n\nto hope\nto corrupt\nto consent\nloosely [?]\nto absolve\nto dissolve\nattainment [?]\nmoderate\nactually\ncleanness\nmeditation\nconstancy\nto present\ntasteable\nexcess\ninfirmity\nto understand\ndisciare [?]\nto reveal\nto draw near\nto shrink back [?]\nremembrance\nsudden\nto say again\ncheerfulness\nmerriment\nto sacrifice\nto weep\nto sigh\n\ntranslator [?]\nantiquity\nmost welcome\nprecepts\ndivinity\ndivine\non foot\nmental\ntransgression\noffered\nto sacrifice\ntenderness\nto admonish\nfatherhood\ncomfort\nto confound\nimmolation\ncharitable\nfortification\nto obtain by entreaty\nsupplication\ngladness\npleasingness [?]\nto receive\nsustenance\nto grieve [?]\nyouth\nto whisper\ncontemporary\ncompatriot\n\ntributione [?]\ntoleration\nto mock\nto flow forth [?]\nultimately\nto tread down\nto walk\nobservance\nto propose\nto endure\nnecessity\nto put on a par\nby chance\nequivalent\nstinking\npleasant\n\nmost famous\nto name\nexcuse\neloquence\nto rule\nunlearned [?]\nhidden\nprecipiente [?]\nprecepts\ndoing\nseizer [?]\nusurper\nprosperity\nadversity\nto burst\nto explode\nto temper\nto moderate\ngreatness\nto strike\nto fall headlong\nheight\nto go mad\nto go crazy\nastentere [?]\nto enjoy [?]\nimpatience\nto beat",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Beltrami, 1891). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "A list of single words, mostly Latinate, without sentences. Beltrami (foreword p. 15) says only a few of the codex's word lists carry a definition or a synonym, and hopes a scholar will explain them. The glosses here are dictionary senses of each word, one per line, not Leonardo's.",
        "Struck out by Leonardo and left out of the translations: the g in 'fame<i>g</i>licho' and 'e<i>g</i>ciesso', the first i in 'im<i>i</i>olatione', and the words 'precipiente', 'faciente' and 'starnazare' in the fifth column (the first two are written again below).",
@@ -205,6 +214,7 @@
       "text": "durchschnitten [?]\nbestätigen\nsich vorstellen\nWille\nVerstand\nsich anpassen\nVernunft\nBegierde\nNeigung\nlassen\nAbwägung\ndas Unterste [?]\nkörperlich\nLicht\nKlang [?]\nUnterschied\nergötzlich\nschwierig\ndimanta [?]\nStreitfrage\nersinnen\nTeilhabe\nausgehungert [?]\nzügellos\nnichtsdestoweniger\nsichtbar\nBewegung\nursprünglich\nBegriff\nunzüchtig\nerhaben [?]\n\nhoffen\nverderben\neinwilligen\nungebunden [?]\nfreisprechen\nauflösen\nErlangung [?]\nmaßvoll\nwirklich\nReinheit\nBetrachtung\nBeständigkeit\ndarbieten\nschmeckbar\nÜbermaß\nKrankheit\nverstehen\ndisciare [?]\nenthüllen\nsich nähern\nzurückweichen [?]\nGedenken\nplötzlich\nwiederholen\nFröhlichkeit\nHeiterkeit\nopfern\nweinen\nseufzen\n\nÜbersetzer [?]\nAltertum\nhochwillkommen\nGebote\nGöttlichkeit\ngöttlich\nzu Fuß\ngeistig\nÜbertretung\ndargebracht\nopfern\nZärtlichkeit\nermahnen\nVaterschaft\nTrost\nverwirren\nOpferung\nmildtätig\nBefestigung\nerflehen\nFlehen\nFreude\nGefälligkeit [?]\nempfangen\nUnterhalt\nsich grämen [?]\nJugend\nflüstern\nzeitgenössisch\nLandsmann\n\ntributione [?]\nDuldung\nspotten\nherabfließen [?]\nschließlich\nniedertreten\ngehen\nBefolgung\nvorschlagen\nertragen\nNotwendigkeit\ngleichstellen\nzufällig\ngleichwertig\nstinkend\nangenehm\n\nhochberühmt\nnennen\nEntschuldigung\nBeredsamkeit\nbeherrschen\nungelehrt [?]\nverborgen\nprecipiente [?]\nGebote\ntätig\nRäuber [?]\nUsurpator\nWohlergehen\nWidrigkeit\nbersten\nzerspringen\nmildern\nmäßigen\nGröße\nstoßen\nniederstürzen\nHöhe\nwahnsinnig werden\nverrückt werden\nastentere [?]\ngenießen [?]\nUngeduld\nschlagen",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Beltrami, 1891). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Eine Liste einzelner Wörter, meist lateinischer Herkunft, ohne Sätze. Beltrami (Vorwort S. 15) sagt, nur wenige Wortlisten des Codex tragen eine Erklärung oder ein Synonym, und hofft, ein Gelehrter werde sie erklären. Die Erklärungen hier sind Wörterbuchbedeutungen jedes Wortes, eine pro Zeile, nicht Leonardos.",
        "Von Leonardo gestrichen und in den Übersetzungen weggelassen: das g in 'fame<i>g</i>licho' und 'e<i>g</i>ciesso', das erste i in 'im<i>i</i>olatione' sowie die Wörter 'precipiente', 'faciente' und 'starnazare' in der fünften Spalte (die ersten beiden stehen weiter unten noch einmal).",
@@ -244,6 +254,7 @@
       "text": "The cut, or edge, of the lower lip of the mouth is the midpoint between the underside of the nose and the underside of the chin.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'63' is the leaf number, which Ravaisson prints in the margin before the first line; it is left out of the translations.",
        "'lalarg' (la larg[hezza], the width) is printed in italics, begun and struck out by Leonardo; it is left out of the translations."
@@ -253,6 +264,7 @@
       "text": "Der Schnitt oder die Kante der Unterlippe des Mundes liegt in der Mitte zwischen der Unterseite der Nase und der Unterseite des Kinns.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'63' ist die Blattnummer, die Ravaisson am Rand vor der ersten Zeile druckt; sie ist in den Übersetzungen weggelassen.",
        "'lalarg' (la larg[hezza], die Breite) ist kursiv gedruckt, von Leonardo begonnen und gestrichen; es ist in den Übersetzungen weggelassen."
@@ -289,6 +301,7 @@
       "text": "The face makes a square within itself: its width runs from one end of the eyes to the other, and its height from the top end of the nose to the underside of the lower lip of the mouth. Then what remains above and below this square makes the height of one more such square.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'daluno alaltro stremo delochio' is literally 'from one to the other end of the eye'; Ravaisson adds '[des yeux]' (of the eyes), and the translation follows him.",
        "Ravaisson's note 1 says these lines belong to the small face seen from the front at the right of the page."
@@ -298,6 +311,7 @@
       "text": "Das Gesicht bildet in sich ein Quadrat: Seine Breite reicht von einem Ende der Augen zum anderen, seine Höhe vom oberen Ende der Nase bis unter die Unterlippe des Mundes. Was dann über und unter diesem Quadrat übrig bleibt, ergibt die Höhe eines gleichen Quadrats.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'daluno alaltro stremo delochio' heißt wörtlich 'von einem zum anderen Ende des Auges'; Ravaisson ergänzt '[des yeux]' (der Augen), und die Übersetzung folgt ihm.",
        "Ravaissons Anmerkung 1 sagt, dass diese Zeilen zu dem kleinen, von vorn gesehenen Gesicht rechts auf der Seite gehören."
@@ -334,6 +348,7 @@
       "text": "a b is equal to the space between c d. d n, and so n c, and likewise s r, q p, h k are equal to one another. It is as far from m to s as from the underside of the nose to the chin.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'simile' (alike) is used here for equal lengths, as Ravaisson renders it ('égal', 'semblables').",
        "The letters are placed on the profile head; Ravaisson's note 2 lists where each stands (see the notes)."
@@ -343,6 +358,7 @@
       "text": "a b ist gleich dem Abstand zwischen c d. d n und ebenso n c, und gleichermaßen s r, q p, h k sind untereinander gleich. Von m bis s ist es so weit wie von der Unterseite der Nase bis zum Kinn.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'simile' (ähnlich) steht hier für gleiche Längen, wie Ravaisson es wiedergibt ('égal', 'semblables').",
        "Die Buchstaben stehen an dem im Profil gezeichneten Kopf; Ravaissons Anmerkung 2 führt auf, wo jeder steht (siehe die Anmerkungen)."
@@ -379,6 +395,7 @@
       "text": "The ear is exactly as long as the nose. It is as far from x to s as from the nose to the chin. The line of the mouth, in profile, points to the angle of the jaw. The ear must be as high as it is from the underside of the nose to the top of the eyelid.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'coperchio dellochio' (the lid of the eye) is read as the upper eyelid, with Ravaisson's '[de la paupière supérieure]'.",
        "Ravaisson's French fills 'from the nose to the chin' as '[du dessous] du nez au [dessous du] menton [en k]'; the Italian says only 'dal naso al mento', and the translations keep that."
@@ -388,6 +405,7 @@
       "text": "Das Ohr ist genau so lang wie die Nase. Von x bis s ist es so weit wie von der Nase bis zum Kinn. Die Linie des Mundes zielt im Profil auf den Winkel des Kiefers. Das Ohr muss so hoch sein, wie es von der Unterseite der Nase bis zur Oberkante des Augenlids ist.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'coperchio dellochio' (der Deckel des Auges) wird wie bei Ravaisson ('[de la paupière supérieure]') als das obere Augenlid gelesen.",
        "Ravaissons Französisch ergänzt 'von der Nase bis zum Kinn' zu '[du dessous] du nez au [dessous du] menton [en k]'; das Italienische sagt nur 'dal naso al mento', und die Übersetzungen behalten das."
@@ -424,6 +442,7 @@
       "text": "The space between the eyes is as large as one eye. The ear falls over the middle of the neck, in profile. It is as far from 4 to 5 as from 5 to r.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'quanda' is Leonardo's slip; Ravaisson prints his correction '[quanta e]' (as much as is) in the Italian, and the translations follow it.",
        "'chade nel mezo delchollo' is literally 'falls in the middle of the neck'; it is read as the ear standing above the middle of the neck when the head is seen in profile.",
@@ -434,6 +453,7 @@
       "text": "Der Abstand zwischen den Augen ist so groß wie ein Auge. Das Ohr liegt im Profil über der Mitte des Halses. Von 4 bis 5 ist es so weit wie von 5 bis r.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'quanda' ist ein Versehen Leonardos; Ravaisson druckt seine Verbesserung '[quanta e]' (so groß wie) im Italienischen, und die Übersetzungen folgen ihr.",
        "'chade nel mezo delchollo' heißt wörtlich 'fällt in die Mitte des Halses'; es wird so gelesen, dass das Ohr über der Mitte des Halses steht, wenn man den Kopf im Profil sieht.",
@@ -477,6 +497,7 @@
       "text": "[Upside down:] c\nNorth b\na\na b: 950\nb c: 2100",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. V, 1890). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'tramontana' is the north wind, used on plans for the north; it is written along the line a c of the small plan. The unit of 950 and 2100 is not written (on the facing page, fol. 2 verso, a similar plan is measured in 'pass[i]', paces)."
       ]
@@ -485,6 +506,7 @@
       "text": "[Auf dem Kopf stehend:] c\nNorden b\na\na b: 950\nb c: 2100",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. V, 1890). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'tramontana' ist der Nordwind, auf Plänen für Norden gebraucht; das Wort steht entlang der Linie a c des kleinen Plans. Die Einheit zu 950 und 2100 steht nicht da (auf der gegenüberliegenden Seite, fol. 2 verso, ist ein ähnlicher Plan in 'pass[i]', Schritten, vermessen)."
       ]
@@ -526,6 +548,7 @@
       "text": "abe [?]",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. V, 1890). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "Ravaisson reads the few letters at the upper left of the leaf as 'abe' with a query, and gives no French for them ('. . . [?]'). The meaning is unknown, so the letters stay as printed, untranslated."
       ]
@@ -534,6 +557,7 @@
       "text": "abe [?]",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. V, 1890). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Ravaisson liest die wenigen Buchstaben oben links auf dem Blatt mit Fragezeichen als 'abe' und gibt dafür kein Französisch ('. . . [?]'). Die Bedeutung ist unbekannt, darum bleiben die Buchstaben wie gedruckt, unübersetzt."
       ]
@@ -574,12 +598,14 @@
      "en": {
       "text": "A white horse may have the spots removed with the spanish haematite or with aqua fortis or with . . . . Removes the black hair on a white horse with the singeing iron. Force him to the ground.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Ein weißes Pferd kann man mit spanischem Blutstein oder mit Scheidewasser oder mit einem Enthaarungsmittel (Merdocco) [?] von Flecken befreien. Das schwarze Haar am Weißen mit einem Ätzmittel [?] entfernen, zu Boden zwingen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'merdocco': Richter lässt das Wort unübersetzt (sein Englisch hat Punkte). Wir behalten das Wort und markieren es.",
        "'rottorio': im älteren Italienisch ein Ätzmittel, das die Haut aufbricht; Richter liest 'singeing iron' (Brenneisen). Wir schreiben 'Ätzmittel' und markieren es.",
@@ -616,12 +642,14 @@
      "en": {
       "text": "Borges shall get for you the Archimedes from the bishop of Padua, and Vitellozzo the one from Borgo a San Sepolcro.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Borges wird dir den Archimedes vom Bischof von Padua besorgen, und Vitellozzo den aus Borgo San Sepolcro.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -657,12 +685,14 @@
      "en": {
       "text": "Short liberty.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Kurze Freiheit.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,
@@ -692,12 +722,14 @@
      "en": {
       "text": "The goldfinch gives victuals to its caged young. Death rather than loss of liberty.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Der Stieglitz gibt seinen Jungen im Käfig Futter [?]. Lieber den Tod, als die Freiheit zu verlieren.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'la vittouaglia' (Nahrung, Proviant) ist Richters Lesart; seine eigene Anmerkung gibt die Handschrift als 'calderigio da il arouialio' wieder. Ravaisson liest dieselben Wörter als 'ilcalderigio da iltortomalio a figlioli ingabiati' und übersetzt 'le chardonneret donne le tithymale aux petits en cage' (Wolfsmilch, eine giftige Pflanze); seine Anmerkung zitiert Richters 'vittouaglia ... gives victuals' und verweist auf das Wort 'tutto maglio [tortomaglio, utumaglio]' auf Folio 65 [17] recto. Das Deutsche folgt Richters gedrucktem Italienisch und markiert das Wort mit [?]; nach Ravaissons Lesart gibt der Stieglitz seinen Jungen im Käfig Wolfsmilch.",
        "'prima morte che perdere libertà': wörtlich 'eher den Tod, als die Freiheit zu verlieren'."
@@ -737,12 +769,14 @@
      "en": {
       "text": "Here I make a note to demonstrate the difference there is between man and the horse and in the same way with other animals. And first I will begin with the bones, and then will go on to all the muscles which spring from the bones without tendons and end in them in the same way, and then go on to those which start with a single tendon at one end.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Hier halte ich fest, dass ich den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht, und ebenso bei den anderen Tieren. Zuerst beginne ich mit den Knochen, dann gehe ich alle Muskeln durch, die ohne Sehnen an den Knochen entspringen und enden, dann die, die mit Sehne an den Knochen entspringen und enden, und dann die, die mit einer einzigen Sehne an einem Ende.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Der letzte Satzteil hat im Italienischen kein Verb ('e poi di quelle che con una sola corda da v̄ canto'); Richter ergänzt 'start' (entspringen). Wir lassen ihn unvollständig, wie gedruckt.",
        "Richters Englisch übergeht den mittleren Satzteil ('e poi di quelli che cō corda nascono e finiscono nell'ossa', die mit einer Sehne an den Knochen entspringen und enden); unser Deutsch behält ihn.",
@@ -777,12 +811,14 @@
      "en": {
       "text": "Messer Vincenzio Aliprando, who lives near the Inn of the Bear, has Giacomo Andrea's Vitruvius.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Messer Vincenzio Aliprando, der beim Gasthaus zum Bären wohnt, hat den Vitruv von Giacomo Andrea.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Iacomo Andrea' ist im Deutschen 'Giacomo Andrea' geschrieben, wie in Richters Englisch."
       ]
@@ -822,6 +858,7 @@
       "text": "Of the muscles that attach onto the bone.\n[Above the third figure:] horse",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'chessa pichano' is read as 'che s'appiccano' (that attach themselves), as Ravaisson's 's'attachent'.",
        "The edition places 'cavallo' above the third figure; on the leaf the word stands at the upper left, over the red chalk hind leg and pelvis. The bracketed placing is the editor's."
@@ -831,6 +868,7 @@
       "text": "Von den Muskeln, die am Knochen ansetzen.\n[Über der dritten Figur:] Pferd",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'chessa pichano' wird als 'che s'appiccano' (die sich anheften) gelesen, wie Ravaissons 's'attachent'.",
        "Die Ausgabe setzt 'cavallo' über die dritte Figur; auf dem Blatt steht das Wort oben links, über dem Hinterbein und dem Becken in Rötel. Die Ortsangabe in Klammern stammt vom Herausgeber."
@@ -872,12 +910,14 @@
      "en": {
       "text": "A FABLE.\n\nThe lily set itself down by the shores of the Ticino, and the current carried away bank and the lily with it.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "FABEL.\n\nDie Lilie ließ sich am Ufer des Tessin nieder, und die Strömung riss das Ufer mitsamt der Lilie fort.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'giglio' und 'lilio' heißen beide 'Lilie'; Leonardo verwendet beide Wörter in einem Satz, das Deutsche hat nur eines."
       ]

@@ -18,12 +18,14 @@
      "en": {
       "text": "Timbers that withstand the shot of bombards, on ships.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Hölzer, die dem Beschuss durch Bombarden standhalten, auf den Schiffen.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Bois résistants au tir des bombardes sur les navires. —"
@@ -56,6 +58,7 @@
       "text": "Scorpion",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The 'scorpion' is a weapon: the last block has a small bombard that throws scorpions, which seem to be the crescent blades."
       ]
@@ -64,6 +67,7 @@
       "text": "Skorpion",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Der 'Skorpion' ist eine Waffe: Im letzten Abschnitt schleudert eine kleine Bombarde Skorpione, anscheinend die sichelförmigen Klingen."
       ]
@@ -98,12 +102,14 @@
      "en": {
       "text": "Good for ships, that is, against them. So that the cut should not fail.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Gut für Schiffe, das heißt gegen sie. Damit der Schnitt nicht fehlgeht.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Bonne pour les navires, c'est-à-dire contre eux. — Afin que le tranchant ne manque pas."
@@ -136,6 +142,7 @@
       "text": "A ship of scorpions, good for cutting the ropes of the great ships. Let it be 4 braccia from one horn of the scythes to the other, and let the scythe be moon-shaped, one foot at its widest and one finger at the back.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The widths are read as Ravaisson reads them: one foot at the widest point, one finger at the back ('chosta') of the blade."
       ]
@@ -144,6 +151,7 @@
       "text": "Ein Schiff mit Skorpionen, gut, um die Seile der großen Schiffe zu durchschneiden. Von einem Horn der Sensen zum anderen seien es 4 Braccia, und die Sense sei mondsichelförmig, an der breitesten Stelle einen Fuß breit und am Rücken einen Finger dick.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Maße werden gelesen wie bei Ravaisson: ein Fuß an der breitesten Stelle, ein Finger am Rücken ('chosta') der Klinge."
       ]
@@ -179,6 +187,7 @@
       "text": "The pivot of the little bombard that throws the scorpions.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'bilico' is a balance point or pivot; Ravaisson has 'Ombilic [tourillon]' (trunnion)."
       ]
@@ -187,6 +196,7 @@
       "text": "Der Drehzapfen der kleinen Bombarde, die die Skorpione schleudert.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'bilico' ist ein Gleichgewichtspunkt oder Drehzapfen; Ravaisson schreibt 'Ombilic [tourillon]' (Schildzapfen)."
       ]
@@ -227,12 +237,14 @@
      "en": {
       "text": "White and sky-blue cloths, woven in checks to make a decoration. Cloths with the threads drawn at a b c d e f g h i k, to go round the decoration.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Weiße und himmelblaue Tücher, im Schachbrettmuster gewebt, um daraus einen Festschmuck zu machen. Tücher, bei a b c d e f g h i k gezogen, um einen Kreis [?] für einen Festschmuck zu machen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Pañi': Richters Abkürzungszeichen über dem n, gelesen als 'panni' (Tücher).",
        "'Pañi tirati in a · b ...': 'tirati' heißt gezogen; Richter liest 'with the threads drawn at' (mit gezogenen Fäden), wie bei der Hohlsaumarbeit. Wir behalten 'gezogen'.",
@@ -267,12 +279,14 @@
      "en": {
       "text": "On the 28th day of April I received from the Marchesino 103 lire and 12 dinari.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Am 28. April erhielt ich vom Marchesino 103 Lire und 12 Soldi.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'S. 12': Die Abkürzung steht gewöhnlich für Soldi; Richters Englisch sagt 'dinari'. Wir lösen sie als Soldi auf; der Widerspruch zu seinem Englisch bleibt offen.",
        "Der '·' nach 'Marchesino' ist Richters hochgestellter Punkt; seine Fußnote sagt, dass die Handschrift dort eine Lücke lässt, wo das Jahr stehen würde."
@@ -313,6 +327,7 @@
       "text": "Bridge. Water. a b c d",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "Labels on the drawing; Ravaisson's footnote places 'ponte' above and 'acqua' below the first two lines of text, with the letters a b c d."
       ]
@@ -321,6 +336,7 @@
       "text": "Brücke. Wasser. a b c d",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Beschriftungen auf der Zeichnung; Ravaissons Fußnote setzt 'ponte' über und 'acqua' unter die ersten beiden Textzeilen, mit den Buchstaben a b c d."
       ]
@@ -356,6 +372,7 @@
       "text": "This bridge is unbreakable if the main beams a b c d are strong and well chained together.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "Errata applied (Errata du manuscrit B, p. 6): line 2, 'sarananol' is to be read 'saran ano' (saranno, will be)."
       ]
@@ -364,6 +381,7 @@
       "text": "Diese Brücke ist unzerbrechlich, wenn die Hauptbalken a b c d stark und gut miteinander verkettet sind.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Errata angewandt (Errata du manuscrit B, S. 6): In Zeile 2 ist 'sarananol' als 'saran ano' zu lesen (saranno, werden sein)."
       ]
@@ -398,12 +416,14 @@
      "en": {
       "text": "This bridge could have 2 passages, one above the other.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Diese Brücke könnte 2 Übergänge haben, einen über dem anderen.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Ce pont pourrait avoir deux passages, l'un au-dessus de l'autre."
@@ -436,6 +456,7 @@
       "text": "Over a stretch of a hundred miles one can build a hundred houses, in which a hundred guards are posted, who will make a piece of news heard through underground corridors in 1/4 of an hour.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "Whether each house holds one guard or a hundred is not said; the translation keeps the Italian's wording.",
        "How the news is 'made heard' through the corridors is not said."
@@ -445,6 +466,7 @@
       "text": "Man kann auf hundert Meilen hundert Häuser bauen, in denen hundert Wachen stehen, die durch unterirdische Gänge eine Nachricht in 1/4 Stunde hörbar machen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Ob in jedem Haus eine Wache steht oder hundert, sagt der Text nicht; die Übersetzung behält den Wortlaut des Italienischen.",
        "Wie die Nachricht durch die Gänge 'hörbar gemacht' wird, steht nicht da."
@@ -487,6 +509,7 @@
       "text": "Compasses",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "A label by the small T-shaped instrument at the top right of the plate; Ravaisson calls it a kind of compass."
       ]
@@ -495,6 +518,7 @@
       "text": "Zirkel",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Eine Beschriftung neben dem kleinen T-förmigen Instrument oben rechts auf der Tafel; Ravaisson nennt es eine Art Zirkel."
       ]
@@ -530,6 +554,7 @@
       "text": "2 pumps that run into a single one.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'tronbe' (trombe) can be pumps, tubes or pipes; Ravaisson reads 'pompes'."
       ]
@@ -538,6 +563,7 @@
       "text": "2 Pumpen, die in eine einzige münden.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'tronbe' (trombe) können Pumpen, Rohre oder Leitungen sein; Ravaisson liest 'pompes'."
       ]
@@ -573,6 +599,7 @@
       "text": "A kind of fortress.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'Modo' (manner, way) here names a type or design of fortress; Ravaisson has 'Système de forteresse'."
       ]
@@ -581,6 +608,7 @@
       "text": "Bauweise einer Festung.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Modo' (Art, Weise) bezeichnet hier einen Typ oder Entwurf einer Festung; Ravaisson schreibt 'Système de forteresse'."
       ]
@@ -622,6 +650,7 @@
       "text": "[First figure:] a b c d\nWhat is laid out here is only so that the pyramids a b c d are not struck outside their angle.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. V, 1890). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'Co' is read as 'Ciò' (what, that which), as in Ravaisson's 'Ce qui'; 'essol' as 'è sol[o]' (is only).",
        "'piramide' is Leonardo's word for a fan or cone of lines; here the fans of lines drawn from the round bastions, most likely lines of fire. 'bactute' (battute) is literally 'struck' or 'beaten'; whether he means struck by enemy shot, or swept by their own fire, the sentence does not say. 'fuori del suo angolo' (outside its angle) is kept literally.",
@@ -632,6 +661,7 @@
       "text": "[Erste Figur:] a b c d\nWas hier angeordnet ist, dient nur dazu, dass die Pyramiden a b c d nicht außerhalb ihres Winkels getroffen werden.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. V, 1890). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Co' wird als 'Ciò' (das, was) gelesen, wie Ravaissons 'Ce qui'; 'essol' als 'è sol[o]' (ist nur).",
        "'piramide' ist Leonardos Wort für einen Fächer oder Kegel von Linien; hier die Linienfächer, die von den runden Bastionen ausgehen, höchstwahrscheinlich Schusslinien. 'bactute' (battute) heißt wörtlich 'geschlagen' oder 'getroffen'; ob er getroffen von feindlichem Beschuss meint oder bestrichen vom eigenen Feuer, sagt der Satz nicht. 'fuori del suo angolo' (außerhalb ihres Winkels) bleibt wörtlich.",
@@ -675,6 +705,7 @@
       "text": "A sledge for mountainous and stony places. The part that touches the ground is made discontinuous [?], so that it is less hard to pull, because a weight that touches less moves with less difficulty.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'disunita' (not joined, not continuous) most likely means the underside should not rest on the ground along its whole length; Ravaisson glosses '[bombée]' (curved)."
       ]
@@ -683,6 +714,7 @@
       "text": "Ein Schlitten für bergige und steinige Orte. Der Teil, der den Boden berührt, wird nicht durchgehend [?] gebaut, damit er weniger schwer zu ziehen ist, denn ein Gewicht, das weniger aufliegt, bewegt sich mit geringerer Mühe.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'disunita' (nicht verbunden, nicht durchgehend) meint höchstwahrscheinlich, dass die Unterseite nicht auf ganzer Länge am Boden aufliegen soll; Ravaisson erklärt '[bombée]' (gewölbt)."
       ]
@@ -718,6 +750,7 @@
       "text": "Auger",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'taniuella' (tanivella) is an auger, a boring tool."
       ]
@@ -726,6 +759,7 @@
       "text": "Bohrer",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'taniuella' (tanivella) ist ein Bohrer, ein Werkzeug zum Bohren von Löchern."
       ]
@@ -761,6 +795,7 @@
       "text": "The man who is in league with the climber, when he takes service with the castellan, should carry with him a ball of strong thread. And when his turn on guard comes, let him pull up with the said thread [?] a length of twine, which the climber will give him; and then with the twine let him pull up the rope, which afterwards will serve to pull up the rope ladder drawn above.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'condettorete' is printed so (checked on the scan); the sense asks for 'con detto refe' (with the said thread), which Ravaisson's French also gives ('avec ledit fil').",
        "'saconcia colcastellano' is read as 'enters the castellan's service' (acconciarsi con); Ravaisson has 's'abouche avec le châtelain' (meets with).",
@@ -772,6 +807,7 @@
       "text": "Wer mit dem Kletterer im Bund ist, soll, wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen. Und wenn er Wache hat, soll er mit diesem Zwirn [?] eine Schnur hinaufziehen, die ihm der Kletterer gibt; und dann soll er mit der Schnur das Seil hinaufziehen, das danach die oben gezeichnete Strickleiter hinaufziehen kann.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'condettorete' ist so gedruckt (am Scan geprüft); der Sinn verlangt 'con detto refe' (mit diesem Zwirn), und so gibt es auch Ravaissons Französisch ('avec ledit fil').",
        "'saconcia colcastellano' wird gelesen als 'beim Kastellan in Dienst tritt' (acconciarsi con); Ravaisson schreibt 's'abouche avec le châtelain' (trifft sich mit ihm).",

@@ -18,12 +18,14 @@
      "en": {
       "text": "There is no boss on branches which has not been produced by some branch which has failed.\nThe lower shoots on the branches of trees grow more than the upper ones and this occurs only because the sap that nourishes them, being heavy, tends downwards more than upwards; and again, because those [branches] which grow downwards turn away from the shade which exists towards the centre of the plant. The older the branches are, the greater is the difference between their upper and their lower shoots and in those dating from the same year or epoch.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Es gibt keinen Knorren an den Ästen, an dem nicht ein Zweig ausgetrieben hat, der eingegangen ist.\nDie unteren Zweige an den Ästen der Bäume wachsen stärker als die oberen, und das kommt allein daher, dass der Saft, der sie nährt, weil er schwer ist, leichter nach unten geht als nach oben, und außerdem daher, dass die Zweige, die nach unten wachsen, sich von dem Schatten entfernen, der zur Mitte des Baumes hin liegt. Je älter die Äste sind, desto größer ist der Unterschied zwischen ihren oberen und ihren unteren Zweigen, bei denen, die aus demselben Jahr oder derselben Zeit stammen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'gobbo': ein Buckel oder Knoten an einem Ast; übersetzt mit 'Knorren'. 'mācato': ausgefallen, abgestorben; übersetzt mit 'eingegangen'.",
        "'piante': Pflanzen, hier Bäume (Richter: 'trees', dann 'the plant'); übersetzt mit 'Bäume'.",
@@ -66,6 +68,7 @@
       "text": "Let the given line be a b. You will make an equilateral triangle a d b, and draw onto the middle of its base a line that comes down from the upper angle, and divide it into 5 equal parts. Put one of the points of the compasses on the fourth part, at the point e, and make your circle touch the ends of the given line, and you will see that this line goes 5 times into the said circle.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The struck-out 'su' (italics in the edition) is left out; 'pare [parte]' follows the editor's bracket.",
        "The construction gives a regular pentagon only approximately; the translation keeps Leonardo's claim as he states it."
@@ -75,6 +78,7 @@
       "text": "Die gegebene Linie sei a b. Du machst ein gleichseitiges Dreieck a d b und ziehst auf die Mitte seiner Grundlinie eine Linie, die vom oberen Winkel herabkommt, und teilst sie in 5 gleiche Teile. Setze eine der Zirkelspitzen auf den vierten Teil, in den Punkt e, und schlage deinen Kreis so, dass er die Enden der gegebenen Linie berührt; dann wirst du sehen, dass diese Linie 5 Mal in den Kreis passt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Das gestrichene 'su' (in der Ausgabe kursiv) ist weggelassen; 'pare [parte]' folgt der Klammer des Herausgebers.",
        "Die Konstruktion ergibt ein regelmäßiges Fünfeck nur näherungsweise; die Übersetzung gibt Leonardos Behauptung so wieder, wie er sie aufstellt."
@@ -111,6 +115,7 @@
       "text": "The reason is this: if d c is the space between the centre and the sides that divide the circle into 6 parts, take away 1/5 of the line, as from d to e, and on the said e set the point of your compasses, and you will make a circle that is less by 1/6 than the first; so it remains divided into 5.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The struck-out 'se' (italics) is left out, and the sentence is read 'la ragion si è questa: se d c è lo spazio ...', as Ravaisson reads it.",
        "'sciema 1/6 parte delprimo' (lessens by a sixth part of the first) does not say which measure shrinks; the translation keeps the wording."
@@ -120,6 +125,7 @@
       "text": "Der Grund ist dieser: Wenn d c der Abstand zwischen dem Mittelpunkt und den Seiten ist, die den Kreis in 6 Teile teilen, dann nimm 1/5 der Linie weg, wie von d bis e, setze auf dieses e die Spitze deines Zirkels, und du schlägst einen Kreis, der um 1/6 kleiner ist als der erste; also bleibt er in 5 geteilt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Das gestrichene 'se' (kursiv) ist weggelassen, und der Satz wird wie bei Ravaisson gelesen: 'la ragion si è questa: se d c è lo spazio ...'.",
        "'sciema 1/6 parte delprimo' (wird um ein Sechstel des ersten kleiner) sagt nicht, welches Maß schrumpft; die Übersetzung behält den Wortlaut."
@@ -156,6 +162,7 @@
       "text": "Make the lead plates as thin as you can, because, being shut in between the two layers, they do not need much thickness.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'ruichiuse' is printed so, read as 'rinchiuse' (shut in).",
        "'soli' (suoli, floors or layers) is marked doubtful by Ravaisson ('sols [?]')."
@@ -165,6 +172,7 @@
       "text": "Mache die Bleiplatten so dünn, wie du kannst, denn da sie zwischen den beiden Schichten eingeschlossen sind, brauchen sie keine große Dicke.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'ruichiuse' ist so gedruckt, gelesen als 'rinchiuse' (eingeschlossen).",
        "'soli' (suoli, Böden oder Schichten) markiert Ravaisson als unsicher ('sols [?]')."
@@ -200,12 +208,14 @@
      "en": {
       "text": "Of the irons m n one should have 2, so that while one is cooling its lead you can pull the hearth over to the other, and no time is lost.",
       "kind": "ours",
-      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors."
+      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors."
      },
      "de": {
       "text": "Von den Eisen m n soll man 2 haben, damit du, während das eine sein Blei abkühlt, die Feuerstelle zum anderen ziehen kannst und keine Zeit verloren geht.",
       "kind": "ours",
-      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten."
+      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
      },
      "fr": {
       "text": "— Des fers m n, on doit en avoir deux, afin que quand l'un refroidit son plomb, tu puisses tirer le fourneau [?] pour [?] l'autre et qu'on ne perde pas de temps."
@@ -238,6 +248,7 @@
       "text": "A way to solder together a lead covering on an open roof.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The edition prints this line in small capitals, as a title. 'solo' is a floor or layer, here the lead covering; 'schoperto' is an uncovered place, a flat roof or terrace."
       ]
@@ -246,6 +257,7 @@
       "text": "Wie man eine Bleidecke auf einem offenen Dach zusammenlötet.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Ausgabe druckt diese Zeile in Kapitälchen, als Überschrift. 'solo' ist ein Boden oder eine Schicht, hier die Bleidecke; 'schoperto' ist ein offener Ort, ein Flachdach oder eine Terrasse."
       ]
@@ -281,6 +293,7 @@
       "text": "Do it like this: when you have made the last vault of your building, lay over it a floor of bricks that is quite level. Then have an iron 1/3 of a braccio wide with 4 sharp edges as high as half the back of a knife, as shown at m n, and put it under the joints of the lead plates. Then beat on the said plates from above with the wooden mallet, so that the edges of the iron sink into them. Then have a hearth without a bottom, 1/4 wide, as high, and as long as the iron m n below; fill the said hearth with glowing coals and melt the joints of the lead together, and do the same everywhere. Then cover it with lime, linseed oil and crushed brick [?], and give it a fall of one finger at the sides.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "'mattonpresto [?]' is marked doubtful by the editor; it is read here as 'matton pesto' (crushed brick). Ravaisson's French has 'de briques. . . . [?]'.",
        "'imo.' is read as 'in modo' (so that).",
@@ -292,6 +305,7 @@
       "text": "Mache es so: Wenn du das letzte Gewölbe deines Hauses gemacht hast, lege darauf einen Boden aus Ziegeln, der ganz eben ist. Dann nimm ein Eisen, 1/3 Braccio breit, mit 4 scharfen Kanten, so hoch wie ein halber Messerrücken, wie man bei m n sieht, und lege es unter die Fugen der Bleiplatten. Dann schlage von oben mit dem Holzhammer auf diese Platten, so dass sich die Schneiden des Eisens hineindrücken. Dann nimm eine Feuerstelle ohne Boden, 1/4 breit, ebenso hoch und so lang wie das Eisen m n darunter; fülle sie mit glühenden Kohlen und schmelze die Fugen des Bleis zusammen, und so mache es überall. Dann decke es mit Kalk, Leinöl und Ziegelmehl [?] ab und gib ihm an den Seiten einen Finger Gefälle.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'mattonpresto [?]' markiert der Herausgeber als unsicher; hier wird es als 'matton pesto' (zerstoßener Ziegel) gelesen. Ravaissons Französisch hat 'de briques. . . . [?]'.",
        "'imo.' wird als 'in modo' (so dass) gelesen.",
@@ -335,12 +349,14 @@
      "en": {
       "text": "Every year when the boughs of a plant [or tree] have made an end of maturing their growth, they will have made, when put together, a thickness equal to that of the main stem; and at every stage of its ramification you will find the thickness of the said main stem; as: i k, g h, e f, c d, a b, will always be equal to each other; unless the tree is pollard—if so the rule does not hold good.\n\nAll the branches have a direction which tends to the centre of the tree m.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Jedes Jahr, wenn die Äste der Pflanzen ihr Wachstum vollendet haben, ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist. Und auf jeder Stufe seiner Verzweigung wirst du die Dicke dieses Stammes wiederfinden, so bei i k, g h, e f, c d, a b: Alle werden untereinander gleich sein, sofern der Baum nicht verstümmelt ist, sonst gilt die Regel nicht.\n\nAlle Äste haben Richtungen, die auf die Mitte des Baumes m zielen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'storpiato': wörtlich verstümmelt, verkrüppelt; Richter liest 'pollard' (gekappt). Wir behalten den wörtlichen Sinn.",
        "'hanno dato fine alla loro maturità': wörtlich 'haben ihre Reife zu Ende gebracht'; wir schreiben 'ihr Wachstum vollendet', wie Richter ('maturing their growth')."
@@ -380,12 +396,14 @@
      "en": {
       "text": "Nothing is so much to be feared as Evil Report.\nThis Evil Report is born of life.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Nichts ist zu fürchten als beschmutzter Ruf. Dieser beschmutzte Ruf ist aus den Lastern geboren.",
       "kind": "printed",
-      "label": "Übersetzung: Marie Herzfeld, 1906"
+      "label": "Übersetzung: Marie Herzfeld, 1906",
+      "rest": "Übersetzung: Marie Herzfeld, 1906"
      },
      "fr": null,
      "label_only": false,
@@ -427,6 +445,7 @@
       "text": "[Figure:]\nf [(above the eye)]\nh [(in front of the eye)]\nl [(above the muzzle)]\nc [(in front of the mouth)]\no [?] . [?] c are equal\ns r, a c are equal\no [?] r are alike\nt f are alike",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
+      "rest": "AI translation. It may contain errors.",
       "doubts": [
        "The words in brackets after f, h, l and c are the editor's, telling where each letter stands on the drawing; Leonardo wrote only the letters.",
        "Two letters are unread in the print ('o [?] . [?] c', 'o [?] r'); the pairs they belong to cannot be fixed, and the translations keep the gaps.",
@@ -438,6 +457,7 @@
       "text": "[Figur:]\nf [(über dem Auge)]\nh [(vor dem Auge)]\nl [(über der Schnauze)]\nc [(vor dem Maul)]\no [?] . [?] c sind gleich\ns r, a c sind gleich\no [?] r sind ähnlich\nt f sind ähnlich",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "Die Wörter in Klammern nach f, h, l und c stammen vom Herausgeber und sagen, wo jeder Buchstabe auf der Zeichnung steht; Leonardo schrieb nur die Buchstaben.",
        "Zwei Buchstaben sind im Druck ungelesen ('o [?] . [?] c', 'o [?] r'); zu welchen Paaren sie gehören, lässt sich nicht festlegen, und die Übersetzungen behalten die Lücken.",
@@ -481,12 +501,14 @@
      "en": {
       "text": "Not to disobey.",
       "kind": "printed",
-      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell"
+      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
+      "rest": "Translation: J. P. Richter, 1883"
      },
      "de": {
       "text": "Um nicht ungehorsam zu sein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
       "doubts": [
        "'Per nō disobbidire': wörtlich 'um nicht ungehorsam zu sein', der Wahlspruch des Emblems; Richter: 'Not to disobey'."
       ]
