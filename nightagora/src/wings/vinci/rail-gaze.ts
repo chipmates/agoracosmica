@@ -375,6 +375,9 @@ export function planCalmGaze(input: {
    * picture's scale at the calm rate, eased at both ends, where that is
    * quicker than one eased curve over the whole change */
   evenLens?: boolean
+  /** a short leg whose lens change or turn sets its time walks at its own
+   * gait from the start and stands while the view finishes */
+  briskWalk?: boolean
 }): CalmGazePlan {
   // A STATION WALK takes the plan that costs least of the one that follows
   // its way and the one held to the floor, walked forward: seconds, and twice
@@ -518,7 +521,11 @@ function planWay(input: Parameters<typeof planCalmGaze>[0], waitLens = false): C
   // view is turned to while the way is followed.
   let endHeld = input.from.heading
   if (way) for (let i = wayCount; i >= 0; i--) if (way.weight[i]! > 0) { endHeld = way.heading[i]!; break }
-  if (!way) return pan()
+  if (!way) {
+    const held = pan()
+    if (input.briskWalk !== true || !(held.leg.seconds > base.seconds + 1e-6)) return held
+    return { ...held, leg: { ...base, seconds: held.leg.seconds }, walk: seconds => gaitAt(base, Math.min(seconds, base.seconds)), secondsAt: metres => gaitSecondsAt(base, metres) }
+  }
   let leg = base, spline: Spline | null = null, total = base.seconds, followed = 0
   for (const share of COURSE_SHARES) {
     const toHeading = share > 0 ? endHeld + wrap(input.to.heading - endHeld) : input.from.heading + wrap(input.to.heading - input.from.heading)

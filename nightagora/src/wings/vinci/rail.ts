@@ -469,6 +469,14 @@ const RAIL_WALKED_APPROACHES:ReadonlySet<string>=new Set(['machine/proportional-
 const RAIL_AIMED_LINKS:ReadonlySet<string>=new Set(['machine/parachute>machine/revolving-crane',
   'machine/miter-lock-gates>machine/flywheel','machine/flywheel>machine/miter-lock-gates',
   'machine/camera-obscura>machine/water-lifting-screw','machine/water-lifting-screw>machine/camera-obscura']),AIM_TAKEN_M=1.5,AIM_BEYOND=15*Math.PI/180,KEY_NEAR_M=1.5
+/** THE HALL'S LINKS WALKED AT THE WALK'S OWN GAIT, both ways. Their lens
+ * change or their turn, not their few metres, set their time, and the body
+ * crept the whole of it: here it walks at its gait and stands while the view
+ * finishes, the lens changing evenly where that is quicker, and the aimed
+ * link's lens changes by time rather than holding the walk to it. */
+const RAIL_BRISK_LINKS:ReadonlySet<string>=new Set([['flywheel','camera-obscura'],['camera-obscura','water-lifting-screw'],['water-lifting-screw','rolling-mill'],
+  ['rolling-mill','lathe'],['lathe','ball-bearing'],['ball-bearing','multi-barrel-gun'],['revolving-crane','anemometer']]
+  .flatMap(([a,b])=>[`machine/${a}>machine/${b}`,`machine/${b}>machine/${a}`]))
 /** A turn made standing still may run this fast, in degrees a second: a half
  * turn in about six seconds on the desktop and eight on the phone. */
 const RAIL_QUICK_TURN=20*TURN_TIME_SCALE,RAIL_QUICK_TURN_PHONE=14*TURN_TIME_SCALE
@@ -786,16 +794,17 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // walk, with its lens
     const held=certified.held,lift=held?held.liftFirst??(held.turnFirst||from.elevation<to.elevation-GALLERY_LIFT_RAD):false
     // a walk between two stops runs at its own speed, planned at it
+    const brisk=request.link===true&&viewing?.exhibit!==undefined&&request.exhibit!==undefined&&RAIL_BRISK_LINKS.has(`${viewing.exhibit}>${request.exhibit}`)
     gaze=withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
       fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],evenLens:evenLensStep(request.wallOn,wallAt,request.wall),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
         fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],
-        tangent:chordHeading,evenLens:evenLensStep(request.wallOn,wallAt,request.wall),
+        tangent:chordHeading,evenLens:brisk||evenLensStep(request.wallOn,wallAt,request.wall),briskWalk:brisk,
         course:certified.aim&&length>=WALKED_LEG_M?aimedAt(certified.aim,from.heading,to.heading):certified.route&&length>=WALKED_LEG_M?course:null,
         // an aimed link turns to its object standing and walks on holding it
         ...(certified.aim&&length>=WALKED_LEG_M?{turns:{start:true,end:true,at:[],quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,
-          wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,forward:true,scripted:true}}:{}),
+          wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,forward:true,scripted:true,...(brisk?{lens:zoom>0?'first' as const:'last' as const}:{})}}:{}),
         ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
           at:doorTurns([...railDoorTurns,...(certified.turns.stands??[]),...stairStands]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),stairs,
           quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,
