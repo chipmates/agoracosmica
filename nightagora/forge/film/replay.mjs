@@ -134,7 +134,7 @@ function nodeMoves(replay, framingName, phone) {
     if (m.rail === 'route') return rail.set(to.railId ?? to.station, pose(to), false, phone)
     if (m.rail === 'wall') {
       if (to.kind === 'stop') return rail.set(to.station, pose(to), false, phone, m.to)
-      return rail.along(m.to, from.station, pose(to), to.exhibit, phone)
+      return rail.along(m.to, from.station, pose(to), to.exhibit, phone, m.quick === true)
     }
     if (m.rail === 'approach') return rail.approach(m.exhibit, pose(to), phone, false)
     if (m.rail === 'return') return rail.returnToStation()

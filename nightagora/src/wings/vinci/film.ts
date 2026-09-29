@@ -31,6 +31,8 @@ export interface FilmMotion {
   from?: number | string
   to?: number | string
   exhibit?: string
+  /** a wall step asked as the wing's arrows ask it (the rail's stop-to-stop pace) */
+  quick?: boolean
 }
 
 export interface FilmParts {
@@ -46,9 +48,9 @@ export interface FilmParts {
     first frame, so every still of a stop is one picture; a leg carries it
     through whole loops as the body walks, easing in and out with the walk,
     and lands on the first frame again. A leg shorter than a loop holds it. */
-export function pinnedWind(nav: { active?: string | null; legSeconds: number; legWalked: number }): number {
+export function pinnedWind(nav: { active?: string | null; legSeconds: number; legWalked: number; legPace?: number }): number {
   if (!nav.active) return 0
-  const loops = Math.floor(nav.legSeconds / LOOP_S)
+  const loops = Math.floor(nav.legSeconds / (nav.legPace || 1) / LOOP_S)
   return (LOOP_S * loops * nav.legWalked) % LOOP_S
 }
 
@@ -105,7 +107,7 @@ export function installFilm(parts: FilmParts): void {
       if (motion.rail === 'route') { rail.set(railOf(to), poseOf(to), false, phone()); return true }
       if (motion.rail === 'wall') {
         if (to.kind === 'stop') { rail.set(to.station, poseOf(to), false, phone(), Number(motion.to)); return true }
-        return rail.along(Number(motion.to), from.station, poseOf(to), to.exhibit, phone())
+        return rail.along(Number(motion.to), from.station, poseOf(to), to.exhibit, phone(), motion.quick === true)
       }
       if (motion.rail === 'approach') return rail.approach(motion.exhibit ?? '', poseOf(to), phone(), false)
       if (motion.rail === 'return') return rail.returnToStation()

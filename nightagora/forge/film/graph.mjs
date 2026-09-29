@@ -118,7 +118,7 @@ function legMoves(wing, byId, stationStop, framingName) {
     if (m.rail === 'route') return rail.set(to.railId ?? to.station, pose(to), false, phone)
     if (m.rail === 'wall') {
       if (to.kind === 'stop') return rail.set(to.station, pose(to), false, phone, m.to)
-      return rail.along(m.to, from.station, pose(to), to.exhibit, phone)
+      return rail.along(m.to, from.station, pose(to), to.exhibit, phone, m.quick === true)
     }
     if (m.rail === 'approach') return rail.approach(m.exhibit, pose(to), phone, false)
     if (m.rail === 'return') return rail.returnToStation()
@@ -132,6 +132,9 @@ function legMoves(wing, byId, stationStop, framingName) {
     the rail holds them when the leg begins (`navigation.legSeconds`: the
     gait's leg, stretched where the calm gaze asks for longer), and the frame
     it lands on at the film's pace by the replay's own count. */
+/** the seconds a leg plays in: its own seconds at the pace the rail runs its clock (a quick wall step, 1.4) */
+const playedSeconds = (nav) => nav.legSeconds / (nav.legPace || 1)
+
 function railLeg(wing, moves, edge, framingName) {
   const framing = FRAMINGS[framingName]
   const aspect = framing.width / framing.height
@@ -150,7 +153,7 @@ function railLeg(wing, moves, edge, framingName) {
       if (request(rail) === false) throw new Error(`${edge.id} ${framingName}: the rail refused the leg`)
       while (!rail.navigation.active && frame < 40) { frame++; rail.update() }
       if (!rail.navigation.active) throw new Error(`${edge.id} ${framingName}: the leg never began`)
-      seconds[pace] = rail.navigation.legSeconds
+      seconds[pace] = playedSeconds(rail.navigation)
     }
     // the film's own pace: the seconds read off the walk the frames are counted on
     gait.setGaitPace(FILM_PACE)
@@ -177,7 +180,7 @@ function railLeg(wing, moves, edge, framingName) {
       rail.update = () => {
         update()
         k++
-        if (seconds[FILM_PACE] === undefined && rail.navigation.active) seconds[FILM_PACE] = rail.navigation.legSeconds
+        if (seconds[FILM_PACE] === undefined && rail.navigation.active) seconds[FILM_PACE] = playedSeconds(rail.navigation)
         if (seconds[FILM_PACE] !== undefined && arrived < 0 && !rail.navigation.active) arrived = k
         stepShadow()
       }
@@ -383,6 +386,10 @@ export function buildGraph(wing, { wall: wallRuns = 'both' } = {}) {
     }
     throw new Error(`${e.id}: no motion ${m.rail}`)
   }
+  /* A WALL STEP IS ASKED AS THE WING'S ARROWS ASK IT, quick: the rail runs a
+     step between two works at its stop-to-stop pace and keeps the walk's for
+     a leg to or from a wall's end station */
+  for (const e of edges.values()) if (e.kinds.includes('STEP') && e.motion.rail === 'wall') e.motion = { ...e.motion, quick: true }
   const list = [...edges.values()]
   const timing = { gait, rail: wing.rail, authority: wing.authority, byId }
   const moves = Object.fromEntries(Object.keys(FRAMINGS).map((name) => [name, legMoves(wing, byId, stationStop, name)]))
