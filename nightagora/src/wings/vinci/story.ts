@@ -53,7 +53,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
     built: true,
     quiet: false,
     chapter: { en: "The pupil's angel", de: "Der Engel des Schülers" },
-    age: { en: "about 20", de: "mit etwa 20 Jahren" },
+    age: { en: "early twenties", de: "mit Anfang zwanzig" },
     line: { en: "They say Leonardo painted one angel in this picture better than his master. The master, they say, never painted again.", de: "Leonardo soll einen Engel in diesem Bild besser gemalt haben als sein Meister. Der Meister habe nie wieder gemalt." },
     drawer: { en: "This is the first picture on the wall. The angel is the one at the left, holding the robes. The panel is by him and his master Verrocchio. Vasari printed the story in 1550, thirty years after Leonardo died. He wrote the master was angry that a boy knew more. The panel's museum still tells it. Nobody can prove it.", de: "Das ist das erste Bild an der Wand. Der Engel ist der linke, der die Gewänder hält. Die Tafel stammt von ihm und seinem Meister Verrocchio. Vasari druckte die Geschichte 1550, dreißig Jahre nach Leonardos Tod. Er schrieb, den Meister habe geärgert, dass ein Junge mehr wusste. Das Museum, dem die Tafel gehört, erzählt sie weiter. Beweisen kann das niemand." },
     certainty: "tradition",
