@@ -198,8 +198,8 @@
   },
   {
    "file": "src/wings/vinci/data/doors.json",
-   "sha256": "d5588e7abcc4631c10ab30f47c5a11d2cc8d9c951eaed9b61100ff28b3a76dd9",
-   "bytes": 15622,
+   "sha256": "1be944058d0d34ce1289c349ce7b5596c930d3986810dd536de601737793075f",
+   "bytes": 15817,
    "unchangedDuringAudit": true
   },
   {
