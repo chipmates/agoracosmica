@@ -229,8 +229,15 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     goldPath.setAttribute('d', end ? ARROW_UP : ARROW_ON)
   }
 
+  /* A PAINT IS ASKED FOR ON EVERY FRAME A CLOSE LOOK STANDS, so the box is
+     written again only when what it shows has changed */
+  let painted = ''
   function paint(): void {
-    const look = host.look()
+    const look = host.look(), at = host.wall()
+    const said = [host.at(), lang(), open, Boolean(look), look?.previous, look?.next?.title, at?.at, at?.of, at?.previous, at?.next,
+      host.leg().walking, document.getElementById('rail-instruments')?.getAttribute('aria-label'), host.wing.querySelector('.wing-door')?.textContent].join('|')
+    if (said === painted) { publish(); return }
+    painted = said
     root.dataset['look'] = String(Boolean(look))
     if (look && open) { open = false; root.dataset['drawer'] = 'false'; drawer.hidden = true; line.hidden = false }
     earlier.disabled = !look?.previous
