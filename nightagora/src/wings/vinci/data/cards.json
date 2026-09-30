@@ -136,7 +136,7 @@
     },
     "ending": {
       "lookup": { "en": "Look up", "de": "Schau nach oben" },
-      "talk": { "en": "Ask Leonardo's Echo", "de": "Frag Leonardos Echo" }
+      "talk": { "en": "Ask Leonardo’s Echo", "de": "Frag Leonardos Echo" }
     },
     "visit": {
       "tell_the_story": { "en": "Tell me the story", "de": "Erzähl mir die Geschichte" },
