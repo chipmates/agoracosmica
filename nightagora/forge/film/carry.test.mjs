@@ -9,9 +9,10 @@ import assert from 'node:assert/strict'
 import { mkdtempSync, readFileSync, rmSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { carriedRecord, carryPlan } from './carry.mjs'
-import { GLOBAL_DEFINITION } from './keys.mjs'
-import { appendLedger, readLedger, stillCurrent, writeRecord } from './render-all.mjs'
+import { carriedRecord, carryFrom, carryPlan } from './carry.mjs'
+import { carriedHolds } from './film-check.mjs'
+import { GLOBAL_DEFINITION, GLOBAL_DEFINITIONS } from './keys.mjs'
+import { appendLedger, beforeOf, readLedger, stillCurrent, writeRecord } from './render-all.mjs'
 
 const G1 = 'a'.repeat(32), G2 = 'b'.repeat(32), D = 'd'.repeat(32)
 const clip = { id: 'clip x>y wide', kind: 'clip', framing: 'wide', edge: 'x>y', from: 'x', to: 'y', keys: { motion: 'm1', picture: 'p1', delivery: D } }
@@ -83,4 +84,81 @@ test("the day dome's evening terms: a record rendered where they stood otherwise
   const plan = carryPlan(job, records, tree)
   assert.deepEqual(plan.carried.map((c) => c.e.id), [cycle.id])
   assert.deepEqual(plan.stale.map((x) => [x.id, x.moved]).sort(), [[clip.id, ['added parts']], [moved.id, ['added parts']], [still.id, ['added parts']]].sort())
+})
+
+/* ---- from the second definition to the third ---- */
+const V2 = 'library-placed-v2', G3 = 'c'.repeat(32)
+const job3 = { ...job, keys: { ...job.keys, global: G3, before: { definition: V2, global: G2 } } }
+const tree3 = { ...tree, global: G3, globals: { v1: G1, [V2]: G2, [GLOBAL_DEFINITION]: G3 }, added: {}, addedAt: new Map() }
+/** a line as this afternoon's carry from v1 to v2 wrote it */
+const afternoon = (e) => {
+  const r = old(e)
+  return { ...r, rung: { file: 'stills/wide/1920x1080/x.png', bytes: 1, sha256: 'e' }, keys: { ...r.keys, global: G2 }, carried: { from: r.keys, fromDefinition: 'v1', definition: V2, globalBefore: G1, job: 'afternoon', at: 'noon', by: 'forge/film/carry.mjs' } }
+}
+
+test('the third definition is the one now, and every older one stays named', () => {
+  assert.equal(GLOBAL_DEFINITION, 'library-placed-v3')
+  assert.deepEqual(GLOBAL_DEFINITIONS, ['v1', V2, GLOBAL_DEFINITION])
+})
+
+test('a plan names the definition it replaced, and keeps it over a plan under the same one', () => {
+  assert.deepEqual(beforeOf(null, GLOBAL_DEFINITION), {})
+  assert.deepEqual(beforeOf({ definition: V2, global: G2 }, GLOBAL_DEFINITION), { before: { definition: V2, global: G2 } })
+  assert.deepEqual(beforeOf({ global: G1 }, V2), { before: { definition: 'v1', global: G1 } }, 'a job that named none was v1')
+  assert.deepEqual(beforeOf({ definition: GLOBAL_DEFINITION, global: G3, before: { definition: V2, global: G2 } }, GLOBAL_DEFINITION), { before: { definition: V2, global: G2 } })
+  assert.deepEqual(beforeOf({ definition: GLOBAL_DEFINITION, global: G3 }, GLOBAL_DEFINITION), {})
+  assert.equal(carryFrom(job3), V2)
+  assert.equal(carryFrom(job), 'v1', 'a job that names none carries from v1, as this afternoon')
+  assert.equal(carryFrom(job3, 'v1'), 'v1', 'a named definition wins')
+})
+
+test('from v2: a record rendered under v2 carries without its head, one carried this afternoon keeps the keys of its render, a moved one stays', () => {
+  const rendered = old(clip, { global: G2 }, 'unreadable')
+  const records = new Map([[clip.id, rendered], [still.id, afternoon(still)], [moved.id, { ...afternoon(moved), keys: { ...afternoon(moved).keys, picture: 'p-old' } }], [cycle.id, old(cycle)]])
+  const plan = carryPlan(job3, records, tree3)
+  assert.equal(plan.from, V2)
+  assert.deepEqual(plan.carried.map((c) => c.e.id).sort(), [clip.id, still.id].sort(), 'nothing is added since v2: no head is asked')
+  assert.deepEqual(plan.stale.map((x) => [x.id, x.moved]).sort(), [[cycle.id, ['global']], [moved.id, ['picture']]].sort(), 'a v1 key is not a v2 key')
+  const byId = new Map(plan.carried.map((c) => [c.e.id, carriedRecord(c, { job: job3, at: 'night' })]))
+  const c = byId.get(clip.id), s2 = byId.get(still.id)
+  assert.deepEqual(c.carried.from, rendered.keys)
+  assert.equal(c.carried.fromDefinition, V2)
+  assert.equal(c.carried.definition, GLOBAL_DEFINITION)
+  assert.equal(c.carried.rendered, undefined, 'rendered under v2: its files are the keys it carries from')
+  assert.deepEqual(s2.carried.rendered, { keys: old(still).keys, definition: 'v1' }, "carried twice: the keys of the render ride along")
+  assert.deepEqual(s2.keys, { motion: 'm2', picture: 'p2', global: G3, delivery: D })
+  assert.ok(stillCurrent(s2, still, job3) && stillCurrent(c, clip, job3))
+  // the release names the keys the files were rendered with, and the gate holds its sidecar against them
+  const dir = mkdtempSync(join(tmpdir(), 'w7-carry3-'))
+  try {
+    for (const r of [rendered, afternoon(still), c, s2]) appendLedger(dir, r)
+    writeRecord(dir, { ...job3, head: 'h', entries: [clip, still], recipe: {} }, readLedger(dir))
+    const release = JSON.parse(readFileSync(join(dir, 'release.json'), 'utf8'))
+    assert.equal(release.definition, GLOBAL_DEFINITION)
+    const [rc] = release.clips, [rs] = release.stills
+    assert.deepEqual(rc.carried, { keys: rendered.keys, fromDefinition: V2, definition: GLOBAL_DEFINITION })
+    assert.deepEqual(rs.carried, { keys: old(still).keys, fromDefinition: 'v1', definition: GLOBAL_DEFINITION })
+    assert.ok(carriedHolds({ keys: rendered.keys }, rc), 'the clip rendered under v2 holds')
+    assert.ok(carriedHolds({ keys: old(still).keys }, rs), 'the still rendered under v1 holds')
+    assert.ok(!carriedHolds({ keys: afternoon(still).keys }, rs), 'a sidecar never holds the keys of a carry')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test("this afternoon's lines from v1 to v2 read as they did", () => {
+  const dir = mkdtempSync(join(tmpdir(), 'w7-carry2-'))
+  try {
+    const line = afternoon(still)
+    appendLedger(dir, line)
+    writeRecord(dir, { ...job, keys: { ...job.keys, definition: V2 }, head: 'h', entries: [still], recipe: {} }, readLedger(dir))
+    const release = JSON.parse(readFileSync(join(dir, 'release.json'), 'utf8'))
+    assert.deepEqual(release.stills[0].carried, { keys: line.carried.from, fromDefinition: 'v1', definition: V2 })
+    assert.ok(carriedHolds({ keys: line.carried.from }, release.stills[0]))
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('a carry names an older definition the tree was keyed under, or is refused', () => {
+  assert.throws(() => carryPlan(job3, new Map(), tree3, { from: GLOBAL_DEFINITION }), /no carry from/)
+  assert.throws(() => carryPlan(job3, new Map(), tree3, { from: 'v0' }), /no carry from/)
+  assert.throws(() => carryPlan(job3, new Map(), { ...tree3, globals: { v1: G1, [GLOBAL_DEFINITION]: G3 } }), /was not taken/)
+  assert.equal(carryPlan(job3, new Map(), tree3, { from: 'v1' }).from, 'v1')
 })

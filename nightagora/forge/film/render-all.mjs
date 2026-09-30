@@ -317,7 +317,7 @@ const readDossier = (slug) => {
   return existsSync(file) ? JSON.parse(readFileSync(file, 'utf8')) : null
 }
 
-async function planJob(dir, log) {
+async function planJob(dir, log, was = null) {
   const replay = await openReplay()
   const graph = buildGraph(replay.wing)
   const machines = machinesOf(graph, readDossier)
@@ -343,12 +343,20 @@ async function planJob(dir, log) {
   const job = {
     format: JOB_FORMAT, created: stamp(), head: headHere(), source: sourceKey().key, build: distDigest(), fps: FPS, pace: 'walk',
     certificate: graph.certificate.sha256, story: graph.story, cuts: graph.cuts, ...(graph.start ? { start: graph.start } : {}), ...(graph.evening ? { evening: graph.evening } : {}),
-    keys: { format: tree.format, definition: tree.global.definition, global: tree.global.key, delivery: tree.delivery.key },
+    keys: { format: tree.format, definition: tree.global.definition, global: tree.global.key, delivery: tree.delivery.key, ...beforeOf(was, tree.global.definition) },
     recipe: recipeOf({ mount: 'held' }), x264: X264, rungs: RUNGS, stillRung: STILL_RUNG,
     machines, counts: countsOf(entries), entries,
   }
   writeAtomic(join(dir, 'job.json'), JSON.stringify(job, null, 1))
   return job
+}
+
+/** THE DEFINITION A PLAN REPLACES, named in the job for the carry (`carry.mjs`): the
+    last job's when it was keyed under another, kept over a plan under the same one. */
+export function beforeOf(was, definition) {
+  if (!was) return {}
+  if ((was.definition ?? 'v1') !== definition) return { before: { definition: was.definition ?? 'v1', global: was.global } }
+  return was.before ? { before: was.before } : {}
 }
 
 export function countsOf(entries) {
@@ -381,7 +389,12 @@ export function stillMarkFiles(dir, marks, e, stillFile, langs = ['en', 'de']) {
 }
 
 /** what a carried record was rendered with, for the gate to hold its sidecar against */
-const carriedOf = (r) => (r.carried ? { carried: { keys: r.carried.from, fromDefinition: r.carried.fromDefinition, definition: r.carried.definition } } : {})
+const carriedOf = (r) => {
+  if (!r.carried) return {}
+  // carried more than once: the keys of the render, not of the carry before
+  const made = r.carried.rendered ?? { keys: r.carried.from, definition: r.carried.fromDefinition }
+  return { carried: { keys: made.keys, fromDefinition: made.definition, definition: r.carried.definition } }
+}
 
 /* ---- the record the gate and the pack read, rewritten from the ledger ---- */
 export function writeRecord(dir, job, records) {
@@ -523,8 +536,9 @@ async function run(flags) {
   if (flags.has('plan') || !existsSync(jobFile)) {
     if (existsSync(jobFile) && !flags.has('replan')) throw new Error(`a job stands at ${jobFile}: --replan writes it again (the ledger stays)`)
     assertBuildFresh()
-    const was = existsSync(jobFile) ? JSON.parse(readFileSync(jobFile, 'utf8')).keys?.definition ?? 'v1' : null
-    const job = await planJob(dir, log)
+    const wasKeys = existsSync(jobFile) ? JSON.parse(readFileSync(jobFile, 'utf8')).keys ?? {} : null
+    const was = wasKeys ? wasKeys.definition ?? 'v1' : null
+    const job = await planJob(dir, log, wasKeys)
     log(`the job planned at ${job.head.slice(0, 8)}: ${job.entries.length} entries; ${Object.entries(job.counts).map(([k, c]) => `${k} ${c.entries} (${c.frames} frames)`).join(', ')}`)
     if (was && was !== job.keys.definition) log(`the global key was taken under ${was} before and under ${job.keys.definition} now: node forge/film/carry.mjs --job=${dir} keeps the ledger's entries nothing has moved for`)
     if (flags.has('plan')) return

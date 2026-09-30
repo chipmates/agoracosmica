@@ -465,3 +465,45 @@ test("a release is held under its own definition: one planned before the library
   assert.ok(asV1(clean.global.key, 'v1').lines.find((l) => l.name === 'keys').red.length > 0, 'v1 named, the key now: every entry red')
   assert.ok(asV1(clean.globalBefore.key, 'some-later-definition').lines.find((l) => l.name === 'keys').red.some((r) => r.at === 'release'), 'a definition this gate cannot read')
 })
+
+test('a release under the third definition reads the tree under it; one under the second still reads the tree under the second', () => {
+  const V2 = 'library-placed-v2'
+  assert.equal(clean.global.definition, 'library-placed-v3')
+  assert.equal(clean.globals[clean.global.definition], clean.global)
+  assert.notEqual(clean.globals[V2].key, clean.global.key)
+  const under = (definition, global) => {
+    const store = release.fork()
+    const rel = JSON.parse(store.read('release.json'))
+    rel.definition = definition
+    rel.global = global
+    for (const e of [...rel.clips, ...rel.stills, ...(rel.evenings ?? [])]) {
+      e.keys = { ...e.keys, global }
+      const side = JSON.parse(store.read(e.sidecar))
+      side.keys = { ...side.keys, global }
+      store.write(e.sidecar, JSON.stringify(side))
+    }
+    store.write('release.json', JSON.stringify(rel))
+    return gate(clean, store).lines.find((l) => l.name === 'keys')
+  }
+  const now = under(clean.global.definition, clean.global.key)
+  assert.deepEqual(now.red, [])
+  assert.ok(!now.notes.some((n) => n.startsWith('the global key is read under')), 'the definition now needs no note')
+  const v2 = under(V2, clean.globals[V2].key)
+  assert.deepEqual(v2.red, [], 'a v2 release is held against the tree under v2')
+  assert.ok(v2.notes.some((n) => n.startsWith(`the global key is read under ${V2}`)))
+  assert.ok(under(V2, clean.global.key).red.length > 0, 'v2 named, the key now: every entry red')
+})
+
+test('an entry carried twice holds: the release names the keys of its render, two definitions back', () => {
+  const still = 'stop:flight upright'
+  const store = release.fork()
+  const rel = JSON.parse(store.read('release.json'))
+  const s = rel.stills.find((x) => `${x.node} ${x.framing}` === still)
+  const side = JSON.parse(store.read(s.sidecar))
+  side.keys = { ...side.keys, global: '1'.repeat(32) }
+  store.write(s.sidecar, JSON.stringify(side))
+  s.carried = { keys: side.keys, fromDefinition: 'v1', definition: clean.global.definition }
+  store.write('release.json', JSON.stringify(rel))
+  assert.deepEqual(gate(clean, store).lines.find((l) => l.name === 'keys').red, [])
+  assert.ok(!carriedHolds(side, { ...s, carried: { ...s.carried, keys: { ...side.keys, global: '2'.repeat(32) } } }), 'the keys of the carry between are not the render\'s')
+})
