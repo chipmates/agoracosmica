@@ -17,7 +17,7 @@ export function fittedRailFov(authoredFov: number, aspect: number, phone: boolea
  * level look lands at minus the shift. The rail sets it with its lens; three
  * rebuilds the projection from the lens, so the shift is added after every
  * rebuild, and a view offset laid on inside a draw adds to it. */
-export const RAIL_SHIFT_CEILING = .6
+export const RAIL_SHIFT_CEILING = .7
 const shifts = new WeakMap<PerspectiveCamera, number>()
 export const railShiftOf = (camera: PerspectiveCamera): number => shifts.get(camera) ?? 0
 export function setRailShift(camera: PerspectiveCamera, shift: number): void {

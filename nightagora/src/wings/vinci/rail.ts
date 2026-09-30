@@ -565,6 +565,9 @@ const wallOfStation=(id:VinciStationId):VinciWall|undefined=>vinciWallOfStation(
 const INSIDE:readonly RailSide[]=['picture-room','long-gallery','mechanism-hall']
 /** How a route may stand and turn: the gaze plan's own table (`rail-gaze.ts`). */
 interface RouteTurns {start:boolean;end:boolean;stands?:readonly RailWaypoint[];named?:{start?:boolean;end?:boolean;at?:readonly RailWaypoint[]};floor?:boolean;lens?:'place'|'last'|'first';forward?:boolean;turned?:boolean;windingRound?:boolean;lensWait?:boolean;whole?:boolean}
+/** The film's picture motion a shifted leg's turn and slide may take together,
+ * a pixel a frame inside the calm law's walking figure. */
+const SLIDE_PICTURE_PX=17
 export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:RailGeometryAuthority) {
   /** A request that carries a wall vertex is walked on the wall's own line,
    * whether it ends at a stop of the hang or at one of its two end stations. */
@@ -595,10 +598,30 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let walkedShare=1
   const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
-  /** THE SHIFT LENS BLENDS WITH THE LENS, by the lens's own weight: the leg's
-   * two ends are certified poses, so every shift between them is inside what
-   * the certificate proved for the leg. */
+  /** THE SHIFT LENS SLIDES OVER THE WHOLE LEG, eased at both ends: a lens
+   * change can be short, and a slide on its clock moved the whole picture
+   * faster than a turn may. Every shift between the two certified ends is
+   * inside what the certificate proved for the leg. */
   let fromShift=0,targetShift=0
+  const slideShare=(u:number)=>{const x=Math.max(0,Math.min(1,u));return x*x*(3-2*x)}
+  /** A plan's picture motion as the calm law reads it, frame by frame at the
+   * film's 30: the turn through the lens, the slide, and the two together. */
+  const readQ=[new Quaternion(),new Quaternion()],readEuler=new Euler(),readView={heading:0,elevation:0}
+  function slideReading(plan:CalmGazePlan,phone:boolean):{turn:number,slide:number,sum:number} {
+    const total=plan.leg.seconds,half=phone?540/(390/844):960/(1280/720),frames=Math.max(1,Math.ceil(total*30))
+    let turn=0,slide=0,sum=0
+    plan.at(0,readView);readQ[0]!.setFromEuler(readEuler.set(readView.elevation,readView.heading,0,'YXZ'))
+    for(let i=1;i<=frames;i++) {
+      const t=Math.min(total,i/30),t0=Math.min(total,(i-1)/30)
+      plan.at(t,readView);readQ[1]!.setFromEuler(readEuler.set(readView.elevation,readView.heading,0,'YXZ'))
+      const angle=2*Math.acos(Math.min(1,Math.abs(readQ[0]!.dot(readQ[1]!)))),perFrame=1/Math.max(1e-9,(t-t0)*30)
+      const turned=filmLensPixels(fromFov+(targetFov-fromFov)*Math.max(0,Math.min(1,plan.lens(t))),phone)*angle*perFrame
+      const slid=half*Math.abs(targetShift-fromShift)*Math.abs(slideShare(t/total)-slideShare(t0/total))*perFrame
+      turn=Math.max(turn,turned);slide=Math.max(slide,slid);sum=Math.max(sum,turned+slid)
+      readQ[0]!.copy(readQ[1]!)
+    }
+    return {turn,slide,sum}
+  }
   let fromHeading=0,fromElevation=0,gaze:CalmGazePlan|undefined
   const view={heading:0,elevation:0}
   const ahead=new Vector3(), behind=new Vector3(), lead=new Vector3(), probe=new Vector3(), span=new Vector3()
@@ -829,7 +852,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const length=path.length
     const faster=certified.station?RAIL_TURN_LIFTS[`${completed.id}>${request.id}`]?.[request.phone?'phone':'desktop']??1:1
     // a lifted walk is planned as if on a lens that many times wider: every pixel cap rises by it
-    const lensPixels=filmLensPixels(Math.min(fromFov,targetFov),request.phone)/faster
+    const lensPixelsAuthored=filmLensPixels(Math.min(fromFov,targetFov),request.phone)/faster
     const zoom=scaleOf(fittedRailFov(targetFov,camera.aspect,request.phone))-scaleOf(fittedRailFov(fromFov,camera.aspect,request.phone))
     // down the aisle the view holds its line and turns once, at the end
     // a view bent further down than the one it goes to is lifted before the
@@ -837,7 +860,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const held=certified.held,lift=held?held.liftFirst??(held.turnFirst||from.elevation<to.elevation-GALLERY_LIFT_RAD):false
     // a walk between two stops runs at its own speed, planned at it
     const brisk=request.link===true&&viewing?.exhibit!==undefined&&request.exhibit!==undefined&&RAIL_BRISK_LINKS.has(`${viewing.exhibit}>${request.exhibit}`)
-    gaze=withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
+    const plan=(lensPixels:number):CalmGazePlan=>withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
       fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],evenLens:request.phone||evenLensStep(request.wallOn,wallAt,request.wall),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
@@ -853,6 +876,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
             namedDegPerSecond:(request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED)*faster}:{}),
           floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,whole:certified.turns.whole===true,scripted:lookKeys!==undefined}}:{})}))
+    gaze=plan(lensPixelsAuthored)
+    // THE SLIDE SHARES THE TURN'S PIXELS: a shifted leg whose turn and slide
+    // together would pass the film's cap is planned again as if on a narrower
+    // lens, which slows the turn and lengthens the leg, until they fit.
+    if(fromShift!==targetShift)for(let narrower=1,round=0;round<8;round++){
+      const reading=slideReading(gaze,request.phone)
+      if(reading.sum<=SLIDE_PICTURE_PX)break
+      narrower*=reading.slide>=.8*SLIDE_PICTURE_PX?2:Math.max(1.05,reading.turn/(SLIDE_PICTURE_PX-reading.slide))
+      gaze=plan(lensPixelsAuthored*narrower)
+    }
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     if(request.quick&&request.wall!==undefined&&request.wallOn&&wallAt!==undefined&&!vinciWallIsEnd(request.wallOn,wallAt)&&!vinciWallIsEnd(request.wallOn,request.wall))pace=STOP_TO_STOP_PACE
     active=request
@@ -1065,7 +1098,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
         euler.set(view.elevation,view.heading,0,'YXZ');base.setFromEuler(euler)
         const lens=gaze.lens(tau)
         camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*lens,camera.aspect,active.phone)
-        if(fromShift!==0||targetShift!==0)setRailShift(camera,fromShift+(targetShift-fromShift)*Math.max(0,Math.min(1,lens)))
+        if(fromShift!==0||targetShift!==0)setRailShift(camera,fromShift+(targetShift-fromShift)*slideShare(tau/duration))
         carry(metres,view.heading)
       }
       render(now)

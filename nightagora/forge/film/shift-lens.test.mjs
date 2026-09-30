@@ -16,7 +16,8 @@ const lens = loader.load(`${WING_DIR}/rail-projection.ts`)
 const seam = loader.load('src/wings/picture/seam.ts')
 const approaches = loader.load(`${WING_DIR}/collection/approaches.ts`)
 const ASPECT = 390 / 844
-const SHIFTED = ['picture/annunciation/front', 'picture/adoration-of-the-magi/front', 'picture/last-supper/front']
+const MURAL = 'picture/last-supper/front'
+const SHIFTED = [...approaches.vinciExhibitRecords().filter(r => r.kind === 'picture' && r.station === 'picture-room').map(r => r.id), MURAL]
 
 function shiftedCamera(shift, fov = 90) {
   const camera = new THREE.PerspectiveCamera(fov, ASPECT, 0.25, 100)
@@ -58,7 +59,7 @@ test('the projection refuses a slide the leg did not certify', () => {
   assert.throws(() => lens.assertRailProjection(camera))
   assert.throws(() => lens.assertRailProjection(camera, 0.2))
   lens.assertRailProjection(camera, 0.3)
-  assert.throws(() => lens.setRailShift(camera, 0.61))
+  assert.throws(() => lens.setRailShift(camera, 0.71))
 })
 
 test('the film\'s print and its player project as the renderer does', () => {
@@ -77,12 +78,14 @@ test('the film\'s print and its player project as the renderer does', () => {
   assert.equal(seam.parsePrint('1,2,3,4,5,6,7,8,9'), null)
 })
 
-test('the three phone close looks look level through the lens, square in their band', () => {
+test('every phone close look of a hung work and the mural looks level through the lens, square in its band', () => {
+  assert.ok(SHIFTED.length >= 26)
   for (const id of SHIFTED) {
     const pose = approaches.vinciApproachPose(id, true)
     assert.ok(pose.shift < 0 && Math.abs(pose.at.y - pose.eye.y) < 1e-12, `${id} looks level, slid down`)
     assert.equal(approaches.vinciApproachPose(id, false).shift, undefined, `${id}: the desktop is not shifted`)
-    const fit = id === SHIFTED[2] ? null : approaches.vinciApproachFit(id, true)
-    if (fit) assert.ok(fit.height <= 1 + 1e-9 && fit.width <= 1 + 1e-9 && Math.max(fit.height, fit.width) > 0.999, `${id} fills its band`)
+    const fit = id === MURAL ? null : approaches.vinciApproachFit(id, true)
+    // a work at the lens's floor stands smaller than its band, centred in it
+    if (fit) assert.ok(fit.height <= 1 + 1e-9 && fit.width <= 1 + 1e-9 && (Math.max(fit.height, fit.width) > 0.999 || approaches.vinciApproachPose(id, true).fov === 34), `${id} fills its band`)
   }
 })

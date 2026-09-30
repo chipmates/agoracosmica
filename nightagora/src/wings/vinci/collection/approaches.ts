@@ -133,7 +133,7 @@ function centredDrop(field: Field, distance: number, fov: number, aspect: number
   return (low + high) / 2
 }
 
-/** THE SHIFT LENS, for the works the phone's band holds only by looking far
+/** THE SHIFT LENS, for the phone's band, which holds a work only by looking
  * down, where the pitch keystones the frame. The eye stays where the fit stood
  * it and looks level along the plate's normal, which sees the plate parallel
  * to the picture, so the frame stands square; the frustum slides until the
@@ -245,14 +245,13 @@ const PHONE_NEAREST_M: Readonly<Record<string, number>> = {
   [exhibitId('salvator-mundi', 'front')]: 1.55,
   [exhibitId('la-belle-ferronniere', 'front')]: 1.5,
 }
-/** THE TWO WORKS THE PHONE READS THROUGH ITS SHIFT LENS, from the eye the fit
- * stands it at: the widest band a phone holds a hung work in, where even the
- * furthest eye still looked down thirty degrees and more. */
-const PHONE_SHIFT_LENS: ReadonlySet<string> = new Set([exhibitId('annunciation', 'front'), exhibitId('adoration-of-the-magi', 'front')])
+/** EVERY HUNG WORK IS READ ON THE PHONE THROUGH ITS SHIFT LENS, from the eye
+ * the fit stands it at: its band is the frame's upper half, which the eye
+ * could reach only by looking down, and a look down keystones the frame. */
 function placement(id: string): Field & { id: string; face: string } | undefined {
   const field = hangPlacements().find(field => exhibitId(field.id, field.face) === id)
   const phoneNearest = PHONE_NEAREST_M[id]
-  return field && { ...field, ...(phoneNearest !== undefined ? { phoneNearest } : {}), ...(PHONE_SHIFT_LENS.has(id) ? { phoneShiftLens: true } : {}) }
+  return field && { ...field, ...(phoneNearest !== undefined ? { phoneNearest } : {}), phoneShiftLens: true }
 }
 
 /** What the frame holds of the work at its own pose: the share of the band it
