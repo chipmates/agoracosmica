@@ -176,16 +176,18 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // was written in, and the support under it the page is read at. The phone
   // stands 2.8 m east of the desktop's eye, where its frame holds the whole
   // gable and the trees past the house's west corner instead of brick alone,
-  // turned onto the gable until both its slopes stand inside the frame, and
-  // lifted so the house stands in the middle of it rather than high at its
-  // right over a third of cobble. The desktop steps down off the terrace's
-  // edge, twelve metres from the gable, which is as far back as a straight
-  // walk in from the gate stays clear of the raised lawn east of it. It lifts
+  // turned onto the gable until both its slopes stand inside the frame. It
+  // looks up ten degrees at a 102 degree lens: at eighteen the gable leaned
+  // back over the eye, its right slope left the frame, and its lowest window
+  // and the support's mark stood under the sheet. The desktop steps down off
+  // the terrace's edge, twelve metres from the gable, which is as far back as
+  // a straight walk in from the gate stays clear of the raised lawn east of
+  // it. It lifts
   // sixteen degrees at seventy: the finial stays whole, the quoins lean less
   // than at the old twenty-one, and the gravel in front of the plinth is a
   // fifth of the frame, not a third. At 80 degrees the walk in from the gate
   // carried a lens too wide for the meadow beside the bank.
-  if(id==='study') return narrow?aimedFrom(p(5.2,-29.8,1.65,5.2,-29.8,1.65),-49,18,86):aimedFrom(standing(.5,-34),-14,16,70)
+  if(id==='study') return narrow?aimedFrom(p(5.2,-29.8,1.65,5.2,-29.8,1.65),-46,10,102):aimedFrom(standing(.5,-34),-14,16,70)
   // THE HOUSE HE DIED IN, SEEN WHOLE. From the court's west end the chamber
   // showed the gable the study stands square to, with the same windows and
   // plaque. It steps down onto the lawn under the court's south-west corner
