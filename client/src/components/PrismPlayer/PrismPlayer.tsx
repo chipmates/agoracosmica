@@ -703,7 +703,7 @@ export function PrismPlayer({ figure, seed, councilId, councilLevel = 1, languag
             <button className="prism-player__resume-btn" onClick={handleResume}>
               {tString('prismPlayer.resume', 'Resume')}
             </button>
-            <button onClick={handleDismissResume} className="prism-player__resume-dismiss">
+            <button onClick={handleDismissResume} className="prism-player__resume-dismiss" aria-label={tString('common.dismiss', 'Dismiss')}>
               &times;
             </button>
           </div>
