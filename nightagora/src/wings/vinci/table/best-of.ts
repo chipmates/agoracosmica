@@ -103,7 +103,7 @@ export interface BestOfPageTexts { lead: number | null; passages: readonly BestO
 
 /** The room's new words, by key, null until the words pass writes them. */
 export type BestOfKey = 'next_topic' | 'previous_topic' | 'full_text' | 'full_record' | 'ai_short' | 'italian' | 'the_page'
-  | 'mirror_ordinary' | 'mirror_plate' | 'kind_leaf' | 'kind_plate' | 'kind_facsimile' | 'topic_pages' | 'topic_count'
+  | 'mirror_ordinary' | 'mirror_plate' | 'kind_leaf' | 'kind_plate' | 'kind_facsimile' | 'topic_page' | 'topic_pages' | 'topic_count'
   | 'absence_paris_rest' | 'absence_ashburnham' | 'absence_arundel_middle'
   | 'credit_rest_ai' | 'credit_rest_richter' | 'picture_leaf' | 'picture_facsimile' | 'way_hand'
 interface BestOfIndex {
@@ -121,6 +121,10 @@ export const BEST_OF_PAGES: readonly BestOfPage[] = INDEX.pages
 export const BEST_OF_NOTICES = INDEX.notices
 /** A key of the room's new words in the page's language, or null until written. */
 export const bestOfKey = (key: BestOfKey, lang: BestOfLang): string | null => INDEX.keys?.[key]?.[lang] ?? null
+/** A topic cell's page count, the singular for one page, or null until written. */
+export function topicPagesWord(n: number, lang: BestOfLang): string | null {
+  return ((n === 1 ? bestOfKey('topic_page', lang) : null) ?? bestOfKey('topic_pages', lang))?.replace('{n}', String(n)) ?? null
+}
 /** The topic the table opens at, and the page: the leaf the 1883 volume lies
  * open at in the room, here in colour. */
 export const BEST_OF_OPENING = { topic: INDEX.topics[0]?.slug ?? '', page: INDEX.topics[0]?.pages[0] ?? '' }

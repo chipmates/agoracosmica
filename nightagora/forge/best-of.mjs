@@ -158,6 +158,7 @@ export const KEYS = {
   kind_plate: 'Read more: the picture is a printed plate of a facsimile; until written, nothing',
   kind_facsimile: 'Read more: the picture is a photograph of a printed facsimile; until written, nothing',
   topic_pages: 'a topic cell\'s page count ("{n} pages"); until written, no count',
+  topic_page: 'the same count for a topic of one page ("{n} page"); until written, topic_pages stands',
   topic_count: 'the count in the name row ("{topic}, {n} of {total}"); until written, the topic and the picture room\'s place pattern',
   absence_paris_rest: 'the new reason for Paris manuscripts C and E to M, now that the Institut\'s own views are admitted; until written, the absence is not shown',
   absence_ashburnham: 'the new reason for the Ashburnham leaves, likewise; until written, not shown',
@@ -375,24 +376,37 @@ function passagesOf(record) {
   })
 }
 
-/** A LEAD IS ONE SPAN OF ONE PASSAGE, word for word: with its ellipses taken
- * off it stands in the passage as printed or translated (spaces, struck
- * words and the kind of quotation mark aside), and it holds no cut inside. */
+/** A LEAD IS A CUT OF ONE PASSAGE, word for word: its pieces between its
+ * ellipses stand in the passage in order, as printed or translated (spaces,
+ * struck words and the kind of quotation mark aside). */
 const quotes = text => text.replace(/[’‘]/g, "'").replace(/[“”„«»]/g, '"')
 const flatten = text => quotes(plain(text)).replace(/^\s*[—–-]\s*/, '').replace(/\s+/g, ' ').trim()
-export function spanOf(lead, passage) {
-  const pieces = flatten(lead).split(/…|\.\.\./).map(piece => piece.replace(/^[\s,;:]+|[\s,;:]+$/g, '')).filter(Boolean)
-  if (pieces.length !== 1) return { ok: false, why: pieces.length ? 'a cut inside it' : 'no words' }
-  const whole = flatten(passage), span = pieces[0], at = whole.indexOf(span)
-  if (at < 0) return { ok: false, why: 'not word for word in its passage' }
-  // a span that starts or stops inside a sentence says so with an ellipsis
-  const before = whole.slice(0, at), opened = !before || /[.!?:;]["')\]]?\s*$/.test(before)
-  const closed = at + span.length === whole.length || /[.!?]["')\]]?$/.test(span)
-  const marked = flatten(lead)
-  const unmarked = [!opened && !marked.startsWith('…') && !marked.startsWith('...') ? 'its start' : null,
-    !closed && !/(…|\.\.\.)$/.test(marked) ? 'its end' : null].filter(Boolean)
+/** A CUT OF A TEXT, word for word: the line's pieces between its ellipses
+ * stand in the text in order, each at word edges and none across a cut the
+ * text itself marks; a cut inside a sentence says so with an ellipsis. A
+ * diplomatic transcription runs words together, so its cuts keep no edges. */
+export function cutOf(line, text, { edges = true } = {}) {
+  const CUT = '\u0000'
+  const whole = flatten(text).replace(/\s*(…|\.\.\.)\s*/g, CUT)
+  const pieces = flatten(line).split(/…|\.\.\./).map(piece => piece.replace(/^[\s,;:]+|[\s,;:]+$/g, '')).filter(Boolean)
+  if (!pieces.length) return { ok: false, why: 'no words' }
+  const word = /[\p{L}\p{N}]/u
+  const edged = (piece, at) => !edges || (!word.test(piece[0]) || !word.test(whole[at - 1] ?? '')) && (!word.test(piece[piece.length - 1]) || !word.test(whole[at + piece.length] ?? ''))
+  let from = 0, first = -1, end = 0
+  for (const piece of pieces) {
+    let at = whole.indexOf(piece, from)
+    while (at >= 0 && !edged(piece, at)) at = whole.indexOf(piece, at + 1)
+    if (at < 0) return { ok: false, why: `"${piece.slice(0, 40)}" is not word for word in it${pieces.length > 1 ? ' (in order)' : ''}` }
+    if (first < 0) first = at
+    from = end = at + piece.length
+  }
+  const marked = flatten(line)
+  const opened = first === 0 || /[.!?:;]["')\]]?\s*$/.test(whole.slice(0, first))
+  const closed = end === whole.length || /[.!?]["')\]]?$/.test(pieces[pieces.length - 1])
+  const unmarked = [!opened && !/^(…|\.\.\.)/.test(marked) ? 'its start' : null, !closed && !/(…|\.\.\.)$/.test(marked) ? 'its end' : null].filter(Boolean)
   return { ok: true, unmarked }
 }
+export const spanOf = (lead, passage, lang) => cutOf(lead, passage, { edges: lang !== 'it' })
 /** about ninety characters keep a lead to two rows at the close look */
 const LEAD_MOST = 120
 const refused = []
@@ -408,7 +422,7 @@ function leadOf(id, passages, record) {
       const said = written[lang]
       if (!said) { refused.push(`${id}: no ${lang} lead line`); good = false; continue }
       if (!p[lang]?.text) { refused.push(`${id}: a ${lang} lead line for passage ${written.passage}, which has no ${lang} text`); good = false; continue }
-      const span = spanOf(said, p[lang].text)
+      const span = spanOf(said, p[lang].text, lang)
       if (!span.ok) { refused.push(`${id}: the ${lang} lead line is ${span.why} (passage ${written.passage})`); good = false; continue }
       if (span.unmarked.length) warn(`${id}: the ${lang} lead line cuts at ${span.unmarked.join(' and ')} without an ellipsis`)
       if (lang !== 'it' && said.length > LEAD_MOST) warn(`${id}: the ${lang} lead line runs ${said.length} characters`)
@@ -439,28 +453,6 @@ function leadOf(id, passages, record) {
 
 /** about eighty characters keep a line to two rows on a 390 px phone */
 const PHONE_MOST = 80
-/** A CUT OF A TEXT, word for word: the line's pieces between its ellipses
- * stand in the text in order. */
-export function cutOf(line, text) {
-  const whole = flatten(text).replace(/…|\.\.\./g, ' ').replace(/\s+/g, ' ').trim()
-  const pieces = flatten(line).split(/…|\.\.\./).map(piece => piece.replace(/^[\s,;:]+|[\s,;:]+$/g, '')).filter(Boolean)
-  if (!pieces.length) return { ok: false, why: 'no words' }
-  let from = 0, first = -1, end = 0
-  for (const piece of pieces) {
-    const at = whole.indexOf(piece, from)
-    if (at < 0) return { ok: false, why: `"${piece.slice(0, 40)}" is not in it${pieces.length > 1 ? ' (in order)' : ''}` }
-    if (first < 0) first = at
-    from = end = at + piece.length
-  }
-  // a cut that starts or stops inside a sentence says so with an ellipsis
-  const marked = flatten(line)
-  // a text that is itself a cut (a lead) opens or closes inside a sentence at its own ellipsis
-  const own = flatten(text)
-  const opened = (first === 0 && !/^(…|\.\.\.)/.test(own)) || /[.!?:;]["')\]]?\s*$/.test(whole.slice(0, first))
-  const closed = (end === whole.length && !/(…|\.\.\.)$/.test(own)) || /[.!?]["')\]]?$/.test(pieces[pieces.length - 1])
-  const unmarked = [!opened && !/^(…|\.\.\.)/.test(marked) ? 'its start' : null, !closed && !/(…|\.\.\.)$/.test(marked) ? 'its end' : null].filter(Boolean)
-  return { ok: true, unmarked }
-}
 /** The first word of a line that is not the next word of a text, in order, or null. */
 function wordsAdded(line, text) {
   const words = t => (flatten(t).toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [])

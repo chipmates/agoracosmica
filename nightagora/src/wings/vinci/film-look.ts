@@ -30,7 +30,7 @@ import { assetAddress } from '../../stack/materials'
 import { loadManifest, type ManifestIndex } from '../../manifest'
 import type { DeskOverviewCell } from '../overview'
 import { deskControl } from '../desk-story'
-import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, topicExhibit, topicPages } from './table/best-of'
+import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfSource, topicExhibit, topicPages, topicPagesWord } from './table/best-of'
 import { createBestOfLook } from './table/best-of-look'
 import { EDITION_EXHIBIT, isCollectionBook, SHELF_BOOKS, shelfBook, shelfPlate } from './table/codex-shelf'
 import { shownAbsences } from './table/absences'
@@ -409,9 +409,8 @@ export function createFilmLook(h: FilmLookHost) {
         const topic = BEST_OF_TOPICS.find(entry => entry.slug === slug)
         const first = topicPages(slug).find(page => bestOfSource(page, assets!))
         if (!topic || !first) continue
-        const count = bestOfKey('topic_pages', lang())
         out.push({ id, kind: 'manuscript', openable: true, title: text(topic.title ?? { en: '', de: '' }),
-          sub: count ? count.replace('{n}', String(admitted(slug))) : null, certainty: 'documented',
+          sub: topicPagesWord(admitted(slug), lang()), certainty: 'documented',
           preview: bestOfSource(first, assets)?.thumb ?? null })
       } else if (id.startsWith('machine/')) {
         const slug = id.slice('machine/'.length) as MachineSlug

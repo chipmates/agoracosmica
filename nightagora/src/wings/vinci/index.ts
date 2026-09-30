@@ -79,7 +79,7 @@ import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
 import { shownAbsences } from './table/absences'
-import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, isTopicExhibit, topicExhibit, topicPages } from './table/best-of'
+import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, isTopicExhibit, topicExhibit, topicPages, topicPagesWord } from './table/best-of'
 import { createBestOfLook } from './table/best-of-look'
 import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
@@ -689,6 +689,13 @@ export function createWing():VinciWingModule {
   /** THE BOOK ON THE TABLE OPENS THE BEST-OF; the whole edition is one of
    * the shelf's sources, asked for by name from the shelf's row or a record. */
   let wholeEdition=false
+  /** the topic of the best-of the reader shows, whatever id its look answers to */
+  let topicShown:string|null=null
+  /** the topic book's own word for its gold, the template's words before the name */
+  const nextTopicWord=():VinciText|null=>{
+    const [en,de]=(['en','de'] as const).map(language=>bestOfKey('next_topic',language)?.replace(/\s*·?\s*\{name\}\s*$/,'')||null)
+    return en&&de?{en,de}:null
+  }
   const EDITION_WHOLE='codex/edition'
   /** THE STATION CARD IS A SHEET ON THE PHONE. Peeked or opened belongs to
    * the walk, so it is held here and never written down. */
@@ -1882,6 +1889,9 @@ export function createWing():VinciWingModule {
     // ANY EXHIBIT BY ITS REGISTRY ID: `open:` cuts to it, `walk:` walks the
     // certified leg where the stage walks.
     const named=/^(open|walk):(.+)$/.exec(id)
+    // a topic of the best-of is no registry exhibit: it opens where the visitor stands
+    const topicNamed=named?.[2]
+    if(topicNamed&&isTopicExhibit(topicNamed)){pendingExhibit='';placeCanonicalStation();openExhibit(topicNamed,null,'cut');return}
     if(named){
       if(!picks.length)refreshExhibits()
       const target=picks.find(pick=>pick.openable&&pick.id===named[2])
@@ -2449,10 +2459,12 @@ export function createWing():VinciWingModule {
   function phoneLook():VinciPhoneLook|null {
     const open=closeLook?.id
     if(!open)return null
-    const id=isLeafDoor(open)?open.slice(0,-LEAF_DOOR.length):open
+    const asked=isLeafDoor(open)?open.slice(0,-LEAF_DOOR.length):open
+    // the book's mark opens the first topic under its own id: its set is the topics
+    const id=asked===EDITION_EXHIBIT&&topicShown?topicExhibit(topicShown):asked
     const previous=exhibitStep(id,-1), next=exhibitStep(id,1), kind=picks.find(pick=>pick.id===id)?.kind
-    const own=deskControl('walk','next_manuscript')
-    const word=kind==='machine'?deskControl('walk','next_machine'):kind==='manuscript'&&own.en&&own.de?own:deskControl('walk','next_work')
+    const own=deskControl('walk','next_manuscript'), topic=isTopicExhibit(id)?nextTopicWord():null
+    const word=topic??(kind==='machine'?deskControl('walk','next_machine'):kind==='manuscript'&&own.en&&own.de?own:deskControl('walk','next_work'))
     return {previous:previous?.title??null,next:next?{title:next.title,word}:null,
       step:direction=>{const to=direction>0?next:previous;if(to)openExhibit(to.id,null)}}
   }
@@ -2784,6 +2796,7 @@ export function createWing():VinciWingModule {
    * reader takes the window at once, and its gold walks topic to topic. */
   function openTopic(slug:string,start:string|undefined,from:HTMLElement|null,how:'auto'|'walk'|'cut',asked?:string):void {
     if(!closeLook||!hosts)return
+    topicShown=slug
     const id=asked??topicExhibit(slug)
     const look=createBestOfLook({slug,start,id,words:{manuscript:vinciManuscriptWords(),vitrine:VINCI_VITRINE_WORDS},manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
       tier:()=>hosts?.world.stack.tierName()??'standard',
@@ -2808,7 +2821,7 @@ export function createWing():VinciWingModule {
   /** A topic cell's count, where the words pass has written the word for it. */
   function topicCount(id:string):string|null {
     const pages=topicPages(id.slice('topic/'.length)).filter(page=>assets&&bestOfSource(page,assets)).length
-    return bestOfKey('topic_pages',lang())?.replace('{n}',String(pages))??null
+    return topicPagesWord(pages,lang())
   }
   /** The edition's plate on the shelf's row: the page the volume lies open at. */
   function editionPlate():string|null {
@@ -2951,7 +2964,7 @@ export function createWing():VinciWingModule {
     if(isTopicExhibit(id)){openTopic(id.slice('topic/'.length),undefined,from,how);return}
     // the book on the table opens the best-of at the leaf it lies open at
     if(id===EDITION_EXHIBIT&&!wholeEdition&&!leafAt){openTopic(BEST_OF_OPENING.topic,BEST_OF_OPENING.page,from,how,EDITION_EXHIBIT);return}
-    wholeEdition=false
+    wholeEdition=false;topicShown=null
     if(isCollectionBook(id)){openCodexBook(id,from,how);return}
     const entry=picks.find(pick=>pick.id===id)
     if(!entry||!hosts||!closeLook)return
