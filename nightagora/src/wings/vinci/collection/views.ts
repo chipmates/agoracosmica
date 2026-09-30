@@ -53,10 +53,12 @@ const HANG_END = [{ stand: 2.335, turn: 2.695, fov: 54 }, { stand: 1.255, turn: 
  * work takes the middle; the lens comes in rather than out, because holding
  * the whole wall on a 390 px stage is what made the far end a smudge. The
  * east end turns past its first work so the second, wide one leaves the
- * frame instead of standing cut at its edge, and closes two degrees so no
- * sliver of that one's frame stays at the edge; the west end looks down
- * far enough that the wall over its work is no longer the top fifth. */
-const HANG_END_NARROW = [{ turn: -.32, drop: .316, fov: 62 }, { turn: .3, drop: .648, fov: 64 }] as const
+ * frame instead of standing cut at its edge; it closes to 56 degrees and
+ * looks down ten, which stands that work large in the middle of the picture
+ * over the sheet, where at 62 and five a band of bare wall stood over it.
+ * The west end looks down far enough that the wall over its work is no
+ * longer the top fifth. */
+const HANG_END_NARROW = [{ turn: -.22, drop: .688, fov: 56 }, { turn: .3, drop: .648, fov: 64 }] as const
 /** THE EAST END'S WIDE FRAME TURNS WEST OFF THE DOOR. Turned onto the first
  * work alone, its left edge looked through the door into the next room;
  * turned on down the wall, the door leaves the frame and the first work
