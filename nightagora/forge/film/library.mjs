@@ -171,6 +171,8 @@ export function importGraph(sources) {
 export const WORDS_FILES = [`${WING_DIR}/content.ts`, `${WING_DIR}/story.ts`, `${WING_DIR}/table/content.ts`]
 /** A property whose strings are displayed text and nothing else. */
 export const DISPLAY_KEY = /^(?:en|de)$|[a-z0-9](?:En|De)$|_(?:en|de)$/
+/** A property whose whole value is displayed text or its absence: a stop's second layer only shows or hides "Read more". */
+export const DISPLAY_WHOLE_KEY = /^drawer$/
 /** The letter modules: the only code that makes text into geometry. */
 export const LETTER_MODULES = ['words/index.ts', 'words/font.ts', 'words/outline.ts'].map((f) => `${WING_DIR}/${f}`)
 const CANVAS_TEXT = /\.(?:fillText|strokeText)\s*\(/
@@ -226,6 +228,7 @@ export function blankDisplay(text, file = 'words.ts') {
     ts.forEachChild(n, strings)
   }
   const visit = (n) => {
+    if (ts.isPropertyAssignment(n) && DISPLAY_WHOLE_KEY.test(nameOf(n.name) ?? '')) { cuts.push([n.initializer.getStart(source), n.initializer.getEnd()]); return }
     if (ts.isPropertyAssignment(n) && DISPLAY_KEY.test(nameOf(n.name) ?? '')) { strings(n.initializer); return }
     ts.forEachChild(n, visit)
   }

@@ -60,6 +60,9 @@ test('a display text is blanked and nothing else is', () => {
   for (const kept of ["'arrival'", 'n: 3', "'74r'", "'house'", '"·"n"·"']) assert.ok(blank.includes(kept), `${kept} is kept`)
   assert.equal(blankDisplay(src.replace("'One'", "'Two words'")), blank, 'a display edit leaves the blanked text')
   assert.notEqual(blankDisplay(src.replace("'74r'", "'75r'")), blank, 'a folio edit moves it')
+  const stop = (drawer) => `const s = { id: 'body-valve', line: { en: 'L', de: 'L' }, drawer: ${drawer}, folio: 'RL 19116' }`
+  assert.equal(blankDisplay(stop("{ en: 'Two', de: 'Zwei' }")), blankDisplay(stop('null')), 'a drawer written where none stood leaves the blanked text')
+  assert.notEqual(blankDisplay(stop('null').replace("'RL 19116'", "'RL 19117'")), blankDisplay(stop('null')), 'beside it a folio still counts')
 })
 
 test('on the tree as it stands, every wire holds', () => {
