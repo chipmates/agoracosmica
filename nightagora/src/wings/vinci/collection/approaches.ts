@@ -192,12 +192,22 @@ function eastFacingApproach(field: Field, narrow: boolean): ApproachPose {
   return { eye: back(turned.eye), at: back(turned.at), fov: turned.fov }
 }
 
-/** THE PORTRAIT HE KEPT IS READ FROM FURTHER BACK ON THE PHONE. It hangs at
- * the eye's own height, and a frame whose lowest third is the sheet lifts it
- * off the sheet only by looking down on it: from 1.1 m that tapered the frame
- * by a fifth, from 2.7 m by under a tenth. It stays inside the phone's
- * furthest eye, so the plates' reach does not move. */
-const PHONE_NEAREST_M: Readonly<Record<string, number>> = { [exhibitId('mona-lisa', 'front')]: 2.7 }
+/** THE PHONE READS A PAINTING SQUARE FROM FURTHER BACK. Its band is the
+ * frame's upper half, above the sheet, and the eye lifts a work into it only
+ * by looking down: the pitch that takes grows with the lens, so a wide lens
+ * from near keystones the frame (the Mona Lisa from 1.1 m tapered by a fifth,
+ * from 2.7 m by under a tenth). The big works stand at the phone's furthest
+ * eye. Every one stays inside it, so the plates' reach does not move. */
+const PHONE_NEAREST_M: Readonly<Record<string, number>> = {
+  [exhibitId('mona-lisa', 'front')]: 2.7,
+  [exhibitId('baptism-of-christ', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('burlington-house-cartoon', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('saint-jerome', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('virgin-and-child-with-st-anne', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('bacchus', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('virgin-of-the-rocks-london', 'front')]: PHONE_FURTHEST_M,
+  [exhibitId('virgin-of-the-rocks-louvre', 'front')]: PHONE_FURTHEST_M,
+}
 function placement(id: string): Field & { id: string; face: string } | undefined {
   const field = hangPlacements().find(field => exhibitId(field.id, field.face) === id)
   const phoneNearest = PHONE_NEAREST_M[id]
