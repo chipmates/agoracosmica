@@ -13,7 +13,7 @@ export const GRAVE_EVIDENCE = {
   slab: 'LEONARDO DA VINCI',
   presumption: 'presumed remains',
   plaque: 'The chapel’s own plaque says presumed remains. Its wording belongs to a separate plaque, not to the slab.',
-  dig: 'Arsène Houssaye excavated the former Saint-Florentin church in 1863 and reported a nearly complete skeleton. The identification remains presumed.',
+  dig: 'Arsène Houssaye excavated the former Saint-Florentin church in 1863 and reported a nearly complete skeleton. The identification is not proven.',
   transfer: 'The château describes a nineteenth-century transfer to Saint-Hubert. The precise 1874 date and the letter-fragment account need the historical excavation and transfer record.',
   frame: 'Computed light · 2 May 1519 · 18:50 UT. A chosen minute, not a witnessed moment.',
 } as const
@@ -25,7 +25,7 @@ export const GRAVE_WORDS = {
   slab: GRAVE_EVIDENCE.slab,
   presumption: { en: 'presumed remains', de: 'mutmaßliche Überreste' },
   dig: '1863',
-  identification: { en: 'The identification remains presumed.', de: 'Die Identifizierung bleibt unbewiesen.' },
+  identification: { en: 'The identification is not proven.', de: 'Die Identifizierung bleibt unbewiesen.' },
   /** What the setting on the real slab holds. An absence is a sentence in
    * the record and never a piece of furniture, so nothing of it is built.
    * The bronze is a 2004 sculpture
