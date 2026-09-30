@@ -78,10 +78,12 @@ type CurveSpan = {
 }
 type Span = LineSpan | CurveSpan
 
-/** Enclosing radius for every orientation of a perspective camera's near rectangle. */
-export function railNearRectangleRadius(nearM: number, verticalFovDegrees: number, aspect: number) {
+/** Enclosing radius for every orientation of a perspective camera's near
+ * rectangle; a shifted rectangle (`rail-projection.ts`) reaches its farthest
+ * corner a shift's share of its half height further. */
+export function railNearRectangleRadius(nearM: number, verticalFovDegrees: number, aspect: number, shift = 0) {
   const height = nearM * Math.tan(verticalFovDegrees * Math.PI / 360)
-  return Math.hypot(nearM, height, height * aspect)
+  return Math.hypot(nearM, height * (1 + Math.abs(shift)), height * aspect)
 }
 
 function curveSpan(a: Vector3, control: Vector3, b: Vector3): CurveSpan {

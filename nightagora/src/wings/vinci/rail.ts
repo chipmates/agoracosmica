@@ -14,11 +14,14 @@ import { GALLERY_WALK_M, VINCI_BODY_WALL, VINCI_PICTURE_WALL, vinciWallEndVertex
 import { vinciApproachesAreNeighbours } from './collection/approaches'
 import { COURT, FACE, FLOOR, OPENING, SUPPER_WALL } from './collection/layout'
 import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railEyeHeightM, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
-import { fittedRailFov, assertRailProjection } from './rail-projection'
+import { fittedRailFov, assertRailProjection, setRailShift } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
 
-export interface Pose { eye: Vector3; at: Vector3; fov: number }
+/** `shift` is the phone's shift lens (`rail-projection.ts`), absent where the
+ * look is not shifted. */
+export interface Pose { eye: Vector3; at: Vector3; fov: number; shift?: number }
+const copyPose=(pose:Pose):Pose=>({eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov,...(pose.shift!==undefined?{shift:pose.shift}:{})})
 /** Which room view each collection station stands in. The rooms are built by
  * the collection module and these are its own compositions: the hang from
  * where a hang is read, the hall from its north door, the line down its
@@ -592,6 +595,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   let walkedShare=1
   const fromQ=new Quaternion(), toQ=new Quaternion()
   let fromFov=49,targetFov=49
+  /** THE SHIFT LENS BLENDS WITH THE LENS, by the lens's own weight: the leg's
+   * two ends are certified poses, so every shift between them is inside what
+   * the certificate proved for the leg. */
+  let fromShift=0,targetShift=0
   let fromHeading=0,fromElevation=0,gaze:CalmGazePlan|undefined
   const view={heading:0,elevation:0}
   const ahead=new Vector3(), behind=new Vector3(), lead=new Vector3(), probe=new Vector3(), span=new Vector3()
@@ -656,7 +663,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     ahead.sub(behind)
     return Math.hypot(ahead.x,ahead.z)>1e-6?Math.atan2(-ahead.x,-ahead.z):pathAngles(from,to-from).heading
   }
-  function samePose(a:Pose,b:Pose) { return a.eye.distanceToSquared(b.eye)<1e-18&&a.at.distanceToSquared(b.at)<1e-18&&Math.abs(a.fov-b.fov)<1e-9 }
+  function samePose(a:Pose,b:Pose) { return a.eye.distanceToSquared(b.eye)<1e-18&&a.at.distanceToSquared(b.at)<1e-18&&Math.abs(a.fov-b.fov)<1e-9&&Math.abs((a.shift??0)-(b.shift??0))<1e-12 }
   function sameRequest(a:Request,b:Request) { return a.id===b.id&&a.phone===b.phone&&samePose(a.pose,b.pose) }
   function matrices() { camera.updateProjectionMatrix();camera.updateMatrixWorld() }
   function placeEndpoint(request:Request) {
@@ -665,7 +672,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     wallAt=request.wall??(wallOn?vinciWallEndVertex(wallOn,request.id):undefined);wallReturn=undefined
     if(!request.exhibit){viewing=undefined;standing=request;wantsReturn=false}
     camera.position.copy(request.pose.eye);base.copy(poseQuaternion(request.pose))
-    camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);matrices()
+    camera.quaternion.copy(base);camera.fov=fittedRailFov(request.pose.fov,camera.aspect,request.phone);setRailShift(camera,request.pose.shift??0);matrices()
   }
   /** The one certified path this request is allowed to move on: a station pair
    * for a station, the exhibit's own leg for an approach, and that same leg
@@ -818,6 +825,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const from=angles(fromQ),to=angles(toQ)
     fromHeading=from.heading;fromElevation=from.elevation
     fromFov=completed.pose.fov;targetFov=request.pose.fov
+    fromShift=completed.pose.shift??0;targetShift=request.pose.shift??0
     const length=path.length
     const faster=certified.station?RAIL_TURN_LIFTS[`${completed.id}>${request.id}`]?.[request.phone?'phone':'desktop']??1:1
     // a lifted walk is planned as if on a lens that many times wider: every pixel cap rises by it
@@ -880,7 +888,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
      * being a station with a route of its own. */
     set(id:VinciStationId,pose:Pose,instant=false,phone=camera.aspect<=.9,vertex?:number) {
       const onWall=vertex!==undefined?wallOfStation(id):undefined
-      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,
+      const request:Request={id,pose:copyPose(pose),phone,
         ...(onWall?{wall:vertex,wallOn:onWall}:{})}
       // Initial/named placement, explicit inspection return and resize are
       // deliberate placement boundaries, including during reduced motion.
@@ -912,7 +920,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
      * the current run lands in, so the eye never stands still between them. */
     along(vertex:number,id:VinciStationId,pose:Pose,exhibit?:string,phone=camera.aspect<=.9,quick=false):boolean {
       if(!completed||wallOn===undefined||wallAt===undefined||vertex===wallAt||wallReturn!==undefined)return false
-      const request:Request={id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit,wall:vertex,wallOn,quick}
+      const request:Request={id,pose:copyPose(pose),phone,exhibit,wall:vertex,wallOn,quick}
       if(active){pending=request;pace=Math.max(pace,carriedPace(++waiting));return true}
       begin(request,clock())
       return true
@@ -922,7 +930,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
      * second exhibit while one is open. */
     approach(exhibit:string,pose:Pose,phone=camera.aspect<=.9,instant=false):boolean {
       if(!completed||active||viewing||pending)return false
-      const request:Request={id:completed.id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      const request:Request={id:completed.id,pose:copyPose(pose),phone,exhibit}
       standing=completed
       if(instant) {
         // An eye placed on a leg is still an eye on a certified leg: the proof
@@ -948,7 +956,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // `home` is the next exhibit's own station where it is not the one
       // stood at: the hall's row runs across its two stations.
       const across=home&&home.id!==standing.id?home:undefined
-      const request:Request={id:(across??standing).id,pose:{eye:pose.eye.clone(),at:pose.at.clone(),fov:pose.fov},phone,exhibit}
+      const request:Request={id:(across??standing).id,pose:copyPose(pose),phone,exhibit}
       // THE NEIGHBOUR IS ONE LEG AWAY. Where the room certifies the line
       // between these two eyes the walk takes it and the station is never
       // stood at; anywhere else the chain is still the return and the
@@ -956,7 +964,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       if(viewing.exhibit&&vinciApproachesAreNeighbours(viewing.exhibit,exhibit)&&authority.status==='verified'){
         begin({...request,link:true},clock())
         // the way back from a machine of the other station is its own approach
-        if(across)standing={id:across.id,pose:{eye:across.pose.eye.clone(),at:across.pose.at.clone(),fov:across.pose.fov},phone}
+        if(across)standing={id:across.id,pose:copyPose(across.pose),phone}
         return true
       }
       // across the two stations only a neighbour is walked
@@ -1005,7 +1013,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // the approach reversed, so its endpoint is the certified station eye.
       if(!active&&viewing&&wantsReturn&&standing&&authority.status==='verified') {
         wantsReturn=false
-        begin({...standing,pose:{eye:standing.pose.eye.clone(),at:standing.pose.at.clone(),fov:standing.pose.fov}},now)
+        begin({...standing,pose:copyPose(standing.pose)},now)
         if(pending&&samePose(pending.pose,standing.pose))pending=undefined
       }
       if(!active&&!viewing&&pending&&authority.status==='verified') {
@@ -1048,14 +1056,16 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
       // A leg that stands to turn at its end has walked its way before it lands.
       const tau=!active||!gaze?duration:s>=1&&strideM>0?duration:strideM>0?Math.max(legClock,gaze.secondsAt(metres)):Math.min(legClock,duration)
       if(active&&path&&gaze) {
-        assertRailProjection(camera)
+        assertRailProjection(camera,Math.max(Math.abs(fromShift),Math.abs(targetShift)))
         path.pointAtDistance(metres,camera.position)
         // THE GAZE LEADS THE WALK, on the curve planned when the leg began.
         // It is read where the body is: a stride taken by hand carries the
         // view on with it, and the arrival is the arriving view exactly.
         gaze.at(tau,view)
         euler.set(view.elevation,view.heading,0,'YXZ');base.setFromEuler(euler)
-        camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*gaze.lens(tau),camera.aspect,active.phone)
+        const lens=gaze.lens(tau)
+        camera.fov=fittedRailFov(fromFov+(targetFov-fromFov)*lens,camera.aspect,active.phone)
+        if(fromShift!==0||targetShift!==0)setRailShift(camera,fromShift+(targetShift-fromShift)*Math.max(0,Math.min(1,lens)))
         carry(metres,view.heading)
       }
       render(now)

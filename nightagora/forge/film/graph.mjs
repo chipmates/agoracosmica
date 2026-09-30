@@ -49,7 +49,9 @@ export const DESIGN_TABLE = {
 const POSE_TOLERANCE = 1e-6
 const near = (a, b) => a.length === b.length && a.every((v, i) => Math.abs(v - b[i]) <= POSE_TOLERANCE)
 const samePose = (a, b) => near(a.eye, b.eye) && near(a.at, b.at) && Math.abs(a.fov - b.fov) <= POSE_TOLERANCE
-const saved = (pose) => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov })
+  && Math.abs((a.shift ?? 0) - (b.shift ?? 0)) <= POSE_TOLERANCE
+/** a pose as the graph keeps it: the shift lens's slide only where a look is shifted */
+const saved = (pose) => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov, ...(pose.shift ? { shift: pose.shift } : {}) })
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 export const stopId = (walkId) => `stop:${walkId}`
 export const eveningId = (walkId) => `evening:${walkId}`
@@ -98,7 +100,7 @@ export async function openWing({ rev = '', stand = {}, overlay = {} } = {}) {
 export const arrivalFrame = (seconds, fps = FPS) => Math.ceil(seconds * fps - 1e-9)
 
 const vec = (a) => new THREE.Vector3(a[0], a[1], a[2])
-const livePose = (s) => ({ eye: vec(s.eye), at: vec(s.at), fov: s.fov })
+const livePose = (s) => ({ eye: vec(s.eye), at: vec(s.at), fov: s.fov, ...(s.shift ? { shift: s.shift } : {}) })
 
 /** How the wing stands the eye at a node and asks for the next one, as the
     film's hook does in the page (`film.ts`) and the replay does in node. */

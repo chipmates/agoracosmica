@@ -74,9 +74,9 @@ export function createLivePicture(hook: FilmHook, walk: VinciWalk): PictureSourc
       return out
     },
     project(point) {
-      const cam = (window as unknown as { __forge?: { state(): { cam?: { p: number[]; r: number[]; fov: number } } } }).__forge?.state().cam
+      const cam = (window as unknown as { __forge?: { state(): { cam?: { p: number[]; r: number[]; fov: number; shift?: number } } } }).__forge?.state().cam
       if (!cam) return null
-      const print = parsePrint([...cam.p, ...cam.r, cam.fov].join(','))
+      const print = parsePrint([...cam.p, ...cam.r, cam.fov, ...(cam.shift ? [cam.shift] : [])].join(','))
       const b = box()
       const at = print ? projectPrint(print, b.width / b.height, point) : null
       return at ? { x: b.left + at.u * b.width, y: b.top + at.v * b.height } : null

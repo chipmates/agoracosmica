@@ -56,6 +56,11 @@ export const CALM = {
    * seconds. With the film's half-open shutter a hung work smears by half of
    * it. */
   filmPixelsPerFrame: 9 * T1,
+  /** THE SHIFT LENS'S SLIDE (`rail-projection.ts`) moves the whole picture
+   * as a tilt moves its middle, so it is picture motion: its own rate, in the
+   * film's pixels per frame, under the film's figure, and every film-pixel
+   * reading above and below counts the slide with the turn. */
+  shiftFilmPixelsPerFrame: 9 * T1,
 }
 /** A TURN MADE STANDING STILL may run faster than one made walking: up to
  * 40 degrees a second on the desktop and 28 on the phone, and on a lens of
@@ -74,6 +79,8 @@ export const CALM_NAMED = CALM_STANDING
 /** The film keeps the authored width: landscape 1920 px from the desktop's
  * lens, portrait 1080 px from the phone's. */
 const filmFocalPixels = (fov, phone) => (phone ? 540 : 960) / (Math.tan(fov * Math.PI / 360) * (phone ? 390 / 844 : 1280 / 720))
+/** The film's half height in its own pixels: a shift of one slides the picture that far. */
+const filmHalfHeight = phone => (phone ? 540 / (390 / 844) : 960 / (1280 / 720))
 const FILM_FPS = 30
 
 const modules = new Map()
@@ -172,7 +179,7 @@ const widthOf = (fov, aspect) => 2 * Math.atan(Math.tan(fov * Math.PI / 360) * a
 /** One leg's readings from its frames: frame 0 is the last standing frame
  * before the leg, so a start that jumps is read as a jump. */
 function read(frames) {
-  let film = 0, peak = 0, peakAt = 0, accel = 0, accelAt = 0, jerk = 0, jerkAt = 0, zoom = 0, turned = 0, widths = 0, body = 0, bodySpeed = null
+  let film = 0, peak = 0, peakAt = 0, accel = 0, accelAt = 0, jerk = 0, jerkAt = 0, zoom = 0, turned = 0, widths = 0, body = 0, bodySpeed = null, slide = 0, shifted = 0
   let over = 0, previous = null, previousAccel = null
   const still = { peakDegPerSecond: 0, peakDegPerSecond2: 0, peakDegPerSecond3: 0, filmPixelsPerFrame: 0, seconds: 0 }
   // the body has not moved between frame n - 1 and frame n
@@ -183,7 +190,10 @@ function read(frames) {
     const w = spin(frames[n - 1].q, frames[n].q, dt)
     const rate = w.length()
     turned += rate * dt
-    const pixels = filmFocalPixels(Math.min(frames[n].fov, frames[n - 1].fov), frames[n].aspect <= .9) * rate / DEG / FILM_FPS
+    const slid = filmHalfHeight(frames[n].aspect <= .9) * Math.abs(frames[n].shift - frames[n - 1].shift) / dt / FILM_FPS
+    slide = Math.max(slide, slid)
+    shifted = Math.max(shifted, Math.abs(frames[n].shift))
+    const pixels = filmFocalPixels(Math.min(frames[n].fov, frames[n - 1].fov), frames[n].aspect <= .9) * rate / DEG / FILM_FPS + slid
     if (stood(n)) {
       still.seconds += dt
       still.peakDegPerSecond = Math.max(still.peakDegPerSecond, rate); still.filmPixelsPerFrame = Math.max(still.filmPixelsPerFrame, pixels)
@@ -223,6 +233,7 @@ function read(frames) {
     peakDegPerSecond2: +accel.toFixed(1), accelAt: +accelAt.toFixed(3),
     peakDegPerSecond3: +jerk.toFixed(0), jerkAt: +jerkAt.toFixed(3),
     zoomPerSecond: +zoom.toFixed(3), bodyMetresPerSecond2: +body.toFixed(2), filmPixelsPerFrame: +film.toFixed(2), framesOverTurnCap: over,
+    shiftFilmPixelsPerFrame: +slide.toFixed(2), shift: +shifted.toFixed(4),
     standing: { seconds: +still.seconds.toFixed(2), peakDegPerSecond: +still.peakDegPerSecond.toFixed(2), peakDegPerSecond2: +still.peakDegPerSecond2.toFixed(1),
       peakDegPerSecond3: +still.peakDegPerSecond3.toFixed(0), filmPixelsPerFrame: +still.filmPixelsPerFrame.toFixed(2) },
   }
@@ -235,7 +246,8 @@ for (const phone of VIEWPORTS) {
   const authority = authorities.get(phone ? 'calm' : 'standard')
   let now = 0
   const rail = createRail(camera, () => now, authority)
-  const frame = (share, metres) => ({ t: now, q: camera.quaternion.clone(), fov: camera.fov, aspect: camera.aspect, share, metres })
+  // the shift lens's slide is read off the projection, where the rail adds it
+  const frame = (share, metres) => ({ t: now, q: camera.quaternion.clone(), fov: camera.fov, shift: camera.projectionMatrix.elements[9], aspect: camera.aspect, share, metres })
   /** Walk whatever the rail was just asked for, frame by frame, until it
    * stands; the frame before and two standing frames after are kept. */
   function walk(kind, from, to, ask, done) {
@@ -366,17 +378,19 @@ const overStanding = leg => { const cap = lifted((/ named\b/.test(leg.gaze ?? ''
   return st.peakDegPerSecond > cap.turnDegPerSecond || st.peakDegPerSecond2 > cap.turnDegPerSecond2 || st.peakDegPerSecond3 > cap.turnDegPerSecond3 || st.filmPixelsPerFrame > cap.filmPixelsPerFrame }
 const over = leg => leg.peakDegPerSecond > CALM.turnDegPerSecond || leg.peakDegPerSecond2 > CALM.turnDegPerSecond2
   || leg.peakDegPerSecond3 > CALM.turnDegPerSecond3 || leg.zoomPerSecond > CALM.zoomPerSecond || leg.bodyMetresPerSecond2 > CALM.bodyMetresPerSecond2
-  || leg.filmPixelsPerFrame > CALM.filmPixelsPerFrame || overStanding(leg)
+  || leg.filmPixelsPerFrame > CALM.filmPixelsPerFrame || leg.shiftFilmPixelsPerFrame > CALM.shiftFilmPixelsPerFrame || overStanding(leg)
 const failing = report.legs.filter(over)
 const byKind = {}
 for (const leg of report.legs) {
   const key = leg.viewport + ' ' + leg.kind.replace(/ back$/, '').replace(/^spine .*/, 'spine')
-  const row = byKind[key] ??= { legs: 0, over: 0, worstDegPerSecond: 0, worstDegPerSecond2: 0, worstDegPerSecond3: 0, worstZoom: 0 }
+  const row = byKind[key] ??= { legs: 0, over: 0, worstDegPerSecond: 0, worstDegPerSecond2: 0, worstDegPerSecond3: 0, worstZoom: 0, worstFilmPixels: 0, worstShiftPixels: 0 }
   row.legs++; if (over(leg)) row.over++
   row.worstDegPerSecond = Math.max(row.worstDegPerSecond, leg.peakDegPerSecond)
   row.worstDegPerSecond2 = Math.max(row.worstDegPerSecond2, leg.peakDegPerSecond2)
   row.worstDegPerSecond3 = Math.max(row.worstDegPerSecond3, leg.peakDegPerSecond3)
   row.worstZoom = Math.max(row.worstZoom, leg.zoomPerSecond)
+  row.worstFilmPixels = Math.max(row.worstFilmPixels, leg.filmPixelsPerFrame)
+  row.worstShiftPixels = Math.max(row.worstShiftPixels, leg.shiftFilmPixelsPerFrame)
 }
 const walkedViewports = VIEWPORTS.map(phone => (phone ? 'phone' : 'desktop'))
 report.allowances = Object.keys(RAIL_TURN_LIFTS).flatMap(pair => walkedViewports.filter(v => railLift(pair, v) !== 1).map(viewport => {
@@ -393,6 +407,10 @@ report.allowances = Object.keys(RAIL_TURN_LIFTS).flatMap(pair => walkedViewports
 const unwalked = ONLY ? [] : report.allowances.filter(a => a.legs.length === 0).map(a => a.allowance)
 report.summary = { legs: report.legs.length, over: failing.length, refused: report.refused.length, allowances: report.allowances.map(a => a.allowance), unwalkedAllowances: unwalked, byKind }
 report.fastest = [...report.legs].sort((a, b) => b.peakDegPerSecond - a.peakDegPerSecond).slice(0, TOP)
+/* the legs through a shifted look, every one: the slide and the picture's motion with it */
+report.shifted = report.legs.filter(leg => leg.shift > 0).map(leg => ({ viewport: leg.viewport, kind: leg.kind, from: leg.from, to: leg.to, seconds: leg.seconds,
+  shift: leg.shift, shiftFilmPixelsPerFrame: leg.shiftFilmPixelsPerFrame, filmPixelsPerFrame: leg.filmPixelsPerFrame, standingFilmPixelsPerFrame: leg.standing.filmPixelsPerFrame,
+  zoomPerSecond: leg.zoomPerSecond, peakDegPerSecond: leg.peakDegPerSecond, over: over(leg) }))
 report.standing = { calm: CALM_STANDING, worst: Object.fromEntries(['desktop', 'phone'].map(v => [v, ['peakDegPerSecond', 'peakDegPerSecond2', 'peakDegPerSecond3', 'filmPixelsPerFrame']
   .map(k => [k, Math.max(0, ...report.legs.filter(l => l.viewport === v).map(l => l.standing[k]))])]).map(([v, e]) => [v, Object.fromEntries(e)])),
   seconds: +report.legs.reduce((n, l) => n + l.standing.seconds, 0).toFixed(1) }

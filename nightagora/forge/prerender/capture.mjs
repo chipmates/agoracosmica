@@ -59,9 +59,10 @@ if (!VIEW) throw new Error(`no framing ${FRAMING}: landscape or portrait`)
 const sha = (buf) => createHash('sha256').update(buf).digest('hex')
 const round = (n, p = 4) => Math.round(n * 10 ** p) / 10 ** p
 
-/** the camera as a number a diff can read: eye, gaze and lens */
+/** the camera as a number a diff can read: eye, gaze and lens, and a shifted look's slide */
 function camPrint(cam) {
-  return [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov)].join(',')
+  const shift = round(cam.shift ?? 0)
+  return [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov), ...(shift ? [shift] : [])].join(',')
 }
 
 async function standWarm(page, id) {

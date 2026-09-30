@@ -22,9 +22,15 @@ import { WING_DIR } from './load.mjs'
 
 export const TRACK_FORMAT = 'vinci-film-track-v1'
 const round = (n, p = 4) => Math.round(n * 10 ** p) / 10 ** p
-/** the capture's own print of a camera: eye, rotation and lens */
+/** THE SHIFT LENS'S SLIDE of a camera (`rail-projection.ts`), read off its
+    projection: the rail adds it to the (2,1) term, which a symmetric frustum
+    holds at zero */
+export const shiftOfCamera = (camera) => camera.projectionMatrix.elements[9]
+/** the capture's own print of a camera: eye, rotation and lens, and the
+    shift lens's slide after them where a look is shifted */
 export function camPrint(camera) {
-  return [...camera.position.toArray().map((v) => round(v)), ...camera.rotation.toArray().slice(0, 3).map((v) => round(v)), round(camera.fov)].join(',')
+  const shift = round(shiftOfCamera(camera))
+  return [...camera.position.toArray().map((v) => round(v)), ...camera.rotation.toArray().slice(0, 3).map((v) => round(v)), round(camera.fov), ...(shift ? [shift] : [])].join(',')
 }
 /** THE SAME ANGLE, ONE PRINT. A camera looking along the world's own axis sits
     on the seam of its Euler angles, where a last bit decides between -π and π:
@@ -61,7 +67,7 @@ export async function openReplay({ rev = '', overlay = {} } = {}) {
 }
 
 const vec = (a) => new THREE.Vector3(a[0], a[1], a[2])
-const livePose = (saved) => ({ eye: vec(saved.eye), at: vec(saved.at), fov: saved.fov })
+const livePose = (saved) => ({ eye: vec(saved.eye), at: vec(saved.at), fov: saved.fov, ...(saved.shift ? { shift: saved.shift } : {}) })
 
 /**
  * Walk one clip and print it.
@@ -81,8 +87,9 @@ export function walkClip(replay, { aspect, phone, place, request, fps = FPS, tai
   /* the station the wing counts the eye as standing at: it names the exposure */
   const departed = rail.navigation.completed
   const prints = [still]
-  /* the same frames unrounded (eye, quaternion, lens), for rates the four-decimal print cannot carry */
-  const sample = () => [...camera.position.toArray(), ...camera.quaternion.toArray(), camera.fov]
+  /* the same frames unrounded (eye, quaternion, lens, and a shifted look's
+     slide), for rates the four-decimal print cannot carry */
+  const sample = () => { const shift = shiftOfCamera(camera); return [...camera.position.toArray(), ...camera.quaternion.toArray(), camera.fov, ...(shift ? [shift] : [])] }
   const samples = [sample()]
   if (request(rail) === false) throw new Error('the rail refused the request')
   /* the capture drops a leading frame that still repeats the still, so both

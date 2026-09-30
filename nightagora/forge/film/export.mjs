@@ -136,7 +136,8 @@ const angleBetween = (a, b) => 2 * Math.acos(Math.min(1, Math.abs(a[0] * b[0] + 
 const parse = (print) => print.split(',').map(Number)
 
 /** THE PICTURE'S MOTION a frame, in delivered pixels: the turn times the lens,
-    and the walk against the nearest depth the last frame's ids saw */
+    the walk against the nearest depth the last frame's ids saw, and a shifted
+    look's slide (the print's eighth figure, in half heights) */
 export function motionOf(prints, i, height, nearM) {
   const at = (k) => parse(prints[Math.max(0, Math.min(prints.length - 1, k))])
   const a = at(i - 1), b = at(i + 1)
@@ -144,7 +145,8 @@ export function motionOf(prints, i, height, nearM) {
   const focal = height / 2 / Math.tan((fov * Math.PI) / 360)
   const turn = (angleBetween(quat(a.slice(3, 6)), quat(b.slice(3, 6))) / 2) * focal
   const walk = nearM > 0 ? (Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) / 2 / nearM) * focal : 0
-  return { turn, walk, px: turn + walk }
+  const slide = (Math.abs((b[7] ?? 0) - (a[7] ?? 0)) / 2) * (height / 2)
+  return { turn, walk, px: turn + walk + slide }
 }
 /** draws for a frame: at least one per pixel the open shutter travels */
 export function drawsFor(px, shutter = SHUTTER, { min = MIN_DRAWS, max = MAX_DRAWS } = {}) {
@@ -722,8 +724,13 @@ export async function exportStill(session, inbox, node, out, opts) {
   }
 }
 
-/** the camera as the replay prints it: eye, rotation and lens to four decimals */
-const printOf = (cam) => [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov)].join(',')
+/** a frame's shift lens slide, off the projection the page drew it with
+    (`rail-projection.ts`): taken after the draw, when no jitter stands on it */
+const shiftOf = (cam) => round(cam.proj?.[9] ?? 0)
+/** the camera as the replay prints it: eye, rotation and lens to four decimals, and a shifted look's slide */
+const printOf = (cam) => [...cam.p.map((v) => round(v)), ...cam.r.map((v) => round(v)), round(cam.fov), ...(shiftOf(cam) ? [shiftOf(cam)] : [])].join(',')
+/** the camera at full precision beside its print: another renderer can take the same eye */
+const camOf = (cam) => ({ p: cam.p, q: cam.q, fov: cam.fov, ...(cam.proj?.[9] ? { shift: cam.proj[9] } : {}) })
 
 /** A CLIP WALKED ONCE UNDER THE CLOCK, KEEPING NOTHING: a room is dressed in
     slices and a machine is built as the eye walks up, so every body a clip can
@@ -790,8 +797,7 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
     if (pt.ratio > texel.max) Object.assign(texel, { max: pt.ratio, at: i, plate: pt.plate, raster: pt.raster })
     const print = printOf(res.report.cam)
     const nearM = nearDepth(res.frame)
-    // the camera at full precision beside its print: another renderer can take the same eye
-    const cam = { p: res.report.cam.p, q: res.report.cam.q, fov: res.report.cam.fov }
+    const cam = camOf(res.report.cam)
     frames.push({ i, sha256: sha256(res.frame.rgb), print, cam, draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, floorCeiling: round(fc.floorCeiling, 4), plateTexel: round(pt.ratio, 3), ...meta })
     if (opts.keep.has(i) || i === 0) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
     return nearM
@@ -864,8 +870,8 @@ export async function exportClip(session, inbox, edge, nodes, track, out, opts) 
     const want = replayPrints[Math.min(f.i, replayPrints.length - 1)]
     if (!want) continue
     const a = parse(f.print), b = parse(want)
-    for (let k = 0; k < 7; k++) {
-      let d = Math.abs(a[k] - b[k])
+    for (let k = 0; k < 8; k++) {
+      let d = Math.abs((a[k] ?? 0) - (b[k] ?? 0))
       if (k >= 3 && k <= 5) d = Math.min(d, Math.abs(Math.abs(d) - 2 * Math.PI))
       maxDeviation = Math.max(maxDeviation, d)
     }
@@ -932,7 +938,7 @@ export async function exportEvening(session, inbox, graph, track, out, opts) {
   const put = async (i, res, meta) => {
     await encoder.write(Buffer.from(res.frame.rgb.buffer, res.frame.rgb.byteOffset, res.frame.rgb.byteLength))
     const nearM = nearDepth(res.frame)
-    frames.push({ i, sha256: sha256(res.frame.rgb), print: printOf(res.report.cam), cam: { p: res.report.cam.p, q: res.report.cam.q, fov: res.report.cam.fov },
+    frames.push({ i, sha256: sha256(res.frame.rgb), print: printOf(res.report.cam), cam: camOf(res.report.cam),
       draws: res.report.drawn, walking: res.report.walking, mounted: res.report.mounted, ms: res.report.ms, nearM, ...meta })
     if (opts.keep.has(i) || i === 0 || i === ev.frames - 1) await savePng(res.frame.rgb, stage.width, stage.height, join(opts.frameDir, `${stem}-${framing}-f${String(i).padStart(4, '0')}.png`))
     return nearM
@@ -972,8 +978,8 @@ export async function exportEvening(session, inbox, graph, track, out, opts) {
     const want = track.prints[f.i]
     if (!want) continue
     const a = parse(f.print), b = parse(want)
-    for (let k = 0; k < 7; k++) {
-      let d = Math.abs(a[k] - b[k])
+    for (let k = 0; k < 8; k++) {
+      let d = Math.abs((a[k] ?? 0) - (b[k] ?? 0))
       if (k >= 3 && k <= 5) d = Math.min(d, Math.abs(Math.abs(d) - 2 * Math.PI))
       maxDeviation = Math.max(maxDeviation, d)
     }

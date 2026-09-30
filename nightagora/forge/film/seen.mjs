@@ -95,7 +95,8 @@ function cull(index, planes, mark, stamp) {
   visit(0)
 }
 
-/** The camera of one sample of a replayed track: eye, quaternion, lens. */
+/** The camera of one sample of a replayed track: eye, quaternion, lens, and
+    a shifted look's slide as the rail adds it (`rail-projection.ts`). */
 function cameraOf(camera, sample, aspect) {
   camera.position.set(sample[0], sample[1], sample[2])
   camera.quaternion.set(sample[3], sample[4], sample[5], sample[6])
@@ -104,6 +105,7 @@ function cameraOf(camera, sample, aspect) {
   camera.near = NEAR
   camera.far = FAR
   camera.updateProjectionMatrix()
+  if (sample[8]) camera.projectionMatrix.elements[9] += sample[8]
   camera.updateMatrixWorld(true)
   return camera
 }
@@ -111,7 +113,8 @@ function cameraOf(camera, sample, aspect) {
 /**
  * The seen set of a track: the sorted cell numbers of (a), (b) and (c).
  *   index     buildIndex(cells)
- *   samples   the track's frames, [x, y, z, qx, qy, qz, qw, fov] each
+ *   samples   the track's frames, [x, y, z, qx, qy, qz, qw, fov] each, and
+ *             the shift after them where a look is shifted
  *   aspect    the framing's authored aspect
  *   sun       the direction toward the key light
  */

@@ -103,19 +103,20 @@ export function onBox(aspect: number, box: PictureBox, u: number, v: number): { 
 }
 
 /** A CAMERA AS THE FILM PRINTS IT: eye, rotation (Euler XYZ, radians) and the
-    vertical lens in degrees, seven numbers, the rig's own print. */
-export type CameraPrint = readonly [number, number, number, number, number, number, number]
+    vertical lens in degrees, seven numbers, the rig's own print; a look
+    through the shift lens adds its slide, in the frame's half heights. */
+export type CameraPrint = readonly [number, number, number, number, number, number, number] | readonly [number, number, number, number, number, number, number, number]
 
 export function parsePrint(print: string): CameraPrint | null {
   const n = print.split(',').map(Number)
-  if (n.length !== 7 || n.some(v => !Number.isFinite(v))) return null
+  if ((n.length !== 7 && n.length !== 8) || n.some(v => !Number.isFinite(v))) return null
   return n as unknown as CameraPrint
 }
 
 /** A POINT OF THE WORLD ON THE MASTER, as the print's camera sees it, in the
     master's own fractions (0 to 1 across and down), or null behind the eye. */
 export function projectPrint(print: CameraPrint, aspect: number, point: readonly [number, number, number]): { u: number; v: number } | null {
-  const [ex, ey, ez, rx, ry, rz, fov] = print
+  const [ex, ey, ez, rx, ry, rz, fov] = print, shift = print[7] ?? 0
   // three's Euler order XYZ: the camera's world rotation is Rx * Ry * Rz
   const cx = Math.cos(rx), sx = Math.sin(rx), cy = Math.cos(ry), sy = Math.sin(ry), cz = Math.cos(rz), sz = Math.sin(rz)
   const m00 = cy * cz, m01 = -cy * sz, m02 = sy
@@ -128,7 +129,7 @@ export function projectPrint(print: CameraPrint, aspect: number, point: readonly
   const vz = m02 * dx + m12 * dy + m22 * dz
   if (vz > -0.05) return null
   const f = 1 / Math.tan((fov * Math.PI) / 360)
-  const ndcX = (f / aspect) * (vx / -vz), ndcY = f * (vy / -vz)
+  const ndcX = (f / aspect) * (vx / -vz), ndcY = f * (vy / -vz) - shift
   return { u: (ndcX + 1) / 2, v: (1 - ndcY) / 2 }
 }
 

@@ -91,7 +91,7 @@ try {
         const box = await page.evaluate(() => window.__naPicture.box())
         const marks = await page.evaluate((l) => window.__naPicture.marks('', l), lang)
         const cam = await page.evaluate(() => window.__forge.state().cam)
-        const print = [...cam.p, ...cam.r, cam.fov].map((v) => round(v, 4)).join(',')
+        const print = [...cam.p, ...cam.r, cam.fov, ...(round(cam.shift ?? 0, 4) ? [cam.shift] : [])].map((v) => round(v, 4)).join(',')
         out.nodes[node] ??= {}
         out.nodes[node][framing] ??= {}
         out.nodes[node][framing][lang] = marks.map((m) => ({ id: m.id, ...toMaster(framing, box, m.x, m.y), walks: m.walks, label: m.label, word: m.word, colour: m.colour }))

@@ -22,7 +22,9 @@ import { dossiers, type MachineSlug } from '../machines/catalog'
 import { bodyWallOrder } from './wall'
 import { studySupport } from '../inner-court'
 
-export interface ApproachPose { eye: Vector3; at: Vector3; fov: number }
+/** `shift` is the phone's shift lens (`rail-projection.ts`), absent where the
+ * look is not shifted. */
+export interface ApproachPose { eye: Vector3; at: Vector3; fov: number; shift?: number }
 
 /** The kinds the registry reads off the scene. A sheet is read and inert. */
 export type VinciExhibitKind = 'picture' | 'sheet' | 'mural' | 'machine' | 'stud' | 'manuscript' | 'place'
@@ -89,12 +91,15 @@ interface Field {
   eye?: number; nearest?: number; furthest?: { desktop: number; phone: number }
   /** The phone's own nearest, where it stands further back than the desktop. */
   phoneNearest?: number
+  /** The phone looks level through a shift lens (`shiftedLook`). */
+  phoneShiftLens?: boolean
 }
 
 /** Where the work's own four corners land in the frame, exactly: the camera
  * has no roll and the eye stands on the work's centre line, so this is the
- * same projection the renderer runs, without a renderer. */
-function corners(field: Field, distance: number, drop: number, fov: number, aspect: number)
+ * same projection the renderer runs, the shift lens's slide included, without
+ * a renderer. */
+function corners(field: Field, distance: number, drop: number, fov: number, aspect: number, shift = 0)
   : { top: number; bottom: number; side: number } {
   const eye = world(field.east, field.north + distance, field.eye ?? EYE)
   const at = world(field.east, field.north, field.datum - drop)
@@ -108,7 +113,7 @@ function corners(field: Field, distance: number, drop: number, fov: number, aspe
     point.set(field.east + x * field.width / 2, field.datum + y * field.height / 2, -field.north).sub(eye)
     const along = point.dot(forward)
     if (!(along > 0)) return { top: Infinity, bottom: -Infinity, side: Infinity }
-    const ndcY = point.dot(up) / along / tan
+    const ndcY = point.dot(up) / along / tan - shift
     const ndcX = point.dot(right) / along / (tan * aspect)
     top = Math.max(top, ndcY); bottom = Math.min(bottom, ndcY); side = Math.max(side, Math.abs(ndcX))
   }
@@ -126,6 +131,19 @@ function centredDrop(field: Field, distance: number, fov: number, aspect: number
     if ((top - seen.top) - (seen.bottom - bottom) > 0) low = drop; else high = drop
   }
   return (low + high) / 2
+}
+
+/** THE SHIFT LENS, for the works the phone's band holds only by looking far
+ * down, where the pitch keystones the frame. The eye stays where the fit stood
+ * it and looks level along the plate's normal, which sees the plate parallel
+ * to the picture, so the frame stands square; the frustum slides until the
+ * work stands in the middle of its band, and the lens only has to hold it. */
+function shiftedLook(field: Field, distance: number, bottom: number, aspect: number, ceiling: number): { fov: number; shift: number } {
+  const band = BAND.phone, eye = field.eye ?? EYE
+  const top = (field.datum + field.height / 2 - eye) / distance, foot = (field.datum - field.height / 2 - eye) / distance
+  const half = Math.max((top - foot) / (band.top - bottom), field.width / 2 / distance / (band.side * aspect))
+  const fov = Math.min(ceiling, Math.max(FOV_FLOOR, 2 * Math.atan(half) * 180 / Math.PI))
+  return { fov, shift: (top + foot) / 2 / halfAngle(fov) - (band.top + bottom) / 2 }
 }
 
 /** One straight square eye per plate: on the plate's own normal through its
@@ -174,6 +192,15 @@ function pictureApproach(field: Field, narrow: boolean)
     bottom = Math.max(-FRAME_EDGE, bottom - .04)
     answer = solve(distance, bottom)
   }
+  if (narrow && field.phoneShiftLens) {
+    const look = shiftedLook(field, distance, bottom, aspect, ceiling), eye = field.eye ?? EYE, drop = field.datum - eye
+    const seen = corners(field, distance, drop, look.fov, aspect, look.shift)
+    return {
+      distance, drop, bottom,
+      fit: { height: (seen.top - seen.bottom) / (band.top - bottom), width: seen.side / band.side },
+      pose: { eye: world(field.east, field.north + distance, eye), at: world(field.east, field.north, eye), fov: look.fov, shift: look.shift },
+    }
+  }
   const seen = corners(field, distance, answer.drop, answer.fov, aspect)
   return {
     distance, drop: answer.drop, bottom,
@@ -189,7 +216,7 @@ function pictureApproach(field: Field, narrow: boolean)
 function eastFacingApproach(field: Field, narrow: boolean): ApproachPose {
   const turned = pictureApproach({ ...field, east: -field.north, north: field.east }, narrow).pose
   const back = (v: Vector3): Vector3 => new Vector3(-v.z, v.y, v.x)
-  return { eye: back(turned.eye), at: back(turned.at), fov: turned.fov }
+  return { eye: back(turned.eye), at: back(turned.at), fov: turned.fov, ...(turned.shift !== undefined ? { shift: turned.shift } : {}) }
 }
 
 /** THE PHONE READS A PAINTING SQUARE FROM FURTHER BACK. Its band is the
@@ -218,10 +245,14 @@ const PHONE_NEAREST_M: Readonly<Record<string, number>> = {
   [exhibitId('salvator-mundi', 'front')]: 1.55,
   [exhibitId('la-belle-ferronniere', 'front')]: 1.5,
 }
+/** THE TWO WORKS THE PHONE READS THROUGH ITS SHIFT LENS, from the eye the fit
+ * stands it at: the widest band a phone holds a hung work in, where even the
+ * furthest eye still looked down thirty degrees and more. */
+const PHONE_SHIFT_LENS: ReadonlySet<string> = new Set([exhibitId('annunciation', 'front'), exhibitId('adoration-of-the-magi', 'front')])
 function placement(id: string): Field & { id: string; face: string } | undefined {
   const field = hangPlacements().find(field => exhibitId(field.id, field.face) === id)
   const phoneNearest = PHONE_NEAREST_M[id]
-  return field && phoneNearest !== undefined ? { ...field, phoneNearest } : field
+  return field && { ...field, ...(phoneNearest !== undefined ? { phoneNearest } : {}), ...(PHONE_SHIFT_LENS.has(id) ? { phoneShiftLens: true } : {}) }
 }
 
 /** What the frame holds of the work at its own pose: the share of the band it
@@ -246,13 +277,14 @@ const pose = (eye: [number, number, number], at: [number, number, number], fov: 
 
 /** THE MURAL IS READ SQUARE, ONE CERTIFIED STEP INSIDE THE STATION'S OWN EYE:
  * eleven metres hold the whole measurement, eight and a third hold it at a
- * lens a card can stand beside. */
+ * lens a card can stand beside. The phone looks at it level, through its
+ * shift lens. */
 const MURAL_ID = 'picture/last-supper/front'
 const MURAL: Field = {
   east: SUPPER_WALL.east + SUPPER_WALL.thickness / 2, north: SUPPER_WALL.north,
   datum: COURT.level + SUPPER_WALL.field.sill + SUPPER_WALL.field.height / 2,
   width: SUPPER_WALL.field.width, height: SUPPER_WALL.field.height,
-  eye: COURT.level + 1.62, nearest: 8.37, furthest: { desktop: 8.37, phone: 8.37 },
+  eye: COURT.level + 1.62, nearest: 8.37, furthest: { desktop: 8.37, phone: 8.37 }, phoneShiftLens: true,
 }
 
 /** The grave's frame in the wing: turned a quarter so its +Z faces east. */
@@ -375,7 +407,7 @@ function otherKinds(): Placed[] {
     const solved: Partial<Record<'wide' | 'narrow', ApproachPose>> = {}
     const pose = (narrow: boolean): ApproachPose => {
       const key = narrow ? 'narrow' : 'wide', held = solved[key] ??= at(narrow)
-      return { eye: held.eye.clone(), at: held.at.clone(), fov: held.fov }
+      return { eye: held.eye.clone(), at: held.at.clone(), fov: held.fov, ...(held.shift !== undefined ? { shift: held.shift } : {}) }
     }
     placed.push({ record: { id, kind, station, workId, face }, pose })
   }

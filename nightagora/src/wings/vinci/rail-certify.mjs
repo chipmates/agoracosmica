@@ -396,12 +396,30 @@ const clockHigh = share => Math.min(1, Math.max(share, rampClock(share)) + 1e-6)
   if (worst > 0) throw new Error(`A gait timing leaves the walked-lens envelope by ${worst} of its clock`)
 }
 /** The near envelope of the widest lens a walk from one pose to another can
- * hold while its body is between two shares of the way. */
-function walkedNearRadius(fromFov, toFov, shareFrom, shareTo, viewport) {
+ * hold while its body is between two shares of the way, at the larger shift
+ * of its two ends. */
+function walkedNearRadius(fromFov, toFov, shareFrom, shareTo, viewport, shift = 0) {
   const change = toFov - fromFov
   const blend = change < 0 ? smoothLens(clockLow(shareFrom)) : change > 0 ? smoothLens(clockHigh(shareTo)) : 0
-  return railNearRectangleRadius(NEAR_M, fittedRailFov(fromFov + change * blend, viewport.aspect, viewport.phone), viewport.aspect)
+  return railNearRectangleRadius(NEAR_M, fittedRailFov(fromFov + change * blend, viewport.aspect, viewport.phone), viewport.aspect, shift)
 }
+
+/* ---- the shift lens ----
+ *
+ * A shifted near rectangle is the authored one slid by its shift's share of
+ * its half height, so its farthest corner is further from the eye. A leg
+ * blends the lens and the shift together by one weight between 0 and 1, so
+ * at every frame the lens is no wider than the wider end's and the shift no
+ * larger than the larger end's: the ball through the corner of that
+ * rectangle holds the near rectangle of every frame of the leg. */
+const shiftOf = pose => Math.abs(pose.shift ?? 0)
+/** One pose's own near rectangle, shifted as it stands. */
+const poseNearRadius = (pose, viewport) => railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect, shiftOf(pose))
+/** The rectangle every frame of a leg between these poses stays inside: the widest lens and the largest shift of them. */
+const legNearRadius = (poses, viewport) => railNearRectangleRadius(NEAR_M,
+  Math.max(...poses.map(pose => fittedRailFov(pose.fov, viewport.aspect, viewport.phone))), viewport.aspect, Math.max(...poses.map(shiftOf)))
+/** A pose as the certificate writes it: the shift only where a look is shifted. */
+const savedPose = pose => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov, ...(pose.shift ? { shift: pose.shift } : {}) })
 
 /* ---- the stations ---- */
 
@@ -413,10 +431,10 @@ for (const viewport of VIEWPORTS) {
   for (const id of ids) {
     const pose = VINCI_WALK_POSE_IDS.includes(id) ? vinciWalkPoseOf(id, viewport.phone) : stationPose(id, viewport.phone)
     const known = seen.find(entry => entry.pose.eye.distanceToSquared(pose.eye) < 1e-18
-      && entry.pose.at.distanceToSquared(pose.at) < 1e-18 && Math.abs(entry.pose.fov - pose.fov) < 1e-9)
+      && entry.pose.at.distanceToSquared(pose.at) < 1e-18 && Math.abs(entry.pose.fov - pose.fov) < 1e-9 && shiftOf(entry.pose) === shiftOf(pose))
     if (known) { known.stations.push(id); continue }
     const fov = fittedRailFov(pose.fov, viewport.aspect, viewport.phone)
-    seen.push({ id, stations: [id], pose, fov, radius: railNearRectangleRadius(NEAR_M, fov, viewport.aspect) })
+    seen.push({ id, stations: [id], pose, fov, radius: poseNearRadius(pose, viewport) })
   }
   families.push({ viewport, seen })
 }
@@ -424,14 +442,14 @@ for (const viewport of VIEWPORTS) {
 /** Every orientation a visitor can hold at a station, proved continuously:
  * the sampled near pyramid plus the distance its corners can travel between
  * two samples. */
-function orientedStationClearance(pose, fov, aspect, cornerRadius) {
+function orientedStationClearance(pose, fov, aspect, cornerRadius, shift = 0) {
   const base = new THREE.PerspectiveCamera(fov, aspect, NEAR_M, 100)
   base.position.copy(pose.eye); base.lookAt(pose.at)
   const forward = new THREE.Vector3(0, 0, -1).applyQuaternion(base.quaternion)
   const heading = Math.atan2(-forward.x, -forward.z), elevation = Math.asin(Math.max(-1, Math.min(1, forward.y)))
   const half = NEAR_M * Math.tan(fov * Math.PI / 360)
   const local = [[-half * aspect, half], [half * aspect, half], [half * aspect, -half], [-half * aspect, -half]]
-    .map(([x, y]) => new THREE.Vector3(x, y, -NEAR_M))
+    .map(([x, y]) => new THREE.Vector3(x, y + shift * half, -NEAR_M))
   const slack = cornerRadius * LOOK_STEP
   const euler = new THREE.Euler(0, 0, 0, 'YXZ'), quaternion = new THREE.Quaternion()
   const corners = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()]
@@ -478,7 +496,7 @@ for (const { viewport, seen } of families) {
     const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
     // The eye leaves the certified line by the step rhythm's own envelope, so
     // the envelope is inside the radius everything below is proved against.
-    const clearance = Math.max(from.radius, to.radius) + (NO_GAIT ? 0 : gaitEnvelopeM)
+    const clearance = legNearRadius([from.pose, to.pose], viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
     const balls = []
     const path = createCertifiedRailPath(points, {
       clearanceRadiusM: clearance, maxTrimM: .5, certificateDepth: 6, numericalMarginM: NUMERICAL_MARGIN_M,
@@ -531,7 +549,7 @@ for (const { viewport, seen } of families) {
     let worstMargin = Infinity, worst = Infinity, worstMesh = null, worstRequired = clearance
     for (const span of spans) {
       if (span.start.distanceToSquared(span.end) < 1e-18) continue
-      const required = walkedNearRadius(from.pose.fov, to.pose.fov, span.from / path.length, span.to / path.length, viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
+      const required = walkedNearRadius(from.pose.fov, to.pose.fov, span.from / path.length, span.to / path.length, viewport, Math.max(shiftOf(from.pose), shiftOf(to.pose))) + (NO_GAIT ? 0 : gaitEnvelopeM)
       const reading = segmentClearance(span.start, span.end, required)
       if (reading.distance - required < worstMargin) { worstMargin = reading.distance - required; worst = reading.distance; worstMesh = reading.mesh; worstRequired = required }
     }
@@ -543,8 +561,8 @@ for (const { viewport, seen } of families) {
     })
     routes.push({
       viewport: viewport.name, from: from.id, to: to.id,
-      fromPose: { eye: from.pose.eye.toArray(), at: from.pose.at.toArray(), fov: from.pose.fov },
-      toPose: { eye: to.pose.eye.toArray(), at: to.pose.at.toArray(), fov: to.pose.fov },
+      fromPose: savedPose(from.pose),
+      toPose: savedPose(to.pose),
       points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: kept,
     })
   }
@@ -567,8 +585,8 @@ for (const { viewport, seen } of families) {
     const pose = vinciApproachPose(record.id, viewport.phone)
     if (!pose) throw new Error(`${record.id}: no viewing pose at ${viewport.name}`)
     const fov = fittedRailFov(pose.fov, viewport.aspect, viewport.phone)
-    const radius = railNearRectangleRadius(NEAR_M, fov, viewport.aspect)
-    const clearance = Math.max(station.radius, radius) + (NO_GAIT ? 0 : gaitEnvelopeM)
+    const radius = poseNearRadius(pose, viewport)
+    const clearance = legNearRadius([station.pose, pose], viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
     const enh = [[station.pose.eye.x, -station.pose.eye.z, station.pose.eye.y], [pose.eye.x, -pose.eye.z, pose.eye.y]]
     const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
     const balls = []
@@ -586,7 +604,7 @@ for (const { viewport, seen } of families) {
     const span = segmentClearance(points[0], points[1], clearance)
     const probe = ballClearance(pose.eye, radius + .05)
     const fullBall = probe.distance > radius
-    const oriented = fullBall ? null : orientedStationClearance(pose, fov, viewport.aspect, radius)
+    const oriented = fullBall ? null : orientedStationClearance(pose, fov, viewport.aspect, radius, pose.shift ?? 0)
     // A plate of the hang carries its fit in the band and its distance to the
     // plate; the other kinds are an eye in front of an object, and carry neither.
     const fit = vinciApproachFit(record.id, viewport.phone)
@@ -599,13 +617,13 @@ for (const { viewport, seen } of families) {
       ...(fit ? { fitHeight: +fit.height.toFixed(3), fitWidth: +fit.width.toFixed(3) } : {}),
       clear: span.distance > clearance - 1e-9 || span.distance === Infinity,
     })
-    approachCones.push({ viewport: viewport.name, exhibit: record.id, fov: pose.fov, radius: +radius.toFixed(4),
+    approachCones.push({ viewport: viewport.name, exhibit: record.id, fov: pose.fov, ...(pose.shift ? { shift: +pose.shift.toFixed(4) } : {}), radius: +radius.toFixed(4),
       fullBallM: +probe.distance.toFixed(4), mesh: probe.mesh, clearAtEveryOrientation: fullBall,
       ...(oriented ? { oriented: { minimumM: +oriented.minimumM.toFixed(4), clear: oriented.clear } } : {}) })
     approaches.push({
       viewport: viewport.name, station: record.station, exhibit: record.id,
-      fromPose: { eye: station.pose.eye.toArray(), at: station.pose.at.toArray(), fov: station.pose.fov },
-      toPose: { eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov },
+      fromPose: savedPose(station.pose),
+      toPose: savedPose(pose),
       points: enh, roundedLength: path.length, maxNearRadius: clearance, certifiedBalls: balls,
     })
   }
@@ -626,8 +644,7 @@ for (const { viewport } of families) {
   for (const pair of vinciApproachRunPairs()) {
     const from = vinciApproachPose(pair.from, viewport.phone), to = vinciApproachPose(pair.to, viewport.phone)
     if (!from || !to) throw new Error(`${pair.from} to ${pair.to}: no viewing pose at ${viewport.name}`)
-    const radius = pose => railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect)
-    const clearance = Math.max(radius(from), radius(to)) + (NO_GAIT ? 0 : gaitEnvelopeM)
+    const clearance = legNearRadius([from, to], viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
     const via = railLinkVia[`${pair.from}>${pair.to}`] ?? [...(railLinkVia[`${pair.to}>${pair.from}`] ?? [])].reverse()
     const run = Math.hypot(to.eye.x - from.eye.x, to.eye.z - from.eye.z)
     const enh = [[from.eye.x, -from.eye.z, from.eye.y],
@@ -675,8 +692,8 @@ for (const { viewport } of families) {
     })
     links.push({
       viewport: viewport.name, station: pair.station, from: pair.from, to: pair.to,
-      fromPose: { eye: from.eye.toArray(), at: from.at.toArray(), fov: from.fov },
-      toPose: { eye: to.eye.toArray(), at: to.at.toArray(), fov: to.fov },
+      fromPose: savedPose(from),
+      toPose: savedPose(to),
       points: enh, roundedLength: path.length - (via.length ? LINK_REVERSED_M : 0), maxNearRadius: clearance, certifiedBalls: kept,
     })
   }
@@ -724,10 +741,10 @@ for (const { viewport, seen } of families) for (const declared of VINCI_WALLS) {
     if (!pose) throw new Error(`${stop.exhibit}: no viewing pose at ${viewport.name}`)
     return pose
   }), ...(ends.length > 1 ? [ends[ends.length - 1].pose] : [])]
-  // The widest near rectangle over every vertex of the line, plus the step
-  // rhythm's own envelope: one radius the whole polyline is proved against.
-  const clearance = Math.max(...poses.map(pose =>
-    railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect))) + (NO_GAIT ? 0 : gaitEnvelopeM)
+  // The widest lens and the largest shift over every vertex of the line, plus
+  // the step rhythm's own envelope: one radius the whole polyline is proved
+  // against, whichever two of its vertices a run blends between.
+  const clearance = legNearRadius(poses, viewport) + (NO_GAIT ? 0 : gaitEnvelopeM)
   const enh = poses.map(pose => [pose.eye.x, -pose.eye.z, pose.eye.y])
   const points = enh.map(([east, north, height]) => new THREE.Vector3(east, height, -north))
   const balls = []
@@ -778,7 +795,7 @@ for (const { viewport, seen } of families) for (const declared of VINCI_WALLS) {
   // The near ball of every vertex, which is where a visitor stands and looks.
   let worstBall = Infinity, worstBallAt = -1, worstBallMesh = null
   for (const [i, pose] of poses.entries()) {
-    const radius = railNearRectangleRadius(NEAR_M, fittedRailFov(pose.fov, viewport.aspect, viewport.phone), viewport.aspect)
+    const radius = poseNearRadius(pose, viewport)
     const probe = ballClearance(pose.eye, radius + .05)
     if (probe.distance - radius < worstBall) { worstBall = probe.distance - radius; worstBallAt = i; worstBallMesh = probe.mesh }
   }
@@ -921,8 +938,9 @@ const certificate = {
     'DOM plates, atmosphere and shadow-only caster copies are excluded; all actual visible mesh solids including leaves and dressing are included.',
     'Every machine stands in its rest pose for the whole walk, and its actual rest geometry at every tier is proved against every route and every station envelope here. A machine is built as the visitor walks up to it, so it is not a mounted mesh when the runtime hashes the scene and is not part of the geometry fingerprint; the placement table it is certified from is hashed in the sources above.',
     `The ${NEAR_M} m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.`,
+    'A phone close look may look level through a shift lens: its near rectangle is the authored one slid vertically by the pose\'s shift, a share of its half height the same on every canvas. A leg blends its lens and its shift by one weight between its two ends, so every frame\'s rectangle is inside the one of the wider end\'s lens slid by the larger end\'s shift, and every leg, wall and station envelope that holds a shifted end is proved with the ball through that rectangle\'s farthest corner. The runtime refuses any shift larger than the certified ends of the leg under way.',
     `Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve ${BALL_RESERVE_M * 1e6} µm beyond the requested radius; runtime matching of quantized geometry consumes at most ${GEOMETRY_TOLERANCE_M * 1e6} µm of it.`,
-    'A route eases its lens from the leaving pose to the arriving one as smooth(t / T) of its own clock, and the body stands where the gait has carried it at t. A straight span of a route between two stations is proved with the widest lens the walk can hold anywhere on it: the share of the clock at a share of the way lies between the even walk and the all-ramp leg for every pace and every stretch the gaze asks for, which this program checks each time it runs, and the lens is read at that bound. Rounded corners, approaches, links and walls keep the larger of their two ends\' lenses.',
+    'A route eases its lens from the leaving pose to the arriving one as smooth(t / T) of its own clock, and the body stands where the gait has carried it at t. A straight span of a route between two stations is proved with the widest lens the walk can hold anywhere on it: the share of the clock at a share of the way lies between the even walk and the all-ramp leg for every pace and every stretch the gaze asks for, which this program checks each time it runs, and the lens is read at that bound. Rounded corners, approaches, links and walls keep the larger of their two ends\' lenses, and of their shifts.',
     'The great hall and the service passage to it are not mounted rail solids. Their actual fabric and furnishings, at the two tiers that build them, are proved against every route and envelope here, outside the geometry fingerprint, as the machines\' rest poses are.',
     `The walk carries a step rhythm of at most ${(gaitEnvelopeM * 1000).toFixed(2)} mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.`,
     'An approach is one straight leg from a station eye to one exhibit\'s viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang\'s plates, the mural, the machines, the grave\'s three, the plaque, the book and the twelve cut dates.',

@@ -1703,6 +1703,8 @@ window.__forge = {
         r: (phase === 'wing' ? wingFrame.camera() : camera).rotation.toArray().slice(0, 3),
         fov: (phase === 'wing' ? wingFrame.camera() : camera).fov,
         proj: (phase === 'wing' ? wingFrame.camera() : camera).projectionMatrix.elements.slice(0, 4),
+        // a shifted look's slide (the wing's shift lens), which a symmetric frustum holds at zero
+        shift: (phase === 'wing' ? wingFrame.camera() : camera).projectionMatrix.elements[9],
       },
     }
   },

@@ -103,7 +103,7 @@ const certificate = JSON.parse(source('src/wings/vinci/data/rail-clearance.json'
 
 /* ---- 1. every declared viewing eye is certified, at both viewports ---- */
 
-const poseKey = pose => JSON.stringify([pose.eye, pose.at, pose.fov])
+const poseKey = pose => JSON.stringify([pose.eye, pose.at, pose.fov, pose.shift ?? 0])
 const saved = new Map(certificate.approaches.map(entry =>
   [`${entry.viewport}:${entry.station}:${entry.exhibit}`, entry]))
 assert.equal(certificate.format, 'vinci-rail-clearance-v2')
@@ -141,9 +141,9 @@ for (const viewport of ['desktop', 'phone']) {
     assert.ok(entry, `no certified approach: ${viewport} ${record.id}`)
     const station = stationPose(record.station, narrow)
     const viewing = vinciApproachPose(record.id, narrow)
-    assert.equal(poseKey(entry.fromPose), poseKey({ eye: station.eye.toArray(), at: station.at.toArray(), fov: station.fov }),
+    assert.equal(poseKey(entry.fromPose), poseKey({ eye: station.eye.toArray(), at: station.at.toArray(), fov: station.fov, shift: station.shift }),
       `the certified start is not the station eye: ${viewport} ${record.id}`)
-    assert.equal(poseKey(entry.toPose), poseKey({ eye: viewing.eye.toArray(), at: viewing.at.toArray(), fov: viewing.fov }),
+    assert.equal(poseKey(entry.toPose), poseKey({ eye: viewing.eye.toArray(), at: viewing.at.toArray(), fov: viewing.fov, shift: viewing.shift }),
       `the certified end is not the viewing eye: ${viewport} ${record.id}`)
     assert.equal(entry.certifiedBalls.length, 0, 'an approach is a straight leg')
 

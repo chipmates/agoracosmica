@@ -12,7 +12,8 @@ import { GALLERY_WALK_M, VINCI_WALLS, vinciGalleryGate, vinciGalleryRun, type Vi
 import type { VinciStationId } from './content'
 import certificateText from './data/rail-clearance.json?raw'
 
-interface SavedPose { eye: number[]; at: number[]; fov: number }
+/** `shift`: the phone's shift lens, written only where a look is shifted. */
+interface SavedPose { eye: number[]; at: number[]; fov: number; shift?: number }
 interface SavedRoute {
   viewport: 'desktop' | 'phone'; from: string; to: string
   fromPose: SavedPose; toPose: SavedPose; points: number[][]
@@ -74,9 +75,14 @@ const data = JSON.parse(certificateText) as ClearanceData
 const POSE_TOLERANCE_M = 1e-6, POSE_TOLERANCE_DEG = 1e-6
 const near = (a: readonly number[], b: readonly number[], tolerance: number) =>
   a.length === b.length && a.every((value, i) => Math.abs(value - b[i]!) <= tolerance)
+const POSE_TOLERANCE_SHIFT = 1e-9
 const samePose = (a: SavedPose, b: SavedPose) =>
   near(a.eye, b.eye, POSE_TOLERANCE_M) && near(a.at, b.at, POSE_TOLERANCE_M) && Math.abs(a.fov - b.fov) <= POSE_TOLERANCE_DEG
-const toSaved = (pose: Pose): SavedPose => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov })
+  && Math.abs((a.shift ?? 0) - (b.shift ?? 0)) <= POSE_TOLERANCE_SHIFT
+const toSaved = (pose: Pose): SavedPose => ({ eye: pose.eye.toArray(), at: pose.at.toArray(), fov: pose.fov, ...(pose.shift ? { shift: pose.shift } : {}) })
+/** The largest shift either end of a certified leg stands at: the rail blends
+ * between them, so no frame of the leg stands further. */
+const shiftBound = (...poses: SavedPose[]): number => Math.max(0, ...poses.map(pose => Math.abs(pose.shift ?? 0)))
 const VIEWPORTS = ['desktop', 'phone'] as const
 /** The pose a rail place stands at: a station's, or one of the walk's own. */
 const placePose = (id: string, viewport: 'desktop' | 'phone'): SavedPose =>
@@ -335,6 +341,17 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
   const wallRunLength = (saved: SavedWall, low: number, high: number): number =>
     (saved.chordM[high]! - saved.chordM[low]!) - (saved.shortenM[high - 1]! - saved.shortenM[low]!)
   const galleryPaths = new Map<string, Certified>()
+  /** A run along a wall blends between two of its stops' certified viewing
+   * poses, so its shift is bounded by the largest any stop stands at. */
+  const wallShifts = new Map<SavedWall, number>()
+  const wallShift = (saved: SavedWall): number => {
+    let bound = wallShifts.get(saved)
+    if (bound === undefined) {
+      bound = shiftBound(...data.approaches.filter(approach => approach.viewport === saved.viewport && saved.stops.includes(approach.exhibit)).map(approach => approach.toPose))
+      wallShifts.set(saved, bound)
+    }
+    return bound
+  }
   return {
     ready,
     get status() { return status },
@@ -342,8 +359,8 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
     get proof() { return proof },
     route(from: Pose, to: Pose, phone: boolean, camera: PerspectiveCamera) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
-      assertRailProjection(camera)
       const saved = data.routes.find(route => route.viewport === (phone ? 'phone' : 'desktop') && sameSavedPose(route.fromPose, from) && sameSavedPose(route.toPose, to))
+      assertRailProjection(camera, saved ? shiftBound(saved.fromPose, saved.toPose) : 0)
       if (!saved || camera.position.distanceToSquared(from.eye) > 1e-18) throw new Error('This camera start/target has no certified Vinci route')
       let path = paths.get(saved)
       if (!path) {
@@ -358,9 +375,9 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
      */
     approach(station: Pose, viewing: Pose, phone: boolean, camera: PerspectiveCamera, back = false) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
-      assertRailProjection(camera)
       const saved = data.approaches.find(approach => approach.viewport === (phone ? 'phone' : 'desktop')
         && sameSavedPose(approach.fromPose, station) && sameSavedPose(approach.toPose, viewing))
+      assertRailProjection(camera, saved ? shiftBound(saved.fromPose, saved.toPose) : 0)
       const from = back ? viewing : station
       if (!saved || camera.position.distanceToSquared(from.eye) > 1e-18) throw new Error('This camera start/target has no certified Vinci approach')
       const held = approachPaths.get(saved) ?? {}
@@ -378,13 +395,13 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
      * the same points reversed and lands on the eye the certificate holds. */
     link(from: string, to: string, fromPose: Pose, toPose: Pose, phone: boolean, camera: PerspectiveCamera) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
-      assertRailProjection(camera)
       const forward = data.links.find(entry => entry.viewport === (phone ? 'phone' : 'desktop')
         && entry.from === from && entry.to === to
         && sameSavedPose(entry.fromPose, fromPose) && sameSavedPose(entry.toPose, toPose))
       const saved = forward ?? data.links.find(entry => entry.viewport === (phone ? 'phone' : 'desktop')
         && entry.from === to && entry.to === from
         && sameSavedPose(entry.fromPose, toPose) && sameSavedPose(entry.toPose, fromPose))
+      assertRailProjection(camera, saved ? shiftBound(saved.fromPose, saved.toPose) : 0)
       if (!saved || camera.position.distanceToSquared(fromPose.eye) > 1e-18) throw new Error('This camera start/target has no certified Vinci link')
       const held = linkPaths.get(saved) ?? {}
       const direction = forward ? 'out' : 'back'
@@ -404,9 +421,9 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
      * subset of them. */
     wall(id: string, from: number, to: number, phone: boolean, camera: PerspectiveCamera) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
-      assertRailProjection(camera)
       const saved = data.walls.find(entry => entry.viewport === (phone ? 'phone' : 'desktop') && entry.id === id)
       if (!saved) throw new Error('This wall has no certificate')
+      assertRailProjection(camera, wallShift(saved))
       const last = saved.points.length - 1
       if (!(Number.isInteger(from) && Number.isInteger(to) && from !== to
         && from >= 0 && from <= last && to >= 0 && to <= last)) throw new Error('This wall run is not between two certified stops')
@@ -436,7 +453,8 @@ export function createRailGeometryAuthority(roots: readonly Object3D[]) {
       if (status !== 'verified') throw new Error(failure || 'Rail clearance identity is still being checked')
       const run = galleryRun(id, from, to, phone)
       if (!run) return null
-      assertRailProjection(camera)
+      const wall = data.walls.find(entry => entry.viewport === (phone ? 'phone' : 'desktop') && entry.id === id)
+      assertRailProjection(camera, wall ? wallShift(wall) : 0)
       const start = run.points[0]!
       if (camera.position.distanceToSquared(new Vector3(start[0]!, start[2]!, -start[1]!)) > 1e-18) throw new Error('This camera start/target has no certified Vinci gallery run')
       const key = `${phone ? 'phone' : 'desktop'}:${id}:${from}:${to}`
