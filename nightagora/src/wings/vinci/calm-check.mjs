@@ -12,7 +12,9 @@
  *
  * It fails when any leg turns faster, or changes its turn faster, than the
  * caps below. The caps are the criteria; the rail plans under them with its
- * own margin, so the two are never the same number by accident.
+ * own margin, so the two are never the same number by accident. The one
+ * exception is the rail's own table of lifted walks (RAIL_TURN_LIFTS): each
+ * is named in the report and read against its lifted criteria.
  */
 import fs from 'node:fs'
 import path from 'node:path'
@@ -106,7 +108,7 @@ async function load(file) {
   return exports
 }
 
-const { createRail, stationPose } = await load(path.join(wing, 'rail.ts'))
+const { createRail, stationPose, RAIL_TURN_LIFTS = {} } = await load(path.join(wing, 'rail.ts'))
 const { createRailGeometryAuthority, collectRailSolids } = await load(path.join(wing, 'rail-proof.ts'))
 const { gradeAt } = await load(path.join(wing, 'terrain-mesh.ts'))
 const { createCollectionStandSolids } = await load(path.join(wing, 'collection/stands.ts'))
@@ -240,13 +242,14 @@ for (const phone of VIEWPORTS) {
     const frames = [frame(0, 0)]
     let length = 0, walkedBefore = 0, lastShare = 0
     let leg = null
+    const standingAt = rail.navigation.completed
     try {
       if (ask() === false) { report.refused.push({ viewport, kind, from, to, why: 'the rail refused the request' }); return false }
       for (let guard = 0; guard < HZ * 300; guard++) {
         now += DT
         rail.update()
         const nav = rail.navigation
-        if (nav.active && !leg) leg = { seconds: nav.legSeconds / (nav.legPace || 1), metres: nav.legMetres, gaze: nav.legGaze }
+        if (nav.active && !leg) leg = { seconds: nav.legSeconds / (nav.legPace || 1), metres: nav.legMetres, gaze: nav.legGaze, pair: `${standingAt}>${nav.active}` }
         // A move may be two legs (a run back along a wall, then the route):
         // the body's distance carries on across them.
         if (nav.active && nav.legMetres !== length) { walkedBefore += length * lastShare; length = nav.legMetres }
@@ -260,7 +263,7 @@ for (const phone of VIEWPORTS) {
       return false
     }
     if (!leg) return true
-    report.legs.push({ viewport, kind, from, to, seconds: +leg.seconds.toFixed(2), metres: +leg.metres.toFixed(2), gaze: leg.gaze, ...read(frames) })
+    report.legs.push({ viewport, kind, from, to, pair: leg.pair, seconds: +leg.seconds.toFixed(2), metres: +leg.metres.toFixed(2), gaze: leg.gaze, ...read(frames) })
     return true
   }
   const place = (station, pose) => { rail.set(station, pose, true, phone); now += DT; rail.update() }
@@ -275,31 +278,34 @@ for (const phone of VIEWPORTS) {
     // A CHAPTER CUT IS CROSSED BY ITS TITLE and the house's door by a cut:
     // neither is walked, so neither is a leg the certificate carries
     const cutPairs = new Set(cuts.flatMap(cut => [`${cut.from}>${cut.to}`, `${cut.to}>${cut.from}`]))
+    // A STOP AT A PLACE OF ITS OWN is asked of the rail by the place's id, as
+    // the wing and the film ask for it, and stands on no wall
+    const railOf = stop => stop.place ?? stop.station
     const movesTo = stop => {
-      const wall = stop.wall ? vinciWallById(stop.wall) : undefined
+      const wall = !stop.place && stop.wall ? vinciWallById(stop.wall) : undefined
       const vertex = wall && stop.exhibit ? vinciWallVertex(wall, stop.exhibit) : undefined
-      const onWall = { id: stop.id, station: stop.station, pose: vinciWalkPose(stop, phone), vertex }
+      const onWall = { id: stop.id, station: stop.station, rail: railOf(stop), pose: vinciWalkPose(stop, phone), vertex }
       if (vertex === undefined) return [onWall]
-      return [{ id: stop.station, station: stop.station, pose: stationPose(stop.station, phone) }, onWall]
+      return [{ id: stop.station, station: stop.station, rail: stop.station, pose: stationPose(stop.station, phone) }, onWall]
     }
     // the life's walk begins above the museum and walks down into its first stop
     if (life && !back) {
       place(VINCI_STAIR_HEAD, vinciWalkPoseOf(VINCI_STAIR_HEAD, phone))
-      if (!walk('spine ' + order, VINCI_STAIR_HEAD, stops[0].id, () => rail.set(stops[0].station, vinciWalkPose(stops[0], phone), false, phone), nav => nav.completed === stops[0].station))
-        place(stops[0].station, vinciWalkPose(stops[0], phone))
-    } else place(stops[0].station, vinciWalkPose(stops[0], phone))
+      if (!walk('spine ' + order, VINCI_STAIR_HEAD, stops[0].id, () => rail.set(railOf(stops[0]), vinciWalkPose(stops[0], phone), false, phone), nav => nav.completed === railOf(stops[0])))
+        place(railOf(stops[0]), vinciWalkPose(stops[0], phone))
+    } else place(railOf(stops[0]), vinciWalkPose(stops[0], phone))
     let standing = stops[0].id, standingStation = stops[0].station
     for (let n = 1; n < stops.length; n++) for (const move of movesTo(stops[n])) {
       if (move.id === standing) continue
-      if (cutPairs.has(`${standing}>${move.id}`)) { place(move.station, move.pose); standing = move.id; standingStation = move.station; continue }
+      if (cutPairs.has(`${standing}>${move.id}`)) { place(move.rail, move.pose); standing = move.id; standingStation = move.station; continue }
       if (move.station === DOOR.station && standingStation !== DOOR.station) {
         const door = vinciWalkPoseOf(DOOR.inward, phone)
         walk('spine ' + order, standing, DOOR.inward, () => rail.set(DOOR.inward, door, false, phone), nav => nav.completed === DOOR.inward)
-        place(move.station, move.pose); standing = move.id; standingStation = move.station; continue
+        place(move.rail, move.pose); standing = move.id; standingStation = move.station; continue
       }
       if (standingStation === DOOR.station && move.station !== DOOR.station) place(DOOR.outward, vinciWalkPoseOf(DOOR.outward, phone))
-      const ok = walk('spine ' + order, standingStation === DOOR.station ? DOOR.outward : standing, move.id, () => rail.set(move.station, move.pose, false, phone, move.vertex), nav => nav.completed === move.station)
-      if (!ok) place(move.station, move.pose)
+      const ok = walk('spine ' + order, standingStation === DOOR.station ? DOOR.outward : standing, move.id, () => rail.set(move.rail, move.pose, false, phone, move.vertex), nav => nav.completed === move.rail)
+      if (!ok) place(move.rail, move.pose)
       standing = move.id; standingStation = move.station
     }
   }
@@ -344,7 +350,19 @@ for (const phone of VIEWPORTS) {
   }
 }
 
-const overStanding = leg => { const cap = (/ named\b/.test(leg.gaze ?? '') ? CALM_NAMED : CALM_STANDING)[leg.viewport], st = leg.standing
+/** THE OWNER'S ALLOWANCE: the lifted walks the owner approved, by screen. A
+ * station walk the rail's table lifts (its pair, completed id to asked id) is
+ * read against the standing turn rate and picture motion lifted by the table's
+ * factor, never past the one allowed here, so a table raised on its own reads
+ * red. Acceleration and jerk stay: the rail's lift leaves the planner's own
+ * caps on them untouched. */
+const CALM_ALLOWANCES = { 'body-valve>line-early': { desktop: 1.4 } }
+const allowedLift = (pair, viewport) => CALM_ALLOWANCES[pair]?.[viewport] ?? 1
+const railLift = (pair, viewport) => RAIL_TURN_LIFTS[pair]?.[viewport] ?? 1
+const liftOf = leg => leg.kind.startsWith('spine') ? Math.min(railLift(leg.pair, leg.viewport), allowedLift(leg.pair, leg.viewport)) : 1
+const lifted = (cap, factor) => factor === 1 ? cap
+  : { ...cap, turnDegPerSecond: +(cap.turnDegPerSecond * factor).toFixed(6), filmPixelsPerFrame: +(cap.filmPixelsPerFrame * factor).toFixed(6) }
+const overStanding = leg => { const cap = lifted((/ named\b/.test(leg.gaze ?? '') ? CALM_NAMED : CALM_STANDING)[leg.viewport], liftOf(leg)), st = leg.standing
   return st.peakDegPerSecond > cap.turnDegPerSecond || st.peakDegPerSecond2 > cap.turnDegPerSecond2 || st.peakDegPerSecond3 > cap.turnDegPerSecond3 || st.filmPixelsPerFrame > cap.filmPixelsPerFrame }
 const over = leg => leg.peakDegPerSecond > CALM.turnDegPerSecond || leg.peakDegPerSecond2 > CALM.turnDegPerSecond2
   || leg.peakDegPerSecond3 > CALM.turnDegPerSecond3 || leg.zoomPerSecond > CALM.zoomPerSecond || leg.bodyMetresPerSecond2 > CALM.bodyMetresPerSecond2
@@ -360,12 +378,25 @@ for (const leg of report.legs) {
   row.worstDegPerSecond3 = Math.max(row.worstDegPerSecond3, leg.peakDegPerSecond3)
   row.worstZoom = Math.max(row.worstZoom, leg.zoomPerSecond)
 }
-report.summary = { legs: report.legs.length, over: failing.length, refused: report.refused.length, byKind }
+const walkedViewports = VIEWPORTS.map(phone => (phone ? 'phone' : 'desktop'))
+report.allowances = Object.keys(RAIL_TURN_LIFTS).flatMap(pair => walkedViewports.filter(v => railLift(pair, v) !== 1).map(viewport => {
+  const rail = railLift(pair, viewport), allowed = allowedLift(pair, viewport), factor = Math.min(rail, allowed)
+  const legs = report.legs.filter(leg => leg.viewport === viewport && leg.pair === pair && leg.kind.startsWith('spine'))
+  return { allowance: allowed !== 1 ? `owner's allowance: ${pair} ${viewport} x${allowed}` : `no owner's allowance: ${pair} ${viewport}`,
+    pair, viewport, railFactor: rail, allowedFactor: allowed, readAt: factor,
+    ...(rail > allowed ? { beyond: `the rail lifts x${rail}, the owner allowed x${allowed}: read at x${factor}` } : {}),
+    standingCriteria: lifted(CALM_STANDING[viewport], factor),
+    legs: legs.map(leg => ({ kind: leg.kind, from: leg.from, to: leg.to, seconds: leg.seconds, gaze: leg.gaze, standing: leg.standing,
+      walking: { peakDegPerSecond: leg.peakDegPerSecond, filmPixelsPerFrame: leg.filmPixelsPerFrame }, over: over(leg) })) }
+}))
+// an allowance no walked leg carries means the checker cannot see the walk it lifts
+const unwalked = ONLY ? [] : report.allowances.filter(a => a.legs.length === 0).map(a => a.allowance)
+report.summary = { legs: report.legs.length, over: failing.length, refused: report.refused.length, allowances: report.allowances.map(a => a.allowance), unwalkedAllowances: unwalked, byKind }
 report.fastest = [...report.legs].sort((a, b) => b.peakDegPerSecond - a.peakDegPerSecond).slice(0, TOP)
 report.standing = { calm: CALM_STANDING, worst: Object.fromEntries(['desktop', 'phone'].map(v => [v, ['peakDegPerSecond', 'peakDegPerSecond2', 'peakDegPerSecond3', 'filmPixelsPerFrame']
   .map(k => [k, Math.max(0, ...report.legs.filter(l => l.viewport === v).map(l => l.standing[k]))])]).map(([v, e]) => [v, Object.fromEntries(e)])),
   seconds: +report.legs.reduce((n, l) => n + l.standing.seconds, 0).toFixed(1) }
 if (!args.includes('--legs')) delete report.legs
-report.ok = failing.length === 0 && report.refused.length === 0
+report.ok = failing.length === 0 && report.refused.length === 0 && unwalked.length === 0
 console.log(JSON.stringify(report, null, 1))
 process.exitCode = report.ok ? 0 : 1
