@@ -441,3 +441,27 @@ test('a carried entry holds: its sidecar names the keys it was rendered with, th
   assert.ok(!carriedHolds(side, { ...c, carried: { ...c.carried, keys: { ...c.carried.keys, picture: 'x' } } }))
   assert.ok(!carriedHolds(side, { ...c, carried: { ...c.carried, fromDefinition: c.carried.definition } }))
 })
+
+test("a release is held under its own definition: one planned before the library was placed reads the tree's v1 key", () => {
+  assert.notEqual(clean.globalBefore.key, clean.global.key)
+  const asV1 = (global, definition) => {
+    const store = release.fork()
+    const rel = JSON.parse(store.read('release.json'))
+    if (definition === undefined) delete rel.definition
+    else rel.definition = definition
+    rel.global = global
+    for (const e of [...rel.clips, ...rel.stills, ...(rel.evenings ?? [])]) {
+      e.keys = { ...e.keys, global }
+      const side = JSON.parse(store.read(e.sidecar))
+      side.keys = { ...side.keys, global }
+      store.write(e.sidecar, JSON.stringify(side))
+    }
+    store.write('release.json', JSON.stringify(rel))
+    return gate(clean, store)
+  }
+  const v1 = asV1(clean.globalBefore.key, undefined)
+  assert.deepEqual(v1.lines.find((l) => l.name === 'keys').red, [], 'a release with no definition is v1, held against the v1 key')
+  assert.ok(v1.lines.find((l) => l.name === 'keys').notes.some((n) => n.startsWith('the global key is read under v1')))
+  assert.ok(asV1(clean.global.key, 'v1').lines.find((l) => l.name === 'keys').red.length > 0, 'v1 named, the key now: every entry red')
+  assert.ok(asV1(clean.globalBefore.key, 'some-later-definition').lines.find((l) => l.name === 'keys').red.some((r) => r.at === 'release'), 'a definition this gate cannot read')
+})

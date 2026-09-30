@@ -257,6 +257,13 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
   }
   const release = JSON.parse(text.toString('utf8'))
   if (release.format !== RELEASE_FORMAT) red(L.graph, 'release', `release format ${release.format}, the gate reads ${RELEASE_FORMAT}`)
+  /* THE GLOBAL KEY UNDER THE RELEASE'S OWN DEFINITION: a release planned
+     before the definition was named is v1, held against the tree's v1 key */
+  const definition = release.definition ?? 'v1'
+  const G = (tree.global.definition ?? definition) === definition ? tree.global : definition === 'v1' ? tree.globalBefore : null
+  if (!G) red(L.keys, 'release', `the release's global key is taken under ${definition}; this gate reads ${tree.global.definition} and v1`)
+  else if (G !== tree.global) L.keys.notes.push(`the global key is read under ${definition}, the release's definition (the tree's under ${tree.global.definition} is ${tree.global.key}): a replan and forge/film/carry.mjs move it`)
+  const globalKey = G?.key ?? tree.global.key
   const read = (file) => { const b = store.read(file); return b ? JSON.parse(b.toString('utf8')) : null }
   const held = new Map([...release.clips.map((e) => [`${e.clip} ${e.framing}`, { ...e, kind: 'clip' }]), ...release.stills.map((e) => [`${e.node} ${e.framing}`, { ...e, kind: 'still' }]),
     ...(release.evenings ?? []).map((e) => [`${e.evening} ${e.framing}`, { ...e, kind: 'evening' }])])
@@ -274,7 +281,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     const sidecar = read(entry.sidecar)
     sidecars.set(at, sidecar)
     // KEYS: the release's record, and the sidecar agreeing with it
-    const current = { motion: now.motion, picture: now.picture, global: tree.global.key, delivery: now.delivery ?? tree.delivery.key }
+    const current = { motion: now.motion, picture: now.picture, global: globalKey, delivery: now.delivery ?? tree.delivery.key }
     const moved = Object.keys(current).filter((k) => entry.keys?.[k] !== current[k])
     if (!sidecar) moved.push('sidecar missing')
     else if (Object.keys(current).some((k) => sidecar.keys?.[k] !== entry.keys?.[k])) {
