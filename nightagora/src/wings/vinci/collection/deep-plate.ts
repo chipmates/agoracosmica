@@ -16,6 +16,7 @@ import { validatePaintingRecord } from '../pictures/policy'
 import { createWindowWorkLabel } from '../pictures/policy-label'
 import type { HangCatalogue } from './catalogue'
 import { pictureDisplayUV, pictureDisplayWindow } from '../pictures/registration'
+import { plateArchGround } from '../pictures/arch-plate'
 import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import cardsRaw from '../data/cards.json?raw'
 import linesRaw from '../data/lines.json?raw'
@@ -237,6 +238,8 @@ export function createVinciPaintingView(options: {
     tier: options.tier,
     pxPerCm: platePxPerCm(options.work, options.plate, cut, deep ? deep.width / options.plate.pixels.width : 1),
     details: vinciPlateDetails(options.id),
+    // a deep source is another file, which never inherits the plate's traced edge
+    ground: deep ? null : plateArchGround(options.plate.plate),
   })
   /* AN OPEN WINDOW OWNS THE SCREEN. On the phone the viewer takes the window
      and the card folds to its peek over the foot, the rule the other windows

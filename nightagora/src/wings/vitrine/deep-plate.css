@@ -3,8 +3,13 @@
    is 44 px; the viewer's own controls are off. */
 /* THE ROOM'S OWN FRAME STAYS VISIBLE while the viewer seats itself on the
    work: the ground is laid only once the plate has grown out of it. */
-.deep-plate {position:absolute;inset:0;overflow:hidden;background:transparent;}
-.deep-plate[data-seated='true'] {background:#0a0f13;}
+.deep-plate {--deep-ground:#0a0f13;position:absolute;inset:0;overflow:hidden;background:transparent;}
+.deep-plate[data-seated='true'] {background:var(--deep-ground);}
+/* A cut-out scan's shoulders outside its round top take that same ground,
+   shown once the plate's own pixels stand under them. */
+.deep-ground {pointer-events:none;visibility:hidden;}
+.deep-ground svg {display:block;width:100%;height:100%;overflow:visible;fill:var(--deep-ground);}
+.deep-plate[data-drawn='true'] .deep-ground {visibility:visible;}
 .deep-plate-stage {position:absolute;inset:0;}
 .deep-plate-stage .openseadragon-canvas {outline:none;}
 .deep-plate-stage .openseadragon-canvas:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}

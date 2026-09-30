@@ -11,6 +11,7 @@ import { getWork, findPlateEntries, MAIN_HANG } from './pictures/register'
 import { createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
 import { validatePaintingRecord } from './pictures/policy'
 import { pictureDisplayUV, pictureDisplayWindow } from './pictures/registration'
+import { plateArchGround } from './pictures/arch-plate'
 import { machineCatalog, type MachineSlug } from './machines/catalog'
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, renderVinciShowpieceRecord, vinciLine, vinciLimits,
   vinciMachineCard, vinciMachineClockWords, vinciMachineSheet, vinciMachineSteps, vinciManuscriptWords, vinciSheetRecords, vinciShowpiece,
@@ -126,7 +127,7 @@ export function createFilmLook(h: FilmLookHost) {
         src: assetAddress(validatePaintingRecord(plate.preview, 'painting-preview').entry), title,
         description: vinciPlateDescription(id), aspect: plate.pixels.width / plate.pixels.height, window: cut, standing: h.standing,
         // the phone's close look is the work on the whole glass, the words folded under it
-        fill: h.narrow(),
+        fill: h.narrow(), ground: plateArchGround(plate.preview),
       })
       const colour = policyLabelText(work, entries).colour
       const certainty = ORDER[Math.max(0, PICTURE_CERTAINTY_KEY.findIndex(entry => entry.colour === colour))] ?? 'reconstructed'

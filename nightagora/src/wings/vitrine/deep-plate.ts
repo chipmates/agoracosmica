@@ -63,6 +63,9 @@ export interface DeepPlateShow {
    * every control beside it stays the right way round. */
   flipped?: boolean
   details?: readonly DeepPlateDetail[]
+  /** An outline in fractions of the whole source the plate covers with its
+   * own ground: a cut-out scan's shoulders outside a round top. */
+  ground?: readonly (readonly [number, number])[] | null
 }
 
 export interface DeepPlatePayload extends VitrinePayload {
@@ -138,6 +141,9 @@ export function createDeepPlatePayload(options: {
   pxPerCm: number | null
   /** What a line of this wing points at on this plate. */
   details?: readonly DeepPlateDetail[]
+  /** An outline in fractions of the whole source covered with the plate's
+   * own ground, where a cut-out scan leaves white outside a round top. */
+  ground?: readonly (readonly [number, number])[] | null
   /** The source standing now has drawn its first tile: the caller may take
    * down whatever ground it laid under the viewer. */
   onDrawn?(): void
@@ -159,7 +165,8 @@ export function createDeepPlatePayload(options: {
   /** The source standing in the viewer now. A reading replaces it; a plate
    * never does. */
   let shown: DeepPlateShow = { source: options.source, window: options.window, title: options.title,
-    description: options.description, details: options.details }
+    description: options.description, details: options.details, ground: options.ground }
+  let ground: HTMLDivElement | undefined
   let cut = shown.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   let { width, height } = shown.source
 
@@ -399,7 +406,7 @@ export function createDeepPlatePayload(options: {
     made.addHandler('canvas-key', event => { event.preventDefaultAction = true })
     // The first page seats itself on the room's own frame; every page after
     // it opens at Home in a window that already stands.
-    made.addHandler('open', () => { if (seated) fitHome(true); else seatNow() })
+    made.addHandler('open', () => { placeGround(); if (seated) fitHome(true); else seatNow() })
     made.addHandler('viewport-change', () => readout())
     // HOME FOLLOWS THE BAND. A window built before the close look's band was
     // measured fits in the old box, and the viewer carries a zoom across a
@@ -415,7 +422,10 @@ export function createDeepPlatePayload(options: {
     // rejects a tile-drawn handler outright. A tile that has loaded is
     // drawn by the next pass of the world, and update-viewport is raised
     // after that pass, so this pair is the first drawn tile on any drawer.
-    made.addHandler('tile-loaded', () => { if (!drawn) { drawn = true; options.onDrawn?.() } readout() })
+    made.addHandler('tile-loaded', () => {
+      if (!drawn) { drawn = true; if (root) root.dataset['drawn'] = 'true'; options.onDrawn?.() }
+      readout()
+    })
     made.addHandler('update-viewport', () => { if (drawn) fit() })
     // A source that never draws a tile may not leave the window standing on
     // a frame the room is no longer keeping.
@@ -432,6 +442,27 @@ export function createDeepPlatePayload(options: {
     seat = options.from()
     host.surface('hold')
     void mountViewer()
+  }
+
+  /** THE GROUND OVER THE SHOULDERS rides the viewer as an overlay over the
+   * whole source, so it pans and zooms with the pixels it covers. */
+  function placeGround(): void {
+    if (!viewer || !library || !root) return
+    if (ground) { viewer.removeOverlay(ground); ground = undefined }
+    const outline = shown.ground
+    if (!outline?.length) return
+    const document = root.ownerDocument, svg = 'http://www.w3.org/2000/svg'
+    ground = document.createElement('div')
+    ground.className = 'deep-ground'
+    const drawing = document.createElementNS(svg, 'svg')
+    drawing.setAttribute('viewBox', '0 0 1 1')
+    drawing.setAttribute('preserveAspectRatio', 'none')
+    drawing.setAttribute('aria-hidden', 'true')
+    const path = document.createElementNS(svg, 'path')
+    path.setAttribute('d', `M${outline.map(([x, y]) => `${x} ${y}`).join('L')}Z`)
+    drawing.append(path)
+    ground.append(drawing)
+    viewer.addOverlay({ element: ground, location: new library.Rect(0, 0, 1, height / width) })
   }
 
   /** Nearer or further by one step, bounded by the same constraints the
@@ -517,6 +548,7 @@ export function createDeepPlatePayload(options: {
       framed = null
       said = ''
       drawn = false
+      if (root) delete root.dataset['drawn']
       host?.describe(next.description ?? next.title)
       if (!viewer || !library) return
       viewer.viewport.setFlip(Boolean(next.flipped))
@@ -574,7 +606,7 @@ export function createDeepPlatePayload(options: {
       viewer?.destroy()
       viewer = undefined
       root?.remove()
-      root = undefined; stage = undefined; host = undefined; library = undefined
+      root = undefined; stage = undefined; host = undefined; library = undefined; ground = undefined
       rule = undefined; ruleBar = undefined; ruleLabel = undefined; corner = undefined
       seat = null; seated = false; framed = null
     },

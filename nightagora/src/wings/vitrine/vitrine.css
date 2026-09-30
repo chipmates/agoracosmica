@@ -158,6 +158,8 @@
 .vitrine-plate {position:fixed;display:block;overflow:hidden;pointer-events:none;}
 .vitrine-plate img,.vitrine-plate canvas {position:absolute;display:block;max-width:none;}
 .vitrine-plate[hidden] {display:none;}
+/* A cut-out scan's shoulders outside its round top take the glass's own ground. */
+.vitrine-plate-ground {position:absolute;display:block;overflow:visible;fill:#0a0f13;}
 
 /* THE MACHINE'S CLOCK, its viewpoints, its steps and its folio. */
 .vitrine-views {display:flex;gap:8px;}

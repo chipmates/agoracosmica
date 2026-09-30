@@ -33,9 +33,13 @@ export function createPlatePayload(options: {
   standing(): boolean
   /** The work takes the narrow stage's whole glass, its card folded under it. */
   fill?: boolean
+  /** An outline in fractions of the whole source the plate covers with its
+   * own ground: a cut-out scan's shoulders outside a round top. */
+  ground?: readonly (readonly [number, number])[] | null
 }): VitrinePayload {
   let host: VitrinePayloadHost | undefined
   let frame: HTMLDivElement | undefined, image: HTMLImageElement | HTMLCanvasElement | undefined
+  let ground: SVGSVGElement | undefined
   let settled = 0, held = false
   const cut = options.window ?? { left: 0, top: 0, right: 1, bottom: 1 }
   const shownAspect = options.aspect * (cut.right - cut.left) / (cut.bottom - cut.top)
@@ -68,6 +72,7 @@ export function createPlatePayload(options: {
     image.style.height = `${height}px`
     image.style.left = `${-cut.left * width}px`
     image.style.top = `${-cut.top * height}px`
+    if (ground) Object.assign(ground.style, { width: image.style.width, height: image.style.height, left: image.style.left, top: image.style.top })
     const pixels = image instanceof HTMLCanvasElement ? options.pixels?.() : null
     if (pixels && image instanceof HTMLCanvasElement) {
       const scale = Math.min(devicePixelRatio, pixels.width / width)
@@ -100,6 +105,19 @@ export function createPlatePayload(options: {
         image.setAttribute('aria-hidden', 'true')
       }
       frame.append(image)
+      if (options.ground?.length) {
+        // drawn over the whole source like the image, so any window cuts both alike
+        const svg = 'http://www.w3.org/2000/svg'
+        ground = document.createElementNS(svg, 'svg')
+        ground.setAttribute('class', 'vitrine-plate-ground')
+        ground.setAttribute('viewBox', '0 0 1 1')
+        ground.setAttribute('preserveAspectRatio', 'none')
+        ground.setAttribute('aria-hidden', 'true')
+        const path = document.createElementNS(svg, 'path')
+        path.setAttribute('d', `M${options.ground.map(([x, y]) => `${x} ${y}`).join('L')}Z`)
+        ground.append(path)
+        frame.append(ground)
+      }
       next.element.append(frame)
       next.describe(options.description ?? options.title)
       next.surface('room')
@@ -119,7 +137,7 @@ export function createPlatePayload(options: {
     },
     unmount() {
       frame?.remove()
-      frame = undefined; image = undefined; host = undefined
+      frame = undefined; image = undefined; ground = undefined; host = undefined
       held = false
     },
   }
