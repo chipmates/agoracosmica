@@ -153,7 +153,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
     chapter: { en: "The heart valve", de: "Die Herzklappe" },
     age: { en: "about 60", de: "mit etwa 60 Jahren" },
     line: { en: "He drew this heart valve on paper. Ours moves in a film. Open the drawing.", de: "Er zeichnete diese Herzklappe auf Papier. Unsere bewegt sich im Film. Öffne die Zeichnung." },
-    drawer: null,
+    drawer: { en: "The sheet is in Windsor, dated to about 1512. He planned a glass model of this valve. Water with grass seeds would be pumped through it. He wrote that the swirl behind the flaps helps them shut. A model showed it in 1968, a living person in 2014. Whether he built it is not settled. Nothing of it survives.", de: "Das Blatt liegt in Windsor und ist auf etwa 1512 datiert. Er plante ein Glasmodell dieser Klappe. Wasser mit Grassamen sollte hindurchgepumpt werden. Er schrieb, der Wirbel hinter der Klappe helfe ihr beim Schließen. 1968 sah man es im Modell, 2014 bei einem lebenden Menschen. Ob er es gebaut hat, ist nicht geklärt. Erhalten ist nichts davon." },
     certainty: "documented",
     sees: "The sheet apart",
     pointers: ["C08"],
