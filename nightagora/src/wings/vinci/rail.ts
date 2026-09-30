@@ -483,6 +483,13 @@ const RAIL_QUICK_TURN=20*TURN_TIME_SCALE,RAIL_QUICK_TURN_PHONE=14*TURN_TIME_SCAL
 /** On a lens of 60 degrees or wider a standing turn may run up to this fast,
  * still under the film's pixel cap at that lens. */
 const RAIL_QUICK_WIDE=35*TURN_TIME_SCALE,RAIL_QUICK_WIDE_PHONE=25*TURN_TIME_SCALE
+/** THE WALKS WHOSE TURNS MAY RUN PAST THE CALM CAPS, by this factor on each
+ * screen: the film's pixel caps and the standing rates, walking and standing
+ * alike, so the picture moves up to that much faster than the calm criteria
+ * allow. From the heart valve to the timeline the desktop's two stands sit at
+ * the pixel cap for most of the leg, so only faster turning shortens it; the
+ * phone's leg waits on its lens instead, which a lift would not shorten. */
+export const RAIL_TURN_LIFTS:Readonly<Record<string,{desktop:number;phone:number}>>={'body-valve>line-early':{desktop:1.4,phone:1}}
 /** FROM ONE WORK OF A WALL TO THE NEXT, where the caller asks for it, the
  * leg's clock runs this much faster than the walk's; a leg to or from the
  * wall's end stations keeps the walk's, and a caller that does not ask (the
@@ -794,7 +801,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     fromHeading=from.heading;fromElevation=from.elevation
     fromFov=completed.pose.fov;targetFov=request.pose.fov
     const length=path.length
-    const lensPixels=filmLensPixels(Math.min(fromFov,targetFov),request.phone)
+    const faster=certified.station?RAIL_TURN_LIFTS[`${completed.id}>${request.id}`]?.[request.phone?'phone':'desktop']??1:1
+    // a lifted walk is planned as if on a lens that many times wider: every pixel cap rises by it
+    const lensPixels=filmLensPixels(Math.min(fromFov,targetFov),request.phone)/faster
     const zoom=scaleOf(fittedRailFov(targetFov,camera.aspect,request.phone))-scaleOf(fittedRailFov(fromFov,camera.aspect,request.phone))
     // down the aisle the view holds its line and turns once, at the end
     // a view bent further down than the one it goes to is lifted before the
@@ -814,9 +823,9 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
           wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,forward:true,scripted:true,...(brisk?{lens:zoom>0?'first' as const:'last' as const}:{})}}:{}),
         ...(certified.turns&&length>=WALKED_LEG_M?{turns:{start:certified.turns.start,end:certified.turns.end,
           at:doorTurns([...railDoorTurns,...(certified.turns.stands??[]),...stairStands]),doors:doorTurns(railDoorways),porches:doorTurns(railPorchStands),stairs,
-          quickDegPerSecond:request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN,wideDegPerSecond:request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE,
+          quickDegPerSecond:(request.phone?RAIL_QUICK_TURN_PHONE:RAIL_QUICK_TURN)*faster,wideDegPerSecond:(request.phone?RAIL_QUICK_WIDE_PHONE:RAIL_QUICK_WIDE)*faster,
           ...(certified.turns.named?{named:{start:certified.turns.named.start,end:certified.turns.named.end,at:doorTurns(certified.turns.named.at??[])},
-            namedDegPerSecond:request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED}:{}),
+            namedDegPerSecond:(request.phone?RAIL_QUICK_NAMED_PHONE:RAIL_QUICK_NAMED)*faster}:{}),
           floor:certified.turns.floor===true,lens:certified.turns.lens??'place',forward:certified.turns.forward===true||stairs.length>0,turned:certified.turns.turned===true,windingRound:certified.turns.windingRound===true,lensWait:certified.turns.lensWait===true,whole:certified.turns.whole===true,scripted:lookKeys!==undefined}}:{})}))
     leg=gaze.leg;duration=leg.seconds;legClock=0;legClockAt=now;pace=1;waiting=0;strideM=strideTarget=0;strideAt=now
     if(request.quick&&request.wall!==undefined&&request.wallOn&&wallAt!==undefined&&!vinciWallIsEnd(request.wallOn,wallAt)&&!vinciWallIsEnd(request.wallOn,request.wall))pace=STOP_TO_STOP_PACE
