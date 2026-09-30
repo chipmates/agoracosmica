@@ -2,7 +2,7 @@
  "format": "vinci-rail-clearance-v2",
  "completeNearClearance": true,
  "recipe": "src/wings/vinci/rail-certify.mjs",
- "recipeSha256": "92765a9d4ef8d7c6249b4de488e6a564bc90cf934495008861163aa1eff9a0a5",
+ "recipeSha256": "870995cd3fba19ea63f19cb95d9e542009a12d22206bdccfccd4bad8804817d6",
  "sources": [
   {
    "file": "src/stack/detail.ts",
@@ -54,8 +54,8 @@
   },
   {
    "file": "src/wings/vinci/collection/approaches.ts",
-   "sha256": "39f3a3046b0c216b2247245bf198c24daf8973d296e18ecc07cc84f4819c0f34",
-   "bytes": 31628,
+   "sha256": "e82db0156fda862971a28d920b0934564064c719066f12de9d4bdb1f396730bb",
+   "bytes": 34052,
    "unchangedDuringAudit": true
   },
   {
@@ -612,14 +612,14 @@
   },
   {
    "file": "src/wings/vinci/rail-projection.ts",
-   "sha256": "b7d3f64d4f217de05494fc3d4becaee255265adf4094e804f0d48d57ed76182a",
-   "bytes": 893,
+   "sha256": "04427a480df38038de0360b6b8ba684585ea8860f3133be3cfbe68ad9cf808e2",
+   "bytes": 2588,
    "unchangedDuringAudit": true
   },
   {
    "file": "src/wings/vinci/rail-smoothing.ts",
-   "sha256": "67b1e644948c9ec55152119a5dd78f92c90a14bf1c88de2ccac15cd466ef592e",
-   "bytes": 9333,
+   "sha256": "cafffb62b32c93d015b1dc641f779c998b11fc72fe831a106f3eb246bea5054e",
+   "bytes": 9489,
    "unchangedDuringAudit": true
   },
   {
@@ -636,8 +636,8 @@
   },
   {
    "file": "src/wings/vinci/rail.ts",
-   "sha256": "67773ec24a934c8eb3a34cd46ff94960335cb411af824403ada1d288481dd62a",
-   "bytes": 80106,
+   "sha256": "bf6ae19cb5e701ac1ebbeca2301147629670ea36499a3baf9b959d4b8c3003d7",
+   "bytes": 80703,
    "unchangedDuringAudit": true
   },
   {
@@ -6936,8 +6936,9 @@
   "DOM plates, atmosphere and shadow-only caster copies are excluded; all actual visible mesh solids including leaves and dressing are included.",
   "Every machine stands in its rest pose for the whole walk, and its actual rest geometry at every tier is proved against every route and every station envelope here. A machine is built as the visitor walks up to it, so it is not a mounted mesh when the runtime hashes the scene and is not part of the geometry fingerprint; the placement table it is certified from is hashed in the sources above.",
   "The 0.25 m near distance, both authored viewport aspect ratios and the authored endpoint FOV are used. The authored aspect gives the largest near rectangle, so a wider or narrower canvas is inside it.",
+  "A phone close look may look level through a shift lens: its near rectangle is the authored one slid vertically by the pose's shift, a share of its half height the same on every canvas. A leg blends its lens and its shift by one weight between its two ends, so every frame's rectangle is inside the one of the wider end's lens slid by the larger end's shift, and every leg, wall and station envelope that holds a shifted end is proved with the ball through that rectangle's farthest corner. The runtime refuses any shift larger than the certified ends of the leg under way.",
   "Every straight span of the finished path is proved end to end by exact segment/triangle distance; every rounded corner is proved by closed balls over its control hull, and those balls are what the runtime replays. Stored balls reserve 4 µm beyond the requested radius; runtime matching of quantized geometry consumes at most 2 µm of it.",
-  "A route eases its lens from the leaving pose to the arriving one as smooth(t / T) of its own clock, and the body stands where the gait has carried it at t. A straight span of a route between two stations is proved with the widest lens the walk can hold anywhere on it: the share of the clock at a share of the way lies between the even walk and the all-ramp leg for every pace and every stretch the gaze asks for, which this program checks each time it runs, and the lens is read at that bound. Rounded corners, approaches, links and walls keep the larger of their two ends' lenses.",
+  "A route eases its lens from the leaving pose to the arriving one as smooth(t / T) of its own clock, and the body stands where the gait has carried it at t. A straight span of a route between two stations is proved with the widest lens the walk can hold anywhere on it: the share of the clock at a share of the way lies between the even walk and the all-ramp leg for every pace and every stretch the gaze asks for, which this program checks each time it runs, and the lens is read at that bound. Rounded corners, approaches, links and walls keep the larger of their two ends' lenses, and of their shifts.",
   "The great hall and the service passage to it are not mounted rail solids. Their actual fabric and furnishings, at the two tiers that build them, are proved against every route and envelope here, outside the geometry fingerprint, as the machines' rest poses are.",
   "The walk carries a step rhythm of at most 10.82 mm off the certified line, and that envelope is added to the clearance radius every span and every corner above is proved against.",
   "An approach is one straight leg from a station eye to one exhibit's viewing eye and back, proved by the same exact segment/triangle distance and the same near rectangle plus gait envelope as a route. It is reachable from that station only, it is not addressable by the station rail, and the table is linear: two entries per exhibit, never the product of poses. The exhibits are the hang's plates, the mural, the machines, the grave's three, the plaque, the book and the twelve cut dates.",
@@ -17743,10 +17744,11 @@
     ],
     "at": [
      -28.30304166666666,
-     -6.3421084048732155,
+     -4.68,
      41.750499999999995
     ],
-    "fov": 117.56696271896362
+    "fov": 96.99946048365297,
+    "shift": -0.48802323803699754
    },
    "points": [
     [
@@ -17761,7 +17763,7 @@
     ]
    ],
    "roundedLength": 5.04099588392374,
-   "maxNearRadius": 0.5294871999160367,
+   "maxNearRadius": 0.5171226785035948,
    "certifiedBalls": []
   },
   {
@@ -18019,10 +18021,11 @@
     ],
     "at": [
      -36.661291666666635,
-     -6.350616824600365,
+     -4.68,
      41.750499999999995
     ],
-    "fov": 116.847491979599
+    "fov": 91.83888663105948,
+    "shift": -0.48492230595913305
    },
    "points": [
     [
@@ -18037,7 +18040,7 @@
     ]
    ],
    "roundedLength": 13.20079613451661,
-   "maxNearRadius": 0.5239139484437167,
+   "maxNearRadius": 0.4837647955605615,
    "certifiedBalls": []
   },
   {
@@ -18847,10 +18850,11 @@
     ],
     "at": [
      -44.77,
-     -6.5199999999981815,
+     -4.82,
      29.5
     ],
-    "fov": 107.07106828689575
+    "fov": 100.86809284003907,
+    "shift": -0.33166630762602334
    },
    "points": [
     [
@@ -18865,7 +18869,7 @@
     ]
    ],
    "roundedLength": 1.7497428382479552,
-   "maxNearRadius": 0.45956953247437105,
+   "maxNearRadius": 0.5051716168991739,
    "certifiedBalls": []
   },
   {
@@ -21996,7 +22000,7 @@
     ]
    ],
    "roundedLength": 42.079031886941436,
-   "maxNearRadius": 0.5294871999160367,
+   "maxNearRadius": 0.5171226785035948,
    "certifiedBalls": [
     {
      "centre": [
@@ -22004,7 +22008,7 @@
       -4.68,
       38.99748288342744
      ],
-     "radiusM": 1.0270946515797332
+     "radiusM": 1.0147301301672913
     },
     {
      "centre": [
@@ -22012,7 +22016,7 @@
       -4.68,
       39.59090962760342
      ],
-     "radiusM": 1.023635851652798
+     "radiusM": 1.011271330240356
     },
     {
      "centre": [
@@ -22020,7 +22024,7 @@
       -4.68,
       40.61019317661275
      ],
-     "radiusM": 0.761636535118153
+     "radiusM": 0.7492720137057112
     },
     {
      "centre": [
@@ -22028,7 +22032,7 @@
       -4.68,
       40.622206591602676
      ],
-     "radiusM": 0.7655518263811713
+     "radiusM": 0.7531873049687294
     },
     {
      "centre": [
@@ -22036,7 +22040,7 @@
       -4.68,
       40.313970454945846
      ],
-     "radiusM": 0.7803519154782348
+     "radiusM": 0.7679873940657931
     },
     {
      "centre": [
@@ -22044,7 +22048,7 @@
       -4.68,
       40.564295285860226
      ],
-     "radiusM": 0.7657392109417871
+     "radiusM": 0.7533746895293453
     },
     {
      "centre": [
@@ -22052,7 +22056,7 @@
       -4.68,
       39.785854155925776
      ],
-     "radiusM": 0.878847483603237
+     "radiusM": 0.8664829621907951
     },
     {
      "centre": [
@@ -22060,7 +22064,7 @@
       -4.68,
       39.15431321001912
      ],
-     "radiusM": 0.9976982674402431
+     "radiusM": 0.9853337460278013
     },
     {
      "centre": [
@@ -22068,7 +22072,7 @@
       -4.68,
       39.90508487785042
      ],
-     "radiusM": 0.9215331601586934
+     "radiusM": 0.9091686387462514
     },
     {
      "centre": [
@@ -22076,7 +22080,7 @@
       -4.68,
       39.22387482464894
      ],
-     "radiusM": 0.8758868917728357
+     "radiusM": 0.8635223703603938
     },
     {
      "centre": [
@@ -22084,7 +22088,7 @@
       -4.68,
       40.59056817046414
      ],
-     "radiusM": 0.7479311257223007
+     "radiusM": 0.7355666043098589
     },
     {
      "centre": [
@@ -22092,7 +22096,7 @@
       -4.68,
       40.62242430048408
      ],
-     "radiusM": 0.7635354940540203
+     "radiusM": 0.7511709726415785
     },
     {
      "centre": [
@@ -22100,7 +22104,7 @@
       -4.68,
       40.313533896373634
      ],
-     "radiusM": 0.7764148010905458
+     "radiusM": 0.7640502796781039
     },
     {
      "centre": [
@@ -22108,7 +22112,7 @@
       -4.68,
       40.55058235104994
      ],
-     "radiusM": 0.7475974111725376
+     "radiusM": 0.7352328897600957
     },
     {
      "centre": [
@@ -22116,7 +22120,7 @@
       -4.68,
       39.28846002415862
      ],
-     "radiusM": 0.8714244702602463
+     "radiusM": 0.8590599488478045
     },
     {
      "centre": [
@@ -22124,7 +22128,7 @@
       -4.68,
       40.58910914710421
      ],
-     "radiusM": 0.7480390298684425
+     "radiusM": 0.7356745084560007
     },
     {
      "centre": [
@@ -22132,7 +22136,7 @@
       -4.68,
       40.60854833932662
      ],
-     "radiusM": 0.7600809256322383
+     "radiusM": 0.7477164042197966
     },
     {
      "centre": [
@@ -22140,7 +22144,7 @@
       -4.68,
       39.94321701450215
      ],
-     "radiusM": 0.8478778069443856
+     "radiusM": 0.8355132855319438
     },
     {
      "centre": [
@@ -22148,7 +22152,7 @@
       -4.68,
       39.12017172343133
      ],
-     "radiusM": 0.8729410712355266
+     "radiusM": 0.8605765498230848
     },
     {
      "centre": [
@@ -22156,7 +22160,7 @@
       -4.68,
       39.03209999999999
      ],
-     "radiusM": 0.8883361701613537
+     "radiusM": 0.8759716487489119
     },
     {
      "centre": [
@@ -22164,7 +22168,7 @@
       -4.68,
       39.121656330556675
      ],
-     "radiusM": 0.9374568456668922
+     "radiusM": 0.9250923242544504
     },
     {
      "centre": [
@@ -22172,7 +22176,7 @@
       -4.68,
       40.125756520519936
      ],
-     "radiusM": 0.7843677733945789
+     "radiusM": 0.772003251982137
     },
     {
      "centre": [
@@ -22180,7 +22184,7 @@
       -4.68,
       40.06636708022791
      ],
-     "radiusM": 0.7900354395726383
+     "radiusM": 0.7776709181601964
     },
     {
      "centre": [
@@ -22188,7 +22192,7 @@
       -4.68,
       40.52350291483483
      ],
-     "radiusM": 0.7542621058028498
+     "radiusM": 0.741897584390408
     },
     {
      "centre": [
@@ -22196,7 +22200,7 @@
       -4.68,
       39.049541016785184
      ],
-     "radiusM": 0.9158326447281389
+     "radiusM": 0.9034681233156969
     }
    ],
    "chordM": [
@@ -23676,7 +23680,7 @@
      -4.68
     ]
    ],
-   "maxNearRadius": 0.5294871999160367,
+   "maxNearRadius": 0.5171226785035948,
    "spurs": [
     {
      "vertex": 0,
@@ -23696,7 +23700,7 @@
         -4.68,
         39.25723068579323
        ],
-       "radiusM": 1.0103303423554244
+       "radiusM": 0.9979658209429826
       }
      ]
     },
@@ -23718,7 +23722,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259961
+       "radiusM": 1.0018685256135542
       }
      ]
     },
@@ -23740,7 +23744,7 @@
         -4.68,
         39.36523999999999
        ],
-       "radiusM": 1.0111906791105045
+       "radiusM": 0.9988261576980626
       }
      ]
     },
@@ -23762,7 +23766,7 @@
         -4.68,
         39.36523999999999
        ],
-       "radiusM": 1.0111906791105045
+       "radiusM": 0.9988261576980626
       }
      ]
     },
@@ -23784,7 +23788,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -23806,7 +23810,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -23828,7 +23832,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -23850,7 +23854,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -23872,7 +23876,7 @@
         -4.68,
         39.4184257065655
        ],
-       "radiusM": 1.0196073311153073
+       "radiusM": 1.0072428097028656
       }
      ]
     },
@@ -23894,7 +23898,7 @@
         -4.68,
         39.4184257065655
        ],
-       "radiusM": 1.0196073311153073
+       "radiusM": 1.0072428097028656
       }
      ]
     },
@@ -23916,7 +23920,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -23938,7 +23942,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -23960,7 +23964,7 @@
         -4.68,
         39.38203999999999
        ],
-       "radiusM": 1.0169083718251786
+       "radiusM": 1.0045438504127369
       }
      ]
     },
@@ -23982,7 +23986,7 @@
         -4.68,
         39.38203999999999
        ],
-       "radiusM": 1.0169083718251821
+       "radiusM": 1.0045438504127404
       }
      ]
     },
@@ -24004,7 +24008,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259955
+       "radiusM": 1.0018685256135538
       }
      ]
     },
@@ -24026,7 +24030,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259997
+       "radiusM": 1.0018685256135578
       }
      ]
     },
@@ -24048,7 +24052,7 @@
         -4.68,
         39.40509343559805
        ],
-       "radiusM": 1.023215553227561
+       "radiusM": 1.0108510318151194
       }
      ]
     },
@@ -24070,7 +24074,7 @@
         -4.68,
         39.40509343559805
        ],
-       "radiusM": 1.023215553227561
+       "radiusM": 1.0108510318151194
       }
      ]
     },
@@ -24092,7 +24096,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259955
+       "radiusM": 1.0018685256135538
       }
      ]
     },
@@ -24114,7 +24118,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259997
+       "radiusM": 1.0018685256135578
       }
      ]
     },
@@ -24136,7 +24140,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -24158,7 +24162,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -24180,7 +24184,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -24202,7 +24206,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -24224,7 +24228,7 @@
         -4.68,
         39.4184257065655
        ],
-       "radiusM": 1.0196073311153073
+       "radiusM": 1.0072428097028656
       }
      ]
     },
@@ -24246,7 +24250,7 @@
         -4.68,
         39.4184257065655
        ],
-       "radiusM": 1.0196073311153073
+       "radiusM": 1.0072428097028656
       }
      ]
     },
@@ -24268,7 +24272,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -24290,7 +24294,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009302063
+       "radiusM": 0.9988405795177645
       }
      ]
     },
@@ -24312,7 +24316,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470260026
+       "radiusM": 1.0018685256135609
       }
      ]
     },
@@ -24334,7 +24338,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259955
+       "radiusM": 1.0018685256135538
       }
      ]
     },
@@ -24356,7 +24360,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -24378,7 +24382,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -24400,7 +24404,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -24422,7 +24426,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301994
+       "radiusM": 0.9988405795177575
       }
      ]
     },
@@ -24444,7 +24448,7 @@
         -4.68,
         39.39792792463608
        ],
-       "radiusM": 1.0247856702615872
+       "radiusM": 1.0124211488491455
       }
      ]
     },
@@ -24466,7 +24470,7 @@
         -4.68,
         39.39792792463608
        ],
-       "radiusM": 1.0247856702615872
+       "radiusM": 1.0124211488491455
       }
      ]
     },
@@ -24488,7 +24492,7 @@
         -4.68,
         39.32603999999999
        ],
-       "radiusM": 1.013662542311534
+       "radiusM": 1.0012980208990923
       }
      ]
     },
@@ -24510,7 +24514,7 @@
         -4.68,
         39.32603999999999
        ],
-       "radiusM": 1.0136625423115266
+       "radiusM": 1.0012980208990847
       }
      ]
     },
@@ -24532,7 +24536,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470260026
+       "radiusM": 1.0018685256135609
       }
      ]
     },
@@ -24554,7 +24558,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259955
+       "radiusM": 1.0018685256135538
       }
      ]
     },
@@ -24576,7 +24580,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259997
+       "radiusM": 1.0018685256135578
       }
      ]
     },
@@ -24598,7 +24602,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259997
+       "radiusM": 1.0018685256135578
       }
      ]
     },
@@ -24620,7 +24624,7 @@
         -4.68,
         39.415222582696444
        ],
-       "radiusM": 1.02055992919088
+       "radiusM": 1.0081954077784383
       }
      ]
     },
@@ -24642,7 +24646,7 @@
         -4.68,
         39.415222582696444
        ],
-       "radiusM": 1.02055992919088
+       "radiusM": 1.0081954077784383
       }
      ]
     },
@@ -24664,7 +24668,7 @@
         -4.68,
         39.401550182179506
        ],
-       "radiusM": 1.0240227599576708
+       "radiusM": 1.0116582385452288
       }
      ]
     },
@@ -24686,7 +24690,7 @@
         -4.68,
         39.440855946539045
        ],
-       "radiusM": 1.0112051009301999
+       "radiusM": 0.998840579517758
       }
      ]
     },
@@ -24708,7 +24712,7 @@
         -4.68,
         39.324439999999996
        ],
-       "radiusM": 1.0142330470259955
+       "radiusM": 1.0018685256135538
       }
      ]
     },
@@ -24730,7 +24734,7 @@
         -4.68,
         39.25723068579323
        ],
-       "radiusM": 1.010330342355428
+       "radiusM": 0.997965820942986
       }
      ]
     }
@@ -25329,10 +25333,11 @@
     ],
     "at": [
      -44.77,
-     -6.5199999999981815,
+     -4.82,
      29.5
     ],
-    "fov": 107.07106828689575
+    "fov": 100.86809284003907,
+    "shift": -0.33166630762602334
    },
    "toPose": {
     "eye": [
@@ -25360,7 +25365,7 @@
     ]
    ],
    "roundedLength": 1.2165525060596438,
-   "maxNearRadius": 0.45956953247437105,
+   "maxNearRadius": 0.5051716168991739,
    "certifiedBalls": []
   },
   {
