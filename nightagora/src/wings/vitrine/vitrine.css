@@ -179,7 +179,6 @@
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-line {margin:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0 0 14px;font-size:14px;line-height:18px;}
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-line[hidden] + .vitrine-note {margin-top:4px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-control {font-size:14px;}
 /* the pinch's two steps stay marks, their words kept for a reader of the screen */
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .reader-zoom .vitrine-control {font-size:0;}
