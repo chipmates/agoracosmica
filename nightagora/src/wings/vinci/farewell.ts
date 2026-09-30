@@ -194,17 +194,17 @@ export function farewellLight(elevation: number): FarewellLight {
 
 /** THE LOOK UP, in seconds of the farewell's clock: the eye stays where it
  * stands, keeps its heading and its lens, and tilts up from its own pitch.
- * The tilt starts at the press, eases in and out and lands by a second and a
- * half (the first key) at about half the speed a one-second tilt needs, so
- * no frame of it smears; the gaze then keeps rising slowly into the sky while
- * the stars come out, so the grave's board has left the frame before the
- * afterglow's peak, and ends where the Milky Way stands over the elm's crown.
+ * The tilt starts at the press, eases in and out and lands by two seconds
+ * (the first key) at the pitch a one-second tilt reached, at about two thirds
+ * of its speed, so no frame of it smears and the board is gone early; the gaze
+ * then keeps rising slowly into the sky while the stars come out, and ends
+ * where the Milky Way stands over the elm's crown.
  * From the grave the view stands on the back wall's filter band with the tall
  * elm over it, and the evening's glow on the left: no turn is needed. */
 export interface FarewellLook { from: number; pitch: readonly (readonly [number, number])[] }
 export const FAREWELL_LOOK: { desktop: FarewellLook; phone: FarewellLook } = {
-  desktop: { from: 0, pitch: [[1.5, 21], [FAREWELL_SECONDS, 49]] },
-  phone: { from: 0, pitch: [[1.5, 19], [FAREWELL_SECONDS, 53]] },
+  desktop: { from: 0, pitch: [[2, 32], [FAREWELL_SECONDS, 49]] },
+  phone: { from: 0, pitch: [[2, 37], [FAREWELL_SECONDS, 53]] },
 }
 
 /** A heading clockwise from north and a pitch, as a direction in the engine. */
