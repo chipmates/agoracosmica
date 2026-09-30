@@ -245,12 +245,17 @@ const written = (dir, file) => {
 }
 
 /* ---- the gate lock ---- */
+/** on the charger the share never limits: it rests below 90 there by the charger's own care */
 function battery() {
-  try { return Number(/(\d+)%/.exec(execFileSync('pmset', ['-g', 'batt'], { encoding: 'utf8' }))?.[1] ?? 0) } catch { return 0 }
+  try {
+    const batt = execFileSync('pmset', ['-g', 'batt'], { encoding: 'utf8' })
+    if (batt.includes("'AC Power'")) return 100
+    return Number(/(\d+)%/.exec(batt)?.[1] ?? 0)
+  } catch { return 0 }
 }
 /**
  * The gate lock by `scratch/locked.sh`'s own protocol: a slot is a folder made
- * by mkdir; slot B only at 90 percent battery or more; the owner and the time
+ * by mkdir; slot B only on the charger or at 90 percent battery or more; the owner and the time
  * written inside. Only a slot this process made is ever removed.
  */
 export function gateLock({ mode = 'gate', dir = mode === 'none' ? '' : findLockDir(), owner = 'w7', log = () => {}, batteryOf = battery, pollMs = LOCK_POLL_MS } = {}) {
