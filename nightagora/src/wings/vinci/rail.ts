@@ -46,8 +46,9 @@ const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
  * stage has under half the wide frame's width, so the aerial screw's sail is
  * centred by yaw before anything else: the flight station turns seven degrees
  * south of its room's aim, which stands the whole sail inside the frame and
- * the water screw's platform under the sheet, and lifts four so the deck
- * stands just above the sheet rather than over a band of bare floor. The
+ * the water screw's platform under the sheet. It looks down seven degrees:
+ * looking up, the slatted ceiling took the top half and the sail sat on the
+ * sheet; down, the sail stands in the middle of the picture over its deck. The
  * works station holds the aerial screw's whole sail behind the water screw:
  * the sail is 9.4 m across and stands seven metres beyond the screw, so any
  * narrower lens slices it at the left edge or the rolling mill at the right;
@@ -60,7 +61,7 @@ const NARROW_LENS=1.26, NARROW_AIM_SHARE=.21
  * room's own eye. Heading from north and pitch, in degrees. */
 const FLIGHT_EYE=[-47.5,-49.3] as const
 const HALL_PHONE:Partial<Record<VinciStationId,HallAim>>={
-  flight:{heading:-74,pitch:5,fov:88,eye:FLIGHT_EYE},
+  flight:{heading:-74,pitch:-7,fov:88,eye:FLIGHT_EYE},
   works:{heading:-70,pitch:-10,fov:104},
 }
 /** THE HALL'S WIDE FRAMES. From the room's eye the water screw's crank
