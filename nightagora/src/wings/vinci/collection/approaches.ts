@@ -202,7 +202,9 @@ const PHONE_NEAREST_M: Readonly<Record<string, number>> = {
   [exhibitId('mona-lisa', 'front')]: 2.7,
   [exhibitId('baptism-of-christ', 'front')]: PHONE_FURTHEST_M,
   [exhibitId('burlington-house-cartoon', 'front')]: PHONE_FURTHEST_M,
-  [exhibitId('saint-jerome', 'front')]: PHONE_FURTHEST_M,
+  // Nearer than the rest: the Adoration beside it keeps its wide lens, and a
+  // lens further from it makes the step between them a slow zoom.
+  [exhibitId('saint-jerome', 'front')]: 2,
   [exhibitId('virgin-and-child-with-st-anne', 'front')]: PHONE_FURTHEST_M,
   [exhibitId('bacchus', 'front')]: PHONE_FURTHEST_M,
   [exhibitId('virgin-of-the-rocks-london', 'front')]: PHONE_FURTHEST_M,
