@@ -38,7 +38,8 @@
  *   words/phone-lines.jsonl  one page per line: {"id", "en", "de", "from":
  *                      "lead" | "caption"}, the phone's own line at rest (at
  *                      most PHONE_MOST characters, two rows at 390 px): a cut
- *                      of the page's lead, "…" at every cut, or of its caption.
+ *                      of the page's lead, "…" at every cut, or its caption
+ *                      with words left out and none added.
  *                      Until the file exists the module carries no phone line
  * and from the texts files: a German page's doubts only from `doubts_de`.
  * Re-run order when the scans are staged anew: --stage, then the plate
@@ -439,21 +440,14 @@ function leadOf(id, passages, record) {
 /** about eighty characters keep a line to two rows on a 390 px phone */
 const PHONE_MOST = 80
 /** A CUT OF A TEXT, word for word: the line's pieces between its ellipses
- * stand in the text in order. The first letter of a piece may change case,
- * where a cut starts a caption's sentence anew. */
-export function cutOf(line, text, { anyCase = false } = {}) {
+ * stand in the text in order. */
+export function cutOf(line, text) {
   const whole = flatten(text).replace(/…|\.\.\./g, ' ').replace(/\s+/g, ' ').trim()
   const pieces = flatten(line).split(/…|\.\.\./).map(piece => piece.replace(/^[\s,;:]+|[\s,;:]+$/g, '')).filter(Boolean)
   if (!pieces.length) return { ok: false, why: 'no words' }
-  const find = (piece, from) => {
-    const at = whole.indexOf(piece, from)
-    if (at >= 0 || !anyCase) return at
-    const other = piece[0] === piece[0].toUpperCase() ? piece[0].toLowerCase() : piece[0].toUpperCase()
-    return whole.indexOf(other + piece.slice(1), from)
-  }
   let from = 0, first = -1, end = 0
   for (const piece of pieces) {
-    const at = find(piece, from)
+    const at = whole.indexOf(piece, from)
     if (at < 0) return { ok: false, why: `"${piece.slice(0, 40)}" is not in it${pieces.length > 1 ? ' (in order)' : ''}` }
     if (first < 0) first = at
     from = end = at + piece.length
@@ -467,9 +461,21 @@ export function cutOf(line, text, { anyCase = false } = {}) {
   const unmarked = [!opened && !/^(…|\.\.\.)/.test(marked) ? 'its start' : null, !closed && !/(…|\.\.\.)$/.test(marked) ? 'its end' : null].filter(Boolean)
   return { ok: true, unmarked }
 }
+/** The first word of a line that is not the next word of a text, in order, or null. */
+function wordsAdded(line, text) {
+  const words = t => (flatten(t).toLowerCase().match(/[\p{L}\p{N}]+/gu) ?? [])
+  const pool = words(text)
+  let at = 0
+  for (const word of words(line)) {
+    while (at < pool.length && pool[at] !== word) at++
+    if (at === pool.length) return word
+    at++
+  }
+  return null
+}
 /** THE PHONE'S OWN LINE of a page, checked against what it is cut from: a
  * line of his words that is not a cut of his lead is refused, a caption's
- * that is not a cut of the caption is reported. */
+ * that adds a word to the caption is reported. */
 function phoneOf(id, lead, caption) {
   const written = PHONE?.get(id)
   if (!written) return null
@@ -487,9 +493,9 @@ function phoneOf(id, lead, caption) {
     } else {
       const own = caption?.[lang]
       if (!own) { refused.push(`${id}: a phone line from the caption, and the page has no ${lang} caption`); return null }
-      const cut = cutOf(said, own, { anyCase: true })
-      if (!cut.ok) warn(`${id}: the ${lang} phone line is not a cut of the caption: ${cut.why}`)
-      else if (cut.unmarked.length) warn(`${id}: the ${lang} phone line cuts the caption at ${cut.unmarked.join(' and ')} without an ellipsis`)
+      // the museum's own words may lose a word anywhere; none may be added or changed
+      const extra = wordsAdded(said, own)
+      if (extra) warn(`${id}: the ${lang} phone line is not a shortening of the caption: "${extra}" is not in it (in order)`)
     }
   }
   return { from: written.from, en: written.en, de: written.de }
