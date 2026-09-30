@@ -75,6 +75,9 @@ export interface BestOfPage {
   plate: { path: string; window: { left: number; top: number; right: number; bottom: number } | null; width: number; height: number } | null
   /** what the mirror shows: the scan turned, the plate turned, or no mirror */
   mirror: 'own' | 'plate' | 'none'
+  /** the phone's own line at rest, two rows at 390 px: a cut of the lead or
+   * of the caption, the same kind in both languages; absent until written */
+  phone?: { from: 'lead' | 'caption'; en: string; de: string } | null
 }
 export interface BestOfTopic {
   key: string

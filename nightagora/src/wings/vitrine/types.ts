@@ -77,6 +77,11 @@ export interface VitrinePeek {
   line?: string | null
   /** the picture's source row, under that line or under the name alone */
   source?: string | null
+  /** the page's own line for the peek, written to fit its two rows, with its
+   * source row: it stands where the card's line does not fit, and before it
+   * (`first`) where it is of another kind than the card's line, so both
+   * languages rest on the same kind of line */
+  own?: { line: string; note: string | null; first: boolean } | null
 }
 
 export interface VitrinePayload {

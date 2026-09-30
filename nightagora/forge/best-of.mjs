@@ -35,6 +35,11 @@
  *   words/notices.json printed_transcription.editions (each volume's label and
  *                      short name) and .by_page (each page's own), which label
  *                      every transcription and every AI translation
+ *   words/phone-lines.jsonl  one page per line: {"id", "en", "de", "from":
+ *                      "lead" | "caption"}, the phone's own line at rest (at
+ *                      most PHONE_MOST characters, two rows at 390 px): a cut
+ *                      of the page's lead, "…" at every cut, or of its caption.
+ *                      Until the file exists the module carries no phone line
  * and from the texts files: a German page's doubts only from `doubts_de`.
  * Re-run order when the scans are staged anew: --stage, then the plate
  * finder's stage (it appends the plates to the same patch), then a plain run.
@@ -133,6 +138,9 @@ const TOPIC_WORDS = json('words/topics.json') ?? {}
 const NOTICES = json('words/notices.json') ?? {}
 const LEADS = new Map(jsonl('words/leads.jsonl').map(r => [r.id, r]))
 const KEYS_WRITTEN = json('words/keys.json') ?? {}
+/** the phone's own lines: read only once written, so the module stays as it was until then */
+const PHONE_FILE = 'words/phone-lines.jsonl'
+const PHONE = existsSync(join(FROM, PHONE_FILE)) ? new Map(jsonl(PHONE_FILE).map(r => [r.id, r])) : null
 /** EVERY NEW WORD THE ROOM NEEDS, by the key the words pass writes it under,
  * with what stands until it does. The room reads `keys` from the module. */
 export const KEYS = {
@@ -426,6 +434,67 @@ function leadOf(id, passages, record) {
   return { lead: { passage: p.index, placeholder: true, en: pick(p.en), de: pick(p.de), it: p.it ? { text: firstSentence(p.it.text), label: p.it.label } : null }, none: false, placeholder: true }
 }
 
+/* ---- the phone's own line at rest -------------------------------------- */
+
+/** about eighty characters keep a line to two rows on a 390 px phone */
+const PHONE_MOST = 80
+/** A CUT OF A TEXT, word for word: the line's pieces between its ellipses
+ * stand in the text in order. The first letter of a piece may change case,
+ * where a cut starts a caption's sentence anew. */
+export function cutOf(line, text, { anyCase = false } = {}) {
+  const whole = flatten(text).replace(/…|\.\.\./g, ' ').replace(/\s+/g, ' ').trim()
+  const pieces = flatten(line).split(/…|\.\.\./).map(piece => piece.replace(/^[\s,;:]+|[\s,;:]+$/g, '')).filter(Boolean)
+  if (!pieces.length) return { ok: false, why: 'no words' }
+  const find = (piece, from) => {
+    const at = whole.indexOf(piece, from)
+    if (at >= 0 || !anyCase) return at
+    const other = piece[0] === piece[0].toUpperCase() ? piece[0].toLowerCase() : piece[0].toUpperCase()
+    return whole.indexOf(other + piece.slice(1), from)
+  }
+  let from = 0, first = -1, end = 0
+  for (const piece of pieces) {
+    const at = find(piece, from)
+    if (at < 0) return { ok: false, why: `"${piece.slice(0, 40)}" is not in it${pieces.length > 1 ? ' (in order)' : ''}` }
+    if (first < 0) first = at
+    from = end = at + piece.length
+  }
+  // a cut that starts or stops inside a sentence says so with an ellipsis
+  const marked = flatten(line)
+  // a text that is itself a cut (a lead) opens or closes inside a sentence at its own ellipsis
+  const own = flatten(text)
+  const opened = (first === 0 && !/^(…|\.\.\.)/.test(own)) || /[.!?:;]["')\]]?\s*$/.test(whole.slice(0, first))
+  const closed = (end === whole.length && !/(…|\.\.\.)$/.test(own)) || /[.!?]["')\]]?$/.test(pieces[pieces.length - 1])
+  const unmarked = [!opened && !/^(…|\.\.\.)/.test(marked) ? 'its start' : null, !closed && !/(…|\.\.\.)$/.test(marked) ? 'its end' : null].filter(Boolean)
+  return { ok: true, unmarked }
+}
+/** THE PHONE'S OWN LINE of a page, checked against what it is cut from: a
+ * line of his words that is not a cut of his lead is refused, a caption's
+ * that is not a cut of the caption is reported. */
+function phoneOf(id, lead, caption) {
+  const written = PHONE?.get(id)
+  if (!written) return null
+  if (written.from !== 'lead' && written.from !== 'caption') { refused.push(`${id}: phone-lines.jsonl says from "${written.from}", not lead or caption`); return null }
+  for (const lang of ['en', 'de']) {
+    const said = written[lang]
+    if (typeof said !== 'string' || !said.trim()) { refused.push(`${id}: no ${lang} phone line`); return null }
+    if (said.length > PHONE_MOST) warn(`${id}: the ${lang} phone line runs ${said.length} characters`)
+    if (written.from === 'lead') {
+      const own = lead?.[lang]?.text
+      if (!own || lead.placeholder) { refused.push(`${id}: a phone line from the lead, and the page has no written lead`); return null }
+      const cut = cutOf(said, own)
+      if (!cut.ok) { refused.push(`${id}: the ${lang} phone line is not a cut of the lead: ${cut.why}`); return null }
+      if (cut.unmarked.length) warn(`${id}: the ${lang} phone line cuts the lead at ${cut.unmarked.join(' and ')} without an ellipsis`)
+    } else {
+      const own = caption?.[lang]
+      if (!own) { refused.push(`${id}: a phone line from the caption, and the page has no ${lang} caption`); return null }
+      const cut = cutOf(said, own, { anyCase: true })
+      if (!cut.ok) warn(`${id}: the ${lang} phone line is not a cut of the caption: ${cut.why}`)
+      else if (cut.unmarked.length) warn(`${id}: the ${lang} phone line cuts the caption at ${cut.unmarked.join(' and ')} without an ellipsis`)
+    }
+  }
+  return { from: written.from, en: written.en, de: written.de }
+}
+
 /* ---- what the room says about a page besides its words ---------------- */
 
 /** THE LEAF'S MARK in the name row, where a catalogue puts a date: the codex
@@ -552,9 +621,12 @@ for (const topic of order) for (const [at, row] of byTopic.get(topic).entries())
     words: shown.length ? { en: kinds('en'), de: kinds('de'), it: shown.some(p => p.it) } : null,
     lead, lead_none: none, lead_placeholder: placeholder && Boolean(shown.length),
     long: words > LONG_WORDS || shown.length > 2,
+    ...(PHONE ? { phone: phoneOf(row.id, lead, caption) } : {}),
   })
   if (shown.length) (texts[slug(row.topic)] ??= {})[row.id] = { lead: lead?.passage ?? null, notes: record?.notes ?? null, passages }
 }
+
+if (PHONE) for (const id of PHONE.keys()) if (!SET.some(row => row.id === id)) warn(`phone-lines.jsonl names ${id}, which is not in the set`)
 
 const topics = order.map(topic => {
   const words = TOPIC_WORDS[topic]
@@ -868,6 +940,8 @@ console.log(`best-of: ${topics.length} topics, ${pages.length} pages (${count(p 
 console.log(`  words: ${count(p => p.words)} pages carry words, ${count(p => p.text_class !== 'none' && !p.words && RECORDS.has(p.id))} written with nothing printed, ${count(p => p.text_class !== 'none' && !RECORDS.has(p.id))} still to arrive, ${count(p => p.text_class === 'none')} have none`)
 console.log(`  leads: ${count(p => p.lead && !p.lead.placeholder)} written, ${count(p => p.lead?.placeholder)} placeholders, ${count(p => p.lead_none)} none by choice`)
 console.log(`  captions ${count(p => p.caption)}/${pages.length}; topic words ${topics.filter(t => t.title).length}/${topics.length}; mirror on ${count(p => p.writing)}`)
+if (PHONE) console.log(`  phone lines: ${count(p => p.phone)}/${pages.length} (${count(p => p.phone?.from === 'lead')} from the lead, ${count(p => p.phone?.from === 'caption')} from the caption); none for ${pages.filter(p => !p.phone).map(p => p.id).join(', ') || 'no page'}`)
+else console.log(`  phone lines: ${PHONE_FILE} not written yet`)
 if (staged) console.log(`  staged ${staged} files into ${option('--stage')}`)
 for (const word of missing) console.log(`  missing word: ${word}`)
 for (const line of warnings) console.log(`  ${line}`)

@@ -127,22 +127,30 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   /** The lead in his words, with whose words they are and whose picture it
    * is; the caption where the page has no lead. At rest on the phone the
    * translation's credit is its short one, the picture's source stands under
-   * every line, and the caption stands in where the lead is too long. */
+   * every line, and the page's own phone line stands in where the lead or
+   * the caption is too long, before the caption the peek fell back to. */
   function lineOf(page: BestOfPage): { head: string | null; note: string | null; peek: VitrinePeek; label: string | null } {
     const lead = page.lead?.[language]
     const caption = page.caption?.[language] || null
     const row = (...parts: (string | null | undefined)[]): string | null => parts.filter(Boolean).join(' · ') || null
     const picture = pictureCredit(page)
+    const phone = page.phone?.[language] ? page.phone : null
     if (lead?.text) {
       const said = lead.kind === 'ours' ? key('ai_short') ?? lead.label : lead.rest ?? lead.label
       // the band's source row keeps one row; the phone's raised card has room for the whole credit
       const credit = options.narrow() ? lead.label ?? said : said
+      const rest = row(lead.rest ?? said, picture)
+      // a cut of his words keeps the lead's credit; a cut of the caption only the picture's,
+      // and it rests before the lead, so both languages show the same kind of line
+      const own = phone ? phone.from === 'lead' ? { line: quoted(phone[language], language), note: rest, first: false }
+        : { line: phone[language], note: picture, first: true } : null
       return { head: quoted(lead.text, language), note: row(credit, picture),
-        peek: { note: row(lead.rest ?? said, picture) ?? '', line: caption, source: picture },
+        peek: { note: rest ?? '', line: caption, source: picture, own },
         label: lead.label && lead.label !== credit ? lead.label : null }
     }
     // the caption is the museum's own words: only the picture's source stands under it
-    return { head: caption, note: row(picture), peek: { note: picture ?? '', line: null, source: picture }, label: null }
+    const own = phone?.from === 'caption' ? { line: phone[language], note: picture, first: false } : null
+    return { head: caption, note: row(picture), peek: { note: picture ?? '', line: null, source: picture, own }, label: null }
   }
   const pictureWord = (page: BestOfPage): string | null =>
     page.picture === 'leaf' ? key('kind_leaf') : page.picture === 'plate' ? key('kind_plate') : page.picture === 'facsimile' ? key('kind_facsimile') : null
