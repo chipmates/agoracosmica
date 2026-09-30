@@ -32,7 +32,7 @@ export interface DeskStoryStop {
    are the one home of those words; nothing here writes one. */
 const CARDS = JSON.parse(cardsSource) as {
   controls: {
-    date: { age: VinciText; age_about: VinciText; age_near: VinciText; age_birth: VinciText }
+    date: { age: VinciText; age_about: VinciText; age_near: VinciText; age_birth: VinciText; [worded: string]: VinciText }
     [group: string]: Record<string, VinciText>
   }
 }
@@ -56,10 +56,13 @@ function sureness(said: VinciStoryCertainty): VinciCertainty {
    three forms the story uses each have their own key: the plain age, the
    about, the near, and the birth, which carries no number at all. */
 function clock(said: VinciText | null): VinciText | null {
-  const years = /-?\d+/.exec(said?.en ?? '')
-  if (!said || !years) return null
+  if (!said) return null
+  const years = /-?\d+/.exec(said.en)
+  // an age said in words ("early twenties") has its whole tag written out, keyed by those words
+  if (!years) return AGE_WORDS[`age_${said.en.trim().replace(/\s+/g, '_')}`] ?? null
   const value = Number(years[0])
-  if (value <= 0) return AGE_WORDS.age_birth
+  // at birth the heading says it already, so no tag
+  if (value <= 0) return null
   const pattern = /\bnear\b/.test(said.en) ? AGE_WORDS.age_near
     : /\babout\b/.test(said.en) ? AGE_WORDS.age_about : AGE_WORDS.age
   return {

@@ -209,10 +209,11 @@
     },
     "date": {
       "previous": { "en": "Previous", "de": "Zurück" },
-      "age": { "en": "age {years}", "de": "mit {years} Jahren" },
-      "age_about": { "en": "age about {years}", "de": "mit etwa {years} Jahren" },
-      "age_near": { "en": "age near {years}", "de": "mit fast {years} Jahren" },
+      "age": { "en": "Leonardo at {years}", "de": "Leonardo mit {years}" },
+      "age_about": { "en": "Leonardo at about {years}", "de": "Leonardo mit etwa {years}" },
+      "age_near": { "en": "Leonardo near {years}", "de": "Leonardo mit fast {years}" },
       "age_birth": { "en": "age 0", "de": "Geburt" },
+      "age_early_twenties": { "en": "Leonardo, early 20s", "de": "Leonardo mit Anfang 20" },
       "next": { "en": "Next", "de": "Weiter" }
     }
   }
