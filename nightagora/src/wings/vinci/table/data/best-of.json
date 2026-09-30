@@ -7,9 +7,9 @@
   "words/captions.jsonl": "7c78897051d5c102c42698383fe266f2ae4dea9cf25426052713ca250f86c9e9",
   "words/topics.json": "acc5230e6bb0d1363835eb6095f108629fee67a43ba6a10243ea077817562451",
   "words/notices.json": "0ce595d11d018e8596c538cf1dd40f9f041323d1994b502104a3c2f410198d42",
-  "words/leads.jsonl": "8a4111bc5d0579db0ac607a975b14148a1d10ab9a199067e880438dc4c3afbe5",
-  "words/keys.json": "cc587e365755ff554b041e5515a71ba1f53c77674b4acf648833ca189c6e4940",
-  "words/phone-lines.jsonl": "2b3445e8e9bb5b5963fa9595c68af6a03ec1f288d19c665836a718350aad0645",
+  "words/leads.jsonl": "25754a4dd652ac9fcbc544233ca1fe969ebf7a861c0dca4f75ee49021910cf45",
+  "words/keys.json": "2b3b3b5a204e87d5f93bc4bd8ed0f17cf8799c4ecfb03814b6b525c6e8b99a4e",
+  "words/phone-lines.jsonl": "a693e526d337f6bcf4d539889a81907fb7fa16dee4b311a1c6e4badd0fe1ef78",
   "texts-final/it-b.jsonl": "4baec9ed8ac99ef71e2feb1d647b0124fbf9f3a83d19ffd56fe1ed139b957e03",
   "texts-final/it.jsonl": "00e6af9c3a0a3545a368c19b0cd58ce1f37d78a2c12f093243206605106b7a74",
   "texts-final/rh-b.jsonl": "3754cf721940edda3f53547f159beccb6e2af5b2f3ded0986b3c4cbba93b2fe4",
@@ -60,11 +60,11 @@
   },
   "the_page": {
    "en": "The page",
-   "de": "Das Blatt"
+   "de": "Die Seite"
   },
   "mirror_ordinary": {
    "en": "This page was written left to right, the ordinary way, and reads without a mirror.",
-   "de": "Dieses Blatt wurde von links nach rechts geschrieben, wie üblich, und liest sich ohne Spiegel."
+   "de": "Diese Seite wurde von links nach rechts geschrieben, so wie man gewöhnlich schreibt, und liest sich ohne Spiegel."
   },
   "mirror_plate": {
    "en": "Leonardo wrote his notes from right to left. Here the mirror turns a printed copy of the page, made between 1881 and 1891: the library's photograph may not be altered.",
@@ -80,27 +80,31 @@
   },
   "kind_facsimile": {
    "en": "The picture is a photograph of a printed copy of the notebook, not of the page itself.",
-   "de": "Das Bild ist eine Fotografie aus einem Nachdruck des Notizbuchs, nicht von der Seite selbst."
+   "de": "Das Bild ist eine Fotografie von einem Nachdruck des Notizbuchs, nicht von der Seite selbst."
   },
   "topic_pages": {
    "en": "{n} pages",
    "de": "{n} Seiten"
+  },
+  "topic_page": {
+   "en": "{n} page",
+   "de": "{n} Seite"
   },
   "topic_count": {
    "en": "{topic}, {n} of {total}",
    "de": "{topic}, {n} von {total}"
   },
   "absence_paris_rest": {
-   "en": "Single pages from them stand in the topics, from the Institut's own photographs. The museum shows leaves under the Institut's licence, not the books whole.",
-   "de": "Einzelne Seiten daraus stehen in den Themen, aus den Fotografien des Institut de France. Das Museum zeigt unter der Lizenz des Instituts Blätter, nicht die ganzen Bände."
+   "en": "Pages from them appear in the topics, from the Institut's own photographs. The museum chose single pages for its topics, not the whole books.",
+   "de": "Seiten daraus stehen in den Themen, aus den Fotografien des Institut de France. Das Museum hat für seine Themen einzelne Seiten gewählt, nicht die ganzen Bände."
   },
   "absence_ashburnham": {
-   "en": "Some of them stand in the topics, from the Institut's own photographs. They were cut from manuscripts A and B, so they are not shown as a book.",
+   "en": "Some of them appear in the topics, from the Institut's own photographs. They were cut from manuscripts A and B, so they are not shown as a book.",
    "de": "Einige davon stehen in den Themen, aus den Fotografien des Institut de France. Sie wurden aus den Manuskripten A und B herausgeschnitten und werden nicht als Buch gezeigt."
   },
   "absence_arundel_middle": {
-   "en": "Pages from this part stand in the topics, from the British Library's own photographs. The printed copy of this part was never published, so it is not on the shelf as a book.",
-   "de": "Seiten aus diesem Teil stehen in den Themen, aus den Fotografien der British Library. Der Nachdruck dieses Teils erschien nie, darum steht er nicht als Buch im Regal."
+   "en": "Pages from this part appear in the topics, from the British Library's own photographs. The printed copy of this part was never published, so this part is not on the shelf as a book.",
+   "de": "Seiten aus diesem Teil stehen in den Themen, aus den Fotografien der British Library. Der Nachdruck dieses Teils erschien nie, darum steht dieser Teil nicht als Buch im Regal."
   },
   "credit_rest_ai": {
    "en": "AI translation. It may have errors.",
@@ -634,8 +638,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…the said screw will make its nut in the air and will rise high.",
-    "de": "…die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe."
+    "en": "…the said screw will make its nut in the air…",
+    "de": "…macht sich die genannte Schraube ihre Mutter in der Luft…"
    },
    "leaf": null,
    "plate": {
@@ -689,8 +693,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A jointed wing, its long ribs fanned out and worked by cords.",
-    "de": "Ein Gelenkflügel, die langen Rippen aufgefächert und von Schnüren bewegt."
+    "en": "On a tall post, its long ribs fanned out and worked by cords.",
+    "de": "An einem hohen Pfosten, die langen Rippen aufgefächert und von Schnüren bewegt."
    },
    "leaf": null,
    "plate": null,
@@ -759,8 +763,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "If the plank of 200 pounds rises before the wing comes down…",
-    "de": "Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt…"
+    "en": "If the plank of 200 pounds rises before the wing comes down, the test is good.",
+    "de": "Wenn sich die Bohle von 200 Pfund hebt… ist der Versuch gut."
    },
    "leaf": null,
    "plate": {
@@ -814,8 +818,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A great feathered wing with a strap harness at its joint.",
-    "de": "Ein großer gefiederter Flügel mit einem Riemengeschirr am Gelenk."
+    "en": "With a strap harness at its joint, a small wheel mechanism below.",
+    "de": "Mit einem Riemengeschirr am Gelenk, darunter ein kleiner Radmechanismus."
    },
    "leaf": null,
    "plate": null,
@@ -859,8 +863,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A jointed wing arm with pulleys, cords and a ratchet.",
-    "de": "Ein Flügelarm mit Gelenk, Rollen, Schnüren und einer Sperrklinke."
+    "en": "With pulleys, cords and a ratchet, its joint drawn again in detail.",
+    "de": "Mit Rollen, Schnüren und einer Sperrklinke, das Gelenk noch einmal im Detail."
    },
    "leaf": null,
    "plate": null,
@@ -1318,8 +1322,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A great bat-like wing of curved ribs, worked by cords.",
-    "de": "Ein großer fledermausartiger Flügel aus gebogenen Rippen, über Schnüre bewegt."
+    "en": "Curved ribs, worked by cords from a drum with a crank.",
+    "de": "Aus gebogenen Rippen, über Schnüre von einer Kurbeltrommel bewegt."
    },
    "leaf": null,
    "plate": null,
@@ -1388,8 +1392,8 @@
    "long": true,
    "phone": {
     "from": "caption",
-    "en": "A large bat wing of ribs and netting, and above it a long folding wing.",
-    "de": "Ein großer Fledermausflügel aus Rippen und Netz, darüber ein langer Klappflügel."
+    "en": "Ribs and netting, and above it a long folding wing.",
+    "de": "Rippen und Netz, darüber ein langer Klappflügel."
    },
    "leaf": null,
    "plate": {
@@ -1447,8 +1451,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A dragonfly with four wings, a bat wing and a butterfly.",
-    "de": "Eine Libelle mit vier Flügeln, ein Fledermausflügel und ein Schmetterling."
+    "en": "With four spread wings, beside a hooded old man.",
+    "de": "Mit vier gespreizten Flügeln, neben einem alten Mann mit Kapuze."
    },
    "leaf": null,
    "plate": {
@@ -1907,8 +1911,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A revolving crane on a circular track at the edge of a cut.",
-    "de": "Ein Drehkran auf einer Kreisbahn am Rand eines Einschnitts."
+    "en": "At the edge of a cut, its tall mast braced.",
+    "de": "Am Rand eines Einschnitts, sein hoher Mast verstrebt."
    },
    "leaf": null,
    "plate": null,
@@ -2250,8 +2254,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A crank-turned drum in a curved housing, its many cords running off.",
-    "de": "Eine Kurbeltrommel in einem gebogenen Gehäuse, ihre vielen Schnüre laufen davon."
+    "en": "A crank-turned drum, its many cords running off in parallel lines.",
+    "de": "Eine Kurbeltrommel, ihre vielen Schnüre laufen in parallelen Linien."
    },
    "leaf": null,
    "plate": null,
@@ -2385,8 +2389,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Two large compasses with ring heads and jointed legs, in red chalk.",
-    "de": "Zwei große Zirkel mit Ringköpfen und Gelenkschenkeln, in Rötel."
+    "en": "With ring heads and jointed legs, in red chalk across the page.",
+    "de": "Mit Ringköpfen und Gelenkschenkeln, in Rötel über die ganze Seite."
    },
    "leaf": null,
    "plate": {
@@ -2655,8 +2659,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Toothed rings spiralling up a shaft on a round drum.",
-    "de": "Zahnkränze winden sich spiralig an einer Welle über einer runden Trommel hoch."
+    "en": "Spiralling up a shaft on a round drum.",
+    "de": "Spiralig an einer Welle über einer runden Trommel."
    },
    "leaf": null,
    "plate": null,
@@ -2700,8 +2704,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A round drum with a toothed ring on top, meshing with a tall toothed wheel.",
-    "de": "Eine runde Trommel mit einem Zahnkranz obenauf, in den ein hohes Zahnrad greift."
+    "en": "With a toothed ring on top, meshing with a tall upright toothed wheel.",
+    "de": "Mit einem Zahnkranz obenauf, in den ein hohes aufrechtes Zahnrad greift."
    },
    "leaf": null,
    "plate": null,
@@ -2790,8 +2794,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Two oval toothed wheels in red chalk, each driven by a spoked wheel.",
-    "de": "Zwei ovale Zahnräder in Rötel, jedes von einem Speichenrad angetrieben."
+    "en": "In red chalk, each driven by a spoked wheel and a crank.",
+    "de": "In Rötel, jedes von einem Speichenrad und einer Kurbel angetrieben."
    },
    "leaf": {
     "left": 0,
@@ -2895,8 +2899,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A shaded cone of rods round a central screw with a crank.",
-    "de": "Ein schattierter Kegel aus Stäben um eine mittlere Schraube mit Kurbel."
+    "en": "Round a central screw with a crank, a small hinged bar drawn beside it.",
+    "de": "Um eine mittlere Schraube mit Kurbel, daneben ein kleiner Gelenkstab."
    },
    "leaf": null,
    "plate": null,
@@ -2985,8 +2989,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A drum of stacked discs on a toothed turntable.",
-    "de": "Eine Trommel aus gestapelten Scheiben auf einem gezahnten Drehteller."
+    "en": "On a toothed turntable inside a timber frame, a shaft below.",
+    "de": "Auf einem gezahnten Drehteller in einem Holzrahmen, darunter eine Welle."
    },
    "leaf": null,
    "plate": null,
@@ -3120,8 +3124,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A clock movement in a frame, its wheels and a curved arc.",
-    "de": "Ein Uhrwerk in einem Rahmen, seine Räder und ein gebogener Bogen."
+    "en": "In a frame, its wheels and a hammer arm beside it.",
+    "de": "In einem Rahmen, seine Räder, daneben ein Hammerarm."
    },
    "leaf": null,
    "plate": null,
@@ -3245,8 +3249,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Two mortars firing showers of shot in arcs across the sheet.",
-    "de": "Zwei Mörser feuern Kugelschauer in Bögen über das Blatt."
+    "en": "Showers of shot in arcs across the sheet, the balls bursting into stars.",
+    "de": "Kugelschauer in Bögen über das Blatt, die Kugeln zerspringen zu Sternen."
    },
    "leaf": null,
    "plate": null,
@@ -3568,8 +3572,8 @@
    "long": true,
    "phone": {
     "from": "caption",
-    "en": "A great gun barrel raised on an A-frame by a winch.",
-    "de": "Ein großes Geschützrohr, mit einer Winde an einem A-Gestell gehoben."
+    "en": "Raised on an A-frame by a winch, a moated keep below.",
+    "de": "Mit einer Winde an einem A-Gestell gehoben, darunter ein Turm mit Graben."
    },
    "leaf": null,
    "plate": {
@@ -3627,8 +3631,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Fans of lines of fire from round bastions, in dark wash.",
-    "de": "Fächer von Schusslinien aus runden Bastionen, in dunkler Lavierung."
+    "en": "From round bastions, his mirror writing between them.",
+    "de": "Aus runden Bastionen, dazwischen seine Spiegelschrift."
    },
    "leaf": null,
    "plate": {
@@ -3682,8 +3686,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A great treadwheel in a timber shed, men climbing its steps.",
-    "de": "Ein großes Tretrad in einem Holzschuppen, Männer steigen seine Stufen hinauf."
+    "en": "In a timber shed, men climbing its steps.",
+    "de": "In einem Holzschuppen, Männer steigen seine Stufen hinauf."
    },
    "leaf": null,
    "plate": null,
@@ -3819,19 +3823,19 @@
     "passage": 2,
     "placeholder": false,
     "en": {
-     "text": "…when he takes service with the castellan, should carry with him a ball of strong thread.",
+     "text": "The man who is in league with the climber… should carry with him a ball of strong thread.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
      "rest": "AI translation. It may have errors."
     },
     "de": {
-     "text": "…wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen.",
+     "text": "Wer mit dem Kletterer im Bund ist, soll… ein Knäuel starken Zwirns bei sich tragen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
      "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "…porti quando saconcia colcastellano. con seco uno gomitolo di forterefe.",
+     "text": "quello chedachordo chollo scalatore porti… con seco uno gomitolo di forterefe.",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. II (Manuscripts B and D), Paris 1883",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. II (Manuskripte B und D), Paris 1883"
@@ -3842,8 +3846,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…should carry with him a ball of strong thread.",
-    "de": "…ein Knäuel starken Zwirns bei sich tragen."
+    "en": "…in league with the climber… should carry with him a ball of strong thread.",
+    "de": "…mit dem Kletterer im Bund ist, soll… ein Knäuel starken Zwirns bei sich tragen."
    },
    "leaf": null,
    "plate": {
@@ -4349,8 +4353,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…whether it will dig at the bottom, or in the middle, or at the top.",
-    "de": "…am Grund, in der Mitte oder oben aushöhlen wird."
+    "en": "I ask… whether it will dig at the bottom, or in the middle, or at the top.",
+    "de": "Ich frage, ob die Strömung… am Grund, in der Mitte oder oben aushöhlen wird."
    },
    "leaf": null,
    "plate": {
@@ -4738,8 +4742,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A sheet of water-raising machines: a screw, bucket wheels, pumps.",
-    "de": "Ein Blatt voller Wasserhebemaschinen: eine Schraube, Schöpfräder, Pumpen."
+    "en": "A great twisted screw, bucket wheels, pumps and a well.",
+    "de": "Eine große gedrehte Schraube, Schöpfräder, Pumpen und ein Brunnen."
    },
    "leaf": null,
    "plate": null,
@@ -4828,8 +4832,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Pumps and water-raising machines round a tall tower.",
-    "de": "Pumpen und Wasserhebemaschinen um einen hohen Turm."
+    "en": "Water-raising machines round a tall tower, an old man's head at the left.",
+    "de": "Wasserhebemaschinen um einen hohen Turm, links der Kopf eines alten Mannes."
    },
    "leaf": null,
    "plate": null,
@@ -4873,8 +4877,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A water wheel with angled blades, turned by a jet.",
-    "de": "Ein Wasserrad mit schrägen Schaufeln, von einem Strahl getrieben."
+    "en": "With angled blades, turned by a jet from a curved channel.",
+    "de": "Mit schrägen Schaufeln, von einem Strahl aus einer gebogenen Rinne getrieben."
    },
    "leaf": null,
    "plate": null,
@@ -4944,7 +4948,7 @@
    "phone": {
     "from": "lead",
     "en": "…this has a usefulness which comes from shortening the time.",
-    "de": "…dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt."
+    "de": "…dass dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt."
    },
    "leaf": null,
    "plate": {
@@ -5243,8 +5247,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A map of Europe's coasts in red chalk among lists of place names.",
-    "de": "Eine Karte der Küsten Europas in Rötel zwischen Listen von Ortsnamen."
+    "en": "In red chalk among lists of place names, wheels and small figures.",
+    "de": "In Rötel zwischen Listen von Ortsnamen, Rädern und kleinen Figuren."
    },
    "leaf": null,
    "plate": null,
@@ -5552,8 +5556,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Two many-domed churches in perspective, one above the other.",
-    "de": "Zwei vielkuppelige Kirchen in Perspektive, eine über der anderen."
+    "en": "In perspective, four plans with round chapels beside them.",
+    "de": "In Perspektive, daneben vier Grundrisse mit runden Kapellen."
    },
    "leaf": null,
    "plate": {
@@ -5611,8 +5615,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A domed church with four rounded apses and corner towers.",
-    "de": "Eine Kuppelkirche mit vier runden Apsiden und Ecktürmen."
+    "en": "With corner towers, four smaller domed variants around it.",
+    "de": "Mit Ecktürmen, darum vier kleinere Kuppelvarianten."
    },
    "leaf": null,
    "plate": {
@@ -5668,19 +5672,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "…when you enter into the crypt, you descend 10 steps…",
+     "text": "…you descend 10 steps, and when you mount into the upper you ascend 20 steps…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab…",
+     "text": "…steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
      "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "…quādo entri nella chiesa di sotto, tu cali 10 scalini…",
+     "text": "…tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -5691,8 +5695,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…when you enter into the crypt, you descend 10 steps…",
-    "de": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab…"
+    "en": "…you descend 10 steps… you ascend 20 steps…",
+    "de": "…steigst du 10 Stufen hinab… steigst du 20 Stufen hinauf…"
    },
    "leaf": null,
    "plate": {
@@ -5750,8 +5754,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A plan with eight lobed chapels round an octagon.",
-    "de": "Ein Grundriss mit acht gelappten Kapellen um ein Achteck."
+    "en": "Round an octagon, a small domed round temple finely shaded.",
+    "de": "Um ein Achteck, ein kleiner Rundtempel mit Kuppel, fein schattiert."
    },
    "leaf": null,
    "plate": {
@@ -5890,7 +5894,7 @@
    "phone": {
     "from": "lead",
     "en": "This building is inhabited below and above…",
-    "de": "Dieses Gebäude ist oben und unten begehbar."
+    "de": "Dieses Gebäude ist oben und unten begehbar…"
    },
    "leaf": null,
    "plate": {
@@ -5948,8 +5952,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A building for preaching, a cone of terraces under a drum and dome.",
-    "de": "Ein Bau zum Predigen, ein Kegel aus Terrassen unter Tambour und Kuppel."
+    "en": "A cone of terraces under a drum and dome.",
+    "de": "Ein Kegel aus Terrassen unter Tambour und Kuppel."
    },
    "leaf": null,
    "plate": {
@@ -6372,8 +6376,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A line of fortification, cut open to show its moats and vaulted chambers.",
-    "de": "Ein Festungsring, aufgeschnitten, um Gräben und gewölbte Kammern zu zeigen."
+    "en": "In coloured wash, cut open to show its moats and vaulted chambers.",
+    "de": "In farbiger Lavierung, aufgeschnitten, um Gräben und gewölbte Kammern zu zeigen."
    },
    "leaf": null,
    "plate": null,
@@ -6417,8 +6421,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A fortress with squat round towers and sloping walls seen from above.",
-    "de": "Eine Festung mit gedrungenen Rundtürmen und geböschten Mauern von oben."
+    "en": "With squat round towers and sloping walls, finely hatched.",
+    "de": "Mit gedrungenen Rundtürmen und geböschten Mauern, fein schraffiert."
    },
    "leaf": null,
    "plate": null,
@@ -6466,8 +6470,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A fortress in pen and wash, a pointed outwork before a round keep.",
-    "de": "Eine Festung in Feder und Lavierung, ein spitzes Vorwerk vor einem runden Turm."
+    "en": "A pointed outwork before a round keep, with moats.",
+    "de": "Ein spitzes Vorwerk vor einem runden Turm, mit Gräben."
    },
    "leaf": {
     "left": 0,
@@ -6606,8 +6610,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A fortress with round corner towers and a keep seen from above.",
-    "de": "Eine Festung mit runden Ecktürmen und einem Bergfried von oben."
+    "en": "With round corner towers seen from above, its plan drawn below.",
+    "de": "Mit runden Ecktürmen von oben, darunter ihr Grundriss."
    },
    "leaf": null,
    "plate": null,
@@ -6651,8 +6655,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Round fortress towers with sloping bases in section and elevation.",
-    "de": "Runde Festungstürme mit geböschtem Fuß in Schnitt und Aufriss."
+    "en": "With sloping bases, red lines fanning across the page.",
+    "de": "Mit geböschtem Fuß, rote Linien fächern über die Seite."
    },
    "leaf": null,
    "plate": null,
@@ -6996,8 +7000,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…at long distances no difference is perceptible in the parts in shadow.",
-    "de": "…wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein."
+    "en": "As to the colours of objects: at long distances no difference is perceptible…",
+    "de": "Zwischen den Farben der Körper wird auf große Entfernung… kein Unterschied sein."
    },
    "leaf": null,
    "plate": {
@@ -7215,7 +7219,7 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…which is lighted up by a greater quantity of luminous rays becomes brighter…",
+    "en": "…an object… lighted up by a greater quantity of luminous rays becomes brighter…",
     "de": "…ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird…"
    },
    "leaf": null,
@@ -7342,19 +7346,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "The form of the shadow cast by any body of uniform density…",
+     "text": "The form of the shadow… can never be the same as that of the body producing it.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke…",
+     "text": "Der Abdruck des Schattens… wird niemals dem Körper gleichen, aus dem er entsteht.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
      "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza…",
+     "text": "La stanpa dell'onbra… mai sarà simile al corpo donde ella nasce.",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -7365,8 +7369,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "The form of the shadow cast by any body of uniform density…",
-    "de": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke…"
+    "en": "The form of the shadow… can never be the same as that of the body producing it.",
+    "de": "Der Abdruck des Schattens… wird niemals dem Körper gleichen…"
    },
    "leaf": null,
    "plate": {
@@ -7445,8 +7449,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…the concave mirror made of half a spherical body has curved hypotenuses…",
-    "de": "…der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat…"
+    "en": "…how the concave mirror made of half a spherical body has curved hypotenuses…",
+    "de": "…wie der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat…"
    },
    "leaf": null,
    "plate": null,
@@ -7541,19 +7545,19 @@
     "passage": 1,
     "placeholder": false,
     "en": {
-     "text": "The flatter the common concave mirror, the greater the sum of reflected rays…",
+     "text": "The flatter the common concave mirror, the greater the sum of reflected rays it will bring to the same place.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors.",
      "rest": "AI translation. It may have errors."
     },
     "de": {
-     "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen…",
+     "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen, die er an dieselbe Stelle führt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten.",
      "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi…",
+     "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi conducerà nel medesimo sito.",
      "label": {
       "en": "Transcription: the Codex Arundel edition of the Reale Commissione Vinciana, part one, Rome 1923",
       "de": "Umschrift: die Ausgabe des Codex Arundel der Reale Commissione Vinciana, erster Teil, Rom 1923"
@@ -7634,8 +7638,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…penetrate the images of illuminated objects into a very dark chamber.",
-    "de": "…die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen."
+    "en": "…by some small round hole penetrate the images of illuminated objects…",
+    "de": "…durch ein kleines rundes Loch die Bilder beleuchteter Dinge… dringen."
    },
    "leaf": null,
    "plate": {
@@ -7794,8 +7798,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…to make what is flat appear in relief and what is in relief flat.",
-    "de": "…dass sie das Flache plastisch und das Plastische flach erscheinen lässt."
+    "en": "…perspective is of such a nature as to make what is flat appear in relief…",
+    "de": "Die Perspektive… das Flache plastisch und das Plastische flach erscheinen lässt."
    },
    "leaf": null,
    "plate": {
@@ -7931,19 +7935,19 @@
     "passage": 2,
     "placeholder": false,
     "en": {
-     "text": "…like the sound of bells in whose jangle you may find any name or word…",
+     "text": "…like the sound of bells… you may find any name or word you choose to imagine.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…wie mit dem Klang von Glocken, daß du in ihren Schlägen jeden Namen und jedes Vokabel finden kannst…",
+     "text": "…wie mit dem Klang von Glocken… jeden Namen und jedes Vokabel finden kannst, so du auszudenken vermagst.",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo…",
+     "text": "…come del suono di cāpane… vi troverai ogni nome e vocabolo che tu īmaginerai.",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -7953,9 +7957,9 @@
    "lead_none": false,
    "long": true,
    "phone": {
-    "from": "caption",
-    "en": "A page of writing: the stains on a wall that set the mind inventing.",
-    "de": "Eine Seite: die Flecken an einer Wand, die den Geist zum Erfinden bringen."
+    "from": "lead",
+    "en": "…like the sound of bells… you may find any name or word you choose to imagine.",
+    "de": "…wie mit dem Klang von Glocken… jeden Namen und jedes Vokabel finden kannst…"
    },
    "leaf": null,
    "plate": {
@@ -8496,19 +8500,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "…if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
+     "text": "…you, O Painter, if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
+     "text": "…wenn du, o Maler, deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
+     "text": "…tu pittore nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -8519,8 +8523,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…are like an orator who knows not how to use his words.",
-    "de": "…bist du wie der Redner, so seine Worte nicht anzuwenden versteht."
+    "en": "…if you do not know how to make your figures move, are like an orator…",
+    "de": "…wenn du… deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner…"
    },
    "leaf": null,
    "plate": {
@@ -8724,8 +8728,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A red chalk profile of an old man, drawn over a page of writing.",
-    "de": "Ein Rötelprofil eines alten Mannes, über eine Seite mit Schrift gezeichnet."
+    "en": "Drawn over a page of writing and sketches.",
+    "de": "Über eine Seite mit Schrift und Skizzen gezeichnet."
    },
    "leaf": null,
    "plate": null,
@@ -8773,8 +8777,8 @@
    "long": true,
    "phone": {
     "from": "caption",
-    "en": "A large profile of an old man among columns of word lists.",
-    "de": "Ein großes Profil eines alten Mannes zwischen Spalten von Wortlisten."
+    "en": "Deep-set eye and hooked nose, among columns of word lists.",
+    "de": "Tiefliegendes Auge und Hakennase, zwischen Spalten von Wortlisten."
    },
    "leaf": null,
    "plate": null,
@@ -8818,8 +8822,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "An old man's bearded profile in red and black chalk.",
-    "de": "Das bärtige Profil eines alten Mannes in Rötel und schwarzer Kreide."
+    "en": "In red and black chalk over faint writing.",
+    "de": "In Rötel und schwarzer Kreide über blasser Schrift."
    },
    "leaf": null,
    "plate": null,
@@ -8943,8 +8947,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A young man's curly head in profile, in fine pen.",
-    "de": "Der lockige Kopf eines jungen Mannes im Profil, in feiner Feder."
+    "en": "In profile, in fine pen, beside rosettes of interlaced circles.",
+    "de": "Im Profil, in feiner Feder, neben Rosetten aus verschlungenen Kreisen."
    },
    "leaf": null,
    "plate": null,
@@ -8992,8 +8996,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A young man's head in profile under a jewelled cap.",
-    "de": "Der Kopf eines jungen Mannes im Profil unter einer edelsteinbesetzten Kappe."
+    "en": "In profile under a jewelled cap with a long tail, in red chalk.",
+    "de": "Im Profil unter einer edelsteinbesetzten Kappe mit langem Zipfel, in Rötel."
    },
    "leaf": null,
    "plate": {
@@ -9051,8 +9055,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A kneeling young soldier in patterned tunic, leaning on a long sword.",
-    "de": "Ein kniender junger Soldat in gemustertem Rock, auf ein langes Schwert gestützt."
+    "en": "In patterned tunic and mail sleeves, leaning on a long sword, red chalk.",
+    "de": "In gemustertem Rock und Kettenärmeln, auf ein langes Schwert gestützt, Rötel."
    },
    "leaf": null,
    "plate": {
@@ -9316,7 +9320,7 @@
    "phone": {
     "from": "lead",
     "en": "…to demonstrate the difference there is between man and the horse…",
-    "de": "…den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht…"
+    "de": "…dass ich den Unterschied zeigen will… zwischen dem Menschen und dem Pferd…"
    },
    "leaf": null,
    "plate": {
@@ -9660,8 +9664,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A horse in red chalk standing inside a boxy framework of struts and plates.",
-    "de": "Ein Pferd in Rötel in einem kastenförmigen Gerüst aus Streben und Platten."
+    "en": "Inside a boxy framework of struts and plates, writing above it.",
+    "de": "In einem kastenförmigen Gerüst aus Streben und Platten, darüber die Schrift."
    },
    "leaf": null,
    "plate": null,
@@ -9799,8 +9803,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A timber A-frame on rollers with two pulleys, cradling a large curved form.",
-    "de": "Ein A-Gestell auf Walzen mit zwei Rollen, das eine große gebogene Form trägt."
+    "en": "With two pulleys, a large curved form, in red chalk.",
+    "de": "Mit zwei Rollen, eine große gebogene Form, in Rötel."
    },
    "leaf": null,
    "plate": null,
@@ -9934,8 +9938,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A rearing horse from behind in grey chalk.",
-    "de": "Ein sich aufbäumendes Pferd von hinten in grauer Kreide."
+    "en": "From behind in grey chalk, beside a fan of arcs.",
+    "de": "Von hinten in grauer Kreide, neben einem Fächer von Bögen."
    },
    "leaf": null,
    "plate": null,
@@ -9983,8 +9987,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A horse in a harness of straps, rings and a chain, in red chalk.",
-    "de": "Ein Pferd in einem Geschirr aus Riemen, Ringen und einer Kette, in Rötel."
+    "en": "Straps, rings and a chain, drawn sideways on the page, in red chalk.",
+    "de": "Aus Riemen, Ringen und einer Kette, quer zur Seite gezeichnet, in Rötel."
    },
    "leaf": {
     "left": 0,
@@ -10067,9 +10071,9 @@
    "lead_none": false,
    "long": false,
    "phone": {
-    "from": "lead",
-    "en": "There is no boss on branches which has not been produced by some branch…",
-    "de": "Es gibt keinen Knorren an den Ästen, an dem nicht ein Zweig ausgetrieben hat…"
+    "from": "caption",
+    "en": "Its thick trunk dividing into branches, a fainter tree beside it.",
+    "de": "Sein dicker Stamm teilt sich in Äste, daneben ein blasserer Baum."
    },
    "leaf": {
     "left": 0.049,
@@ -10182,8 +10186,8 @@
    "long": true,
    "phone": {
     "from": "caption",
-    "en": "Violets in flower, blossoms on long stems among leaves and grass.",
-    "de": "Blühende Veilchen, Blüten an langen Stielen zwischen Blättern und Gras."
+    "en": "Shaded blossoms on long stems among leaves and grass.",
+    "de": "Schattierte Blüten an langen Stielen zwischen Blättern und Gras."
    },
    "leaf": null,
    "plate": {
@@ -10262,7 +10266,7 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…when put together, a thickness equal to that of the main stem…",
+    "en": "…they will have made… a thickness equal to that of the main stem…",
     "de": "…ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist."
    },
    "leaf": null,
@@ -10445,8 +10449,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A red chalk dog's head in profile under a grid of measuring lines.",
-    "de": "Ein Hundekopf im Profil in Rötel unter einem Raster aus Messlinien."
+    "en": "In profile under a grid of measuring lines, its fur in pen.",
+    "de": "Im Profil unter einem Raster aus Messlinien, das Fell mit der Feder."
    },
    "leaf": null,
    "plate": {
@@ -10680,8 +10684,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…what shines in the moon is water like that of our seas…",
-    "de": "…was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere…"
+    "en": "Whence it may be concluded that what shines in the moon is water…",
+    "de": "Hier wird man schließen, daß jenes, was von dem Monde leuchtet, Wasser ist…"
    },
    "leaf": null,
    "plate": null,
@@ -10891,7 +10895,7 @@
    "phone": {
     "from": "lead",
     "en": "The earth is not in the centre of the Sun's orbit…",
-    "de": "Wie die Erde nicht inmitten des Sonnenkreises…"
+    "de": "Wie die Erde nicht inmitten des Sonnenkreises, noch im Mittelpunkt der Welt ist…"
    },
    "leaf": {
     "left": 0.02,
@@ -11060,8 +11064,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…make our world shine with the appearance of a moon…",
-    "de": "…unsere Welt gleich dem Monde leuchten macht…"
+    "en": "…the ocean and the other seas must, by means of the sun, make our world shine…",
+    "de": "…der Ozean… vermittels der Sonne unsere Welt gleich dem Monde leuchten macht…"
    },
    "leaf": null,
    "plate": {
@@ -11117,19 +11121,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "But I cannot forbear to condemn many of the ancients…",
+     "text": "But I cannot forbear to condemn many of the ancients, who said that the sun was no larger than it appears…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten…",
+     "text": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten, welche sagen, daß die Sonne keine andere Größe habe als die, welche sie zeigt…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…mai nō posso fare ch'io non biasimi molti di quelli antichi…",
+     "text": "…mai nō posso fare ch'io non biasimi molti di quelli antichi, li quali dissero che 'l sole non avea altra grādezza che quella che mostra…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -11139,9 +11143,9 @@
    "lead_none": false,
    "long": true,
    "phone": {
-    "from": "lead",
-    "en": "But I cannot forbear to condemn many of the ancients…",
-    "de": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten…"
+    "from": "caption",
+    "en": "Its first lines in reddish ink, dotted marks at the right.",
+    "de": "Die ersten Zeilen in rötlicher Tinte, rechts gepunktete Zeichen."
    },
    "leaf": {
     "left": 0,
@@ -11468,8 +11472,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A round sheet with a wheel of crescents spiralling round a centre.",
-    "de": "Ein rundes Blatt mit einem Rad aus Möndchen, die spiralig um eine Mitte laufen."
+    "en": "Crescents spiralling round a centre.",
+    "de": "Möndchen, die spiralig um eine Mitte laufen."
    },
    "leaf": null,
    "plate": null,
@@ -11562,8 +11566,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "Four rosettes of looping cords and curling leaves in red chalk.",
-    "de": "Vier Rosetten aus geschlungenen Schnüren und gekräuselten Blättern in Rötel."
+    "en": "Looping cords and curling leaves in red chalk.",
+    "de": "Aus geschlungenen Schnüren und gekräuselten Blättern in Rötel."
    },
    "leaf": {
     "left": 0.048,
@@ -11757,8 +11761,8 @@
    "long": false,
    "phone": {
     "from": "caption",
-    "en": "A great ring of box-shaped sections in steep perspective.",
-    "de": "Ein großer Ring aus kastenförmigen Abschnitten in steiler Perspektive."
+    "en": "Box-shaped sections in steep perspective on a grey ground.",
+    "de": "Aus kastenförmigen Abschnitten in steiler Perspektive auf grauem Grund."
    },
    "leaf": null,
    "plate": null,
@@ -11959,19 +11963,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "Those who are in love with practice without knowledge are like the sailor…",
+     "text": "Those who are in love with practice without knowledge are like the sailor who gets into a ship without rudder or compass…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot…",
+     "text": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "Quelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere…",
+     "text": "Quelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere che ētra navilio sanza timone o bussola…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -11982,8 +11986,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "Those who are in love with practice without knowledge are like the sailor…",
-    "de": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot…"
+    "en": "Those… are like the sailor who gets into a ship without rudder or compass…",
+    "de": "Jene… sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt…"
    },
    "leaf": {
     "left": 0.013,
@@ -12222,8 +12226,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…their reasoning is not confirmed by experience.",
-    "de": "…ihre Gründe werden von der Erfahrung nicht bestätigt."
+    "en": "…these speculators, because their reasoning is not confirmed by experience.",
+    "de": "…jener Spekulatoren, denn ihre Gründe werden von der Erfahrung nicht bestätigt."
    },
    "leaf": null,
    "plate": {
@@ -12441,9 +12445,9 @@
    "lead_none": false,
    "long": false,
    "phone": {
-    "from": "lead",
-    "en": "…truth bears the same relation to falsehood as light to darkness…",
-    "de": "…zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist…"
+    "from": "caption",
+    "en": "A page of writing with birds in flight sketched down the right margin.",
+    "de": "Eine beschriebene Seite, am rechten Rand Vögel im Flug skizziert."
    },
    "leaf": null,
    "plate": null,
@@ -13032,7 +13036,7 @@
    "phone": {
     "from": "lead",
     "en": "…in the house of Piero di Braccio Martelli, on the 22nd day of March 1508.",
-    "de": "Begonnen in Florenz, im Haus des Piero di Braccio Martelli, am 22. März 1508."
+    "de": "…im Haus des Piero di Braccio Martelli, am 22. März 1508."
    },
    "leaf": null,
    "plate": null,
@@ -13424,7 +13428,7 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…a kite came to me and opened my mouth with its tail…",
+    "en": "…it seemed to me that… a kite came to me and opened my mouth with its tail…",
     "de": "…als ob ein Milan zu mir käme, mir mit seinem Schwanz den Mund öffnete…"
    },
    "leaf": null,
@@ -13471,19 +13475,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci…",
+     "text": "On the 9th of July 1504, Wednesday, … died Ser Piero da Vinci, notary at the Palazzo del Podestà, my father…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
      "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci…",
+     "text": "Am 9. Juli 1504, Mittwoch, … starb Ser Piero da Vinci, Notar am Palazzo del Podestà, mein Vater…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
      "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "A dì 9 di luglio 1504, mercoledì a ore 7 morì Ser Piero da Vinci…",
+     "text": "A dì 9 di luglio 1504, mercoledì … morì Ser Piero da Vinci, notaio al Palazzo del Podestà, mio padre…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -13494,8 +13498,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci…",
-    "de": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci…"
+    "en": "On the 9th of July 1504, Wednesday, … died Ser Piero da Vinci…",
+    "de": "Am 9. Juli 1504, Mittwoch, … starb Ser Piero da Vinci…"
    },
    "leaf": null,
    "plate": null,
