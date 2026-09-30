@@ -14,6 +14,10 @@ import { deskAny } from './desk-switches'
 import { setCloseLookBand } from './desk-stage'
 
 const MOUNT = 'na-title-plate'
+/* A key pressed anywhere in the page: until then a focus the door gives itself
+   is where a keyboard starts, not a ring to show at rest. */
+let keyed = false
+globalThis.addEventListener?.('keydown', () => { keyed = true }, { capture: true })
 /** the aspect the wing chrome already calls a phone */
 const NARROW = '(max-aspect-ratio: 9/10)'
 
@@ -478,6 +482,8 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
   const answerStage = (): void => { standDown(); if (dialog.open) height(); setLine(); holdBand() }
   narrow.addEventListener('change', answerStage)
   const resized = (): void => { if (door && dialog.open) { setLine(); holdBand() } }
+  /** the first key the door hears gives its focus ring back */
+  const speak = (): void => { delete dialog.dataset['quietFocus'] }
   addEventListener('resize', resized)
   host.append(dialog)
 
@@ -496,6 +502,10 @@ export function createTitlePlate(host: HTMLElement, parts: PlateParts): TitlePla
       // the serif may still be on its way: the rows are set again once it is here
       if (door) void document_.fonts?.ready.then(() => { if (live && dialog.open) { setLine(); holdBand() } })
       holdBand()
+      if (door && !keyed) {
+        dialog.dataset['quietFocus'] = ''
+        dialog.addEventListener('keydown', speak, { once: true })
+      }
       dialog.querySelector<HTMLButtonElement>('.na-plate-primary')?.focus({ preventScroll: true })
       dialog.scrollTop = 0
     },

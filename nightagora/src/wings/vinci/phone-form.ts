@@ -41,6 +41,16 @@ function icon(path: string, cls = 'film-ic'): SVGSVGElement {
   return svg
 }
 const wordOf = (node: Element | null): string => node?.textContent?.trim() ?? ''
+/** A pill's label whose last two words never part, so a wrapped label leaves
+    no word alone on its last row; a label under `least` words wraps freely. */
+function keepLast(node: HTMLElement, said: string, least = 3): void {
+  const words = said.split(' ')
+  if (words.length < least) { node.textContent = said; return }
+  const tail = words.splice(-2).join(' ')
+  node.replaceChildren(words.length ? `${words.join(' ')} ` : '', make('span', 'film-keep', tail))
+}
+/** the story's clock at his birth repeats what its heading already says */
+const atBirth = (age: VinciText): boolean => text(age) === text(deskControl('date', 'age_birth'))
 
 /** A wall the eye stands on: where along it, and the way to its neighbours. */
 export interface VinciPhoneWall {
@@ -168,6 +178,14 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
   wall.setAttribute('role', 'group')
   root.append(wall, name, line, drawer, keys, foot)
   host.layer.append(root)
+  // whether the age had to drop under a long heading, read wherever the row's size changes;
+  // written a frame later, since the answer resizes the row it observes
+  const nameRows = new ResizeObserver(() => requestAnimationFrame(() => {
+    const chapter = name.querySelector<HTMLElement>('.film-chapter'), clock = name.querySelector<HTMLElement>('.film-clock')
+    root.dataset['nameRows'] = chapter && clock && clock.offsetTop > chapter.offsetTop + 4 ? '2' : '1'
+  }))
+  nameRows.observe(name)
+  signal.addEventListener('abort', () => nameRows.disconnect())
 
   let open = false
   let walkingPainted: boolean | null = null
@@ -206,22 +224,24 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     root.dataset['walking'] = String(walking)
     gold.dataset['leg'] = String(walking)
     if (look?.next && !walking) {
-      goldName.textContent = look.next.title
+      keepLast(goldName, look.next.title)
       gold.setAttribute('aria-label', `${text(look.next.word)} · ${look.next.title}`)
     } else if (walking) {
       goldName.textContent = text(deskControl('walk', 'walk_faster'))
       gold.setAttribute('aria-label', `${text(deskControl('walk', 'walking'))} · ${text(deskControl('walk', 'walk_faster'))}`)
     } else if (to !== null) {
       const title = text(deskStoryStop(host.id(to))?.chapter ?? host.name(to))
-      goldName.textContent = title
+      keepLast(goldName, title)
       gold.setAttribute('aria-label', `${text(host.words.next)} · ${title}`)
     } else {
       /* THE WALK ENDS IN TWO WAYS, side by side as the desktop's panel stands
          them: gold looks up, and the talk choice beside it opens the door */
       const end = text(deskControl('walk', 'the_end')), look = text(deskControl('ending', 'lookup'))
-      goldName.textContent = look
+      keepLast(goldName, look, 2)
       gold.setAttribute('aria-label', `${end} · ${look}`)
-      talk.textContent = text(deskControl('ending', 'talk'))
+      const said = make('span', 'film-talk-name')
+      keepLast(said, text(deskControl('ending', 'talk')))
+      talk.replaceChildren(said)
     }
     const end = !walking && to === null && !look?.next
     gold.dataset['end'] = String(end)
@@ -246,7 +266,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     const stop = deskStoryStop(host.id(index))
     name.textContent = ''
     name.append(deskMark(stop?.certainty ?? 'reconstructed'), make('span', 'film-chapter', text(stop?.chapter ?? host.name(index))))
-    if (stop?.age) name.append(make('span', 'film-clock', text(stop.age)))
+    if (stop?.age && !atBirth(stop.age)) name.append(make('span', 'film-clock', text(stop.age)))
     line.textContent = stop ? text(stop.line) : ''
     drawer.textContent = ''
     if (open && stop?.drawer) {
@@ -364,6 +384,6 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
       return boxes.filter(b => b.width > 0 && b.height > 0).map(b => ({ left: b.left, top: b.top, right: b.right, bottom: b.bottom }))
     },
     show(shown) { root.hidden = !shown },
-    dispose() { root.remove(); dispatchEvent(new CustomEvent('na-wing-instruments', { detail: { rows: [] } })) },
+    dispose() { nameRows.disconnect(); root.remove(); dispatchEvent(new CustomEvent('na-wing-instruments', { detail: { rows: [] } })) },
   }
 }

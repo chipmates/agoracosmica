@@ -345,6 +345,8 @@
 }
 .na-plate[data-form='door'] .na-plate-primary:hover { background: color-mix(in srgb, var(--na-gold) 22%, transparent); }
 .na-plate[data-form='door'] .na-plate-primary:focus-visible { outline: 1px solid var(--na-gold); outline-offset: 4px; }
+/* the focus the door gives itself on opening stays unringed until a key is pressed */
+.na-plate[data-form='door'][data-quiet-focus] .na-plate-primary:focus-visible { outline-color: transparent; }
 .na-door-arrow {
   display: grid;
   place-items: center;

@@ -46,6 +46,12 @@
   padding-top: 8px;
   min-height: 26px;
 }
+/* a heading too long to share its row with the age: the age drops under it,
+   and the row gives back the space it took, so the picture keeps two thirds */
+.film-box[data-name-rows='2'] > .film-name { padding-top: 4px; }
+.film-box[data-name-rows='2'] .film-clock { line-height: 16px; }
+.film-box[data-name-rows='2'] > .film-line,
+.film-box[data-name-rows='2'] > .film-drawer { padding-top: 0; }
 .film-name .desk-mark { width: 12px; height: 12px; flex: 0 0 12px; align-self: center; overflow: visible; }
 .film-name .desk-mark circle, .film-name .desk-mark path { stroke-width: 1.6; }
 .film-name .desk-mark[data-certainty='documented'] { color: #8cba8b; }
@@ -126,9 +132,9 @@
 }
 .film-back, .film-book {
   position: absolute;
-  top: 16px;
-  width: 40px;
-  height: 40px;
+  top: 14px;
+  width: 44px;
+  height: 44px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -140,11 +146,13 @@
   justify-content: center;
   cursor: pointer;
 }
+/* the two glass seats stand as a pair, and gold keeps 16 px clear of the
+   book at its widest (the gold's max-width below) */
 .film-back { left: 16px; }
-.film-book { left: 76px; }
-/* the corner target runs into the corner: back 0 to 64, the book 72 to 120 */
-.film-back::after { content: ''; position: absolute; left: -16px; right: -8px; top: -4px; bottom: -12px; }
-.film-book::after { content: ''; position: absolute; left: -4px; right: -4px; top: -4px; bottom: -4px; }
+.film-book { left: 68px; }
+/* the corner target runs into the corner: back 0 to 64, the book 64 to 116 */
+.film-back::after { content: ''; position: absolute; left: -16px; right: -4px; top: -2px; bottom: -10px; }
+.film-book::after { content: ''; position: absolute; left: -4px; right: -4px; top: -2px; bottom: -2px; }
 .film-back:disabled { opacity: .45; cursor: default; }
 .film-ic { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
 .film-ic.film-ic-fill { fill: currentColor; stroke-width: 1; width: 14px; height: 14px; }
@@ -171,8 +179,10 @@
 }
 .film-gold::after { content: ''; position: absolute; left: -8px; right: -12px; top: -4px; bottom: -4px; }
 .film-gold:disabled { opacity: .55; cursor: default; }
-/* the name keeps one line where the pill has the room, and wraps whole words where it has not */
+/* the name keeps one line where the pill has the room, and wraps whole words where it has not;
+   its last two words stay together, so no word stands alone on the last row */
 .film-gold-name { display: block; font: 400 .9375rem/18px var(--serif); text-align: left; white-space: normal; text-wrap: balance; }
+.film-keep { white-space: nowrap; }
 .film-gold-arrow {
   position: relative;
   flex: 0 0 36px;
@@ -225,20 +235,21 @@
 }
 
 /* THE WALK ENDS IN TWO WAYS at its last stop: the talk choice takes the
-   book's seat, and it and gold stand side by side at one width, gold still
-   lit, pointing up; the row's height and the controls' centres stay put */
+   book's seat, and it and gold stand side by side, gold still lit, pointing
+   up; the row's height and the controls' centres stay put. The talk keeps
+   its one row first, gold takes the rest and wraps before the talk does. */
 .film-talk { display: none; }
 .film-box[data-end='true'] .film-foot { display: flex; align-items: flex-start; gap: 8px; height: 68px; padding: 12px 12px env(safe-area-inset-bottom) 16px; }
-.film-box[data-end='true'] .film-back { position: relative; top: 4px; left: auto; flex: 0 0 40px; }
+.film-box[data-end='true'] .film-back { position: relative; top: 2px; left: auto; flex: 0 0 44px; }
 .film-box[data-end='true'] .film-book { display: none; }
-/* one width each: the row less the way back (40), the gaps (8, 8) and the book's old margin (12) */
 .film-box[data-end='true'] .film-talk,
-.film-box[data-end='true'] .film-gold { position: relative; top: auto; right: auto; flex: 0 0 calc((100% - 68px) / 2); box-sizing: border-box; min-width: 0; max-width: none; height: 48px; }
+.film-box[data-end='true'] .film-gold { position: relative; top: auto; right: auto; box-sizing: border-box; min-width: auto; max-width: none; height: 48px; }
+.film-box[data-end='true'] .film-talk { flex: 0 1 auto; }
+.film-box[data-end='true'] .film-gold { flex: 1 1 0; }
 .film-box[data-end='true'] .film-talk {
   display: flex;
   align-items: center;
-  margin-left: 12px;
-  padding: 0 14px;
+  padding: 0 12px;
   border: 0;
   border-radius: 24px;
   background: var(--glass);

@@ -55,6 +55,16 @@ function icon(path: string, cls = 'film-ic'): SVGSVGElement {
   svg.append(line)
   return svg
 }
+/** A pill's label whose last two words never part, so a wrapped label leaves
+    no word alone on its last row; a label under `least` words wraps freely. */
+function keepLast(node: HTMLElement, said: string, least = 3): void {
+  const words = said.split(' ')
+  if (words.length < least) { node.textContent = said; return }
+  const tail = words.splice(-2).join(' ')
+  node.replaceChildren(words.length ? `${words.join(' ')} ` : '', make('span', 'film-keep', tail))
+}
+/** the story's clock at his birth repeats what its heading already says */
+const atBirth = (age: VinciText): boolean => text(age) === text(deskControl('date', 'age_birth'))
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4', ARROW_UP = 'M8 13V3M4 7l4-4 4 4', ARROW_DOWN = 'M8 3v10M4 9l4 4 4-4'
 const BOOK = 'M8 3.2a4.8 4.8 0 1 0 0 9.6a4.8 4.8 0 1 0 0-9.6M8 6.2v3.6M6.2 8h3.6'
 const TRIANGLE_BACK = 'M11 3.5L4.5 8 11 12.5z'
@@ -620,6 +630,14 @@ export function createWing(): WingModule {
     foot.append(back, book, talk, gold)
     root.append(name, line, drawer, keys, foot)
     h.stage.append(root)
+    // whether the age had to drop under a long heading, read wherever the row's size changes;
+    // written a frame later, since the answer resizes the row it observes
+    const rows = new ResizeObserver(() => requestAnimationFrame(() => {
+      const chapter = name.querySelector<HTMLElement>('.film-chapter'), clock = name.querySelector<HTMLElement>('.film-clock')
+      root.dataset['nameRows'] = chapter && clock && clock.offsetTop > chapter.offsetTop + 4 ? '2' : '1'
+    }))
+    rows.observe(name)
+    signal.addEventListener('abort', () => rows.disconnect())
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
     back.addEventListener('click', () => { if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
@@ -655,7 +673,7 @@ export function createWing(): WingModule {
     const stop = deskStoryStop(id)
     phone.name.textContent = ''
     phone.name.append(deskMark(stop?.certainty ?? 'reconstructed'), make('span', 'film-chapter', text(stop?.chapter ?? LIFE[card]!.name)))
-    if (stop?.age) phone.name.append(make('span', 'film-clock', text(stop.age)))
+    if (stop?.age && !atBirth(stop.age)) phone.name.append(make('span', 'film-clock', text(stop.age)))
     phone.line.textContent = stop ? text(stop.line) : ''
     phone.drawer.textContent = ''
     if (drawerOpen && stop?.drawer) {
@@ -696,15 +714,17 @@ export function createWing(): WingModule {
       phone.gold.setAttribute('aria-label', `${text(deskControl('walk', 'walking'))} · ${text(deskControl('walk', 'walk_faster'))}`)
     } else if (to !== null) {
       const title = text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name)
-      phone.goldName.textContent = title
+      keepLast(phone.goldName, title)
       phone.gold.setAttribute('aria-label', `${text(CARDS.controls.date.next)} · ${title}`)
     } else {
       /* THE WALK ENDS IN TWO WAYS, side by side as the desktop's panel stands
          them: gold looks up, and the talk choice beside it opens the door */
       const end = text(deskControl('walk', 'the_end')), look = text(deskControl('ending', 'lookup'))
-      phone.goldName.textContent = look
+      keepLast(phone.goldName, look, 2)
       phone.gold.setAttribute('aria-label', `${end} · ${look}`)
-      phone.talk.textContent = text(deskControl('ending', 'talk'))
+      const said = make('span', 'film-talk-name')
+      keepLast(said, text(deskControl('ending', 'talk')))
+      phone.talk.replaceChildren(said)
     }
     phone.gold.dataset['end'] = String(!walking && to === null)
     phone.root.dataset['end'] = String(!walking && to === null)
