@@ -544,7 +544,14 @@ export function createWing():VinciWingModule {
     if(!cut&&vertex===undefined&&stop.exhibit){walkOnToWall(index);return}
     // an uncertified place is stood at by a cut, never walked along the grid
     const cutHere=cut||Boolean(stop.place&&!placeProved(stop))
-    rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),cutHere,narrow(),cutHere&&stop.place?walkVertex(stop):vertex)
+    const id=railPlaceOf(stop), pose=vinciWalkPose(stop,narrow())
+    // FROM A WORK THE RUN ALONG THE WALL IS ASKED AS A STEP IS: `set` raises
+    // the rail's return flag there, and a run that opens no work never lowers it.
+    // The leg is the same.
+    const fromWork=!cutHere&&vertex!==undefined&&rail.navigation.exhibit!==undefined
+    if(fromWork)yieldEye()
+    if(!(fromWork&&proved(()=>rail.along(vertex,id,pose,undefined,narrow()))))
+      rail.set(id,pose,cutHere,narrow(),cutHere&&stop.place?walkVertex(stop):vertex)
     // On a walk the card changes when the visitor arrives, not when the
     // rail mark is pressed: a title that names the next room over the room
     // you are still standing in is a lie the frame tells.
