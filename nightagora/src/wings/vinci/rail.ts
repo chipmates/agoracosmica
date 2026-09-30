@@ -104,11 +104,15 @@ const BODY_PHONE=p(-32,-52.55,FLOOR+1.62,-32,-52.55,FLOOR+1.62)
  * passes that corner at head height. At 56 its end stands outside the
  * frame with a margin and the field takes four fifths of its width. */
 const SUPPER_DESK_EYE={east:-38.4,north:SUPPER_WALL.north-.4,fov:56}
-/** THE LINE'S FIRST YEARS are seen from north of the room's own view, on its
- * heading and lens, so the arrival's turn keeps off the gallery's end wall:
- * 1.2 m on the phone; on the desktop, whose wider frame reaches nearer
- * floor, less and with the aim dipped, so the first stud's year stays in it. */
-const LINE_EYE_NORTH_M=1.2,LINE_EYE_NORTH_DESKTOP_M=.6,LINE_TILT_DESKTOP=4*Math.PI/180
+/** THE LINE'S FIRST YEARS are seen from 0.6 m north of the room's own view,
+ * so the arrival's turn keeps off the gallery's end wall. The desktop keeps
+ * the room's heading and lens with the aim dipped, so the first stud's year
+ * stays in it. The phone's sheet covers the frame's lowest third: from 1.2 m
+ * further north the first 1452 lay under it at any aim that kept the line,
+ * so the phone stands at the desktop's eye and looks down until that year
+ * and its disc stand above the sheet, the line running up to the far wall. */
+const LINE_EYE_NORTH_M=.6,LINE_TILT_DESKTOP=4*Math.PI/180
+const LINE_PHONE={heading:5,pitch:-43,fov:92}
 /** The chamber's eye, on the lawn under the court's south-west corner. */
 const CHAMBER_LAWN=standing(-4,-38)
 function narrowRoomPose(pose:Pose,share=NARROW_AIM_SHARE):Pose {
@@ -221,9 +225,9 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   const room=COLLECTION_STATION_ROOMS[id]
   // THE TIMELINE'S FIRST EYE stands north of its room's view: 0.6 m off the
   // gallery's end wall, every walk in turned round with that wall filling the frame.
-  if(id==='line-early'){const pose=collectionView(room!,narrow)!,step=new Vector3(0,0,-(narrow?LINE_EYE_NORTH_M:LINE_EYE_NORTH_DESKTOP_M))
+  if(id==='line-early'){const pose=collectionView(room!,narrow)!,step=new Vector3(0,0,-LINE_EYE_NORTH_M)
     const eye=pose.eye.clone().add(step),aim=pose.at.clone().sub(pose.eye)
-    if(narrow)return {eye,at:eye.clone().add(aim),fov:pose.fov}
+    if(narrow)return aimedFrom({eye,at:eye,fov:LINE_PHONE.fov},LINE_PHONE.heading,LINE_PHONE.pitch,LINE_PHONE.fov)
     const flat=Math.hypot(aim.x,aim.z),far=aim.length(),pitch=Math.atan2(aim.y,flat)-LINE_TILT_DESKTOP
     return {eye,at:eye.clone().add(new Vector3(aim.x/flat*Math.cos(pitch)*far,Math.sin(pitch)*far,aim.z/flat*Math.cos(pitch)*far)),fov:pose.fov}}
   // Floor subjects and the wall read end-on have a measured phone composition
