@@ -102,19 +102,21 @@ function validate(camera) {
   ensure(norm<1e-10&&roll<1e-10,'Camera lost unit quaternion or acquired roll')
 }
 function harness(phone,initial='arrival',status='verified') {
+  // the real authority allows a leg the larger shift of its two ends
+  const legShift=(a,b)=>Math.max(Math.abs(a.shift??0),Math.abs(b.shift??0))
   let now=0
   const camera=new THREE.PerspectiveCamera(49,phone?390/844:1512/950,.25,1100),calls=[]
   const authority={status,failure:'',rejectRoute:false,route(from,to,requestPhone,actualCamera){
     calls.push({from:from.eye.toArray(),to:to.eye.toArray(),phone:requestPhone})
     ensure(authority.status==='verified','Controller called a pending/failed authority')
-    assertRailProjection(actualCamera)
+    assertRailProjection(actualCamera,legShift(from,to))
     ensure(actualCamera.position.distanceToSquared(from.eye)<1e-18,'Controller supplied a false route origin')
     if(authority.rejectRoute)throw new Error('Intentional controller route rejection')
     return realAuthorities.get(phone?'calm':'standard').route(from,to,requestPhone,actualCamera)
   },approach(from,to,requestPhone,actualCamera,back=false){
     calls.push({kind:'approach',back,from:from.eye.toArray(),to:to.eye.toArray(),phone:requestPhone})
     ensure(authority.status==='verified','Controller called a pending/failed authority')
-    assertRailProjection(actualCamera)
+    assertRailProjection(actualCamera,legShift(from,to))
     const origin=back?to:from
     ensure(actualCamera.position.distanceToSquared(origin.eye)<1e-18,'Controller supplied a false approach origin')
     return realAuthorities.get(phone?'calm':'standard').approach(from,to,requestPhone,actualCamera,back)
