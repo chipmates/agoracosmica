@@ -180,7 +180,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
     quiet: false,
     chapter: { en: "A wall in Milan", de: "Eine Wand in Mailand" },
     age: { en: "45", de: "mit 45 Jahren" },
-    line: { en: "His biggest surviving picture is this big. He painted it on a wall in Milan, before the French came.", de: "Sein größtes erhaltenes Bild ist so groß. Er malte es auf eine Wand in Mailand, bevor die Franzosen kamen." },
+    line: { en: "His biggest surviving picture is this big. He painted it on a wall in Milan, before the French came.", de: "Sein größtes erhaltenes Bild: so groß. Ein Wandbild in Mailand, bevor die Franzosen kamen." },
     drawer: { en: "This field is the Last Supper’s true size. Four and a half metres high, almost nine across. The wall is in the dining hall of a monastery. The duke pressed him to finish it, and he did at 45. He painted it dry on the plaster, not into it. In 1652 a doorway took the feet of Christ.", de: "Dieses Feld hat die wahre Größe des Abendmahls. Viereinhalb Meter hoch, fast neun breit. Die Wand steht im Speisesaal eines Klosters. Der Herzog drängte ihn, es zu vollenden, und mit 45 war es fertig. Er malte trocken auf den Putz, nicht in ihn hinein. 1652 nahm eine Türöffnung die Füße Christi mit." },
     certainty: "documented",
     sees: "The court field at 4.6 by 8.8 m",
