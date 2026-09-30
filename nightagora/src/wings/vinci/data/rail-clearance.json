@@ -168,8 +168,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "7e3cbc460892b2ce029acc483e054573a2ae0de5da226ed4306ed10e6c701940",
-   "bytes": 94254,
+   "sha256": "28bacfbc4d31e884087636c736801f5c6e8ad973085e5d7025bacb0e6da7c7d9",
+   "bytes": 94845,
    "unchangedDuringAudit": true
   },
   {
