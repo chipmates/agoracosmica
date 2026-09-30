@@ -9,7 +9,7 @@
   "words/notices.json": "0ce595d11d018e8596c538cf1dd40f9f041323d1994b502104a3c2f410198d42",
   "words/leads.jsonl": "25754a4dd652ac9fcbc544233ca1fe969ebf7a861c0dca4f75ee49021910cf45",
   "words/keys.json": "2b3b3b5a204e87d5f93bc4bd8ed0f17cf8799c4ecfb03814b6b525c6e8b99a4e",
-  "words/phone-lines.jsonl": "a693e526d337f6bcf4d539889a81907fb7fa16dee4b311a1c6e4badd0fe1ef78",
+  "words/phone-lines.jsonl": "d2363f639ba63730244a36d593f67389e4270bab12c77327843bc23ee07973f3",
   "texts-final/it-b.jsonl": "4baec9ed8ac99ef71e2feb1d647b0124fbf9f3a83d19ffd56fe1ed139b957e03",
   "texts-final/it.jsonl": "00e6af9c3a0a3545a368c19b0cd58ce1f37d78a2c12f093243206605106b7a74",
   "texts-final/rh-b.jsonl": "3754cf721940edda3f53547f159beccb6e2af5b2f3ded0986b3c4cbba93b2fe4",
@@ -763,8 +763,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "If the plank of 200 pounds rises before the wing comes down, the test is good.",
-    "de": "Wenn sich die Bohle von 200 Pfund hebt… ist der Versuch gut."
+    "en": "If the plank of 200 pounds rises before the wing comes down…",
+    "de": "Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt…"
    },
    "leaf": null,
    "plate": {
@@ -5695,8 +5695,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…you descend 10 steps… you ascend 20 steps…",
-    "de": "…steigst du 10 Stufen hinab… steigst du 20 Stufen hinauf…"
+    "en": "…when you enter into the crypt, you descend 10 steps…",
+    "de": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab…"
    },
    "leaf": null,
    "plate": {
@@ -7000,8 +7000,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "As to the colours of objects: at long distances no difference is perceptible…",
-    "de": "Zwischen den Farben der Körper wird auf große Entfernung… kein Unterschied sein."
+    "en": "…at long distances no difference is perceptible in the parts in shadow.",
+    "de": "…wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein."
    },
    "leaf": null,
    "plate": {
@@ -7798,7 +7798,7 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…perspective is of such a nature as to make what is flat appear in relief…",
+    "en": "…perspective… to make what is flat appear in relief and what is in relief flat.",
     "de": "Die Perspektive… das Flache plastisch und das Plastische flach erscheinen lässt."
    },
    "leaf": null,
@@ -7958,7 +7958,7 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "…like the sound of bells… you may find any name or word you choose to imagine.",
+    "en": "…like the sound of bells… you may find any name or word…",
     "de": "…wie mit dem Klang von Glocken… jeden Namen und jedes Vokabel finden kannst…"
    },
    "leaf": null,
@@ -8798,7 +8798,7 @@
    },
    "seat": {
     "en": "Codex Atlanticus, 118 a",
-    "de": "Codex Atlanticus"
+    "de": "Codex Atlanticus, 118 a"
    },
    "file": "codices/thek-atlanticus/p0291.jpg",
    "thumb": "codices/thek-atlanticus/thumbs/p0291.jpg",
@@ -10266,7 +10266,7 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…they will have made… a thickness equal to that of the main stem…",
+    "en": "…when put together, a thickness equal to that of the main stem…",
     "de": "…ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist."
    },
    "leaf": null,
@@ -10684,8 +10684,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "Whence it may be concluded that what shines in the moon is water…",
-    "de": "Hier wird man schließen, daß jenes, was von dem Monde leuchtet, Wasser ist…"
+    "en": "…what shines in the moon is water like that of our seas…",
+    "de": "…was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere…"
    },
    "leaf": null,
    "plate": null,
@@ -10895,7 +10895,7 @@
    "phone": {
     "from": "lead",
     "en": "The earth is not in the centre of the Sun's orbit…",
-    "de": "Wie die Erde nicht inmitten des Sonnenkreises, noch im Mittelpunkt der Welt ist…"
+    "de": "Wie die Erde nicht inmitten des Sonnenkreises… ist…"
    },
    "leaf": {
     "left": 0.02,
@@ -11064,8 +11064,8 @@
    "long": false,
    "phone": {
     "from": "lead",
-    "en": "…the ocean and the other seas must, by means of the sun, make our world shine…",
-    "de": "…der Ozean… vermittels der Sonne unsere Welt gleich dem Monde leuchten macht…"
+    "en": "…the ocean… must, by means of the sun, make our world shine…",
+    "de": "…der Ozean… vermittels der Sonne unsere Welt… leuchten macht…"
    },
    "leaf": null,
    "plate": {
@@ -11278,7 +11278,7 @@
    },
    "seat": {
     "en": "Codex Arundel, 155v-156r",
-    "de": "Codex Arundel"
+    "de": "Codex Arundel, 155v-156r"
    },
    "file": "codices/bl-arundel/p0186.jpg",
    "thumb": "codices/bl-arundel/thumbs/p0186.jpg",
@@ -11986,8 +11986,8 @@
    "long": true,
    "phone": {
     "from": "lead",
-    "en": "Those… are like the sailor who gets into a ship without rudder or compass…",
-    "de": "Jene… sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt…"
+    "en": "Those who are in love with practice without knowledge are like the sailor…",
+    "de": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot…"
    },
    "leaf": {
     "left": 0.013,
@@ -12445,9 +12445,9 @@
    "lead_none": false,
    "long": false,
    "phone": {
-    "from": "caption",
-    "en": "A page of writing with birds in flight sketched down the right margin.",
-    "de": "Eine beschriebene Seite, am rechten Rand Vögel im Flug skizziert."
+    "from": "lead",
+    "en": "…truth bears the same relation to falsehood as light to darkness…",
+    "de": "…zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist…"
    },
    "leaf": null,
    "plate": null,
