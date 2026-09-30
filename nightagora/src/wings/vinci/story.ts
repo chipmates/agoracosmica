@@ -350,7 +350,7 @@ export const vinciStoryCanon: readonly VinciStoryCanonRow[] = [
 
 export const vinciStoryTitleWall: VinciStoryTitleWall = {
   name: "Leonardo da Vinci",
-  kicker: { en: "CLOS LUCÉ, AMBOISE · 10 OCTOBER 1517, 15:19 BY THE SUN", de: "CLOS LUCÉ, AMBOISE · 10. OKTOBER 1517, 15:19 NACH DER SONNE" },
+  kicker: { en: "CLOS LUCÉ, AMBOISE · 10 OCTOBER 1517, 15:19 BY THE SUN", de: "CLOS LUCÉ, AMBOISE · 10. OKTOBER 1517, 15:19 SONNENZEIT" },
   prose: { en: "Leonardo da Vinci lived in the house above you. On this day a visitor came to see him. What the visitor wrote down waits for you inside. Behind you is a museum of what he left.", de: "Leonardo da Vinci wohnte im Haus über dir. An diesem Tag kam ein Besucher zu ihm. Was der Besucher aufschrieb, wartet drinnen auf dich. Hinter dir steht ein Museum seiner Werke." },
   buttons: [{ en: "Begin", de: "Beginnen" }, { en: "Tell me the story", de: "Erzähl mir die Geschichte" }, { en: "Walk freely", de: "Frei umsehen" }],
 };
