@@ -12,6 +12,10 @@
 //     [--only=pilot|<entry id,...>] [--framings=wide,upright] [--limit=N] [--port=5573] [--origin-port=5572]
 //     [--lock=gate|none] [--accept-held] [--walk=job|all|run]
 //
+// A job planned under another definition of the global key than the ledger's
+// records were rendered under keeps those records by `carry.mjs` (the ledger's
+// done entries whose old keys are the tree's own, carried to the keys now).
+//
 // The job folder is a release the gate reads (`film-check.mjs --release=<dir>`)
 // and the pack packs (`pack.mjs --export=<dir>`). Each output is written under
 // a temporary name and renamed when whole; a done entry is one line of
@@ -334,7 +338,7 @@ async function planJob(dir, log) {
   const job = {
     format: JOB_FORMAT, created: stamp(), head: headHere(), source: sourceKey().key, build: distDigest(), fps: FPS, pace: 'walk',
     certificate: graph.certificate.sha256, story: graph.story, cuts: graph.cuts, ...(graph.start ? { start: graph.start } : {}), ...(graph.evening ? { evening: graph.evening } : {}),
-    keys: { format: tree.format, global: tree.global.key, delivery: tree.delivery.key },
+    keys: { format: tree.format, definition: tree.global.definition, global: tree.global.key, delivery: tree.delivery.key },
     recipe: recipeOf({ mount: 'held' }), x264: X264, rungs: RUNGS, stillRung: STILL_RUNG,
     machines, counts: countsOf(entries), entries,
   }
@@ -371,12 +375,15 @@ export function stillMarkFiles(dir, marks, e, stillFile, langs = ['en', 'de']) {
   return out
 }
 
+/** what a carried record was rendered with, for the gate to hold its sidecar against */
+const carriedOf = (r) => (r.carried ? { carried: { keys: r.carried.from, fromDefinition: r.carried.fromDefinition, definition: r.carried.definition } } : {})
+
 /* ---- the record the gate and the pack read, rewritten from the ledger ---- */
-function writeRecord(dir, job, records) {
+export function writeRecord(dir, job, records) {
   const marks = existsSync(join(dir, 'marks.json')) ? JSON.parse(readFileSync(join(dir, 'marks.json'), 'utf8')) : null
   const done = [...records.values()].filter((r) => r.status === 'done')
   const byId = new Map(job.entries.map((e) => [e.id, e]))
-  const release = { format: 'vinci-film-release-v1', keysFormat: job.keys.format, wing: 'vinci', revision: job.head, renderer: done.find((r) => r.renderer)?.renderer ?? null, fps: FPS, pace: 'walk', global: job.keys.global, delivery: job.keys.delivery, clips: [], stills: [], sampledJoins: [] }
+  const release = { format: 'vinci-film-release-v1', keysFormat: job.keys.format, definition: job.keys.definition ?? 'v1', wing: 'vinci', revision: job.head, renderer: done.find((r) => r.renderer)?.renderer ?? null, fps: FPS, pace: 'walk', global: job.keys.global, delivery: job.keys.delivery, clips: [], stills: [], sampledJoins: [] }
   const summary = { format: EXPORT_FORMAT, head: job.head, job: JOB_FORMAT, recipe: job.recipe, rungs: RUNGS, x264: X264, stills: [], clips: [] }
   const cycles = {}
   for (const r of done) {
@@ -384,17 +391,17 @@ function writeRecord(dir, job, records) {
     if (!e) continue
     const keys = e.keys ? { motion: e.keys.motion, picture: e.keys.picture, global: job.keys.global, delivery: e.keys.delivery ?? job.keys.delivery } : null
     if (e.kind === 'still') {
-      release.stills.push({ node: e.node, framing: e.framing, keys, files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar, session: r.session })
+      release.stills.push({ node: e.node, framing: e.framing, keys, ...carriedOf(r), files: { [STILL_RUNG[e.framing].join('x')]: r.rung, ...stillMarkFiles(dir, marks, e, r.rung.file) }, sidecar: r.sidecar, session: r.session })
       summary.stills.push({ node: e.node, framing: e.framing, raw: r.raw, master: r.master, rung: r.rung, settledIn: r.settledIn, aSecondLater: r.aSecondLater, pendingAtRest: r.pendingAtRest })
     } else if (e.kind === 'clip') {
       // the sessions and the measured gaps are the gate's: a join between sessions may part by its tolerance
-      release.clips.push({ clip: e.edge, framing: e.framing, keys, frames: r.frames, seconds: r.frames / FPS, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
+      release.clips.push({ clip: e.edge, framing: e.framing, keys, ...carriedOf(r), frames: r.frames, seconds: r.frames / FPS, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
       summary.clips.push({ clip: e.edge, framing: e.framing, kinds: e.kinds, stem: r.stem, frames: r.frames, files: r.files, joins: r.joins, joinsAgree: r.joinsAgree, mountedSetChanges: r.mountedSetChanges, pendingAtRest: r.pendingAtRest, refused: [] })
     } else if (e.kind === 'cycle') {
       const c = (cycles[`machine/${e.slug}`] ??= { period: r.period, fps: FPS, frames: r.cycleFrames, framings: {} })
       c.framings[e.framing] = r.framing
     } else if (e.kind === 'evening') {
-      ;(release.evenings ??= []).push({ evening: e.evening, framing: e.framing, keys, frames: r.frames, fps: r.fps, seconds: r.seconds, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
+      ;(release.evenings ??= []).push({ evening: e.evening, framing: e.framing, keys, ...carriedOf(r), frames: r.frames, fps: r.fps, seconds: r.seconds, files: r.files, sidecar: r.sidecar, session: r.session, ...(r.joinGaps ? { joinGaps: r.joinGaps } : {}) })
       ;(summary.evenings ??= []).push({ evening: e.evening, from: e.from, framing: e.framing, stem: r.stem, frames: r.frames, fps: r.fps, seconds: r.seconds, files: r.files, joins: r.joins, joinsAgree: r.joinsAgree, mountedSetChanges: r.mountedSetChanges })
     }
   }
@@ -511,8 +518,10 @@ async function run(flags) {
   if (flags.has('plan') || !existsSync(jobFile)) {
     if (existsSync(jobFile) && !flags.has('replan')) throw new Error(`a job stands at ${jobFile}: --replan writes it again (the ledger stays)`)
     assertBuildFresh()
+    const was = existsSync(jobFile) ? JSON.parse(readFileSync(jobFile, 'utf8')).keys?.definition ?? 'v1' : null
     const job = await planJob(dir, log)
     log(`the job planned at ${job.head.slice(0, 8)}: ${job.entries.length} entries; ${Object.entries(job.counts).map(([k, c]) => `${k} ${c.entries} (${c.frames} frames)`).join(', ')}`)
+    if (was && was !== job.keys.definition) log(`the global key was taken under ${was} before and under ${job.keys.definition} now: node forge/film/carry.mjs --job=${dir} keeps the ledger's entries nothing has moved for`)
     if (flags.has('plan')) return
   }
   const job = JSON.parse(readFileSync(jobFile, 'utf8'))

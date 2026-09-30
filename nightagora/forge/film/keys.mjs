@@ -6,7 +6,9 @@
 //   PICTURE   the cells the clip can show, each by what is drawn in it
 //             (`scene.mjs`, `seen.mjs`), and the exposure at its two ends
 //   GLOBAL    the stack, the print, the light, the sky, the recipe, and the
-//             library sets no plate claims that a frame can draw
+//             library sets no plate claims that a frame can draw, save what
+//             no frame can show (`library.mjs`): the display texts of the
+//             words records and the flat reader's records
 //   DELIVERY  the job image, the encoder and the rungs; a clip exempt from
 //             its byte line says so
 //
@@ -19,10 +21,16 @@ import { FILM_PACE, FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { WING_DIR, createLoader } from './load.mjs'
 import { canonicalPrint, openReplay, replayEdge, trackKey } from './replay.mjs'
 import { mountWorld } from './scene.mjs'
+import { READER_ROLES, importGraph, libraryAt, readerPlacement, sourcesAt, wordsPlacement } from './library.mjs'
 import { buildIndex, seenSet } from './seen.mjs'
 import { eveningTrack } from './evening.mjs'
 
 export const KEYS_FORMAT = 'vinci-film-keys-v1'
+/** THE GLOBAL KEY'S DEFINITION. `v1` kept every library record no plate
+    claims; this one leaves out what no frame can show. A job and a release
+    name the definition their global key was taken under (`carry.mjs`). */
+export const GLOBAL_DEFINITION = 'library-placed-v2'
+export const GLOBAL_DEFINITIONS = ['v1', GLOBAL_DEFINITION]
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 const short = (text) => sha256(text).slice(0, 32)
 
@@ -61,6 +69,36 @@ const GLOBAL_WING_FILES = ['display-sky-haze.ts', 'sky-probe.ts', 'static-shadow
     dome adds the evening's twilight and sun disc, weighted by the uniforms
     `createEveningSky` opens at zero; the terms themselves are the evening's. */
 const GLOBAL_FOREIGN_DECLARATIONS = { [`${WING_DIR}/farewell-sky.ts`]: ['createEveningSky'] }
+/** The definition now keys the day dome's two evening terms as well, which
+    `buildTheHouse` adds to every sky: a term outside the zero weight, or one
+    gone NaN, moves every frame. Each root is keyed with every top-level
+    declaration it names and the modules those import. */
+const GLOBAL_FOREIGN_REACHED = { [`${WING_DIR}/farewell-sky.ts`]: ['createEveningSky', 'twilightRadiance', 'sunDiscRadiance'] }
+/** The other wing modules' declarations a global key reads, under a definition. */
+export function foreignParts(loader, definition = GLOBAL_DEFINITION) {
+  const parts = {}
+  if (definition === 'v1') {
+    for (const [file, names] of Object.entries(GLOBAL_FOREIGN_DECLARATIONS)) {
+      const found = declarations(loader.text(file), names)
+      for (const name of names) {
+        if (!found.has(name)) throw new Error(`${file} declares no ${name}`)
+        parts[`${file}#${name}`] = short(found.get(name).getText())
+      }
+    }
+    return parts
+  }
+  for (const [file, roots] of Object.entries(GLOBAL_FOREIGN_REACHED)) {
+    const reached = reachedFrom(loader, file, roots)
+    for (const [name, text] of reached.texts) parts[`${file}#${name}`] = short(text)
+    for (const f of reached.files) for (const g of closure(loader, f, 'src/')) parts[g] = short(loader.text(g))
+  }
+  return parts
+}
+/** The parts the definition now reads that the one before did not: a carry holds them equal between a record's render tree and the tree now. */
+export function addedParts(loader) {
+  const before = foreignParts(loader, 'v1')
+  return Object.fromEntries(Object.entries(foreignParts(loader, GLOBAL_DEFINITION)).filter(([k]) => !(k in before)).sort())
+}
 
 /* THE LIBRARY'S RECIPE RECORDS. A procedural record (`procedural/...`) names
    no file a frame binds: its sha256 is its recipe file's (provenance-check).
@@ -254,8 +292,11 @@ export function cycleKey(loader, slug) {
 const NOT_DRAWN = /\.(mp4|m4v|mov|webm|mp3|m4a|aac|wav|ogg|opus)$/i
 export const drawable = (entry) => !NOT_DRAWN.test(String(entry.path ?? '')) && !String(entry.role ?? '').startsWith('showpiece-')
 
-/** THE GLOBAL KEY and each of its inputs, so a red can say which one moved. */
-export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
+/** THE GLOBAL KEY and each of its inputs, so a red can say which one moved.
+    `placement` is `placeLibrary()` of the same tree; without it nothing is
+    left out of the library part. */
+export function globalKey(loader, { library = [], claimed = new Set(), definition = GLOBAL_DEFINITION, placement = null } = {}) {
+  if (!GLOBAL_DEFINITIONS.includes(definition)) throw new Error(`no global key is defined as ${definition}`)
   const parts = {}
   for (const file of closure(loader, 'src/stack/index.ts', 'src/stack/')) parts[file] = short(loader.text(file))
   for (const file of GLOBAL_WING_FILES) parts[file] = short(loader.text(file))
@@ -264,18 +305,44 @@ export function globalKey(loader, { library = [], claimed = new Set() } = {}) {
     if (!held.has(name)) throw new Error(`the wing's index declares no ${name}`)
     parts[`${INDEX_FILE}#${name}`] = short(held.get(name).getText())
   }
-  for (const [file, names] of Object.entries(GLOBAL_FOREIGN_DECLARATIONS)) {
-    const found = declarations(loader.text(file), names)
-    for (const name of names) {
-      if (!found.has(name)) throw new Error(`${file} declares no ${name}`)
-      parts[`${file}#${name}`] = short(found.get(name).getText())
-    }
-  }
+  Object.assign(parts, foreignParts(loader, definition))
   parts.recipe = short(JSON.stringify(RECIPE))
   const globalFiles = new Set(Object.keys(parts).filter((k) => !k.includes('#')))
-  parts['library sets no plate claims'] = short(library.filter((e) => drawable(e) && !claimed.has(`${e.id}|${e.path}|${e.sha256 ?? ''}`) && !carriedElsewhere(e, globalFiles))
-    .map((e) => `${e.id}|${e.path}|${e.sha256 ?? ''}`).sort().join('\n'))
-  return { key: short(JSON.stringify(Object.entries(parts).sort())), parts }
+  const identity = (e) => `${e.id}|${e.path}|${e.sha256 ?? ''}`
+  const unclaimed = library.filter((e) => drawable(e) && !claimed.has(identity(e)) && !carriedElsewhere(e, globalFiles))
+  if (definition === 'v1') {
+    parts['library sets no plate claims'] = short(unclaimed.map(identity).sort().join('\n'))
+    return { key: short(JSON.stringify(Object.entries(parts).sort())), parts, definition }
+  }
+  /* A WORDS RECORD keys its recipe file with the display texts blanked; the
+     flat reader's records are keyed nowhere, while their wires hold */
+  const words = new Map(Object.entries(placement?.words ?? {}).filter(([, w]) => w.placed))
+  const reader = placement?.reader?.placed ? new Set(READER_ROLES) : new Set()
+  const kept = [], told = []
+  for (const e of unclaimed) {
+    if (reader.has(e.role)) continue
+    const files = recipeFilesOf(e)
+    if (String(e.path ?? '').startsWith('procedural/') && files.length === 1 && words.has(files[0])) told.push(`${e.id}|${e.path}|${words.get(files[0]).blanked}`)
+    else kept.push(identity(e))
+  }
+  parts['library sets no plate claims'] = short(kept.sort().join('\n'))
+  parts['words records, their display texts left out'] = short(told.sort().join('\n'))
+  parts.definition = definition
+  return { key: short(JSON.stringify(Object.entries(parts).sort())), parts, definition, placement }
+}
+
+/** WHERE THE LIBRARY ACTS, read off the tree (`library.mjs`): the words wire of
+    each words file and the reader's wire. */
+export function placeLibrary({ rev = '', overlay = {}, loader, worldFiles = [] }) {
+  const sources = sourcesAt({ rev, overlay })
+  const graph = importGraph(sources)
+  const text = declaringText(loader)
+  const shaping = [...declarations(text, GLOBAL_DECLARATIONS).values(), ...declarations(text, ['STATION_EXPOSURE', 'STATION_TOE']).values(),
+    ...declarations(text, (n) => EVENING_DECLARATIONS.includes(n) || EVENING_NAME.test(n)).values()].map((node) => node.getText())
+  return {
+    words: wordsPlacement({ sources, graph, worldFiles: new Set(worldFiles) }),
+    reader: readerPlacement({ sources, graph, frameShaping: shaping }),
+  }
 }
 
 /** THE EVENING'S OWN LIGHT, which no global input names: the farewell's
@@ -327,9 +394,13 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
   const graph = buildGraph(replay.wing)
   const loader = await createLoader({ rev, overlay })
   const exposure = exposures(declaringText(loader))
-  const world = await mountWorld({ rev, overlay, library })
+  // a revision keys with its own library, never the working tree's
+  const world = await mountWorld({ rev, overlay, library: library ?? libraryAt({ rev }) })
   log(`world ${((Date.now() - t0) / 1000).toFixed(1)} s (${world.parts.filter((p) => !p.reused).map((p) => p.id).join(', ') || 'all reused'})`)
-  const global = globalKey(loader, { library: world.library, claimed: world.claimed })
+  const placement = placeLibrary({ rev, overlay, loader, worldFiles: world.files.map(([f]) => f) })
+  const global = globalKey(loader, { library: world.library, claimed: world.claimed, placement })
+  /* the same tree under the definition before, for the carry */
+  const globalBefore = globalKey(loader, { library: world.library, claimed: world.claimed, definition: 'v1' })
   /* the stand-in's seen set is a function of the track, the occupied cells,
      the sun and the water: held once per process for each */
   const occupancy = sha256(Float64Array.from([...world.cells.hashes.keys()].sort((a, b) => a - b)))
@@ -404,7 +475,7 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
   }
   return {
     format: KEYS_FORMAT, revision: replay.wing.loader.revision, graph, clips, stills, evenings,
-    global, delivery: { key: deliveryKey(delivery), settings: delivery }, exposure, world,
+    global, globalBefore, delivery: { key: deliveryKey(delivery), settings: delivery }, exposure, world,
     seconds: (Date.now() - t0) / 1000,
   }
 }

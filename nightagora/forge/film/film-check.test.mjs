@@ -13,7 +13,7 @@ import assert from 'node:assert/strict'
 import { createHash } from 'node:crypto'
 import { readFileSync } from 'node:fs'
 import path from 'node:path'
-import { BYTE_EXEMPT, BYTE_LINES, JOIN_TOLERANCE, byteExempt, calmCaps, calmReadings, checkRelease, joinVerdict, lineOf, memoryStore, writeStandIn } from './film-check.mjs'
+import { BYTE_EXEMPT, BYTE_LINES, JOIN_TOLERANCE, byteExempt, calmCaps, calmReadings, carriedHolds, checkRelease, joinVerdict, lineOf, memoryStore, writeStandIn } from './film-check.mjs'
 import { DELIVERY, deliveryKey, treeKeys } from './keys.mjs'
 import { MOTION_CAPS } from './motion.mjs'
 import { APP_ROOT, CERTIFICATE_FILE, WING_DIR, createLoader } from './load.mjs'
@@ -408,4 +408,36 @@ test("the delivery key moves for the grass's legs alone, and a capped encode of 
   const result = gate(clean, store)
   for (const l of result.lines) assert.deepEqual(sorted(new Set(l.red.map((r) => r.at))), l.name === 'keys' ? gardenClips : [], `${l.name}`)
   for (const at of gardenClips) assert.deepEqual(result.keyRed.get(at), ['delivery'])
+})
+
+test('a carried entry holds: its sidecar names the keys it was rendered with, the release names both, and only the global key differs', () => {
+  const clip = 'stop:line-early>stop:supper-wall wide'
+  const still = 'stop:flight upright'
+  const store = release.fork()
+  const rel = JSON.parse(store.read('release.json'))
+  const oldGlobal = '0'.repeat(32)
+  const carry = (e) => {
+    const side = JSON.parse(store.read(e.sidecar))
+    side.keys = { ...side.keys, global: oldGlobal }
+    store.write(e.sidecar, JSON.stringify(side))
+    e.carried = { keys: side.keys, fromDefinition: 'v1', definition: clean.global.definition }
+  }
+  const c = rel.clips.find((x) => `${x.clip} ${x.framing}` === clip), s = rel.stills.find((x) => `${x.node} ${x.framing}` === still)
+  carry(c); carry(s)
+  store.write('release.json', JSON.stringify(rel))
+  const held = gate(clean, store)
+  assert.deepEqual(held.lines.find((l) => l.name === 'keys').red, [], 'a carried entry is green on the keys line')
+  assert.ok(held.lines.find((l) => l.name === 'keys').notes.some((n) => n.startsWith('2 entries carried')))
+  // the same sidecars without the carry's record disagree with the release
+  const bare = store.fork()
+  const rel2 = JSON.parse(bare.read('release.json'))
+  for (const e of [...rel2.clips, ...rel2.stills]) delete e.carried
+  bare.write('release.json', JSON.stringify(rel2))
+  assert.deepEqual(sorted(gate(clean, bare).byLine.keys), sorted(new Set([clip, still])))
+  // a carry never covers a moved picture, nor a carry within one definition
+  const side = { keys: { ...c.keys, global: oldGlobal } }
+  assert.ok(carriedHolds(side, c))
+  assert.ok(!carriedHolds({ keys: { ...side.keys, picture: 'x' } }, c))
+  assert.ok(!carriedHolds(side, { ...c, carried: { ...c.carried, keys: { ...c.carried.keys, picture: 'x' } } }))
+  assert.ok(!carriedHolds(side, { ...c, carried: { ...c.carried, fromDefinition: c.carried.definition } }))
 })

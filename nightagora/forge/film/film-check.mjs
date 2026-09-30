@@ -152,6 +152,14 @@ const stillStem = (node) => node.replace(/[:/]/g, (c) => (c === ':' ? '-' : '.')
 /** A node's files: its still at each rung and its marks file in each language. */
 const stillRungs = (tree, framing) => [...tree.delivery.settings.still.rungs[framing], ...tree.delivery.settings.still.marks.map((l) => `marks-${l}`)]
 const keysOf = (entry, tree) => ({ motion: entry.motion, picture: entry.picture, global: tree.global.key, delivery: entry.delivery ?? tree.delivery.key })
+const FOUR = ['motion', 'picture', 'global', 'delivery']
+/** A CARRIED ENTRY (`carry.mjs`): its sidecar holds the keys it was rendered
+    with, which the release names; a carry moved the global key alone. */
+export function carriedHolds(sidecar, entry) {
+  const c = entry?.carried
+  if (!c?.keys || !sidecar?.keys || c.fromDefinition === c.definition) return false
+  return FOUR.every((k) => sidecar.keys[k] === c.keys[k]) && FOUR.every((k) => k === 'global' || c.keys[k] === entry.keys?.[k])
+}
 
 /**
  * A STAND-IN RELEASE of a tree: what an export that rendered nothing would
@@ -160,7 +168,7 @@ const keysOf = (entry, tree) => ({ motion: entry.motion, picture: entry.picture,
  */
 export function writeStandIn(store, tree) {
   const release = {
-    format: RELEASE_FORMAT, keysFormat: KEYS_FORMAT, wing: 'vinci', revision: tree.revision, renderer: STAND_IN,
+    format: RELEASE_FORMAT, keysFormat: KEYS_FORMAT, definition: tree.global.definition, wing: 'vinci', revision: tree.revision, renderer: STAND_IN,
     fps: FPS, pace: FILM_PACE, global: tree.global.key, delivery: tree.delivery.key, clips: [], stills: [], sampledJoins: [],
   }
   const put = (dir, stem, rung, ext, label) => {
@@ -259,6 +267,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
   if (orphans.length) L.graph.notes.push(`${orphans.length} orphaned (dropped from the graph; kept until the owner deletes them): ${orphans.slice(0, 4).join(', ')}`)
   const sidecars = new Map()
   const drift = []
+  let carried = 0
   for (const [at, entry] of held) {
     const now = want.get(at)
     if (!now) continue
@@ -268,7 +277,10 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     const current = { motion: now.motion, picture: now.picture, global: tree.global.key, delivery: now.delivery ?? tree.delivery.key }
     const moved = Object.keys(current).filter((k) => entry.keys?.[k] !== current[k])
     if (!sidecar) moved.push('sidecar missing')
-    else if (Object.keys(current).some((k) => sidecar.keys?.[k] !== entry.keys?.[k])) moved.push('sidecar disagrees with the release')
+    else if (Object.keys(current).some((k) => sidecar.keys?.[k] !== entry.keys?.[k])) {
+      if (carriedHolds(sidecar, entry)) carried++
+      else moved.push('sidecar disagrees with the release')
+    }
     if (moved.length) L.keys.red.push({ at, why: moved.join(', '), moved })
     // FILES
     const rungs = now.kind === 'still' ? stillRungs(tree, now.framing) : tree.delivery.settings.rungs[now.framing]
@@ -345,6 +357,7 @@ export function checkRelease(store, tree, { calm = null, motion = null } = {}) {
     // TEXELS
     if (!(sidecar.plateTexelRatioMax <= TEXEL_CAP)) red(L.texels, at, `a plate at ${sidecar.plateTexelRatioMax} screen pixels a source texel`)
   }
+  if (carried) L.keys.notes.push(`${carried} entries carried from an earlier definition of the global key: their sidecars hold the keys they were rendered with`)
   if (drift.length) L.joins.notes.push(`${drift.length} joins between two sessions part by at most ${Math.max(...drift.map((d) => d.max))} of 255 in at most ${Math.max(...drift.map((d) => d.pixels))} pixels, within the tolerance`)
   if (!motion) for (const l of [L.near, L.heading]) l.notes.push('not measured: the film check runs them unless --no-motion')
   if (!calm) L.calm.notes.push(`waiting: no calm caps in the tree (${CALM_FILE} arrives with M46); the line reads them the day it lands`)
