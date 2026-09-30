@@ -1,5 +1,6 @@
 import inscriptionsText from '../words/data/inscriptions.json?raw';
-import { buildAbsences, buildCodexList } from './codex-shelf'
+import { buildShownAbsences } from './absences'
+import { buildCodexList } from './codex-shelf'
 import { FAMOUS_FOLIOS, SOURCE_READINGS, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content';
 import panelCss from './panel.css?raw';
 
@@ -251,7 +252,7 @@ export function createPanel(pages: PageRecord[], onOpen: (folio: string) => void
     const codices = buildCodexList(lang, page ? folioKey(page) : '', onOpen);
     const leafSection = node('section', 'vt-leaf-section');
     leafSection.append(node('h3', 'vt-codex-title', copy.famous), node('p', 'vt-kicker', copy.shelfIntro), list);
-    shelf.replaceChildren(heading, codices, leafSection, buildAbsences(lang));
+    shelf.replaceChildren(heading, codices, leafSection, buildShownAbsences(lang));
     if (openingInscription) {
       const inscription = node('details', 'vt-inscription');
       inscription.append(node('summary', 'vt-source-summary', copy.inscription));

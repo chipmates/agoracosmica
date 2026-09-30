@@ -11,7 +11,8 @@ import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import { createReaderPayload as createReader, type ReaderBook, type ReaderSide } from '../../vitrine/reader'
 import type { VitrinePayload } from '../../vitrine/types'
-import { buildAbsences, buildCodexList, codexSides, type ShelfBook } from './codex-shelf'
+import { buildShownAbsences } from './absences'
+import { buildCodexList, codexSides, type ShelfBook } from './codex-shelf'
 import { MIRROR_EXPLANATION, TABLE_UI, type Language } from './content'
 
 export interface CodexReaderPayload extends VitrinePayload {
@@ -211,7 +212,7 @@ export function createCodexReaderPayload(options: {
       }
       add(copy.codices, 'h4')
       full.append(buildCodexList(language, '', options.openLeaf, options.openBook, book.codex))
-      full.append(buildAbsences(language))
+      full.append(buildShownAbsences(language))
       host.append(full)
     },
   }

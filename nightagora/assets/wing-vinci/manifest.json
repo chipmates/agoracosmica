@@ -2769,7 +2769,7 @@
       "prompt": "Semantic reading panel, edition-order index, manuscript-leaf index, a codex selector naming holder and class, eight named leaves and the named absences. Source text remains DOM text.",
       "model": "Deterministic TypeScript, three.js TSL and CSS; authored with GPT-6",
       "date": "2026-09-14",
-      "sha256": "16d803d923cc2f33a52c51cdc8b5b91d72152bc29a4e472344e16d9b3620d8b0",
+      "sha256": "7c609a7f891886ff9e27dfb23dfd12b6d3605172ede4df4db6ed9ae7ccee9e24",
       "note": "recipe_file=src/wings/vinci/table/panel.ts; output_source=src/wings/vinci/table/panel.ts; modern exhibition design, not documentary reconstruction"
     },
     {
@@ -3919,7 +3919,7 @@
       "prompt": "One book of the shelf read in the museum's reader: its sides in the order the table read them off the scans, each from its pyramid where one is cut and from the scan itself where none is, each under its own record's honesty line; a book reopens where it was left within one visit.",
       "model": "Deterministic TypeScript; authored with Opus 5.5",
       "date": "2026-09-23",
-      "sha256": "26760978c066781ccd37e423902ed20f509f3c4786f4229a2e0a55415904317d",
+      "sha256": "2001fbce591a50a1ae0f32c9ad3cf4a57da858e0c547f0a52a4754492a1fe310",
       "note": "recipe_file=src/wings/vinci/table/codex-reader.ts; output_source=src/wings/vinci/table/codex-reader.ts; a scan the store does not admit for display is not a side"
     },
     {
