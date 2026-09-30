@@ -16,8 +16,11 @@
 
 /* THE RULE MEASURES THE WORK, NOT THE SCREEN. Its length is the numeral's
    centimetres of the painting at the magnification standing now, so it
-   assumes nothing about the size of the glass it is drawn on. */
-.deep-rule {position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:none;}
+   assumes nothing about the size of the glass it is drawn on. It stands on
+   its own backing, the corner's chip, because a plate's white border or a
+   light passage swallows a thin numeral whatever its shadow. */
+.deep-rule {position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:none;
+  padding:7px 10px 6px;background:#101d27d9;border:1px solid #a9977344;}
 .deep-rule[hidden] {display:none;}
 /* A MEASUREMENT IS READ OVER WHATEVER THE PLATE IS: deep in a light passage
    the ground under these marks is near white, so each one carries a tight
