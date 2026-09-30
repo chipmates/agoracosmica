@@ -14,6 +14,7 @@ import { deskMark } from '../desk-chrome'
 import { deskControl, deskStoryStop, storySentences } from '../desk-story'
 import type { DeskPanelRow } from '../desk-panel'
 import { endWith } from './ending-talk'
+import { fitGoldName, watchGoldName } from './gold-fit'
 import type { VinciText } from './content'
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -186,6 +187,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
   }))
   nameRows.observe(name)
   signal.addEventListener('abort', () => nameRows.disconnect())
+  watchGoldName(goldName, signal)
 
   let open = false
   let walkingPainted: boolean | null = null
@@ -247,6 +249,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     gold.dataset['end'] = String(end)
     root.dataset['end'] = String(end)
     goldPath.setAttribute('d', end ? ARROW_UP : ARROW_ON)
+    fitGoldName(goldName)
   }
 
   /* A PAINT IS ASKED FOR ON EVERY FRAME A CLOSE LOOK STANDS, so the box is

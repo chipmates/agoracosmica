@@ -182,6 +182,8 @@
 /* the name keeps one line where the pill has the room, and wraps whole words where it has not;
    its last two words stay together, so no word stands alone on the last row */
 .film-gold-name { display: block; font: 400 .9375rem/18px var(--serif); text-align: left; white-space: normal; text-wrap: balance; }
+/* a name that would take a third row steps to the small type (gold-fit.ts): three rows inside the same 48 px */
+.film-gold-name[data-rows='3'] { font-size: .8125rem; line-height: 15px; }
 .film-keep { white-space: nowrap; }
 .film-gold-arrow {
   position: relative;

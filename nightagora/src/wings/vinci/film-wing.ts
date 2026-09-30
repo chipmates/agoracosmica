@@ -36,6 +36,7 @@ import deskPanelCss from '../desk-panel.css?inline'
 import deskMarksCss from '../desk-marks.css?inline'
 import deskOverviewCss from '../overview/desk-overview.css?inline'
 import filmWingCss from './film-wing.css?inline'
+import { fitGoldName, watchGoldName } from './gold-fit'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -638,6 +639,7 @@ export function createWing(): WingModule {
     }))
     rows.observe(name)
     signal.addEventListener('abort', () => rows.disconnect())
+    watchGoldName(goldName, signal)
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
     back.addEventListener('click', () => { if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
@@ -730,6 +732,7 @@ export function createWing(): WingModule {
     phone.root.dataset['end'] = String(!walking && to === null)
     phone.goldPath.setAttribute('d', !walking && to === null ? ARROW_UP : ARROW_ON)
     phone.gold.disabled = false
+    fitGoldName(phone.goldName)
   }
   function pressOn(): void {
     const s = picture?.state()
