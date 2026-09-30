@@ -315,8 +315,7 @@
   pointer-events: auto;
 }
 /* one ask at a time: while the plate stands its own ask is the way through,
-   and the talk ending keeps its place empty so the ways beside it stay put */
+   and the talk ending leaves the row so the way back stands beside the gold */
 #wing[data-desk~='panel'] .wing-door-plate[open] .desk-panel-talk {
-  visibility: hidden;
-  pointer-events: none;
+  display: none;
 }
