@@ -158,8 +158,11 @@ export function stationPose(id:VinciStationId, narrow:boolean):Pose {
   // passage's side door, the service passage and the hall's door stand on one
   // axis, and the eye stands forty centimetres inside the last of them, looking
   // down it at the west windows the hour's sun comes through; the wide frame
-  // turns four degrees onto the table and holds the whole west wall.
-  if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-123,-11,74):aimedFrom(HALL_DOOR,-119,-4,52)
+  // turns four degrees onto the table and holds the whole west wall. The
+  // phone turns past the lion onto the table, whose models the line names,
+  // and looks down to them: turned onto both, the lion and the models stood
+  // small side by side under a band of beams.
+  if(id==='hall') return narrow?aimedFrom(HALL_DOOR,-114,-15,62):aimedFrom(HALL_DOOR,-119,-4,52)
   // THE CHAPEL IS THE ONE HERO. Square on from the court it was a wall of
   // ashlar in the house's shadow with nothing behind it; from the foot of the
   // raised lawn the gable took the left half of the frame, the gable the study
