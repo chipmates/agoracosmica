@@ -19,7 +19,7 @@
       "text": "This is how the 8 domes of the neighbouring temple should stand.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. VI, 1891). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'tiburi': a tiburio is the tower or lantern dome over a crossing; Ravaisson renders 'dômes'.",
        "'vissino' read as 'vicino' (near, neighbouring), as Ravaisson reads it ('voisin')."
@@ -29,7 +29,7 @@
       "text": "So sollen die 8 Kuppeln des benachbarten Tempels stehen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. VI, 1891). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'tiburi': Ein tiburio ist der Turm oder die Laternenkuppel über einer Vierung; Ravaisson übersetzt 'dômes'.",
        "'vissino' gelesen als 'vicino' (nahe, benachbart), wie bei Ravaisson ('voisin')."
@@ -66,13 +66,13 @@
       "text": "Here there cannot and ought not to be any campanile; on the contrary it must stand apart like that of the Cathedral and of San Giovanni at Florence, and of the Cathedral at Pisa, where the campanile is quite detached as well as the dome. Thus each can display its own perfection. If however you wish to join it to the church, make the lantern serve for the campanile as in the church at Chiaravalle.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Hier kann und soll kein Glockenturm gebaut werden. Er muss vielmehr getrennt stehen, wie beim Dom und bei San Giovanni in Florenz, und ebenso beim Dom von Pisa, wo der Glockenturm für sich steht, rundum frei, und ebenso der Dom, und jedes kann für sich seine Vollkommenheit zeigen. Und wer ihn dennoch mit der Kirche verbinden will, der lasse die Laterne als Glockenturm dienen, wie bei der Kirche von Chiaravalle.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'faccia la lāterna scusare cāpanile': 'scusare' im Sinn von etwas vertreten; gelesen wie bei Richter: Die Laterne soll als Glockenturm dienen."
       ]
@@ -112,13 +112,13 @@
       "text": "If you want the tree a to make its branch n as thick as m, keep the branch m pruned of its twigs, leaving n its twigs, and it will grow like m.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors."
+      "rest": "AI translation. It may have errors."
      },
      "de": {
       "text": "Wenn du willst, dass der Baum a seinen Ast n so dick macht wie m, halte den Ast m frei von Zweigen und lass n seine Zweige; dann wird er wachsen wie m.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": {
       "text": "— Si tu veux que l'arbre a fasse sa branche n aussi grosse que m, tiens émondés les rameaux de la branche m, en laissant à n ses rameaux, et elle [n] croîtra comme m."
@@ -151,13 +151,13 @@
       "text": "If you want a lance that does not warp, take it from the tree b, which by its slenderness will almost match the thickness of the lance.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors."
+      "rest": "AI translation. It may have errors."
      },
      "de": {
       "text": "Wenn du eine Lanze willst, die sich nicht verzieht, nimm sie aus dem Baum b, der durch seine Schlankheit fast schon die Dicke der Lanze hat.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": {
       "text": "— Si tu veux une lance qui ne se torde pas, tire-la de l'arbre b, qui, par sa minceur, sera pour ainsi dire juste ce qu'il faut pour l'épaisseur de la lance."
@@ -190,7 +190,7 @@
       "text": "From the tree c you will get only one good lance that will never bend, and it will be taken from the part that faces north; and all the others will warp because of the humours, which always move with the sun.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "The struck-out 'nv' (italics in the edition) is left out.",
        "'omori' are the humours, the saps of the tree; the idea that they follow the sun is Leonardo's."
@@ -200,7 +200,7 @@
       "text": "Aus dem Baum c gewinnst du nur eine gute Lanze, die sich nie biegen wird, und sie wird aus dem Teil genommen, der nach Norden gewandt ist; alle anderen werden sich verziehen wegen der Säfte, die sich immer mit der Sonne bewegen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Das gestrichene 'nv' (in der Ausgabe kursiv) ist weggelassen.",
        "'omori' sind die Säfte des Baumes; die Vorstellung, dass sie der Sonne folgen, ist Leonardos eigene."
@@ -237,7 +237,7 @@
       "text": "If you take a ring of bark off the tree d, it will dry out from the ring upward and stay alive from there downward. And if you make the said ring at a bad moon and then cut the plant at the foot at a good moon, what belongs to the good moon will keep and the rest will spoil.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'pelle' (skin) is the bark.",
        "'quel della bona luna' (what is of the good moon) is kept literal; Leonardo does not say which part that is."
@@ -247,7 +247,7 @@
       "text": "Wenn du dem Baum d einen Ring Rinde abnimmst, vertrocknet er vom Ring aufwärts und bleibt von dort abwärts lebendig. Und wenn du diesen Ring bei schlechtem Mond machst und dann die Pflanze am Fuß bei gutem Mond fällst, hält sich, was zum guten Mond gehört, und der Rest verdirbt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'pelle' (Haut) ist die Rinde.",
        "'quel della bona luna' (was zum guten Mond gehört) bleibt wörtlich; Leonardo sagt nicht, welcher Teil das ist."
@@ -284,13 +284,13 @@
       "text": "If you want a beam or other straight timber not to warp, saw the wood lengthwise into two parts, turn the said parts head to foot, and fix them well together, and they will never warp.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors."
+      "rest": "AI translation. It may have errors."
      },
      "de": {
       "text": "Wenn du willst, dass sich ein Balken oder ein anderes gerades Holz nicht verzieht, säge das Holz der Länge nach in zwei Teile, lege die Teile Kopf an Fuß und befestige sie gut miteinander; dann verziehen sie sich nie.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": {
       "text": "— Si tu veux qu'une poutre ou autre pièce droite ne se torde pas, scie le bois en long en deux parties, tourne les deux parties tête aux pieds, fixe les bien ensemble, et jamais elles ne se tordront."
@@ -323,7 +323,7 @@
       "text": "It would also be good to build this edifice from the line a b c d upward.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'insui' is read as 'in su' (upward); Ravaisson has 'selon la ligne a b c d' (along the line)."
       ]
@@ -332,7 +332,7 @@
       "text": "Auch wäre es gut, dieses Gebäude von der Linie a b c d an aufwärts zu bauen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'insui' wird als 'in su' (aufwärts) gelesen; Ravaisson schreibt 'selon la ligne a b c d' (entlang der Linie)."
       ]
@@ -374,13 +374,13 @@
       "text": "The horns of a capital must measure the fourth part of a square",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Die Ecken des Kapitells müssen der vierte Teil eines Quadrats sein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. VI, 1891). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'chorni' (corni, Hörner) sind die Ecken des Kapitells, die vorspringenden Spitzen der Deckplatte; Ravaisson: 'coins', Richter: 'horns'. Das Deutsche sagt 'Ecken'.",
        "Die gedruckte Zeile trennt 'capite / lo' (capitello) wie die Handschrift; in der Übersetzung zusammengefügt."
@@ -428,13 +428,13 @@
       "text": "This edifice is inhabited [accessible] below and above, like San Sepolcro, and it is the same above as below, except that the upper story has the dome c d; and the lower has the dome a b, and when you enter into the crypt, you descend 10 steps, and when you mount into the upper you ascend 20 steps, which, with 1/3 braccio for each, make 10 braccia, and this is the height between one floor of the church and the other.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Dieses Gebäude ist unten und oben begehbar, wie San Sepolcro, und es ist oben wie unten, nur dass das obere die Kuppel c d hat und das untere die Kuppel a b. Und wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf, die zu je 1/3 Elle 10 Ellen ergeben. Und das ist der Abstand zwischen den Böden der einen und der anderen Kirche.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'abitato': wörtlich 'bewohnt'; übersetzt mit 'begehbar' (auf beiden Ebenen in Gebrauch und erreichbar), gestützt auf Richters Erklärung '[accessible]' (zugänglich).",
        "'al tiburio': Der tiburio ist die Kuppel oder der Laternenturm über der Mitte; übersetzt mit 'Kuppel', wie Richter 'dome' schreibt.",
@@ -470,13 +470,13 @@
       "text": "interior of the edifice above",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Im Inneren des oberen Gebäudes",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Eine Beschriftung aus fünf Wörtern unter der Schnittzeichnung; 'dentro' gelesen als 'im Inneren'."
       ]
@@ -516,7 +516,7 @@
       "text": "a b",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "Letters of the drawing; Ravaisson's footnote puts them at the top of the last figure."
       ]
@@ -525,7 +525,7 @@
       "text": "a b",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Buchstaben der Zeichnung; Ravaissons Fußnote setzt sie oben an die letzte Figur."
       ]
@@ -561,7 +561,7 @@
       "text": "This one should have 12 faces, with 12 tabernacles, like a b.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "Errata applied: line 2, 'come' is to be read 'come. a. b.' (Errata du manuscrit B, p. 7).",
        "'tabernaculi' are small shrines or chapels; Ravaisson glosses '[chapelles à coupoles]' (domed chapels)."
@@ -571,7 +571,7 @@
       "text": "Dieser soll 12 Seiten haben, mit 12 Tabernakeln, wie a b.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Errata angewandt: In Zeile 2 ist 'come' als 'come. a. b.' zu lesen (Errata du manuscrit B, S. 7).",
        "'tabernaculi' sind kleine Schreine oder Kapellen; Ravaisson erklärt '[chapelles à coupoles]' (Kapellen mit Kuppeln)."
@@ -614,7 +614,7 @@
       "text": "The moving of m between s and n is done because, if g touched h, the box would touch the wall and the lever m could not stay inside; and I conclude that the angle [of the box] under g should touch the 2 faces of g that are turned towards it. And do not move it unless the box looks somewhat red-hot.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'e non mouere' is read as a command (do not move it), the old negative imperative; Ravaisson reads a statement ('il n'y aura pas de déplacement').",
        "'[della cassa]' is the editor's insertion, kept in brackets.",
@@ -625,7 +625,7 @@
       "text": "Das Versetzen von m zwischen s und n geschieht, weil der Kasten, wenn g an h stieße, an die Mauer stoßen würde und der Hebel m nicht darin bleiben könnte; und ich schließe, dass die Ecke [des Kastens] unter g die 2 Seiten von g berühren soll, die ihr zugewandt sind. Und bewege ihn nicht, solange der Kasten nicht etwas glühend aussieht.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'e non mouere' wird als Befehl gelesen (bewege ihn nicht), der alte verneinte Imperativ; Ravaisson liest eine Aussage ('il n'y aura pas de déplacement').",
        "'[della cassa]' ist eine Ergänzung des Herausgebers und bleibt in Klammern.",
@@ -663,7 +663,7 @@
       "text": "Make the lever m m a female with its son in its body; and when the other female n has moved as far from its companion as the female m is thick, detach the whole instrument and take out the female lever m, then remove the female n and put m in the space that will have been made between n and s, then put n back in its place, and use the female lever as you please. a is an iron that stands between the mould and the iron, so that b heats better; and when you do this work, take it apart [?].",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "Errata applied: line 4, 'li. eva. m. n.' is to be read 'lieva. m. m.' (Errata du manuscrit B, p. 6).",
        "'femina' (female) is Leonardo's word for a nut, the part a screw turns in; 'figliolo' (son) is probably the screw inside it. The German 'Mutter' carries both senses.",
@@ -676,7 +676,7 @@
       "text": "Mache den Hebel m m zu einer Mutter mit ihrem Sohn im Leib; und wenn sich die andere Mutter n so weit von ihrer Gefährtin entfernt hat, wie die Mutter m dick ist, dann löse das ganze Instrument, zieh den Mutterhebel m heraus, nimm dann die Mutter n weg und setze m in den Raum, der zwischen n und s entstanden ist; dann setze n wieder an seinen Platz und gebrauche den Mutterhebel nach deinem Belieben. a ist ein Eisen, das zwischen der Form und dem Eisen steht, damit sich b besser erhitzt; und wenn du diese Arbeit machst, nimm es auseinander [?].",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Errata angewandt: In Zeile 4 ist 'li. eva. m. n.' als 'lieva. m. m.' zu lesen (Errata du manuscrit B, S. 6).",
        "'femina' (wörtlich 'die Weibliche') ist Leonardos Wort für eine Schraubenmutter, das Teil, in dem sich eine Schraube dreht; 'figliolo' (Sohn) ist wohl die Schraube darin. Das deutsche 'Mutter' trägt beide Bedeutungen.",
@@ -722,13 +722,13 @@
       "text": "This building is inhabited below and above; the way up is by the campaniles, and in going up one has to use the platform, where the drums of the four domes are, and this platform has a parapet in front, and none of these domes communicate with the church, but they are quite separate.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Dieses Gebäude ist oben und unten begehbar. Nach oben geht man über die Glockentürme, und man steigt hinauf über die Plattform, auf der die 4 Kuppeln gegründet sind, und diese Plattform hat vorn eine Brüstung. Und keine dieser Kuppeln öffnet sich zur Kirche, vielmehr sind sie ganz getrennt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'abitato': wörtlich 'bewohnt', übersetzt mit 'begehbar' (auf beiden Ebenen in Gebrauch).",
        "'tiburi': Der tiburio ist die Kuppel oder ihr Tambour über einer Mitte; übersetzt mit 'Kuppeln'. Richter: 'the drums of the four domes' (die Tamboure der vier Kuppeln).",
@@ -770,7 +770,7 @@
       "text": "[First figure:] Place where one preaches.\n[Third figure:] Foundation",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. VI, 1891). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'fondamento' (foundation) is the word Leonardo writes in plans for the ground plan; German 'Grundriss' says that, English keeps 'foundation'. J.-P. Richter notes that Leonardo often used the word for plans.",
        "The bracketed figure numbers are the editor's: the first figure is the view of the exterior, the third the half-circle plan."
@@ -780,7 +780,7 @@
       "text": "[Erste Figur:] Ort, an dem gepredigt wird.\n[Dritte Figur:] Grundriss",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. VI, 1891). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'fondamento' (Fundament) ist das Wort, das Leonardo auf Plänen für den Grundriss schreibt; das deutsche 'Grundriss' sagt das, das Englische behält 'foundation'. J.-P. Richter merkt an, dass Leonardo das Wort oft für Grundrisse gebrauchte.",
        "Die Figurennummern in Klammern stammen vom Herausgeber: Die erste Figur ist die Außenansicht, die dritte der halbkreisförmige Grundriss."
@@ -824,13 +824,13 @@
       "text": "The arch supports as much below it [i. e. a hanging weight] as above it",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Der Bogen trägt ebenso viel unter sich wie über sich.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Beltrami, 1891). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Beltrami druckt 'regie' (regge: trägt, stützt); Richter liest 'regierà' (wird tragen). Der Sinn ist derselbe.",
        "Was unter dem Bogen hängt, steht nicht da. Richter ergänzt '[i. e. a hanging weight]' (also ein hängendes Gewicht); das Deutsche lässt es offen wie das Italienische.",
@@ -867,13 +867,13 @@
       "text": "The column will bear the weight at a b.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Der Pfeiler wird bei a b belastet sein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Beltrami, 1891). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'pilastro' ist ein Pfeiler oder eine Stütze; Richter sagt 'column' (Säule) und beschreibt die Skizze als 'a round pillar on which is indicated which part of its summit is to bear the weight' (ein runder Pfeiler, an dem angegeben ist, welcher Teil seines oberen Endes die Last tragen soll)."
       ]
@@ -913,13 +913,13 @@
       "text": "It never looks well to see the roofs of a church; they should rather be flat and the water should run off by gutters made in the frieze.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht. Vielmehr soll das Dach eingeebnet sein, und das Wasser soll durch Rinnen zu den Leitungen hinablaufen, die im Fries angelegt sind.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'sia rappianato': Das Subjekt steht nicht da; gelesen als das Dach, wie bei Richter ('they should rather be flat').",
        "'fregiō': Richter druckt einen Querstrich über dem letzten o; Ravaisson liest in der Handschrift 'fregiona'. Beides ändert nichts am Sinn 'Fries'."

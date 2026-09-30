@@ -19,7 +19,7 @@
       "text": "It is as far from the attachment of one ear to that of the other as from the meeting of the eyebrows to the chin.\nThe mouth of a handsome face is as wide as it is from the parting of the lips to the underside of the chin.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'apichatura' (appiccatura) is where the ear is attached to the head; 'le givnture dele ciglia' (the joining of the brows) is the point between the eyebrows, Ravaisson's 'l'intervalle des sourcils'.",
        "The edition prints 'pi' in italics, a word Leonardo struck out; it is left out of the translations.",
@@ -30,7 +30,7 @@
       "text": "Vom Ansatz des einen Ohrs bis zum anderen ist es so weit wie von der Stelle, wo die Brauen zusammentreffen, bis zum Kinn.\nDer Mund eines schönen Gesichts ist so breit, wie es von der Trennlinie der Lippen bis unter das Kinn ist.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'apichatura' (appiccatura) ist die Stelle, wo das Ohr am Kopf ansetzt; 'le givnture dele ciglia' (das Zusammentreffen der Brauen) ist der Punkt zwischen den Augenbrauen, Ravaissons 'l'intervalle des sourcils'.",
        "Die Ausgabe druckt 'pi' kursiv, ein Wort, das Leonardo gestrichen hat; es ist in den Übersetzungen weggelassen.",
@@ -68,7 +68,7 @@
       "text": "It shall be as far from one ear to the other as the ear itself is long.\nThe ear must be a quarter of the face in length.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "The Italian does not name the horse. Ravaisson adds '[du cheval]' in his French because these two lines stand beside the two horse's heads; 'volto' (face) is then the horse's head."
       ]
@@ -77,7 +77,7 @@
       "text": "Von einem Ohr zum anderen soll es so weit sein, wie das Ohr selbst lang ist.\nDas Ohr muss ein Viertel des Gesichts lang sein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Das Italienische nennt das Pferd nicht. Ravaisson ergänzt in seinem Französisch '[du cheval]', weil diese zwei Zeilen neben den beiden Pferdeköpfen stehen; 'volto' (Gesicht) ist dann der Kopf des Pferdes."
       ]
@@ -119,13 +119,13 @@
       "text": "All the heads of the large nails.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Alle Köpfe der Bolzen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'chiavarde': Bolzen mit Kopf, eiserne Stifte, die ein Gerüst zusammenhalten; Richter: 'large nails' (große Nägel)."
       ]
@@ -165,13 +165,13 @@
       "text": "Objects seen by one and the same eye appear sometimes large, and sometimes small.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Die Dinge, die ein und dasselbe Auge sieht, erscheinen manchmal groß, manchmal klein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": null,
      "label_only": false,

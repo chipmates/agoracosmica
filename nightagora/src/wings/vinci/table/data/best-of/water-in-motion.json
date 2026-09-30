@@ -19,7 +19,7 @@
       "text": "How all the air that rises again with the water does not stay on the surface, but through the impetus is submerged anew among the revolutions of the waters.\n[Second figure:]\nPlace of the rebound\nplace of the percussion",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'linpeto' (l'impeto) is Leonardo's impetus; Ravaisson keeps it in quotation marks.",
        "The two labels belong to the second figure, the small drawing of the basin at the lower right of the leaf: 'risaltatione' is the water's rebound, 'perchussione' the place where it strikes."
@@ -29,7 +29,7 @@
       "text": "Wie die ganze Luft, die mit dem Wasser wieder aufsteigt, nicht an der Oberfläche bleibt, sondern durch den Antrieb von Neuem unter die Umwälzungen des Wassers getaucht wird.\n[Zweite Figur:]\nOrt des Rückpralls\nOrt des Aufpralls",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'linpeto' (l'impeto) ist Leonardos Impetus, im Deutschen 'Antrieb'; Ravaisson setzt das Wort in Anführungszeichen.",
        "Die beiden Beschriftungen gehören zur zweiten Figur, der kleinen Zeichnung des Beckens unten rechts auf dem Blatt: 'risaltatione' ist der Rückprall des Wassers, 'perchussione' die Stelle, wo es aufschlägt."
@@ -66,7 +66,7 @@
       "text": "How the movements of waters among other waters are not constrained to move by a straight line rather than a curved one, and after their desired rising up again they are not constrained to rest, but, to go back down, and with a whirling motion, they go along with the course of the river until they have unloaded the air shut in with them at the surface of the pool.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'la desiderata resurgitione' (the desired rising up) is Leonardo's own figure of speech: water that has been driven down 'wants' to rise again. Ravaisson: 'après avoir rejailli comme elles le voulaient'.",
        "'per ritornare in basso' (to go back down) is kept as written, even though the sentence then speaks of the air reaching the surface.",
@@ -77,7 +77,7 @@
       "text": "Wie die Bewegungen der Wasser inmitten anderer Wasser nicht gezwungen sind, sich eher in gerader als in gekrümmter Linie zu bewegen, und wie sie nach dem ersehnten Wiederauftauchen nicht zur Ruhe gezwungen sind, sondern, um wieder hinabzusinken, und in wirbelnder Bewegung, mit dem Lauf des Flusses mitziehen, bis sie die mit ihnen eingeschlossene Luft an der Oberfläche des Beckens entladen haben.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'la desiderata resurgitione' (das ersehnte Wiederauftauchen) ist Leonardos eigenes Sprachbild: Wasser, das hinabgedrückt wurde, 'will' wieder aufsteigen. Ravaisson: 'après avoir rejailli comme elles le voulaient'.",
        "'per ritornare in basso' (um wieder hinabzugehen) bleibt, wie es geschrieben ist, obwohl der Satz dann davon spricht, dass die Luft die Oberfläche erreicht.",
@@ -121,7 +121,7 @@
       "text": "How much air is needed to lift various weights of different materials. How much water will enter the boat to make it sink. Which air supports more when it is shut in: the rarefied, as is done in cupping glasses, or the ordinary, or the condensed, as is done in balls blown up by force of a screw? Without doubt the rarefied, and then the ordinary, and the condensed resists least.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'manco resiste' is literally 'resists less' (here: least, at the end of the ranking). Ravaisson renders 'ne résiste pas du tout' (does not resist at all), which says more than the Italian.",
        "Ravaisson splits 'essendo rinchiusa' off as a first kind of air ('celui qui est enfermé ou du raréfié'); the Italian reads more naturally as one condition for all three kinds (air that is shut in), and the translations follow the Italian. The ranking itself is Leonardo's and is kept as written.",
@@ -132,7 +132,7 @@
       "text": "Wie viel Luft man braucht, um verschiedene Lasten aus verschiedenen Stoffen zu heben. Wie viel Wasser in die Barke eindringen muss, um sie sinken zu lassen. Welche Luft trägt mehr, wenn sie eingeschlossen ist: die verdünnte, wie man sie in Schröpfköpfen erzeugt, oder die gewöhnliche, oder die verdichtete, wie man sie in Bällen erzeugt, die mit Schraubenkraft aufgepumpt sind? Ohne Zweifel die verdünnte, dann die gewöhnliche, und die verdichtete widersteht am wenigsten.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'manco resiste' heißt wörtlich 'widersteht weniger' (hier: am wenigsten, am Ende der Rangfolge). Ravaisson übersetzt 'ne résiste pas du tout' (widersteht gar nicht), was mehr sagt als das Italienische.",
        "Ravaisson trennt 'essendo rinchiusa' als erste Art von Luft ab ('celui qui est enfermé ou du raréfié'); das Italienische liest sich natürlicher als eine Bedingung für alle drei Arten (eingeschlossene Luft), und die Übersetzungen folgen dem Italienischen. Die Rangfolge selbst ist Leonardos und bleibt, wie sie geschrieben ist.",
@@ -170,7 +170,7 @@
       "text": "Every part of the thickness of the water that falls from a river into the air follows the line in which the impetus began that carried it into that fall.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'inpeto' (impeto) is Leonardo's term for the impetus a moving body carries; Ravaisson: 'l'impulsion'.",
        "'Ciascun moto e' (every movement and) and 'co' are printed in italics, struck out by Leonardo; they are left out of the translations. The sign '//' is printed by the edition inside 'ciasscu // n a'; it is kept in the Italian."
@@ -180,7 +180,7 @@
       "text": "Jeder Teil der Wassermasse, die von einem Fluss in die Luft fällt, folgt der Linie, in der der Antrieb begann, der ihn in diesen Fall geführt hat.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'grosseza dellacqua' heißt wörtlich 'die Dicke des Wassers'; das deutsche 'Wassermasse' bewahrt den Sinn des ganzen fallenden Wasserkörpers.",
        "'inpeto' (impeto) ist Leonardos Begriff für den Impetus, den ein bewegter Körper mit sich trägt; im Deutschen 'Antrieb'.",
@@ -224,7 +224,7 @@
       "text": "Given the power disjoined, with what motion the moving body will be moved by its mover.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'8.' is the leaf number, which Ravaisson prints before the first line.",
        "'potentia disgunta' (disgiunta) is literally 'disjoined power'; most likely a power that has left the body it moves, as in a thrown weight, but the line is only a heading and does not explain it. Ravaisson's note 1 points to Ms K, fol. 33 [32] recto."
@@ -234,7 +234,7 @@
       "text": "Gegeben die getrennte Kraft: mit welcher Bewegung das Bewegliche von seinem Beweger bewegt wird.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'8.' ist die Blattnummer, die Ravaisson vor die erste Zeile druckt.",
        "'potentia disgunta' (disgiunta) heißt wörtlich 'getrennte Kraft'; höchstwahrscheinlich eine Kraft, die den Körper, den sie bewegt, verlassen hat, wie bei einem geworfenen Gewicht, aber die Zeile ist nur eine Überschrift und erklärt es nicht. Ravaissons Anmerkung 1 verweist auf Ms K, fol. 33 [32] recto."
@@ -271,7 +271,7 @@
       "text": "[Second figure:] f n n m\nWhen m is pushed forward, the little door opens and the water no longer pours through the mouth f, where the mill wheel is struck. This way of taking the water from the mill wheels and giving it to them is used in rivers or canals of continuous flow, and where space is short for making room for the spillways [?], or flushing channels, for the mills' surplus water.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'lussciuolo' is read as 'l'usciuolo', a small door or gate, as Ravaisson's 'la petite porte'.",
        "'cialatoi' is a rare word; Ravaisson renders the pair 'cialatoi overo rissciacquatoi' as 'conduits de dérivation' (bypass channels). Translated as spillways and marked [?]; 'rissciacquatoi' is literally 'rinsing places', here channels that flush the surplus water away.",
@@ -282,7 +282,7 @@
       "text": "[Zweite Figur:] f n n m\nSchiebt man m nach vorn, öffnet sich das Türchen, und das Wasser fließt nicht mehr durch die Mündung f, wo das Mühlrad getroffen wird. Diese Art, den Mühlrädern das Wasser zu nehmen und zu geben, wendet man in Flüssen oder Kanälen mit ständiger Strömung an, und dort, wo der Platz fehlt für die Abläufe [?] oder Spülrinnen für das überschüssige Wasser der Mühlen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'lussciuolo' wird als 'l'usciuolo' gelesen, eine kleine Tür oder Schleuse, wie Ravaissons 'la petite porte'.",
        "'cialatoi' ist ein seltenes Wort; Ravaisson gibt das Paar 'cialatoi overo rissciacquatoi' als 'conduits de dérivation' (Umleitungskanäle) wieder. Übersetzt mit 'Abläufe' und mit [?] markiert; 'rissciacquatoi' heißt wörtlich 'Spülstellen', hier Rinnen, die das überschüssige Wasser fortspülen.",
@@ -326,7 +326,7 @@
       "text": "[First figure:] f [Under the first figure:] Such overturnings of the currents are made by the impetus of the water beneath the other water.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'ra voltamen ti' (rivoltamenti) are turnings over or rollings; Ravaisson: 'tournoiements'. 'enpeto' (impeto) is Leonardo's impetus, kept by Ravaisson in quotation marks."
       ]
@@ -335,7 +335,7 @@
       "text": "[Erste Figur:] f [Unter der ersten Figur:] Solche Umwälzungen der Strömungen entstehen durch den Antrieb des Wassers unter dem anderen Wasser.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'ra voltamen ti' (rivoltamenti) sind Umwälzungen oder Überschläge; Ravaisson: 'tournoiements'. 'enpeto' (impeto) ist Leonardos Impetus, im Deutschen 'Antrieb'; Ravaisson setzt das Wort in Anführungszeichen."
       ]
@@ -371,7 +371,7 @@
       "text": "[At the top:] Of the thickness of water that strikes the object, the lowest part is the first to strike the bed, and it is at once thrown back to the surface. The part halfway up [?] does not go down to the bed, but, meeting the first, which is thrown back, it strikes upon it and is pushed, and so it too is thrown back along the same lines and eddies.\nAnd the 2 waters, when the lower meets the upper, unite and turn round together, where they touch.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'de vr tata' is read as 'ed è urtata' (and is pushed); Ravaisson: 'est heurtée'.",
        "'ein media<i>n</i> te' is read as 'e immediate' (and at once); the italic n is a letter Leonardo struck out.",
@@ -383,7 +383,7 @@
       "text": "[Oben:] Von der Wassermasse, die auf den Gegenstand trifft, trifft der untere Teil als erster auf den Grund und wird sogleich zur Oberfläche zurückgeworfen. Der Teil in halber Höhe [?] sinkt nicht zum Grund hinab, sondern stößt auf den ersten, der zurückgeworfen wird, trifft auf ihn, wird gestoßen und so ebenfalls entlang derselben Linien und Wirbel zurückgeworfen.\nUnd wenn die 2 Wasser aufeinandertreffen, das untere mit dem oberen, vereinen sie sich und drehen sich gemeinsam, dort, wo sie sich berühren.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'de vr tata' wird als 'ed è urtata' (und wird gestoßen) gelesen; Ravaisson: 'est heurtée'.",
        "'ein media<i>n</i> te' wird als 'e immediate' (und sogleich) gelesen; das kursive n ist ein Buchstabe, den Leonardo gestrichen hat.",
@@ -422,13 +422,13 @@
       "text": "Of water that falls into other water, the part nearest the middle of the fall is more slanting, and the part nearest the ends is more upright.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors."
+      "rest": "AI translation. It may have errors."
      },
      "de": {
       "text": "Von Wasser, das in anderes Wasser fällt, ist der Teil, der der Mitte des Falls am nächsten ist, schräger, und der Teil, der den Rändern am nächsten ist, steiler.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": {
       "text": "Des eaux qui tombent dans d'autres eaux, celle qui est la plus voisine du milieu de la chute est plus oblique, et la plus voisine des extrémités est plus droite."
@@ -461,7 +461,7 @@
       "text": "[Last figure:] a b c n\nAt a b the bed lay deeper than on the opposite side, because towards the river's stronger current a greater wave and eddy is made at a b than beyond, as the object f shows above. And at n the bank breaks.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'stava piu lfondo' (the bed stood more) is read as the bed lying deeper, as Ravaisson's 'il y avait plus de fond'.",
        "'dila' (di là, beyond) is read as the far side, away from the strongest current."
@@ -471,7 +471,7 @@
       "text": "[Letzte Figur:] a b c n\nBei a b lag der Grund tiefer als auf der Gegenseite, weil zur stärkeren Strömung des Flusses hin bei a b eine größere Welle und ein größerer Wirbel entsteht als drüben, wie oben der Gegenstand f zeigt. Und bei n bricht das Ufer ein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'stava piu lfondo' (der Grund stand mehr) wird so gelesen, dass der Grund tiefer lag, wie Ravaissons 'il y avait plus de fond'.",
        "'dila' (di là, drüben) wird als die abgewandte Seite gelesen, fern der stärksten Strömung."
@@ -514,7 +514,7 @@
       "text": "To make fine [?] displays of water in thin films, by placing many different objects in a shallow, even and swift current.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'48.' is the leaf number, printed by Ravaisson before the first line.",
        "'pelgli' is doubtful; the edition reads it '[belli?]' (beautiful), hence 'fine [?]'.",
@@ -525,7 +525,7 @@
       "text": "Um schöne [?] Schauspiele von Wasser in dünnen Häutchen zu erzeugen, indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'48.' ist die Blattnummer, von Ravaisson vor die erste Zeile gedruckt.",
        "'pelgli' ist unsicher; die Ausgabe liest es '[belli?]' (schön), daher 'schöne [?]'.",
@@ -563,7 +563,7 @@
       "text": "[Figure:] a c d n g p, b r s t c f m o h q\nTHE WATER THAT STRIKES AND GIRDLES THE OBJECT, WHEN IT RUNS SWIFTLY, WILL BE OF TWO KINDS: THE FIRST WILL BE IN FILMS AND INCIDENT, THE OTHER WILL BE REAL [?] AND REFLECTED.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "The edition sets this sentence in small capitals, as Leonardo's heading of a rule; the translations keep the capitals.",
        "'reale' (real) is contrasted with the thin films; Ravaisson adds '[simple]'. It most likely means the solid body of the water, but the text does not say more, hence [?].",
@@ -575,7 +575,7 @@
       "text": "[Figur:] a c d n g p, b r s t c f m o h q\nDAS WASSER, DAS AUF DEN GEGENSTAND TRIFFT UND IHN UMGÜRTET, WIRD BEI SCHNELLEM LAUF VON ZWEIERLEI ART SEIN: DIE ERSTE HÄUTCHENARTIG UND EINFALLEND, DIE ANDERE WIRKLICH [?] UND ZURÜCKGEWORFEN.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Die Ausgabe setzt diesen Satz in Kapitälchen, als Leonardos Überschrift einer Regel; die Übersetzungen behalten die Großbuchstaben.",
        "'reale' (wirklich) steht im Gegensatz zu den dünnen Häutchen; Ravaisson ergänzt '[simple]'. Gemeint ist höchstwahrscheinlich der feste Körper des Wassers, aber mehr sagt der Text nicht, daher [?].",
@@ -614,7 +614,7 @@
       "text": "a b are the said objects, of which b is girdled by the water r s t, and this then turns into a film, which is e f, m o. The real one will be h.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'n m' is printed in italics (struck out by Leonardo) in both the Italian and the French, and is left out of the translations.",
        "'eposiconuerte' (e poi si converte, and then turns) has no written subject; it is read as the water r s t, not the object b."
@@ -624,7 +624,7 @@
       "text": "a b sind die genannten Gegenstände. b wird vom Wasser r s t umgürtet, und dieses verwandelt sich dann in ein Häutchen, nämlich e f, m o. Das wirkliche wird h sein.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'n m' ist im Italienischen wie im Französischen kursiv gedruckt (von Leonardo gestrichen) und in den Übersetzungen weggelassen.",
        "'eposiconuerte' (e poi si converte, und verwandelt sich dann) hat kein geschriebenes Subjekt; es wird als das Wasser r s t gelesen, nicht als der Gegenstand b."
@@ -667,7 +667,7 @@
       "text": "[Figure:] m f g n\nThis percussion of water heads towards m and strikes the bank m, after it has rebounded from the bed and turned back towards the surface percussion, where the water is lower. And finding the second fall from f, where the water has already been made high by the leap, it cannot climb over it, but is submerged with that high water, which then comes down. So it must pass under the leap it made before, and turn back at n, and there it digs the bed, and first passes [continued on folio 104 [56] verso]",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'ne [onde]': Leonardo wrote 'o ne'; the edition prints its correction '[onde]' (whence), and the translations follow it.",
        "'la percussione superfitiale' (the surface percussion) is the place where the falling water first strikes the surface; the sentence does not define it further.",
@@ -679,7 +679,7 @@
       "text": "[Figur:] m f g n\nDieser Aufprall des Wassers richtet sich gegen m und trifft das Ufer m, nachdem er vom Grund zurückgeprallt ist und sich wieder dem Aufprall an der Oberfläche zugewandt hat, wo das Wasser niedriger ist. Und da er auf den zweiten Fall von f trifft, wo das Wasser durch den Sprung schon hoch geworden ist, kann er ihn nicht übersteigen, sondern taucht mit diesem hohen Wasser unter, das dann herabsinkt. Daher muss er unter dem Sprung hindurch, den er vorher selbst gemacht hat, wendet sich bei n, höhlt dort den Grund aus und zieht zuerst [Fortsetzung auf Blatt 104 [56] verso]",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'ne [onde]': Leonardo schrieb 'o ne'; die Ausgabe druckt ihre Verbesserung '[onde]' (daher), und die Übersetzungen folgen ihr.",
        "'la percussione superfitiale' (der Aufprall an der Oberfläche) ist die Stelle, wo das fallende Wasser zuerst auf die Oberfläche trifft; der Satz bestimmt es nicht näher.",
@@ -719,7 +719,7 @@
       "text": "under the 2 leaps made from f and from g. And for this reason it stays high opposite its leap, because such a leap makes itself a bridge over the course of the water that whirls round beneath it and then comes out with impetus.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'questo rimane alto' (this stays high): the subject is not named; Ravaisson reads it as the water ('elle reste haute'). It may also be the leap itself.",
        "'che' after 'eper' is printed in italics, struck out by Leonardo; left out.",
@@ -730,7 +730,7 @@
       "text": "unter den 2 Sprüngen hindurch, die von f und von g ausgehen. Und deshalb bleibt es gegenüber seinem Sprung hoch, weil ein solcher Sprung zur Brücke über den Lauf des Wassers wird, das darunter kreist und dann mit Wucht herauskommt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'questo rimane alto' (dies bleibt hoch): Das Subjekt ist nicht genannt; Ravaisson liest es als das Wasser ('elle reste haute'). Es kann auch der Sprung selbst sein.",
        "'che' nach 'eper' ist kursiv gedruckt, von Leonardo gestrichen; weggelassen.",
@@ -774,7 +774,7 @@
       "text": "If the water's entry into the pool is circular in shape, the hollow of its bed will be crescent-shaped, taking the gravel into its body, or else between the 2 horns of that shape.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'lunare' (lunar) is read as crescent-shaped, with Ravaisson's '[en forme de croissant]'.",
        "'in corcorpo' is printed so (a doubled syllable, 'in corpo'); read as 'into its body', that is, into the hollow itself, as Ravaisson's 'en corps [en ce fond]'.",
@@ -785,7 +785,7 @@
       "text": "Ist der Eintritt des Wassers in das Becken kreisförmig, so wird die Höhlung seines Grundes mondsichelförmig sein und den Kies in ihren Leib aufnehmen oder aber zwischen die 2 Hörner dieser Form.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'lunare' (mondförmig) wird wie bei Ravaisson ('[en forme de croissant]') als mondsichelförmig gelesen.",
        "'in corcorpo' ist so gedruckt (eine doppelte Silbe, 'in corpo'); gelesen als 'in ihren Leib', also in die Höhlung selbst, wie Ravaissons 'en corps [en ce fond]'.",
@@ -823,7 +823,7 @@
       "text": "I ask, if the current makes a bend, whether it will dig at the bottom, or in the middle, or at the top. And the same of the leaps that then follow against the banks of rivers, the bed being of the same material, and likewise the bank. And where it lifts [material] and where it sets it down, and its remedies.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'leua e pone' (lifts and sets down) has no object; it is read as the current taking away and depositing material, and the translations add '[material]' in brackets. Ravaisson reads the bank as the subject ('où elle s'élève et se pose'); that reading is possible too.",
        "'sua ripari' (its remedies, repairs) are the works that protect the bank; Ravaisson adds '[l'améliorer]'.",
@@ -834,7 +834,7 @@
       "text": "Ich frage, ob die Strömung, wenn sie eine Biegung macht, am Grund, in der Mitte oder oben aushöhlen wird. Und dasselbe von den Sprüngen, die danach gegen die Ufer der Flüsse folgen, wobei der Grund aus gleichem Stoff ist und ebenso das Ufer. Und wo sie [Stoff] abträgt und wo sie ihn ablagert, und die Abhilfen dagegen.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'leua e pone' (hebt und setzt ab) hat kein Objekt; es wird so gelesen, dass die Strömung Stoff abträgt und ablagert, und die Übersetzungen ergänzen '[Stoff]' in Klammern. Ravaisson liest das Ufer als Subjekt ('où elle s'élève et se pose'); auch diese Lesart ist möglich.",
        "'sua ripari' (seine Abhilfen, Ausbesserungen) sind die Bauten, die das Ufer schützen; Ravaisson ergänzt '[l'améliorer]'.",
@@ -878,13 +878,13 @@
       "text": "The river Loire at Amboise.\nThe river is higher within the bank b d than outside that bank.\nThe island where there is a part of Amboise.\nThis is the river that passes through Amboise; it passes at a b c d, and when it has passed the bridge it turns back, against the original current, by the channel d e, b f in contact with the bank which lies between the two contrary currents of the said river, a b, c d, and d e, b f. It then turns down again by the channel f l, g h, n m, and reunites with the river from which it was at first separated, which passes by k n, which makes k m, r t. But when the river is very full it flows all in one channel passing over the bank b d.",
       "kind": "printed",
       "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-      "rest": "Translation: J. P. Richter, 1883"
+      "rest": "Translation: Richter's edition, 1883"
      },
      "de": {
       "text": "Die Loire, der Fluss von Amboise.\nDer Fluss steht innerhalb des Damms b d höher als außerhalb dieses Damms.\nInsel, auf der ein Teil von Amboise liegt.\nDie Loire, die durch Amboise fließt, fließt durch a b, c d, und wenn sie die Brücke passiert hat, kehrt sie gegen ihre eigene Strömung durch den Kanal d e, b f zurück, entlang dem Damm, der zwischen den zwei gegenläufigen Strömungen des genannten Flusses liegt, a b, c d, d e, b f. Danach wendet sie sich wieder abwärts durch den Kanal f l, g h, n m und vereinigt sich wieder mit dem Fluss, von dem sie sich zuerst getrennt hat, der durch k n fließt und k m, r t bildet. Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung und geht über den Damm b d.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'contro al suo avenimento': wörtlich 'gegen sein Kommen'; gelesen als 'gegen ihre eigene Strömung' (Richter: 'against the original current').",
        "'che fa k m, r t': wörtlich 'der k m, r t macht'; die Buchstaben beziehen sich auf die Zeichnung und bleiben wie gedruckt.",
@@ -926,7 +926,7 @@
       "text": "Things lighter than water do not follow the course of the rebound and of the crossing of the water, but pass through the middle of its course, or near the sides [?], according to where they happened to be on entering those currents, and they are not hindered except by equal pushes. For if the right wave of the rebound meets the left one, it is necessary, if they are of equal power, that the place where they strike have an equal rebound backwards. (So the things that were moving on the water in that place, not being pushed more by the one blow than by the other, stay in the same line of the current. But if one power of the wave is greater than the other, that is, by speed of current, I do not mean power by greater [continued on folio 78 [30] verso]",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "The first nine printed lines are split in two columns because the writing runs round the drawing; each line is given here as Ravaisson's left part followed by his right part, which is how his French reads them.",
        "'alle parti' (to the parts) is unclear; Ravaisson adds '[centrales?]'. Translated as 'the sides' with [?].",
@@ -939,7 +939,7 @@
       "text": "Dinge, die leichter sind als Wasser, folgen nicht dem Lauf des Rückpralls und der Kreuzung des Wassers, sondern ziehen durch die Mitte seines Laufs oder nahe an den Seiten [?] vorbei, je nachdem, wo sie sich beim Eintritt in diese Strömungen befanden, und sie werden nur durch gleiche Stöße gehemmt. Denn wenn die rechte Welle des Rückpralls auf die linke trifft, muss, wenn sie gleich stark sind, die Stelle des Aufpralls einen gleichen Rückprall nach hinten haben. (Deshalb bleiben die Dinge, die sich an dieser Stelle auf dem Wasser bewegten, in derselben Linie der Strömung, da sie von dem einen Stoß nicht stärker getrieben werden als vom anderen. Wenn aber die eine Kraft der Welle größer ist als die andere, nämlich durch die Geschwindigkeit der Strömung, so meine ich nicht Kraft durch größere [Fortsetzung auf Blatt 78 [30] verso]",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "Die ersten neun gedruckten Zeilen sind in zwei Spalten geteilt, weil die Schrift um die Zeichnung läuft; jede Zeile steht hier als Ravaissons linker Teil, gefolgt von seinem rechten, so wie sein Französisch sie liest.",
        "'alle parti' (zu den Teilen) ist unklar; Ravaisson ergänzt '[centrales?]'. Übersetzt mit 'an den Seiten' und [?].",
@@ -979,13 +979,13 @@
       "text": "[Towards the bottom of the figure:] Tell me which eddies are wide below and not above.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors."
+      "rest": "AI translation. It may have errors."
      },
      "de": {
       "text": "[Unten bei der Figur:] Sag mir, welche Wirbel unten breit sind und oben nicht.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+      "rest": "KI-Übersetzung, kann Fehler enthalten."
      },
      "fr": {
       "text": "[Vers le bas de la figure :] Dis-moi quels tournants sont larges dessous et ne le sont pas dessus."
@@ -1019,7 +1019,7 @@
       "text": "mass of water, because if one water were even of much smaller thickness than the other, it makes no difference (let us say that one water is half as thick as another, and that it then has double the speed: because these waters, meeting each other, are of equal size where they touch, as I proved in the third of the fifth, the greater being one square braccio and the smaller a half, the smaller strikes the greater only on half of it, and likewise the greater strikes the smaller with half of itself, so that the contacts made by the percussions are equal in quantity and unequal by double power, because of the double speed that the one has over the other.)\nAnd so the floating thing will be pushed off the straight line of its course with a proportionate turning.",
       "kind": "ours",
       "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-      "rest": "AI translation. It may contain errors.",
+      "rest": "AI translation. It may have errors.",
       "doubts": [
        "'di sub 2la grosseza' is 'subdupla', half the thickness; 'didoppia' before it is printed in italics, struck out by Leonardo, and left out.",
        "'la terza del quinto' (the third of the fifth) refers to a proposition in a book of his own treatise on water; the words 'proposition' and 'book' are not written.",
@@ -1032,7 +1032,7 @@
       "text": "Wassermenge. Denn wäre ein Wasser auch von viel geringerer Dicke als das andere, so macht das nichts aus (sagen wir, ein Wasser sei halb so dick wie ein anderes und habe dann die doppelte Geschwindigkeit: weil diese Wasser, wenn sie aufeinandertreffen, dort, wo sie sich berühren, gleich groß sind, wie ich im dritten des fünften bewiesen habe, wobei das größere einen Quadratbraccio misst und das kleinere einen halben, trifft das kleinere das größere nur auf dessen Hälfte, und ebenso trifft das größere das kleinere mit seiner eigenen Hälfte, sodass die Berührungen, die durch die Aufpralle entstehen, an Menge gleich und an Kraft um das Doppelte ungleich sind, wegen der doppelten Geschwindigkeit, die das eine gegenüber dem anderen hat.)\nUnd so wird der schwimmende Gegenstand mit einer verhältnismäßigen Drehung aus der geraden Linie seines Laufs gedrängt.",
       "kind": "ours",
       "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-      "rest": "KI-Übersetzung. Sie kann Fehler enthalten.",
+      "rest": "KI-Übersetzung, kann Fehler enthalten.",
       "doubts": [
        "'di sub 2la grosseza' ist 'subdupla', die halbe Dicke; 'didoppia' davor ist kursiv gedruckt, von Leonardo gestrichen, und weggelassen.",
        "'la terza del quinto' (das dritte des fünften) verweist auf einen Lehrsatz in einem Buch seiner eigenen Abhandlung über das Wasser; die Wörter 'Lehrsatz' und 'Buch' stehen nicht da.",

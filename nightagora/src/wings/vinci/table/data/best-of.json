@@ -4,11 +4,12 @@
  "inputs": {
   "curator-250/SET.csv": "9edb048064cc91a1fccea997e925b823eaf0db4ae9f3661d335482482de2a792",
   "curator-250/TOPICS.csv": "60cc864f750bcf14ee8b60b2329ad75b81c510c1db9549aff0344653c72c61aa",
-  "words/captions.jsonl": "67a47bbbdf5da91cfdfaacebd299fe5a2c7f107e539ee925b11473f87890e30b",
+  "words/captions.jsonl": "7c78897051d5c102c42698383fe266f2ae4dea9cf25426052713ca250f86c9e9",
   "words/topics.json": "acc5230e6bb0d1363835eb6095f108629fee67a43ba6a10243ea077817562451",
   "words/notices.json": "0ce595d11d018e8596c538cf1dd40f9f041323d1994b502104a3c2f410198d42",
-  "words/leads.jsonl": "d99cb817b56f04ea316676f5cd5503b274ff54ab83997b471ca03a70470963e8",
-  "words/keys.json": "f88f5cd116ce828d6c50db16a0b512c215e300e5e92bdb6701aca1af65479b9b",
+  "words/leads.jsonl": "8a4111bc5d0579db0ac607a975b14148a1d10ab9a199067e880438dc4c3afbe5",
+  "words/keys.json": "cc587e365755ff554b041e5515a71ba1f53c77674b4acf648833ca189c6e4940",
+  "words/phone-lines.jsonl": "2b3445e8e9bb5b5963fa9595c68af6a03ec1f288d19c665836a718350aad0645",
   "texts-final/it-b.jsonl": "4baec9ed8ac99ef71e2feb1d647b0124fbf9f3a83d19ffd56fe1ed139b957e03",
   "texts-final/it.jsonl": "00e6af9c3a0a3545a368c19b0cd58ce1f37d78a2c12f093243206605106b7a74",
   "texts-final/rh-b.jsonl": "3754cf721940edda3f53547f159beccb6e2af5b2f3ded0986b3c4cbba93b2fe4",
@@ -53,39 +54,69 @@
    "en": "AI translation of the printed text. It may contain errors.",
    "de": "KI-Übersetzung des gedruckten Textes. Sie kann Fehler enthalten."
   },
-  "italian": null,
-  "the_page": null,
+  "italian": {
+   "en": "Italian",
+   "de": "Italienisch"
+  },
+  "the_page": {
+   "en": "The page",
+   "de": "Das Blatt"
+  },
   "mirror_ordinary": {
    "en": "This page was written left to right, the ordinary way, and reads without a mirror.",
    "de": "Dieses Blatt wurde von links nach rechts geschrieben, wie üblich, und liest sich ohne Spiegel."
   },
-  "mirror_plate": null,
-  "kind_leaf": null,
-  "kind_plate": null,
-  "kind_facsimile": null,
-  "topic_pages": null,
+  "mirror_plate": {
+   "en": "Leonardo wrote his notes from right to left. Here the mirror turns a printed copy of the page, made between 1881 and 1891: the library's photograph may not be altered.",
+   "de": "Leonardo schrieb seine Notizen von rechts nach links. Der Spiegel zeigt hier einen Nachdruck der Seite, gedruckt zwischen 1881 und 1891: Die Fotografie der Bibliothek darf nicht verändert werden."
+  },
+  "kind_leaf": {
+   "en": "The picture is a photograph of the page itself.",
+   "de": "Das Bild ist eine Fotografie der Seite selbst."
+  },
+  "kind_plate": {
+   "en": "The picture is a page from a printed copy of the notebook, not the page itself.",
+   "de": "Das Bild ist eine Seite aus einem Nachdruck des Notizbuchs, nicht die Seite selbst."
+  },
+  "kind_facsimile": {
+   "en": "The picture is a photograph of a printed copy of the notebook, not of the page itself.",
+   "de": "Das Bild ist eine Fotografie aus einem Nachdruck des Notizbuchs, nicht von der Seite selbst."
+  },
+  "topic_pages": {
+   "en": "{n} pages",
+   "de": "{n} Seiten"
+  },
   "topic_count": {
    "en": "{topic}, {n} of {total}",
    "de": "{topic}, {n} von {total}"
   },
-  "absence_paris_rest": null,
-  "absence_ashburnham": null,
-  "absence_arundel_middle": null,
+  "absence_paris_rest": {
+   "en": "Single pages from them stand in the topics, from the Institut's own photographs. The museum shows leaves under the Institut's licence, not the books whole.",
+   "de": "Einzelne Seiten daraus stehen in den Themen, aus den Fotografien des Institut de France. Das Museum zeigt unter der Lizenz des Instituts Blätter, nicht die ganzen Bände."
+  },
+  "absence_ashburnham": {
+   "en": "Some of them stand in the topics, from the Institut's own photographs. They were cut from manuscripts A and B, so they are not shown as a book.",
+   "de": "Einige davon stehen in den Themen, aus den Fotografien des Institut de France. Sie wurden aus den Manuskripten A und B herausgeschnitten und werden nicht als Buch gezeigt."
+  },
+  "absence_arundel_middle": {
+   "en": "Pages from this part stand in the topics, from the British Library's own photographs. The printed copy of this part was never published, so it is not on the shelf as a book.",
+   "de": "Seiten aus diesem Teil stehen in den Themen, aus den Fotografien der British Library. Der Nachdruck dieses Teils erschien nie, darum steht er nicht als Buch im Regal."
+  },
   "credit_rest_ai": {
-   "en": "AI translation. It may contain errors.",
-   "de": "KI-Übersetzung. Sie kann Fehler enthalten."
+   "en": "AI translation. It may have errors.",
+   "de": "KI-Übersetzung, kann Fehler enthalten."
   },
   "credit_rest_richter": {
-   "en": "Translation: J. P. Richter, 1883",
-   "de": "Übersetzung: J. P. Richter, 1883"
+   "en": "Translation: Richter's edition, 1883",
+   "de": "Übersetzung: Richters Ausgabe, 1883"
   },
   "picture_leaf": {
    "en": "{holder}, photograph",
    "de": "{holder}, Fotografie"
   },
   "picture_facsimile": {
-   "en": "{holder}, facsimile of {year}",
-   "de": "{holder}, Faksimile von {year}"
+   "en": "{holder}, printed copy of {year}",
+   "de": "{holder}, Nachdruck von {year}"
   },
   "way_hand": {
    "en": "His hand",
@@ -562,8 +593,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 83v, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "The aerial screw, a spiral sail wound round a mast on a round platform.",
-    "de": "Die Luftschraube, ein spiralig um einen Mast gewundenes Segel auf einer runden Plattform."
+    "en": "A spiral sail wound round a mast on a round platform.",
+    "de": "Ein Segel, spiralig um einen Mast gewunden, auf einer runden Plattform."
    },
    "writing": true,
    "drawing_only": false,
@@ -583,13 +614,13 @@
      "text": "…and is turned swiftly, the said screw will make its nut in the air and will rise high.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "…und schnell gedreht wird, dann macht sich die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…e voltato con presteza. che dettavite. sifa. la femina. nellaria e montera inalto…",
@@ -601,6 +632,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…the said screw will make its nut in the air and will rise high.",
+    "de": "…die genannte Schraube ihre Mutter in der Luft und steigt in die Höhe."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0340.jpg",
@@ -651,6 +687,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A jointed wing, its long ribs fanned out and worked by cords.",
+    "de": "Ein Gelenkflügel, die langen Rippen aufgefächert und von Schnüren bewegt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -677,8 +718,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 88v, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A man heaves a lever to beat a bat wing on a plank: the wing test rig.",
-    "de": "Ein Mann stemmt einen Hebel, der einen Fledermausflügel auf einem Brett schlagen lässt: der Flügelprüfstand."
+    "en": "A man heaves a lever to beat a bat wing on a plank.",
+    "de": "Ein Mann stemmt einen Hebel, der einen Fledermausflügel auf einem Brett schlagen lässt."
    },
    "writing": true,
    "drawing_only": false,
@@ -698,13 +739,13 @@
      "text": "If the plank of 200 pounds rises before the wing comes down, the test is good.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt, ist der Versuch gut.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…esse il pancone delle 200 libbre. si leua prima. innalto. chellalia sabassi la pruova e bona…",
@@ -716,6 +757,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "If the plank of 200 pounds rises before the wing comes down…",
+    "de": "Wenn sich die Bohle von 200 Pfund hebt, bevor der Flügel sich senkt…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0346.jpg",
@@ -766,6 +812,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A great feathered wing with a strap harness at its joint.",
+    "de": "Ein großer gefiederter Flügel mit einem Riemengeschirr am Gelenk."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -806,6 +857,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A jointed wing arm with pulleys, cords and a ratchet.",
+    "de": "Ein Flügelarm mit Gelenk, Rollen, Schnüren und einer Sperrklinke."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -832,8 +888,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 74v, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A wing frame worked by pulleys, cords and a hand grip: one of the hall's ornithopters.",
-    "de": "Ein Flügelgestell, über Rollen, Schnüre und einen Handgriff bewegt: einer der Ornithopter der Halle."
+    "en": "A wing frame worked by pulleys, cords and a hand grip, for a machine that beats its wings.",
+    "de": "Ein Flügelgestell, über Rollen, Schnüre und einen Handgriff bewegt, für eine Maschine mit Flügelschlag."
    },
    "writing": true,
    "drawing_only": false,
@@ -853,13 +909,13 @@
      "text": "…you will wear a long wineskin tied round your waist, so that if you fall you do not drown.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "…du wirst einen langen Lederschlauch um den Leib gebunden tragen, damit du nicht ertrinkst, wenn du fällst.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…porterai. cinto. vnotro lungo acio chenelchadere. tu nonanegassi.",
@@ -871,6 +927,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…a long wineskin tied round your waist, so that if you fall you do not drown.",
+    "de": "…Lederschlauch um den Leib gebunden tragen, damit du nicht ertrinkst…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0304.jpg",
@@ -907,8 +968,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 75r, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "Levers and pulleys in a frame, wing spars swinging through arcs: an ornithopter of the hall.",
-    "de": "Hebel und Rollen in einem Gestell, Flügelholme schwingen durch Bögen: ein Ornithopter der Halle."
+    "en": "Levers and pulleys in a frame, wing spars swinging through arcs: a flying machine with beating wings.",
+    "de": "Hebel und Rollen in einem Gestell, Flügelholme schwingen durch Bögen: eine Flugmaschine mit schlagenden Flügeln."
    },
    "writing": true,
    "drawing_only": false,
@@ -925,6 +986,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Levers and pulleys in a frame, wing spars swinging through arcs.",
+    "de": "Hebel und Rollen in einem Gestell, Flügelholme schwingen durch Bögen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0306.jpg",
@@ -982,16 +1048,16 @@
      "text": "The beating of the wings will be crosswise, like the gait of the horse.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Das Schlagen der Flügel wird über Kreuz gehen, so wie der Gang des Pferdes.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "…elmenare dellali sari in croce simile allo andare delcavallo",
+     "text": "…elmenare dellali sari in croce simile allo andare delcavallo…",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. II (Manuscripts B and D), Paris 1883",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. II (Manuskripte B und D), Paris 1883"
@@ -1000,6 +1066,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The beating of the wings will be crosswise, like the gait of the horse.",
+    "de": "Das Schlagen der Flügel wird über Kreuz gehen, so wie der Gang des Pferdes."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0326.jpg",
@@ -1057,13 +1128,13 @@
      "text": "…when one of the legs stretches out it will bring down one pair of wings…",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "…Wenn sich eines der Beine streckt, senkt es ein Flügelpaar…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…quando luna delleganbe sidistendera quellachalera vnparo dalie…",
@@ -1075,6 +1146,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…when one of the legs stretches out it will bring down one pair of wings…",
+    "de": "…Wenn sich eines der Beine streckt, senkt es ein Flügelpaar…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0322.jpg",
@@ -1111,8 +1187,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 64r. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "A globe of crossed vanes above a long wing-like sail on a frame: the hall's Madrid glider.",
-    "de": "Eine Kugel aus gekreuzten Flächen über einem langen flügelartigen Segel auf einem Gestell: der Madrider Gleiter der Halle."
+    "en": "A globe of crossed vanes above a long wing-like sail on a frame.",
+    "de": "Eine Kugel aus gekreuzten Flächen über einem langen flügelartigen Segel auf einem Gestell."
    },
    "writing": true,
    "drawing_only": false,
@@ -1125,6 +1201,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A globe of crossed vanes above a long wing-like sail.",
+    "de": "Eine Kugel aus gekreuzten Flächen über einem langen flügelartigen Segel."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1172,13 +1253,13 @@
      "text": "An object offers as much resistance to the air as the air does to the object.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "So viel Kraft übt ein Ding gegen die Luft aus, wie die Luft gegen das Ding.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Tāta forza si fa colla cosa īcōtro all'aria, quāto l'aria alla cosa…",
@@ -1190,6 +1271,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "An object offers as much resistance to the air as the air does to the object.",
+    "de": "So viel Kraft übt ein Ding gegen die Luft aus, wie die Luft gegen das Ding."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1230,6 +1316,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A great bat-like wing of curved ribs, worked by cords.",
+    "de": "Ein großer fledermausartiger Flügel aus gebogenen Rippen, über Schnüre bewegt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -1277,13 +1368,13 @@
      "text": "A way to make the wing stay perforated when it rises, and all closed when it comes down.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Ein Verfahren, damit der Flügel durchbrochen bleibt, wenn er sich hebt, und ganz geschlossen ist, wenn er sich senkt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "modo. chequando. lalja. sileua. inalto rimanghi traforata ecquando ella. chala. sia tucta. vnita…",
@@ -1295,6 +1386,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A large bat wing of ribs and netting, and above it a long folding wing.",
+    "de": "Ein großer Fledermausflügel aus Rippen und Netz, darüber ein langer Klappflügel."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0302.jpg",
@@ -1349,6 +1445,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A dragonfly with four wings, a bat wing and a butterfly.",
+    "de": "Eine Libelle mit vier Flügeln, ein Fledermausflügel und ein Schmetterling."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0336.jpg",
@@ -1406,7 +1507,7 @@
      "text": "Remember that your flying machine must imitate no other than the bat…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Erinnere dich, daß dein Vogel nichts anderes nachahmen darf als die Fledermaus…",
@@ -1424,6 +1525,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Remember that your flying machine must imitate no other than the bat…",
+    "de": "Erinnere dich, daß dein Vogel nichts anderes nachahmen darf als die Fledermaus…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1471,16 +1577,16 @@
      "text": "How the bird rises by means of the wind without beating its wings.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Wie der Vogel sich mit Hilfe des Windes erhebt, ohne die Flügel zu schlagen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "CHOMELLUCCIELLO SINALZA MEDIANTE ILUENTA SANZA BATTI MENTO DALIE",
+     "text": "CHOMELLUCCIELLO SINALZA MEDIANTE ILUENTA SANZA BATTI MENTO DALIE…",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. III (Manuscripts C, E and K), Paris 1888",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. III (Manuskripte C, E und K), Paris 1888"
@@ -1489,6 +1595,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "How the bird rises by means of the wind without beating its wings.",
+    "de": "Wie der Vogel sich mit Hilfe des Windes erhebt, ohne die Flügel zu schlagen."
+   },
    "leaf": {
     "left": 0.062,
     "top": 0.022,
@@ -1544,6 +1655,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A plant leaf in red chalk under the writing, birds in flight beside it.",
+    "de": "Ein Pflanzenblatt in Rötel unter der Schrift, daneben Vögel im Flug."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1591,7 +1707,7 @@
      "text": "…must stand free from the waist upwards so as to be able to balance himself as he does in a boat…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…hat sich vom Gürtel aufwärts frei zu halten, um zu balancieren, wie er es im Boote tat…",
@@ -1609,6 +1725,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…must stand free from the waist upwards so as to be able to balance himself…",
+    "de": "…hat sich vom Gürtel aufwärts frei zu halten, um zu balancieren…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1649,6 +1770,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A three-wheeled cart seen from above, curved springs driving toothed wheels.",
+    "de": "Ein dreirädriger Wagen von oben, gebogene Federn treiben Zahnräder."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -1675,8 +1801,8 @@
    "picture": "facsimile",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 24r. Original: Veneranda Biblioteca Ambrosiana, Milan. Image: Leonardo//thek@, Museo Galileo, Florence, from the facsimile Giunti Barbèra 1973-75; photographic plates Civico Archivio Fotografico di Milano. Public-domain work; non-profit cultural use (Codice dei beni culturali art. 108 comma 3-bis); not for commercial reuse. https://teche.museogalileo.it/leonardo/foglio/index.html?num=ATL.0047.1",
    "caption": {
-    "en": "The file-cutting machine: a falling weight drives the hammer while a screw feeds the file.",
-    "de": "Die Feilenhaumaschine: ein fallendes Gewicht treibt den Hammer, während eine Schraube die Feile vorschiebt."
+    "en": "A falling weight drives the hammer while a screw feeds the file.",
+    "de": "Ein fallendes Gewicht treibt den Hammer, während eine Schraube die Feile vorschiebt."
    },
    "writing": true,
    "drawing_only": false,
@@ -1689,6 +1815,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A weight drives the hammer while a screw feeds the file.",
+    "de": "Ein Gewicht treibt den Hammer, während eine Schraube die Feile vorschiebt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1729,6 +1860,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A great treadwheel crane in a timber frame astride a canal cut.",
+    "de": "Ein großer Tretradkran in einem Holzgerüst über einem Kanaleinschnitt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -1769,6 +1905,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A revolving crane on a circular track at the edge of a cut.",
+    "de": "Ein Drehkran auf einer Kreisbahn am Rand eines Einschnitts."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -1795,8 +1936,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 49r, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "The revolving crane on its turntable base lifting a block, a hinged scoop drawn below.",
-    "de": "Der Drehkran auf seinem Drehteller hebt einen Block, darunter eine Schaufel mit Gelenk."
+    "en": "A crane on its turntable base lifting a block, a hinged scoop drawn below.",
+    "de": "Ein Kran auf seinem Drehteller hebt einen Block, darunter eine Schaufel mit Gelenk."
    },
    "writing": true,
    "drawing_only": false,
@@ -1813,6 +1954,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A crane on its turntable base lifting a block, a scoop drawn below.",
+    "de": "Ein Kran auf seinem Drehteller hebt einen Block, darunter eine Schaufel."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0202.jpg",
@@ -1863,6 +2009,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Long threaded rods turned by paired toothed wheels to drive a sledge.",
+    "de": "Lange Gewindestangen, von Zahnradpaaren gedreht, treiben einen Schlitten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1903,6 +2054,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Hammers on long arms lifted by a pegged drum.",
+    "de": "Hämmer an langen Armen, von einer Trommel mit Stiften gehoben."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -1929,8 +2085,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 68v. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "A spinning machine: two great wheels turned by a crank drive a row of spindles by belts.",
-    "de": "Eine Spinnmaschine: zwei große Räder, mit einer Kurbel gedreht, treiben über Riemen eine Reihe von Spindeln."
+    "en": "Two great wheels turned by a crank drive a row of spindles by belts.",
+    "de": "Zwei große Räder, mit einer Kurbel gedreht, treiben über Riemen eine Reihe von Spindeln."
    },
    "writing": false,
    "drawing_only": false,
@@ -1943,6 +2099,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two great wheels turned by a crank drive a row of spindles.",
+    "de": "Zwei große Räder, mit einer Kurbel gedreht, treiben eine Reihe von Spindeln."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -1969,8 +2130,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 44v. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "A rope-twisting machine drawn twice, a ring of spindles turned by a crank.",
-    "de": "Eine Seildrehmaschine, zweimal gezeichnet, ein Kranz von Spindeln, mit einer Kurbel gedreht."
+    "en": "Drawn twice, a ring of spindles turned by a crank.",
+    "de": "Zweimal gezeichnet, ein Kranz von Spindeln, mit einer Kurbel gedreht."
    },
    "writing": true,
    "drawing_only": false,
@@ -1983,6 +2144,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Drawn twice, a ring of spindles turned by a crank.",
+    "de": "Zweimal gezeichnet, ein Kranz von Spindeln, mit einer Kurbel gedreht."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2009,8 +2175,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit L, fol. 35v, vers 1497-1502 ; 1504. Bibliothèque de l'Institut de France, Ms 2182. https://bibnum.institutdefrance.fr/ark:/61562/bi24199. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A windmill cut open, its timber roof and sails turning on top of the round tower.",
-    "de": "Eine Windmühle, aufgeschnitten, Holzdach und Flügel drehen sich oben auf dem runden Turm."
+    "en": "Cut open, its timber roof and sails turning on top of the round tower.",
+    "de": "Aufgeschnitten, Holzdach und Flügel drehen sich oben auf dem runden Turm."
    },
    "writing": true,
    "drawing_only": false,
@@ -2027,6 +2193,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Cut open, its timber roof and sails turning on top of the round tower.",
+    "de": "Aufgeschnitten, Holzdach und Flügel drehen sich oben auf dem runden Turm."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0246.jpg",
@@ -2077,6 +2248,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A crank-turned drum in a curved housing, its many cords running off.",
+    "de": "Eine Kurbeltrommel in einem gebogenen Gehäuse, ihre vielen Schnüre laufen davon."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -2117,6 +2293,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A tall shaded tube with a lever bellows above it.",
+    "de": "Eine hohe schattierte Röhre mit einem Hebelblasebalg darüber."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2157,6 +2338,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A bridge of interlocking poles that holds itself up.",
+    "de": "Eine Brücke aus verschränkten Stangen, die sich selbst trägt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2197,6 +2383,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two large compasses with ring heads and jointed legs, in red chalk.",
+    "de": "Zwei große Zirkel mit Ringköpfen und Gelenkschenkeln, in Rötel."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0122.jpg",
@@ -2254,13 +2445,13 @@
      "text": "A way to get a piece of work done quickly.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Wie man eine Arbeit rasch erledigt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Modo difare una opera chomprestezza",
@@ -2272,6 +2463,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "A way to get a piece of work done quickly.",
+    "de": "Wie man eine Arbeit rasch erledigt."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0212.jpg",
@@ -2308,8 +2504,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 10r. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "Chains of every kind, link belts over toothed wheels, plaited and twisted links: the chain drive.",
-    "de": "Ketten jeder Art, Gliederriemen über Zahnrädern, geflochtene und gedrehte Glieder: der Kettenantrieb."
+    "en": "Chains of every kind, link belts over toothed wheels, plaited and twisted links.",
+    "de": "Ketten jeder Art, Gliederriemen über Zahnrädern, geflochtene und gedrehte Glieder."
    },
    "writing": true,
    "drawing_only": false,
@@ -2322,6 +2518,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Chains, link belts over toothed wheels, plaited and twisted links.",
+    "de": "Ketten, Gliederriemen über Zahnrädern, geflochtene und gedrehte Glieder."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2348,8 +2549,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 85r. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "A page of springs: stacked bows, coils and flat spirals, spring barrels with hanging weights below.",
-    "de": "Eine Seite voller Federn: gestapelte Bögen, Spiralen und flache Schnecken, unten Federhäuser mit hängenden Gewichten."
+    "en": "Stacked bows, coils and flat spirals, spring barrels with hanging weights below.",
+    "de": "Gestapelte Bögen, Spiralen und flache Schnecken, unten Federhäuser mit hängenden Gewichten."
    },
    "writing": true,
    "drawing_only": false,
@@ -2362,6 +2563,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Stacked bows, coils and flat spirals, spring barrels below.",
+    "de": "Gestapelte Bögen, Spiralen und flache Schnecken, unten Federhäuser."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2388,8 +2594,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 20v. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "The hall's ball bearing, a caged ring of balls, rollers under a plate, a toothed ring.",
-    "de": "Das Kugellager der Halle, ein Kranz von Kugeln im Käfig, Walzen unter einer Platte, ein Zahnkranz."
+    "en": "A caged ring of balls, rollers under a plate, a toothed ring.",
+    "de": "Ein Kranz von Kugeln im Käfig, Walzen unter einer Platte, ein Zahnkranz."
    },
    "writing": true,
    "drawing_only": false,
@@ -2402,6 +2608,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A caged ring of balls, rollers under a plate, a toothed ring.",
+    "de": "Ein Kranz von Kugeln im Käfig, Walzen unter einer Platte, ein Zahnkranz."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2442,6 +2653,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Toothed rings spiralling up a shaft on a round drum.",
+    "de": "Zahnkränze winden sich spiralig an einer Welle über einer runden Trommel hoch."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2482,6 +2698,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A round drum with a toothed ring on top, meshing with a tall toothed wheel.",
+    "de": "Eine runde Trommel mit einem Zahnkranz obenauf, in den ein hohes Zahnrad greift."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2522,6 +2743,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A long toothed bar on posts driven by a wheel beneath.",
+    "de": "Eine lange Zahnstange auf Pfosten, von einem Rad darunter getrieben."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2562,6 +2788,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two oval toothed wheels in red chalk, each driven by a spoked wheel.",
+    "de": "Zwei ovale Zahnräder in Rötel, jedes von einem Speichenrad angetrieben."
+   },
    "leaf": {
     "left": 0,
     "top": 0.038,
@@ -2617,6 +2848,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A cone of lengthwise staves inside a toothed ring on a round drum.",
+    "de": "Ein Kegel aus Längsstäben in einem Zahnkranz auf einer runden Trommel."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2657,6 +2893,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A shaded cone of rods round a central screw with a crank.",
+    "de": "Ein schattierter Kegel aus Stäben um eine mittlere Schraube mit Kurbel."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -2697,6 +2938,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A tall tripod carrying a great lifting screw through a nut box.",
+    "de": "Ein hohes Dreibein mit einer großen Hubschraube durch einen Mutterkasten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2737,6 +2983,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A drum of stacked discs on a toothed turntable.",
+    "de": "Eine Trommel aus gestapelten Scheiben auf einem gezahnten Drehteller."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2777,6 +3028,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A twisted rope ring wound round three spools, and four hammers on springs below.",
+    "de": "Ein gedrehter Seilring um drei Spulen, darunter vier Hämmer an Federn."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2817,6 +3073,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "An hourglass-shaped roller between two plates, gun-locks below.",
+    "de": "Eine sanduhrförmige Walze zwischen zwei Platten, darunter Gewehrschlösser."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2857,6 +3118,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A clock movement in a frame, its wheels and a curved arc.",
+    "de": "Ein Uhrwerk in einem Rahmen, seine Räder und ein gebogener Bogen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -2904,13 +3170,13 @@
      "text": "A ship of scorpions, good for cutting the ropes of the great ships.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Ein Schiff mit Skorpionen, gut, um die Seile der großen Schiffe zu durchschneiden.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "nave di scorpioni bone attagliare le corde delle gran navi…",
@@ -2922,6 +3188,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…good for cutting the ropes of the great ships.",
+    "de": "…gut, um die Seile der großen Schiffe zu durchschneiden."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0310.jpg",
@@ -2972,6 +3243,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two mortars firing showers of shot in arcs across the sheet.",
+    "de": "Zwei Mörser feuern Kugelschauer in Bögen über das Blatt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -2998,8 +3274,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 149r. Wikimedia Commons (Ambrosiana scans); Public domain; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Ambrosiana-Codice-Atlantico-Codex-Atlanticus-f-149-recto.jpg",
    "caption": {
-    "en": "The giant crossbow on six wheels, a man at its release, crossbows and a cannon above.",
-    "de": "Die Riesenarmbrust auf sechs Rädern, ein Mann am Auslöser, darüber Armbrüste und eine Kanone."
+    "en": "A crossbow on six wheels, a man at its release, crossbows and a cannon above.",
+    "de": "Eine Armbrust auf sechs Rädern, ein Mann am Auslöser, darüber Armbrüste und eine Kanone."
    },
    "writing": true,
    "drawing_only": false,
@@ -3012,6 +3288,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A crossbow on six wheels, a man at its release.",
+    "de": "Eine Armbrust auf sechs Rädern, ein Mann am Auslöser."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -3052,6 +3333,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A catapult with a great curved arm, a man straining at its winding wheel.",
+    "de": "Ein Katapult mit einem großen gebogenen Arm, ein Mann stemmt sich ins Spannrad."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -3096,6 +3382,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A robed man beside a burning spiked ball and a spiked wheel.",
+    "de": "Ein Mann im Gewand neben einer brennenden Stachelkugel und einem Stachelrad."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0022.jpg",
@@ -3132,8 +3423,8 @@
    "picture": "facsimile",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 157r. Original: Veneranda Biblioteca Ambrosiana, Milan. Image: Leonardo//thek@, Museo Galileo, Florence, from the facsimile Giunti Barbèra 1973-75; photographic plates Civico Archivio Fotografico di Milano. Public-domain work; non-profit cultural use (Codice dei beni culturali art. 108 comma 3-bis); not for commercial reuse. https://teche.museogalileo.it/leonardo/foglio/index.html?num=ATL.0313.1",
    "caption": {
-    "en": "Many-barrelled guns on carts, a triple rack and a fan of barrels: the hall's organ gun.",
-    "de": "Geschütze mit vielen Rohren auf Lafetten, ein dreifaches Gestell und ein Fächer von Rohren: das Orgelgeschütz der Halle."
+    "en": "Many-barrelled guns on carts, a triple rack and a fan of barrels.",
+    "de": "Geschütze mit vielen Rohren auf Lafetten, ein dreifaches Gestell und ein Fächer von Rohren."
    },
    "writing": true,
    "drawing_only": false,
@@ -3146,6 +3437,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Many-barrelled guns on carts, a fan of barrels.",
+    "de": "Geschütze mit vielen Rohren auf Lafetten, ein Fächer von Rohren."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -3193,13 +3489,13 @@
      "text": "This bridge could have 2 passages, one above the other.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Diese Brücke könnte 2 Übergänge haben, einen über dem anderen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "potrebe questo ponte avere 2 transiti uno sopra laltro",
@@ -3211,6 +3507,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "This bridge could have 2 passages, one above the other.",
+    "de": "Diese Brücke könnte 2 Übergänge haben, einen über dem anderen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0098.jpg",
@@ -3265,6 +3566,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A great gun barrel raised on an A-frame by a winch.",
+    "de": "Ein großes Geschützrohr, mit einer Winde an einem A-Gestell gehoben."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0216.jpg",
@@ -3319,6 +3625,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Fans of lines of fire from round bastions, in dark wash.",
+    "de": "Fächer von Schusslinien aus runden Bastionen, in dunkler Lavierung."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0256.jpg",
@@ -3369,6 +3680,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A great treadwheel in a timber shed, men climbing its steps.",
+    "de": "Ein großes Tretrad in einem Holzschuppen, Männer steigen seine Stufen hinauf."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -3409,6 +3725,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Defenders on a wall push scaling ladders away with a pivoting beam.",
+    "de": "Verteidiger auf einer Mauer stoßen Sturmleitern mit einem Schwenkbalken weg."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -3449,6 +3770,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A wheeled stair let down onto a wall across a moat.",
+    "de": "Eine Treppe auf Rädern, über einen Graben an eine Mauer gelegt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -3493,19 +3819,19 @@
     "passage": 2,
     "placeholder": false,
     "en": {
-     "text": "The man who is in league with the climber, when he takes service with the castellan, should carry with him a ball of strong thread.",
+     "text": "…when he takes service with the castellan, should carry with him a ball of strong thread.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
-     "text": "Wer mit dem Kletterer im Bund ist, soll, wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen.",
+     "text": "…wenn er beim Kastellan in Dienst tritt, ein Knäuel starken Zwirns bei sich tragen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "quello chedachordo chollo scalatore porti quando saconcia colcastellano. con seco uno gomitolo di forterefe.",
+     "text": "…porti quando saconcia colcastellano. con seco uno gomitolo di forterefe.",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. II (Manuscripts B and D), Paris 1883",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. II (Manuskripte B und D), Paris 1883"
@@ -3514,6 +3840,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…should carry with him a ball of strong thread.",
+    "de": "…ein Knäuel starken Zwirns bei sich tragen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0206.jpg",
@@ -3571,13 +3902,13 @@
      "text": "How all the air that rises again with the water does not stay on the surface…",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Wie die ganze Luft, die mit dem Wasser wieder aufsteigt, nicht an der Oberfläche bleibt…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Come tutta laria cheresurge collacqua nonresta in superfitie…",
@@ -3589,6 +3920,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Water crashing into churning foam and curling waves.",
+    "de": "Wasser stürzt in brodelnden Schaum und gekräuselte Wellen."
+   },
    "leaf": {
     "left": 0,
     "top": 0.06,
@@ -3648,6 +3984,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Water poured from a sluice, plunging into a pool and boiling up in foam.",
+    "de": "Wasser, das oben aus einer Schleuse in ein Becken stürzt und in Schaum aufkocht."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0110.jpg",
@@ -3702,6 +4043,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Water falling from two sluices in braided strands.",
+    "de": "Wasser, das aus zwei Schleusen in geflochtenen Strähnen fällt."
+   },
    "leaf": {
     "left": 0,
     "top": 0.041,
@@ -3754,16 +4100,16 @@
      "text": "Such overturnings of the currents are made by the impetus of the water beneath the other water.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Solche Umwälzungen der Strömungen entstehen durch den Antrieb des Wassers unter dem anderen Wasser.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "tali ra voltamen ti dicorsi so fatti dalenpeto dellacqua sottolal tra acqua",
+     "text": "tali ra voltamen ti dicorsi so fatti dalenpeto dellacqua sottolal tra acqua…",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. IV (Manuscripts F and I), Paris 1889",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. IV (Manuskripte F und I), Paris 1889"
@@ -3772,6 +4118,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Such overturnings of the currents are made by the impetus of the water…",
+    "de": "Solche Umwälzungen der Strömungen entstehen durch den Antrieb des Wassers…"
+   },
    "leaf": {
     "left": 0.047,
     "top": 0.063,
@@ -3831,19 +4182,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "…displays of water in thin films, by placing many different objects in a shallow, even and swift current.",
+     "text": "…by placing many different objects in a shallow, even and swift current.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
-     "text": "…Schauspiele von Wasser in dünnen Häutchen zu erzeugen, indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
+     "text": "…indem man viele verschiedene Gegenstände in eine flache, gleichmäßige und schnelle Strömung setzt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "espectaculi dacqua panniculata ponendo molti vari obietti nuna conrente bassa equale eveloce",
+     "text": "…ponendo molti vari obietti nuna conrente bassa equale eveloce…",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. IV (Manuscripts F and I), Paris 1889",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. IV (Manuskripte F und I), Paris 1889"
@@ -3852,6 +4203,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Two jets falling side by side and braiding as they meet.",
+    "de": "Zwei Strahlen fallen nebeneinander und verflechten sich beim Treffen."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0112.jpg",
@@ -3906,6 +4262,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Water pouring over a wall and churning into waves and bubbles.",
+    "de": "Wasser stürzt über eine Mauer und wirbelt zu Wellen und Blasen auf."
+   },
    "leaf": {
     "left": 0,
     "top": 0.082,
@@ -3968,13 +4329,13 @@
      "text": "I ask, if the current makes a bend, whether it will dig at the bottom, or in the middle, or at the top.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Ich frage, ob die Strömung, wenn sie eine Biegung macht, am Grund, in der Mitte oder oben aushöhlen wird.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Domando sella corrente fara alcuno gomito sella cavera infondo oinmezo odisopra…",
@@ -3986,6 +4347,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…whether it will dig at the bottom, or in the middle, or at the top.",
+    "de": "…am Grund, in der Mitte oder oben aushöhlen wird."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0298.jpg",
@@ -4036,6 +4402,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Three shaded bowls with ripples spreading in rings.",
+    "de": "Drei schattierte Schalen mit Wellenringen, die sich ausbreiten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4083,13 +4454,13 @@
      "text": "But when the river is very full it flows all in one channel…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…ma quādo il fiume è grosso, allora elli corre tutto per uno solo verso…",
@@ -4101,6 +4472,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "But when the river is very full it flows all in one channel…",
+    "de": "Führt der Fluss aber Hochwasser, dann fließt er ganz in einer einzigen Richtung…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4148,13 +4524,13 @@
      "text": "Tell me which eddies are wide below and not above.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. IV, 1889). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Sag mir, welche Wirbel unten breit sind und oben nicht.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. IV, 1889). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "dimi quali re trosi sono lar ghi di sotto enon disopra",
@@ -4166,6 +4542,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Tell me which eddies are wide below and not above.",
+    "de": "Sag mir, welche Wirbel unten breit sind und oben nicht."
+   },
    "leaf": {
     "left": 0,
     "top": 0.038,
@@ -4228,13 +4609,13 @@
      "text": "To make the great canal, first make the smaller one…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Um den großen Kanal zu bauen, mach zuerst den kleinen…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Per fare il grā canale, fa prima il piccolo…",
@@ -4246,6 +4627,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "To make the great canal, first make the smaller one…",
+    "de": "Um den großen Kanal zu bauen, mach zuerst den kleinen…"
+   },
    "leaf": {
     "left": 0.05,
     "top": 0.019,
@@ -4295,6 +4681,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A paddle wheel drives a pump up a sloping trough.",
+    "de": "Ein Schaufelrad treibt eine Pumpe eine schräge Rinne hinauf."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0220.jpg",
@@ -4345,6 +4736,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A sheet of water-raising machines: a screw, bucket wheels, pumps.",
+    "de": "Ein Blatt voller Wasserhebemaschinen: eine Schraube, Schöpfräder, Pumpen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4371,8 +4767,8 @@
    "picture": "facsimile",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 6r. Original: Veneranda Biblioteca Ambrosiana, Milan. Image: Leonardo//thek@, Museo Galileo, Florence, from the facsimile Giunti Barbèra 1973-75; photographic plates Civico Archivio Fotografico di Milano. Public-domain work; non-profit cultural use (Codice dei beni culturali art. 108 comma 3-bis); not for commercial reuse. https://teche.museogalileo.it/leonardo/foglio/index.html?num=ATL.0011.1",
    "caption": {
-    "en": "Water-raising machines in pen and wash: the hall's water screw, a paddle wheel, pumps, a siphon.",
-    "de": "Wasserhebemaschinen in Feder und Lavierung: die Wasserschraube der Halle, ein Schaufelrad, Pumpen, ein Heber."
+    "en": "Water-raising machines in pen and wash: a water screw, a paddle wheel, pumps, a siphon.",
+    "de": "Wasserhebemaschinen in Feder und Lavierung: eine Wasserschraube, ein Schaufelrad, Pumpen, ein Heber."
    },
    "writing": true,
    "drawing_only": false,
@@ -4385,6 +4781,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Water-raising machines: a water screw, a paddle wheel, pumps, a siphon.",
+    "de": "Wasserhebemaschinen: eine Wasserschraube, ein Schaufelrad, Pumpen, ein Heber."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4425,6 +4826,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Pumps and water-raising machines round a tall tower.",
+    "de": "Pumpen und Wasserhebemaschinen um einen hohen Turm."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4465,6 +4871,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A water wheel with angled blades, turned by a jet.",
+    "de": "Ein Wasserrad mit schrägen Schaufeln, von einem Strahl getrieben."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4491,8 +4902,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit E, fol. 75v, vers 1513-1515. Bibliothèque de l'Institut de France, Ms 2176. https://bibnum.institutdefrance.fr/ark:/61562/bi24189. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "The hall's dredger in wash, a wheel of scoops between two hulls lifting mud from the bed.",
-    "de": "Der Bagger der Halle, laviert, ein Rad aus Schaufeln zwischen zwei Rümpfen hebt Schlamm vom Grund."
+    "en": "A wheel of scoops between two hulls lifting mud from the bed, in wash.",
+    "de": "Ein Rad aus Schaufeln zwischen zwei Rümpfen hebt Schlamm vom Grund, laviert."
    },
    "writing": true,
    "drawing_only": false,
@@ -4512,13 +4923,13 @@
      "text": "But you, reader, must understand that this has a usefulness which comes from shortening the time.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Du aber, Leser, musst verstehen, dass dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…Mattu lectore ai aintendere quessto a vere vtilita laqual nasscie mediante loabbre viamento deltenpo…",
@@ -4530,6 +4941,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…this has a usefulness which comes from shortening the time.",
+    "de": "…dies einen Nutzen hat, der aus der Verkürzung der Zeit kommt."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0280.jpg",
@@ -4584,6 +5000,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A coloured map, walled Pisa on the winding Arno, the sea in blue.",
+    "de": "Eine farbige Karte, die Mauerstadt Pisa am gewundenen Arno, das Meer in Blau."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4624,6 +5045,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "The map goes on east of Pisa: yellow hills, the river in loops.",
+    "de": "Die Karte geht östlich von Pisa weiter: gelbe Hügel, der Fluss in Schleifen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4668,6 +5094,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A coloured map, a winding river under hills and a blue lake.",
+    "de": "Eine farbige Karte, ein gewundener Fluss unter Hügeln und einem blauen See."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4712,6 +5143,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A coloured map dense with rivers, towns joined by survey lines.",
+    "de": "Eine farbige Karte voller Flüsse, Orte durch Messlinien verbunden."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4756,6 +5192,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A river's course in red chalk, its currents braided between the banks.",
+    "de": "Ein Flusslauf in Rötel, die Strömungen zwischen den Ufern verflochten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4800,6 +5241,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A map of Europe's coasts in red chalk among lists of place names.",
+    "de": "Eine Karte der Küsten Europas in Rötel zwischen Listen von Ortsnamen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4840,6 +5286,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A ship with a triangular sail where two red chalk lines cross.",
+    "de": "Ein Schiff mit dreieckigem Segel, wo sich zwei Rötellinien kreuzen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -4887,13 +5338,13 @@
      "text": "A building should always be detached on all sides so that its form may be seen.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Ein Gebäude soll immer ringsum frei stehen, damit es seine wahre Gestalt zeigen kann.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Senpre vno edifitio vole · essere spiccato dintorno a volere dimostrare la sua vera forma.",
@@ -4905,6 +5356,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "A building should always be detached on all sides…",
+    "de": "Ein Gebäude soll immer ringsum frei stehen…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0164.jpg",
@@ -4962,13 +5418,13 @@
      "text": "Here there cannot and ought not to be any campanile…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Hier kann und soll kein Glockenturm gebaut werden.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Qui nō si può nè si debe fare cāpanile…",
@@ -4980,6 +5436,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Here there cannot and ought not to be any campanile…",
+    "de": "Hier kann und soll kein Glockenturm gebaut werden."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0316.jpg",
@@ -5034,6 +5495,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Two churches crowned with clusters of domes, one above the other.",
+    "de": "Zwei Kirchen mit Kuppelgruppen gekrönt, eine über der anderen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0076.jpg",
@@ -5084,6 +5550,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two many-domed churches in perspective, one above the other.",
+    "de": "Zwei vielkuppelige Kirchen in Perspektive, eine über der anderen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0108.jpg",
@@ -5138,6 +5609,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A domed church with four rounded apses and corner towers.",
+    "de": "Eine Kuppelkirche mit vier runden Apsiden und Ecktürmen."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0308.jpg",
@@ -5192,19 +5668,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "…when you enter into the crypt, you descend 10 steps, and when you mount into the upper you ascend 20 steps…",
+     "text": "…when you enter into the crypt, you descend 10 steps…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab, und wenn du in die obere hinaufgehst, steigst du 20 Stufen hinauf…",
+     "text": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "…quādo entri nella chiesa di sotto, tu cali 10 scalini, e quādo mōti in quello di sopra tu sali 20 scalini…",
+     "text": "…quādo entri nella chiesa di sotto, tu cali 10 scalini…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -5213,6 +5689,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…when you enter into the crypt, you descend 10 steps…",
+    "de": "…wenn du in die untere Kirche gehst, steigst du 10 Stufen hinab…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0310.jpg",
@@ -5267,6 +5748,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A plan with eight lobed chapels round an octagon.",
+    "de": "Ein Grundriss mit acht gelappten Kapellen um ein Achteck."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0232.jpg",
@@ -5321,6 +5807,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A domed church with round chapels, and its star-shaped plan beside it.",
+    "de": "Eine Kuppelkirche mit runden Kapellen, daneben ihr sternförmiger Grundriss."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0094.jpg",
@@ -5378,13 +5869,13 @@
      "text": "This building is inhabited below and above; the way up is by the campaniles…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Dieses Gebäude ist oben und unten begehbar. Nach oben geht man über die Glockentürme…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Questo · edifitio è abitato di sopra e di sotto; di sopra · si va · per li campanili…",
@@ -5396,6 +5887,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "This building is inhabited below and above…",
+    "de": "Dieses Gebäude ist oben und unten begehbar."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0102.jpg",
@@ -5450,6 +5946,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A building for preaching, a cone of terraces under a drum and dome.",
+    "de": "Ein Bau zum Predigen, ein Kegel aus Terrassen unter Tambour und Kuppel."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0314.jpg",
@@ -5504,6 +6005,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A dome with pointed pinnacles in elevation and section.",
+    "de": "Eine Kuppel mit spitzen Fialen in Aufriss und Schnitt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -5551,13 +6057,13 @@
      "text": "It never looks well to see the roofs of a church…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "A nessuna chiesa sta bene vedere tetti…",
@@ -5569,6 +6075,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "It never looks well to see the roofs of a church…",
+    "de": "Keiner Kirche steht es gut an, dass man ihre Dächer sieht."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0080.jpg",
@@ -5605,8 +6116,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit B, fol. 16r, vers 1487-1489. Bibliothèque de l'Institut de France, Ms 2173. https://bibnum.institutdefrance.fr/ark:/61562/bi24197. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "The city on two levels, arcaded palaces on a raised street, a roadway and a passage beneath.",
-    "de": "Die Stadt auf zwei Ebenen, Paläste mit Arkaden an einer erhöhten Straße, darunter eine Fahrstraße und ein Durchgang."
+    "en": "Arcaded palaces on a raised street, a roadway and a passage beneath.",
+    "de": "Paläste mit Arkaden an einer erhöhten Straße, darunter eine Fahrstraße und ein Durchgang."
    },
    "writing": true,
    "drawing_only": false,
@@ -5626,13 +6137,13 @@
      "text": "One house must turn its back to the other, leaving the lower streets between them.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Ein Haus soll dem anderen den Rücken zukehren, so dass die niedrige Straße dazwischen bleibt…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…l'una casa de' volgiere le schiene all'altra ·, lasciādo la strada bassa in mezzo…",
@@ -5644,6 +6155,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "One house must turn its back to the other…",
+    "de": "Ein Haus soll dem anderen den Rücken zukehren…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0070.jpg",
@@ -5701,13 +6217,13 @@
      "text": "Let the width of the streets be equal to the average height of the houses.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Straße soll so breit sein, wie die Häuser im Allgemeinen hoch sind.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Tanto sia larga la strada ·, quanto è la universale altezza delle case.",
@@ -5719,6 +6235,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Let the width of the streets be equal to the average height of the houses.",
+    "de": "Die Straße soll so breit sein, wie die Häuser im Allgemeinen hoch sind."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0150.jpg",
@@ -5776,13 +6297,13 @@
      "text": "…to make this place, contrary to the general custom, clean and neat…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…diesen Ort gegen den allgemeinen Brauch sauber und reinlich zu machen…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…fare detto sito cōtro allo universale vso · pulito e netto…",
@@ -5794,6 +6315,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…to make this place, contrary to the general custom, clean and neat…",
+    "de": "…diesen Ort gegen den allgemeinen Brauch sauber und reinlich zu machen…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0162.jpg",
@@ -5844,6 +6370,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A line of fortification, cut open to show its moats and vaulted chambers.",
+    "de": "Ein Festungsring, aufgeschnitten, um Gräben und gewölbte Kammern zu zeigen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -5884,6 +6415,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A fortress with squat round towers and sloping walls seen from above.",
+    "de": "Eine Festung mit gedrungenen Rundtürmen und geböschten Mauern von oben."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -5928,6 +6464,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A fortress in pen and wash, a pointed outwork before a round keep.",
+    "de": "Eine Festung in Feder und Lavierung, ein spitzes Vorwerk vor einem runden Turm."
+   },
    "leaf": {
     "left": 0,
     "top": 0.047,
@@ -5990,13 +6531,13 @@
      "text": "Double stairs: one for the castellan, the other for the paid soldiers.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Doppelte Treppen: eine für den Kastellan, die andere für die Söldner.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "schale. docpie. una perlochastellano. laltra. periprouisionati",
@@ -6008,6 +6549,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Double stairs: one for the castellan, the other for the paid soldiers.",
+    "de": "Doppelte Treppen: eine für den Kastellan, die andere für die Söldner."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0280.jpg",
@@ -6058,6 +6604,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A fortress with round corner towers and a keep seen from above.",
+    "de": "Eine Festung mit runden Ecktürmen und einem Bergfried von oben."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6098,6 +6649,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Round fortress towers with sloping bases in section and elevation.",
+    "de": "Runde Festungstürme mit geböschtem Fuß in Schnitt und Aufriss."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6145,13 +6701,13 @@
      "text": "A fireplace that fills itself with wood and fire…",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. II, 1883). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Ein Kamin, der sich selbst mit Holz und Feuer füllt…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "cammino chesenpie di legnie. effocho…",
@@ -6163,6 +6719,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "A fireplace that fills itself with wood and fire…",
+    "de": "Ein Kamin, der sich selbst mit Holz und Feuer füllt…"
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0100.jpg",
@@ -6199,8 +6760,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 199v. Wikimedia Commons (Ambrosiana scans); Public domain; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Ambrosiana-Codice-Atlantico-Codex-Atlanticus-f-199-verso.jpg",
    "caption": {
-    "en": "The round plan of Milan, its wall measured and its gates named, the city sketched below.",
-    "de": "Der runde Plan von Mailand, die Mauer vermessen und die Tore benannt, darunter die Stadt skizziert."
+    "en": "A round plan, its wall measured and its gates named, the city sketched below.",
+    "de": "Ein runder Plan, die Mauer vermessen und die Tore benannt, darunter die Stadt skizziert."
    },
    "writing": true,
    "drawing_only": false,
@@ -6220,13 +6781,13 @@
      "text": "Indicate the centre of Milan.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Trage die wahre Mitte von Mailand ein.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Poni il uero mezzo di Milano.",
@@ -6238,6 +6799,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Indicate the centre of Milan.",
+    "de": "Trage die wahre Mitte von Mailand ein."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6285,13 +6851,13 @@
      "text": "…both the light and the shadow form pyramids.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…das Licht oder die Schatten tun ihr Werk durch Pyramiden.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…il lume · o l'onbre faño loro · ofitio per piramide…",
@@ -6303,6 +6869,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…both the light and the shadow form pyramids.",
+    "de": "…das Licht oder die Schatten tun ihr Werk durch Pyramiden."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0212.jpg",
@@ -6353,6 +6924,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A row of lamps sends rays to a red band's notches.",
+    "de": "Eine Reihe von Lampen schickt Strahlen zu den Kerben eines roten Bandes."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6400,13 +6976,13 @@
      "text": "As to the colours of objects: at long distances no difference is perceptible in the parts in shadow.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Zwischen den Farben der Körper wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Infra i colori · de' corpi nō fia · differentia · in lunga · distantia · nelle · loro · parti onbrose.",
@@ -6418,6 +6994,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…at long distances no difference is perceptible in the parts in shadow.",
+    "de": "…wird auf große Entfernung in ihren beschatteten Teilen kein Unterschied sein."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0064.jpg",
@@ -6475,13 +7056,13 @@
      "text": "And in proportion as one body is better illuminated than another its shadow will be shorter than another.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Und so viel heller der eine Körper beleuchtet ist als der andere, so viel kürzer wird sein Schatten sein als der andere.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…e tāto fia più · luminoso · l'ū che l'altro corpo, quāto l'ombra sua fia piv · corta · che l'altra.",
@@ -6493,6 +7074,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A half circle of lettered rays crossing onto three spheres.",
+    "de": "Ein Halbkreis beschrifteter Strahlen fällt kreuzend auf drei Kugeln."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0200.jpg",
@@ -6547,6 +7133,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Rays from two lit spheres past two small ones onto a wall.",
+    "de": "Strahlen aus zwei leuchtenden Kugeln an zwei kleinen vorbei auf eine Wand."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0088.jpg",
@@ -6604,13 +7195,13 @@
      "text": "Just as an object which is lighted up by a greater quantity of luminous rays becomes brighter…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "So wie ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Siccome vna · cosa toccata · da maggior sōma · di razzi luminosi · si fa piv chiara…",
@@ -6622,6 +7213,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…which is lighted up by a greater quantity of luminous rays becomes brighter…",
+    "de": "…ein Ding, das von einer größeren Menge Lichtstrahlen berührt wird, heller wird…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0030.jpg",
@@ -6679,13 +7275,13 @@
      "text": "Where the shadow is larger, or smaller, or equal the body which casts it.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Wo der Schatten größer oder kleiner ist als der schattende Körper, von dem er ausgeht, oder ebenso groß wie er.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Doue l'ōbra è maggiore o minore o equale al corpo ōbroso sua origine.",
@@ -6697,6 +7293,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Where the shadow is larger, or smaller, or equal the body which casts it.",
+    "de": "Wo der Schatten größer oder kleiner ist als der schattende Körper…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6741,19 +7342,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "The form of the shadow cast by any body of uniform density can never be the same as that of the body producing it.",
+     "text": "The form of the shadow cast by any body of uniform density…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke wird niemals dem Körper gleichen, aus dem er entsteht.",
+     "text": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza mai sarà simile al corpo donde ella nasce.",
+     "text": "La stanpa dell'onbra di qualūque corpo di uniforme grossezza…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -6762,6 +7363,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "The form of the shadow cast by any body of uniform density…",
+    "de": "Der Abdruck des Schattens jedes beliebigen Körpers von gleichmäßiger Dicke…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0254.jpg",
@@ -6819,13 +7425,13 @@
      "text": "See here how the concave mirror made of half a spherical body has curved hypotenuses…",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Sieh hier, wie der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Ecco qui che lo spechio concavo di mezo corpo sperico ha le ipotemisse curve…",
@@ -6837,6 +7443,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…the concave mirror made of half a spherical body has curved hypotenuses…",
+    "de": "…der Hohlspiegel aus einem halben Kugelkörper gekrümmte Hypotenusen hat…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6881,6 +7492,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Rays from a curved mirror crossing into a pointed web.",
+    "de": "Strahlen aus einem gewölbten Spiegel kreuzen sich zu einem spitzen Geflecht."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6925,19 +7541,19 @@
     "passage": 1,
     "placeholder": false,
     "en": {
-     "text": "The flatter the common concave mirror, the greater the sum of reflected rays it will bring to the same place.",
+     "text": "The flatter the common concave mirror, the greater the sum of reflected rays…",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Reale Commissione Vinciana, part one, 1923). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
-     "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen, die er an dieselbe Stelle führt.",
+     "text": "Je flacher der gewöhnliche Hohlspiegel ist, desto größer ist die Menge der zurückgeworfenen Strahlen…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Reale Commissione Vinciana, erster Teil, 1923). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi conducerà nel medesimo sito.",
+     "text": "Quanto lo specchio concavo comune sarà più piano, tanta magiore somma di razi refressi…",
      "label": {
       "en": "Transcription: the Codex Arundel edition of the Reale Commissione Vinciana, part one, Rome 1923",
       "de": "Umschrift: die Ausgabe des Codex Arundel der Reale Commissione Vinciana, erster Teil, Rom 1923"
@@ -6946,6 +7562,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Parallel rays on a curved mirror crossing into a web.",
+    "de": "Parallele Strahlen auf einem gewölbten Spiegel kreuzen sich zu einem Geflecht."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -6972,8 +7593,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit D, fol. 8r, vers 1508-1509. Bibliothèque de l'Institut de France, Ms 2175. https://bibnum.institutdefrance.fr/ark:/61562/bi24185. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A page on the eye, drawn as rings, with crossing rays below: the camera obscura's page.",
-    "de": "Eine Seite über das Auge, als Ringe gezeichnet, darunter sich kreuzende Strahlen: die Seite der Camera obscura."
+    "en": "A page on the eye, drawn as rings, with crossing rays below.",
+    "de": "Eine Seite über das Auge, als Ringe gezeichnet, darunter sich kreuzende Strahlen."
    },
    "writing": true,
    "drawing_only": false,
@@ -6993,13 +7614,13 @@
      "text": "…by some small round hole penetrate the images of illuminated objects into a very dark chamber.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…durch ein kleines rundes Loch die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…per alcuno piccolo spiraculo rotōdo penetrāno le spetie delli obbietti alluminati in abitatione fortemente oscura…",
@@ -7011,6 +7632,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…penetrate the images of illuminated objects into a very dark chamber.",
+    "de": "…die Bilder beleuchteter Dinge in einen sehr dunklen Raum dringen."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0386.jpg",
@@ -7068,7 +7694,7 @@
      "text": "…that all objects transmit their image to the eye by a pyramid of lines.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…daß alle Dinge ihr Abbild mittels pyramidaler Linien ins Auge senden.",
@@ -7086,6 +7712,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…that all objects transmit their image to the eye by a pyramid of lines.",
+    "de": "…daß alle Dinge ihr Abbild mittels pyramidaler Linien ins Auge senden."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel01lo__n0079.jpg",
@@ -7143,13 +7774,13 @@
      "text": "The art of perspective is of such a nature as to make what is flat appear in relief and what is in relief flat.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Perspektive ist von solcher Natur, dass sie das Flache plastisch und das Plastische flach erscheinen lässt.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "La prospettiva · è di tale · natura · ch'ella fa · parere · il piano · rilievo e 'l rilievo piano.",
@@ -7161,6 +7792,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…to make what is flat appear in relief and what is in relief flat.",
+    "de": "…dass sie das Flache plastisch und das Plastische flach erscheinen lässt."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel01lo__n0191.jpg",
@@ -7218,7 +7854,7 @@
      "text": "The mind of the painter must resemble a mirror…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Der Geist des Malers will dem Spiegel gleichen…",
@@ -7236,6 +7872,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The mind of the painter must resemble a mirror…",
+    "de": "Der Geist des Malers will dem Spiegel gleichen…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0164.jpg",
@@ -7290,19 +7931,19 @@
     "passage": 2,
     "placeholder": false,
     "en": {
-     "text": "…like the sound of bells in whose jangle you may find any name or word you choose to imagine.",
+     "text": "…like the sound of bells in whose jangle you may find any name or word…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…wie mit dem Klang von Glocken, daß du in ihren Schlägen jeden Namen und jedes Vokabel finden kannst, so du auszudenken vermagst.",
+     "text": "…wie mit dem Klang von Glocken, daß du in ihren Schlägen jeden Namen und jedes Vokabel finden kannst…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo che tu īmaginerai.",
+     "text": "…come del suono di cāpane · che ne' loro tochi vi troverai ogni nome e vocabolo…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -7311,6 +7952,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A page of writing: the stains on a wall that set the mind inventing.",
+    "de": "Eine Seite: die Flecken an einer Wand, die den Geist zum Erfinden bringen."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0246.jpg",
@@ -7365,19 +8011,19 @@
     "passage": 1,
     "placeholder": false,
     "en": {
-     "text": "The air must be full of arrows in every direction, some shooting upwards, some falling, some flying level.",
+     "text": "The air must be full of arrows in every direction, some shooting upwards, some falling…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Die Luft sei voller Pfeilschwärme verschiedener Gattung: die einen steigen, die anderen fallen, manche fliegen in ebener Linie…",
+     "text": "Die Luft sei voller Pfeilschwärme verschiedener Gattung: die einen steigen, die anderen fallen…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…L'aria sia · piena · di saettume di diverse ragioni: chi mōti ·, chi discēda, qual sia · per linia piana…",
+     "text": "…L'aria sia · piena · di saettume di diverse ragioni: chi mōti ·, chi discēda…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -7386,6 +8032,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The air must be full of arrows in every direction…",
+    "de": "Die Luft sei voller Pfeilschwärme verschiedener Gattung…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0280.jpg",
@@ -7443,7 +8094,7 @@
      "text": "Let the sea be rough and tempestuous and full of foam whirled among the lofty waves…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Das aufgewühlte und stürmische Meer sei voller wirbelnden Gischtes zwischen den sich aufbäumenden Wogen…",
@@ -7461,6 +8112,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Let the sea be rough and tempestuous and full of foam…",
+    "de": "Das aufgewühlte und stürmische Meer sei voller wirbelnden Gischtes…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0240.jpg",
@@ -7518,7 +8174,7 @@
      "text": "That which is entirely bereft of light is all darkness…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Was gänzlich des Lichtes beraubt ist, ist völlige Dunkelheit.",
@@ -7536,6 +8192,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "That which is entirely bereft of light is all darkness…",
+    "de": "Was gänzlich des Lichtes beraubt ist, ist völlige Dunkelheit."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0230.jpg",
@@ -7593,7 +8254,7 @@
      "text": "Men and birds might be seen crowded on the tall trees which remained uncovered by the swelling waters…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Man sah die Menschen und die Vögel, die mit sich die großen Bäume füllten, so von den ausgeweiteten Wogen bloß gelassen…",
@@ -7611,6 +8272,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Men and birds might be seen crowded on the tall trees…",
+    "de": "Man sah die Menschen und die Vögel, die mit sich die großen Bäume füllten…"
+   },
    "leaf": {
     "left": 0.052,
     "top": 0.032,
@@ -7673,7 +8339,7 @@
      "text": "…take a mirror and look in that at the reflection of the real things…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…nimm einen Spiegel, laß darin den lebendigen Gegenstand sich spiegeln…",
@@ -7691,6 +8357,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…take a mirror and look in that at the reflection of the real things…",
+    "de": "…nimm einen Spiegel, laß darin den lebendigen Gegenstand sich spiegeln…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0254.jpg",
@@ -7748,7 +8419,7 @@
      "text": "…he seems to me but a poor master who can only do a figure well.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…mir scheint ein trauriger Meister, der nichts als eine Figur gut macht.",
@@ -7766,6 +8437,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…he seems to me but a poor master who can only do a figure well.",
+    "de": "…mir scheint ein trauriger Meister, der nichts als eine Figur gut macht."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0258.jpg",
@@ -7802,8 +8478,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit K, fol. 110v, vers 1503-1505. Bibliothèque de l'Institut de France, Ms 2181. https://bibnum.institutdefrance.fr/ark:/61562/bi24177. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A small page, upper lines in red chalk and lower in ink: his words to the painter.",
-    "de": "Eine kleine Seite, die oberen Zeilen in Rötel, die unteren in Tinte: seine Worte an den Maler."
+    "en": "A small page, upper lines in red chalk and lower in ink.",
+    "de": "Eine kleine Seite, die oberen Zeilen in Rötel, die unteren in Tinte."
    },
    "writing": true,
    "drawing_only": false,
@@ -7820,19 +8496,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "…you, O Painter, if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
+     "text": "…if you do not know how to make your figures move, are like an orator who knows not how to use his words.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "…wenn du, o Maler, deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
+     "text": "…deine Figuren nicht ins Werk zu setzen weißt, bist du wie der Redner, so seine Worte nicht anzuwenden versteht.",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…tu pittore nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
+     "text": "…nō sapiēdo adoperare le tue figure, tu se' come l'oratore che nō sa adoperare le parole sue.",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -7841,6 +8517,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…are like an orator who knows not how to use his words.",
+    "de": "…bist du wie der Redner, so seine Worte nicht anzuwenden versteht."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0406.jpg",
@@ -7898,7 +8579,7 @@
      "text": "The name of man differs in different countries, but his form is never changed but by death.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Der Name Mensch wechselt mit den wechselnden Ländern; die Form wird nicht verändert, außer durch den Tod…",
@@ -7916,6 +8597,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…but his form is never changed but by death.",
+    "de": "…die Form wird nicht verändert, außer durch den Tod…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0232.jpg",
@@ -7973,13 +8659,13 @@
      "text": "Savage he is who saves himself.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Wild ist, wer sich rettet.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Saluatico è quel che si salua.",
@@ -7991,6 +8677,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Savage he is who saves himself.",
+    "de": "Wild ist, wer sich rettet."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8031,6 +8722,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A red chalk profile of an old man, drawn over a page of writing.",
+    "de": "Ein Rötelprofil eines alten Mannes, über eine Seite mit Schrift gezeichnet."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8075,6 +8771,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A large profile of an old man among columns of word lists.",
+    "de": "Ein großes Profil eines alten Mannes zwischen Spalten von Wortlisten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8115,6 +8816,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "An old man's bearded profile in red and black chalk.",
+    "de": "Das bärtige Profil eines alten Mannes in Rötel und schwarzer Kreide."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8162,13 +8868,13 @@
      "text": "The ear is exactly as long as the nose.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Das Ohr ist genau so lang wie die Nase.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "lorechio. eapunto tanto lungo quanto ilnaso…",
@@ -8180,6 +8886,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The ear is exactly as long as the nose.",
+    "de": "Das Ohr ist genau so lang wie die Nase."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel01lo__n0285.jpg",
@@ -8230,6 +8941,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A young man's curly head in profile, in fine pen.",
+    "de": "Der lockige Kopf eines jungen Mannes im Profil, in feiner Feder."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8274,6 +8990,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A young man's head in profile under a jewelled cap.",
+    "de": "Der Kopf eines jungen Mannes im Profil unter einer edelsteinbesetzten Kappe."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0210.jpg",
@@ -8328,6 +9049,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A kneeling young soldier in patterned tunic, leaning on a long sword.",
+    "de": "Ein kniender junger Soldat in gemustertem Rock, auf ein langes Schwert gestützt."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0212.jpg",
@@ -8385,13 +9111,13 @@
      "text": "Borges shall get for you the Archimedes from the bishop of Padua…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Borges wird dir den Archimedes vom Bischof von Padua besorgen…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Borges ti farà avere Archimede del vescouo di Padova…",
@@ -8403,6 +9129,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Borges shall get for you the Archimedes from the bishop of Padua…",
+    "de": "Borges wird dir den Archimedes vom Bischof von Padua besorgen…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0210.jpg",
@@ -8457,6 +9188,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A striding man, cloak flying, an animal leaping from his hand.",
+    "de": "Ein schreitender Mann, der Mantel fliegt, ein Tier springt aus seiner Hand."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0078.jpg",
@@ -8507,6 +9243,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A man, one hand clutching his head, the other gripping his tunic.",
+    "de": "Ein Mann, eine Hand an den Kopf gepresst, die andere greift in seinen Rock."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8554,13 +9295,13 @@
      "text": "Here I make a note to demonstrate the difference there is between man and the horse…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Hier halte ich fest, dass ich den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Qui fo ricordo di dimostrare la differentia ch'è dall'omo al cauallo…",
@@ -8572,6 +9313,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…to demonstrate the difference there is between man and the horse…",
+    "de": "…den Unterschied zeigen will, der zwischen dem Menschen und dem Pferd besteht…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0406.jpg",
@@ -8629,16 +9375,16 @@
      "text": "Of the muscles that attach onto the bone.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. III, 1888). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Von den Muskeln, die am Knochen ansetzen.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. III, 1888). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "de muss coli chessa pichano su llosso",
+     "text": "de muss coli chessa pichano su llosso…",
      "label": {
       "en": "Transcription: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, vol. III (Manuscripts C, E and K), Paris 1888",
       "de": "Umschrift: Charles Ravaisson-Mollien, Les manuscrits de Léonard de Vinci, Bd. III (Manuskripte C, E und K), Paris 1888"
@@ -8647,6 +9393,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Of the muscles that attach onto the bone.",
+    "de": "Von den Muskeln, die am Knochen ansetzen."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel03lo__n0398.jpg",
@@ -8704,13 +9455,13 @@
      "text": "The lily set itself down by the shores of the Ticino, and the current carried away bank and the lily with it.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Lilie ließ sich am Ufer des Tessin nieder, und die Strömung riss das Ufer mitsamt der Lilie fort.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Il giglio si pose sopra la ripa di · Tesino, e la corrēte tirò la ripa īsieme col lilio.",
@@ -8722,6 +9473,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…the current carried away bank and the lily with it.",
+    "de": "…die Strömung riss das Ufer mitsamt der Lilie fort."
+   },
    "leaf": {
     "left": 0,
     "top": 0.029,
@@ -8784,13 +9540,13 @@
      "text": "The ear must be a quarter of the face in length.",
      "kind": "ours",
      "label": "AI translation from the printed Italian (Ravaisson-Mollien, vol. I, 1881). It may contain errors.",
-     "rest": "AI translation. It may contain errors."
+     "rest": "AI translation. It may have errors."
     },
     "de": {
      "text": "Das Ohr muss ein Viertel des Gesichts lang sein.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ravaisson-Mollien, Bd. I, 1881). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "lorechio. deessere. lungo. la. quarta. parte. deluolto",
@@ -8802,6 +9558,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "The ear must be a quarter of the face in length.",
+    "de": "Das Ohr muss ein Viertel des Gesichts lang sein."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel01lo__n0283.jpg",
@@ -8852,6 +9613,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A red chalk lattice shaped as a horse's head and neck.",
+    "de": "Ein Rötelgitter in der Form von Kopf und Hals eines Pferdes."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8892,6 +9658,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A horse in red chalk standing inside a boxy framework of struts and plates.",
+    "de": "Ein Pferd in Rötel in einem kastenförmigen Gerüst aus Streben und Platten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8932,6 +9703,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A frame of raking timber struts holding a great round form bound with bands.",
+    "de": "Ein Gerüst aus schrägen Holzstreben, das eine große runde Form mit Bändern hält."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -8976,6 +9752,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "The Sforza horse in outline inside a timber frame, packed for moving.",
+    "de": "Das Sforza-Pferd im Umriss in einem Holzgerüst, zum Transport verpackt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9016,6 +9797,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A timber A-frame on rollers with two pulleys, cradling a large curved form.",
+    "de": "Ein A-Gestell auf Walzen mit zwei Rollen, das eine große gebogene Form trägt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9056,6 +9842,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "An A-frame of timbers beside a tall frame with rungs.",
+    "de": "Ein A-Gestell aus Balken neben einem hohen Gerüst mit Sprossen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9096,6 +9887,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A frame on a flat base holding hooks and ribs over a drum.",
+    "de": "Ein Gestell auf flachem Sockel, das Haken und Rippen über einer Trommel hält."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9136,6 +9932,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A rearing horse from behind in grey chalk.",
+    "de": "Ein sich aufbäumendes Pferd von hinten in grauer Kreide."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -9180,6 +9981,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A horse in a harness of straps, rings and a chain, in red chalk.",
+    "de": "Ein Pferd in einem Geschirr aus Riemen, Ringen und einer Kette, in Rötel."
+   },
    "leaf": {
     "left": 0,
     "top": 0.022,
@@ -9242,13 +10048,13 @@
      "text": "There is no boss on branches which has not been produced by some branch which has failed.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Es gibt keinen Knorren an den Ästen, an dem nicht ein Zweig ausgetrieben hat, der eingegangen ist.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Nessū gobbo è ne rami, che nō ui sia dato alcun ramo, il quale è mācato…",
@@ -9260,6 +10066,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "There is no boss on branches which has not been produced by some branch…",
+    "de": "Es gibt keinen Knorren an den Ästen, an dem nicht ein Zweig ausgetrieben hat…"
+   },
    "leaf": {
     "left": 0.049,
     "top": 0.041,
@@ -9315,6 +10126,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Green pods, two opened, red cherries and a strawberry.",
+    "de": "Grüne Schoten, zwei geöffnet, rote Kirschen und eine Erdbeere."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0018.jpg",
@@ -9364,6 +10180,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Violets in flower, blossoms on long stems among leaves and grass.",
+    "de": "Blühende Veilchen, Blüten an langen Stielen zwischen Blättern und Gras."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0062.jpg",
@@ -9421,13 +10242,13 @@
      "text": "…they will have made, when put together, a thickness equal to that of the main stem…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…essi ànno cōposto, givti insieme, altrettanta grossezza, quāto è la grossezza del suo pedale…",
@@ -9439,6 +10260,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…when put together, a thickness equal to that of the main stem…",
+    "de": "…ergeben sie zusammengenommen ebenso viel Dicke, wie ihr Stamm dick ist."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel05lo__n0386.jpg",
@@ -9489,6 +10315,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A scallop shell, a snail shell, a honeycomb, curling leaves.",
+    "de": "Eine Jakobsmuschel, ein Schneckenhaus, eine Bienenwabe, gekräuselte Blätter."
+   },
    "leaf": {
     "left": 0,
     "top": 0.113,
@@ -9548,6 +10379,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Animal fights in pen, a rider on a lion chasing a small beast.",
+    "de": "Tierkämpfe mit der Feder, ein Reiter auf einem Löwen jagt ein kleines Tier."
+   },
    "leaf": {
     "left": 0,
     "top": 0.026,
@@ -9607,6 +10443,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A red chalk dog's head in profile under a grid of measuring lines.",
+    "de": "Ein Hundekopf im Profil in Rötel unter einem Raster aus Messlinien."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0312.jpg",
@@ -9664,13 +10505,13 @@
      "text": "Not to disobey.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Um nicht ungehorsam zu sein.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Per nō disobbidire.",
@@ -9682,6 +10523,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Not to disobey.",
+    "de": "Um nicht ungehorsam zu sein."
+   },
    "leaf": {
     "left": 0.041,
     "top": 0.041,
@@ -9744,7 +10590,7 @@
      "text": "The moon has no light in itself; but so much of it as faces the sun is illuminated…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Der Mond hat kein Licht von sich, aber so viel, als die Sonne von ihm sieht, so viel erleuchtet sie…",
@@ -9762,6 +10608,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The moon has no light in itself…",
+    "de": "Der Mond hat kein Licht von sich…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9809,7 +10660,7 @@
      "text": "Whence it may be concluded that what shines in the moon is water like that of our seas…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Hier wird man schließen, daß jenes, was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere…",
@@ -9827,6 +10678,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…what shines in the moon is water like that of our seas…",
+    "de": "…was von dem Monde leuchtet, Wasser ist, gleich jenem unserer Meere…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9874,7 +10730,7 @@
      "text": "…this is caused by the clouds that rise from the waters in the moon…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…dies kommt von Wolken, die sich aus den Wassern dieses Mondes heben…",
@@ -9892,6 +10748,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…this is caused by the clouds that rise from the waters in the moon…",
+    "de": "…dies kommt von Wolken, die sich aus den Wassern dieses Mondes heben…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -9939,7 +10800,7 @@
      "text": "Construct glasses to see the moon magnified.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Mache Gläser für die Augen, um den Mond groß zu sehen.",
@@ -9957,6 +10818,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Construct glasses to see the moon magnified.",
+    "de": "Mache Gläser für die Augen, um den Mond groß zu sehen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10004,7 +10870,7 @@
      "text": "The earth is not in the centre of the Sun's orbit nor at the centre of the universe…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Wie die Erde nicht inmitten des Sonnenkreises, noch im Mittelpunkt der Welt ist…",
@@ -10022,6 +10888,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "The earth is not in the centre of the Sun's orbit…",
+    "de": "Wie die Erde nicht inmitten des Sonnenkreises…"
+   },
    "leaf": {
     "left": 0.02,
     "top": 0.066,
@@ -10084,7 +10955,7 @@
      "text": "In your discourse you must prove that the earth is a star much like the moon…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Du in deiner Rede hast zu schließen, daß die Erde ein Stern ist, so ähnlich wie der Mond…",
@@ -10102,6 +10973,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…that the earth is a star much like the moon…",
+    "de": "…daß die Erde ein Stern ist, so ähnlich wie der Mond…"
+   },
    "leaf": {
     "left": 0,
     "top": 0.051,
@@ -10164,7 +11040,7 @@
      "text": "…how the ocean and the other seas must, by means of the sun, make our world shine with the appearance of a moon…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…wie der Ozean mit den andern Meeren vermittels der Sonne unsere Welt gleich dem Monde leuchten macht…",
@@ -10182,6 +11058,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…make our world shine with the appearance of a moon…",
+    "de": "…unsere Welt gleich dem Monde leuchten macht…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0206.jpg",
@@ -10236,19 +11117,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "But I cannot forbear to condemn many of the ancients, who said that the sun was no larger than it appears…",
+     "text": "But I cannot forbear to condemn many of the ancients…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten, welche sagen, daß die Sonne keine andere Größe habe als die, welche sie zeigt…",
+     "text": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "…mai nō posso fare ch'io non biasimi molti di quelli antichi, li quali dissero che 'l sole non avea altra grādezza che quella che mostra…",
+     "text": "…mai nō posso fare ch'io non biasimi molti di quelli antichi…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -10257,6 +11138,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "But I cannot forbear to condemn many of the ancients…",
+    "de": "Aber ich bin außerstande, nicht zu tadeln viele von den Alten…"
+   },
    "leaf": {
     "left": 0,
     "top": 0.026,
@@ -10316,6 +11202,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A page of writing, at the foot the sun's rays drawn through a ring.",
+    "de": "Eine beschriebene Seite, unten die Sonnenstrahlen, durch einen Ring gezeichnet."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10360,6 +11251,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Truss frames above, and below them a mountain opened up round a domed hall.",
+    "de": "Oben Fachwerkbinder, darunter ein Berg, der sich um eine Kuppelhalle öffnet."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10407,7 +11303,7 @@
      "text": "O time, swift robber of all created things, how many kings, how many nations hast thou undone…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "O Zeit, schneller Erbeuter der geschaffenen Dinge, wie viele Könige, wie viele Völker hast du vernichtet…",
@@ -10425,6 +11321,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "O time, swift robber of all created things, how many kings…",
+    "de": "O Zeit, schneller Erbeuter der geschaffenen Dinge, wie viele Könige…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10465,6 +11366,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A circle of interlocking circles and six-petal rosettes.",
+    "de": "Ein Kreis aus ineinandergreifenden Kreisen und sechsblättrigen Rosetten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10505,6 +11411,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Five interlace designs in red chalk, knotwork, looped cords and palmettes.",
+    "de": "Fünf Flechtmuster in Rötel, Knotenwerk, Schlingen aus Schnüren und Palmetten."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel06lo__n0046.jpg",
@@ -10555,6 +11466,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A round sheet with a wheel of crescents spiralling round a centre.",
+    "de": "Ein rundes Blatt mit einem Rad aus Möndchen, die spiralig um eine Mitte laufen."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -10595,6 +11511,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Three square frames locked into each other at right angles.",
+    "de": "Drei quadratische Rahmen, rechtwinklig ineinander verschränkt."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -10639,6 +11560,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Four rosettes of looping cords and curling leaves in red chalk.",
+    "de": "Vier Rosetten aus geschlungenen Schnüren und gekräuselten Blättern in Rötel."
+   },
    "leaf": {
     "left": 0.048,
     "top": 0.054,
@@ -10694,6 +11620,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A large wire-frame pyramid holding a lattice of inner edges.",
+    "de": "Eine große Pyramide als Drahtgitter mit einem Geflecht innerer Kanten."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10734,6 +11665,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Wire-frame pyramids in red chalk and ink, one a dense lattice.",
+    "de": "Pyramiden als Drahtgitter in Rötel und Tinte, eine ein dichtes Geflecht."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10774,6 +11710,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A sheet dense with octagonal and square plans.",
+    "de": "Ein Blatt voller achteckiger und quadratischer Grundrisse."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10814,6 +11755,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "A great ring of box-shaped sections in steep perspective.",
+    "de": "Ein großer Ring aus kastenförmigen Abschnitten in steiler Perspektive."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10861,7 +11807,7 @@
      "text": "A vase of unbaked clay, when broken, may be remoulded, but not a baked one.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Ein rohes Gefäß, wenn zerbrochen, ist wieder herzustellen; ein gebranntes nie.",
@@ -10879,6 +11825,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "A vase of unbaked clay, when broken, may be remoulded, but not a baked one.",
+    "de": "Ein rohes Gefäß, wenn zerbrochen, ist wieder herzustellen; ein gebranntes nie."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -10926,7 +11877,7 @@
      "text": "Science is the captain, and practice the soldiers.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Wissenschaft ist der Kapitän, die Praxis, das sind Soldaten.",
@@ -10944,6 +11895,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Science is the captain, and practice the soldiers.",
+    "de": "Die Wissenschaft ist der Kapitän, die Praxis, das sind Soldaten."
+   },
    "leaf": {
     "left": 0,
     "top": 0.022,
@@ -11003,19 +11959,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "Those who are in love with practice without knowledge are like the sailor who gets into a ship without rudder or compass…",
+     "text": "Those who are in love with practice without knowledge are like the sailor…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot, so ein Schiff ohne Steuer noch Kompaß betritt…",
+     "text": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot…",
      "kind": "printed",
      "label": "Übersetzung: Marie Herzfeld, 1906",
      "rest": "Übersetzung: Marie Herzfeld, 1906"
     },
     "it": {
-     "text": "Quelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere che ētra navilio sanza timone o bussola…",
+     "text": "Quelli che s'inamorā di pratica sāza sciētia, sō come 'l nochiere…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. I",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. I"
@@ -11024,6 +11980,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Those who are in love with practice without knowledge are like the sailor…",
+    "de": "Jene, die sich in die Praxis ohne Wissenschaft verlieben, sind wie der Pilot…"
+   },
    "leaf": {
     "left": 0.013,
     "top": 0.029,
@@ -11086,7 +12047,7 @@
      "text": "Mechanics are the Paradise of mathematical science, because here we come to the fruits of mathematics.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Mechanik ist das Paradies der mathematischen Wissenschaften; denn durch sie kommt man zur mathematischen Frucht.",
@@ -11104,6 +12065,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Mechanics are the Paradise of mathematical science…",
+    "de": "Die Mechanik ist das Paradies der mathematischen Wissenschaften…"
+   },
    "leaf": {
     "left": 0.119,
     "top": 0.038,
@@ -11166,13 +12132,13 @@
      "text": "I know that many will call this useless work…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Ich weiß, dass viele sagen werden, dies sei ein nutzloses Werk.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "So che molti diranno · questa · essere opera invtile…",
@@ -11184,6 +12150,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "I know that many will call this useless work…",
+    "de": "Ich weiß, dass viele sagen werden, dies sei ein nutzloses Werk."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11231,7 +12202,7 @@
      "text": "Beware of the teaching of these speculators, because their reasoning is not confirmed by experience.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Fliehe die Lehren jener Spekulatoren, denn ihre Gründe werden von der Erfahrung nicht bestätigt.",
@@ -11249,6 +12220,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…their reasoning is not confirmed by experience.",
+    "de": "…ihre Gründe werden von der Erfahrung nicht bestätigt."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0024.jpg",
@@ -11306,7 +12282,7 @@
      "text": "Instrumental or mechanical science is of all the noblest and the most useful…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die instrumentale oder mechanische Wissenschaft ist höchst edel und über alle andern äußerst nützlich…",
@@ -11324,6 +12300,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Instrumental or mechanical science is of all the noblest…",
+    "de": "Die instrumentale oder mechanische Wissenschaft ist höchst edel…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11371,7 +12352,7 @@
      "text": "The senses are of the earth; Reason, stands apart in contemplation.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Sinne sind irdisch, die Vernunft steht außerhalb von ihnen, wenn sie betrachtet.",
@@ -11389,6 +12370,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "The senses are of the earth; Reason, stands apart in contemplation.",
+    "de": "Die Sinne sind irdisch, die Vernunft steht außerhalb von ihnen…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11436,7 +12422,7 @@
      "text": "…truth bears the same relation to falsehood as light to darkness…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…solcher Abstand ist zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist…",
@@ -11454,6 +12440,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…truth bears the same relation to falsehood as light to darkness…",
+    "de": "…zwischen der Wahrheit und der Lüge, wie er vom Licht zur Finsternis ist…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11498,6 +12489,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "A small page: the ermine that will die rather than soil itself.",
+    "de": "Eine kleine Seite: das Hermelin, das lieber stirbt, als sich zu beschmutzen."
+   },
    "leaf": {
     "left": 0.045,
     "top": 0.044,
@@ -11560,7 +12556,7 @@
      "text": "You grow in reputation like bread in the hands of a child.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Du wächst an Ruf wie Brot den Kindern auf der flachen Hand wächst.",
@@ -11578,6 +12574,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "You grow in reputation like bread in the hands of a child.",
+    "de": "Du wächst an Ruf wie Brot den Kindern auf der flachen Hand wächst."
+   },
    "leaf": null,
    "plate": {
     "path": "msb/lesmanuscritsdel02lo__n0020.jpg",
@@ -11635,7 +12636,7 @@
      "text": "The water you touch in a river is the last of that which has passed, and the first of that which is coming.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Das Wasser, das von den Flüssen du berührst, ist das letzte von jenem, das ging, und das erste von jenem, das kommt…",
@@ -11653,6 +12654,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The water you touch in a river is the last of that which has passed…",
+    "de": "Das Wasser, das von den Flüssen du berührst, ist das letzte von jenem, das ging…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11700,7 +12706,7 @@
      "text": "The net that was wont to take the fish was seized and carried away by the rush of fish.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Das Netz, so die Fische zu fangen pflegte, wurde gefangen und fortgetragen vom Furor der Fische.",
@@ -11718,6 +12724,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The net that was wont to take the fish was seized and carried away…",
+    "de": "Das Netz, so die Fische zu fangen pflegte, wurde gefangen und fortgetragen…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11765,7 +12776,7 @@
      "text": "The Forests will bring forth young which will be the cause of their death.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Die Wälder werden Kinder gebären, die die Ursache ihres Todes sein werden.",
@@ -11783,6 +12794,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "The Forests will bring forth young which will be the cause of their death.",
+    "de": "Die Wälder werden Kinder gebären, die die Ursache ihres Todes sein werden."
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0280.jpg",
@@ -11840,7 +12856,7 @@
      "text": "Our life is made by the death of others.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Wir machen unser Leben mit dem Tode anderer.",
@@ -11858,6 +12874,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "Our life is made by the death of others.",
+    "de": "Wir machen unser Leben mit dem Tode anderer."
+   },
    "leaf": {
     "left": 0.058,
     "top": 0.044,
@@ -11920,7 +12941,7 @@
      "text": "As a day well spent procures a happy sleep, so a life well employed procures a happy death.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "So wie ein gut verbrachtes Tageswerk ein frohes Schlafen gibt, so gibt ein wohl angewandtes Leben einen heiteren Tod.",
@@ -11938,6 +12959,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…so a life well employed procures a happy death.",
+    "de": "…so gibt ein wohl angewandtes Leben einen heiteren Tod."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -11985,13 +13011,13 @@
      "text": "Begun at Florence, in the house of Piero di Braccio Martelli, on the 22nd day of March 1508.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Begonnen in Florenz, im Haus des Piero di Braccio Martelli, am 22. März 1508.",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. I, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Comīciato in Firenze in casa Piero di Braccio Martelli addi 22 di marzo 1508…",
@@ -12003,6 +13029,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "…in the house of Piero di Braccio Martelli, on the 22nd day of March 1508.",
+    "de": "Begonnen in Florenz, im Haus des Piero di Braccio Martelli, am 22. März 1508."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -12050,7 +13081,7 @@
      "text": "I will make covered chariots, safe and unattackable…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…werde ich Wagen machen, bedeckt und sicher, unangreifbar…",
@@ -12068,6 +13099,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "I will make covered chariots, safe and unattackable…",
+    "de": "…werde ich Wagen machen, bedeckt und sicher, unangreifbar…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "none"
@@ -12094,8 +13130,8 @@
    "picture": "facsimile",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 888r. Original: Veneranda Biblioteca Ambrosiana, Milan. Image: Leonardo//thek@, Museo Galileo, Florence, from the facsimile Giunti Barbèra 1973-75; photographic plates Civico Archivio Fotografico di Milano. Public-domain work; non-profit cultural use (Codice dei beni culturali art. 108 comma 3-bis); not for commercial reuse. https://teche.museogalileo.it/leonardo/foglio/index.html?num=ATL.1775.1",
    "caption": {
-    "en": "Sketches above, a row of profile heads along the foot, writing between: the list of his works.",
-    "de": "Skizzen oben, eine Reihe von Profilköpfen am Fuß, dazwischen Schrift: die Liste seiner Werke."
+    "en": "Sketches above, a row of profile heads along the foot, writing between.",
+    "de": "Skizzen oben, eine Reihe von Profilköpfen am Fuß, dazwischen Schrift."
    },
    "writing": true,
    "drawing_only": false,
@@ -12112,6 +13148,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": true,
+   "phone": {
+    "from": "caption",
+    "en": "Sketches above, a row of profile heads along the foot, writing between.",
+    "de": "Skizzen oben, eine Reihe von Profilköpfen am Fuß, dazwischen Schrift."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -12138,8 +13179,8 @@
    "picture": "facsimile",
    "credit": "Leonardo da Vinci, Codex Atlanticus, f. 559r. Original: Veneranda Biblioteca Ambrosiana, Milan. Image: Leonardo//thek@, Museo Galileo, Florence, from the facsimile Giunti Barbèra 1973-75; photographic plates Civico Archivio Fotografico di Milano. Public-domain work; non-profit cultural use (Codice dei beni culturali art. 108 comma 3-bis); not for commercial reuse. https://teche.museogalileo.it/leonardo/foglio/index.html?num=ATL.1117.1",
    "caption": {
-    "en": "Two columns of short entries in red chalk over a faint circle and triangle: the list of his books.",
-    "de": "Zwei Spalten kurzer Einträge in Rötel über einem blassen Kreis und einem Dreieck: die Liste seiner Bücher."
+    "en": "Two columns of short entries in red chalk over a faint circle and triangle.",
+    "de": "Zwei Spalten kurzer Einträge in Rötel über einem blassen Kreis und einem Dreieck."
    },
    "writing": true,
    "drawing_only": false,
@@ -12156,6 +13197,11 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
+   "phone": {
+    "from": "caption",
+    "en": "Two columns of short entries in red chalk over a circle and triangle.",
+    "de": "Zwei Spalten kurzer Einträge in Rötel über einem Kreis und einem Dreieck."
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -12182,8 +13228,8 @@
    "picture": "leaf",
    "credit": "Léonard de Vinci, Manuscrit I, fol. 138v, vers 1497-1498. Bibliothèque de l'Institut de France, Ms 2180. https://bibnum.institutdefrance.fr/ark:/61562/bi24187. CC BY-NC-ND 3.0 FR.",
    "caption": {
-    "en": "A red chalk structure and a flower above the writing: an allegory of Il Moro to paint.",
-    "de": "Ein Bau in Rötel und eine Blume über der Schrift: eine Allegorie auf den Moro, als Bild zum Malen beschrieben."
+    "en": "A red chalk structure and a flower above the writing.",
+    "de": "Ein Bau in Rötel und eine Blume über der Schrift."
    },
    "writing": true,
    "drawing_only": false,
@@ -12203,7 +13249,7 @@
      "text": "Again, Poverty in a hideous form running behind a youth.",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Ferner, die Armut in erschreckender Gestalt läuft hinter einem Jüngling her…",
@@ -12221,6 +13267,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "Again, Poverty in a hideous form running behind a youth.",
+    "de": "Ferner, die Armut in erschreckender Gestalt läuft hinter einem Jüngling her…"
+   },
    "leaf": null,
    "plate": {
     "path": "ravaisson/lesmanuscritsdel04lo__n0378.jpg",
@@ -12278,13 +13329,13 @@
      "text": "The Duke has lost the state, property and liberty…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "Der Herzog hat seinen Staat, seine Habe und seine Freiheit verloren…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "Il duca perso lo stato e la roba e liertà…",
@@ -12296,6 +13347,11 @@
    },
    "lead_none": false,
    "long": true,
+   "phone": {
+    "from": "lead",
+    "en": "The Duke has lost the state, property and liberty…",
+    "de": "Der Herzog hat seinen Staat, seine Habe und seine Freiheit verloren…"
+   },
    "leaf": {
     "left": 0.089,
     "top": 0.029,
@@ -12348,13 +13404,13 @@
      "text": "…it seemed to me that, as I was in my cradle, a kite came to me and opened my mouth with its tail…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
      "text": "…kam es mir vor, als ich in der Wiege lag, als ob ein Milan zu mir käme, mir mit seinem Schwanz den Mund öffnete…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
      "text": "…e' mi parea che, essendo io in culla, che vn nibbio venisse a me e mi aprisse la bocca colla sua coda…",
@@ -12366,6 +13422,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "…a kite came to me and opened my mouth with its tail…",
+    "de": "…als ob ein Milan zu mir käme, mir mit seinem Schwanz den Mund öffnete…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
@@ -12392,8 +13453,8 @@
    "picture": "plate",
    "credit": "Leonardo da Vinci, Codex Arundel, f. 272r. 1923 printed facsimile plate (Reale Commissione Vinciana) via pbc.gda.pl; Domena publiczna; https://pbc.gda.pl/dlibra/publication/edition/10290",
    "caption": {
-    "en": "Four lines written left to right above a red chalk river: the note of his father's death.",
-    "de": "Vier Zeilen, von links nach rechts geschrieben, über einem Fluss in Rötel: die Notiz vom Tod seines Vaters."
+    "en": "Four lines written left to right above a red chalk river.",
+    "de": "Vier Zeilen, von links nach rechts geschrieben, über einem Fluss in Rötel."
    },
    "writing": true,
    "drawing_only": false,
@@ -12410,19 +13471,19 @@
     "passage": 0,
     "placeholder": false,
     "en": {
-     "text": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci, notary at the Palazzo del Podestà, my father…",
+     "text": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci…",
      "kind": "printed",
      "label": "Translation: Jean Paul Richter's edition, 1883, English mainly by Mrs R. C. Bell",
-     "rest": "Translation: J. P. Richter, 1883"
+     "rest": "Translation: Richter's edition, 1883"
     },
     "de": {
-     "text": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci, Notar am Palazzo del Podestà, mein Vater…",
+     "text": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci…",
      "kind": "ours",
      "label": "KI-Übersetzung aus dem gedruckten Italienisch (Ausgabe von Richter, Bd. II, 1883). Sie kann Fehler enthalten.",
-     "rest": "KI-Übersetzung. Sie kann Fehler enthalten."
+     "rest": "KI-Übersetzung, kann Fehler enthalten."
     },
     "it": {
-     "text": "A dì 9 di luglio 1504, mercoledì a ore 7 morì Ser Piero da Vinci, notaio al Palazzo del Podestà, mio padre…",
+     "text": "A dì 9 di luglio 1504, mercoledì a ore 7 morì Ser Piero da Vinci…",
      "label": {
       "en": "Transcription: Jean Paul Richter's edition, 1883, vol. II",
       "de": "Umschrift: Ausgabe von Jean Paul Richter, 1883, Bd. II"
@@ -12431,6 +13492,11 @@
    },
    "lead_none": false,
    "long": false,
+   "phone": {
+    "from": "lead",
+    "en": "On the 9th of July 1504, Wednesday, at seven o'clock, died Ser Piero da Vinci…",
+    "de": "Am 9. Juli 1504, Mittwoch, zur 7. Stunde starb Ser Piero da Vinci…"
+   },
    "leaf": null,
    "plate": null,
    "mirror": "own"
