@@ -168,8 +168,8 @@
   },
   {
    "file": "src/wings/vinci/content.ts",
-   "sha256": "28bacfbc4d31e884087636c736801f5c6e8ad973085e5d7025bacb0e6da7c7d9",
-   "bytes": 94845,
+   "sha256": "4c683be636f7cac8557281544f577a7fe2af4c638278a19373719a39533ebc40",
+   "bytes": 94798,
    "unchangedDuringAudit": true
   },
   {
@@ -678,8 +678,8 @@
   },
   {
    "file": "src/wings/vinci/story.ts",
-   "sha256": "1d77304eeb8ed10ff90c894aaf29dd61022911e7e639502943304ddb9ad94e70",
-   "bytes": 26591,
+   "sha256": "8bb0aaab9a1a290a78e513a1e1112c99d8a5a8a46ac150ff09375a2d7902bb27",
+   "bytes": 27255,
    "unchangedDuringAudit": true
   },
   {
