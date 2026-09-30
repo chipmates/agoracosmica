@@ -12,7 +12,8 @@
  * What it reads out of the card, by part:
  *   2  the stations in their order, with their chapter titles, age clocks,
  *      frames, lines, certainties and pointers, and the two chapter cuts
- *   3  the drawers, keyed by the station's number or by `quiet · <id>`
+ *   3  the drawers, keyed by the station's number (`8a` included) or by
+ *      `quiet · <id>`
  *   4  the title wall            5  the exit's three things and its doors
  *   7  the canon sheet's keys, which every pointer resolves against
  */
@@ -106,7 +107,8 @@ function resolve(stopSources) {
 
 /* ------------------------------------------------------- part 2, the stops */
 
-const CLOCK = /^(?:he is |age |about |near )?\d{1,3}$/i
+/** an age clock: a number, or a decade in words where the date is a range */
+const CLOCK = /^(?:(?:he is |age |about |near )?\d{1,3}|(?:early|mid|late) [a-z]+ties)$/i
 const CLASSES = ['documented', 'reconstructed', 'conjectural', 'inferred', 'tradition', 'disputed']
 
 const blocks = []
@@ -157,7 +159,8 @@ for (const block of blocks) {
   const certainty = CLASSES.find((c) => certaintyLine.includes(c))
     ?? (/not known|unknown/.test(certaintyLine) ? 'unknown' : '')
   stops.push({
-    kind, id, beat: quiet ? null : Number(segments[0]), quiet, chapter,
+    /* the station list's own segment, so a stop between two beats (8a) keys too */
+    kind, id, beat: quiet ? null : segments[0], quiet, chapter,
     age: clockEn ? { en: clockEn, de: clockDe } : null,
     line: { en: field(block.body, 'EN'), de: field(block.body, 'DE') },
     drawer: null,
@@ -173,10 +176,10 @@ for (const block of blocks) {
 {
   let current = null
   for (const line of part(3)) {
-    const head = line.match(/^\*\*(\d+|quiet) · ([a-z the-]+)\.\*\*/)
+    const head = line.match(/^\*\*(\d+[a-z]?|quiet) · ([a-z the-]+)\.\*\*/)
     if (head) {
-      const key = head[1] === 'quiet' ? head[2].trim() : Number(head[1])
-      current = stops.find((s) => (typeof key === 'number' ? s.beat === key : s.id === key))
+      const quietKey = head[1] === 'quiet'
+      current = stops.find((s) => (quietKey ? s.id === head[2].trim() : s.beat === head[1]))
       if (!current) refuse('drawer-key', line.slice(0, 40), 'no stop of part 2 carries this drawer key')
       continue
     }
@@ -268,7 +271,7 @@ for (const [index, stop] of stops.entries()) {
 for (const [index, stop] of stops.entries()) {
   if (stop.kind !== 'cut') continue
   const next = stops.slice(index + 1).find((s) => s.kind === 'station')
-  stop.id = `cut-${stop.chapter.en.split('.')[0].toLowerCase().replace(/^the /, '').replace(/'/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`
+  stop.id = `cut-${stop.chapter.en.split('.')[0].toLowerCase().replace(/^the /, '').replace(/['’]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '')}`
   stop.certainty = next?.certainty ?? ''
   stop.pointers = next ? [...next.pointers] : []
   stop.built = false
