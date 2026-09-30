@@ -152,7 +152,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
     quiet: false,
     chapter: { en: "The heart valve", de: "Die Herzklappe" },
     age: { en: "about 60", de: "mit etwa 60 Jahren" },
-    line: { en: "He drew this heart valve on paper. Ours moves in a film. Open the sheet.", de: "Er zeichnete diese Herzklappe auf Papier. Unsere bewegt sich im Film. Öffne das Blatt." },
+    line: { en: "He drew this heart valve on paper. Ours moves in a film. Open the drawing.", de: "Er zeichnete diese Herzklappe auf Papier. Unsere bewegt sich im Film. Öffne die Zeichnung." },
     drawer: null,
     certainty: "documented",
     sees: "The sheet apart",
