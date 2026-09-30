@@ -311,7 +311,8 @@ export function createFilmLook(h: FilmLookHost) {
   const recordOf = (id: string, title: VinciText, render: (host: HTMLElement) => void): void => h.openRecord(id, title, 'documented', render)
   /** ONE TOPIC, in the window where the visitor stands; the gold walks topic to topic. */
   function openTopic(slug: string, start: string | undefined, from: HTMLElement | null, asked?: string): void {
-    const look = createBestOfLook({ slug, start, ...(asked ? { id: asked } : {}), manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
+    const look = createBestOfLook({ slug, start, ...(asked ? { id: asked } : {}), words: { manuscript: vinciManuscriptWords(), vitrine: VINCI_VITRINE_WORDS },
+      manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
       tier: () => 'standard', openTopic: (next, button) => openTopic(next, undefined, button),
       openRecord: recordOf, openBook: book => void open(book === EDITION_EXHIBIT ? EDITION_WHOLE : book, null),
       openShelf: () => closeLook.close(), close: () => closeLook.close() })

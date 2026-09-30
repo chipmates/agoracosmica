@@ -328,8 +328,12 @@ export function createWing():VinciWingModule {
     return here>=0?here:WALK.stops.findIndex(stop=>!stop.place&&stop.station===id&&stop.exhibit===undefined)
   }
   /** THE EXHIBIT THE EYE STANDS AT: a stop at a place of its own stands at
-   * one sheet's viewing eye, so that sheet opens where the visitor stands. */
+   * one sheet's viewing eye, so that sheet opens where the visitor stands.
+   * A topic of the best-of opens where the visitor stands too: its reader
+   * holds the stage at once, so a walk to the book would never land. Asked
+   * here, outside the house's generator, which the film's global key reads. */
   function opensHere(id:string):boolean {
+    if(topicOpening)return true
     const stop=WALK.stops[card], nav=standing?rail.navigation:undefined
     return Boolean(stop?.opens===id&&stop.place&&nav&&!nav.active&&nav.completed===railPlaceOf(stop)&&(placeProved(stop)||nav.wall===walkVertex(stop)))
   }
@@ -1219,8 +1223,6 @@ export function createWing():VinciWingModule {
         // stage may be held, so none is left standing on a still frame.
         dots?.setOpen(id);dots?.setLimit(0);paintExhibitTitle();paintHeaderVisibility();paintStrip()
         yieldEye()
-        // its reader holds the stage at once, so a walk to the book would never land
-        if(topicOpening)return false
         // ON THE WALL A PRESS IS A RUN. A stop is a vertex of the room's own
         // certified line, so the eye slides along the hang to the work asked
         // for instead of returning to a station between two neighbours. It
@@ -2782,7 +2784,7 @@ export function createWing():VinciWingModule {
   function openTopic(slug:string,start:string|undefined,from:HTMLElement|null,how:'auto'|'walk'|'cut',asked?:string):void {
     if(!closeLook||!hosts)return
     const id=asked??topicExhibit(slug)
-    const look=createBestOfLook({slug,start,id,manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
+    const look=createBestOfLook({slug,start,id,words:{manuscript:vinciManuscriptWords(),vitrine:VINCI_VITRINE_WORDS},manifest:loadManifest(),colour:certaintyColour('documented'),narrow,
       tier:()=>hosts?.world.stack.tierName()??'standard',
       openTopic:(next,button)=>openTopic(next,undefined,button,'auto'),
       openRecord:(record,title,render)=>{

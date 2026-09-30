@@ -15,7 +15,7 @@ import { assetAddress } from '../../../stack/materials'
 import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload, type ReaderBook, type ReaderPayload, type ReaderSide, type ReaderWay } from '../../vitrine/reader'
 import type { VitrineExhibit, VitrinePeek } from '../../vitrine/types'
-import { vinciManuscriptWords, VINCI_VITRINE_WORDS } from '../collection/close-look'
+import type { vinciManuscriptWords, VINCI_VITRINE_WORDS } from '../collection/close-look'
 import type { VinciText } from '../content'
 import { BEST_OF_NOTICES, BEST_OF_TOPICS, bestOfKey, bestOfRecord, bestOfSource, bestOfTopic, topicExhibit, topicPages,
   topicTexts, type BestOfLang, type BestOfPage, type BestOfPageTexts, type BestOfPassage, type ScanRecord } from './best-of'
@@ -24,6 +24,10 @@ import { MIRROR_EXPLANATION, TABLE_UI } from './content'
 
 export interface BestOfLookOptions {
   slug: string
+  /** the close look's own words, handed in by the caller: an import of the
+   * close look here would reach the letter modules, which the film key's
+   * words wire audits (forge/film/library.mjs) */
+  words: { manuscript: ReturnType<typeof vinciManuscriptWords>; vitrine: typeof VINCI_VITRINE_WORDS }
   /** the id the look answers to where a mark asked for it by another (the
    * 1883 book's mark opens the first topic): the topic's own where absent */
   id?: string
@@ -89,7 +93,8 @@ function bookOf(page: BestOfPage): string | null {
 
 export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
   const language: BestOfLang = lang()
-  const words = vinciManuscriptWords()
+  const words = options.words.manuscript
+  const VINCI_VITRINE_WORDS = options.words.vitrine
   const copy = TABLE_UI[language]
   const topic = bestOfTopic(options.slug)
   const pages = topicPages(options.slug)
