@@ -207,6 +207,14 @@ const PHONE_NEAREST_M: Readonly<Record<string, number>> = {
   [exhibitId('bacchus', 'front')]: PHONE_FURTHEST_M,
   [exhibitId('virgin-of-the-rocks-london', 'front')]: PHONE_FURTHEST_M,
   [exhibitId('virgin-of-the-rocks-louvre', 'front')]: PHONE_FURTHEST_M,
+  // The medium ones where the lens stays near fifty: further back it reaches
+  // the floor and the work no longer fills its band.
+  [exhibitId('anghiari-copy', 'front')]: 1.8,
+  [exhibitId('annunciation-predella', 'front')]: 1.7,
+  [exhibitId('saint-john-the-baptist', 'front')]: 1.75,
+  [exhibitId('madonna-of-the-carnation', 'front')]: 1.5,
+  [exhibitId('salvator-mundi', 'front')]: 1.55,
+  [exhibitId('la-belle-ferronniere', 'front')]: 1.5,
 }
 function placement(id: string): Field & { id: string; face: string } | undefined {
   const field = hangPlacements().find(field => exhibitId(field.id, field.face) === id)
