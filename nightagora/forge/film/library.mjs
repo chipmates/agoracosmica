@@ -18,8 +18,20 @@
 //            tiles and spreads, the Ravaisson plates): no module that can turn
 //            a store record into a texture or a mesh names them or reaches the
 //            codex register.
+//   TABLE    (from library-placed-v3) the reading table's page: its panel, the
+//            panel's style, the codex register and the codex reader. They
+//            make no picture and reach none; a module that imports them and
+//            can shape a picture is audited; the table reads one value of its
+//            panel, the shelf's hidden state (the folio rack stands only while
+//            the shelf is shown), and that stays keyed; the panel calls the
+//            table back only from a visitor's event.
+//   BENCH    (from library-placed-v3) the reading table's bench: only the
+//            bench page imports it, by import(), when it opens it.
 //
 // Everything else a record's text or bytes can reach stays in the global key.
+// What no wire can see: a page module that throws while the table is built
+// leaves the table unbuilt (the exhibits swallow the error) with the key where
+// it was; only a check that builds the table in a browser sees that.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
@@ -108,6 +120,13 @@ export function sourcesAt({ rev = '', overlay = {} } = {}) {
   }
   for (const [file, text] of Object.entries(overlay)) if (wanted(file)) out.set(file, text)
   return out
+}
+
+/** One file of the app as a tree holds it (a revision, or the working tree), with planted texts over it; null when absent. */
+export function fileAt({ rev = '', overlay = {} } = {}, file) {
+  if (file in overlay) return overlay[file]
+  if (rev) return blobsAt(rev, path.posix.dirname(file), (f) => f === file).get(file) ?? null
+  return existsSync(path.join(APP_ROOT, file)) ? readFileSync(path.join(APP_ROOT, file), 'utf8') : null
 }
 
 /* ---- the value imports of the app ---- */
@@ -359,6 +378,315 @@ export function readerPlacement({ sources, graph, frameShaping = [] }) {
       if (!audited) return `${f} makes textures and walks the whole manifest`
       if (n !== audited.length) return `${f} walks the manifest ${n} times, audited ${audited.length}`
       for (const line of audited) if (!sources.get(f).includes(line)) return `${f} no longer holds its audited filter`
+    }
+    return null
+  })()
+  return why ? { placed: false, why } : { placed: true }
+}
+
+/* ---- THE TABLE'S PAGE ---- */
+/** The reading table's page modules: the panel, its style, the codex register
+    and the codex reader. Records whose recipe files these are leave the global
+    key while the table's wire holds. */
+export const TABLE_DOM_FILES = ['panel.ts', 'panel.css', 'codex-shelf.ts', 'codex-reader.ts', 'data/codices.json', 'data/codex-sides.json']
+  .map((f) => `${WING_DIR}/table/${f}`)
+const TABLE_PANEL = `${WING_DIR}/table/panel.ts`, TABLE_PANEL_CSS = `${WING_DIR}/table/panel.css`
+const TABLE_REGISTER = `${WING_DIR}/table/codex-shelf.ts`, TABLE_INDEX = `${WING_DIR}/table/index.ts`
+/** What can make or change a picture the renderer draws: three.js by value, a texture maker, a drawing context. */
+const THREE_VALUE = /^\s*import\s+(?!type\b)[^'"]*?from\s+['"]three(?:\/[^'"]*)?['"]/m
+const SCENE_MAKING = (text) => THREE_VALUE.test(text) || TEXTURE_MAKING.test(text) || /\.getContext\s*\(/.test(text)
+/**
+ * THE MODULES THAT IMPORT A PAGE MODULE, DIRECTLY OR THROUGH OTHERS, AND CAN
+ * SHAPE A PICTURE, and why none hands a frame a value of the page (audited
+ * 2026-09-30). A new one trips the wire.
+ */
+export const TABLE_DOM_BRIDGES = {
+  'src/main.ts': "the app's entry: it mounts the lobby, the bench and a wing module and passes none of the page",
+  'src/wings/registry.ts': 'loads a wing module by its slug',
+  'src/bench/index.ts': 'the bench page, never mounted on the wing',
+  [`${WING_DIR}/table/bench/index.ts`]: "the reading table's bench, on the bench page only",
+  [`${WING_DIR}/table/bench/orientation.ts`]: "the reading table's bench, on the bench page only",
+  [`${WING_DIR}/table/bench/probes.ts`]: "the reading table's bench, on the bench page only",
+  [`${WING_DIR}/film-wing.ts`]: 'the film player, never on the page the film is rendered from',
+  [`${WING_DIR}/film-look.ts`]: "the film player's close look, never on the page the film is rendered from",
+  [`${WING_DIR}/collection/exhibits.ts`]: 'builds the table (only buildTable, checked) and calls its update; it reads neither the panel nor the shelf of what it builds (checked)',
+  [TABLE_INDEX]: "builds the panel (createPanel); its drawing reads one value of it, the shelf's hidden state, keyed as its own part; every read of the panel is one of TABLE_PANEL_READS (checked); the panel calls it back only from a visitor's event (checked)",
+  [`${WING_DIR}/index.ts`]: "names the register, the codex reader and the edition reader for the strip and the flat readers (the page); its frame-shaping declarations use no name it takes from a module that reaches the page modules, save TABLE_FRAME_PATH's (checked on every tree)",
+  [`${WING_DIR}/table/reader.ts`]: "the edition's flat reader payload, made when a visitor opens the book; the index's frame-shaping declarations never make it (checked)",
+}
+/** The names the index's frame-shaping declarations may take from a module that reaches the page: the table's own build, whose way to the panel is audited above. */
+export const TABLE_FRAME_PATH = { [`${WING_DIR}/collection/exhibits.ts`]: ['mountCollectionExhibits'] }
+/** What the collection's exhibits take from the table's module. */
+export const EXHIBITS_TABLE_NAMES = ['buildTable']
+/** Every way the table reads its panel (audited 2026-09-30): the element's data, its hidden flag and text (the page and the bench), the panel's update, showShelf and dispose, the shelf handed out, and the shelf's hidden state, the one value the drawing reads (the folio rack stands only while the shelf is shown). */
+export const TABLE_PANEL_READS = ['panel', 'panel.element.dataset', 'panel.element.hidden', 'panel.element.innerText', 'panel.update', 'panel.showShelf', 'panel.shelf', 'panel.shelf.hidden', 'panel.dispose']
+/** The table's callbacks inside the page modules: called only from a visitor's event. */
+export const TABLE_CALLBACKS = { [TABLE_PANEL]: ['createPanel', ['onOpen']], [TABLE_REGISTER]: ['buildCodexList', ['onOpen', 'onBook']] }
+
+const parse = (file, text) => ts.createSourceFile(file, text, ts.ScriptTarget.ES2022, true)
+/** A name as it is referred to: not a property name, not an object key. */
+function referenceOf(n) {
+  const p = n.parent
+  if (ts.isPropertyAccessExpression(p) && p.name === n) return false
+  if ((ts.isPropertyAssignment(p) || ts.isMethodDeclaration(p) || ts.isPropertyDeclaration(p)) && p.name === n) return false
+  return true
+}
+/** The statement of a function's (or the file's) own body that holds a node. */
+function bodyStatement(n) {
+  let at = n
+  while (at.parent && !(ts.isSourceFile(at.parent) || (ts.isBlock(at.parent) && at.parent.parent && ts.isFunctionLike(at.parent.parent)))) at = at.parent
+  return at
+}
+const isListener = (fn) => ts.isCallExpression(fn.parent) && fn.parent.arguments.includes(fn) &&
+  ts.isPropertyAccessExpression(fn.parent.expression) && fn.parent.expression.name.text === 'addEventListener'
+
+/** THE PANEL'S SHELF STATE: the statements that set the shelf's hidden flag, or why the panel uses its shelf another way. */
+export function shelfState(text) {
+  const source = parse(TABLE_PANEL, text)
+  const held = new Map()
+  let why = null
+  const visit = (n) => {
+    if (why) return
+    if (ts.isIdentifier(n) && (n.text === 'shelf' || n.text === 'shelfShown') && referenceOf(n)) {
+      const p = n.parent
+      const keep = () => { const s = bodyStatement(n); held.set(s.getStart(source), s.getText(source)) }
+      if (n.text === 'shelfShown' || (ts.isVariableDeclaration(p) && p.name === n)) keep()
+      else if (ts.isShorthandPropertyAssignment(p)) { /* handed to the table */ }
+      else if (ts.isPropertyAccessExpression(p) && p.expression === n) {
+        const name = p.name.text, call = ts.isCallExpression(p.parent) && p.parent.expression === p ? p.parent : null
+        if (name === 'hidden') keep()
+        else if (name === 'lang' && ts.isBinaryExpression(p.parent) && p.parent.left === p && p.parent.operatorToken.kind === ts.SyntaxKind.EqualsToken) { /* its language */ }
+        else if (call && ['append', 'replaceChildren', 'remove'].includes(name)) { /* its content */ }
+        else if (call && name === 'setAttribute' && ts.isStringLiteral(call.arguments[0]) && !/^hidden$/i.test(call.arguments[0].text)) { /* an attribute */ }
+        else why = `the panel uses its shelf as ${p.parent.getText(source).slice(0, 80)}`
+      } else why = `the panel uses its shelf as ${p.getText(source).slice(0, 80)}`
+    }
+    ts.forEachChild(n, visit)
+  }
+  visit(source)
+  if (why) return { why }
+  if (![...held.values()].some((s) => /\bshelf\.hidden\b/.test(s))) return { why: 'the panel sets no hidden state of its shelf' }
+  const statements = [...held].sort(([a], [b]) => a - b).map(([, s]) => s)
+  return { key: sha256(statements.join('\n')), statements }
+}
+
+/** Why a callback of the table is called outside a visitor's event, or null. */
+function callbacksHeld(file, text, [owner, names]) {
+  const source = parse(file, text)
+  let fn = null
+  const find = (n) => { if (!fn && ts.isFunctionDeclaration(n) && n.name?.text === owner) fn = n; if (!fn) ts.forEachChild(n, find) }
+  find(source)
+  if (!fn) return `${file} declares no ${owner}`
+  const params = fn.parameters.map((p) => p.name.getText(source))
+  for (const name of names) if (!params.includes(name)) return `${file}#${owner} takes no ${name}`
+  let why = null
+  const enclosing = (n) => { let at = n.parent; while (at && !ts.isFunctionLike(at)) at = at.parent; return at }
+  /** a reference that is only tested for being there */
+  const tested = (n) => {
+    let at = n
+    while (ts.isParenthesizedExpression(at.parent) || (ts.isPrefixUnaryExpression(at.parent) && at.parent.operator === ts.SyntaxKind.ExclamationToken) ||
+      (ts.isBinaryExpression(at.parent) && at.parent.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken)) at = at.parent
+    return at !== n && ((ts.isConditionalExpression(at.parent) && at.parent.condition === at) || (ts.isIfStatement(at.parent) && at.parent.expression === at))
+  }
+  /** a closure a visitor's event runs: an event's listener, or a const handed only to one (and tested before) */
+  const onEvent = (f) => {
+    if (!f || f === fn) return false
+    if (isListener(f)) return true
+    let d = f.parent
+    while (d && (ts.isConditionalExpression(d) || ts.isParenthesizedExpression(d))) d = d.parent
+    if (!d || !ts.isVariableDeclaration(d) || !ts.isIdentifier(d.name)) return false
+    const local = d.name.text
+    let only = true
+    const uses = (n) => {
+      if (ts.isIdentifier(n) && n.text === local && n !== d.name && referenceOf(n)) {
+        const p = n.parent
+        const listener = ts.isCallExpression(p) && p.arguments.includes(n) && ts.isPropertyAccessExpression(p.expression) && p.expression.name.text === 'addEventListener'
+        const tested = ts.isIfStatement(p) && p.expression === n
+        if (!listener && !tested) only = false
+      }
+      ts.forEachChild(n, uses)
+    }
+    uses(enclosing(d) ?? source)
+    return only
+  }
+  const visit = (n) => {
+    if (why) return
+    if (ts.isIdentifier(n) && names.includes(n.text) && referenceOf(n) && !(ts.isParameter(n.parent) && n.parent.name === n)) {
+      const p = n.parent
+      if (ts.isCallExpression(p) && p.expression === n) { if (!onEvent(enclosing(n))) why = `${file} calls ${n.text} outside a visitor's event` }
+      else if (tested(n)) { /* only whether it was given */ }
+      else if (ts.isCallExpression(p) && p.arguments.includes(n) && ts.isIdentifier(p.expression) && TABLE_CALLBACKS[TABLE_REGISTER][0] === p.expression.text) { /* handed to the register's list */ }
+      else why = `${file} hands ${n.text} on as ${p.getText(source).slice(0, 80)}`
+    }
+    ts.forEachChild(n, visit)
+  }
+  visit(fn)
+  return why
+}
+
+/** Why the table reads its panel another way than audited, or null. */
+function panelReads(text) {
+  const source = parse(TABLE_INDEX, text)
+  let why = null, made = 0
+  const visit = (n) => {
+    if (why) return
+    if (ts.isIdentifier(n) && n.text === 'panel' && referenceOf(n)) {
+      const p = n.parent
+      if (ts.isVariableDeclaration(p) && p.name === n) {
+        made++
+        if (!(p.initializer && ts.isCallExpression(p.initializer) && p.initializer.expression.getText(source) === 'createPanel')) why = 'the table names another panel than createPanel\'s'
+      } else {
+        let path = 'panel', at = n
+        while (ts.isPropertyAccessExpression(at.parent) && at.parent.expression === at) { at = at.parent; path += `.${at.name.text}` }
+        const bare = at === n
+        if (!TABLE_PANEL_READS.includes(path)) why = `the table reads ${path}`
+        else if (bare && !ts.isShorthandPropertyAssignment(p)) why = `the table hands its panel on as ${p.getText(source).slice(0, 80)}`
+        else if (path === 'panel.shelf' && !ts.isPropertyAssignment(at.parent)) why = `the table hands the shelf on as ${at.parent.getText(source).slice(0, 80)}`
+      }
+    }
+    ts.forEachChild(n, visit)
+  }
+  visit(source)
+  return why ?? (made === 1 ? null : `the table makes ${made} panels`)
+}
+
+/** Why a stylesheet may style anything but the panel's own elements, or null. */
+export function panelStyleScoped(css) {
+  const text = css.replace(/\/\*[\s\S]*?\*\//g, '')
+  let at = 0, depth = 0
+  const groups = []
+  while (at < text.length) {
+    const open = text.indexOf('{', at), close = text.indexOf('}', at)
+    if (open < 0 || (close >= 0 && close < open)) { if (close < 0) break; depth--; if (groups.length > depth) groups.length = depth; at = close + 1; continue }
+    const prelude = text.slice(at, open).trim()
+    at = open + 1
+    depth++
+    if (prelude.startsWith('@')) {
+      if (!/^@(?:media|container|supports)\b/.test(prelude)) return `an at-rule ${prelude.slice(0, 40)}`
+      groups[depth - 1] = true
+      continue
+    }
+    const selectors = []
+    let cur = '', paren = 0
+    for (const ch of prelude) { if (ch === '(') paren++; if (ch === ')') paren--; if (ch === ',' && !paren) { selectors.push(cur); cur = '' } else cur += ch }
+    selectors.push(cur)
+    for (const s of selectors) {
+      // scoped: a compound names a class of the panel's own, and every step after it goes down into it
+      const flat = s.replace(/\([^()]*\)/g, '()').replace(/\([^()]*\)/g, '()').trim()
+      const steps = flat.split(/(\s*[>+~]\s*|\s+)/).map((x) => (x.trim() === '' && x !== '' ? ' ' : x.trim()))
+      let inside = false
+      for (let i = 0; i < steps.length; i += 2) {
+        if (/\.(?:vt|vinci-table)-[\w-]+/.test(steps[i])) inside = true
+        else if (i > 0 && !(steps[i - 1] === ' ' || steps[i - 1] === '>')) inside = false
+      }
+      if (!inside) return `the selector ${s.trim().slice(0, 60)} styles more than the panel`
+    }
+    const end = text.indexOf('}', at)
+    if (end < 0) return 'a rule without its end'
+    if (text.slice(at, end).includes('{')) return `a nested rule in ${prelude.slice(0, 40)}`
+    at = end + 1
+    depth--
+  }
+  return null
+}
+
+/** The value imports of a module with the names they bind here, resolved in the tree. */
+function importsHere(sources, file) {
+  const out = []
+  const resolve = (spec) => {
+    const clean = spec.replace(/\?(raw|inline|url)$/, '')
+    if (!clean.startsWith('.')) return null
+    const joined = path.posix.normalize(path.posix.join(path.posix.dirname(file), clean))
+    return [joined, `${joined}.ts`, `${joined}/index.ts`].find((f) => sources.has(f)) ?? null
+  }
+  const visit = (n) => {
+    if (ts.isImportDeclaration(n) && ts.isStringLiteral(n.moduleSpecifier)) {
+      const c = n.importClause
+      if (!c?.isTypeOnly) {
+        const named = c?.namedBindings
+        const locals = !c ? [] : [...(c.name ? [c.name.text] : []), ...(named && ts.isNamespaceImport(named) ? ['*'] : []),
+          ...(named && ts.isNamedImports(named) ? named.elements.filter((e) => !e.isTypeOnly).map((e) => e.name.text) : [])]
+        out.push({ to: resolve(n.moduleSpecifier.text), locals, dynamic: false })
+      }
+    } else if (ts.isExportDeclaration(n) && n.moduleSpecifier && ts.isStringLiteral(n.moduleSpecifier) && !n.isTypeOnly) out.push({ to: resolve(n.moduleSpecifier.text), locals: ['*'], dynamic: false })
+    else if (ts.isCallExpression(n) && n.expression.kind === ts.SyntaxKind.ImportKeyword && n.arguments[0] && ts.isStringLiteralLike(n.arguments[0])) out.push({ to: resolve(n.arguments[0].text), locals: ['*'], dynamic: true })
+    ts.forEachChild(n, visit)
+  }
+  visit(parse(file, sources.get(file)))
+  return out.filter((e) => e.to)
+}
+
+/**
+ * THE TABLE'S WIRE: whether the page modules' records leave the global key,
+ * the first reason they do not, and the panel's shelf state the key keeps.
+ *   frameShaping   the texts of the index's declarations that shape a frame
+ */
+export function tablePlacement({ sources, graph, worldFiles = new Set(), frameShaping = [], css = null }) {
+  const why = (() => {
+    const group = new Set(TABLE_DOM_FILES)
+    for (const f of TABLE_DOM_FILES) if (f !== TABLE_PANEL_CSS && !sources.has(f)) return `${f} is not in the tree`
+    for (const f of TABLE_DOM_FILES) if (worldFiles.has(f)) return `a part of the world reads ${f}`
+    // the page makes no picture, nor anything it imports
+    const scene = new Set([...sources].filter(([f, t]) => f.endsWith('.ts') && SCENE_MAKING(t)).map(([f]) => f))
+    const follow = (e) => !(e.to === 'src/stack/materials.ts' && e.names.length && e.names.every((n) => ADDRESS_ONLY.has(n)))
+    const shapes = (f) => scene.has(f) || graph.reaches(f, scene, follow)
+    for (const f of TABLE_DOM_FILES) if (f.endsWith('.ts') && shapes(f)) return `${f} makes or reaches a picture`
+    // every importer that can shape a picture is audited
+    for (const f of TABLE_DOM_FILES) for (const x of graph.importersOf(f)) {
+      if (!group.has(x) && !TABLE_DOM_BRIDGES[x] && shapes(x)) return `${x} reaches ${f} and a picture`
+    }
+    // the stylesheet: the panel's alone, and scoped to its own elements
+    for (const [f, t] of sources) {
+      if (f === TABLE_PANEL || !f.endsWith('.ts')) continue
+      for (const m of t.matchAll(/from\s+['"](\.[^'"]*panel\.css)(?:\?[a-z]+)?['"]/g)) {
+        if (path.posix.normalize(path.posix.join(path.posix.dirname(f), m[1])) === TABLE_PANEL_CSS) return `${f} imports the panel's stylesheet`
+      }
+    }
+    if (css === null) return "the panel's stylesheet is not in the tree"
+    const style = panelStyleScoped(css)
+    if (style) return `the panel's stylesheet: ${style}`
+    // the exhibits build the table and read nothing of its page
+    const exhibits = `${WING_DIR}/collection/exhibits.ts`
+    for (const e of graph.edges.get(exhibits) ?? []) if (e.to === TABLE_INDEX && e.names.some((n) => !EXHIBITS_TABLE_NAMES.includes(n))) return `the exhibits import ${e.names.join(', ')} from the table`
+    if (/\.(?:panel|shelf)\b/.test(sources.get(exhibits) ?? '')) return 'the exhibits read a panel or a shelf'
+    // the table reads its panel only as audited, and is called back only from an event
+    const read = panelReads(sources.get(TABLE_INDEX) ?? '')
+    if (read) return read
+    for (const [file, spec] of Object.entries(TABLE_CALLBACKS)) { const w = callbacksHeld(file, sources.get(file), spec); if (w) return w }
+    // the index's frame-shaping declarations take nothing of the page
+    const index = `${WING_DIR}/index.ts`
+    for (const e of importsHere(sources, index)) {
+      if (!(group.has(e.to) || graph.reaches(e.to, group))) continue
+      if (e.locals.includes('*')) return `the index imports the whole of ${e.to}, which reaches the table's page`
+      const free = TABLE_FRAME_PATH[e.to] ?? []
+      for (const n of e.locals) if (!free.includes(n) && frameShaping.some((t) => new RegExp(`\\b${n}\\b`).test(t))) return `a frame-shaping declaration of the index uses ${n} of ${e.to}`
+    }
+    return null
+  })()
+  if (why) return { placed: false, why }
+  const shelf = shelfState(sources.get(TABLE_PANEL))
+  return shelf.why ? { placed: false, why: shelf.why } : { placed: true, shelf: shelf.key }
+}
+
+/* ---- THE TABLE'S BENCH ---- */
+/** The reading table's bench: records whose recipe files these are leave the global key while no page but the bench's opens them. */
+export const TABLE_BENCH_FILES = ['bench/index.ts', 'bench/probes.ts', 'bench/table-bench.css', 'bench-content.ts'].map((f) => `${WING_DIR}/table/${f}`)
+const inBench = (f) => f.startsWith(`${WING_DIR}/table/bench/`) || f === `${WING_DIR}/table/bench-content.ts`
+/** The modules that may import the bench, and how (audited 2026-09-30). */
+export const TABLE_BENCH_OPENERS = { 'src/bench/index.ts': 'the bench page: it imports a kind by import() only when the bench opens it, which the wing never does' }
+
+/** THE BENCH'S WIRE: whether the bench's records leave the global key, and the first reason they do not. */
+export function benchPlacement({ sources, graph, worldFiles = new Set() }) {
+  const why = (() => {
+    for (const f of TABLE_BENCH_FILES) if (worldFiles.has(f)) return `a part of the world reads ${f}`
+    for (const [f, t] of sources) {
+      if (inBench(f) || !f.endsWith('.ts')) continue
+      if (/table-bench\.css|bench-content/.test(t)) return `${f} names a file of the bench`
+      for (const e of graph.edges.get(f) ?? []) {
+        if (!inBench(e.to)) continue
+        if (!TABLE_BENCH_OPENERS[f]) return `${f} imports the bench`
+        if (importsHere(sources, f).some((i) => inBench(i.to) && !i.dynamic)) return `${f} imports the bench when it loads`
+      }
     }
     return null
   })()

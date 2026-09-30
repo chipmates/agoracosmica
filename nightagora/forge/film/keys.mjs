@@ -8,7 +8,8 @@
 //   GLOBAL    the stack, the print, the light, the sky, the recipe, and the
 //             library sets no plate claims that a frame can draw, save what
 //             no frame can show (`library.mjs`): the display texts of the
-//             words records and the flat reader's records
+//             words records, the flat reader's records, and the reading
+//             table's page and bench (the panel's shelf state stays)
 //   DELIVERY  the job image, the encoder and the rungs; a clip exempt from
 //             its byte line says so
 //
@@ -21,16 +22,18 @@ import { FILM_PACE, FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { WING_DIR, createLoader } from './load.mjs'
 import { canonicalPrint, openReplay, replayEdge, trackKey } from './replay.mjs'
 import { mountWorld } from './scene.mjs'
-import { READER_ROLES, importGraph, libraryAt, readerPlacement, sourcesAt, wordsPlacement } from './library.mjs'
+import { READER_ROLES, TABLE_BENCH_FILES, TABLE_DOM_FILES, benchPlacement, fileAt, importGraph, libraryAt, readerPlacement, sourcesAt, tablePlacement, wordsPlacement } from './library.mjs'
 import { buildIndex, seenSet } from './seen.mjs'
 import { eveningTrack } from './evening.mjs'
 
 export const KEYS_FORMAT = 'vinci-film-keys-v1'
 /** THE GLOBAL KEY'S DEFINITION. `v1` kept every library record no plate
-    claims; this one leaves out what no frame can show. A job and a release
-    name the definition their global key was taken under (`carry.mjs`). */
-export const GLOBAL_DEFINITION = 'library-placed-v2'
-export const GLOBAL_DEFINITIONS = ['v1', GLOBAL_DEFINITION]
+    claims; `library-placed-v2` leaves out what no frame can show; this one
+    leaves out the reading table's page and bench as well. A job and a release
+    name the definition their global key was taken under (`carry.mjs`); every
+    definition here stays computable, oldest first. */
+export const GLOBAL_DEFINITION = 'library-placed-v3'
+export const GLOBAL_DEFINITIONS = ['v1', 'library-placed-v2', GLOBAL_DEFINITION]
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 const short = (text) => sha256(text).slice(0, 32)
 
@@ -94,10 +97,12 @@ export function foreignParts(loader, definition = GLOBAL_DEFINITION) {
   }
   return parts
 }
-/** The parts the definition now reads that the one before did not: a carry holds them equal between a record's render tree and the tree now. */
-export function addedParts(loader) {
-  const before = foreignParts(loader, 'v1')
-  return Object.fromEntries(Object.entries(foreignParts(loader, GLOBAL_DEFINITION)).filter(([k]) => !(k in before)).sort())
+/** The parts a definition reads that an older one did not: a carry holds them
+    equal between a record's render tree and the tree now. The table's shelf
+    state is no such part: the older definitions read the whole panel. */
+export function addedParts(loader, from = 'v1', to = GLOBAL_DEFINITION) {
+  const before = foreignParts(loader, from)
+  return Object.fromEntries(Object.entries(foreignParts(loader, to)).filter(([k]) => !(k in before)).sort())
 }
 
 /* THE LIBRARY'S RECIPE RECORDS. A procedural record (`procedural/...`) names
@@ -315,24 +320,29 @@ export function globalKey(loader, { library = [], claimed = new Set(), definitio
     return { key: short(JSON.stringify(Object.entries(parts).sort())), parts, definition }
   }
   /* A WORDS RECORD keys its recipe file with the display texts blanked; the
-     flat reader's records are keyed nowhere, while their wires hold */
+     flat reader's records are keyed nowhere, while their wires hold; so,
+     under v3, are the table's page and bench records */
   const words = new Map(Object.entries(placement?.words ?? {}).filter(([, w]) => w.placed))
   const reader = placement?.reader?.placed ? new Set(READER_ROLES) : new Set()
+  const v3 = definition === 'library-placed-v3'
+  const page = new Set([...(v3 && placement?.table?.placed ? TABLE_DOM_FILES : []), ...(v3 && placement?.bench?.placed ? TABLE_BENCH_FILES : [])])
   const kept = [], told = []
   for (const e of unclaimed) {
     if (reader.has(e.role)) continue
     const files = recipeFilesOf(e)
+    if (String(e.path ?? '').startsWith('procedural/') && files.length && files.every((f) => page.has(f))) continue
     if (String(e.path ?? '').startsWith('procedural/') && files.length === 1 && words.has(files[0])) told.push(`${e.id}|${e.path}|${words.get(files[0]).blanked}`)
     else kept.push(identity(e))
   }
   parts['library sets no plate claims'] = short(kept.sort().join('\n'))
   parts['words records, their display texts left out'] = short(told.sort().join('\n'))
+  if (v3 && placement?.table?.placed) parts["the table panel's shelf state"] = short(placement.table.shelf)
   parts.definition = definition
   return { key: short(JSON.stringify(Object.entries(parts).sort())), parts, definition, placement }
 }
 
 /** WHERE THE LIBRARY ACTS, read off the tree (`library.mjs`): the words wire of
-    each words file and the reader's wire. */
+    each words file, the reader's wire, the table's page wire and its bench's. */
 export function placeLibrary({ rev = '', overlay = {}, loader, worldFiles = [] }) {
   const sources = sourcesAt({ rev, overlay })
   const graph = importGraph(sources)
@@ -342,6 +352,8 @@ export function placeLibrary({ rev = '', overlay = {}, loader, worldFiles = [] }
   return {
     words: wordsPlacement({ sources, graph, worldFiles: new Set(worldFiles) }),
     reader: readerPlacement({ sources, graph, frameShaping: shaping }),
+    table: tablePlacement({ sources, graph, worldFiles: new Set(worldFiles), frameShaping: shaping, css: fileAt({ rev, overlay }, `${WING_DIR}/table/panel.css`) }),
+    bench: benchPlacement({ sources, graph, worldFiles: new Set(worldFiles) }),
   }
 }
 
@@ -399,8 +411,10 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
   log(`world ${((Date.now() - t0) / 1000).toFixed(1)} s (${world.parts.filter((p) => !p.reused).map((p) => p.id).join(', ') || 'all reused'})`)
   const placement = placeLibrary({ rev, overlay, loader, worldFiles: world.files.map(([f]) => f) })
   const global = globalKey(loader, { library: world.library, claimed: world.claimed, placement })
-  /* the same tree under the definition before, for the carry */
-  const globalBefore = globalKey(loader, { library: world.library, claimed: world.claimed, definition: 'v1' })
+  /* the same tree under every definition, for the carry and the gate */
+  const globals = Object.fromEntries(GLOBAL_DEFINITIONS.map((d) => [d, d === GLOBAL_DEFINITION ? global
+    : globalKey(loader, { library: world.library, claimed: world.claimed, definition: d, placement: d === 'v1' ? null : placement })]))
+  const globalBefore = globals.v1
   /* the stand-in's seen set is a function of the track, the occupied cells,
      the sun and the water: held once per process for each */
   const occupancy = sha256(Float64Array.from([...world.cells.hashes.keys()].sort((a, b) => a - b)))
@@ -475,7 +489,7 @@ export async function treeKeys({ rev = '', overlay = {}, library, delivery = DEL
   }
   return {
     format: KEYS_FORMAT, revision: replay.wing.loader.revision, graph, clips, stills, evenings,
-    global, globalBefore, delivery: { key: deliveryKey(delivery), settings: delivery }, exposure, world,
+    global, globalBefore, globals, delivery: { key: deliveryKey(delivery), settings: delivery }, exposure, world,
     seconds: (Date.now() - t0) / 1000,
   }
 }
