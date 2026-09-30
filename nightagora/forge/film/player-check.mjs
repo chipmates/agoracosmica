@@ -135,6 +135,18 @@ async function shot(page, dir, name) {
   const n = await page.evaluate(numbers).catch((e) => ({ error: String(e) }))
   return { name, file, ...n }
 }
+/** the node the picture comes to rest at once it rests anywhere but `from`, or null */
+async function restAway(page, from, ms = 120000) {
+  return page.waitForFunction((f) => { const s = window.__naSeam?.state?.(); return s && s.kind === 'rest' && s.node !== f ? s.node : false }, from, { timeout: ms, polling: 50 })
+    .then((h) => h.jsonValue()).catch(() => null)
+}
+/** the story's stops the release carries in this framing, in the life's order, as the way on counts them */
+async function carriedStory(page, framing) {
+  return page.evaluate(async (f) => {
+    const film = await (await fetch(new URL('film.json', new URL(`/film/${new URLSearchParams(location.search).get('film')}/`, location.origin)).href)).json()
+    return film.story.filter((n) => film.nodes[n]?.stills?.[f])
+  }, framing)
+}
 async function press(page, selector) {
   const el = await page.$(selector)
   if (!el) return false
@@ -383,6 +395,7 @@ async function run(engine, width, lang) {
     await page.waitForTimeout(2000)
     shots.push(await shot(page, dir, '05-rest-west'))
     if (WALK === 'short') return record
+    const opener = await page.evaluate(() => window.__naSeam?.state?.().node ?? null)
     // a work on the wall, walked to and back
     // the work both designs mark from the west end, walked to and back; Saint John where it is the one the film carries
     const walkable = await page.evaluate(() => [...document.querySelectorAll('.film-dot[data-mark="walk"]')].map((d) => d.dataset.exhibit))
@@ -394,15 +407,26 @@ async function run(engine, width, lang) {
       await waitState(page, 'rest', 60000)
       await page.waitForTimeout(2500)
       shots.push(await shot(page, dir, '06-close-work'))
+      // LEAVING THE LOOK GOES UP A LEVEL, as the player does: to the story stop the
+      // work belongs to; the way on is then pressed until the stop after the opener
+      const atWork = await page.evaluate(() => window.__naSeam?.state?.().node ?? null)
+      const story = await carriedStory(page, phone ? 'upright' : 'wide')
+      const target = story[story.indexOf(opener) + 1] ?? null
       await page.keyboard.press('Escape')
-      await page.waitForTimeout(800)
-      shots.push(await shot(page, dir, '07-at-work'))
-      // on: back along the wall, a moment at its end, and the leg to the hall
-      await press(page, gold)
-      await waitState(page, 'walk', 20000)
-      for (let k = 0; k < 2; k++) { await waitState(page, 'rest', 60000); await page.waitForTimeout(200) }
-      await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest', null, { timeout: 60000 }).catch(() => null)
-      await page.waitForTimeout(1500)
+      const upTo = await restAway(page, atWork, 60000)
+      await page.waitForTimeout(1200)
+      shots.push(await shot(page, dir, '07-up'))
+      const on = record.afterLook = { work: atWork, opener, up: upTo, target, steps: [] }
+      let at = upTo
+      while (at && target && at !== target && story.indexOf(at) < story.indexOf(target) && on.steps.length < 6) {
+        if (!(await press(page, gold))) break
+        const next = await restAway(page, at)
+        on.steps.push({ from: at, to: next })
+        at = next
+        await page.waitForTimeout(1200)
+      }
+      on.reached = at
+      await page.waitForTimeout(300)
     } else {
       record.missing = 'no walking mark at the west end'
       await press(page, gold)
@@ -477,6 +501,7 @@ for (const engine of ENGINES) for (const width of WIDTHS) for (const lang of LAN
   report.runs.push(r)
   const s = r.shots.map((x) => `${x.name.slice(3)} ${x.pictureShare ?? '?'}%`).join(' · ')
   console.log(`${engine} ${width} ${lang}: first picture ${r.firstPicture?.toFixed?.(2)} s, ${Math.round((r.bytesToFirstPicture ?? 0) / 1024)} kB · ${s}${r.failed ? ` · FAILED ${r.failed}` : ''} · errors ${r.errors.length}`)
+  if (r.afterLook) console.log(`   after the look at ${r.afterLook.work}: up to ${r.afterLook.up}, on ${r.afterLook.steps.map((x) => x.to).join(' > ') || '(no press)'}; reached ${r.afterLook.reached} (the stop after ${r.afterLook.opener}: ${r.afterLook.target})`)
   if (r.lookup) console.log(`   look up: gold ${JSON.stringify(r.lookup.gold)}, ahead ${r.lookup.fetchedAhead.length}, played ${r.lookup.played} after ${r.lookup.msToPlay} ms, fade step ${r.lookup.fade?.largestStep}, lobby ${r.lookup.home} at ${r.lookup.msToLobby} ms${CUT ? `, cut to lobby ${r.lookup.cutHome} in ${r.lookup.msCutToLobby} ms` : ''}`)
   if (r.joins) for (const j of r.joins) console.log(`   join ${j.clip}: start mean ${j.start?.mean} max ${j.start?.max} · end mean ${j.end?.mean} max ${j.end?.max}${j.error ? ` ${j.error}` : ''}`)
   writeFileSync(join(OUT, 'report.json'), JSON.stringify(report, null, 1))
