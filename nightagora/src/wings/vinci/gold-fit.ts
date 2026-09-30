@@ -1,7 +1,10 @@
 /* THE GOLD'S NAME FITS ITS PILL. A name stands at the pill's own type on up
    to two rows; one that would take a third steps to the small type, which
    holds three rows inside the same 48 px, so the pill keeps its height and no
-   row is cut. Shared by the live wing's phone form and the film player's. */
+   row is cut. A name the small type still sets in four rows (the longest
+   German titles on a narrow phone) grows the pill about the seats' centre
+   line, inside the foot row. Shared by the live wing's phone form and the
+   film player's. */
 
 const rowsOf = (name: HTMLElement): number =>
   Math.round(name.getBoundingClientRect().height / (parseFloat(getComputedStyle(name).lineHeight) || 18))
@@ -14,9 +17,10 @@ export function fitGoldName(name: HTMLElement): void {
   // hidden (the walking ring): read when it shows
   if (!width || !(name.getBoundingClientRect().height > 0)) return
   const key = `${name.textContent ?? ''}|${width}`
-  if (name.dataset['fit'] === key && (name.dataset['rows'] === '3' || rowsOf(name) <= 2)) return
+  if (name.dataset['fit'] === key && (name.dataset['rows'] || rowsOf(name) <= 2)) return
   delete name.dataset['rows']
   if (rowsOf(name) > 2) name.dataset['rows'] = '3'
+  if (name.dataset['rows'] === '3' && rowsOf(name) > 3) name.dataset['rows'] = '4'
   name.dataset['fit'] = key
 }
 
