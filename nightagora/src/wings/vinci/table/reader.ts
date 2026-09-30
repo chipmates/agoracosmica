@@ -20,7 +20,8 @@ import type { DeepPlateSource, DeepPlateTier } from '../../vitrine/deep-plate'
 import { createReaderPayload as createReader, type ReaderBook, type ReaderSide } from '../../vitrine/reader'
 import type { VitrinePayload } from '../../vitrine/types'
 import { vinciLeafSource } from '../collection/deep-plate'
-import { CODEX_ENTRIES, buildAbsences, buildCodexList } from './codex-shelf'
+import { CODEX_ENTRIES, buildCodexList } from './codex-shelf'
+import { buildShownAbsences } from './absences'
 import { CODEX_TITLES, FAMOUS_FOLIOS, MIRROR_EXPLANATION, SHELF_UI, TABLE_UI, folioKey, folioProvenance, hasItalian, type Language, type PageRecord } from './content'
 import type { ReadingTable } from './index'
 import windowsRaw from './data/leaf-windows.json?raw'
@@ -335,7 +336,7 @@ export function createReaderPayload(options: {
         item.append(go)
         leaves.append(item)
       }
-      full.append(leaves, buildAbsences(language))
+      full.append(leaves, buildShownAbsences(language))
       // THE PAGE-RECORD SELECTORS: every record of the edition and every
       // represented leaf stays reachable by name.
       const selector = (label: string, records: readonly PageRecord[], value: (page: PageRecord) => string,

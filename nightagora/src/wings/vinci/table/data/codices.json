@@ -4,8 +4,7 @@
   "governing_source": "program/rounds/wing-vinci/refs/RECLASS-2026-09-14/codices.json",
   "rights_authority": "program/rounds/wing-vinci/refs/RECLASS-2026-09-14/RIGHTS-CROSSCHECK-2026-09-14.md section 3",
   "prepared_date": "2026-09-14",
-  "scope": "What the reading table admits, by codex. Counts are scans or edition pages and never manuscript folio totals. Page maps are named for provenance and are not read by the shelf.",
-  "admission_2026_09_28": "The Institut de France's own colour views of Paris manuscripts A to M and the Ashburnham leaves, and the British Library's views of Codex Arundel, are admitted (research/best-of-0928/rights/LEGAL-READ.md, sections 1 and 4). The three absences that named the old facsimiles as the only source carry a words_key: their new reason is the words pass's, and until it is written the absence is not shown."
+  "scope": "What the reading table admits, by codex. Counts are scans or edition pages and never manuscript folio totals. Page maps are named for provenance and are not read by the shelf."
  },
  "entries": [
   {
@@ -192,7 +191,6 @@
   },
   {
    "id": "arundel-middle",
-   "words_key": "absence_arundel_middle",
    "en": "Codex Arundel, folios 117 to 220",
    "de": "Codex Arundel, Blätter 117 bis 220",
    "holder_en": "British Library, London",
@@ -202,7 +200,6 @@
   },
   {
    "id": "paris-rest",
-   "words_key": "absence_paris_rest",
    "en": "Paris manuscripts C, E, F, G, H, I, K, L and M",
    "de": "Pariser Manuskripte C, E, F, G, H, I, K, L und M",
    "holder_en": "Bibliothèque de l’Institut de France, Paris",
@@ -212,7 +209,6 @@
   },
   {
    "id": "ashburnham",
-   "words_key": "absence_ashburnham",
    "en": "The Ashburnham leaves",
    "de": "Die Ashburnham-Blätter",
    "holder_en": "Bibliothèque de l’Institut de France, Paris",
