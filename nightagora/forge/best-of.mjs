@@ -38,7 +38,8 @@
  *   words/phone-lines.jsonl  one page per line: {"id", "en", "de", "from":
  *                      "lead" | "caption"}, the phone's own line at rest (at
  *                      most PHONE_MOST characters, two rows at 390 px): a cut
- *                      of the page's lead, "…" at every cut, or its caption
+ *                      of the page's lead (or of the lead's passage, warned),
+ *                      "…" at every cut, or its caption
  *                      with words left out and none added.
  *                      Until the file exists the module carries no phone line
  * and from the texts files: a German page's doubts only from `doubts_de`.
@@ -468,7 +469,7 @@ function wordsAdded(line, text) {
 /** THE PHONE'S OWN LINE of a page, checked against what it is cut from: a
  * line of his words that is not a cut of his lead is refused, a caption's
  * that adds a word to the caption is reported. */
-function phoneOf(id, lead, caption) {
+function phoneOf(id, lead, caption, passages) {
   const written = PHONE?.get(id)
   if (!written) return null
   if (written.from !== 'lead' && written.from !== 'caption') { refused.push(`${id}: phone-lines.jsonl says from "${written.from}", not lead or caption`); return null }
@@ -479,8 +480,14 @@ function phoneOf(id, lead, caption) {
     if (written.from === 'lead') {
       const own = lead?.[lang]?.text
       if (!own || lead.placeholder) { refused.push(`${id}: a phone line from the lead, and the page has no written lead`); return null }
-      const cut = cutOf(said, own)
-      if (!cut.ok) { refused.push(`${id}: the ${lang} phone line is not a cut of the lead: ${cut.why}`); return null }
+      // his words beyond the lead may stand in it only from the lead's own passage, which names the same translation
+      const whole = passages[lead.passage]?.[lang]?.text
+      let cut = cutOf(said, own)
+      if (!cut.ok && whole) {
+        const wider = cutOf(said, whole)
+        if (wider.ok) { warn(`${id}: the ${lang} phone line reaches past the lead into its passage`); cut = wider }
+      }
+      if (!cut.ok) { refused.push(`${id}: the ${lang} phone line is not a cut of the lead or its passage: ${cut.why}`); return null }
       if (cut.unmarked.length) warn(`${id}: the ${lang} phone line cuts the lead at ${cut.unmarked.join(' and ')} without an ellipsis`)
     } else {
       const own = caption?.[lang]
@@ -520,7 +527,7 @@ const folioOf = row => /^\d+$/.test(row.folio) ? `${row.folio}${row.side === 're
 // a folio written out in words is English in the set, so the German seat
 // names the book alone until the words pass writes the place
 const seatOf = row => Object.fromEntries(['en', 'de'].map(lang => [lang,
-  lang === 'de' && !/^\d+[a-z]?$/.test(row.folio) ? codexName(row.codex, lang) : `${codexName(row.codex, lang)}, ${folioOf(row)}`]))
+  lang === 'de' && /[a-z]{3,}/i.test(row.folio) ? codexName(row.codex, lang) : `${codexName(row.codex, lang)}, ${folioOf(row)}`]))
 
 /** WHAT THE PICTURE IS: a photograph of the leaf, a printed plate of a
  * facsimile, or a photograph of a printed facsimile, by where it came from. */
@@ -619,7 +626,7 @@ for (const topic of order) for (const [at, row] of byTopic.get(topic).entries())
     words: shown.length ? { en: kinds('en'), de: kinds('de'), it: shown.some(p => p.it) } : null,
     lead, lead_none: none, lead_placeholder: placeholder && Boolean(shown.length),
     long: words > LONG_WORDS || shown.length > 2,
-    ...(PHONE ? { phone: phoneOf(row.id, lead, caption) } : {}),
+    ...(PHONE ? { phone: phoneOf(row.id, lead, caption, passages) } : {}),
   })
   if (shown.length) (texts[slug(row.topic)] ??= {})[row.id] = { lead: lead?.passage ?? null, notes: record?.notes ?? null, passages }
 }
