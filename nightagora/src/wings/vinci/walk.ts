@@ -131,12 +131,12 @@ export function vinciWalk(life: boolean): VinciWalk {
  * the frame, so the aim stands at the eye's own height and the lens opens
  * until the frame's foot clears the picture's edge. Its near rectangle stays
  * inside the radius the hang's wall is proved with (78 degrees and under).
- * THE PHONE LOOKS DOWN TWELVE DEGREES, NOT NINETEEN. The sheet takes the
- * stage's lower third, so the frame's foot stands just above it; the lens
- * opens until the whole frame stands inside both edges, and the top of the
- * frame is a sixth wider than its foot instead of a quarter. */
-const LISA_SWING_M = { desktop: .469, phone: 0 }, LISA_RISE_M = { desktop: null, phone: .163 }
-const LISA_FOV = { desktop: 71, phone: 94 }
+ * THE PHONE STANDS 2.7 M OFF THE WALL, its own viewing eye (`approaches.ts`),
+ * and looks down ten and a half degrees at 50: the frame stands whole in the
+ * middle of the picture over the sheet, its top under a tenth wider than its
+ * foot. From 1.1 m the look down that cleared the sheet widened it a fifth. */
+const LISA_SWING_M = { desktop: .469, phone: 0 }, LISA_RISE_M = { desktop: null, phone: .43 }
+const LISA_FOV = { desktop: 71, phone: 50 }
 export function vinciLisaPose(narrow: boolean): Pose {
   const viewport = narrow ? 'phone' : 'desktop'
   const eye = vinciApproachPose(LISA_EXHIBIT, narrow)?.eye

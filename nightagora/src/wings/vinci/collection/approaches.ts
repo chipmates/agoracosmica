@@ -87,6 +87,8 @@ interface Field {
   east: number; north: number; datum: number; width: number; height: number
   /** The height the standing eye is at, and how near and far it may stand. */
   eye?: number; nearest?: number; furthest?: { desktop: number; phone: number }
+  /** The phone's own nearest, where it stands further back than the desktop. */
+  phoneNearest?: number
 }
 
 /** Where the work's own four corners land in the frame, exactly: the camera
@@ -144,7 +146,7 @@ function pictureApproach(field: Field, narrow: boolean)
   // hold the work and the work would read smaller. The eye stands back in the
   // same proportion instead, so the band's loss is paid by the room around
   // the work and not by the work.
-  let distance = Math.min(furthest, Math.max(field.nearest ?? NEAREST_M,
+  let distance = Math.min(furthest, Math.max((narrow ? field.phoneNearest : undefined) ?? field.nearest ?? NEAREST_M,
     Math.max(field.height, field.width) * band.standOff))
   const solve = (distance: number, bottom: number): { fov: number; drop: number; holds: boolean } => {
     const fits = (fov: number): boolean => {
@@ -190,8 +192,16 @@ function eastFacingApproach(field: Field, narrow: boolean): ApproachPose {
   return { eye: back(turned.eye), at: back(turned.at), fov: turned.fov }
 }
 
+/** THE PORTRAIT HE KEPT IS READ FROM FURTHER BACK ON THE PHONE. It hangs at
+ * the eye's own height, and a frame whose lowest third is the sheet lifts it
+ * off the sheet only by looking down on it: from 1.1 m that tapered the frame
+ * by a fifth, from 2.7 m by under a tenth. It stays inside the phone's
+ * furthest eye, so the plates' reach does not move. */
+const PHONE_NEAREST_M: Readonly<Record<string, number>> = { [exhibitId('mona-lisa', 'front')]: 2.7 }
 function placement(id: string): Field & { id: string; face: string } | undefined {
-  return hangPlacements().find(field => exhibitId(field.id, field.face) === id)
+  const field = hangPlacements().find(field => exhibitId(field.id, field.face) === id)
+  const phoneNearest = PHONE_NEAREST_M[id]
+  return field && phoneNearest !== undefined ? { ...field, phoneNearest } : field
 }
 
 /** What the frame holds of the work at its own pose: the share of the band it
