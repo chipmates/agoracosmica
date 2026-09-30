@@ -12,8 +12,8 @@ import { collectionLayout } from './collection'
 import { collectionView } from './collection/views'
 import { GALLERY_WALK_M, VINCI_BODY_WALL, VINCI_PICTURE_WALL, vinciWallEndVertex, vinciWallIsEnd, vinciWallNearerEnd, vinciWallOfStation, type VinciWall } from './collection/wall'
 import { vinciApproachesAreNeighbours } from './collection/approaches'
-import { COURT, FLOOR, SUPPER_WALL } from './collection/layout'
-import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
+import { COURT, FACE, FLOOR, OPENING, SUPPER_WALL } from './collection/layout'
+import { railAccessWaypoints, railCollectionStairWaypoints, railDoorTurns, railGateWaypoints, railDoorways, railGardenPorch, railPairTurns, railEyeHeightM, railPorchStands, railReadingPorch, railSide, type RailSide, type RailWaypoint } from './rail-waypoints'
 import { fittedRailFov, assertRailProjection } from './rail-projection'
 import type { RailGeometryAuthority } from './rail-proof'
 import { hallView } from './house-hall'
@@ -412,6 +412,14 @@ const RAIL_TURNED_ARRIVALS=new Set(['garden>line-early','body>line-early','body-
  * standing and ends it in the first steps out, facing its way, so the steps
  * are held about two seconds rather than four and a half. */
 const RAIL_WHOLE_STANDS=new Set(['line-early>supper-wall'])
+/** THE PHONE'S WALK FROM THE WORKS TO THE READING TABLE STANDS AT BOTH SIDES
+ * OF THE HALL'S DOOR. Led toward the turns beyond it, the phone's narrower
+ * lens faced the hall's blank east wall for the first stretch and brushed the
+ * door's panel turning through it: here the view faces the door as it walks
+ * there, goes through it straight, and turns to the reading room beyond. */
+const HALL_DOOR_NORTH=(OPENING.hallToGallery.north[0]+OPENING.hallToGallery.north[1])/2
+const RAIL_PHONE_PAIR_TURNS:Readonly<Record<string,readonly RailWaypoint[]>>={
+  'works>reading-table':[[FACE.hallPartitionWest-1.3,HALL_DOOR_NORTH,FLOOR+railEyeHeightM],[FACE.hallPartitionEast+3.42,HALL_DOOR_NORTH,FLOOR+railEyeHeightM]]}
 /** Station walks kept as they were walked and passed, off the floor: two
  * short ones that look the same way at both ends step back rather than turn
  * round twice. */
@@ -703,7 +711,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // reveals out of the frame's edges.
     const pair=`${completed!.id}>${request.id}`,from=completed!.id,to=request.id
     const named={start:RAIL_NAMED_LEAVE.has(from),end:RAIL_NAMED_ARRIVE.has(to),at:from==='reading-table'||to==='reading-table'?[railReadingPorch]:[]}
-    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair),windingRound:RAIL_WINDING_ROUND.has(pair),lensWait:RAIL_LENS_WAITS.has(pair),whole:RAIL_WHOLE_STANDS.has(pair)}
+    const turns={start:RAIL_TURN_TO_LEAVE.has(from),end:RAIL_TURN_ON_ARRIVAL.has(to),stands:(request.phone?RAIL_PHONE_PAIR_TURNS[pair]:undefined)??railPairTurns[pair],named,floor:!RAIL_FLOOR_KEPT.has(pair),forward:true,turned:RAIL_TURNED_ARRIVALS.has(pair),windingRound:RAIL_WINDING_ROUND.has(pair),lensWait:RAIL_LENS_WAITS.has(pair),whole:RAIL_WHOLE_STANDS.has(pair)}
     if(to==='garden'&&INSIDE.includes(railSide(from)))return {path:route,route:true,station:true,turns:{...turns,end:true,named:{...named,at:[...named.at,railGardenPorch]},lens:'first',forward:true}}
     if(from==='garden'&&INSIDE.includes(railSide(to)))return {path:route,route:true,station:true,turns:{...turns,start:false,named:{...named,at:[...named.at,railGardenPorch]},lens:'last',forward:true}}
     return {path:route,route:true,station:true,turns}
