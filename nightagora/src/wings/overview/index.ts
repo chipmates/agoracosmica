@@ -85,6 +85,9 @@ const WORD = {
   close: () => LOBBY_TEXT.close,
 }
 
+/** kept here, not in the card data, which the machine films' key reads whole */
+const TOPICS: VinciText = { en: '{n} topics to see', de: '{n} Themen zu sehen' }
+
 const SVG = 'http://www.w3.org/2000/svg'
 const STEP_BACK = 'M10 3L5 8l5 5'
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
@@ -134,11 +137,8 @@ function setName(cells: readonly DeskOverviewCell[]): VinciText {
 
 export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   const say = (value: VinciText): string => value[host.lang()]
-  /** the count's own words: the table counts topics where the card data names them */
-  const counted = (): VinciText => {
-    const topics = host.unit?.() === 'topics' ? deskControl('overview', 'topics_to_see') : null
-    return topics?.en && topics.de ? topics : WORD.count()
-  }
+  /** the count's own words: the table counts topics */
+  const counted = (): VinciText => (host.unit?.() === 'topics' ? TOPICS : WORD.count())
 
   /* THE ONE WORD IN THE FOOT ROW. It carries the set's own count, and where
      the station holds no set it is not there at all. */
