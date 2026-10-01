@@ -40,10 +40,13 @@ export function whenFraming(picture: PictureSource | undefined, want: () => Pict
   })
 }
 
+/** A mark's press target, wider than its drawn ring and halo in every form. */
+export const MARK_TARGET = 48
+
 /** A mark within a fingertip of one already standing gives way: the wide film
     at a phone's height sets the works half as far apart as on a desktop. The
     room's list and a press on the work itself still reach it. */
-export function crowded(x: number, y: number, placed: readonly HTMLElement[], room = 44): boolean {
+export function crowded(x: number, y: number, placed: readonly HTMLElement[], room = MARK_TARGET): boolean {
   return placed.some(d => Math.hypot((parseFloat(d.style.left) || 0) - x, (parseFloat(d.style.top) || 0) - y) < room)
 }
 

@@ -41,7 +41,7 @@ import deskOverviewCss from '../overview/desk-overview.css?inline'
 import filmWingCss from './film-wing.css?inline'
 import { fitGoldName, watchGoldName } from './gold-fit'
 import { setWalkingLeg, walkingRing } from './labels'
-import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, type FilmCinema, type FilmForm } from './film-cinema'
+import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, MARK_TARGET, type FilmCinema, type FilmForm } from './film-cinema'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -363,7 +363,8 @@ export function createWing(): WingModule {
       dot.type = 'button'
       dot.style.left = `${x}px`
       dot.style.top = `${y}px`
-      dot.style.width = dot.style.height = '44px'
+      // the press target runs past the drawn ring and its halo, in every form
+      dot.style.width = dot.style.height = `${MARK_TARGET}px`
       // ONE SIGN FOR ONE ACT: every mark wears the live wing's own ring; the
       // certainty colour is the close look's, and only the word says it walks
       dot.dataset['mark'] = walks ? 'walk' : 'detail'
