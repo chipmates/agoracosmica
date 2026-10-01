@@ -486,13 +486,28 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
   display: flex; align-items: center; min-height: 44px; cursor: pointer; color: #e6d6b8; font: 400 .875rem/1.4 var(--sans);
 }
 
-/* ---- THE PANEL, upright: the wing's own rows at its foot ---- */
-/* Lobby, Plan, Life and Chapters stand nearest the close and the thumb, the
-   museum's settings and links above them; one hairline between the two */
+/* ---- THE PANEL, upright: a sheet whose every control is in the thumb's reach ----
+   The sheet starts a third of the way down, so its first control stands under
+   40 % of the glass and every row it shows is in the lower 60 %; it scrolls
+   inside. At rest it reads the language and the pace, then the wing's own rows
+   nearest the close; the museum's legend and links follow under the fold. */
+html:has(#wing[data-film='upright']) #instruments { top: 34dvh; padding-top: 16px; }
 html:has(#wing[data-film='upright']) #instruments .inst-links { display: flex; flex-direction: column; }
+html:has(#wing[data-film='upright']) #instruments .inst-links > * { order: 4; }
+html:has(#wing[data-film='upright']) #instruments .inst-links > .inst-setting:not(.inst-tiers) { order: 1; }
+html:has(#wing[data-film='upright']) #instruments .inst-links > .inst-pace { order: 2; }
 html:has(#wing[data-film='upright']) #instruments .inst-wing {
-  order: 1; margin: 6px 0 0; padding: 6px 0 0; box-shadow: inset 0 1px 0 var(--press-hairline);
+  order: 3; margin: 4px 0 6px; padding: 4px 0; box-shadow: inset 0 1px 0 var(--press-hairline), inset 0 -1px 0 var(--press-hairline);
 }
+/* the pace as the desk has it: three cells in a row, its cost line under them */
+html:has(#wing[data-film='upright']) #instruments .inst-pace {
+  position: relative; display: flex; flex-wrap: wrap; gap: 0 8px; padding-bottom: 50px;
+}
+html:has(#wing[data-film='upright']) #instruments .inst-pace legend { flex: 1 0 100%; }
+html:has(#wing[data-film='upright']) #instruments .inst-pace button {
+  position: static; display: inline-flex; flex: 1 1 0; width: auto; min-width: 0; justify-content: center; padding: 0 4px;
+}
+html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: absolute; left: 0; right: 0; bottom: 6px; margin: 0; }
 
 /* ---- THE PLAN'S PLATE AT A PHONE'S READING SIZE, both forms ---- */
 #wing .wing-plan[data-reading='true'] :is(.wing-plan-number, .wing-plan-north-letter) { font-size: 13px; }
