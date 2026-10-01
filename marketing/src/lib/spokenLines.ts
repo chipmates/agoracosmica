@@ -1,7 +1,7 @@
-// Lines an author gave to a character. The theme pages pick quotes from the
-// seeds, which credit the author; these get the speaker and the work instead,
-// so a character's line never reads as the author's own view. Matched on the
-// opening words of the EN or DE seed quote.
+// Lines an author gave to a character. On the theme pages these get the
+// speaker and the work, so a character's line never reads as the author's own
+// view. Matched on the opening words of the EN or DE quote; the quote list
+// names the speaker too, and the build stops when the two disagree.
 import type { Lang } from '../i18n';
 
 interface CharacterLine {
@@ -38,7 +38,11 @@ const LINES: CharacterLine[] = [
   // Hamlet, act 2, scene 2
   {
     figureId: 'shakespeare',
-    opens: ['There is nothing either good or bad', 'Es gibt nichts, was entweder gut oder schlecht ist'],
+    opens: [
+      'There is nothing either good or bad',
+      'Es gibt nichts, was entweder gut oder schlecht ist',
+      'An sich ist nichts weder gut noch böse',
+    ],
     speaker: 'Hamlet',
     work: { en: 'Hamlet', de: 'Hamlet' },
   },

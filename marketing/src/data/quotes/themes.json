@@ -1,0 +1,4 @@
+{
+  "about": "The only quotes a theme page may show, each read against its source before it was added. Fields and checks: src/lib/themeQuotes.ts. A page draws its block from the entries that list it, in the order they stand here.",
+  "quotes": []
+}

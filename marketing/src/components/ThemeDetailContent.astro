@@ -21,7 +21,7 @@ import ThemeStyles from './ThemeStyles.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
-import { characterLine } from '../lib/spokenLines';
+import { themeQuotes } from '../lib/themeQuotes';
 import { runtimeMinutes, hearDebateLabel, shortMinutes } from '../lib/councilRuntime';
 import {
   type ThemeId,
@@ -37,7 +37,6 @@ import {
 } from '@client/data/councilCatalog';
 import { hasCouncilPreview } from '@client/data/public/councilPreviews';
 import { getThemeVoices } from '@client/data/public/themeVoices';
-import { themeSeedCrossRef } from '@client/data/public/themeSeedCrossRef';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import publicEn from '@client/assets/translations/public-en.json';
@@ -69,24 +68,6 @@ const EXTRA_SELF_QUESTIONS = [
   'what-does-your-anger-want',
   'the-discipline-of-seeing',
 ];
-
-// The attribution always comes from the figure catalog, never from the
-// extracted figureName: the German seed file for one figure carries the string
-// "undefined", and the English one names him differently from every other
-// surface on the site.
-// Quotes are shown verbatim or not at all. The extractor clips at 200 chars,
-// so anything at the cap is a fragment; paraphrase placeholders and quotes
-// carrying a modern translator credit are skipped too, and the two estates
-// whose prose is still in copyright never appear.
-const RIGHTS_EXCLUDED = new Set(['angelou', 'king']);
-function usableQuote(quote: string, figureId: string): boolean {
-  if (RIGHTS_EXCLUDED.has(figureId)) return false;
-  if (quote.length >= 200 || quote.length < 20) return false;
-  if (quote.startsWith('[')) return false;
-  if (quote.trimEnd().endsWith('...') || quote.trimEnd().endsWith('…')) return false;
-  if (/trans\.|©/.test(quote)) return false;
-  return true;
-}
 
 const { themeId, lang } = Astro.props;
 const t = getT(lang);
@@ -194,16 +175,13 @@ const askJump = isSelfTheme && askItems.length > 0
   ? t('themes.askJumpSelf').replace('{count}', String(askItems.length))
   : '';
 
-// Dickinson and Woolf punctuate with dashes, and those are theirs, not ours.
-// The house rule still keeps dashes off displayed pages, so a dashed quote is
-// only used when dropping it would leave the block too thin to run.
-const quotePool = (themeSeedCrossRef[themeId]?.[lang] ?? []).filter(m =>
-  usableQuote(m.quote, m.figureId),
-);
-const dashless = quotePool.filter(m => !/[—–]/.test(m.quote));
-const quotes = (dashless.length >= 2 ? dashless : quotePool)
-  .slice(0, 4)
-  .map(m => ({ ...m, spoken: characterLine(m.figureId, m.quote, lang) }));
+// Only the reviewed list can put a quote here. The name beside it comes from
+// the figure catalog, so a figure is called the same on every surface.
+const quotes = themeQuotes(themeId, lang);
+const quoteHref = (figureId: string): string =>
+  publicUrl(lang, `/figures/${figureIdToSlug[figureId] || figureId}`);
+const quoteName = (figureId: string, fallback: string): string =>
+  getFigureById(figureId, lang)?.name ?? fallback;
 
 const bundle = (lang === 'de' ? publicDe : publicEn) as Record<string, any>;
 const substance: { q: string; a: string }[] = bundle.themes?.[themeId]?.substance ?? [];
@@ -389,18 +367,20 @@ const heroFacts = [
     <!-- Section 5: the depth layer. The quotes stay open because they are
          short, the long answers tier into panels. Native details, so every
          word stays in the markup whether or not a panel is open. -->
-    {(quotes.length >= 2 || substance.length > 0) && (
+    {(quotes.length > 0 || substance.length > 0) && (
       <section class="tq-section">
         <h2 class="tq-h2">{depthLabel}</h2>
 
-        {quotes.length >= 2 && (
+        {quotes.length > 0 && (
           <>
             <h3 class="tq-h3 tq-h3--first">{t('themes.quotesLabel')}</h3>
             <p class="tq-note">{t('themes.quotesCaption')}</p>
             <div class="tq-quotes">
               {quotes.map(q => (
                 <figure class="tq-quote">
-                  <blockquote class="tq-quote__text">{q.quote}</blockquote>
+                  <blockquote class="tq-quote__text">{q.text.includes('\n')
+                    ? q.text.split('\n').map(line => <span class="tq-quote__line">{line}</span>)
+                    : q.text}</blockquote>
                   {q.spoken ? (
                     <figcaption class="tq-quote__cite">
                       <span class="tq-quote__speaker">{q.spoken.speaker}</span>
@@ -409,15 +389,15 @@ const heroFacts = [
                         <span class="tq-quote__src">
                           in <cite>{q.spoken.work}</cite> von <a
                             class="tq-quote__name"
-                            href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
-                          >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                            href={quoteHref(q.figure)}
+                          >{quoteName(q.figure, q.source.author)}</a>, {q.lineRuns.map(run => (run.title ? <cite>{run.text}</cite> : run.text))}
                         </span>
                       ) : (
                         <span class="tq-quote__src">
                           in <a
                             class="tq-quote__name"
-                            href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
-                          >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>’s <cite>{q.spoken.work}</cite>
+                            href={quoteHref(q.figure)}
+                          >{quoteName(q.figure, q.source.author)}</a>’s <cite>{q.spoken.work}</cite>, {q.lineRuns.map(run => (run.title ? <cite>{run.text}</cite> : run.text))}
                         </span>
                       )}
                     </figcaption>
@@ -425,12 +405,10 @@ const heroFacts = [
                     <figcaption class="tq-quote__cite">
                       <a
                         class="tq-quote__name"
-                        href={publicUrl(lang, `/figures/${figureIdToSlug[q.figureId] || q.figureId}`)}
-                      >{getFigureById(q.figureId, lang)?.name ?? q.figureName}</a>
+                        href={quoteHref(q.figure)}
+                      >{quoteName(q.figure, q.source.author)}</a>
                       <span class="tq-quote__sep" aria-hidden="true">·</span>
-                      <span class="tq-quote__src">
-                        {t('themes.fromTeaching', 'from {title}').replace('{title}', q.seedTitle)}
-                      </span>
+                      <span class="tq-quote__src">{q.lineRuns.map(run => (run.title ? <cite>{run.text}</cite> : run.text))}</span>
                     </figcaption>
                   )}
                 </figure>
@@ -729,19 +707,24 @@ const heroFacts = [
     color: var(--text-primary);
     font-style: italic;
   }
+  /* A verse quote: one block per line, a wrapped line hangs indented. */
+  .tq-quote__line {
+    display: block;
+    padding-left: 1.1em;
+    text-indent: -1.1em;
+  }
+  /* Running text, so a long source line wraps under the name. */
   .tq-quote__cite {
     margin: 0.5rem 0 0 1rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.45rem;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-xs);
+    line-height: var(--leading-relaxed);
     color: var(--text-tertiary);
   }
   .tq-quote__name { color: var(--gold-deep); text-decoration: none; }
   .tq-quote__speaker { color: var(--text-secondary); }
   .tq-quote__src cite { font-style: italic; }
-  .tq-quote__sep { color: var(--text-dim); }
+  .tq-quote__sep { margin: 0 0.45rem; color: var(--text-dim); }
   .tq-quote__name:hover { color: var(--gold-primary); }
 
   /* ── Lattice ── */
