@@ -3468,7 +3468,8 @@ async function loadAdGrants() {
   // CONSENT rows (routes/funnel.ts, the ad_consent_* steps) are anonymous
   // counters about the prompt itself: blob1 = step, blob2 = sanitized page
   // path, blob4 = language, blob5 forced to '200'. No click id, no figure,
-  // no user dimension, by construction in the worker.
+  // no user dimension, by construction in the worker. Every consent query is
+  // probe filtered, so a card answered from a marked test browser is left out.
   //
   // mode_selected is retired as a conversion (the worker rejects it and the
   // Ads action is deleted), so nothing here queries it any more. Its organic
@@ -3500,20 +3501,20 @@ async function loadAdGrants() {
     { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 IN ('listened','dialogue_started','council_engaged','start_exploring') AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // --- Ad consent prompt, r[19..26]. Anonymous counters, current + previous
     // for every step so both rates can show a percentage-point change. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // --- Consent breakdowns, r[27..30]. Seen and accepted by page path
     // (blob2) and by interface language (blob4): where does the question work. ---
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
     // --- Traffic, r[31..35]. Volume and geography only, no source split. ---
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
@@ -3656,7 +3657,7 @@ async function loadAdGrants() {
   // accept-of-seen rate moves mechanically whenever the prompt starts appearing
   // more often, the accept-of-decisions rate does not.
   html += '<div class="section-divider">Ad consent prompt</div>';
-  html += '<div class="hint-banner">Seen counts only cards that sat at least half in view for a full second, so the denominator means plausibly seen, not merely rendered. Both accept rates are shown on purpose. Accepts over seen moves whenever the prompt starts appearing more often, accepts over decisions does not, so a change in one and not the other tells you which happened. Closing the card is not a decision, so it gets its own share.</div>';
+  html += '<div class="hint-banner">Seen counts only cards that sat at least half in view for a full second, so the denominator means plausibly seen, not merely rendered. Cards shown in our own marked test browsers are left out of every number here. Both accept rates are shown on purpose. Accepts over seen moves whenever the prompt starts appearing more often, accepts over decisions does not, so a change in one and not the other tells you which happened. Closing the card is not a decision, so it gets its own share.</div>';
   html += '<div class="grid">';
   html += kpi('Prompt Seen', cShown, { hero: true, delta: cShownPrev, sub: 'half the card in view for a full second' });
   html += '<div class="card card-wide">' + engagementPoolHtml(
