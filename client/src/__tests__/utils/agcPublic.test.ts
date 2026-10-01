@@ -172,6 +172,56 @@ describe('agc-public.js: the ad click ID', () => {
   });
 });
 
+describe('agc-public.js: a paid arrival is a fresh navigation', () => {
+  // The browser's navigation entry, or none at all (type null).
+  function setNavigation(type: string | null): void {
+    Object.defineProperty(performance, 'getEntriesByType', {
+      configurable: true,
+      writable: true,
+      value: (kind: string) => (kind === 'navigation' && type ? [{ type }] : []),
+    });
+  }
+  afterEach(() => {
+    Reflect.deleteProperty(performance, 'getEntriesByType');
+  });
+  const paidRows = () => beacons.filter((b) => b.body.step === 'paid_arrival');
+
+  it('counts a navigation to a paid landing URL once', async () => {
+    setNavigation('navigate');
+    loadPage('/marcus-aurelius/?p=1&gclid=TESTCLICKID0001', 'de');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(paidRows()).toHaveLength(1);
+    expect(paidRows()[0].body).toEqual({ step: 'paid_arrival', language: 'de' });
+  });
+
+  it('does not count a reload, a restored tab or a prerender of the same URL', async () => {
+    for (const type of ['reload', 'back_forward', 'prerender']) {
+      setNavigation(type);
+      loadPage('/marcus-aurelius/?p=1&gclid=TESTCLICKID0001');
+    }
+    await new Promise((r) => setTimeout(r, 0));
+    expect(paidRows()).toHaveLength(0);
+    // The page itself is still counted, and the click ID is still dropped.
+    expect(fetches.filter((f) => f.url.endsWith('/v1/page'))).toHaveLength(3);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  it('counts as before when the browser has no navigation entry', async () => {
+    setNavigation(null);
+    loadPage('/marcus-aurelius/?p=1');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(paidRows()).toHaveLength(1);
+  });
+
+  it('never counts a page without the paid parameter', async () => {
+    setNavigation('navigate');
+    loadPage('/marcus-aurelius/?gclid=TESTCLICKID0001');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(paidRows()).toHaveLength(0);
+  });
+});
+
 describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;

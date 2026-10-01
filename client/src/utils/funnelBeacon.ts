@@ -15,7 +15,7 @@
 // the listen tracker in utils/playbackBeacon.ts. council_heard fires once per
 // page, from the same listen tracker for curated councils and from the live
 // council's own clock (services/council/CustomCouncilService.ts). paid_arrival fires once per
-// pageview from utils/pageBeacon.ts. The ask_listen_* trio fires from the
+// fresh navigation from utils/pageBeacon.ts. The ask_listen_* trio fires from the
 // paused-chapter ask (hooks/useAskWhileListening.ts), shown deduped per
 // chapter play by the hook itself.
 // The marketing pages' cta_click and paid_arrival fire from agc-public.js with
@@ -106,9 +106,10 @@ export type FunnelStep =
   // minutes of it were heard, the rule the listened arm of engaged uses. Its
   // own one-shot, never part of engaged, whose meaning is frozen.
   | 'council_heard'
-  // The landing URL carried the paid-ads parameter. One per pageview,
-  // language and the edge dimensions only, so the row describes the parameter
-  // rather than the person who clicked it.
+  // The landing URL carried the paid-ads parameter. One per fresh navigation
+  // (a reload or a restored tab does not count again), language and the edge
+  // dimensions only, so the row describes the parameter rather than the
+  // person who clicked it.
   | 'paid_arrival'
   // Ask while listening (per-occurrence volume counters, like handoff_shown).
   // shown = the ask bar arrived under a paused chapter, sent = a question went

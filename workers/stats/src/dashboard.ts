@@ -3677,7 +3677,7 @@ async function loadAdGrants() {
   // above: neither one is a channel report and neither is a conversion.
   var attrNs2 = ns2Coverage();
   html += '<div class="section-divider">Attribution</div>';
-  var attrHint = 'Paid arrivals count a pageview whose landing URL carried the paid parameter. That is reach, and only reach: paid campaigns are deliberately not tracked for conversions, so nothing here says what a paid click went on to do, and no conversion number for paid exists anywhere on this dashboard. ' +
+  var attrHint = 'Paid arrivals count a pageview whose landing URL carried the paid parameter. Only a fresh navigation counts, never a reload or a restored tab. Earlier rows counted those too, so the series steps down where that rule shipped. That is reach, and only reach: paid campaigns are deliberately not tracked for conversions, so nothing here says what a paid click went on to do, and no conversion number for paid exists anywhere on this dashboard. ' +
     'Landing pageviews are the pageviews that opened a visit, decided from the referrer of the document itself with nothing stored. ' +
     'Rows written before either flag shipped carry an empty slot, which reads as not known to be one rather than as not one, so any window reaching back that far undercounts both. ' +
     'Both counters are probe filtered while Raw Visits above is not, so the two must not be divided into each other.';

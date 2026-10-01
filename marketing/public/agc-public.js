@@ -7,7 +7,7 @@
 //     on record, and drop any kept click ID on a paid (?p=1) landing
 //   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
 //     opened the visit and carrying the source class of that arrival, plus the
-//     paid-arrival counter on a paid landing URL
+//     paid-arrival counter on a fresh navigation to a paid landing URL
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
@@ -62,6 +62,18 @@
   function hasPaidParam() {
     try { return new URLSearchParams(window.location.search).get('p') === '1'; }
     catch (e) { return false; }
+  }
+
+  // A paid arrival is the ad click itself: a fresh navigation. A reload, or a
+  // tab the browser brings back, loads the same address again without a new
+  // click. The browser's own navigation entry says which it was, so nothing is
+  // stored to tell them apart. Without that entry the load counts as before.
+  function isFreshNavigation() {
+    try {
+      var nav = performance.getEntriesByType('navigation')[0];
+      if (nav && typeof nav.type === 'string') return nav.type === 'navigate';
+    } catch (e) { /* no entry to read */ }
+    return true;
   }
 
   // The click ID is stored only after a yes. Without one on record it stays in
@@ -367,7 +379,8 @@
   }
 
   // Anonymous counter for paid-ad arrivals: the landing URL carried the paid
-  // parameter. Language and the dimensions the edge derives, nothing else, so
+  // parameter and the page was navigated to, not reloaded or restored.
+  // Language and the dimensions the edge derives, nothing else, so
   // the row describes the parameter and not the person who clicked it. The
   // paid split never captures a click ID, and this changes nothing about that.
   function sendPaidArrivalBeacon() {
@@ -394,7 +407,7 @@
 
   captureGclidFromUrl();
   sendPageBeacon();
-  if (hasPaidParam()) sendPaidArrivalBeacon();
+  if (hasPaidParam() && isFreshNavigation()) sendPaidArrivalBeacon();
   markDoors();
 
   // Doors an island renders after this script ran get the class when used.

@@ -122,8 +122,9 @@ const VALID_STEPS = new Set([
   'ask_listen_resumed',
   'ask_listen_resume_failed',
   // A paid-ad arrival: the landing URL carried the paid parameter. One per
-  // pageview, standard dimensions only, so it describes the parameter and not
-  // the person who clicked.
+  // fresh navigation (the client skips reloads and restored tabs), standard
+  // dimensions only, so it describes the parameter and not the person who
+  // clicked.
   'paid_arrival',
   ...CONSENT_STEPS,
 ]);

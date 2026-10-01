@@ -44,6 +44,22 @@ function hasPaidParam(): boolean {
   }
 }
 
+// A paid arrival is the ad click itself, so only a fresh navigation counts: a
+// reload or a restored tab loads the same address without a new click. Read
+// from the browser's navigation entry, nothing stored; with no entry to read
+// the load counts as before. Twin of the check in marketing/public/agc-public.js.
+function isFreshNavigation(): boolean {
+  try {
+    const nav = performance.getEntriesByType('navigation')[0] as
+      | PerformanceNavigationTiming
+      | undefined;
+    if (nav && typeof nav.type === 'string') return nav.type === 'navigate';
+  } catch {
+    // no entry to read
+  }
+  return true;
+}
+
 /**
  * Send a page-load beacon. Fire-and-forget — never throws, never blocks the
  * caller, never breaks app boot on network failure. Captures only:
@@ -54,8 +70,9 @@ function hasPaidParam(): boolean {
  *   - on a landing only, the source class of that arrival (utils/sourceClass.ts)
  *   - the in-house probe constant, only from a browser marked as one
  *
- * A paid-ad arrival also emits its own counter, so paid landings can be told
- * apart from the rest without any of them carrying a click ID.
+ * A paid-ad arrival also emits its own counter on a fresh navigation, so paid
+ * landings can be told apart from the rest without any of them carrying a
+ * click ID.
  *
  * No user dimension, no message content, no fingerprint.
  */
@@ -88,7 +105,7 @@ export function sendPageBeacon(): void {
       // Silent fail — beacons must never surface to the user.
     });
 
-    if (hasPaidParam()) sendFunnelBeacon('paid_arrival');
+    if (hasPaidParam() && isFreshNavigation()) sendFunnelBeacon('paid_arrival');
   } catch {
     // Silent fail
   }
