@@ -299,7 +299,7 @@
 }
 #wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button[aria-selected='true'] { border-bottom-color: #d2a557; color: #edcc8c; }
 /* the record's small words at a size a phone reads: none under 13 px */
-#wing[data-film='upright'] .vinci-dock :is(.vinci-certainty, .vinci-certainty-word) { font-size: .8125rem; letter-spacing: .08em; }
+#wing[data-film='upright'] .vinci-dock :is(.vinci-certainty, .vinci-certainty-word) { font-size: .875rem; letter-spacing: .08em; }
 #wing[data-film='upright'] .vinci-dock .vinci-certainty-word { margin-bottom: 4px; }
 #wing[data-film='upright'] .vinci-dock :is(.vinci-citation, .vinci-record .vinci-statement, .vinci-record-fold summary, .vinci-arithmetic) { font-size: .875rem; }
 #wing[data-film='upright'] .vinci-dock .vinci-record-fold summary { min-height: 44px; display: flex; align-items: center; }
@@ -400,6 +400,8 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
   .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-stand p, .deep-rule-label) { font-size: .8125rem; }
+/* the certainty word in capitals reads small at 13 px: 14, as the record's */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-certainty { font-size: .875rem; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio { font-size: .8125rem; }
 
 /* THE PLAN AND THE LIFE AS THE PHONE'S TALL SHEETS, the record's and the
@@ -416,8 +418,8 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-works { margin-left: 44px; }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-foot .wing-life-door { font-size: .875rem; }
 
-/* THE INSTRUMENTS' SMALL WORDS at 13 px, the size the box keeps */
-html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size: .8125rem; }
+/* THE INSTRUMENTS' SMALL WORDS at 14 px, clear of the 13 px floor */
+html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size: .875rem; }
 
 /* THE ROOM'S LIST ON THE PHONE: a work's whole name, three rows at most, so
    the German names of the sheets and the machines are read, not cut */
