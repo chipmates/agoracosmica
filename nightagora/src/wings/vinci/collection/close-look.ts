@@ -8,7 +8,8 @@
  */
 import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
 import { createTurntablePayload, type TurntableEye, type TurntableOptions, type TurntablePayload, type TurntableViewpoint } from '../../vitrine/turntable'
-import type { ReaderWords } from '../../vitrine/reader'
+import type { ReaderSide, ReaderWords } from '../../vitrine/reader'
+import { MIRROR_EXPLANATION } from '../table/content'
 import { lang } from '../../content'
 import { FURTHER, NEARER } from './deep-plate'
 import type { Grade, Stack } from '../../../stack'
@@ -139,6 +140,38 @@ export const VINCI_VITRINE_WORDS = {
 /** The one thing to remember about an exhibit, in the page's language. */
 export function vinciLine(id: string): string | null {
   return LINES[id]?.[lang()] ?? null
+}
+
+const ROOM_SHORT = (JSON.parse(cardsRaw) as { station_short_names?: Record<string, Words> }).station_short_names ?? {}
+/** THE ROOM A CLOSE LOOK'S ONE STEP BACK NAMES: its short name, where the
+ * card data gives one, since the full name is a chapter title. */
+export function vinciRoomName(station: string, full: Words): string {
+  return (ROOM_SHORT[station] ?? full)[lang()]
+}
+
+/** A work's own name by its face: the register names a reverse as its own. */
+export function vinciWorkTitle(work: { title_en: string; title_de: string; reverse_title_en?: string; reverse_title_de?: string },
+  face: 'front' | 'reverse' | null | undefined): Words {
+  if (face !== 'reverse') return { en: work.title_en, de: work.title_de }
+  return { en: work.reverse_title_en ?? work.title_en, de: work.reverse_title_de ?? work.title_de }
+}
+
+/** THE BODY WALL AS ONE BOOK: one side for each sheet in the order given,
+ * read in his hand and in its mirror, each with its own line at the card's
+ * head; a drawn sheet has no printed page beside it. */
+export function vinciSheetSides(sheets: readonly { id: string; page: ManifestEntry; thumb: ManifestEntry }[], colour: string): ReaderSide[] {
+  const words = vinciManuscriptWords()
+  const ways = [{ id: 'hand', label: words.hand },
+    { id: 'mirror', label: words.mirror, mirrored: true, line: MIRROR_EXPLANATION[lang()].documented }]
+  return sheets.map(sheet => {
+    const page = validateSheetRecord(sheet.page, 'sheet-page')
+    const thumb = validateSheetRecord(sheet.thumb, 'sheet-thumb')
+    const holder = (sheet.page as ManifestEntry & { holder?: string }).holder ?? ''
+    return { id: sheet.id, label: vinciSheetTitle(lang() === 'de' ? page.entry.honesty_de : page.entry.honesty_en), shows: '',
+      head: vinciLine(`sheet/${sheet.id}`),
+      source: { pyramid: null, file: assetAddress(page.entry), width: page.pixels.width, height: page.pixels.height },
+      thumb: assetAddress(thumb.entry), ways, colour, holder }
+  })
 }
 
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string): HTMLElementTagNameMap[K] => {

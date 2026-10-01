@@ -74,7 +74,7 @@ import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, vinciWorkRegions, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
 import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciApproachesAreNeighbours, vinciStudIndex } from './collection/approaches'
-import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
+import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciSheetSides, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
 import { CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, isCollectionBook, shelfBook, shelfPlate } from './table/codex-shelf'
@@ -83,7 +83,7 @@ import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, isTopicExhibi
 import { createBestOfLook } from './table/best-of-look'
 import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
-import { FAMOUS_FOLIOS, MIRROR_EXPLANATION, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
+import { FAMOUS_FOLIOS, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
 import { vinciLeafSource } from './collection/deep-plate'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
@@ -2903,17 +2903,8 @@ export function createWing():VinciWingModule {
     // HIS HAND AND ITS MIRROR, as every manuscript page is read: the sheets
     // carry his reversed writing beside the drawing
     const words=vinciManuscriptWords()
-    const ways=[{id:'hand',label:words.hand},
-      {id:'mirror',label:words.mirror,mirrored:true,line:MIRROR_EXPLANATION[lang()].documented}]
     // FROM A FILM the sheet stands alone, and the way back is the film's
-    const sides=(back?[opened]:wall).map(source=>{
-      const page=validateSheetRecord(source.page,'sheet-page')
-      const thumb=validateSheetRecord(source.preview,'sheet-thumb')
-      const record=source.page as typeof source.page&{holder?:string}
-      return {id:source.sheet.id,label:named(source),shows:'',head:vinciLine(`sheet/${source.sheet.id}`),
-        source:{pyramid:null,file:assetAddress(page.entry),width:page.pixels.width,height:page.pixels.height},
-        thumb:assetAddress(thumb.entry),ways,colour:certaintyColour('documented'),holder:record.holder??''}
-    })
+    const sides=vinciSheetSides((back?[opened]:wall).map(source=>({id:source.sheet.id,page:source.page,thumb:source.preview})),certaintyColour('documented'))
     reader=createVitrineReaderPayload({
       book:Promise.resolve({sides,
         // The row of a station is named by the station, as the wall's own
