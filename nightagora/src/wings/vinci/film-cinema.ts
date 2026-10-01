@@ -73,6 +73,10 @@ export interface FilmCinema {
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
+/** the air a whole line keeps above or below a box's foot */
+const LINE_AIR = 2
+/** what a box's foot keeps whole besides its lines of words */
+const CONTROLS = 'button, a[href], input, select, summary, [role="button"]'
 const ARROW_UP = 'M8 13V3M4 7l4-4 4 4'
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
   const node = document.createElement(tag)
@@ -135,6 +139,8 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
       panel.remove()
       caption.remove()
       lowerLooks()
+      for (const scroller of cut) scroller.style.removeProperty('--cinema-cut')
+      cut.clear()
     }
   }
 
@@ -212,7 +218,7 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     raised.delete(vitrine)
     vitrine.querySelector<HTMLElement>('.vitrine-grab[aria-expanded="true"]')?.click()
   }
-  const watch = new MutationObserver(() => { if (on) { raiseLooks(); paint() } })
+  const watch = new MutationObserver(() => { if (on) { raiseLooks(); paint(); cardLater() } })
   watch.observe(wing, { subtree: true, attributes: true, attributeFilter: ['data-peek', 'data-drawer', 'hidden'] })
   const lineWatch = new MutationObserver(() => paint())
   const phoneLine = part('film-line')
@@ -221,16 +227,100 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
      period read, and only this form lets the life's body scroll */
   const lifeWatch = new MutationObserver(records => {
     if (!on) return
-    for (const record of records)
-      if ((record.target as Element).matches('.wing-life[open]'))
-        (record.target as Element).querySelector<HTMLElement>('.wing-life-body')?.scrollTo({ top: 0 })
+    for (const record of records) {
+      const target = record.target as Element
+      if (target.matches('.wing-life[open]')) target.querySelector<HTMLElement>('.wing-life-body')?.scrollTo({ top: 0 })
+      // the plan opens at the visitor's own row; its list then ends on a whole row
+      if (target.matches('.wing-plan[open]')) {
+        const reading = target.querySelector<HTMLElement>('.wing-plan-reading')
+        if (reading) requestAnimationFrame(() => wholeLines(reading))
+      }
+    }
   })
   lifeWatch.observe(wing, { subtree: true, attributes: true, attributeFilter: ['open'] })
-  addEventListener('resize', () => { said = ''; requestAnimationFrame(() => paint()) }, { signal })
+  addEventListener('resize', () => { said = ''; requestAnimationFrame(() => { paint(); panelLines() }); cardLater() }, { signal })
   // gold's name settles its own width a frame late: the caption takes what is left
   const goldWatch = new ResizeObserver(() => requestAnimationFrame(() => paint()))
   if (gold) goldWatch.observe(gold)
   signal.addEventListener('abort', () => { watch.disconnect(); lineWatch.disconnect(); lifeWatch.disconnect(); goldWatch.disconnect(); set(false) })
+
+  /* ---- a scrolling box ends on a whole line at rest ---- */
+  /** the boxes whose foot this form has moved, restored when it leaves */
+  const cut = new Set<HTMLElement>()
+  /** No line of words and no control stands cut in half at a box's foot:
+      the foot moves up to just above the line or control its edge would cut,
+      or down past it where the glass has `grow` px free under the box. The
+      move is --cinema-cut, which only this form's rules read; the lines are
+      read from their own boxes, so a row, a paragraph and a legend are all
+      one case. A move that would take more than a third of the box is left. */
+  function wholeLines(box: HTMLElement, grow = 0): void {
+    if (!on) return
+    cut.add(box)
+    let move = 0
+    box.style.setProperty('--cinema-cut', '0px')
+    const range = document.createRange()
+    for (let pass = 0; pass < 3; pass++) {
+      const r = box.getBoundingClientRect()
+      if (!r.height) return
+      const edge = r.bottom - (parseFloat(getComputedStyle(box).borderBottomWidth) || 0)
+      let top = Infinity, bottom = -Infinity
+      const walker = document.createTreeWalker(box, NodeFilter.SHOW_TEXT)
+      for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+        const parent = node.parentElement
+        if (!parent || !node.textContent?.trim()) continue
+        const held = parent.getBoundingClientRect()
+        if (held.bottom <= edge || held.top >= edge || getComputedStyle(parent).visibility === 'hidden') continue
+        range.selectNodeContents(node)
+        for (const line of range.getClientRects())
+          if (line.height > 1 && line.top < edge - 1 && line.bottom > edge + 1) {
+            top = Math.min(top, line.top)
+            bottom = Math.max(bottom, line.bottom)
+          }
+      }
+      for (const control of box.querySelectorAll<HTMLElement>(CONTROLS)) {
+        const c = control.getBoundingClientRect()
+        if (c.height > 1 && c.height < 120 && c.top < edge - 1 && c.bottom > edge + 1) {
+          top = Math.min(top, c.top)
+          bottom = Math.max(bottom, c.bottom)
+        }
+      }
+      if (top === Infinity) return
+      const down = bottom + LINE_AIR - edge
+      // down where it fits on the first passes, else up over the line
+      const next = pass < 2 && down - move <= grow ? move - down : move + edge - (top - LINE_AIR)
+      if (next - move > r.height / 3) return
+      move = next
+      box.style.setProperty('--cinema-cut', `${Math.round(move)}px`)
+    }
+  }
+  /** the museum's panel: its column may reach down to its close's foot */
+  function panelLines(): void {
+    if (!on || document.documentElement.dataset['naPanel'] !== 'open') return
+    const links = document.querySelector<HTMLElement>('#instruments .inst-links')
+    const close = document.querySelector<HTMLElement>('#instruments .inst-close')
+    if (!links) return
+    links.style.setProperty('--cinema-cut', '0px')
+    const room = close ? close.getBoundingClientRect().bottom - links.getBoundingClientRect().bottom : 0
+    wholeLines(links, Math.max(0, room))
+  }
+  const panelWatch = new MutationObserver(() => requestAnimationFrame(() => requestAnimationFrame(panelLines)))
+  panelWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-na-panel'] })
+  addEventListener('na-language', () => requestAnimationFrame(() => requestAnimationFrame(panelLines)), { signal })
+  document.querySelector('#instruments')?.addEventListener('toggle', () => requestAnimationFrame(panelLines), { capture: true, signal })
+  /** the close look's card, once its words have settled after a change */
+  const cards = new WeakSet<HTMLElement>()
+  const cardWatch = new MutationObserver(() => cardLater())
+  let cardTimer = 0
+  function cardLater(): void {
+    clearTimeout(cardTimer)
+    cardTimer = window.setTimeout(() => requestAnimationFrame(() => {
+      const card = wing.querySelector<HTMLElement>('.vitrine[data-narrow="true"]:not([hidden]) .vitrine-card')
+      if (!on || !card) return
+      if (!cards.has(card)) { cards.add(card); cardWatch.observe(card, { childList: true, subtree: true, characterData: true }) }
+      wholeLines(card)
+    }), 160)
+  }
+  signal.addEventListener('abort', () => { panelWatch.disconnect(); cardWatch.disconnect(); clearTimeout(cardTimer) })
 
   /* ---- the marks clear of the foot row ---- */
   /** a mark keeps clear of the row's controls themselves, not of the air

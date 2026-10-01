@@ -204,6 +204,10 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
   width: var(--cinema-card) !important;
   height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px) !important;
 }
+/* the card's words end on a whole line at rest: film-cinema.ts shortens the scroll by --cinema-cut */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card {
+  height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px - var(--cinema-cut, 0px)) !important;
+}
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-sheet { border-radius: 10px; }
 /* the card in the phone's own order and type: the window's phone rules key on the glass's shape, so they are carried
    here at a weight under the window's own rules for a kind (the reader's row, the zoom's glyphs) */
@@ -234,10 +238,8 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'][data-payload='machine'] .vitrine-card:has(.vitrine-more[aria-expanded='false']) .vitrine-steps { display: none; }
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-part-name { max-width: 200px; font-size: 13px; }
 /* THE CARD READS AS ONE COLUMN: the name, the line and the work's own row
-   first, the label's words under them, the whole card one scroll, its foot
-   fading while more waits below */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent); }
+   first, the label's words under them, the whole card one scroll */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-body { display: contents; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-card > *, .vitrine-body > *) { flex-shrink: 0; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls { order: 1; }
@@ -383,11 +385,12 @@ html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-set
 /* the scrolling column would clip a ring drawn outside the row, so the rows keep air inside it for their mark */
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-wing button { padding-left: 12px; padding-right: 12px; }
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-wing button:focus-visible { outline-offset: -1px; }
-/* the column's last row fades out under its foot, it never breaks off */
+/* the column ends on a whole row at rest, never on a row cut in half or one
+   faded as if it could not be pressed: film-cinema.ts moves its foot by
+   --cinema-cut, down into the free glass under it where that holds the row */
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-links {
-  padding-bottom: 36px;
-  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
-  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  bottom: calc(var(--cinema-b) + 60px + var(--cinema-cut, 0px));
+  padding-bottom: 16px;
 }
 
 /* the wing plays no sound and its plan has its own row, as on the upright phone */
@@ -452,6 +455,8 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
 #wing[data-film='cinema'] .wing-plan[open] { background: #101d27; }
 /* the chosen row's ring stands clear of its number */
 #wing[data-film='cinema'] .wing-plan .wing-plan-entry { padding-left: 10px; }
+/* the list ends on a whole row at rest: film-cinema.ts shortens it by --cinema-cut */
+#wing[data-film='cinema'] .wing-plan .wing-plan-reading { margin-bottom: var(--cinema-cut, 0px); }
 #wing[data-film='cinema'] .wing-life-body { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
   padding-bottom: 24px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
   mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent); }
