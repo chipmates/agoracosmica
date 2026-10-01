@@ -353,6 +353,9 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
 @media (prefers-reduced-motion: reduce) {
   #wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate'] .vitrine-scrim { transition: none; }
 }
+/* the film holds no room to cut the place's window from, so the place's own
+   stones would dim with the rest: in the film they stand undimmed */
+#wing[data-film='wide'] .vitrine[data-payload='place'] :is(.vitrine-scrim, .vitrine-hole) { display: none; }
 /* the corner that named the side on the glass is the band's name row now */
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .deep-stand { display: none; }
 #wing[data-desk~='closelook'] .vitrine[data-narrow='false'] .reader-shelf { display: none; }
