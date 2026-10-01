@@ -475,7 +475,8 @@ export function createWing(): WingModule {
         onClose: () => { marksAt = ''; if (!lookLeaving) outOfLook() }, above: wallAbove,
         cycle: id => { const cycle = release?.cycles?.[id]; return cycle ? { cycle, base: filmReleaseBase() } : null },
         cycleLayer: () => cycleLayer!,
-        box, framing: () => (wide ? 'wide' : 'upright') })
+        box, framing: () => (wide ? 'wide' : 'upright'),
+        ...filmLookWays() })
       lookCard = m.FILM_LOOK_CARD
       marksAt = ''
       refreshCells()
@@ -504,6 +505,22 @@ export function createWing(): WingModule {
     if (!look || key === cellsFor) return
     cellsFor = key
     void look.cells(setOf(station)).then(cells => { if (cellsFor === key) { cellsNow = cells; paintDesk() } })
+  }
+  /** THE CLOSE LOOK'S WAYS ALONG ITS SET: the room's own row, and a step to a
+      neighbour goes as its mark goes, the look shut where it stands (not up
+      to the stop), the film walked or dipped to the neighbour, its look opened */
+  function filmLookWays() {
+    return {
+      row: () => setOf(stationOf(LIFE[card]!.station).id),
+      reach: (id: string) => picture?.reach(viewNode(id)) ?? 'none',
+      walkOn: (id: string) => {
+        lookLeaving = true
+        try { look?.close() } finally { lookLeaving = false }
+        openFromOverview(id)
+      },
+      // the line's floor opens the life view, where this wing carries one
+      life: () => { const open = hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-life-open'); open?.click(); return Boolean(open) },
+    }
   }
   function openFromOverview(id: string): void {
     if (!picture) return
