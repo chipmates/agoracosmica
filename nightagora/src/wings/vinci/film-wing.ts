@@ -41,6 +41,7 @@ import deskOverviewCss from '../overview/desk-overview.css?inline'
 import filmWingCss from './film-wing.css?inline'
 import { fitGoldName, watchGoldName } from './gold-fit'
 import { setWalkingLeg, walkingRing } from './labels'
+import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, type FilmCinema, type FilmForm } from './film-cinema'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -184,7 +185,11 @@ export function createWing(): WingModule {
   let doorLeaving = 0
   const controller = new AbortController()
   const signal = controller.signal
-  const narrow = (): boolean => innerWidth / innerHeight <= 0.9
+  /** the desktop's band, the phone upright, or the phone held sideways (film-cinema.ts) */
+  let form: FilmForm = 'desk'
+  let cinema: FilmCinema | undefined
+  /** both phone forms stand the phone's own controls, close looks and list */
+  const narrow = (): boolean => form !== 'desk'
 
   const carried = (index: number): boolean => Boolean(release?.nodes[stopNode(LIFE[index]?.id ?? '')])
   const deskStation = (index: number): DeskStation => ({ id: LIFE[index]!.id, index, count: LIFE.length })
@@ -268,6 +273,7 @@ export function createWing(): WingModule {
   let tall: HTMLDivElement | undefined
   let cycleLayer: HTMLDivElement | undefined
   function box() {
+    if (form === 'cinema') return { left: 0, top: 0, width: innerWidth, height: innerHeight }
     if (wide) return { left: 0, top: 0, width: innerWidth, height: doorStanding || eveningFull ? innerHeight : deskStageHeight() }
     const height = Math.max(innerHeight, tall?.getBoundingClientRect().height ?? 0)
     return { left: 0, top: 0, width: innerWidth, height }
@@ -289,7 +295,7 @@ export function createWing(): WingModule {
       cutCard.hidden = false
       /* ON THE PHONE THE CUT KEEPS THE FOOT: the card stands inside the stage,
          under the graded box, so back and gold stay over the dark */
-      const parent = wide ? wing : hosts.stage
+      const parent = form === 'desk' ? wing : hosts.stage
       if (cutCard.parentElement !== parent) parent.append(cutCard)
       void cutCard.offsetWidth
       cutCard.dataset['on'] = '1'
@@ -315,7 +321,7 @@ export function createWing(): WingModule {
     return how === 'walk' || how === 'dip'
   }
   function chrome(): { left: number; top: number; right: number; bottom: number } | null {
-    const node = hosts?.stage.parentElement?.querySelector<HTMLElement>(wide ? '.desk-low' : '.film-box')
+    const node = hosts?.stage.parentElement?.querySelector<HTMLElement>(form === 'desk' ? '.desk-low' : '.film-box')
     const r = node?.getBoundingClientRect()
     return r && r.height > 0 ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null
   }
@@ -351,6 +357,7 @@ export function createWing(): WingModule {
       const x = b.left + mark.x, y = b.top + mark.y
       // no mark stands under the museum's own words
       if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) continue
+      if (form === 'cinema' && crowded(x, y, dots)) continue
       const walks = routable(mark.id)
       const dot = make('button', 'vinci-dot vinci-exhibit-dot film-dot')
       dot.type = 'button'
@@ -1026,7 +1033,7 @@ export function createWing(): WingModule {
     const wing = hosts?.stage.parentElement
     /* THE PICTURE GIVES THE BAND ITS ROW as the door leaves, in one soft move
        rather than a cut; the marks wait for the picture to settle */
-    if (wing && wide) {
+    if (wing && form === 'desk') {
       wing.dataset['doorLeaving'] = ''
       doorLeaving = performance.now() + 460
       setTimeout(() => { delete wing.dataset['doorLeaving']; marksAt = ''; wordsAt = '' }, 470)
@@ -1039,24 +1046,42 @@ export function createWing(): WingModule {
     }
     // the door's third way is the life, opened as its own control opens it
     if (route === 'life') { const life = wing?.querySelector<HTMLElement>('.wing-life-open'); if (life) { life.click(); return } }
-    requestAnimationFrame(() => wing?.querySelector<HTMLElement>(wide ? '.desk-on' : '.film-gold')?.focus({ preventScroll: true }))
+    requestAnimationFrame(() => wing?.querySelector<HTMLElement>(form === 'desk' ? '.desk-on' : '.film-gold')?.focus({ preventScroll: true }))
+  }
+
+  /** A PHONE TURNED between upright and sideways: the form and the framing
+      change and the controls stay; the marks and the words wait for the
+      picture to stand in its new framing */
+  function turn(next: FilmForm): void {
+    if (!hosts) return
+    form = next
+    wide = next !== 'upright'
+    hosts.stage.parentElement!.dataset['film'] = next
+    cinema?.set(next === 'cinema')
+    clearMarks()
+    words?.hide()
+    marksAt = ''; wordsAt = ''
+    look?.layout()
+    paintPhone()
+    void whenFraming(picture, () => (wide ? 'wide' : 'upright'), signal).then(() => { marksAt = ''; wordsAt = ''; look?.layout() })
   }
 
   /** the frame hides its labels' layer from assistive technology; the close look, the record and the phone's box stand in it */
   let labelsHidden: string | null = null
   async function mount(h: WingHosts): Promise<void> {
     hosts = h
-    wide = !narrow()
+    form = filmForm()
+    wide = form !== 'upright'
     labelsHidden = h.labels.getAttribute('aria-hidden')
     h.labels.removeAttribute('aria-hidden')
     const wing = h.stage.parentElement!
     h.stage.textContent = ''
     wing.dataset['wing'] = 'vinci'
-    wing.dataset['film'] = wide ? 'wide' : 'upright'
-    if (wide) applyDeskSteps(wing)
+    wing.dataset['film'] = form === 'desk' ? 'wide' : form
+    if (form === 'desk') applyDeskSteps(wing)
     else delete wing.dataset['desk']
     const style = make('style', '')
-    style.textContent = [wingCss, deskTypeCss, deskCss, deskCloseLookCss, deskPanelCss, deskMarksCss, deskOverviewCss, filmWingCss].join('\n')
+    style.textContent = [wingCss, deskTypeCss, deskCss, deskCloseLookCss, deskPanelCss, deskMarksCss, deskOverviewCss, filmWingCss, FILM_CINEMA_CSS].join('\n')
     h.stage.append(style)
     tall = make('div', 'film-tall')
     h.stage.append(tall)
@@ -1093,7 +1118,7 @@ export function createWing(): WingModule {
     /* THE ROOM'S LIST STANDS ON THE FIRST ARRIVAL: its cells come from the
        close looks' module, which the desktop asks for once the first still is
        asked for; the phone shows no list and pays for the picture first */
-    if (wide) void lookNow()
+    if (form === 'desk') void lookNow()
     // the seam as the rigs read it, the way the live wing hands them `__forge`
     ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
     // a machine's filmed cycle stands over the film and under every word
@@ -1116,7 +1141,7 @@ export function createWing(): WingModule {
       paintGold()
       ahead()
     })
-    if (wide && (deskOn('words') || deskOn('ways'))) desk = createDeskChrome({
+    if (form === 'desk' && (deskOn('words') || deskOn('ways'))) desk = createDeskChrome({
       stage: h.stage, wing, lang,
       standing: () => deskStation(card),
       next: () => { const to = nextIndex(); return to === null ? null : deskStation(to) },
@@ -1134,10 +1159,14 @@ export function createWing(): WingModule {
       hurry: () => picture?.hurry(),
       overview: listHost(),
     })
-    if (!wide) {
+    if (form !== 'desk') {
       buildPhone(h)
       phoneList = createDeskOverview({ ...listHost(), columns: () => 2, lang, mark: deskMark, sheet: true })
       h.labels.append(phoneList.element)
+      // the panel's rows are the film's ways' own where the phone stood upright at the mount
+      cinema = createFilmCinema({ wing, box: phone!.root, stop: () => LIFE[card]!.id, rows: form === 'cinema',
+        count: () => `${card + 1} / ${LIFE.length}`, signal })
+      cinema.set(form === 'cinema')
       /* A CLOSE LOOK STANDS OVER THE FOOT ROW, which the box keeps (standDown),
          and a sideways swipe on its card steps the set as the row's two ways do */
       h.labels.dataset['keepsFoot'] = ''
@@ -1164,11 +1193,13 @@ export function createWing(): WingModule {
     wing.querySelector('.wing-rail-group')?.append(sourceButton)
     sources = createVinciSourcesWindow(h.labels, sourceButton, () => { sources?.setOpen(false); recordOf = null })
     // THE PLAN AND THE LIFE, the live wing's two ways through it, pressed the film's way
-    mountFilmWays({ hosts: h, narrow, stops: LIFE, carried, standing: () => card, stood: () => [...stood],
+    // the plan and the life open as the desktop's dialogs sideways: the phone's tall sheets need its height
+    mountFilmWays({ hosts: h, narrow: () => form === 'upright', stops: LIFE, carried, standing: () => card, stood: () => [...stood],
       release: () => release, picture: () => picture, cells: ids => lookNow().then(l => l.cells(ids)), open: openFromOverview,
       quiet: () => { if (!look?.id) return false; lookLeaving = true; try { look.close(false) } finally { lookLeaving = false } return true },
-      openRecord, floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight), signal })
+      openRecord, floor: () => form === 'cinema' ? innerHeight : desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight), signal })
     swipeSheetsShut()
+    cinema?.paint()
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       if (document.querySelector('dialog[open]')) return
@@ -1204,14 +1235,18 @@ export function createWing(): WingModule {
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })
     addEventListener('resize', () => { marksAt = ''; look?.layout() }, { signal })
-    /* THE FRAMING IS CHOSEN ONCE, AT THE MOUNT: a window that crosses between
-       wide and upright (a turned tablet, a narrowed desktop window) loads the
-       film again at the stop its address names, in the other framing, rather
-       than squeezing the desktop's band onto a phone's glass */
+    /* A PHONE TURNED KEEPS ITS PLACE: between upright and sideways the same
+       controls stand in the other form and the picture is picked again in the
+       other framing, the stop and an open look kept. A window that crosses to
+       or from the desktop's band (a turned tablet, a narrowed desktop window)
+       loads the film again at the stop its address names. */
     let crossing = 0
     addEventListener('resize', () => {
       clearTimeout(crossing)
-      crossing = window.setTimeout(() => { if (hosts && narrow() === wide && !new URLSearchParams(location.search).has('export')) location.reload() }, 400)
+      const next = filmForm()
+      if (!hosts || next === form || new URLSearchParams(location.search).has('export')) return
+      if (next !== 'desk' && form !== 'desk') { turn(next); return }
+      crossing = window.setTimeout(() => { if (filmForm() !== form) location.reload() }, 400)
     }, { signal })
     stood.add(LIFE[card]!.id)
     paint()
