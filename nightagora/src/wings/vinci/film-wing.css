@@ -273,32 +273,80 @@
 #wing[data-film='upright'] .vinci-dock {
   left: 0; right: 0; top: 44px; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
   max-width: none; max-height: none;
-  padding: 0 16px calc(80px + env(safe-area-inset-bottom));
+  padding: 20px 16px calc(112px + env(safe-area-inset-bottom));
   border: 0; border-top: 1px solid #a9977355; border-radius: 14px 14px 0 0;
   background: #0d171f;
 }
 #wing[data-film='upright'] .vinci-dock::backdrop { background: #081016a6; }
-#wing[data-film='upright'] .vinci-sources-toolbar .vinci-sources-close {
-  position: fixed; left: 16px; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
-  width: 48px; height: 48px; max-width: 48px; min-width: 48px; padding: 0; border-radius: 50%;
-  background: #07101ad9; box-shadow: inset 0 0 0 1px #ffffff40;
+/* THE RECORD'S THREE TABS STAND AT ITS FOOT, beside its close and in the
+   thumb's reach; the foot is solid, so the reading ends above it */
+#wing[data-film='upright'] .vinci-dock .vinci-sources-toolbar {
+  position: fixed; left: 0; right: 0; top: auto; bottom: 0; z-index: 4; box-sizing: border-box;
+  height: calc(88px + env(safe-area-inset-bottom)); padding: 0 12px env(safe-area-inset-bottom) 72px; gap: 0;
+  align-items: center; background: #0d171f; border-top: 1px solid #a9977333; border-bottom: 0;
 }
+#wing[data-film='upright'] .vinci-dock .vinci-sources-tabs { gap: 0; align-self: center; }
+#wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button {
+  flex: 1 1 0; min-width: 0; min-height: 44px; padding: 6px 2px; font: 400 .875rem/1.2 var(--sans); white-space: normal;
+  border: 0; border-bottom: 2px solid transparent; color: #d8cdb6;
+}
+#wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button[aria-selected='true'] { border-bottom-color: #d2a557; color: #edcc8c; }
+/* the record's small words at a size a phone reads: none under 13 px */
+#wing[data-film='upright'] .vinci-dock :is(.vinci-certainty, .vinci-certainty-word) { font-size: .8125rem; letter-spacing: .08em; }
+#wing[data-film='upright'] .vinci-dock .vinci-certainty-word { margin-bottom: 4px; }
+#wing[data-film='upright'] .vinci-dock :is(.vinci-citation, .vinci-record .vinci-statement, .vinci-record-fold summary, .vinci-arithmetic) { font-size: .875rem; }
+#wing[data-film='upright'] .vinci-dock .vinci-record-fold summary { min-height: 44px; display: flex; align-items: center; }
 html:has(#wing[data-film='upright']) #instruments {
   left: 0; right: 0; top: 44px; bottom: 0; width: auto; max-width: none; max-height: none;
   padding: 22px 24px calc(16px + env(safe-area-inset-bottom));
   border-radius: 14px 14px 0 0;
 }
 html:has(#wing[data-film='upright']) #instruments:not([hidden]) { display: flex; flex-direction: column; }
-/* the panel's way out stays on the glass at the far lower left, over the
-   list that scrolls under it and fades into it */
-html:has(#wing[data-film='upright']) #instruments { padding-bottom: 0; }
-html:has(#wing[data-film='upright']) #instruments .inst-close {
-  position: sticky; bottom: 0; z-index: 1; flex: none;
-  width: calc(100% + 48px); max-width: none; min-height: 60px; margin: auto -24px 0;
-  padding: 18px 24px env(safe-area-inset-bottom); text-align: left;
-  font-size: 15px; color: var(--press-white);
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss) 0%, transparent), var(--na-abyss) 18px);
+/* the panel's rows scroll above the foot that carries its close */
+html:has(#wing[data-film='upright']) #instruments { padding-bottom: calc(88px + env(safe-area-inset-bottom)); overflow-y: auto; }
+
+/* ONE CLOSE ON THE PHONE. Every sheet, window and close look shuts from one
+   glass circle at the far lower left, the seat the foot row's way back holds,
+   one drawn cross in all of them; the word stays the control's name for the
+   screen reader, and a swipe down on the sheet does the same (film-wing.ts) */
+html:has(#wing[data-film='upright']) {
+  --film-cross:
+    linear-gradient(45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)),
+    linear-gradient(-45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px));
 }
+html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
+  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close) {
+  position: fixed; left: 16px; right: auto; top: auto; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 4;
+  display: grid; place-items: center; box-sizing: border-box; flex: none;
+  width: 44px; height: 44px; min-width: 44px; max-width: 44px; min-height: 44px; margin: 0; padding: 0;
+  border: 0; border-radius: 50%; background: #07101af2; box-shadow: inset 0 0 0 1px #ffffff40; color: #ecdfc7;
+  font-size: 0; letter-spacing: 0; line-height: 0; text-indent: 0;
+}
+html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
+  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close) > * { display: none; }
+html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
+  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close)::before {
+  /* placed, not flowed: a close that keeps its word as text would push a flowed cross off centre */
+  content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; translate: -50% -50%; background: var(--film-cross);
+}
+html:has(#wing[data-film='upright']) #wing .vinci-sources-toolbar .vinci-sources-close::after { content: none; }
+html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
+  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close):focus-visible { outline: 1px solid var(--na-gold, #e0b96a); outline-offset: 2px; }
+/* the close look's own mark at the top corner stands down: the foot row's
+   first seat is the look's close while a look stands */
+#wing[data-film='upright'] .vitrine-shut { display: none !important; }
+.film-cross { display: none; width: 10px; height: 10px; background: var(--film-cross); }
+.film-box[data-look='true'] .film-back .film-ic-fill { display: none; }
+.film-box[data-look='true'] .film-back .film-cross { display: block; }
+/* THE FOOT UNDER THE CLOSE on every tall sheet: what scrolls fades into it and
+   never runs under the circle */
+html:has(#wing[data-film='upright']) :is(#instruments:not([hidden]), #wing .wing-life[open])::after {
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(80px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px); pointer-events: none;
+}
+html:has(#wing[data-film='upright']) #instruments:not([hidden])::after { background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0b1a2a) 0%, transparent), var(--na-abyss, #0b1a2a) 26px); }
+#wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-reading { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-foot { padding-left: 72px; min-height: calc(64px + env(safe-area-inset-bottom)); box-sizing: border-box; }
 
 /* THE DOOR LEAVES: the picture gives the band its row in one soft move */
 #wing[data-door-leaving] .na-film { transition: height 420ms cubic-bezier(.22,.61,.36,1); }

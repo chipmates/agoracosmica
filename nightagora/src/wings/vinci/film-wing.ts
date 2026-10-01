@@ -461,6 +461,7 @@ export function createWing(): WingModule {
   function standDown(down: boolean): void {
     if (!phone) return
     phone.root.dataset['look'] = String(down)
+    paintBackSeat()
     if (down && drawerOpen) setDrawer(false)
     paintGold()
   }
@@ -684,6 +685,8 @@ export function createWing(): WingModule {
     back.type = 'button'
     // the frozen phone form draws its way back as a filled triangle
     back.append(icon(TRIANGLE_BACK, 'film-ic film-ic-fill'))
+    // while a close look stands this seat is its close, drawn as every sheet's close is (film-wing.css)
+    back.append(make('span', 'film-cross'))
     const book = make('button', 'film-book')
     book.type = 'button'
     book.append(icon(BOOK))
@@ -783,12 +786,19 @@ export function createWing(): WingModule {
     phone.from.textContent = text(deskControl('machine', 'provenance'))
     phone.count.textContent = `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`
     const back = backIndex()
-    phone.back.disabled = back === null && !upward()
-    phone.back.setAttribute('aria-label', text(CARDS.controls.date.previous))
+    phone.back.disabled = back === null && !upward() && phone.root.dataset['look'] !== 'true'
+    paintBackSeat()
     // the book opens the instruments, and is named as their control is: by its own word, which carries no aria-label
     const instruments = document.getElementById('rail-instruments')
     phone.book.setAttribute('aria-label', instruments?.getAttribute('aria-label') || instruments?.textContent?.trim() || text(deskControl('ways', 'chapters')))
     paintGold()
+  }
+  /** the foot row's first seat: the way back, or the close of a look that stands */
+  function paintBackSeat(): void {
+    if (!phone) return
+    const closing = phone.root.dataset['look'] === 'true'
+    phone.back.setAttribute('aria-label', text(closing ? LOBBY_TEXT.close : CARDS.controls.date.previous))
+    if (closing) phone.back.disabled = false
   }
   let goldWalking: boolean | null = null
   /** the open look's ways as last painted, so a look stepped in place repaints gold */
@@ -845,6 +855,49 @@ export function createWing(): WingModule {
     const to = nextIndex()
     if (to !== null) hosts?.navigate(to)
     else if (!endWith('lookup')) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+  }
+
+  /* A SWIPE DOWN SHUTS A TALL SHEET ON THE PHONE, beside its one close: the
+     record, the room's list, the plan, the life, the instruments, and a close
+     look's card at its peek. Read from touches, which a scroll does not cancel,
+     and only where whatever the finger started on was scrolled to its top. */
+  function swipeSheetsShut(): void {
+    const SHEETS: [string, string][] = [
+      ['.vinci-dock[open]', '.vinci-sources-close'], ['.desk-ov[data-sheet][open]', '.desk-ov-shut'],
+      ['.wing-plan[open]', '.wing-plan-shut'], ['.wing-life[open]', '.wing-life-shut'], ['#instruments:not([hidden])', '.inst-close'],
+    ]
+    let from: { x: number; y: number; shut: () => void } | null = null
+    const atTop = (node: Element | null, sheet: Element): boolean => {
+      for (let n = node; n; n = n.parentElement) {
+        if (n.scrollTop > 0) return false
+        if (n === sheet) return true
+      }
+      return true
+    }
+    addEventListener('touchstart', e => {
+      from = null
+      if (wide || e.touches.length !== 1) return
+      const target = e.target instanceof Element ? e.target : null
+      const touch = e.touches[0]!
+      for (const [sheet, close] of SHEETS) {
+        const open = target?.closest(sheet)
+        if (!open) continue
+        if (target?.closest('input, [role="slider"]') || !atTop(target, open)) return
+        const button = open.querySelector<HTMLElement>(close)
+        if (button) from = { x: touch.clientX, y: touch.clientY, shut: () => button.click() }
+        return
+      }
+      const card = target?.closest('.vitrine[data-peek="true"] .vitrine-card')
+      if (card && look?.id && atTop(target, card)) from = { x: touch.clientX, y: touch.clientY, shut: () => look?.back() }
+    }, { capture: true, passive: true, signal })
+    addEventListener('touchend', e => {
+      const touch = e.changedTouches[0]
+      const was = from
+      from = null
+      if (!was || !touch) return
+      const dy = touch.clientY - was.y, dx = touch.clientX - was.x
+      if (dy > 90 && dy > Math.abs(dx) * 1.5) was.shut()
+    }, { capture: true, passive: true, signal })
   }
 
   /* ---- the words of the place, painted where the design stands them ---- */
@@ -1105,6 +1158,7 @@ export function createWing(): WingModule {
       release: () => release, picture: () => picture, cells: ids => lookNow().then(l => l.cells(ids)), open: openFromOverview,
       quiet: () => { if (!look?.id) return false; lookLeaving = true; try { look.close(false) } finally { lookLeaving = false } return true },
       openRecord, floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight), signal })
+    swipeSheetsShut()
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       if (document.querySelector('dialog[open]')) return
