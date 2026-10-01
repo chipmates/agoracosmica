@@ -546,3 +546,18 @@ html:has(#wing[data-film='upright']) #instruments .inst-wing {
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-body { display: flex; flex-direction: column; }
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-after { order: 1; }
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-words:not(.vitrine-after) { order: 2; }
+
+/* ---- THE CLOSE LOOK SIDEWAYS: a sheet's reader row ----
+   The phone's reader rules sit behind an upright media query, so sideways the
+   strip stood where the desktop puts it, over the row. Here it rides the card
+   in its own row, the steps keep their seats and the zoom takes a row of its own. */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row { flex-wrap: wrap; gap: 6px 4px; width: 100%; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .vitrine-step { flex: 0 0 44px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-way { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom { display: flex; order: 1; flex: 1 0 100%; gap: 4px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom .vitrine-control { flex: 1 1 0; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls .reader-shelf {
+  position: static; flex: 1 0 100%; height: 44px; margin: 0; padding: 0; gap: 4px;
+}
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls .reader-page { width: 44px; height: 44px; min-width: 44px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls :is(.reader-absence, .reader-part) { height: 44px; }
