@@ -354,10 +354,15 @@ export function createWing(): WingModule {
     if (!chip.isConnected) hosts.labels.append(chip)
     const marks: PictureMark[] = [...picture.marks(node, lang())].sort((a, c) => a.x - c.x)
     for (const mark of marks) {
-      const x = b.left + mark.x, y = b.top + mark.y
-      // no mark stands under the museum's own words
-      if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) continue
-      if (form === 'cinema' && crowded(x, y, dots)) continue
+      const x = b.left + mark.x
+      let y = b.top + mark.y
+      // no mark stands under the museum's own words; sideways it keeps clear of the row's controls, lifted where that is short
+      if (form === 'cinema') {
+        const clear = cinema ? cinema.clear(x, y, MARK_TARGET / 2) : y
+        if (clear === null) continue
+        y = clear
+        if (crowded(x, y, dots)) continue
+      } else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) continue
       const walks = routable(mark.id)
       const dot = make('button', 'vinci-dot vinci-exhibit-dot film-dot')
       dot.type = 'button'

@@ -67,6 +67,9 @@ export interface FilmCinema {
   /** the form stands on the glass now, or has left it */
   set(on: boolean): void
   paint(): void
+  /** where a mark at (x, y) stands clear of the foot row's controls: its own
+      height, a short lift above them, or nowhere (null) */
+  clear(x: number, y: number, half: number): number | null
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -111,6 +114,11 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   more.append(moreWord, arrowUp())
   caption.append(mark, words, ' ', more)
   more.addEventListener('click', () => box.querySelector<HTMLElement>('.film-more')?.click(), { signal })
+  // the whole strip is the key's target; the key stays the one control a keyboard and a screen reader meet
+  caption.addEventListener('click', event => {
+    if (more.hidden || more.contains(event.target as Node)) return
+    more.click()
+  }, { signal })
 
   let on = false
   function set(want: boolean): void {
@@ -224,6 +232,28 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   if (gold) goldWatch.observe(gold)
   signal.addEventListener('abort', () => { watch.disconnect(); lineWatch.disconnect(); lifeWatch.disconnect(); goldWatch.disconnect(); set(false) })
 
+  /* ---- the marks clear of the foot row ---- */
+  /** a mark keeps clear of the row's controls themselves, not of the air
+      between them; one that a control would cover by its lower edge stands
+      lifted just above it, so the work keeps its mark */
+  const LIFT_MOST = 28
+  function clear(x: number, y: number, half: number): number | null {
+    if (!on) return y
+    const foot = box.querySelector<HTMLElement>(':scope > .film-foot')
+    if (!foot) return y
+    let at = y
+    for (const seat of foot.children) {
+      if (!(seat instanceof HTMLElement) || seat.hidden || getComputedStyle(seat).visibility === 'hidden') continue
+      const r = seat.getBoundingClientRect()
+      if (!r.width || !r.height) continue
+      const air = 4
+      if (x + half <= r.left - air || x - half >= r.right + air) continue
+      if (at + half <= r.top - air || at - half >= r.bottom + air) continue
+      at = r.top - air - half
+    }
+    return y - at <= LIFT_MOST ? at : null
+  }
+
   /* ---- the panel's rows: Lobby, the plan, the life, the chapters ---- */
   let rowsSaid = ''
   function publish(): void {
@@ -247,5 +277,5 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     addEventListener('na-language', () => { rowsSaid = ''; publish() }, { signal })
   }
 
-  return { set, paint }
+  return { set, paint, clear }
 }

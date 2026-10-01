@@ -82,6 +82,9 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   hyphens: manual;
   text-wrap: pretty;
 }
+/* the whole strip is the key's target, at least 44 px tall even on one row */
+#wing[data-film='cinema'] .cinema-caption { position: relative; cursor: pointer; }
+#wing[data-film='cinema'] .cinema-caption::before { content: ''; position: absolute; left: 0; right: 0; top: -6px; bottom: -6px; }
 #wing[data-film='cinema'] .cinema-mark { display: inline-block; width: 10px; height: 10px; margin-right: 7px; vertical-align: 0; }
 #wing[data-film='cinema'] .cinema-mark .desk-mark { display: block; width: 10px; height: 10px; overflow: visible; }
 #wing[data-film='cinema'] .cinema-mark .desk-mark circle,
@@ -168,6 +171,8 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 }
 #wing[data-film='cinema'] .film-box[data-end='true'] .film-foot > .film-gold { flex: 0 0 auto; max-width: min(240px, 28vw); }
 #wing[data-film='cinema'] .film-box[data-end='true'] .film-foot > .film-talk { flex: 0 0 auto; max-width: min(220px, 26vw); height: 48px; }
+/* sideways the row has room for both endings and the book: the panel's ways stay one press away at the end */
+#wing[data-film='cinema'] .film-box[data-end='true'] .film-foot > .film-book:not(.vinci-phone-earlier) { display: flex; }
 
 /* ---- THE CLOSE LOOK SIDE BY SIDE: the work at the left, its card as a
    column at the right, the foot row under both. The window lays itself out
