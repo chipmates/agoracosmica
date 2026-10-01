@@ -54,6 +54,8 @@ export interface DeskOverviewHost {
   books?: () => { heading: string; items: readonly { id: string; title: string; preview: string | null }[] } | null
   /** the museum's certainty mark, handed in so this view draws the same one */
   mark: (certainty: VinciCertainty) => SVGSVGElement
+  /** what the set's count counts where it is not things: the reading table's topics */
+  unit?: () => 'topics' | null
   /** ON THE PHONE THE VIEW IS A SHEET at the glass's tall height, as the
       record and the panel are, and a press on a cell walks there */
   sheet?: boolean
@@ -132,6 +134,11 @@ function setName(cells: readonly DeskOverviewCell[]): VinciText {
 
 export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   const say = (value: VinciText): string => value[host.lang()]
+  /** the count's own words: the table counts topics where the card data names them */
+  const counted = (): VinciText => {
+    const topics = host.unit?.() === 'topics' ? deskControl('overview', 'topics_to_see') : null
+    return topics?.en && topics.de ? topics : WORD.count()
+  }
 
   /* THE ONE WORD IN THE FOOT ROW. It carries the set's own count, and where
      the station holds no set it is not there at all. */
@@ -211,7 +218,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   function paint(): void {
     const set = pictured()
     control.hidden = set.length < 2
-    control.textContent = say(WORD.count()).replace('{n}', String(set.length))
+    control.textContent = say(counted()).replace('{n}', String(set.length))
     if (open) fill(set)
   }
 
@@ -224,7 +231,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
     // THE SET'S MEASURE STANDS UNDER ITS NAME, and it carries the count, so
     // the count stands alone only where a room has no measure of its own
     const measure = host.measure?.() ?? null
-    sub.textContent = say(measure ?? WORD.count()).replace('{n}', String(shown.length))
+    sub.textContent = say(measure ?? counted()).replace('{n}', String(shown.length))
     view.setAttribute('aria-label', `${say(name)} · ${host.room()}`)
     stepBack.textContent = ''
     stepBack.append(icon(STEP_BACK), document.createTextNode(host.room()))

@@ -185,6 +185,9 @@ export function createReaderPayload(options: {
   column?(side: ReaderSide): readonly HTMLElement[]
   /** The side's line stands on the folded card, as the one text at rest. */
   lined?: boolean
+  /** False where the book is chosen from elsewhere (the room's list) and its
+   * pages step with the two arrows only: no strip of small pages stands. */
+  strip?: boolean
   /** The whole text's own name, for a reader of the screen. */
   columnLabel?: string
 }): ReaderPayload {
@@ -534,7 +537,7 @@ export function createReaderPayload(options: {
     const inside = volume()
     // A BOOK OF ONE SIDE HAS NO STRIP, and the page takes the room the strip
     // would have stood in.
-    const single = inside.length < 2 && !(book.gaps ?? []).length
+    const single = options.strip === false || (inside.length < 2 && !(book.gaps ?? []).length)
     shelf.hidden = single
     if (root) root.dataset['strip'] = String(!single)
     dockShelf()
@@ -721,7 +724,7 @@ export function createReaderPayload(options: {
         event.stopPropagation()
       }, { signal: listening.signal })
       root.append(style, ground, stage, beside)
-      if (!next.narrow) root.append(shelf)
+      if (!next.narrow && options.strip !== false) root.append(shelf)
       root.dataset['lined'] = String(Boolean(options.lined))
       next.element.append(root)
       next.surface('room')
@@ -739,7 +742,7 @@ export function createReaderPayload(options: {
       }
       row.append(steps.next)
       next.controls.append(row)
-      if (next.narrow) next.controls.append(shelf)
+      if (next.narrow && options.strip !== false) next.controls.append(shelf)
       // THE STRIP TAKES ONE TAB STOP. Inside it the arrows walk, and its two
       // ends are Home and End.
       shelf.addEventListener('keydown', event => {

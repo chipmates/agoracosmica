@@ -2384,6 +2384,8 @@ export function createWing():VinciWingModule {
       name:()=>hereContent().id==='reading-table'?{en:SHELF_UI.en.shelf,de:SHELF_UI.de.shelf}:null,
       // the seventeen topics stand in three rows of six
       columns:()=>hereContent().id==='reading-table'?6:null,
+      // the table's count counts its topics
+      unit:()=>hereContent().id==='reading-table'?'topics':null,
       absent:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].absent,
         items:shownAbsences(lang()).map(absence=>({title:absence.title,reason:absence.reason}))},
       // every whole book stays one press away, as a source under the topics

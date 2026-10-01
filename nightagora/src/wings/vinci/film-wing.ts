@@ -535,6 +535,7 @@ export function createWing(): WingModule {
       // THE READING TABLE'S SHELF: its name, columns, whole books and absences, from the look once loaded
       name: () => atTable() ? look?.shelf().name ?? null : null,
       columns: () => atTable() ? 6 : null,
+      unit: () => atTable() ? 'topics' : null,
       absent: () => atTable() ? look?.shelf().absent ?? null : null,
       books: () => atTable() ? look?.shelf().books ?? null : null,
       // the three rooms whose set the card data measures: the hang, the machine hall, the leaves

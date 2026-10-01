@@ -312,6 +312,21 @@
   .vitrine-date {inset:0 0 28px;gap:2px;}
   .vitrine-date-year {font-size:30px;}
 }
+/* A LINED BOOK WITHOUT ITS STRIP (the best-of: its topics are chosen from the
+   room's list): at rest one row, the page's two steps either side of the
+   ways, so the line keeps its two rows over a foot row the phone keeps; the
+   viewer's three zoom words come up with the card, as the painting's look
+   stands them, and the pinch and the double tap zoom at rest */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row {flex-wrap:wrap;row-gap:8px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .vitrine-step {position:static;flex:0 0 44px;font-size:20px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom {display:flex;order:1;flex:1 0 100%;gap:4px;}
+.vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom {display:none;}
+/* the count's reach keeps 14 px of air over the line, so the line's two rows stand at rest over the kept foot row */
+.vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .vitrine-seat {margin-bottom:14px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom .vitrine-control {
+  flex:1 1 0;min-width:0;padding:10px 6px;font-size:14px;line-height:18px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom] {display:block;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom]::before {content:none;}
 /* A HOST THAT KEEPS ITS FOOT ROW UNDER THE WINDOW (the phone form) walks the
    set from that row: the work before in the book's seat, gold the work after,
    and the one close is the mark over the work. The card's own steps and its

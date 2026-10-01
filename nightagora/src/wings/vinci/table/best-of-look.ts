@@ -289,6 +289,8 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     column,
     columnLabel: key('full_text') ?? copy.transcription,
     lined: true,
+    // the topics are chosen from the room's list, and a topic's pages step with the arrows
+    strip: false,
     changed: () => {
       const here = payload.current()
       if (here) LEFT.set(options.slug, here.id)
