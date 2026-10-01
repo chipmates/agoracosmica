@@ -768,17 +768,41 @@ export function createWing(): WingModule {
     const next = nextIndex()
     if (next !== null) picture?.ahead([stopNode(LIFE[next]!.id)])
     // at the last stop the way on is the look up: its evening is fetched while the visitor reads, unless reduced motion sends the press home
-    else if (evening?.here() && !matchMedia('(prefers-reduced-motion: reduce)').matches) evening.ahead()
+    else if (evening && atTheEvening() && !matchMedia('(prefers-reduced-motion: reduce)').matches) evening.ahead()
   }
 
   /* ---- the grave's look up ---- */
-  /** THE EVENING, as the live wing's `lookUp()` plays it: the chrome fades,
-      the farewell plays as the film recorded it, then the lobby. False where it cannot play (reduced motion, a
-      close look open, not at rest where it begins, a release without it):
-      the caller goes home as before. */
+  /** resting anywhere in the court the evening begins from: its stop or one of its works */
+  function atTheEvening(): boolean {
+    const from = release?.evening?.from, s = picture?.state()
+    return Boolean(from && s?.kind === 'rest' && release?.nodes[s.node]?.station === release?.nodes[from]?.station)
+  }
+  /** the walk back to the evening's stop, under way */
+  let eveningAsked = false
+  /** THE LOOK UP FROM ANYWHERE AT THE GRAVE: a close look shuts, the eye
+      walks back to the stop on its rendered leg, then the evening. False where
+      it cannot play (reduced motion, away from the grave, a release without
+      it): the caller goes home as before. */
   function lookUp(): boolean {
-    if (eveningOn) return true
-    if (!hosts || !evening || look?.id || matchMedia('(prefers-reduced-motion: reduce)').matches || !evening.here()) return false
+    if (eveningOn || eveningAsked) return true
+    if (!hosts || !evening || !picture || matchMedia('(prefers-reduced-motion: reduce)').matches || !atTheEvening()) return false
+    const from = release!.evening!.from
+    if (look?.id) { lookLeaving = true; try { look.close() } finally { lookLeaving = false } }
+    if (evening.here()) return nightfall()
+    eveningAsked = true
+    clearMarks()
+    void picture.go(from).then(() => {
+      eveningAsked = false
+      // a press elsewhere during the walk back took the visitor on: nothing more
+      if (picture?.state().kind !== 'rest' || here() !== from) return
+      if (!nightfall()) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+    })
+    return true
+  }
+  /** THE EVENING, as the live wing's `lookUp()` plays it: the chrome fades,
+      the farewell plays as the film recorded it, then the lobby */
+  function nightfall(): boolean {
+    if (!hosts || !evening?.here()) return false
     const wing = hosts.stage.parentElement!
     eveningOn = true
     if (drawerOpen) setDrawer(false)
@@ -1087,7 +1111,7 @@ export function createWing(): WingModule {
       clearMarks(); chip?.remove(); answering?.dot.remove(); answering = null
       words?.dispose(); words = undefined; wordsAt = ''
       cutCard?.remove()
-      evening = undefined; eveningOn = eveningFull = false
+      evening = undefined; eveningOn = eveningFull = eveningAsked = false
       welcome?.dispose(); welcome = undefined
       if (doorStanding) delete document.documentElement.dataset['naDoor']
       doorStanding = false
