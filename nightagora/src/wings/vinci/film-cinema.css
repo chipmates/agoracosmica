@@ -259,8 +259,10 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
 }
 
 /* THE WORK'S SCALE STANDS UNDER THE WORK, never on it: the plate keeps a
-   strip at its foot for the rule, which reads on one line there */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-plate:has(.deep-rule:not([hidden])) .deep-plate-stage { bottom: 30px; }
+   strip at its foot for the rule, which reads on one line there. The strip
+   stands from the first frame: the viewer fits the work once, to the box it
+   opens in, and a stage shortened after that cut the work at top and foot */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-plate .deep-plate-stage { bottom: 30px; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-rule {
   left: 10px; bottom: 7px; flex-direction: row; align-items: center; gap: 8px;
   padding: 0; background: none; border: 0;
