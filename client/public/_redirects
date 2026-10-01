@@ -42,6 +42,11 @@
 /de/von-historischen-persoenlichkeiten-lernen  /de/figures/ 301
 /de/von-historischen-persoenlichkeiten-lernen/ /de/figures/ 301
 
+# A poem page that was taken down goes to the collection it stood in. Both
+# slug forms again, since no static file is left to normalize the slash.
+/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant  /figures/emily-dickinson/poems/ 301
+/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant/ /figures/emily-dickinson/poems/ 301
+
 # Guessable legal URLs that people (and crawlers) try but that live elsewhere.
 # Without these they fell through to the SPA shell as soft-404s.
 # (/terms is a real English page since 2026-07, so it no longer redirects.)
