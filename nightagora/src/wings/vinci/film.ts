@@ -42,6 +42,8 @@ export interface FilmParts {
   walkPose: (stop: VinciWalkStop, narrow: boolean) => Pose
   approachPose: (exhibit: string, narrow: boolean) => Pose | undefined
   placePose: (place: VinciWalkPoseId, narrow: boolean) => Pose
+  /** every work a press on the picture reaches now, its outline in frame pixels */
+  regions?: () => readonly { id: string; points: [number, number][]; depth: number }[]
 }
 
 /** THE WORLD'S CLOCK AT THE JOINS. At rest the wind stands on its loop's
@@ -127,6 +129,10 @@ export function installFilm(parts: FilmParts): void {
         approaching: nav.approaching ?? null,
         wall: nav.wall ?? null,
       }
+    },
+    /** the works a press on the picture reaches where the eye stands now */
+    regions() {
+      return parts.regions?.() ?? []
     },
     /** at the top of every draw, after the wing's own update wrote the clock */
     beforeDraw(): void {

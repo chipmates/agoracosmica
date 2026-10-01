@@ -32,6 +32,13 @@ export interface FilmMarkRecord {
   colour: string
 }
 
+/** One work's region at a node, its outline in the master's own fractions */
+export interface FilmRegionRecord {
+  id: string
+  points: [number, number][]
+  depth: number
+}
+
 export interface FilmNodeRecord {
   kind: 'stop' | 'view'
   station: string
@@ -41,7 +48,8 @@ export interface FilmNodeRecord {
   vertex?: number
   stills: Partial<Record<PictureFraming, Record<Size, FilmFile>>>
   print: Partial<Record<PictureFraming, string>>
-  marks: Partial<Record<PictureFraming, Partial<Record<'en' | 'de', FilmMarkRecord[]>>>>
+  /** the marks in each language, and beside them the regions of the works a press on the picture reaches */
+  marks: Partial<Record<PictureFraming, Partial<Record<'en' | 'de', FilmMarkRecord[]>> & { regions?: FilmRegionRecord[] }>>
 }
 
 export interface FilmEdgeRecord {
@@ -872,6 +880,12 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
         out.push({ id: m.id, x: p.x, y: p.y, walks: m.walks, label: m.label, word: m.word, colour: m.colour })
       }
       return out
+    },
+    regions(node) {
+      const f = shownFraming
+      const box = fit()
+      return (release.nodes[node]?.marks[f]?.regions ?? []).map(r => ({ id: r.id, depth: r.depth,
+        points: r.points.map(([u, v]) => { const p = onBox(PICTURE_ASPECT[f], box, u, v); return [p.x, p.y] as const }) }))
     },
     project(point) {
       const f = shownFraming

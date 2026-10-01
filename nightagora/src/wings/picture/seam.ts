@@ -34,6 +34,14 @@ export interface PictureMark {
   colour: string
 }
 
+/** One work's region at rest, in picture-box pixels: a press inside it opens
+    the work as its mark does, and the nearer of two overlapping works takes it. */
+export interface PictureRegion {
+  id: string
+  points: readonly (readonly [number, number])[]
+  depth: number
+}
+
 export interface PictureWords { en: string; de: string }
 
 export type PictureState =
@@ -72,6 +80,8 @@ export interface PictureSource {
   state(): PictureState
   /** the marks of a node, in picture-box pixels, in one language */
   marks(node: PictureNode, lang: 'en' | 'de'): readonly PictureMark[]
+  /** the works of a node a press on the picture reaches, in picture-box pixels */
+  regions(node: PictureNode): readonly PictureRegion[]
   /** a point of the world on the picture as it stands now, or null behind the eye */
   project(point: readonly [number, number, number]): { x: number; y: number } | null
   box(): PictureBox

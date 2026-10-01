@@ -2,7 +2,9 @@
 // live side (`window.__naPicture`, the export's address only): each node stood
 // at on a stage whose picture box is the authored frame, its marks read in
 // both languages and kept in the master's own fractions, with the camera
-// print they stood on so a still and its marks can be proved one projection.
+// print they stood on so a still and its marks can be proved one projection;
+// beside them, under `regions`, the outline of every work a press on the
+// picture reaches, which the film opens as the work's mark does.
 //
 //   node forge/film/marks.mjs --port=5514 --nodes=<id,id> --out=<file>
 //
@@ -95,10 +97,14 @@ try {
         out.nodes[node] ??= {}
         out.nodes[node][framing] ??= {}
         out.nodes[node][framing][lang] = marks.map((m) => ({ id: m.id, ...toMaster(framing, box, m.x, m.y), walks: m.walks, label: m.label, word: m.word, colour: m.colour }))
+        // THE WORKS A PRESS ON THE PICTURE REACHES, beside the marks: the same in every language, read with each
+        const regions = await page.evaluate(() => window.__naPicture.regions?.('') ?? [])
+        out.nodes[node][framing].regions = regions.map((r) => ({ id: r.id, depth: r.depth,
+          points: r.points.map(([x, y]) => { const m = toMaster(framing, box, x, y); return [m.u, m.v] }) }))
         out.prints[node] ??= {}
         out.prints[node][framing] = print
         read.push({ node, box, settled, marks: marks.length })
-        console.error(`  ${framing} ${lang} ${node}: ${marks.length} marks on a ${box.width}x${box.height} box${settled ? '' : ' (not settled)'}`)
+        console.error(`  ${framing} ${lang} ${node}: ${marks.length} marks, ${regions.length} works on a ${box.width}x${box.height} box${settled ? '' : ' (not settled)'}`)
       }
       out.read[`${framing} ${lang}`] = { errors, read }
       await ctx.close()

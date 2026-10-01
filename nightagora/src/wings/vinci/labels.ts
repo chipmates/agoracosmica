@@ -1,6 +1,6 @@
 import {
-  Box3, Mesh, Raycaster, Vector3,
-  type Intersection, type Material, type Object3D, type PerspectiveCamera,
+  Box3, Matrix4, Mesh, Raycaster, Vector2, Vector3,
+  type InstancedMesh, type Intersection, type Material, type Object3D, type PerspectiveCamera,
 } from 'three/webgpu'
 import { deskStageHeight } from '../desk-stage'
 
@@ -299,6 +299,88 @@ export const VINCI_MARK_BAND = { head: 120, foot: 220 }
 export const vinciMarkInBand = (x: number, y: number, width: number, height: number, foot: number): boolean =>
   x > 22 && x < width - 22 && y > VINCI_MARK_BAND.head && y < height - foot
 
+/** One work's region on the frame: the outline its bounds project to, in
+ * frame pixels, and how far it stands from the eye, so the nearer of two
+ * overlapping works takes the press. */
+export interface VinciWorkRegion { id: string; points: [number, number][]; depth: number }
+
+/** WHERE A WORK LIES ON THE FRAME: its own vertices projected, a few
+ * thousand at most, so a machine's outline follows the machine and not the
+ * box round it. Null where any of it stands behind the eye. */
+const vertex = new Vector3(), placed = new Matrix4(), copy = new Matrix4()
+export function vinciWorkPoints(object: Object3D, camera: PerspectiveCamera, width: number, height: number, budget = 3000): [number, number][] | null {
+  const meshes: Mesh[] = []
+  object.traverseVisible(child => { if ((child as Mesh).isMesh && (child as Mesh).geometry?.attributes['position']) meshes.push(child as Mesh) })
+  if (!meshes.length) return null
+  const each = Math.max(24, Math.floor(budget / meshes.length))
+  const points: [number, number][] = []
+  for (const mesh of meshes) {
+    const position = mesh.geometry.attributes['position']!
+    const instanced = (mesh as InstancedMesh).isInstancedMesh === true
+    const copies = instanced ? Math.min((mesh as InstancedMesh).count, 64) : 1
+    const step = Math.max(1, Math.ceil((position.count * copies) / each))
+    for (let c = 0; c < copies; c++) {
+      if (instanced) { (mesh as InstancedMesh).getMatrixAt(c, copy); placed.multiplyMatrices(mesh.matrixWorld, copy) } else placed.copy(mesh.matrixWorld)
+      for (let i = 0; i < position.count; i += step) {
+        vertex.fromBufferAttribute(position, i).applyMatrix4(placed).project(camera)
+        if (vertex.z <= -1 || vertex.z >= 1) return null
+        points.push([(vertex.x * .5 + .5) * width, (-vertex.y * .5 + .5) * height])
+      }
+    }
+  }
+  return points
+}
+/** The convex outline of a set of points, counter-clockwise on the frame. */
+function hull(points: [number, number][]): [number, number][] {
+  const sorted = [...points].sort((a, b) => a[0] - b[0] || a[1] - b[1])
+  const cross = (o: [number, number], a: [number, number], b: [number, number]): number => (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+  const lower: [number, number][] = [], upper: [number, number][] = []
+  for (const p of sorted) { while (lower.length >= 2 && cross(lower[lower.length - 2]!, lower[lower.length - 1]!, p) <= 0) lower.pop(); lower.push(p) }
+  for (const p of [...sorted].reverse()) { while (upper.length >= 2 && cross(upper[upper.length - 2]!, upper[upper.length - 1]!, p) <= 0) upper.pop(); upper.push(p) }
+  return [...lower.slice(0, -1), ...upper.slice(0, -1)]
+}
+/** An outline cut to the frame, one edge of the frame at a time. */
+function clipToFrame(points: [number, number][], width: number, height: number): [number, number][] {
+  const edges: [(p: [number, number]) => number][] = [[p => p[0]], [p => width - p[0]], [p => p[1]], [p => height - p[1]]]
+  let out = points
+  for (const [inside] of edges) {
+    const next: [number, number][] = []
+    for (let i = 0; i < out.length; i++) {
+      const a = out[i]!, b = out[(i + 1) % out.length]!
+      const da = inside(a), db = inside(b)
+      if (da >= 0) next.push(a)
+      if ((da >= 0) !== (db >= 0)) { const t = da / (da - db); next.push([a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t]) }
+    }
+    out = next
+    if (!out.length) break
+  }
+  return out
+}
+/** THE WORKS A PRESS ON THE PICTURE CAN REACH: every work the frame shows,
+ * as the convex outline of its projected vertices, where its own mark's
+ * anchor or its middle is in sight. A work partly behind the eye has none. */
+export function vinciWorkRegions(works: readonly { id: string; object: Object3D; anchor: Readonly<Vector3> }[],
+  camera: PerspectiveCamera, occluders: readonly Mesh[], width: number, height: number): VinciWorkRegion[] {
+  const out: VinciWorkRegion[] = []
+  const eye = new Vector3(), middle = new Vector3(), bounds = new Box3()
+  const ray = new Raycaster(), hits: Intersection<Mesh>[] = []
+  camera.updateWorldMatrix(true, false)
+  camera.getWorldPosition(eye)
+  for (const work of works) {
+    if (!visibleAncestors(work.object)) continue
+    bounds.setFromObject(work.object)
+    if (bounds.isEmpty()) continue
+    const points = vinciWorkPoints(work.object, camera, width, height)
+    if (!points) continue
+    const outline = clipToFrame(hull(points), width, height)
+    if (outline.length < 3) continue
+    bounds.getCenter(middle)
+    if (vinciSightBlocked(eye, work.anchor, occluders, ray, hits) && vinciSightBlocked(eye, middle, occluders, ray, hits)) continue
+    out.push({ id: work.id, points: outline.map(([x, y]) => [Math.round(x * 10) / 10, Math.round(y * 10) / 10]), depth: Math.round(eye.distanceTo(middle) * 1000) / 1000 })
+  }
+  return out
+}
+
 export interface VinciExhibitDots {
   setExhibits(marks: readonly VinciExhibitMark[]): void
   setMode(mode: VinciLabelMode): void
@@ -477,6 +559,41 @@ export function createVinciExhibitDots(options: {
     }
     return tries.find(at => at.x - reach >= 0 && at.x + reach <= width && clear(at.x, at.y) && fits(at.x, at.y)) ?? null
   }
+  /** the point of the work itself under a point of the frame, or null where the frame shows something else there */
+  const surface = new Raycaster(), ndc = new Vector2()
+  function surfaceAt(object: Object3D, px: number, py: number, width: number, height: number): Vector3 | null {
+    surface.setFromCamera(ndc.set((px / width) * 2 - 1, -(py / height) * 2 + 1), camera)
+    const hit = surface.intersectObject(object, true).find(h => visibleAncestors(h.object))
+    return hit ? hit.point.clone() : null
+  }
+  /** A WORK WHOSE MARK HAS NO PLACE BESIDE IT, its anchor outside the band
+   * or under a panel, wears the mark on itself: on what the band shows of
+   * it, from its foot up, under the anchor where it can, so the work a frame
+   * is about can always be opened. The mark stands where a ray meets the
+   * work, never on the room beside it. Null where none such fits. */
+  function onWork(mark: VinciExhibitMark, x: number, width: number, height: number,
+    fits: (x: number, y: number) => boolean): { x: number; y: number; beside: ''; seen: Vector3 } | null {
+    const points = vinciWorkPoints(mark.object, camera, width, height, 1200)
+    if (!points) return null
+    let l = Infinity, r = -Infinity, t = Infinity, b = -Infinity
+    for (const [px, py] of points) { l = Math.min(l, px); r = Math.max(r, px); t = Math.min(t, py); b = Math.max(b, py) }
+    const inset = (mark.walks ? MARK_REACH.walk : MARK_REACH.detail) + MARK_GAP
+    const left = Math.max(l, 0) + inset, right = Math.min(r, width) - inset
+    const top = Math.max(t, VINCI_MARK_BAND.head) + inset, bottom = Math.min(b, height - foot) - inset
+    if (right < left || bottom < top) return null
+    const under = Math.max(left, Math.min(right, x))
+    // rows from the foot up, each tried nearest the anchor's column first
+    const columns = [under, left, right, (left + right) / 2, (under + left) / 2, (under + right) / 2]
+    for (let row = 0; row < 4; row++) {
+      const y = bottom - ((bottom - top) * row) / 3
+      for (const cx of columns) {
+        if (!fits(cx, y)) continue
+        const seen = surfaceAt(mark.object, cx, y, width, height)
+        if (seen) return { x: cx, y, beside: '', seen }
+      }
+    }
+    return null
+  }
   const ray = new Raycaster()
   const hits: Intersection<Mesh>[] = []
   const sight = new Map<string, boolean>()
@@ -561,18 +678,19 @@ export function createVinciExhibitDots(options: {
       // the picture's own box, which is the window where no band stands
       const width = view.innerWidth, height = deskStageHeight()
       const centreX = width / 2, centreY = height / 2
-      const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number; beside: string }[] = []
+      const candidates: { mark: VinciExhibitMark; x: number; y: number; from: number; beside: string; seen: Vector3 | null }[] = []
       for (const mark of marks) {
         if (!mark.object.visible) continue
         projected.copy(mark.anchor as Vector3).project(camera)
         if (projected.z <= -1 || projected.z >= 1) continue
         const at = { x: (projected.x * .5 + .5) * width, y: (-projected.y * .5 + .5) * height, beside: '' }
         const fits = (px: number, py: number): boolean => vinciMarkInBand(px, py, width, height, foot) && !underPanel(px, py, panels)
-        const placed = mark.face ? clearOf(mark, at.x, at.y, width, height, names, fits) : fits(at.x, at.y) ? at : null
+        const placed = (mark.face ? clearOf(mark, at.x, at.y, width, height, names, fits) : fits(at.x, at.y) ? at : null)
+          ?? onWork(mark, at.x, width, height, fits)
         if (!placed) continue
         const { x, y, beside } = placed
         // which marks stand is chosen by where the works are, not where their marks stepped to
-        candidates.push({ mark, x, y, from: Math.hypot(at.x - centreX, at.y - centreY), beside })
+        candidates.push({ mark, x, y, from: Math.hypot(at.x - centreX, at.y - centreY), beside, seen: (placed as { seen?: Vector3 }).seen ?? null })
       }
       candidates.sort((a, b) => a.from - b.from)
       const shown: typeof candidates = []
@@ -580,7 +698,8 @@ export function createVinciExhibitDots(options: {
         if (shown.length >= limit) break
         let clear = sight.get(candidate.mark.id)
         if (clear === undefined) {
-          clear = !vinciSightBlocked(eye, candidate.mark.anchor, occluders, ray, hits)
+          // a mark worn on the work is in sight where the work's own point under it is
+          clear = !vinciSightBlocked(eye, candidate.seen ?? candidate.mark.anchor, occluders, ray, hits)
           sight.set(candidate.mark.id, clear)
         }
         if (clear) shown.push(candidate)

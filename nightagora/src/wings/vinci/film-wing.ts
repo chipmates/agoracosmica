@@ -381,6 +381,33 @@ export function createWing(): WingModule {
       dots.push(dot)
     }
   }
+  /* ---- a press on a work itself ---- */
+  /** the work under a point of the picture at rest, in box pixels: the nearest whose outline holds it */
+  function workAt(x: number, y: number): string | null {
+    if (!picture || look?.id || picture.state().kind !== 'rest' || veiled || eveningOn || doorStanding) return null
+    let best: { id: string; depth: number } | null = null
+    for (const region of picture.regions(here())) {
+      const p = region.points
+      let inside = false
+      for (let i = 0, j = p.length - 1; i < p.length; j = i++) {
+        const [xi, yi] = p[i]!, [xj, yj] = p[j]!
+        if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) inside = !inside
+      }
+      if (inside && (!best || region.depth < best.depth)) best = region
+    }
+    return best?.id ?? null
+  }
+  /** A PRESS ON A WORK ITSELF opens it as its mark does: walked or dipped to
+      where the film carries a way, else opened where the visitor stands */
+  function pressWork(id: string): void {
+    if (!picture || look?.id || picture.state().kind !== 'rest') return
+    void lookNow().then(l => l.warm(id))
+    if (!routable(id)) { openExhibit(id, null); return }
+    void picture.go(viewNode(id)).then(at => {
+      marksAt = ''
+      if (at === viewNode(id) || picture?.state().kind === 'rest') openExhibit(id, null)
+    })
+  }
   /** A WALK INSIDE THE GRAVE'S COURT: both its ends stand there. The year is
    * cut into the stone and its words are laid on, so the words stay with the
    * stones through the clip's own track, as the live wing keeps them. */
@@ -927,7 +954,7 @@ export function createWing(): WingModule {
     picture.element.after(cycleLayer)
     words?.dispose()
     words = createPictureWords(layer => cycleLayer!.after(layer))
-    picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = '' })
+    picture.on('state', state => { paintDip(state); if (state.kind === 'rest') marksAt = ''; else h.stage.style.cursor = '' })
     picture.on('rest', state => {
       if (state.kind !== 'rest') return
       // a work of a wall belongs to the story stop before it along the wall
@@ -1015,6 +1042,15 @@ export function createWing(): WingModule {
       const ending = asked.detail?.ending
       if (ending === 'talk' ? talkAtTheGrave() : ending === 'lookup' && lookUp()) asked.preventDefault()
     }, { signal })
+    /* A PRESS ON A WORK ITSELF opens it as its mark does, and over a work the
+       hand turns a pointer; nothing else changes on hover. Not while the
+       phone's words stand raised: that press folds them. */
+    const pictureAt = (e: MouseEvent): string | null => {
+      const b = picture?.box()
+      return e.target === h.stage && b ? workAt(e.clientX - b.left, e.clientY - b.top) : null
+    }
+    h.stage.addEventListener('click', e => { const id = drawerOpen ? null : pictureAt(e); if (id) pressWork(id) }, { signal })
+    h.stage.addEventListener('pointermove', e => { h.stage.style.cursor = pictureAt(e) ? 'pointer' : '' }, { signal })
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })
     addEventListener('resize', () => { marksAt = ''; look?.layout() }, { signal })

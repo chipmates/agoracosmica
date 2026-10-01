@@ -10,12 +10,13 @@ import { vinciWallOfExhibit, vinciWallVertex, vinciWallById } from '../vinci/col
 import type { FilmMotion, FilmNode } from '../vinci/film'
 import type { VinciWalk } from '../vinci/walk'
 import type { VinciStationId } from '../vinci/content'
-import { parsePrint, projectPrint, type PictureBox, type PictureEvent, type PictureMark, type PictureNode, type PictureSource, type PictureState } from './seam'
+import { parsePrint, projectPrint, type PictureBox, type PictureEvent, type PictureMark, type PictureNode, type PictureRegion, type PictureSource, type PictureState } from './seam'
 
 interface FilmHook {
   place(node: FilmNode): boolean
   walk(from: FilmNode, to: FilmNode, motion: FilmMotion): boolean
   state(): { walking: boolean }
+  regions?(): readonly PictureRegion[]
 }
 
 /** A node of the film graph, resolved the way `forge/film/graph.mjs` builds it. */
@@ -73,6 +74,8 @@ export function createLivePicture(hook: FilmHook, walk: VinciWalk): PictureSourc
       }
       return out
     },
+    /** the works a press on the live picture reaches now, in picture-box pixels */
+    regions: () => hook.regions?.() ?? [],
     project(point) {
       const cam = (window as unknown as { __forge?: { state(): { cam?: { p: number[]; r: number[]; fov: number; shift?: number } } } }).__forge?.state().cam
       if (!cam) return null
