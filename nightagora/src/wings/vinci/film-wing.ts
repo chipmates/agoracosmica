@@ -12,6 +12,7 @@ import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciCont
   vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { shownCitation } from './citations'
+import { showLicences } from './licence-words'
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
@@ -596,7 +597,7 @@ export function createWing(): WingModule {
     const head = make('p', 'vinci-certainty', text(vinciCertaintyWords[certainty]))
     head.dataset['certainty'] = certainty
     panel.append(head, make('h2', '', text(exhibit?.title ?? s.name)))
-    if (exhibit) { exhibit.render(panel); return }
+    if (exhibit) { exhibit.render(panel); showLicences(panel, lang()); return }
     for (const label of s.labels) {
       const p = make('p', 'vinci-statement')
       p.dataset['certainty'] = label.certainty
