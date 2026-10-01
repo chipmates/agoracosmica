@@ -583,6 +583,9 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab::after {
   content: '\2191'; width: auto; height: auto; border-radius: 0; background: none; color: #d2a557; font: 400 .9375rem/1 var(--sans);
 }
+/* a place or a single picture has no controls of its own: its few words stand
+   in the middle of the card's rest height, not over an empty foot */
+#wing[data-film='upright'] .vitrine[data-peek='true']:is([data-payload='place'], [data-payload='picture']) .vitrine-card { justify-content: center; }
 /* the film's caption under a showpiece keeps two rows at rest */
 #wing[data-film='upright'] .vitrine[data-peek='true'] .showpiece-line {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-bottom: 0;
