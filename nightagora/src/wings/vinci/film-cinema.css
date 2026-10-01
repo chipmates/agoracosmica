@@ -125,14 +125,14 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   left: var(--cinema-text-left, 120px);
   width: var(--cinema-text-width, 420px);
   bottom: var(--cinema-b);
-  max-height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 12px);
+  max-height: calc(100dvh - var(--cinema-t) - var(--cinema-b));
   box-sizing: border-box;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
   overscroll-behavior: contain;
-  scrollbar-width: thin;
-  padding: 12px 16px 0;
+  scrollbar-width: none;
+  padding: 10px 16px 0;
   border-radius: 12px;
   background: #08121c;
   pointer-events: auto;
@@ -144,13 +144,25 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .cinema-panel > .film-line[hidden] { display: block; }
 #wing[data-film='cinema'] .cinema-panel > .film-line { padding-top: 6px; font-size: 1.125rem; line-height: 24px; }
 #wing[data-film='cinema'] .cinema-panel > .film-drawer { padding-top: 8px; }
+#wing[data-film='cinema'] .cinema-panel::-webkit-scrollbar { display: none; }
+/* the column's parts keep their own heights: shrunk to fit, the age stood on
+   the line under it and the keys lost their foot */
+#wing[data-film='cinema'] .cinema-panel > * { flex-shrink: 0; }
+/* the drawer's two ways, the Echo and the room's list, share one row, so the
+   list stands in view under the words as the Echo's question does */
+#wing[data-film='cinema'] .cinema-panel > .film-drawer:not([hidden]):has(> .film-ask + .desk-ov-open:not([hidden])) {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px;
+}
+#wing[data-film='cinema'] .cinema-panel > .film-drawer > :not(.film-ask, .desk-ov-open) { grid-column: 1 / -1; }
+#wing[data-film='cinema'] .cinema-panel > .film-drawer > :is(.film-ask, .desk-ov-open) { margin-top: 6px; }
+#wing[data-film='cinema'] .cinema-panel > .film-drawer > .vinci-phone-question { margin-top: 8px; }
 /* the way back to the strip stays at the column's foot while the words scroll by */
 #wing[data-film='cinema'] .cinema-panel > .film-keys {
   position: sticky;
   bottom: 0;
-  margin-top: 4px;
-  padding-top: 6px;
-  padding-bottom: 6px;
+  margin-top: 2px;
+  padding-top: 4px;
+  padding-bottom: 10px;
   background: #08121c;
   box-shadow: 0 -16px 12px -4px #08121c;
 }
