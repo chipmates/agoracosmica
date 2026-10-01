@@ -37,6 +37,7 @@ import deskMarksCss from '../desk-marks.css?inline'
 import deskOverviewCss from '../overview/desk-overview.css?inline'
 import filmWingCss from './film-wing.css?inline'
 import { fitGoldName, watchGoldName } from './gold-fit'
+import { setWalkingLeg, walkingRing } from './labels'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -351,7 +352,8 @@ export function createWing(): WingModule {
       dot.style.left = `${x}px`
       dot.style.top = `${y}px`
       dot.style.width = dot.style.height = '44px'
-      dot.style.setProperty('--certainty', mark.colour)
+      // ONE SIGN FOR ONE ACT: every mark wears the live wing's own ring; the
+      // certainty colour is the close look's, and only the word says it walks
       dot.dataset['mark'] = walks ? 'walk' : 'detail'
       dot.dataset['exhibit'] = mark.id
       dot.dataset['name'] = mark.label
@@ -360,15 +362,7 @@ export function createWing(): WingModule {
       dot.setAttribute('aria-label', word ? `${word} · ${mark.label}` : mark.label)
       if (lookCard) dot.setAttribute('aria-controls', lookCard)
       dot.setAttribute('aria-expanded', 'false')
-      const ring = document.createElementNS(SVG, 'svg')
-      ring.setAttribute('class', 'vinci-mark-ring')
-      ring.setAttribute('viewBox', '0 0 44 44')
-      ring.setAttribute('aria-hidden', 'true')
-      const leg = document.createElementNS(SVG, 'circle')
-      leg.setAttribute('class', 'vinci-mark-leg')
-      leg.setAttribute('cx', '22'); leg.setAttribute('cy', '22'); leg.setAttribute('r', '20.5')
-      ring.append(leg)
-      dot.append(ring)
+      dot.append(walkingRing(document))
       dot.addEventListener('click', () => pressMark(dot, mark.id, walks))
       dot.addEventListener('pointerenter', () => {
         nameMark(dot)
@@ -1068,11 +1062,7 @@ export function createWing(): WingModule {
         const share = s.kind === 'walk' || s.kind === 'wait' ? s.share : 0
         phone.ringLine.setAttribute('stroke-dasharray', `${(RING * share).toFixed(1)} ${RING.toFixed(1)}`)
       }
-      if (answering) {
-        const leg = answering.dot.querySelector<SVGCircleElement>('.vinci-mark-leg')
-        const share = s.kind === 'walk' ? s.share : 0
-        leg?.setAttribute('stroke-dasharray', `${(2 * Math.PI * 20.5 * share).toFixed(1)} ${(2 * Math.PI * 20.5).toFixed(1)}`)
-      }
+      if (answering) setWalkingLeg(answering.dot, s.kind === 'walk' ? s.share : 0)
       desk?.update()
       const courtWalk = inGraveCourt(s) && !eveningOn
       if (s.kind === 'rest' && performance.now() > doorLeaving && !eveningOn) { paintMarks(); paintWords() }

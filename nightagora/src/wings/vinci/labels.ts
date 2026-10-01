@@ -245,8 +245,9 @@ export interface VinciExhibitMark {
 }
 
 /** How far a mark's drawing reaches from its centre, halo included: the
- * walking ring and the certainty bead. */
-const MARK_REACH = { walk: 23, detail: 13 }
+ * walking ring, and the film's 28 px ring that every mark the film reads
+ * from here is drawn as, the detail marks included. */
+const MARK_REACH = { walk: 23, detail: 20 }
 /** The air a mark keeps from a work's face and from a name. */
 const MARK_GAP = 4
 
@@ -262,8 +263,9 @@ export const vinciMarkDomId = (exhibit: string): string =>
 
 /** THE WALKING MARK'S BODY: a gold ring of 34 px inside the 44 px target,
  * the walk glyph in it, and the counted arc that fills on press. The arc is
- * the leg itself, never a timer. */
-function walkingRing(document: Document): SVGSVGElement {
+ * the leg itself, never a timer. The film draws every one of its marks with
+ * this same body. */
+export function walkingRing(document: Document): SVGSVGElement {
   const svg = document.createElementNS(MARK_SVG, 'svg')
   svg.setAttribute('viewBox', '0 0 34 34')
   svg.setAttribute('class', 'vinci-mark-ring')
@@ -279,6 +281,11 @@ function walkingRing(document: Document): SVGSVGElement {
   glyph.setAttribute('class', 'vinci-mark-glyph')
   svg.append(leg, glyph)
   return svg
+}
+/** THE COUNTED ARC of a mark's ring: `share` of the leg under way, 0 to 1. */
+export function setWalkingLeg(dot: Element, share: number): void {
+  const arc = dot.querySelector<SVGCircleElement>('.vinci-mark-leg')
+  arc?.setAttribute('stroke-dasharray', `${(MARK_RING * share).toFixed(1)} ${MARK_RING.toFixed(1)}`)
 }
 
 
@@ -391,10 +398,7 @@ export function createVinciExhibitDots(options: {
     setLeg(dot, 0)
     placeChip(dot)
   }
-  function setLeg(dot: HTMLButtonElement, share: number): void {
-    const arc = dot.querySelector<SVGCircleElement>('.vinci-mark-leg')
-    arc?.setAttribute('stroke-dasharray', `${(MARK_RING * share).toFixed(1)} ${MARK_RING.toFixed(1)}`)
-  }
+  const setLeg = setWalkingLeg
   function release(): void {
     if (!answering) return
     delete answering.dataset['state']
