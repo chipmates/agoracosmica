@@ -2025,6 +2025,33 @@ function byKey(list, field, emptyLabel) {
   return out;
 }
 
+// Split one period's page rows (grouped by path, landing flag and source
+// class) into the funnel's stages. The app is its own address: /app and
+// anything under it. An app load came from our pages when it did not open the
+// visit, is direct when it opened the visit with no referrer, and is another
+// landing otherwise (another site, or a row from before the source class
+// existed). Paths that are neither marketing nor the app keep their own count,
+// so every row lands in exactly one bucket.
+function splitPageRows(list, isMarketingPath) {
+  var out = { marketing: 0, appFromPages: 0, appDirect: 0, appOther: 0, otherPaths: 0, marketingByPath: {} };
+  (list || []).forEach(function(row) {
+    var p = String(row.path || '');
+    var c = Number(row.c) || 0;
+    var first = p.split('/').filter(function(part) { return part !== ''; })[0];
+    if (first === 'app') {
+      if (row.landing !== 'landing') out.appFromPages += c;
+      else if (row.source === 'direct') out.appDirect += c;
+      else out.appOther += c;
+    } else if (isMarketingPath(p)) {
+      out.marketing += c;
+      out.marketingByPath[p] = (out.marketingByPath[p] || 0) + c;
+    } else {
+      out.otherPaths += c;
+    }
+  });
+  return out;
+}
+
 // A share as text, with the same small-base rule the rest of the file uses: a
 // percentage off fewer than 20 is Poisson noise, so print the raw fraction.
 function shareText(num, den) {
@@ -2206,8 +2233,10 @@ async function loadOverview() {
     // Funnel split: all distinct page paths with counts. Aggregated client-side
     // into marketing (Astro static figures/themes/about/contact, both langs) vs
     // app (React SPA). AE SQL does not support LIKE pattern matching, so we
-    // group by path and classify in JS by prefix + exact-match lookup.
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 200", dataset: 'agora_llm' },
+    // group by path and classify in JS by prefix + exact-match lookup. The
+    // landing flag (blob8) and the source class (blob3) ride along so the app's
+    // loads can be split by where they came from, out of this one query.
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path, landing, source ORDER BY c DESC LIMIT 1000", dataset: 'agora_llm' },
     // Signups (total new-account beacons; distinct from gclid-gated profile_created)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Content completed total (blob8='completed' OR legacy empty blob8 — see analytics.ts trackPlayback comment).
@@ -2224,7 +2253,7 @@ async function loadOverview() {
     // Entry previous period (funnel ghost bar)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Page paths previous period (classified into marketing/app for the ghost)
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path ORDER BY c DESC LIMIT 200", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path, landing, source ORDER BY c DESC LIMIT 1000", dataset: 'agora_llm' },
     // Daily Conversations (chat) current + previous period for the ghost trend line
     S.range > 1
       ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
@@ -2328,30 +2357,23 @@ async function loadOverview() {
     '/de/about': 1, '/de/about/': 1, '/de/contact': 1, '/de/contact/': 1,
     '/de/impressum': 1, '/de/impressum/': 1, '/de/datenschutz': 1, '/de/datenschutz/': 1,
   };
-  var allPaths = rows(r[26]);
-  var marketingArrivals = 0;
-  var appArrivalsFromPaths = 0;
-  var topMarketingPages = [];
-  for (var i = 0; i < allPaths.length; i++) {
-    var pathRow = allPaths[i];
-    var p = String(pathRow.path || '');
-    var isMkt = false;
+  function isMarketingPath(p) {
     for (var j = 0; j < MARKETING_PREFIXES.length; j++) {
-      if (p.indexOf(MARKETING_PREFIXES[j]) === 0) { isMkt = true; break; }
+      if (p.indexOf(MARKETING_PREFIXES[j]) === 0) return true;
     }
-    if (!isMkt && MARKETING_EXACT[p]) isMkt = true;
-    if (isMkt) {
-      marketingArrivals += Number(pathRow.c) || 0;
-      // Include every marketing page (figures, themes, about, contact, impressum,
-      // datenschutz + their /de/ variants) so the chart reflects total marketing-
-      // page traffic. Labels are computed in the topMarketingItems map below.
-      topMarketingPages.push(pathRow);
-    } else {
-      // Non-marketing paths (/app + SPA routes) are the App stage, summed from
-      // the SAME query as Marketing so the two are always mutually consistent.
-      appArrivalsFromPaths += Number(pathRow.c) || 0;
-    }
+    return !!MARKETING_EXACT[p];
   }
+  // Marketing, the app's three kinds of load and the leftover paths all come
+  // out of ONE query, so the stages can never disagree with each other the way
+  // two separately timed counts can.
+  var pageSplit = splitPageRows(rows(r[26]), isMarketingPath);
+  var marketingArrivals = pageSplit.marketing;
+  // Every marketing page (figures, themes, about, contact, impressum,
+  // datenschutz + their /de/ variants), so the chart reflects total marketing-
+  // page traffic. Labels are computed in the topMarketingItems map below.
+  var topMarketingPages = Object.keys(pageSplit.marketingByPath).map(function(path) {
+    return { path: path, c: pageSplit.marketingByPath[path] };
+  });
   topMarketingPages.sort(function(a, b) { return b.c - a.c; });
   topMarketingPages = topMarketingPages.slice(0, 15);
   var signups = val(r[27]);
@@ -2372,34 +2394,23 @@ async function loadOverview() {
   // errors feed the reply-success caption under the funnel.
   var firstReplies = val(r[45]), firstRepliesPrev = val(r[46]);
   var firstReplyErrors = val(r[47]), firstReplyErrorsPrev = val(r[48]);
-  // Previous-period marketing-vs-app split (same classification as the current
-  // period) so the funnel can draw a ghost bar behind each stage. MARKETING_*
-  // and arrivalsPrev are already in scope above.
-  var marketingArrivalsPrev = 0;
-  var appArrivalsPrev = 0;
-  for (var pi = 0; pi < prevPaths.length; pi++) {
-    var pp2 = String(prevPaths[pi].path || '');
-    var isMkt2 = false;
-    for (var pj = 0; pj < MARKETING_PREFIXES.length; pj++) {
-      if (pp2.indexOf(MARKETING_PREFIXES[pj]) === 0) { isMkt2 = true; break; }
-    }
-    if (!isMkt2 && MARKETING_EXACT[pp2]) isMkt2 = true;
-    if (isMkt2) marketingArrivalsPrev += Number(prevPaths[pi].c) || 0;
-    else appArrivalsPrev += Number(prevPaths[pi].c) || 0;
-  }
+  // Previous-period split (same classification as the current period) so the
+  // funnel can draw a ghost bar behind each stage.
+  var pageSplitPrev = splitPageRows(prevPaths, isMarketingPath);
+  var marketingArrivalsPrev = pageSplitPrev.marketing;
   // Engagement endpoints (parallel from Sessions): content played + chat sent.
   // Content Started total is derived from the existing contentByType breakdown
   // (saves one query). Content Completed and Chat-by-Mode are new dedicated queries.
   var contentStarted = contentByType.reduce(function(acc, row) { return acc + (Number(row.c) || 0); }, 0);
   var contentCompleted = val(r[28]);
   var chatByMode = rows(r[29]);
-  // App arrivals come from the SAME path-breakdown query as Marketing (above),
-  // NOT from subtracting the independent total-arrivals COUNT. Analytics Engine
-  // is eventually consistent across queries, so total-arrivals could briefly read
-  // lower than marketing-arrivals and clamp App to 0 ("Marketing 560, App 0,
-  // Entry 20" — an impossible funnel that self-healed on the next refresh). Same
-  // query in, same query out: Marketing and App can never disagree now.
-  var appArrivals = appArrivalsFromPaths;
+  // The App stage counts loads of /app that came from one of our own pages.
+  // Direct landings on /app (no referrer, no page of ours before them) are
+  // mostly machines, so they are shown beside the stage instead of inside it.
+  var appFromPages = pageSplit.appFromPages;
+  var appDirect = pageSplit.appDirect;
+  var appOther = pageSplit.appOther;
+  var appAll = appFromPages + appDirect + appOther;
   // North Star v2 reads (appended queries r[51..53]). An engaged session is one
   // tab that did something: the first arm it reaches writes 'typed' or
   // 'listened', and only if the other arm follows does a second 'both' row
@@ -2501,10 +2512,16 @@ async function loadOverview() {
   // a single row in either period (deploy lag, or simply pre-launch of the
   // beacon), the stage renders a quiet "awaiting first <event>" placeholder
   // instead of a zero bar, so the funnel never reads as a fake 100% cliff.
+  // Rows from before the landing flag shipped carry an empty flag and so read
+  // as from our pages. A previous period that reaches back that far is no
+  // baseline, so it draws no ghost.
+  var appPrevFlagged = (Date.now() - 2 * S.range * 86400000) >= NS2_LIVE_MS;
+  var appPrev = appPrevFlagged ? pageSplitPrev.appFromPages : null;
+  var appSub = 'from our pages &middot; plus ' + fmt(appDirect) + ' direct';
   var funnelStages = [
     { label: 'Marketing', value: marketingArrivals, prev: marketingArrivalsPrev, sub: 'figures · themes · about' },
     { label: 'CTA Click', value: ctaClicks, prev: ctaClicksPrev, sub: 'Start Exploring', pending: 'cta_click' },
-    { label: 'App', value: appArrivals, prev: appArrivalsPrev, sub: '/app + SPA routes' },
+    { label: 'App', value: appFromPages, prev: appPrev, sub: appSub },
     { label: 'Saw Intro', value: cinStarts, prev: cinStartsPrev, sub: 'cinematic started', pending: 'cinematic_start' },
     { label: 'Finished Intro', value: cinEnds, prev: cinEndsPrev, sub: 'watched or skipped', pending: 'cinematic_end' },
     { label: 'Welcome', value: welcomeShown, prev: welcomeShownPrev, sub: 'consent screen shown', pending: 'welcome_shown' },
@@ -2546,11 +2563,20 @@ async function loadOverview() {
   } else {
     replyNote = 'Reply success: ' + Math.round(firstReplies / replyTotal * 100) + '% (' + firstReplies + ' of ' + replyTotal + ' first replies, ' + firstReplyErrors + ' errored).';
   }
+  // Where the app's loads came from, all of them: the stage shows the first
+  // number, and nothing is dropped from the count.
+  var appNote = 'App = loads of /app that came from one of our own pages (' + fmt(appFromPages) + '). ' +
+    'Beside it, not in the bar: ' + fmt(appDirect) + ' direct landings on /app with no page of ours before them, mostly machines' +
+    (appOther > 0 ? ', and ' + fmt(appOther) + ' landings from other sites or from before the source label shipped on 2026-09-14' : '') +
+    '. All app loads: ' + fmt(appAll) + '. ' +
+    (pageSplit.otherPaths > 0 ? fmt(pageSplit.otherPaths) + ' page loads sit on paths that are neither listed marketing pages nor the app (hub and legal pages, stray addresses). They count in Raw Visits and in no funnel stage. ' : '') +
+    (ns2.partial ? 'This window reaches back before the landing flag shipped on ' + NS2_LIVE_DATE + '. Earlier app loads carry no flag and all read as from our pages, so the App bar is too high here. ' : '');
   var funnelNote = '<div style="margin-top:8px;font-size:11px;color:var(--dim);line-height:1.4">' +
     'New-visitor funnel only, compared step by step against the previous ' + RANGE_LABEL[S.range] + ' (the faint bars). ' +
     'Entry &amp; Signup fire at the welcome modal (post-consent). ' +
     'Returning visitors skip it, so they appear only as App Sessions below, never here. ' +
-    'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). App = /app. ' +
+    'Marketing = / and /de/ plus figure and theme pages (mixed sources, incl. ads + bots). ' +
+    appNote +
     replyNote +
     '</div>';
   html += chartCard(
