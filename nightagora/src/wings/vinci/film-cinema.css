@@ -74,9 +74,8 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   margin: 0 8px;
   padding: 6px 12px;
   border-radius: 10px;
-  background: color-mix(in srgb, var(--plate) 74%, transparent);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+  /* the plate's own colour, solid: a bright floor's numerals read through the glass where WebKit does not blur it */
+  background: #08121c;
   font: 400 .9375rem/20px var(--serif);
   color: var(--ink);
   hyphens: manual;
@@ -113,6 +112,13 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   cursor: pointer;
 }
 #wing[data-film='cinema'] .cinema-more[hidden] { display: none; }
+/* where the endings leave the strip too narrow for its words, it gives way to
+   them: only its key stays, one press from the whole caption */
+#wing[data-film='cinema'] .cinema-caption[data-squeezed='true'] { flex: 0 0 auto; }
+#wing[data-film='cinema'] .cinema-caption[data-squeezed='true'] .cinema-words { display: none; }
+#wing[data-film='cinema'] .cinema-caption[data-squeezed='true'] .cinema-more { margin-left: 0; }
+/* for one read of the row's room the strip is stretched over it */
+#wing[data-film='cinema'] .cinema-caption[data-measure='true'] { flex: 1 1 0 !important; }
 /* the key's target is 44 px tall over its 20 px row */
 #wing[data-film='cinema'] .cinema-more::after { content: ''; position: absolute; left: -6px; right: -8px; top: -12px; bottom: -12px; }
 #wing[data-film='cinema'] .cinema-more .film-ic { width: 13px; height: 13px; margin-left: 4px; vertical-align: -2px; color: var(--gold); }

@@ -73,6 +73,8 @@ export interface FilmCinema {
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
+/** the strip's least width for its words; under it the caption gives way to the endings */
+const CAPTION_LEAST = 300
 /** the air a whole line keeps above or below a box's foot */
 const LINE_AIR = 2
 /** what a box's foot keeps whole besides its lines of words */
@@ -152,7 +154,10 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     const stop = deskStoryStop(id)
     const line = stop ? say(stop.line) : ''
     const opens = !box.querySelector<HTMLElement>('.film-more')?.hidden
-    const key = [id, lang(), line, opens, innerWidth, innerHeight, Math.round(gold?.getBoundingClientRect().width ?? 0)].join('|')
+    // where the endings leave the strip too narrow for its words, it gives way to them and keeps its key
+    const free = opens ? stripRoom() : 0
+    const squeezed = free > 0 && free < CAPTION_LEAST
+    const key = [id, lang(), line, opens, squeezed, innerWidth, innerHeight, Math.round(gold?.getBoundingClientRect().width ?? 0)].join('|')
     publish()
     if (key === said) return
     said = key
@@ -161,8 +166,17 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     moreWord.textContent = say(deskControl('shared', 'read_more'))
     more.hidden = !opens
     more.setAttribute('aria-expanded', box.dataset['drawer'] === 'true' ? 'true' : 'false')
-    fit(line, opens ? 2 : 3)
+    caption.dataset['squeezed'] = String(squeezed)
+    if (squeezed) words.textContent = line
+    else fit(line, opens ? 2 : 3)
     room()
+  }
+  /** the width the row leaves the strip, read with the strip stretched over it, whatever words it holds now */
+  function stripRoom(): number {
+    caption.dataset['measure'] = 'true'
+    const width = caption.clientWidth
+    delete caption.dataset['measure']
+    return width
   }
   /** the line whole where it stands in its rows, else cut at a word with an ellipsis before the key */
   function fit(line: string, rows: number): void {
@@ -239,9 +253,10 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   })
   lifeWatch.observe(wing, { subtree: true, attributes: true, attributeFilter: ['open'] })
   addEventListener('resize', () => { said = ''; requestAnimationFrame(() => { paint(); panelLines() }); cardLater() }, { signal })
-  // gold's name settles its own width a frame late: the caption takes what is left
+  // gold's name settles its own width a frame late, and the row its own at a turn: the caption takes what is left
   const goldWatch = new ResizeObserver(() => requestAnimationFrame(() => paint()))
   if (gold) goldWatch.observe(gold)
+  if (foot) goldWatch.observe(foot)
   signal.addEventListener('abort', () => { watch.disconnect(); lineWatch.disconnect(); lifeWatch.disconnect(); goldWatch.disconnect(); set(false) })
 
   /* ---- a scrolling box ends on a whole line at rest ---- */
