@@ -112,7 +112,8 @@ import filmWingCss from './film-wing.css?inline'
 import { createVinciPhoneForm, type VinciPhoneForm, type VinciPhoneLook, type VinciPhoneWall } from './phone-form'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskBand, deskStageHeight, setDeskBand } from '../desk-stage'
-import { createDeskChrome, type DeskChrome, type DeskStation } from '../desk-chrome'
+import { createDeskChrome, deskMark, type DeskChrome, type DeskStation } from '../desk-chrome'
+import { createDeskOverview, type DeskOverview } from '../overview'
 import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
 import deskCloseLookCss from '../desk-closelook.css?inline'
@@ -707,6 +708,8 @@ export function createWing():VinciWingModule {
   let desk:DeskChrome|undefined
   /** THE PHONE'S FROZEN FORM: the one box at the foot of the glass, where the desk's band is not */
   let phone:VinciPhoneForm|undefined, phoneMount=false
+  /** the room's list on the phone, its word at the drawer's foot (phone-form.ts) */
+  let phoneList:DeskOverview|undefined
   /** How far down the screen a panel of this wing may stand. */
   let panelFloor:()=>number=()=>innerHeight
   let restoreEnvironmentRotation:(()=>void)|null=null
@@ -976,31 +979,7 @@ export function createWing():VinciWingModule {
       // desk.marks: its host fields
 
       // desk.overview: its host fields
-      overview:{cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
-        sub:shelfBook(cell.id)?text(shelfBook(cell.id)!.official):isTopicExhibit(cell.id)?topicCount(cell.id):null,
-        certainty:pictureCertainty(cell.colour),kind:isTopicExhibit(cell.id)?'manuscript':picks.find(pick=>pick.id===cell.id)?.kind??'picture',
-        preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
-        open:id=>openExhibit(id,null),room:roomName,
-        // THE SHELF NAMES ITSELF, and the books it cannot show stand on it by
-        // name with the reason, never opened
-        name:()=>hereContent().id==='reading-table'?{en:SHELF_UI.en.shelf,de:SHELF_UI.de.shelf}:null,
-        // the seventeen topics stand in three rows of six
-        columns:()=>hereContent().id==='reading-table'?6:null,
-        absent:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].absent,
-          items:shownAbsences(lang()).map(absence=>({title:absence.title,reason:absence.reason}))},
-        // every whole book stays one press away, as a source under the topics
-        books:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].codices,
-          items:SHELF_BOOKS.map(book=>({id:book.entry?book.id:EDITION_WHOLE,title:text(book.official),
-            preview:book.entry?shelfPlate(book.entry):editionPlate()}))},
-        // the three rooms whose set the card data measures: the hang, the
-        // machine hall, and the leaves
-        measure:()=>{const here=hereContent().id
-          const key=here==='picture-room'||here==='picture-room-west'?'measure_wall'
-            :here==='flight'||here==='works'?'measure_hall':here==='body'?'measure_book':''
-          // the best-of is measured by its pages, never by its topics
-          if(here==='reading-table'){const pages=String(bestOfCount())
-            const said=deskControl('overview','measure_book');return {en:said.en.replace('{n}',pages),de:said.de.replace('{n}',pages)}}
-          return key?deskControl('overview',key):null}},
+      overview:listHost(),
 
       // desk.sheet: its host fields
 
@@ -2393,6 +2372,34 @@ export function createWing():VinciWingModule {
         if(stop)openExhibit(stop.exhibit,null)
       }}
   }
+  /** THE ROOM'S LIST, the same on the desk's band and in the phone's drawer */
+  function listHost():NonNullable<Parameters<typeof createDeskChrome>[0]['overview']> {
+    return {cells:()=>stationExhibits().map(cell=>({id:cell.id,title:cell.title,short:exhibitShort(cell.id),openable:cell.openable,
+      sub:shelfBook(cell.id)?text(shelfBook(cell.id)!.official):isTopicExhibit(cell.id)?topicCount(cell.id):null,
+      certainty:pictureCertainty(cell.colour),kind:isTopicExhibit(cell.id)?'manuscript':picks.find(pick=>pick.id===cell.id)?.kind??'picture',
+      preview:cell.preview===null?null:strip?.thumb(cell.preview)??cell.preview})),
+      open:id=>openExhibit(id,null),room:roomName,
+      // THE SHELF NAMES ITSELF, and the books it cannot show stand on it by
+      // name with the reason, never opened
+      name:()=>hereContent().id==='reading-table'?{en:SHELF_UI.en.shelf,de:SHELF_UI.de.shelf}:null,
+      // the seventeen topics stand in three rows of six
+      columns:()=>hereContent().id==='reading-table'?6:null,
+      absent:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].absent,
+        items:shownAbsences(lang()).map(absence=>({title:absence.title,reason:absence.reason}))},
+      // every whole book stays one press away, as a source under the topics
+      books:()=>hereContent().id!=='reading-table'?null:{heading:TABLE_UI[lang()].codices,
+        items:SHELF_BOOKS.map(book=>({id:book.entry?book.id:EDITION_WHOLE,title:text(book.official),
+          preview:book.entry?shelfPlate(book.entry):editionPlate()}))},
+      // the three rooms whose set the card data measures: the hang, the
+      // machine hall, and the leaves
+      measure:()=>{const here=hereContent().id
+        const key=here==='picture-room'||here==='picture-room-west'?'measure_wall'
+          :here==='flight'||here==='works'?'measure_hall':here==='body'?'measure_book':''
+        // the best-of is measured by its pages, never by its topics
+        if(here==='reading-table'){const pages=String(bestOfCount())
+          const said=deskControl('overview','measure_book');return {en:said.en.replace('{n}',pages),de:said.de.replace('{n}',pages)}}
+        return key?deskControl('overview',key):null}}
+  }
   /** THE PHONE STANDS IN ITS FROZEN FORM: the one box over the room, and the
    * frame's bar, the old card with its door block and the wall's row stand
    * down (wing.css). Stood at the mount, before the house is built, with its
@@ -2411,7 +2418,11 @@ export function createWing():VinciWingModule {
       hurry:()=>{if(standing)rail.stride(1)},
       record:()=>{if(!standing)return;sources.select('station');mode=2;paintDock()},
       wall:phoneWall,look:phoneLook,
+      list:()=>{phoneList?.paint();return phoneList?.control??null},
       words:{next:LIFE_CARDS.controls.date.next,previous:LIFE_CARDS.controls.date.previous}})
+    phoneList?.dispose()
+    phoneList=createDeskOverview({...listHost(),columns:()=>2,lang,mark:deskMark,sheet:true})
+    h.labels.append(phoneList.element)
     h.stage.parentElement!.dataset['phoneForm']='';h.labels.dataset['keepsFoot']=''
     // a press on the picture folds the words back to the one line
     h.stage.addEventListener('pointerdown',()=>{if(phone?.drawerOpen())phone.setDrawer(false)},{signal})
@@ -2812,7 +2823,8 @@ export function createWing():VinciWingModule {
       },
       openBook:openFromRecord,
       // the phone's count goes back to the station, whose row is the set
-      openShelf:()=>closeLook?.close(),
+      // on the phone the count opens the room's list of topics over the look
+      openShelf:()=>{if(phoneList&&narrow()){phoneList.control.click();if(phoneList.standing())return}closeLook?.close()},
       close:()=>closeLook?.close(),
       changed:()=>{if(exhibitSources?.id===id&&mode===2)paintDock()}})
     const how_=closeLook.id&&closeLook.id!==id?'advance':'enter'
@@ -3776,7 +3788,7 @@ export function createWing():VinciWingModule {
       dots?.update(panels,undefined,name&&name.width>0?[{left:name.left,top:name.top,right:name.right,bottom:name.bottom}]:null)
       paintPictureWords()},
     // the evening's uniforms and the scene's light outlive a visit: the hour goes back before they are let go
-    stop(){if(hosts){delete hosts.stage.parentElement!.dataset['farewell'];delete hosts.stage.parentElement!.dataset['phoneForm'];delete hosts.labels.dataset['keepsFoot']}phone?.dispose();phone=undefined;phoneStop?.abort();phoneStop=undefined;farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
+    stop(){if(hosts){delete hosts.stage.parentElement!.dataset['farewell'];delete hosts.stage.parentElement!.dataset['phoneForm'];delete hosts.labels.dataset['keepsFoot']}phone?.dispose();phone=undefined;phoneList?.dispose();phoneList=undefined;phoneStop?.abort();phoneStop=undefined;farewellRun=null;farewellHeld=null;if(farewellShare!==null)applyEvening(null);pictureWordsLayer?.dispose();pictureWordsLayer=undefined;wordsPrint=wordsDrawn="";studySheet?.dispose();studySheet=undefined;releaseSheetMemory?.();releaseSheetMemory=undefined;desk?.dispose();desk=undefined;visit?.close();visit=undefined;plan?.dispose();plan=undefined;planControl?.remove();planControl=undefined;life?.dispose();life=undefined;lifeControl?.remove();lifeControl=undefined;closeLook?.dispose();closeLook=undefined;if(scheduled)cancelAnimationFrame(scheduled);scheduled=0;house=undefined;houseUp=0;standing=false;warm?.abort();warm=undefined;announceBuilt();exhibits?.dispose();exhibits=undefined;shadowBody?.dispose();shadowBody=undefined;shadowCache?.dispose();shadowCache=undefined;hallSun=undefined;restoreEnvironmentRotation?.();restoreEnvironmentRotation=null;clearSky?.dispose();clearSky=undefined;controller?.abort();strip?.dispose();strip=undefined;dots?.dispose();dots=undefined;picks=[];picksTier='';occluders=[];collectionRoot=undefined;welcome?.dispose();welcome=undefined;sources?.dispose();source?.remove();labels?.dispose();measurement?.dispose();water?.dispose();hosts?.world.scene.traverse(o=>{if(o instanceof DirectionalLight&&o!==key?.light)o.dispose()});key?.dispose();if(hosts){hosts.world.scene.traverse(o=>{if(o instanceof Mesh){o.geometry.dispose();for(const m of Array.isArray(o.material)?o.material:[o.material])m.dispose()}});hosts.world.scene.clear();delete hosts.stage.parentElement!.dataset['wing'];if(labelHostHidden===null)hosts.labels.removeAttribute('aria-hidden');else hosts.labels.setAttribute('aria-hidden',labelHostHidden)}hosts=undefined},
   }
   return wingModule
 }

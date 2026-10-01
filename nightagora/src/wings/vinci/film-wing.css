@@ -313,3 +313,18 @@ html:has(#wing[data-film='upright']) #instruments .inst-close {
 #wing[data-film][data-evening] .wing-stage > :not(.na-film) { opacity: 0; pointer-events: none; transition: opacity .9s ease; }
 body:has(#wing[data-film][data-evening]) :is(#rail-instruments, #rail-sound) { opacity: 0; visibility: hidden; }
 body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacity .9s ease; }
+
+/* THE ROOM'S LIST AT THE DRAWER'S FOOT, a row as the door's ask is: its word
+   at the left, the four small plates of a set at the right, in gold */
+.film-drawer .desk-ov-open {
+  display: flex; align-items: center; gap: 6px; width: 100%; height: auto; min-height: 44px; margin-top: 0; padding: 0;
+  border: 0; border-top: 1px solid #22303c; border-radius: 0; background: none; box-shadow: none;
+  font: 400 .9375rem/1 var(--sans); color: var(--key); text-align: left; white-space: normal; cursor: pointer;
+}
+.film-drawer .desk-ov-open::after {
+  content: ''; flex: 0 0 14px; width: 14px; height: 14px; margin-left: auto; background: var(--gold);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center / contain no-repeat;
+}
+.film-drawer .desk-ov-open:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
+.film-drawer .desk-ov-open[hidden] { display: none; }

@@ -253,3 +253,48 @@
 }
 /* the book's name reads before the reason it is not here */
 .desk-ov-absent-name { margin-right: 8px; color: var(--desk-quiet); }
+
+/* ---- ON THE PHONE THE SET IS A SHEET at the glass's tall height, as the
+   record and the panel are: the full width from 44 px under the top, one
+   scroll, two columns (the desk's cell width, which two rows of a German
+   title need), a press on a cell walks there, and the one close in the
+   thumb's reach at the foot's left, where the record keeps its own ---- */
+.desk-ov[data-sheet] {
+  inset: 44px 0 0;
+  height: auto;
+  max-height: none;
+  padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  border-top: 1px solid #a9977355;
+  border-radius: 14px 14px 0 0;
+  background: #0d171f;
+  --desk-title: #fff5e3;
+  --desk-quiet: #c8bda6;
+}
+/* it stands in the wing's labels layer, which takes no press of its own */
+.desk-ov[data-sheet][open] { display: block; pointer-events: auto; }
+.desk-ov[data-sheet]::backdrop { background: #081016a6; }
+/* the foot under the close: the list fades into it as it scrolls by */
+.desk-ov[data-sheet]::after {
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1; height: calc(80px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 28px); pointer-events: none;
+}
+/* one close, and a press on a cell is the walk: the step back and the foot's selector stand down */
+.desk-ov[data-sheet] :is(.desk-ov-back, .desk-ov-foot) { display: none; }
+.desk-ov[data-sheet] .desk-ov-shut {
+  position: fixed; left: 16px; right: auto; top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
+  width: 48px; height: 48px; background: #07101ad9; box-shadow: inset 0 0 0 1px #ffffff40; color: #ecdfc7;
+}
+.desk-ov[data-sheet] .desk-ov-title { margin: 0; padding-right: 8px; font: 400 1.375rem/1.75rem var(--serif); }
+.desk-ov[data-sheet] .desk-ov-sub { margin-top: 4px; font: 400 .875rem/1.25rem var(--sans); }
+.desk-ov[data-sheet] .desk-ov-grid {
+  margin-top: 18px; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 12px;
+  align-content: start; overflow: visible;
+}
+.desk-ov[data-sheet] .desk-ov-plate { height: 136px; }
+.desk-ov[data-sheet] :is(.desk-ov-books, .desk-ov-absent) { width: 100%; margin-top: 22px; }
+.desk-ov[data-sheet] .desk-ov-absent-list { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+/* the selector is the desk's hand; on the phone a press walks, so no cell stands selected */
+.desk-ov[data-sheet] .desk-ov-cell[aria-current='true']:not(:focus-visible) .desk-ov-thumb { box-shadow: 0 1px 4px color-mix(in srgb, var(--na-abyss) 70%, transparent); }
+.desk-ov[data-sheet] .desk-ov-cell[aria-current='true']:not(:focus-visible) .desk-ov-cellname { color: var(--na-mist); }

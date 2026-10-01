@@ -28,7 +28,7 @@ import { walkedClip } from '../../../forge/film/walks.mjs'
 import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook, FilmLookWays } from './film-look'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
-import type { DeskOverviewCell } from '../overview'
+import { createDeskOverview, type DeskOverview, type DeskOverviewCell } from '../overview'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
 import wingCss from './wing.css?inline'
 import deskCss from '../desk-chrome.css?inline'
@@ -523,6 +523,27 @@ export function createWing(): WingModule {
       },
       // the line's floor opens the life view, where this wing carries one
       life: () => { const open = hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-life-open'); open?.click(); return Boolean(open) },
+      list: () => { if (!phoneList) return false; phoneList.control.click(); return phoneList.standing() },
+    }
+  }
+  /** THE ROOM'S LIST, the same on the desk's band and in the phone's drawer */
+  function listHost(): NonNullable<Parameters<typeof createDeskChrome>[0]['overview']> {
+    return {
+      cells: () => cellsNow,
+      open: id => openFromOverview(id),
+      room: () => text(CARDS.station_short_names?.[stationOf(LIFE[card]!.station).id] ?? stationOf(LIFE[card]!.station).name),
+      // THE READING TABLE'S SHELF: its name, columns, whole books and absences, from the look once loaded
+      name: () => atTable() ? look?.shelf().name ?? null : null,
+      columns: () => atTable() ? 6 : null,
+      absent: () => atTable() ? look?.shelf().absent ?? null : null,
+      books: () => atTable() ? look?.shelf().books ?? null : null,
+      // the three rooms whose set the card data measures: the hang, the machine hall, the leaves
+      measure: () => {
+        if (atTable()) return look?.shelf().measure ?? null
+        const here = stationOf(LIFE[card]!.station).id
+        const key = here === 'picture-room' || here === 'picture-room-west' ? 'measure_wall' : here === 'flight' || here === 'works' ? 'measure_hall' : here === 'body' ? 'measure_book' : ''
+        return key ? deskControl('overview', key) : null
+      },
     }
   }
   function openFromOverview(id: string): void {
@@ -635,6 +656,11 @@ export function createWing(): WingModule {
     goldPath: SVGPathElement
   } | undefined
   let drawerOpen = false
+  /* THE ROOM'S LIST ON THE PHONE: its word stands at the drawer's foot under
+     the door's ask, since the key row has no room for it at 390 and a row of
+     its own at rest would take the picture under two thirds; it opens the set
+     as a sheet at the glass's tall height */
+  let phoneList: DeskOverview | undefined
   function buildPhone(h: WingHosts): void {
     const root = make('div', 'film-box')
     const name = make('div', 'film-name')
@@ -744,6 +770,7 @@ export function createWing(): WingModule {
         ask.addEventListener('click', () => door.click())
         phone.drawer.append(ask)
       }
+      if (phoneList) { phoneList.paint(); phone.drawer.append(phoneList.control) }
     }
     phone.more.textContent = ''
     phone.more.append(document.createTextNode(text(drawerOpen ? LOBBY_TEXT.close : deskControl('shared', 'read_more'))), icon(drawerOpen ? ARROW_DOWN : ARROW_UP))
@@ -1033,26 +1060,12 @@ export function createWing(): WingModule {
       // a wait is not a walk: the words and the way on stand until the clip can play through
       leg: () => { const s = picture?.state(); return s?.kind === 'walk' ? s.share : null },
       hurry: () => picture?.hurry(),
-      overview: {
-        cells: () => cellsNow,
-        open: id => openFromOverview(id),
-        room: () => text(CARDS.station_short_names?.[stationOf(LIFE[card]!.station).id] ?? stationOf(LIFE[card]!.station).name),
-        // THE READING TABLE'S SHELF: its name, columns, whole books and absences, from the look once loaded
-        name: () => atTable() ? look?.shelf().name ?? null : null,
-        columns: () => atTable() ? 6 : null,
-        absent: () => atTable() ? look?.shelf().absent ?? null : null,
-        books: () => atTable() ? look?.shelf().books ?? null : null,
-        // the three rooms whose set the card data measures: the hang, the machine hall, the leaves
-        measure: () => {
-          if (atTable()) return look?.shelf().measure ?? null
-          const here = stationOf(LIFE[card]!.station).id
-          const key = here === 'picture-room' || here === 'picture-room-west' ? 'measure_wall' : here === 'flight' || here === 'works' ? 'measure_hall' : here === 'body' ? 'measure_book' : ''
-          return key ? deskControl('overview', key) : null
-        },
-      },
+      overview: listHost(),
     })
     if (!wide) {
       buildPhone(h)
+      phoneList = createDeskOverview({ ...listHost(), columns: () => 2, lang, mark: deskMark, sheet: true })
+      h.labels.append(phoneList.element)
       /* A CLOSE LOOK STANDS OVER THE FOOT ROW, which the box keeps (standDown),
          and a sideways swipe on its card steps the set as the row's two ways do */
       h.labels.dataset['keepsFoot'] = ''
@@ -1208,6 +1221,7 @@ export function createWing(): WingModule {
       desk?.dispose(); desk = undefined
       look?.dispose(); look = undefined; lookLoading = undefined
       phone?.root.remove(); phone = undefined
+      phoneList?.dispose(); phoneList = undefined
       sources?.dispose(); sources = undefined
       sourceButton?.remove(); sourceButton = undefined
       picture?.dispose(); picture = undefined

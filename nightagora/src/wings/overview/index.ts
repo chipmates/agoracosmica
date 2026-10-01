@@ -54,6 +54,9 @@ export interface DeskOverviewHost {
   books?: () => { heading: string; items: readonly { id: string; title: string; preview: string | null }[] } | null
   /** the museum's certainty mark, handed in so this view draws the same one */
   mark: (certainty: VinciCertainty) => SVGSVGElement
+  /** ON THE PHONE THE VIEW IS A SHEET at the glass's tall height, as the
+      record and the panel are, and a press on a cell walks there */
+  sheet?: boolean
 }
 
 export interface DeskOverview {
@@ -171,6 +174,7 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   on.append(onWords, onArrow)
   foot.append(named, on)
   view.append(stepBack, shut, title, sub, grid, books, absent, foot)
+  if (host.sheet) view.dataset['sheet'] = ''
 
   let shown: DeskOverviewCell[] = []
   let buttons: HTMLButtonElement[] = []
@@ -185,6 +189,12 @@ export function createDeskOverview(host: DeskOverviewHost): DeskOverview {
   on.addEventListener('click', () => walk(at))
   // Escape is one step back and not a cancel: the set is a place to look at.
   view.addEventListener('cancel', event => { event.preventDefault(); close(true) })
+  // a press on the sheet's backdrop closes it, as the record's does: the thumb is already below it
+  view.addEventListener('click', event => {
+    if (event.target !== view) return
+    const box = view.getBoundingClientRect()
+    if (event.clientX < box.left || event.clientX > box.right || event.clientY < box.top || event.clientY > box.bottom) close(true)
+  })
   // A traversal walks the museum under the view, so the view goes with it.
   const leaving = new AbortController()
   window_.addEventListener('popstate', () => close(false), { signal: leaving.signal })

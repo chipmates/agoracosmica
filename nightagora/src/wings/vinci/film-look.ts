@@ -68,6 +68,8 @@ export interface FilmLookHost {
   walkOn(id: string): void
   /** the wing's life window, which the line's floor opens whole; false where the film carries none */
   life?(): boolean
+  /** the room's list as the phone's sheet, over the look; false where the framing has none */
+  list?(): boolean
   stack: Stack
   scene: Scene
   camera: PerspectiveCamera
@@ -473,7 +475,8 @@ export function createFilmLook(h: FilmLookHost) {
       manifest: loadManifest(), colour: certaintyColour('documented'), narrow: h.narrow,
       tier: () => 'standard', openTopic: (next, button) => openTopic(next, undefined, button),
       openRecord: recordOf, openBook: book => void open(book === EDITION_EXHIBIT ? EDITION_WHOLE : book, null),
-      openShelf: () => closeLook.close(), close: () => closeLook.close() })
+      // the count opens the room's list of topics: the phone's sheet over the look, else the room under it
+      openShelf: () => { if (!h.list?.()) closeLook.close() }, close: () => closeLook.close() })
     h.standDown(true)
     openLook(look.exhibit, from, closeLook.id ? 'advance' : 'enter')
   }

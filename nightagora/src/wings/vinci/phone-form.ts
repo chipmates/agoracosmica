@@ -95,6 +95,10 @@ export interface VinciPhoneHost {
   wall(): VinciPhoneWall | null
   /** the close look standing, whose foot row this box keeps */
   look(): VinciPhoneLook | null
+  /** THE ROOM'S LIST, its word at the drawer's foot under the door's ask: the
+      key row has no room for it at 390, and a row of its own at rest would
+      take the picture under two thirds. Null where the room holds no set. */
+  list?(): HTMLElement | null
   words: { next: VinciText; previous: VinciText }
 }
 
@@ -287,6 +291,8 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
         ask.addEventListener('click', () => door.click())
         drawer.append(ask)
       }
+      const list = host.list?.()
+      if (list) drawer.append(list)
     }
     more.textContent = ''
     more.append(document.createTextNode(text(open ? LOBBY_TEXT.close : deskControl('shared', 'read_more'))), icon(open ? ARROW_DOWN : ARROW_UP))
