@@ -316,6 +316,18 @@ describe('agc-public.js: the read counter', () => {
     expect(await reads()).toHaveLength(1);
   });
 
+  it('takes no scroll when the page already stood past the middle at the first input', async () => {
+    readingPage(4000);
+    loadPage('/themes/moral-life/');
+    scrollTo(3000); // the browser's own scroll to a passage
+    input('touchmove');
+    scrollTo(3010);
+    expect(added.filter(([, type]) => type === 'scroll')).toEqual([]);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(30_000);
+    expect(await reads()).toHaveLength(1);
+  });
+
   it('does not take a scroll on a page whose middle is on the first screen', async () => {
     readingPage(1200); // middle at 600, already in view
     loadPage('/figures/william-blake/poems/the-tyger/');

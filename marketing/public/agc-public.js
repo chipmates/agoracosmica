@@ -485,12 +485,13 @@
 
     // The scroll rule waits for the visitor's own wheel, touch or key input:
     // a browser scrolls by itself to a highlighted passage, and that address
-    // part is hidden from scripts. A scrollbar drag alone counts by the clock.
+    // part is hidden from scripts. A scrollbar drag alone counts by the clock,
+    // and so does a page already past the middle at that first input.
     function armScroll() {
       window.removeEventListener('wheel', armScroll);
       window.removeEventListener('touchmove', armScroll);
       window.removeEventListener('keydown', armScroll);
-      if (!counted) window.addEventListener('scroll', onScroll, { passive: true });
+      if (!counted && !pastMiddle()) window.addEventListener('scroll', onScroll, { passive: true });
     }
 
     document.addEventListener('visibilitychange', onVisibility);
