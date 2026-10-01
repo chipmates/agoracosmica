@@ -10,6 +10,7 @@
 //     paid-arrival counter on a fresh navigation to a paid landing URL
 //   - Count a read on the reading pages (thirty visible seconds, or a scroll
 //     past the middle of the text), once per page load
+//   - Count the first play of an audio element in the page, once per page load
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
@@ -489,10 +490,34 @@
     }
   }
 
+  // Anonymous play counter: the first time an <audio> element in the page
+  // starts to sound, once per page load. Media events do not bubble, so the
+  // listener sits in the capture phase, and a player that keeps its Audio
+  // object outside the document never reaches it. The row is the read row
+  // under another name: step, path, language, and the probe constant from a
+  // marked browser. It says a play happened and nothing about how long.
+  function armPlayCounter() {
+    function onPlaying(e) {
+      var el = e.target;
+      if (!el || el.tagName !== 'AUDIO') return;
+      document.removeEventListener('playing', onPlaying, true);
+      try {
+        postFunnel({
+          step: 'audio_play',
+          path: window.location.pathname,
+          language: pageLanguage(),
+          probe: probeField(),
+        });
+      } catch (err) { /* no-op */ }
+    }
+    document.addEventListener('playing', onPlaying, true);
+  }
+
   captureGclidFromUrl();
   sendPageBeacon();
   if (hasPaidParam() && isFreshNavigation()) sendPaidArrivalBeacon();
   armReadCounter();
+  armPlayCounter();
   markDoors();
 
   // Doors an island renders after this script ran get the class when used.

@@ -18,7 +18,7 @@
 // fresh navigation from utils/pageBeacon.ts. The ask_listen_* trio fires from the
 // paused-chapter ask (hooks/useAskWhileListening.ts), shown deduped per
 // chapter play by the hook itself.
-// The marketing pages' cta_click, paid_arrival and read fire from
+// The marketing pages' cta_click, paid_arrival, read and audio_play fire from
 // agc-public.js with the same payload shape.
 //
 // Privacy: keyless aggregate counter only. No clientId, no gclid, no IP, no

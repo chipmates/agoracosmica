@@ -359,6 +359,74 @@ describe('agc-public.js: the read counter', () => {
   });
 });
 
+describe('agc-public.js: the audio play counter', () => {
+  function audioInPage(): HTMLAudioElement {
+    const audio = document.createElement('audio');
+    document.body.appendChild(audio);
+    return audio;
+  }
+  // Media events do not bubble: only a capture-phase listener sees them.
+  const fire = (el: EventTarget, type: string) => el.dispatchEvent(new Event(type));
+  const sentSoFar = () => vi.mocked(navigator.sendBeacon).mock.calls.length;
+  async function plays(): Promise<Record<string, unknown>[]> {
+    await new Promise((r) => setTimeout(r, 0));
+    return beacons.filter((b) => b.body.step === 'audio_play').map((b) => b.body);
+  }
+
+  it('counts the first play of an audio element in the page, once per page load', async () => {
+    const first = audioInPage();
+    const second = audioInPage();
+    loadPage('/figures/emily-dickinson/poems/?utm_source=x#theme-hope');
+    fire(first, 'playing');
+    fire(first, 'pause');
+    fire(first, 'playing');
+    fire(second, 'playing');
+    expect(await plays()).toEqual([
+      { step: 'audio_play', path: '/figures/emily-dickinson/poems/', language: 'en' },
+    ]);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  it('waits for sound: a play that never starts counts nothing', async () => {
+    const audio = audioInPage();
+    loadPage('/de/', 'de');
+    fire(audio, 'play');
+    fire(audio, 'waiting');
+    fire(audio, 'error');
+    expect(sentSoFar()).toBe(0);
+    fire(audio, 'playing');
+    expect(await plays()).toEqual([{ step: 'audio_play', path: '/de/', language: 'de' }]);
+  });
+
+  it('does not see a player that keeps its audio outside the document', async () => {
+    loadPage('/figures/marcus-aurelius/');
+    fire(new Audio(), 'playing');
+    expect(sentSoFar()).toBe(0);
+    expect(await plays()).toEqual([]);
+  });
+
+  it('leaves a video alone, and still counts the audio after it', async () => {
+    const video = document.createElement('video');
+    document.body.appendChild(video);
+    const audio = audioInPage();
+    loadPage('/');
+    fire(video, 'playing');
+    expect(sentSoFar()).toBe(0);
+    fire(audio, 'playing');
+    expect(await plays()).toHaveLength(1);
+  });
+
+  it('carries the probe constant from a marked browser', async () => {
+    const audio = audioInPage();
+    loadPage('/figures/emily-dickinson/poems/?probe=1');
+    fire(audio, 'playing');
+    expect(await plays()).toEqual([
+      { step: 'audio_play', path: '/figures/emily-dickinson/poems/', language: 'en', probe: 1 },
+    ]);
+  });
+});
+
 describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;

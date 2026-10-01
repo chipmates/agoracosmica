@@ -1,6 +1,6 @@
 // Anonymous funnel-step beacon
-// Fires from the marketing pages (cta_click, paid_arrival and read via
-// agc-public.js, the ad_consent_* counters via the ArrivalChoice island),
+// Fires from the marketing pages (cta_click, paid_arrival, read and audio_play
+// via agc-public.js, the ad_consent_* counters via the ArrivalChoice island),
 // from the client app (cinematic_start / cinematic_end / welcome_shown /
 // first_turn / figure_selected / mode_selected / first_reply / engaged /
 // council_heard via utils/funnelBeacon.ts) and from the museum (the museum_* steps via
@@ -54,6 +54,11 @@ const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
 // client, and the row is the page path and the language, nothing about how
 // long or how far.
 const READ_STEPS = ['read'] as const;
+
+// An audio element in a public page started to play: the first play of a
+// page load, one-shot on the client. The row is the page path and the
+// language, and nothing about how much was heard.
+const PLAY_STEPS = ['audio_play'] as const;
 
 // Strict server-side step allowlist (Waves 1-2). Anything not on this list is
 // silently dropped — no row is written and the client learns nothing (same
@@ -134,6 +139,7 @@ const VALID_STEPS = new Set([
   'paid_arrival',
   ...CONSENT_STEPS,
   ...READ_STEPS,
+  ...PLAY_STEPS,
 ]);
 
 // The museum's steps, plain totals with no join key between them:
@@ -193,18 +199,18 @@ const DOOR_LABELS = new Set(['door', 'plain']);
 const DIMENSIONLESS_STEPS = new Set(['paid_arrival']);
 
 // Counter-only steps: the row is the step name, the sanitized page path (the
-// page the question appeared on, or the page that was read), the interface
+// page the question appeared on, was read, or played its audio), the interface
 // language, the country and device class the edge derives, on the consent
 // answers the coarse time-to-answer bucket, and the in-house probe constant
 // when a marked browser sent it (every funnel row can carry that one). Nothing
 // else. The mode slot is blanked, the outcome is forced to '200' server-side,
 // and the path slot only ever takes a path — a figure id sent on one of these
 // steps is dropped rather than stored, so no content dimension can ride along
-// with a consent answer or a read. The route reads no gclid field on any step,
-// so none can be stored either. Derived from the step lists above rather than
-// re-listed, so the lists cannot drift apart.
+// with a consent answer, a read or a play. The route reads no gclid field on
+// any step, so none can be stored either. Derived from the step lists above
+// rather than re-listed, so the lists cannot drift apart.
 // docs/MEASUREMENT.md states this shape.
-const COUNTER_ONLY_STEPS = new Set<string>([...CONSENT_STEPS, ...READ_STEPS]);
+const COUNTER_ONLY_STEPS = new Set<string>([...CONSENT_STEPS, ...READ_STEPS, ...PLAY_STEPS]);
 
 // Counter-only steps that may still carry a bucket. Everything else on the
 // counter-only list is pinned to 0. The consent set has exactly four buckets,
