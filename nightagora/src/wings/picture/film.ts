@@ -679,7 +679,9 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
           for (const r of queued?.resolve ?? []) r(here)
           queued = { node, fade, resolve: [resolve] }
         }
-        carried = 1
+        // only a press while the picture moves carries its pace: one that
+        // lands while the bytes are still on their way hurries nothing
+        if (state.kind !== 'wait') carried = 1
         if (playing) playing.video.playbackRate = rate()
       })
     }
