@@ -60,6 +60,10 @@ export function createShowpiecePayload(options: {
   let shown = false, dragging = false, line = -1, lineBox = 0, measuredAt = ''
   let film: { left: number; top: number; width: number; height: number } | null = null
   let listening = new AbortController()
+  /** ON THE PHONE THE LINE IS THE CARD'S: it stands in the sheet under the
+      work's name, as the phone form's line does, and never over the film */
+  let said: HTMLParagraphElement | undefined
+  const lineHost = (): HTMLElement | undefined => (host?.narrow ? said : host?.caption)
 
   const cutOf = (f: ShowpieceFraming): ShowpieceCut | undefined => options.cuts[f] ?? options.cuts.wide ?? options.cuts.upright
   const aspect = (): number => { const c = cutOf(framing); return c ? c.poster.width / c.poster.height : 16 / 9 }
@@ -82,22 +86,24 @@ export function createShowpiecePayload(options: {
       language in the caption's own type, so the picture never moves when a
       line gives way to the next */
   function measureLines(): number {
-    if (!host) return 0
-    const caption = host.caption
-    const box = host.element.getBoundingClientRect()
+    const caption = lineHost()
+    if (!host || !caption) return 0
+    const box = (host.narrow ? caption : host.element).getBoundingClientRect()
     const key = `${Math.round(box.width)}|${host.lang}|${lines.length}`
     if (key === measuredAt) return lineBox
-    const said = caption.textContent
-    caption.style.top = '0px'
-    caption.style.bottom = 'auto'
+    const shown = caption.textContent
+    if (!host.narrow) { caption.style.top = '0px'; caption.style.bottom = 'auto' }
+    caption.style.minHeight = ''
     let most = 0
     for (const each of lines) {
       caption.textContent = each.text
       most = Math.max(most, caption.getBoundingClientRect().height)
     }
-    caption.textContent = said
+    caption.textContent = shown
     measuredAt = key
     lineBox = Math.ceil(most)
+    // the card's peek is measured once, at the longest line, so it never jumps
+    if (host.narrow) caption.style.minHeight = `${lineBox}px`
     return lineBox
   }
 
@@ -107,6 +113,7 @@ export function createShowpiecePayload(options: {
     if (!host || !root) return
     const box = host.element.getBoundingClientRect()
     if (box.width < 2 || box.height < 2) return
+    if (host.narrow) { fitGlass(box); return }
     const lanes = !host.narrow && door ? 2 * (door.offsetWidth + LANE) : 0
     const room = { width: Math.max(LEAST, box.width - lanes), height: Math.max(LEAST, box.height - measureLines() - GAP) }
     const a = aspect()
@@ -122,6 +129,23 @@ export function createShowpiecePayload(options: {
       door.style.left = `${film.left + film.width + LANE}px`
       door.style.top = `${film.top + film.height - door.offsetHeight}px`
     }
+  }
+
+  /** THE FILM TAKES THE GLASS'S WIDTH ON THE PHONE, at its own aspect: its
+      middle stands in the middle of the glass above the sheet, and a film
+      taller than that runs on under the sheet and past the glass's top, as
+      the walk's own picture runs under its box */
+  function fitGlass(box: DOMRect): void {
+    if (!host || !root) return
+    measureLines()
+    const view = host.element.ownerDocument.defaultView!
+    const width = view.innerWidth, height = width / aspect()
+    // the payload ends where the card's peek begins
+    const above = box.bottom
+    let top = (above - height) / 2
+    if (height > above) top = Math.min(0, Math.max(above - height, top))
+    film = { left: Math.round(-box.left), top: Math.round(top - box.top), width: Math.round(width), height: Math.round(height) }
+    Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
   }
 
   function load(f: ShowpieceFraming, at: number, playing: boolean): void {
@@ -191,8 +215,10 @@ export function createShowpiecePayload(options: {
     const at = lineAt(t)
     if (at === line) return
     line = at
-    host.caption.textContent = lines[at]?.text ?? ''
-    host.caption.lang = host.lang
+    const into = lineHost()
+    if (!into) return
+    into.textContent = lines[at]?.text ?? ''
+    into.lang = host.lang
   }
 
   function build(next: VitrinePayloadHost): void {
@@ -215,6 +241,11 @@ export function createShowpiecePayload(options: {
     for (const name of ['playsinline', 'muted', 'disableremoteplayback']) video.setAttribute(name, '')
     root.append(style, poster, video)
     next.element.append(root)
+    if (next.narrow) {
+      said = make(doc, 'p', 'showpiece-line')
+      said.setAttribute('aria-live', 'polite')
+      next.aside.append(said)
+    }
     video.addEventListener('playing', reveal, { signal })
     video.addEventListener('seeked', reveal, { signal })
     for (const event of ['play', 'pause', 'ended', 'timeupdate', 'seeked']) video.addEventListener(event, paint, { signal })
@@ -310,6 +341,8 @@ export function createShowpiecePayload(options: {
         host.caption.style.removeProperty('bottom')
         host.caption.style.removeProperty('min-height')
       }
+      said?.remove()
+      said = undefined
       root?.remove()
       door?.remove()
       root = undefined; poster = undefined; video = undefined; play = undefined; slider = undefined; door = undefined

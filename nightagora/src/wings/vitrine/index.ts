@@ -281,7 +281,9 @@ export function createVitrine(options: {
       } else paintLine(null)
       // The sheet is the card's ground; the viewport above it stays open to
       // the stage, so the work is seen and not a shade through a panel.
-      place2(fill ? (raised ? Math.round(tall * RAISED_SHARE) : peek) : bottom - top - viewHeight)
+      // a raised card takes the height its words need, never more than its share
+      if (fill && raised) place2(Math.round(tall * RAISED_SHARE))
+      place2(fill ? (raised ? Math.max(peek, Math.min(Math.round(tall * RAISED_SHARE), raisedAsked())) : peek) : bottom - top - viewHeight)
       payloadControls.style.cssText = ''
       // a lined book's page runs to the stage's top corner, where its folio
       // stands: the mark waits above the stage there
@@ -427,7 +429,32 @@ export function createVitrine(options: {
   function peekAsked(): number {
     const own = view.getComputedStyle(card)
     const slack = Math.min(26, parseFloat(own.paddingTop) + parseFloat(own.paddingBottom) + 4)
-    return Math.ceil(grab.getBoundingClientRect().height + body.scrollHeight + payloadControls.getBoundingClientRect().height + slack)
+    // a grab that reaches over the name gives its overlap back
+    const reach = grab.hidden ? 0 : grab.getBoundingClientRect().height + Math.min(0, parseFloat(view.getComputedStyle(grab).marginBottom) || 0)
+    return Math.ceil(reach + body.scrollHeight + payloadControls.getBoundingClientRect().height + slack)
+  }
+  /** The height the raised card's words and rows ask for: every row at its
+   * own height, the words whole. */
+  function raisedAsked(): number {
+    const own = view.getComputedStyle(card)
+    let asked = parseFloat(own.paddingTop) + parseFloat(own.paddingBottom) + parseFloat(own.borderTopWidth) + parseFloat(own.borderBottomWidth)
+    for (const part of [...card.children] as HTMLElement[]) {
+      if (part.hidden || view.getComputedStyle(part).display === 'none') continue
+      const style = view.getComputedStyle(part)
+      asked += (part === body ? bodyAsked() : part.getBoundingClientRect().height) + parseFloat(style.marginTop) + parseFloat(style.marginBottom)
+    }
+    return Math.ceil(asked) + 2
+  }
+  /** The words' own height: the body grows to the card it stands in, so its
+   * scroll height is the card's and not the words'. */
+  function bodyAsked(): number {
+    const kids = ([...body.children] as HTMLElement[]).filter((kid) => kid.getClientRects().length > 0)
+    if (!kids.length) return 0
+    const edge = (kid: HTMLElement, side: 'marginTop' | 'marginBottom') => parseFloat(view.getComputedStyle(kid)[side]) || 0
+    const top = Math.min(...kids.map((kid) => kid.getBoundingClientRect().top - edge(kid, 'marginTop')))
+    const end = Math.max(...kids.map((kid) => kid.getBoundingClientRect().bottom + edge(kid, 'marginBottom')))
+    const own = view.getComputedStyle(body)
+    return end - top + parseFloat(own.paddingTop) + parseFloat(own.paddingBottom)
   }
   /** The peek the words ask for keeps the work its share above the sheet. */
   const peekRoom = (): boolean => view.innerHeight - 10 - peekAsked() >= Math.ceil(view.innerHeight * WORK_AT_REST)

@@ -24,3 +24,11 @@
 .vitrine[data-narrow='true'] .vitrine-clock .showpiece-door {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
   padding:0;overflow:hidden;border-radius:50%;}
 .vitrine[data-narrow='true'] .vitrine-clock .showpiece-door .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
+
+/* ON THE PHONE the film's line is the card's own, under the work's name, in
+   the type a book's line takes at the peek; the film keeps the glass. */
+.vitrine[data-narrow='true'] .showpiece-line {margin:0 0 2px;font:400 17px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
+/* the grab's reach over the work's name, as a lined book's: the sheet at rest
+   keeps the film its glass */
+.vitrine[data-narrow='true'][data-fill='true'][data-payload='showpiece'] .vitrine-grab {position:relative;z-index:1;align-items:flex-start;
+  padding-top:10px;margin-bottom:-22px;}

@@ -1132,6 +1132,15 @@ export function createWing(): WingModule {
     // a press on the picture folds the phone's words back to the one line
     h.stage.addEventListener('click', e => { if (drawerOpen && !(e.target as Element).closest('.film-box')) setDrawer(false) }, { signal })
     addEventListener('resize', () => { marksAt = ''; look?.layout() }, { signal })
+    /* THE FRAMING IS CHOSEN ONCE, AT THE MOUNT: a window that crosses between
+       wide and upright (a turned tablet, a narrowed desktop window) loads the
+       film again at the stop its address names, in the other framing, rather
+       than squeezing the desktop's band onto a phone's glass */
+    let crossing = 0
+    addEventListener('resize', () => {
+      clearTimeout(crossing)
+      crossing = window.setTimeout(() => { if (hosts && narrow() === wide && !new URLSearchParams(location.search).has('export')) location.reload() }, 400)
+    }, { signal })
     stood.add(LIFE[card]!.id)
     paint()
     await picture.ready()
