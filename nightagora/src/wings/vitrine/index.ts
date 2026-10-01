@@ -170,7 +170,16 @@ export function createVitrine(options: {
   /** ONE MARK DISMISSES THE WINDOW where the card's own row has stood down. */
   const shutMark = make('button', 'vitrine-shut')
   shutMark.type = 'button'
-  shutMark.textContent = '\u2715'
+  // drawn, not a glyph: the cross's font differs between engines and shrank in one
+  const cross = document.createElementNS('http://www.w3.org/2000/svg', 'svg')
+  cross.setAttribute('viewBox', '0 0 16 16')
+  cross.setAttribute('width', '16')
+  cross.setAttribute('height', '16')
+  cross.setAttribute('aria-hidden', 'true')
+  const stroke = document.createElementNS('http://www.w3.org/2000/svg', 'path')
+  for (const [name, value] of [['d', 'M4 4l8 8M12 4l-8 8'], ['fill', 'none'], ['stroke', 'currentColor'], ['stroke-width', '1.4'], ['stroke-linecap', 'round']] as const) stroke.setAttribute(name, value)
+  cross.append(stroke)
+  shutMark.append(cross)
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
   // the viewport and its controls follow it in the tab order.
   root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark)
