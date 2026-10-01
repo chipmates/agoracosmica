@@ -19,6 +19,7 @@ import { createVinciPaintingView } from './collection/deep-plate'
 import { hangCatalogue } from './collection/catalogue'
 import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF } from './film-look-kinds'
 import { GRAVE_DEATHBED } from './grave/placement'
+import { keepTogetherIn } from './keep-together'
 import { createPlacePayload } from '../vitrine/place'
 import type { VitrineExhibit, VitrinePlace } from '../vitrine/types'
 import type { ShowpiecePayload } from '../vitrine/showpiece'
@@ -146,6 +147,8 @@ export function createFilmLook(h: FilmLookHost) {
     walked = exhibit.walk ?? []
     kicker = exhibit.onKicker ?? null
     closeLook.open(exhibit, from, how)
+    const card = h.host.querySelector('.vitrine-card')
+    if (card) keepTogetherIn(card)
   }
   const tier = () => h.stack.tierName()
 

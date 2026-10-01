@@ -13,6 +13,7 @@ import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciCont
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
 import { shownCitation } from './citations'
 import { showLicences } from './licence-words'
+import { keepTogether, keepTogetherIn } from './keep-together'
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
@@ -65,7 +66,7 @@ function icon(path: string, cls = 'film-ic'): SVGSVGElement {
 /** A pill's label whose last two words never part, so a wrapped label leaves
     no word alone on its last row; a label under `least` words wraps freely. */
 function keepLast(node: HTMLElement, said: string, least = 3): void {
-  const words = said.split(' ')
+  const words = keepTogether(said).split(' ')
   if (words.length < least) { node.textContent = said; return }
   const tail = words.splice(-2).join(' ')
   node.replaceChildren(words.length ? `${words.join(' ')} ` : '', make('span', 'film-keep', tail))
@@ -597,7 +598,7 @@ export function createWing(): WingModule {
     const head = make('p', 'vinci-certainty', text(vinciCertaintyWords[certainty]))
     head.dataset['certainty'] = certainty
     panel.append(head, make('h2', '', text(exhibit?.title ?? s.name)))
-    if (exhibit) { exhibit.render(panel); showLicences(panel, lang()); return }
+    if (exhibit) { exhibit.render(panel); showLicences(panel, lang()); keepTogetherIn(panel); return }
     for (const label of s.labels) {
       const p = make('p', 'vinci-statement')
       p.dataset['certainty'] = label.certainty
