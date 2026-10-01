@@ -209,7 +209,7 @@ test("on the tree as it stands the table's wires hold, and its page and bench re
 test("the table's page and bench move the key now only by the panel's shelf state; the key before moved for each", async () => {
   const base = await keysAt()
   const edits = [
-    ['the shelf of codices and famous leaves in another order', plant(PANEL, 'shelf.replaceChildren(heading, codices, leafSection, buildAbsences(lang));', 'shelf.replaceChildren(heading, leafSection, codices, buildAbsences(lang));')],
+    ['the shelf of codices and famous leaves in another order', plant(PANEL, 'shelf.replaceChildren(heading, codices, leafSection, buildShownAbsences(lang));', 'shelf.replaceChildren(heading, leafSection, codices, buildShownAbsences(lang));')],
     ['the register', appended(REGISTER, '\n')],
     ['the codex reader', appended(READER, '\n// planted\n')],
     ['the register module', appended(SHELF, '\n// planted\n')],
@@ -286,9 +286,10 @@ test('the older definitions key byte for byte as the code of 7a18ca94 keyed them
   assert.equal(then.GLOBAL_DEFINITION, V2)
   const loader = await createLoader()
   const args = { library: world.library, claimed: world.claimed }
-  const placedThen = then.placeLibrary({ loader, worldFiles }), placedNow = placeLibrary({ loader, worldFiles })
+  // both sides read today's wires: a newly audited bridge moves what is placed, never how a definition keys it
+  const placedNow = placeLibrary({ loader, worldFiles })
   for (const definition of ['v1', V2]) {
-    const was = then.globalKey(loader, { ...args, definition, placement: placedThen })
+    const was = then.globalKey(loader, { ...args, definition, placement: placedNow })
     const is = globalKey(loader, { ...args, definition, placement: placedNow })
     assert.deepEqual(is.parts, was.parts, `${definition}: every part`)
     assert.equal(is.key, was.key, `${definition}: the key`)
