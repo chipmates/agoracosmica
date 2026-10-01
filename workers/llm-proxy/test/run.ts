@@ -1236,6 +1236,17 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('a page row keeps the longest poem path, and drops anything that is not a path', async () => {
+    const longest = '/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant/';
+    const kept = await pageBeacon({ path: longest, language: 'en', landing: 1, source: 'search' });
+    assertEqual(kept.blobs[1], longest, 'the 68-character path is recorded');
+    for (const bad of ['/figures/rumi/?gclid=TESTCLICKID0001', '/figures/rumi/#top', `/${'a'.repeat(120)}`]) {
+      const row = await pageBeacon({ path: bad, language: 'en' });
+      assertEqual(row.blobs[0], 'page', 'the row is still counted');
+      assertEqual(row.blobs[1], '', `dropped: ${bad.slice(0, 40)}`);
+    }
+  });
+
   await test('a beacon without the field writes the row with an empty slot', async () => {
     const row = await pageBeacon({ path: '/de/', language: 'de', landing: 1 });
     assertEqual(row.blobs[2], '', 'blob3 stays empty');

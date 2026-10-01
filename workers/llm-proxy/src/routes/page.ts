@@ -23,8 +23,10 @@ interface PagePayload {
 }
 
 // Path is sanitized server-side to a safe shape. Anything else becomes empty
-// in blob2 so the row is still recorded but the path slot stays clean.
-const PATH_RE = /^\/[A-Za-z0-9/_-]{0,60}$/;
+// in blob2 so the row is still recorded but the path slot stays clean. The
+// cap leaves room for the longest poem page (a 68-character path), same as
+// the funnel route.
+const PATH_RE = /^\/[A-Za-z0-9/_-]{0,119}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
 // Rate limit: 100 page beacons per IP per hour. A real user generates 1-10
