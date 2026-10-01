@@ -120,6 +120,8 @@ export interface FilmOptions {
   pace(): Pace
   /** how long a chapter's title stands on a dip, in milliseconds */
   hold(title: PictureWords | null): number
+  /** the clips a press may walk; a clip refused here stands in the release unplayed */
+  walks?(edge: FilmEdgeRecord): boolean
 }
 
 /* THE CLIP'S LIFE, in the numbers the design gives it (RENDER-GRAPH §7.3, §7.4) */
@@ -159,9 +161,9 @@ const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(r
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** the router's own graph, one per framing: the clips this release carries */
-function routerGraph(release: FilmRelease, framing: PictureFraming): RouterGraph {
+function routerGraph(release: FilmRelease, framing: PictureFraming, walks: (edge: FilmEdgeRecord) => boolean = () => true): RouterGraph {
   const nodes = Object.entries(release.nodes).map(([id, n]) => ({ id, ...(n.wall ? { wall: n.wall } : {}) }))
-  const edges = release.edges.filter(e => e.framings[framing]).map(e => ({
+  const edges = release.edges.filter(e => e.framings[framing] && walks(e)).map(e => ({
     id: e.id, from: e.from, to: e.to, kinds: e.kinds, passes: e.passes,
     framings: { [framing]: { seconds: e.framings[framing]!.seconds } },
   }))
@@ -181,7 +183,7 @@ interface Held { url: string; bytes: number; got: number; blob: Blob | null; hea
 export function createFilmSource(options: FilmOptions): PictureSource & { readout(): Record<string, unknown>[]; evening: FilmEvening } {
   const { release, host, base } = options
   const graphs: Partial<Record<PictureFraming, RouterGraph>> = {}
-  const graphOf = (f: PictureFraming): RouterGraph => (graphs[f] ??= routerGraph(release, f))
+  const graphOf = (f: PictureFraming): RouterGraph => (graphs[f] ??= routerGraph(release, f, options.walks))
   const edgeById = new Map(release.edges.map(e => [e.id, e]))
 
   /* THE ELEMENTS: one still, the cross-fade over it, two videos, the dark and
@@ -654,7 +656,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     if (plan.type === 'dip') {
       if (!release.nodes[node]?.stills[f]) return here
       const step = plan.steps[0] as { title?: PictureWords; quiet?: true } | undefined
-      await dip(node, step?.title ?? null, step?.quiet === true)
+      // a work reached by the dark, with no chapter to name, is reached as a door is: quiet and short
+      await dip(node, step?.title ?? null, step?.quiet === true || (!step?.title && release.nodes[node]?.kind === 'view'))
     } else {
       // the chain's second clip, fetched while the first plays
       const clips = plan.steps.filter((s): s is { clip: string; seconds: number } => 'clip' in s)

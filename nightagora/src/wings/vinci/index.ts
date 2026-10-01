@@ -2032,7 +2032,8 @@ export function createWing():VinciWingModule {
   /** ONE MARK FOR THE WHOLE GRID, the line's rule: the sheets without a film
    * are pressable but unmarked, so the grid carries one mark in the wall's
    * own short name. It stands on the sheet nearest the grid's middle, where
-   * its plaque would be, and opens the reader on that sheet. */
+   * its plaque would be, and opens the reader on the wall's first sheet, from
+   * where the way on reads the wall sheet by sheet in its own order. */
   function bodyGridMark():Omit<VinciExhibitMark,'walks'|'word'>|null {
     const grid=picks.filter(entry=>entry.kind==='sheet'&&entry.openable&&!(assets&&vinciShowpiece(entry.id,assets)))
     const name=ROOM_SHORT['body']
@@ -2040,8 +2041,9 @@ export function createWing():VinciWingModule {
     const middle=new Vector3()
     for(const entry of grid)middle.add(entry.anchor)
     middle.divideScalar(grid.length)
-    const target=grid.reduce((best,entry)=>entry.anchor.distanceToSquared(middle)<best.anchor.distanceToSquared(middle)?entry:best)
-    return {id:target.id,anchor:target.anchor,object:target.object,label:text(name),colour:certaintyColour('documented')}
+    const plaque=grid.reduce((best,entry)=>entry.anchor.distanceToSquared(middle)<best.anchor.distanceToSquared(middle)?entry:best)
+    const first=grid.reduce((best,entry)=>entry.order<best.order?entry:best)
+    return {id:first.id,anchor:plaque.anchor,object:plaque.object,label:text(name),colour:certaintyColour('documented')}
   }
   /** WHAT THE HOVER NAMES: the name a mark over this exhibit would carry, and
    * for a sheet without a film its own title, since a press opens it all the

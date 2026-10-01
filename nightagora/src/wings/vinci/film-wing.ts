@@ -23,6 +23,7 @@ import { gaitPace } from './gait'
 import { createVinciSourcesWindow } from './sources'
 import cardsSource from './data/cards.json?raw'
 import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEvening, type FilmRelease } from '../picture/film'
+import { walkedClip } from '../../../forge/film/walks.mjs'
 import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook } from './film-look'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
@@ -230,7 +231,9 @@ export function createWing(): WingModule {
     if (to === null || !carried(to)) return false
     goingUp = true
     asked = to
-    void picture.go(stopNode(LIFE[to]!.id)).finally(() => { goingUp = false; paintDesk(); paintPhone() })
+    // the room's own stop, where no clip walks back to it, is reached by the quiet dark, never a chapter's card
+    const back = stopNode(LIFE[to]!.id)
+    void picture.go(back, { fade: picture.reach(back) === 'dip' }).finally(() => { goingUp = false; paintDesk(); paintPhone() })
     return true
   }
   /** A CLOSE LOOK SHUT BY THE VISITOR at a work of a wall goes up to its
@@ -275,10 +278,9 @@ export function createWing(): WingModule {
     cutCard ??= make('div', 'vinci-cut')
     cutCard.setAttribute('role', 'status')
     if (state.kind === 'dip') {
-      const node = release?.nodes[state.to]
       const to = LIFE.find(s => stopNode(s.id) === state.to)
       // a door's dip is dark and says nothing
-      const title = state.quiet ? '' : state.title ? text(state.title) : to ? text(deskStoryStop(to.id)?.chapter ?? to.name) : node?.station ?? ''
+      const title = state.quiet ? '' : state.title ? text(state.title) : to ? text(deskStoryStop(to.id)?.chapter ?? to.name) : ''
       cutCard.textContent = ''
       if (title) cutCard.append(make('p', 'vinci-cut-title', title))
       cutCard.hidden = false
@@ -887,7 +889,7 @@ export function createWing(): WingModule {
     if (welcome && above) { welcome.dispose(); welcome = undefined }
     else if (welcome && early && mayDescend) openDoor()
     const film = createFilmSource({ host: h.stage, base: filmReleaseBase(), release, at: above ? release.start! : stopNode(LIFE[card]!.id),
-      framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
+      framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title), walks: walkedClip(release.nodes) })
     picture = film
     evening = release.evening ? film.evening : undefined
     /* THE ROOM'S LIST STANDS ON THE FIRST ARRIVAL: its cells come from the
