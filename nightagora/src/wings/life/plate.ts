@@ -121,7 +121,31 @@ export function drawLifePlate(options: {
   const afterYears = afterEvents.map(event => dateYears(event.date)?.from).filter((year): year is number => year !== undefined)
   const hasAfter = Boolean(after && afterYears.length)
   const pad = narrow ? PLATE.pad.narrow : PLATE.pad.wide
-  const top = pad + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
+  /* ON A PHONE A NAME NO PIECE HOLDS STANDS OVER THE RIBBON, at its own
+     segment's middle: written across the pieces it would hide their edges.
+     The row is only there when a name needs it. */
+  const overSize = PLATE.name.narrow
+  const living = record.bands.filter(band => !band.afterlife)
+  const left = pad, span = Math.max(40, width - pad * 2)
+  const x = (year: number): number => left + scale.at(year) * span
+  const edge = (band: LifeBand, next: LifeBand | undefined): number =>
+    next ? (x(band.years.to + 1) + x(next.years.from)) / 2 : x(band.years.to + 1)
+  const gapRuns = scale.gaps.map((gap: LifeGap) => ({ left: x(gap.from), right: x(gap.to + 1), years: gap.years }))
+  const naming = (index: number, band: LifeBand) => {
+    const start = index === 0 ? x(band.years.from) : edge(living[index - 1]!, band)
+    const end = edge(band, living[index + 1])
+    const from = start + PLATE.gutter / 2, to = Math.max(start + PLATE.least, end - PLATE.gutter / 2)
+    const widest = pieces(from, to, gapRuns).reduce<{ left: number; right: number } | null>(
+      (held, piece) => !held || piece.right - piece.left > held.right - held.left ? piece : held, null)
+    const words = band.place[language]
+    const base = narrow ? PLATE.name.narrow : PLATE.name.wide
+    const held = widest !== null && nameSize(words, widest.right - widest.left, base, PLATE.name.floor) !== null
+    const run = held ? widest : { left: from, right: to }
+    const size = run ? nameSize(words, run.right - run.left, base, PLATE.name.floor) : null
+    return { from, to, words, held, run, size, over: narrow && !held && size !== null }
+  }
+  const overRow = living.some((band, index) => naming(index, band).over) ? overSize + 8 : 0
+  const top = pad + overRow + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
   const ticksTop = top + stripHeight + 3
   // the life's own two years stand under its ticks, one row of type
   const lifeYears = ticksTop + PLATE.ticks.floor + PLATE.years
@@ -142,9 +166,6 @@ export function drawLifePlate(options: {
     return node
   }
 
-  const left = pad, span = Math.max(40, width - pad * 2)
-  const x = (year: number): number => left + scale.at(year) * span
-  const living = record.bands.filter(band => !band.afterlife)
   // what one full year is worth in pixels, for the instruments that read the
   // drawing back: the last year of the life is never inside an empty stretch
   svg.dataset['year'] = (x(record.span.to + 1) - x(record.span.to)).toFixed(2)
@@ -152,14 +173,10 @@ export function drawLifePlate(options: {
   /* THE PERIODS, EACH TO ITS DECLARED BOUNDS. Two periods that name the same
      year of a move share it, so the boundary between them is drawn in the
      middle of that year and neither bar runs under the other. */
-  const edge = (band: LifeBand, next: LifeBand | undefined): number =>
-    next ? (x(band.years.to + 1) + x(next.years.from)) / 2 : x(band.years.to + 1)
-  const gapRuns = scale.gaps.map((gap: LifeGap) => ({ left: x(gap.from), right: x(gap.to + 1), years: gap.years }))
   const bands: LifePlateBand[] = []
+  const overTaken: { l: number; r: number }[] = []
   for (const [index, band] of living.entries()) {
-    const start = index === 0 ? x(band.years.from) : edge(living[index - 1]!, band)
-    const end = edge(band, living[index + 1])
-    const from = start + PLATE.gutter / 2, to = Math.max(start + PLATE.least, end - PLATE.gutter / 2)
+    const { from, to, words, run, size, over } = naming(index, band)
     const lit = band.id === open
     /* The declared bounds and where the scale puts them travel with the
        drawing, so a machine can read whether a segment spans what the record
@@ -177,19 +194,22 @@ export function drawLifePlate(options: {
       add('line', { class: 'wing-life-break', 'data-years': gap.years, x1: bridgeFrom, y1: top + stripHeight / 2, x2: bridgeTo, y2: top + stripHeight / 2 }, group)
     }
     /* THE NAME STANDS ON THE WIDEST PIECE, never across a break: a name laid
-       over the middle of an interrupted segment sits on the empty years. */
-    const widest = pieces(from, to, gapRuns).reduce<{ left: number; right: number } | null>(
-      (held, piece) => !held || piece.right - piece.left > held.right - held.left ? piece : held, null)
-    const words = band.place[language]
-    const base = narrow ? PLATE.name.narrow : PLATE.name.wide
-    /* A name no piece holds is written across the whole segment rather than
+       over the middle of an interrupted segment sits on the empty years.
+       A name no piece holds is written across the whole segment rather than
        dropped, because a period with no name reads as no period. Where it
        crosses a break it carries a halo in its own segment's ink, so the
-       dashes under it never run through the letters. */
-    const held = widest !== null && nameSize(words, widest.right - widest.left, base, PLATE.name.floor) !== null
-    const run = held ? widest : { left: from, right: to }
-    const size = run ? nameSize(words, run.right - run.left, base, PLATE.name.floor) : null
-    if (run && size !== null) {
+       dashes under it never run through the letters; on a phone it stands
+       over the ribbon instead. */
+    if (over) {
+      const w = nameWidth(words, overSize)
+      const middle = Math.min(Math.max((from + to) / 2, left + w / 2), left + span - w / 2)
+      const room = { l: middle - w / 2 - 6, r: middle + w / 2 + 6 }
+      if (!overTaken.some(held => held.l < room.r && room.l < held.r)) {
+        const text = add('text', { class: 'wing-life-place', 'data-over': 'true', x: middle, y: pad + overSize * .82, 'font-size': overSize }, group)
+        text.textContent = words
+        overTaken.push(room)
+      }
+    } else if (run && size !== null) {
       const text = add('text', { class: 'wing-life-place', x: (run.left + run.right) / 2, y: top + stripHeight / 2 + size * .36, 'font-size': size }, group)
       text.textContent = words
     }

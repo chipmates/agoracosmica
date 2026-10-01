@@ -515,6 +515,10 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing .wing-plan[data-reading='true'] .wing-plan-number { text-shadow: 0 0 2px #0d171f, 0 0 2px #0d171f, 0 0 4px #0d171f; }
 #wing .wing-plan[data-reading='true'] .wing-plan-room-name { paint-order: stroke; stroke: #0d171f; stroke-width: 3px; stroke-linejoin: round; }
 
+/* ---- THE LIFE'S DRAWING on a phone: a name over the ribbon reads in the sheet's ink, lit when its place is open ---- */
+#wing .wing-life .wing-life-place[data-over='true'] { fill: #d6ccb8; stroke: #0d171f; }
+#wing .wing-life .wing-life-segment[data-open='true'] .wing-life-place[data-over='true'] { fill: #edcc8c; stroke: #0d171f; }
+
 /* ---- THE LIFE'S PLACES, upright: every period in view at once ---- */
 #wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-spine { flex-wrap: wrap; overflow: visible; row-gap: 6px; }
 
