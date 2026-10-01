@@ -8,7 +8,8 @@
 // or transmitted beyond that one flag. An unmarked browser sends nothing at
 // all, so the default row shape is unchanged.
 //
-// Mark a browser (once, from the devtools console on the site):
+// Mark a browser (once, from the devtools console on the site, or by opening
+// any page with ?probe=1):
 //   localStorage.setItem('agc_probe', '1')
 // Unmark:
 //   localStorage.removeItem('agc_probe')
@@ -19,9 +20,24 @@ const PROBE_KEY = 'agc_probe';
 // a cached read keeps the beacon path free of storage access.
 let cached: boolean | null = null;
 
+// A page opened with ?probe=1 is marked by its own address, so the answer
+// does not depend on whichever script stores the flag having run first.
+function urlMarksProbe(): boolean {
+  try {
+    return typeof window !== 'undefined'
+      && new URLSearchParams(window.location.search).get('probe') === '1';
+  } catch {
+    return false;
+  }
+}
+
 /** Is this browser marked as an in-house probe? */
 export function isProbeSession(): boolean {
   if (cached !== null) return cached;
+  if (urlMarksProbe()) {
+    cached = true;
+    return cached;
+  }
   try {
     cached = typeof localStorage !== 'undefined' && localStorage.getItem(PROBE_KEY) === '1';
   } catch {

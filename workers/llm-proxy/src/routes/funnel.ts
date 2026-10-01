@@ -186,13 +186,14 @@ const DIMENSIONLESS_STEPS = new Set(['paid_arrival']);
 
 // Counter-only steps: the row is the step name, the sanitized page path the
 // question appeared on, the interface language, the country and device class
-// the edge derives, and on the two answers the coarse time-to-answer
-// bucket. Nothing else. The mode slot is blanked, the outcome is forced to
-// '200' server-side, and the path slot only ever takes a path — a figure id
-// sent on one of these steps is dropped rather than stored, so no content
-// dimension can ride along with a consent answer. The route reads no gclid
-// field on any step, so none can be stored either. Derived from CONSENT_STEPS
-// rather than re-listed, so the lists cannot drift apart.
+// the edge derives, on the answer steps the coarse time-to-answer bucket, and
+// the in-house probe constant when a marked browser sent it (every funnel row
+// can carry that one). Nothing else. The mode slot is blanked, the outcome is
+// forced to '200' server-side, and the path slot only ever takes a path — a
+// figure id sent on one of these steps is dropped rather than stored, so no
+// content dimension can ride along with a consent answer. The route reads no
+// gclid field on any step, so none can be stored either. Derived from
+// CONSENT_STEPS rather than re-listed, so the lists cannot drift apart.
 // docs/MEASUREMENT.md states this shape.
 const COUNTER_ONLY_STEPS = new Set<string>(CONSENT_STEPS);
 

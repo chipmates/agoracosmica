@@ -104,6 +104,42 @@ describe('ArrivalChoice', () => {
   });
 });
 
+describe('ArrivalChoice counts from an in-house browser', () => {
+  const funnel = () => sent.filter((s) => s.url.endsWith('/v1/funnel'));
+
+  it('marks its counts on a ?probe=1 landing, before anything has stored the flag', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?probe=1&gclid=${CLICK}`);
+    const [, no] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(no); });
+    await new Promise((r) => setTimeout(r, 0));
+    const declined = funnel().filter((c) => c.body.step === 'ad_consent_declined');
+    expect(declined).toHaveLength(1);
+    expect(declined[0].body.probe).toBe(1);
+    expect(storageKeys(localStorage)).toEqual(['agc_ad_consent']);
+  });
+
+  it('marks its counts when the flag is already stored', async () => {
+    localStorage.setItem('agc_probe', '1');
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    await new Promise((r) => setTimeout(r, 0));
+    const accepted = funnel().filter((c) => c.body.step === 'ad_consent_accepted');
+    expect(accepted).toHaveLength(1);
+    expect(accepted[0].body.probe).toBe(1);
+  });
+
+  it('sends no probe field from an unmarked browser', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    await new Promise((r) => setTimeout(r, 0));
+    const counts = funnel();
+    expect(counts.length).toBeGreaterThan(0);
+    for (const c of counts) expect('probe' in c.body).toBe(false);
+  });
+});
+
 describe('heard seconds', () => {
   async function loadHeard(url: string) {
     window.history.replaceState({}, '', url);

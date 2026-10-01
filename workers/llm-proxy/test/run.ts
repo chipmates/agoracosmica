@@ -1327,6 +1327,20 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('a consent count carries the probe constant, and still only its path', async () => {
+    for (const step of ['ad_consent_shown', 'ad_consent_accepted', 'ad_consent_declined']) {
+      const marked = await funnelBeacon({ step, path: '/figures/rumi/', language: 'de', probe: 1, figureId: 'rumi', mode: 'story' });
+      assertEqual(marked.blobs[0], step, 'the step name is blob1');
+      assertEqual(marked.blobs[1], '/figures/rumi/', 'the path, never the figure id');
+      assertEqual(marked.blobs[2], '', 'no mode on a consent count');
+      assertEqual(marked.blobs[8], 'probe', `${step} keeps the marker in blob9`);
+      const plain = await funnelBeacon({ step, path: '/figures/rumi/', language: 'de' });
+      assertEqual(plain.blobs[8], '', `${step} from an unmarked browser`);
+      const odd = await funnelBeacon({ step, path: '/figures/rumi/', language: 'de', probe: 'yes' });
+      assertEqual(odd.blobs[8], '', `${step} with a value that is not the marker`);
+    }
+  });
+
   // -------------------------------------------------------------------------
   // The museum's steps on the funnel route
   // -------------------------------------------------------------------------

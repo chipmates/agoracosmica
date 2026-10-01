@@ -43,6 +43,7 @@ import {
   grantAdConsent,
   revokeAdConsent,
 } from '@client/utils/public/gclidCapture';
+import { probeField } from '@client/utils/probeSession';
 import {
   armPreDecisionListening,
   dropPreDecisionListening,
@@ -108,9 +109,10 @@ const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, the interface language, and on the three answer steps
-// a coarse time-to-answer bucket, and it has to stay that way. A gclid or an
-// id here would pair a user dimension with a consent decision, which is
+// step, the page path, the interface language, on the three answer steps a
+// coarse time-to-answer bucket, and from a browser marked as in-house the
+// probe constant every other count carries. It has to stay that way. A gclid
+// or an id here would pair a user dimension with a consent decision, which is
 // exactly what this measurement must not do.
 type ConsentCounter =
   | 'ad_consent_shown'
@@ -159,12 +161,15 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
     // Path only, no query and no hash, exactly like the cta_click beacon.
     // The worker holds it to the same closed shape it holds that one to
     // (a short slug path or nothing), plus the coarse bucket on the three
-    // answer steps.
-    const body = JSON.stringify(
-      bucket === undefined
-        ? { step, path: window.location.pathname, language: lang }
-        : { step, path: window.location.pathname, language: lang, bucket }
-    );
+    // answer steps. JSON drops an undefined bucket or probe, so a shown step
+    // has no bucket and an unmarked browser sends no probe field at all.
+    const body = JSON.stringify({
+      step,
+      path: window.location.pathname,
+      language: lang,
+      bucket,
+      probe: probeField(),
+    });
     // sendBeacon survives the navigation an accept can trigger. text/plain
     // keeps it a simple CORS request, so no preflight gets lost in transit.
     if (
