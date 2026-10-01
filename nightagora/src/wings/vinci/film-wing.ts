@@ -785,7 +785,9 @@ export function createWing(): WingModule {
     const back = backIndex()
     phone.back.disabled = back === null && !upward()
     phone.back.setAttribute('aria-label', text(CARDS.controls.date.previous))
-    phone.book.setAttribute('aria-label', document.getElementById('rail-instruments')?.getAttribute('aria-label') || text(deskControl('ways', 'chapters')))
+    // the book opens the instruments, and is named as their control is: by its own word, which carries no aria-label
+    const instruments = document.getElementById('rail-instruments')
+    phone.book.setAttribute('aria-label', instruments?.getAttribute('aria-label') || instruments?.textContent?.trim() || text(deskControl('ways', 'chapters')))
     paintGold()
   }
   let goldWalking: boolean | null = null

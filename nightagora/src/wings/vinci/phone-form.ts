@@ -262,7 +262,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
   function paint(): void {
     const look = host.look(), at = host.wall()
     const said = [host.at(), lang(), open, Boolean(look), look?.previous, look?.next?.title, at?.at, at?.of, at?.previous, at?.next,
-      host.leg().walking, document.getElementById('rail-instruments')?.getAttribute('aria-label'), host.wing.querySelector('.wing-door')?.textContent, host.wing.querySelector('.wing-question')?.textContent].join('|')
+      host.leg().walking, document.getElementById('rail-instruments')?.textContent, host.wing.querySelector('.wing-door')?.textContent, host.wing.querySelector('.wing-question')?.textContent].join('|')
     if (said === painted) { publish(); return }
     painted = said
     root.dataset['look'] = String(Boolean(look))
@@ -302,7 +302,8 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     // in a close look the way back is always the way out of it
     back.disabled = index === 0 && !host.wall()?.at && !look
     back.setAttribute('aria-label', text(host.words.previous))
-    book.setAttribute('aria-label', document.getElementById('rail-instruments')?.getAttribute('aria-label') || text(deskControl('ways', 'chapters')))
+    const instruments = document.getElementById('rail-instruments')
+    book.setAttribute('aria-label', instruments?.getAttribute('aria-label') || instruments?.textContent?.trim() || text(deskControl('ways', 'chapters')))
     paintWall()
     paintGold()
     publish()
