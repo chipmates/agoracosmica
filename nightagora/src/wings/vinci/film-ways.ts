@@ -239,5 +239,8 @@ export function mountFilmWays(host: FilmWaysHost): void {
     }, { signal })
     signal.addEventListener('abort', () => { off?.(); dispatchEvent(new CustomEvent('na-wing-instruments', { detail: { rows: [] } })) })
   }
-  signal.addEventListener('abort', () => { planControl.remove(); lifeControl.remove(); style.remove() })
+  /* the band puts the borrowed sources button back before its old neighbour,
+     the plan control, when it is struck after this signal: the controls leave
+     once the stop has run */
+  signal.addEventListener('abort', () => queueMicrotask(() => { planControl.remove(); lifeControl.remove(); style.remove() }))
 }
