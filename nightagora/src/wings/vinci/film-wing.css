@@ -322,9 +322,12 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
   font: 400 .9375rem/1 var(--sans); color: var(--key); text-align: left; white-space: normal; cursor: pointer;
 }
 .film-drawer .desk-ov-open::after {
-  content: ''; flex: 0 0 14px; width: 14px; height: 14px; margin-left: auto; background: var(--gold);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center / contain no-repeat;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M2 2h5v5H2zM9 2h5v5H9zM2 9h5v5H2zM9 9h5v5H9z'/%3E%3C/svg%3E") center / contain no-repeat;
+  content: ''; flex: 0 0 14px; width: 14px; height: 14px; margin-left: auto;
+  background:
+    linear-gradient(var(--gold), var(--gold)) 0 0 / 6px 6px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 100% 0 / 6px 6px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 0 100% / 6px 6px no-repeat,
+    linear-gradient(var(--gold), var(--gold)) 100% 100% / 6px 6px no-repeat;
 }
 .film-drawer .desk-ov-open:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .film-drawer .desk-ov-open[hidden] { display: none; }

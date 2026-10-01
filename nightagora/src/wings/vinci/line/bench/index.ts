@@ -305,7 +305,7 @@ export function createBench(stack:Stack){
    const s=STUDS[selected]!;appendFact(s.certainty as keyof typeof CERTAINTY,`${s.certainty} · ${CERTAINTY[s.certainty as keyof typeof CERTAINTY].de}`,`vinci/source/${s.id}`)
    if(selected>=42)card.append(make('p','vb-reception',text(AFTERLIFE,AFTERLIFE_DE)))
    card.append(make('h2','',language==='en'?s.date_label_en:s.date_label_de),Object.assign(make('p','',language==='en'?s.line_en:s.line_de),{lang:language}),Object.assign(make('p','vb-de',language==='en'?s.line_de:s.line_en),{lang:language==='en'?'de':'en'}))
-   record.append(make('p','',language==='de'?(s.document_de??s.document):s.document),make('p','',(language==='de'?(s.holder_de??s.holder):s.holder)??text('Present holder not established.','Heutiger Aufbewahrungsort nicht ermittelt.')))
+   record.append(make('p','',s.document),make('p','',s.holder??text('Present holder not established.','Heutiger Aufbewahrungsort nicht ermittelt.')))
    if(s.qualifications_en)record.append(make('p','',language==='en'?s.qualifications_en:s.qualifications_de))
    for(const gap of s.gaps)record.append(make('p','',gap))
    record.append(make('p','',`${s.calendar} · ${s.document_status}`),make('p','',SPACING))
