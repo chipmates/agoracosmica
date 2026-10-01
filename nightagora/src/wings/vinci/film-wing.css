@@ -352,7 +352,7 @@ html:has(#wing[data-film='upright']) :is(#instruments:not([hidden]), #wing .wing
   background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px); pointer-events: none;
 }
 html:has(#wing[data-film='upright']) #instruments:not([hidden])::after { background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0b1a2a) 0%, transparent), var(--na-abyss, #0b1a2a) 26px); }
-#wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-reading { padding-bottom: calc(88px + env(safe-area-inset-bottom)); }
+#wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-reading { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-foot { padding-left: 72px; min-height: calc(64px + env(safe-area-inset-bottom)); box-sizing: border-box; }
 
 /* THE DOOR LEAVES: the picture gives the band its row in one soft move */
@@ -491,3 +491,6 @@ html:has(#wing[data-film='upright']) #instruments .inst-wing {
 
 /* ---- THE PLAN'S PLATE AT A PHONE'S READING SIZE, both forms ---- */
 #wing .wing-plan[data-reading='true'] :is(.wing-plan-number, .wing-plan-north-letter) { font-size: 13px; }
+
+/* ---- THE LIFE'S PLACES, upright: every period in view at once ---- */
+#wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-spine { flex-wrap: wrap; overflow: visible; row-gap: 6px; }
