@@ -398,6 +398,13 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
   font-size: 1.75rem; line-height: 1;
 }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
+/* the card's own "more" reads as the record's fold does: one link, underlined, with the plus */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) {
+  color: #e6d6b8; text-decoration: underline; text-decoration-color: color-mix(in srgb, #edcc8c 45%, transparent);
+  text-underline-offset: 5px; text-decoration-thickness: 1px;
+}
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more)::after { content: '\00a0+'; color: #edcc8c; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more)[aria-expanded='true']::after { content: '\00a0\2212'; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
   .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-stand p, .deep-rule-label) { font-size: .8125rem; }
 /* the certainty word in capitals reads small at 13 px: 14, as the record's */
@@ -458,6 +465,11 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
   content: '+'; margin-left: auto; padding-left: 12px; color: #edcc8c; font: 400 1.125rem/1 var(--sans);
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-record-fold[open] > summary::after { content: '\2212'; }
+/* upright it reads as one link: its words and the plus on one line, under
+   one underline, the whole row its target */
+#wing[data-film='upright'] .vinci-dock .vinci-record-fold > summary { display: block; box-sizing: border-box; padding: 12px 0; line-height: 20px; }
+#wing[data-film='upright'] .vinci-dock .vinci-record-fold > summary::after { content: '\00a0+'; margin-left: 0; padding-left: 0; font: inherit; }
+#wing[data-film='upright'] .vinci-dock .vinci-record-fold[open] > summary::after { content: '\00a0\2212'; }
 /* the tab the record opens on wears its underline only: the focused tab is
    always the chosen one (arrows choose), so focus brightens and thickens
    that underline instead of drawing a box round it */
