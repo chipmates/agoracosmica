@@ -94,6 +94,12 @@
 /* a set that outgrows its box scrolls and wears its bar, and the rows then
    start at the top instead of standing in the middle of a taller box */
 .desk-ov-grid[data-scrolls='true'] { align-content: start; }
+/* a row passing under the box's foot fades out instead of being cut through
+   its words; the air under the last row lets it stand whole at the end */
+.desk-ov-grid[data-scrolls='true'] {
+  padding-bottom: 32px;
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 32px), transparent);
+}
 
 .desk-ov-cell {
   width: 100%;
