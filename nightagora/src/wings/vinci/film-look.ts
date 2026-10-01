@@ -289,10 +289,12 @@ export function createFilmLook(h: FilmLookHost) {
     const plate = painting ? assets?.byId.get(FILM_DEATHBED_PLATE) : undefined
     const place = painting ? vinciDeathbedCard(placeCertainty('conjectural'), plate?.licence ?? null) : vinciPlaceCard(id as VinciPlaceId, placeCertainty)
     const record = (): void => h.openRecord(id, { en: place.title, de: place.title }, place.certainty, host => place.record(host))
+    /* ON THE PHONE THE PLACE TAKES THE GLASS, as every other work does: the
+       held frame (the stones) or the painting above, the card folded under */
     const payload = painting
       ? createPlatePayload({ title: place.title, aspect: GRAVE_DEATHBED.imageWidth / GRAVE_DEATHBED.imageHeight, window: null, standing: h.standing,
-        ...(plate ? { src: assetAddress(plate) } : {}) })
-      : createPlacePayload({ title: place.title, standing: h.standing })
+        fill: h.narrow(), ...(plate ? { src: assetAddress(plate) } : {}) })
+      : { ...createPlacePayload({ title: place.title, standing: h.standing }), fill: h.narrow() }
     const { set, walk } = stand(id)
     h.standDown(true)
     openLook({ id, title: place.title, line: vinciLine(id), card: place.card, after: place.after, payload,
