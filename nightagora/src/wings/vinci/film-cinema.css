@@ -296,7 +296,7 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
 #wing[data-film='cinema'] .vinci-dock {
   left: 0; right: 0; top: 0; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
   max-width: none; max-height: none;
-  padding: 0 max(var(--cinema-r), calc((100vw - 680px) / 2)) calc(var(--cinema-b) + 64px) max(var(--cinema-l), calc((100vw - 680px) / 2));
+  padding: 0 max(var(--cinema-r), calc((100vw - 680px) / 2)) 0 max(var(--cinema-l), calc((100vw - 680px) / 2));
   border: 0; border-radius: 0;
   background: var(--na-abyss, #0d171f);
 }
@@ -381,11 +381,13 @@ html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-lin
 /* the wing plays no sound and its plan has its own row, as on the upright phone */
 html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none; }
 
-/* the record's words scroll under its close into a foot of their own */
+/* the record's words scroll into a foot of their own, which ends the scroll:
+   it fades them out above the close and is solid from there down, so no line
+   runs under the close; under the toolbar's layer, which carries the close */
 #wing[data-film='cinema'] .vinci-dock::after {
-  /* under the toolbar's layer, which carries the close */
-  content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 0; height: calc(var(--cinema-b) + 60px);
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0d171f) 0%, transparent), var(--na-abyss, #0d171f) 26px);
+  content: ''; display: block; position: sticky; bottom: 0; z-index: 0;
+  height: calc(var(--cinema-b) + 48px + 8px + 24px);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0d171f) 0%, transparent), var(--na-abyss, #0d171f) 24px);
   pointer-events: none;
 }
 
