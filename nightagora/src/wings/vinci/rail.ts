@@ -458,22 +458,26 @@ const RAIL_STAIRS:readonly (readonly [RailWaypoint,RailWaypoint,RailWaypoint])[]
  * garden. Headings, west of north, at waypoints along the way and metres
  * past them; the walk leaves on its own view and turns standing from the
  * last heading to the one it arrives in. A key's heading is one for both
- * framings, or the desktop's then the phone's; a look with no end arrives on
- * its arriving view's own heading, and a sign of 0 turns the short way. */
-const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number,number,number?])[];end?:number;sign:1|-1|0}>>={
+ * framings, or the desktop's then the phone's, and so is its distance past
+ * its waypoint, or a pair; a look with no end arrives on its arriving view's
+ * own heading, a sign of 0 turns the short way, and an eased look turns
+ * between its keys on a smoothstep. */
+const RAIL_TERRACE_LOOK:Readonly<Record<string,{keys:readonly (readonly [RailWaypoint,number|readonly [number,number],number,number?])[];end?:number;sign:1|-1|0;eased?:boolean}>>={
   'chamber>garden':{sign:1,end:176,keys:[[railAccessWaypoints[0]!,0,2],[railAccessWaypoints[3]!,0,4],[railAccessWaypoints[4]!,0,80],
     [railCollectionStairWaypoints[0]!,-.1,85],[railCollectionStairWaypoints[0]!,0,133],[railCollectionStairWaypoints[1]!,0,135],[railCollectionStairWaypoints[2]!,0,174]]},
   // THE WAY IN FROM THE STREET LOOKS THROUGH THE GATE, as the way back out
   // looks up the gallery: held on the street to the gallery's mouth, turned
   // into it there, and down it to the court, where the view turns standing
   'arrival>courtyard':{sign:1,end:123,keys:[[railGateWaypoints[0]!,-1,80],[railGateWaypoints[1]!,0,123],[railGateWaypoints[4]!,0,123]]},
-  // THE OPENER'S DESCENT TURNS RIGHT DOWN THE STAIR TO THE SUPPER ROOM'S DOOR:
-  // the Last Supper stands in it, square on, from the last three metres of
-  // the stair to the apron's corner, and nowhere above them (the room's roof,
-  // its north wall and the parachute hide it). Held there off the stair, it
-  // gives way to the picture room's own view through the entrance.
-  'stair-head>picture-room':{sign:0,keys:[[railCollectionStairWaypoints[1]!,1.5,150,126],[railCollectionStairWaypoints[2]!,-4,112,106],
-    [railCollectionStairWaypoints[2]!,-2.5,112,104],[railCollectionStairWaypoints[3]!,0,112,104]]},
+  // THE OPENER'S DESCENT LOOKS DOWN THE STAIR IT WALKS, turned to it as the
+  // walk sets off. Near the stair's foot the head turns right to the Supper
+  // room's door, where the Last Supper stands from the last metres of the
+  // stair to the apron's corner (the roof, the room's north wall and the
+  // parachute hide it higher up), then on to the picture room's view. The
+  // phone's narrow field turns further, at its own distances. Eased: linear
+  // keys left corners the calm plan could only follow as a pan.
+  'stair-head>picture-room':{sign:0,eased:true,keys:[[railCollectionStairWaypoints[1]!,[3.5,5],165,176],[railCollectionStairWaypoints[1]!,[5.5,9],165,176],
+    [railCollectionStairWaypoints[2]!,[-3,-1.5],121,108],[railCollectionStairWaypoints[3]!,[.6,.5],121,108]]},
 }
 /** Stretches walked without a stand, never backward. */
 const RAIL_FLIGHTS:readonly (readonly [RailWaypoint,RailWaypoint])[]=[[railAccessWaypoints[1]!,railAccessWaypoints[2]!]]
@@ -540,7 +544,13 @@ const RAIL_PACE_KEPT:ReadonlySet<string>=new Set([
   'picture-room-west>flight','flight>picture-room-west',
   'body>body-valve','body-valve>body','courtyard>hall-door-in','hall-door-out>courtyard','hall-door-out>oratory','oratory>hall-door-in',
   'oratory>study','study>oratory','study>chamber','chamber>study'])
-export const railLegSpeed=(from:string,to:string):number=>RAIL_PACE_KEPT.has(`${from}>${to}`)?1:RAIL_WALK_SPEED
+/** THE PHONE WALKS THE OPENING DESCENT SLOWER. Its look down the stair and
+ * aside to the Supper room's door turns its narrow field much further than the
+ * wide frame's, and the calm caps give each turn its time: at the walk's speed
+ * the plan rounds the look away into a pan. */
+const RAIL_LEG_SPEEDS:Readonly<Record<string,{desktop:number;phone:number}>>={'stair-head>picture-room':{desktop:RAIL_WALK_SPEED,phone:.75}}
+export const railLegSpeed=(from:string,to:string,phone=false):number=>
+  RAIL_LEG_SPEEDS[`${from}>${to}`]?.[phone?'phone':'desktop']??(RAIL_PACE_KEPT.has(`${from}>${to}`)?1:RAIL_WALK_SPEED)
 /** Over the last metres the way ahead runs out and the arriving composition
  * takes the gaze. */
 const GAZE_ARRIVAL_M = 4
@@ -800,11 +810,11 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
   /** Where the leg under way goes down the collection stair, head to foot. */
   let stairDown:[number,number]|undefined
   /** The terrace walk's headings by distance, turning one way, or none. */
-  let lookKeys:{m:number;h:number}[]|undefined
+  let lookKeys:{m:number;h:number}[]|undefined, lookEased=false
   function lookAt(metres:number):number {
     const k=lookKeys!
     if(metres<=k[0]!.m)return k[0]!.h
-    for(let i=1;i<k.length;i++)if(metres<=k[i]!.m){const a=k[i-1]!,b=k[i]!;return a.h+(b.h-a.h)*(metres-a.m)/Math.max(1e-6,b.m-a.m)}
+    for(let i=1;i<k.length;i++)if(metres<=k[i]!.m){const a=k[i-1]!,b=k[i]!,u=(metres-a.m)/Math.max(1e-6,b.m-a.m);return a.h+(b.h-a.h)*(lookEased?u*u*(3-2*u):u)}
     return k[k.length-1]!.h
   }
   const scaleOf=(fov:number):number=>Math.log(Math.tan(fov*Math.PI/360))
@@ -818,10 +828,10 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     // landing both ways, the court's short run under the walk's own view
     const stairs:[number,number][]=[],stairStands:RailWaypoint[]=[]
     const terrace=certified.route?RAIL_TERRACE_LOOK[`${completed.id}>${request.id}`]:undefined
-    lookKeys=undefined
+    lookKeys=undefined;lookEased=terrace?.eased===true
     if(terrace){
       const keys=[{m:0,h:angles(camera.quaternion).heading}]
-      for(const [point,past,deg,phoneDeg] of terrace.keys){const at=keyTurn(point);if(at<0){keys.length=0;break};keys.push({m:at+past,h:(request.phone?phoneDeg??deg:deg)*Math.PI/180})}
+      for(const [point,past,deg,phoneDeg] of terrace.keys){const at=keyTurn(point);if(at<0){keys.length=0;break};keys.push({m:at+(typeof past==='number'?past:past[request.phone?1:0]),h:(request.phone?phoneDeg??deg:deg)*Math.PI/180})}
       if(keys.length){
         keys.push({m:path.length,h:terrace.end!==undefined?terrace.end*Math.PI/180:angles(poseQuaternion(request.pose)).heading})
         for(let i=1;i<keys.length;i++){let d=Math.atan2(Math.sin(keys[i]!.h-keys[i-1]!.h),Math.cos(keys[i]!.h-keys[i-1]!.h));if(d*terrace.sign<0)d+=terrace.sign*2*Math.PI;keys[i]!.h=keys[i-1]!.h+d}
@@ -860,7 +870,7 @@ export function createRail(camera:PerspectiveCamera,clock:()=>number,authority:R
     const held=certified.held,lift=held?held.liftFirst??(held.turnFirst||from.elevation<to.elevation-GALLERY_LIFT_RAD):false
     // a walk between two stops runs at its own speed, planned at it
     const brisk=request.link===true&&viewing?.exhibit!==undefined&&request.exhibit!==undefined&&RAIL_BRISK_LINKS.has(`${viewing.exhibit}>${request.exhibit}`)
-    const plan=(lensPixels:number):CalmGazePlan=>withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
+    const plan=(lensPixels:number):CalmGazePlan=>withGaitLegSpeed(certified.station?railLegSpeed(completed!.id,request.id,request.phone):1,()=>held?planGalleryGaze({from,to,zoom,lensPixels,timed:seconds=>gaitLeg(length,seconds),
       fovs:[fittedRailFov(fromFov,camera.aspect,request.phone),fittedRailFov(targetFov,camera.aspect,request.phone)],evenLens:request.phone||evenLensStep(request.wallOn,wallAt,request.wall),
       first:{heading:held.turnFirst,elevation:lift,lens:held.lensFirst??lift},long:held.long===true})
       :planCalmGaze({from,to,lengthM:length,lensPixels,zoom,timed:seconds=>gaitLeg(length,seconds),
