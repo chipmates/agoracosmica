@@ -418,6 +418,18 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
    the German names of the sheets and the machines are read, not cut */
 #wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname { -webkit-line-clamp: 3; }
 
+/* ---- THE SHEETS' FEET AND HEADS, upright: the close stands on solid ground ---- */
+/* the room's list: its foot solid under the whole close and the last row
+   scrolls clear of it; its head fades the scrolled cells (the band above) */
+#wing[data-film='upright'] .desk-ov[data-sheet] {
+  padding-top: 0; padding-bottom: calc(124px + env(safe-area-inset-bottom));
+  border-top: 6px solid #0d171f; box-shadow: 0 -1px 0 #a9977355;
+}
+#wing[data-film='upright'] .desk-ov[data-sheet]::after {
+  height: calc(106px + env(safe-area-inset-bottom));
+  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px);
+}
+
 /* ---- THE RECORD ON BOTH PHONE FORMS ---- */
 /* the library's note belongs to the library's door, which is in the drawer
    and on the door's own plate with these same words; in the record it named
