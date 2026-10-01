@@ -2282,6 +2282,8 @@ export function createWing():VinciWingModule {
     exhibitSources={id,title:{en:work.title_en,de:work.title_de},
       certainty:pictureCertainty(policyLabelText(work,entries).colour),
       renderStation(host){
+        // the record speaks the page's language, as the label does
+        for(const column of record.querySelectorAll<HTMLElement>('.picture-label-language'))column.hidden=column.lang!==lang()
         host.append(record)
         // What the evidence does not say and what the view invents: two slots
         // a text seat fills, empty until it does.
