@@ -481,12 +481,24 @@
       if (isVisible() && pastMiddle()) count();
     }
 
+    // The scroll rule waits for the visitor's own wheel, touch or key input:
+    // a browser scrolls by itself to a highlighted passage, and that address
+    // part is hidden from scripts. A scrollbar drag alone counts by the clock.
+    function armScroll() {
+      window.removeEventListener('wheel', armScroll);
+      window.removeEventListener('touchmove', armScroll);
+      window.removeEventListener('keydown', armScroll);
+      if (!counted) window.addEventListener('scroll', onScroll, { passive: true });
+    }
+
     document.addEventListener('visibilitychange', onVisibility);
     if (isVisible()) startClock();
     // A reload, a restored tab or an address with an anchor puts the visitor
     // mid-page without a scroll of their own, so there only the clock counts.
     if (isFreshNavigation() && !window.location.hash) {
-      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('wheel', armScroll, { passive: true });
+      window.addEventListener('touchmove', armScroll, { passive: true });
+      window.addEventListener('keydown', armScroll);
     }
   }
 

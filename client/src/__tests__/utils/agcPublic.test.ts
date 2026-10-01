@@ -37,16 +37,7 @@ async function drainBeacons(): Promise<void> {
 function loadPage(url: string, lang = 'en'): void {
   window.history.replaceState({}, '', url);
   document.documentElement.lang = lang;
-  for (const target of [document, window] as EventTarget[]) {
-    const real = target.addEventListener.bind(target);
-    vi.spyOn(target, 'addEventListener').mockImplementation((type, fn, opts) => {
-      added.push([target, type, fn as EventListenerOrEventListenerObject, opts]);
-      real(type, fn as EventListenerOrEventListenerObject, opts as AddEventListenerOptions);
-    });
-  }
   new Function(SOURCE)();
-  vi.mocked(document.addEventListener).mockRestore();
-  vi.mocked(window.addEventListener).mockRestore();
 }
 
 function click(el: Element): void {
@@ -78,6 +69,14 @@ beforeEach(() => {
   sessionStorage.clear();
   localStorage.clear();
   document.body.innerHTML = '';
+  // Tracked for the whole case: the script adds its scroll listener on a later input.
+  for (const target of [document, window] as EventTarget[]) {
+    const real = target.addEventListener.bind(target);
+    vi.spyOn(target, 'addEventListener').mockImplementation((type, fn, opts) => {
+      added.push([target, type, fn as EventListenerOrEventListenerObject, opts]);
+      real(type, fn as EventListenerOrEventListenerObject, opts as AddEventListenerOptions);
+    });
+  }
   Object.defineProperty(navigator, 'sendBeacon', {
     configurable: true,
     writable: true,
@@ -96,6 +95,8 @@ afterEach(() => {
   for (const [target, type, fn, opts] of added) {
     target.removeEventListener(type, fn, opts as EventListenerOptions);
   }
+  vi.mocked(document.addEventListener).mockRestore();
+  vi.mocked(window.addEventListener).mockRestore();
   Reflect.deleteProperty(navigator, 'sendBeacon');
   Reflect.deleteProperty(performance, 'getEntriesByType');
   window.history.replaceState({}, '', '/');
@@ -237,6 +238,10 @@ describe('agc-public.js: the read counter', () => {
     Object.defineProperty(window, 'scrollY', { value: y, configurable: true, writable: true });
     window.dispatchEvent(new Event('scroll'));
   }
+  /** The visitor's own input, bubbling up from the page as in a browser. */
+  function input(type: 'wheel' | 'touchmove' | 'keydown'): void {
+    document.body.dispatchEvent(new Event(type, { bubbles: true }));
+  }
   function setVisibility(state: 'visible' | 'hidden'): void {
     visibility = state;
     document.dispatchEvent(new Event('visibilitychange'));
@@ -278,22 +283,43 @@ describe('agc-public.js: the read counter', () => {
     expect(storageKeys(localStorage)).toEqual([]);
   });
 
-  it('counts on a scroll past the middle of the main content, and only once', async () => {
-    readingPage(4000); // middle at 2000
+  it.each(['wheel', 'touchmove', 'keydown'] as const)(
+    'after a %s, counts on a scroll past the middle of the main content, and only once',
+    async (type) => {
+      readingPage(4000); // middle at 2000
+      loadPage('/themes/moral-life/');
+      input(type);
+      scrollTo(1100); // viewport bottom at 1900
+      vi.advanceTimersByTime(1_000);
+      expect(sentSoFar()).toBe(0);
+      scrollTo(1250); // viewport bottom at 2050
+      expect(sentSoFar()).toBe(1);
+      scrollTo(3000);
+      vi.advanceTimersByTime(60_000);
+      expect(await reads()).toEqual([{ step: 'read', path: '/themes/moral-life/', language: 'en' }]);
+    },
+  );
+
+  it('takes no scroll before the visitor has used the wheel, a touch or a key', async () => {
+    readingPage(4000);
     loadPage('/themes/moral-life/');
-    scrollTo(1100); // viewport bottom at 1900
-    vi.advanceTimersByTime(1_000);
+    scrollTo(3000); // the browser's own scroll to a passage, or a scrollbar drag
     expect(sentSoFar()).toBe(0);
-    scrollTo(1250); // viewport bottom at 2050
+    vi.advanceTimersByTime(29_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
     expect(sentSoFar()).toBe(1);
-    scrollTo(3000);
-    vi.advanceTimersByTime(60_000);
-    expect(await reads()).toEqual([{ step: 'read', path: '/themes/moral-life/', language: 'en' }]);
+    // Counted by the clock: a later input arms nothing.
+    input('wheel');
+    scrollTo(3500);
+    expect(added.filter(([, type]) => type === 'scroll')).toEqual([]);
+    expect(await reads()).toHaveLength(1);
   });
 
   it('does not take a scroll on a page whose middle is on the first screen', async () => {
     readingPage(1200); // middle at 600, already in view
     loadPage('/figures/william-blake/poems/the-tyger/');
+    input('wheel');
     scrollTo(300);
     vi.advanceTimersByTime(29_000);
     expect(sentSoFar()).toBe(0);
@@ -305,6 +331,7 @@ describe('agc-public.js: the read counter', () => {
     visibility = 'hidden';
     readingPage(4000);
     loadPage('/figures/marcus-aurelius/meditations/');
+    input('wheel');
     scrollTo(3000);
     vi.advanceTimersByTime(300_000);
     expect(sentSoFar()).toBe(0);
@@ -333,8 +360,10 @@ describe('agc-public.js: the read counter', () => {
       setNavigation(type);
       readingPage(4000);
       loadPage(url);
+      for (const type of ['wheel', 'touchmove', 'keydown'] as const) input(type);
       scrollTo(3000);
     }
+    expect(added.filter(([, type]) => type === 'scroll')).toEqual([]);
     expect(sentSoFar()).toBe(0);
     vi.advanceTimersByTime(29_000);
     expect(sentSoFar()).toBe(0);
@@ -346,6 +375,7 @@ describe('agc-public.js: the read counter', () => {
   it('stays silent on a page the layout has not marked for reading', async () => {
     readingPage(4000, false);
     loadPage('/about/');
+    input('wheel');
     scrollTo(3000);
     vi.advanceTimersByTime(120_000);
     expect(await reads()).toEqual([]);
