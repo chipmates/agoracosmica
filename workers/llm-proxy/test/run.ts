@@ -1237,9 +1237,9 @@ async function main(): Promise<number> {
   });
 
   await test('a page row keeps the longest poem path, and drops anything that is not a path', async () => {
-    const longest = '/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant/';
+    const longest = '/figures/emily-dickinson/poems/because-i-could-not-stop-for-death/';
     const kept = await pageBeacon({ path: longest, language: 'en', landing: 1, source: 'search' });
-    assertEqual(kept.blobs[1], longest, 'the 68-character path is recorded');
+    assertEqual(kept.blobs[1], longest, 'the 66-character path is recorded');
     for (const bad of ['/figures/rumi/?gclid=TESTCLICKID0001', '/figures/rumi/#top', `/${'a'.repeat(120)}`]) {
       const row = await pageBeacon({ path: bad, language: 'en' });
       assertEqual(row.blobs[0], 'page', 'the row is still counted');
@@ -1398,7 +1398,7 @@ async function main(): Promise<number> {
   });
 
   await test('a read and a CTA click share one path rule', async () => {
-    const longest = '/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant/';
+    const longest = '/figures/emily-dickinson/poems/because-i-could-not-stop-for-death/';
     for (const step of ['read', 'audio_play', 'cta_click', 'ad_consent_shown']) {
       const kept = await funnelBeacon({ step, path: longest, language: 'en' });
       assertEqual(kept.blobs[1], longest, `${step} keeps the longest poem path`);

@@ -232,7 +232,7 @@ const VALID_OUTCOMES = new Set([
 
 // blob2 holds a figureId OR a sanitized path, never free text: slug
 // characters and slashes only, so no query, no fragment and no address can
-// ride in. The cap leaves room for the longest poem page (a 68-character
+// ride in. The cap leaves room for the longest poem page (a 66-character
 // path); a path over it is stored as an empty slot. Figure ids are held to a
 // tight slug shape.
 const PATH_RE = /^\/[A-Za-z0-9/_-]{0,119}$/;
