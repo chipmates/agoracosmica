@@ -438,8 +438,9 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
    the German names of the sheets and the machines are read, not cut */
 #wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname { -webkit-line-clamp: 3; }
 /* the marks before the names at a size and weight the navy sheet keeps; the
-   film wing carries no data-desk, so the marks' four colours are named here */
-#wing[data-film='upright'] .desk-ov[data-sheet] {
+   film wing carries no data-desk, so the marks' four colours are named here,
+   for the sideways sheet too */
+#wing:is([data-film='upright'], [data-film='cinema']) .desk-ov[data-sheet] {
   --desk-title: #fff5e3;
   --desk-sure-documented: #8cba8b;
   --desk-sure-reconstructed: #d2a557;
