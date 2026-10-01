@@ -122,7 +122,7 @@
 .film-key::after { content: ''; position: absolute; left: -6px; right: -6px; top: -8px; bottom: -8px; }
 .film-key[hidden] { display: none; }
 .film-key .film-ic { width: 14px; height: 14px; color: var(--gold); }
-.film-count { margin-left: auto; font: 400 .9375rem/32px var(--sans); font-variant-numeric: tabular-nums; color: #e8eef3; white-space: nowrap; }
+.film-count { margin-left: auto; font: 400 .9375rem/32px var(--sans); font-variant-numeric: tabular-nums; color: var(--key); white-space: nowrap; }
 .film-foot {
   position: relative;
   height: 80px;

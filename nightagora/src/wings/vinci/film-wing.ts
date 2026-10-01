@@ -654,7 +654,7 @@ export function createWing(): WingModule {
   /* ---- the phone's graded box ---- */
   let phone: {
     root: HTMLElement; name: HTMLElement; line: HTMLElement; drawer: HTMLElement; keys: HTMLElement
-    more: HTMLButtonElement; from: HTMLButtonElement; count: HTMLElement
+    more: HTMLButtonElement; from: HTMLButtonElement; count: HTMLButtonElement
     back: HTMLButtonElement; book: HTMLButtonElement; earlier: HTMLButtonElement; talk: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
     goldPath: SVGPathElement
   } | undefined
@@ -678,7 +678,10 @@ export function createWing(): WingModule {
     more.setAttribute('aria-controls', drawer.id)
     const from = make('button', 'film-key film-from')
     from.type = 'button'
-    const count = make('span', 'film-count')
+    // the count is the way into the story's index, as the panel's chapters row with the same count is
+    const count = make('button', 'film-key film-count')
+    count.type = 'button'
+    count.setAttribute('aria-haspopup', 'dialog')
     keys.append(more, from, count)
     const foot = make('div', 'film-foot')
     const back = make('button', 'film-back')
@@ -727,6 +730,7 @@ export function createWing(): WingModule {
     watchGoldName(goldName, signal)
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
+    count.addEventListener('click', () => dispatchEvent(new Event('na-wing-plan')))
     back.addEventListener('click', () => { if (look?.id) { look.back(); return } if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
     book.addEventListener('click', () => document.getElementById('rail-instruments')?.click())
     talk.addEventListener('click', () => { endWith('talk') })
@@ -785,6 +789,7 @@ export function createWing(): WingModule {
     phone.more.hidden = !stop?.drawer
     phone.from.textContent = text(deskControl('machine', 'provenance'))
     phone.count.textContent = `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`
+    phone.count.setAttribute('aria-label', `${text(deskControl('ways', 'chapters'))} ${card + 1} / ${LIFE.length}`)
     const back = backIndex()
     phone.back.disabled = back === null && !upward() && phone.root.dataset['look'] !== 'true'
     paintBackSeat()
