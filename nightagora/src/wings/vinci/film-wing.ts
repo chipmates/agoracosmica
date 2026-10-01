@@ -469,7 +469,8 @@ export function createWing(): WingModule {
   const atTable = (): boolean => stationOf(LIFE[card]!.station).id === 'reading-table'
   function refreshCells(): void {
     const station = stationOf(LIFE[card]!.station).id
-    const key = `${station}|${lang()}`
+    // the release's sets are read into the key: a look that loads before the release counts again once it lands
+    const key = `${station}|${lang()}|${release ? 'sets' : ''}`
     if (!look || key === cellsFor) return
     cellsFor = key
     void look.cells(setOf(station)).then(cells => { if (cellsFor === key) { cellsNow = cells; paintDesk() } })
@@ -889,6 +890,10 @@ export function createWing(): WingModule {
       framing: () => (wide ? 'wide' : 'upright'), box, pace: () => gaitPace(), hold: title => readingMs(title) })
     picture = film
     evening = release.evening ? film.evening : undefined
+    /* THE ROOM'S LIST STANDS ON THE FIRST ARRIVAL: its cells come from the
+       close looks' module, which the desktop asks for once the first still is
+       asked for; the phone shows no list and pays for the picture first */
+    if (wide) void lookNow()
     // the seam as the rigs read it, the way the live wing hands them `__forge`
     ;(window as unknown as { __naSeam?: PictureSource }).__naSeam = picture
     // a machine's filmed cycle stands over the film and under every word
