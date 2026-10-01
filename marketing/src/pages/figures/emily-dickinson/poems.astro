@@ -719,11 +719,51 @@ const schemas = [
     margin: 0;
   }
 
+  /* On a phone the first poem's opening lines belong on the first screen. The
+     portrait shrinks and floats beside the title, the lead runs full width
+     under both, and the gaps down to the first poem tighten. No text goes. */
   @media (max-width: 560px) {
     .ed-hero {
-      flex-direction: column;
-      text-align: center;
-      gap: 1.25rem;
+      display: flow-root;
+      margin: 0.75rem 0 1.5rem;
+    }
+    .ed-hero__portrait {
+      float: left;
+      width: 76px;
+      margin: 0 1rem 0 0;
+    }
+    .ed-hero__img {
+      width: 76px;
+    }
+    .ed-hero__caption {
+      margin-top: 0.4rem;
+      font-size: 0.6rem;
+      line-height: 1.35;
+    }
+    /* Scaled to the width so the name stays on one line beside the portrait
+       down to a 360 px screen. */
+    .ed-hero__title {
+      font-size: min(1.65rem, 6.5vw);
+      line-height: 1.1;
+      margin-bottom: 0.4rem;
+    }
+    .ed-hero__dates {
+      font-size: 0.8rem;
+      margin: 0;
+    }
+    .ed-hero__lead {
+      clear: left;
+      padding-top: 0.85rem;
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+    .ed-theme__title {
+      font-size: min(1.4rem, 5.8vw);
+    }
+    .ed-theme__framing {
+      font-size: 1rem;
+      line-height: 1.6;
+      margin-bottom: 1.1rem;
     }
     .ed-poem {
       padding-left: 1rem;
