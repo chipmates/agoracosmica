@@ -437,6 +437,17 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
 /* THE ROOM'S LIST ON THE PHONE: a work's whole name, three rows at most, so
    the German names of the sheets and the machines are read, not cut */
 #wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname { -webkit-line-clamp: 3; }
+/* the marks before the names at a size and weight the navy sheet keeps; the
+   film wing carries no data-desk, so the marks' four colours are named here */
+#wing[data-film='upright'] .desk-ov[data-sheet] {
+  --desk-title: #fff5e3;
+  --desk-sure-documented: #8cba8b;
+  --desk-sure-reconstructed: #d2a557;
+  --desk-sure-conjectural: #df9385;
+  --desk-sure-unknown: #a8b3b7;
+}
+#wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname .desk-mark { width: 15px; height: 15px; vertical-align: -2px; }
+#wing[data-film='upright'] .desk-ov[data-sheet] .desk-mark :is(.desk-mark-ring, .desk-mark-open, .desk-mark-broken) { stroke-width: 2.6; }
 
 /* ---- THE SHEETS' FEET AND HEADS, upright: the close stands on solid ground ---- */
 /* the room's list: its foot solid under the whole close and the last row
