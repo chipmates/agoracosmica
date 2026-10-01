@@ -766,6 +766,9 @@ export function createWing(): WingModule {
       for (const sentence of sentences(text(stop.drawer), lang())) phone.drawer.append(make('p', '', sentence))
       const door = hosts.stage.parentElement!.querySelector<HTMLElement>('.wing-door')
       if (door) {
+        // the question the door carries stands over it, as in the desktop's drawer and the live phone's
+        const asked = hosts.stage.parentElement!.querySelector('.wing-question')?.textContent?.trim()
+        if (asked) phone.drawer.append(make('p', 'vinci-phone-question', asked))
         const ask = make('button', 'film-ask', door.textContent ?? '')
         ask.type = 'button'
         ask.append(icon('M5 11l6-6M6 5h5v5', 'film-ic film-ic-out'))
