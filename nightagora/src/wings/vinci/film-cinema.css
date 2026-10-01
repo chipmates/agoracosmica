@@ -13,6 +13,10 @@ html:has(#wing[data-film='cinema']) {
   --cinema-b: calc(var(--na-safe-bottom, env(safe-area-inset-bottom, 0px)) + 8px);
   /* the foot row's height, which the close looks and the sheets keep clear of */
   --cinema-row: 52px;
+  /* the one close's drawn cross, the upright phone's own */
+  --film-cross:
+    linear-gradient(45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)),
+    linear-gradient(-45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px));
 }
 
 /* the frame's bar, the door block and the museum's own rail stand down: the box carries their ways */
@@ -223,11 +227,62 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-body > :is(.vitrine-words, .vitrine-aside, .vitrine-after) { order: 2; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card > :is(.vitrine-controls, .vitrine-foot) { order: 3; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-grab { display: none !important; }
-/* the close of the work at the work's own top right corner, as on the phone */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-shut {
-  left: calc(100vw - var(--cinema-r) - var(--cinema-card) - 12px - 50px) !important;
-  top: calc(var(--cinema-t) + 14px) !important;
+/* one close for a look, the foot row's first seat drawn as the cross, as on the upright phone */
+#wing[data-film='cinema'] .vitrine-shut { display: none !important; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-ic-fill { display: none; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-cross { display: block; width: 10px; height: 10px; background: var(--film-cross); }
+
+/* the close look's small words at a phone's reading size, as the upright phone sets them */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
+  .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-rule-label, .vitrine-folio) { font-size: .8125rem; }
+
+/* THE MACHINE'S FILMED CYCLE INSIDE ITS FRAME: the wide cycle is cut to the
+   frame and stands on the frame's own ground, its lower edge fading into it,
+   so the step's words under the machine read on that ground */
+#wing[data-film='cinema'] .film-cycle-layer:has(> .na-cycle) {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  clip-path: inset(calc(var(--cinema-t) + 9px) calc(var(--cinema-r) + var(--cinema-card) + 13px)
+    calc(var(--cinema-b) + var(--cinema-row) + 5px) calc(var(--cinema-l) + 1px));
+  background: #0b141c;
 }
+#wing[data-film='cinema'] .film-cycle-layer > .na-cycle {
+  -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent);
+  mask-image: linear-gradient(to bottom, #000 84%, transparent);
+}
+
+/* THE WORK'S SCALE STANDS UNDER THE WORK, never on it: the plate keeps a
+   strip at its foot for the rule, which reads on one line there */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-plate:has(.deep-rule:not([hidden])) .deep-plate-stage { bottom: 30px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-rule {
+  left: 10px; bottom: 7px; flex-direction: row; align-items: center; gap: 8px;
+  padding: 0; background: none; border: 0;
+}
+/* the card names the page, so nothing stands on the page itself, as on the upright phone */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-stand { display: none; }
+
+/* THE READER AS THE PHONE STANDS IT: the page down to the frame's foot, the
+   two zoom steps as the row's own glyphs beside the ways, so the card's words
+   begin above its fold; the book's card is a little wider for that row */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'][data-payload='manuscript'] { --cinema-card: min(400px, 48vw); }
+#wing[data-film='cinema'] .reader[data-dock='card'] :is(.reader-ground, .reader-stage) { bottom: 8px; }
+#wing[data-film='cinema'] .vitrine-payload-controls .reader-shelf { position: static; height: 44px; margin: 0; padding: 0; gap: 4px; }
+#wing[data-film='cinema'] .vitrine-payload-controls .reader-page { width: 44px; height: 44px; min-width: 44px; }
+#wing[data-film='cinema'] .vitrine-payload-controls :is(.reader-absence, .reader-part) { height: 44px; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row { gap: 4px; row-gap: 8px; width: 100%; flex-wrap: wrap; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-way { flex: 1 1 0; min-width: 0; padding: 10px 2px; font-size: .8125rem; }
+/* a book's named details keep their words, each on a row of its own under the ways */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='detail'] { order: 2; flex: 1 0 100%; padding: 10px 8px; font-size: .875rem; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .vitrine-step { flex: 0 0 44px; }
+/* the side's own words read as paragraphs, at the close look's line */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-aside :is(p, li) { margin: 0 0 8px; line-height: 1.42; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom { display: contents; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='whole'] { display: none; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom .vitrine-control { flex: 0 0 44px; min-width: 44px; padding: 0; font-size: 0; }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='nearer']::before { content: '+'; font: 400 20px/1 var(--sans); }
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='further']::before { content: '\2212'; font: 400 20px/1 var(--sans); }
 
 /* ---- THE SHEETS OVER THE WHOLE GLASS, one close at the lower left ---- */
 /* the record */
