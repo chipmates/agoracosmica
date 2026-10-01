@@ -299,13 +299,25 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
   background: var(--na-abyss, #0d171f);
 }
 #wing[data-film='cinema'] .vinci-dock::backdrop { background: color-mix(in srgb, var(--na-abyss, #081016) 70%, transparent); }
-#wing[data-film='cinema'] .vinci-sources-toolbar .vinci-sources-close {
-  position: fixed; left: var(--cinema-l); bottom: var(--cinema-b); z-index: 2;
-  width: 48px; height: 48px; max-width: 48px; min-width: 48px; padding: 0; border-radius: 50%;
-  font-size: 0; letter-spacing: 0;
-  background: color-mix(in srgb, var(--na-abyss, #07101a) 85%, transparent); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--press-white, #fff) 25%, transparent);
+/* EVERY SHEET'S ONE CLOSE is the same glass circle with the drawn cross, at
+   the lower left where back stands; its word stays its name for a screen reader */
+html:has(#wing[data-film='cinema']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #instruments .inst-close) {
+  position: fixed; left: var(--cinema-l); right: auto; top: auto; bottom: var(--cinema-b); z-index: 4;
+  display: grid; place-items: center; box-sizing: border-box; flex: none;
+  width: 48px; height: 48px; max-width: 48px; min-width: 48px; min-height: 48px; margin: 0; padding: 0; border: 0; border-radius: 50%;
+  font-size: 0; letter-spacing: 0; text-indent: 0; color: #ecdfc7;
+  background: #07101af2; box-shadow: inset 0 0 0 1px #ffffff40;
 }
-#wing[data-film='cinema'] .vinci-sources-toolbar .vinci-sources-close::after { content: '\2715'; font: 15px/1 var(--sans); color: #e6d6b8; }
+html:has(#wing[data-film='cinema']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #instruments .inst-close)::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 10px; height: 10px; translate: -50% -50%; background: var(--film-cross);
+}
+html:has(#wing[data-film='cinema']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #instruments .inst-close):focus-visible {
+  outline: 1px solid var(--na-gold, #e0b96a); outline-offset: 2px;
+}
+#wing[data-film='cinema'] .vinci-dock .vinci-sources-tabs button { font-size: .875rem; }
+#wing[data-film='cinema'] .vinci-dock :is(.vinci-certainty, .vinci-certainty-word) { font-size: .8125rem; letter-spacing: .08em; }
+#wing[data-film='cinema'] .vinci-dock .vinci-certainty-word { margin-bottom: 4px; }
+#wing[data-film='cinema'] .vinci-dock :is(.vinci-citation, .vinci-record .vinci-statement, .vinci-record-fold summary, .vinci-arithmetic) { font-size: .875rem; }
 
 /* the room's list */
 #wing[data-film='cinema'] .desk-ov[data-sheet] {
@@ -316,7 +328,12 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
 }
 #wing[data-film='cinema'] .desk-ov[data-sheet] .desk-ov-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
 #wing[data-film='cinema'] .desk-ov[data-sheet] .desk-ov-shut { left: var(--cinema-l); bottom: var(--cinema-b); }
-#wing[data-film='cinema'] .desk-ov[data-sheet]::after { height: calc(var(--cinema-b) + 60px); }
+/* the foot is solid from above the close, so no thumbnail runs under it */
+#wing[data-film='cinema'] .desk-ov[data-sheet]::after { height: calc(var(--cinema-b) + 72px);
+  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 14px); }
+/* a short glass shows a row and the head of the next: every work stands in the middle of its plate, so none
+   waits at a plate's foot under the fold and reads as an empty place */
+#wing[data-film='cinema'] .desk-ov[data-sheet] .desk-ov-plate { height: 120px; align-items: center; }
 
 /* the museum's panel */
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments {
@@ -349,12 +366,14 @@ html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-lin
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-links > .inst-wing { grid-column: 1; grid-row: 1 / span 12; align-self: start; }
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-links > :not(.inst-wing) { grid-column: 2; }
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-setting { padding-top: 4px; }
-/* the scrolling column would clip a ring drawn outside the row */
+/* the scrolling column would clip a ring drawn outside the row, so the rows keep air inside it for their mark */
+html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-wing button { padding-left: 12px; padding-right: 12px; }
 html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-wing button:focus-visible { outline-offset: -1px; }
-html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-close {
-  left: var(--cinema-l);
-  right: auto;
-  bottom: var(--cinema-b);
+/* the column's last row fades out under its foot, it never breaks off */
+html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-links {
+  padding-bottom: 36px;
+  -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 28px), transparent);
 }
 
 /* the wing plays no sound and its plan has its own row, as on the upright phone */
@@ -404,9 +423,20 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
 /* THE LIFE over the glass's height: at 390 px its head, drawing and words
    left the list no room, so the body scrolls as one column down to the list,
    whose two columns keep their own scroll */
-#wing[data-film='cinema'] .wing-life[open] {
+#wing[data-film='cinema'] :is(.wing-life, .wing-plan)[open] {
+  left: var(--cinema-l) !important;
+  width: calc(100vw - var(--cinema-l) - var(--cinema-r)) !important;
   top: calc(var(--cinema-t) + 8px) !important;
   height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 8px) !important;
 }
-#wing[data-film='cinema'] .wing-life-body { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
+#wing[data-film='cinema'] .wing-plan :is(.wing-plan-number, .wing-plan-entry-number) { font-size: .8125rem; }
+#wing[data-film='cinema'] .wing-plan svg text { font-size: 13px; }
+#wing[data-film='cinema'] .wing-plan :is(.wing-plan-close, .wing-life-door) { font-size: .875rem; }
+/* the plan is as solid as the life: the bar's words stood faintly through its foot */
+#wing[data-film='cinema'] .wing-plan[open] { background: #101d27; }
+/* the chosen row's ring stands clear of its number */
+#wing[data-film='cinema'] .wing-plan .wing-plan-entry { padding-left: 10px; }
+#wing[data-film='cinema'] .wing-life-body { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin;
+  padding-bottom: 24px; -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent);
+  mask-image: linear-gradient(to bottom, #000 calc(100% - 24px), transparent); }
 #wing[data-film='cinema'] .wing-life-reading { flex: 0 0 auto; height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 132px); }
