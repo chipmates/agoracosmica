@@ -535,7 +535,12 @@ export function createWing(): WingModule {
       open: id => openFromOverview(id),
       room: () => text(CARDS.station_short_names?.[stationOf(LIFE[card]!.station).id] ?? stationOf(LIFE[card]!.station).name),
       // THE READING TABLE'S SHELF: its name, columns, whole books and absences, from the look once loaded
-      name: () => atTable() ? look?.shelf().name ?? null : null,
+      name: () => {
+        if (atTable()) return look?.shelf().name ?? null
+        // the grave's set is a stone, its drawing and a picture, no wall: it carries its room's own name
+        const here = stationOf(LIFE[card]!.station).id
+        return here === 'grave' ? CARDS.station_short_names?.[here] ?? null : null
+      },
       columns: () => atTable() ? 6 : null,
       unit: () => atTable() ? 'topics' : null,
       absent: () => atTable() ? look?.shelf().absent ?? null : null,
