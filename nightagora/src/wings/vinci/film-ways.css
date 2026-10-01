@@ -1,0 +1,4 @@
+/* the panel's own sound and plan rows stand down in the film on the phone, as
+   in the live phone form: the wing plays no sound, and the plan is one of the
+   wing's rows */
+html:has(#wing[data-film='upright']) :is(#inst-sound, #inst-plan) { display: none; }

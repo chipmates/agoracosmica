@@ -21,6 +21,7 @@ import { deskStageHeight } from '../desk-stage'
 import { createDeskChrome, deskMark, type DeskChrome, type DeskStation } from '../desk-chrome'
 import { gaitPace } from './gait'
 import { createVinciSourcesWindow } from './sources'
+import { mountFilmWays } from './film-ways'
 import cardsSource from './data/cards.json?raw'
 import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEvening, type FilmRelease } from '../picture/film'
 import { walkedClip } from '../../../forge/film/walks.mjs'
@@ -1019,6 +1020,11 @@ export function createWing(): WingModule {
     sourceButton.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
     wing.querySelector('.wing-rail-group')?.append(sourceButton)
     sources = createVinciSourcesWindow(h.labels, sourceButton, () => { sources?.setOpen(false); recordOf = null })
+    // THE PLAN AND THE LIFE, the live wing's two ways through it, pressed the film's way
+    mountFilmWays({ hosts: h, narrow, stops: LIFE, carried, standing: () => card, stood: () => [...stood],
+      release: () => release, picture: () => picture, cells: ids => lookNow().then(l => l.cells(ids)), open: openFromOverview,
+      quiet: () => { if (!look?.id) return false; lookLeaving = true; try { look.close(false) } finally { lookLeaving = false } return true },
+      openRecord, floor: () => desk?.floor() ?? (phone && !phone.root.hidden ? phone.root.getBoundingClientRect().top : innerHeight), signal })
     window.addEventListener('keydown', e => {
       if (e.defaultPrevented || e.ctrlKey || e.metaKey || e.altKey) return
       if (document.querySelector('dialog[open]')) return
