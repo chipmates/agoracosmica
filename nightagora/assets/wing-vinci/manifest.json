@@ -49,7 +49,7 @@
       "prompt": "Conjectural atmospheric sky at the exact computed 1517 sun vector: turbidity4, Rayleigh1.4, cloudScale0.0006, cloudCoverage0.28, cloudDensity0.42, cloudElevation0.35, cloudSpeed0. No weather observation survives; cloud shader parameters are scenic choices, not measured altitude. Displayed horizon colour continues the FogExp2 asymptote at assumed density0.0075/m [0.0075–0.015/m] with an assumed effective column18m [12–24m] and clear elevation12deg [10–16deg]; no terrain extrapolation. Source src/wings/vinci/display-sky-haze.ts. The environment probe rotation is separately corrected to Euler Y=-pi/2 in index.ts to match the actual computed solar azimuth; display haze never enters its radiance. A thin streaked high cloud veil is added above ten degrees of elevation, four-octave fractal noise stretched 3.1/11/2.4 on the view ray, peaking near forty degrees and fading at the zenith and the horizon, mixed toward a grey lit from the sun at up to 40 per cent. The dome keeps 82 per cent of its own saturation. Assumed weather, no observation claimed. The irradiance probe is the CIE clear sky (ISO 15469 type 12, circumsolar term held to a third) from the same sun, coloured from the rig zenith to its horizon and warmed toward the sun, levelled to the former two-colour band on an open horizontal face (src/wings/vinci/sky-probe.ts). Aerial perspective past 18 m at an assumed 0.004/m, cooler away from the sun and warmer toward it; none on a surface inside the collection seen from inside it; the displayed sky pales and loses up to 28 per cent of its saturation toward the horizon.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "9fef2f485c0b4674c2886c56d3b5856556919c532cc582ddd81fc397fbe79357",
+      "sha256": "4c59b187e0a094ac4069ba777e506eabc655e65164cbc288c2660832cdf81723",
       "note": "brief/SITE-HOUR.md; three.js SkyMesh MIT; recipe_file=src/wings/vinci/index.ts displayed_haze_recipe=src/wings/vinci/display-sky-haze.ts; sky_display_only=true; fog_density=0.0075; fog_density_assumed_range=0.0075..0.015; environmentRotation_y_rad=-1.5707963267948966; displayed_haze_sha256=8c9b9be738df3285931a694255770c477d0cf7a23804a954af3cf89c2460f684;"
     },
     {
@@ -62,7 +62,7 @@
       "prompt": "Museum camera poses and piecewise exterior circulation in the fixed dossier frame. All poses are exhibition choices. Latest target semantic navigation on measured gate/terrace/stair/apron routes. Bounded physical near-pyramid clearance; measured geometry identity at mount. CSS projection-derived drag with 0.1 second monotone response; explicit inspection entry and return. The active certified leg finishes before a direct certified route to the newest pending target. Static material inspection aliases have separate actual placement audits.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "5353f8c09f8078a8cb068faef8258aaac12b37795ce962abf55d147e3af5fc16",
+      "sha256": "24c53a5e7d3ffcc59a8c41e67b36a136ef261f00b41657679daa95d170412b38",
       "note": "brief/CONCEPT.md; src/wings/vinci/data/closluce.json; recipe_file=src/wings/vinci/rail.ts; companion_file=src/wings/vinci/input.ts; companion_file=src/wings/vinci/rail-gallery-gaze.ts; companion_recipe_ids=vinci/rail-smoothing,vinci/rail-proof,vinci/rail-fingerprint,vinci/rail-projection,vinci/projection-drag,vinci/rail-clearance,vinci/rail-waypoints,vinci/rail-solids,vinci/gait"
     },
     {
@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "4c683be636f7cac8557281544f577a7fe2af4c638278a19373719a39533ebc40",
+      "sha256": "4fb95c4190d83d79872e2f9d08d6f5fd6a98f9b5799fbf7da1214da672af64b7",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {
