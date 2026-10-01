@@ -316,7 +316,8 @@ html:has(#wing[data-film='upright']) #instruments { padding-bottom: calc(88px + 
    glass circle at the far lower left, the seat the foot row's way back holds,
    one drawn cross in all of them; the word stays the control's name for the
    screen reader, and a swipe down on the sheet does the same (film-wing.ts) */
-html:has(#wing[data-film='upright']) {
+/* sideways too: the foot row's first seat is a look's close there as well */
+html:has(#wing:is([data-film='upright'], [data-film='cinema'])) {
   --film-cross:
     linear-gradient(45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px)),
     linear-gradient(-45deg, transparent calc(50% - .75px), currentColor calc(50% - .75px) calc(50% + .75px), transparent calc(50% + .75px));
