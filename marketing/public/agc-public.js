@@ -47,12 +47,14 @@
   // Landing on any URL with ?probe=1 marks this browser, so a harness or an
   // in-house browser stays out of the funnel. Same check and same value as
   // client/src/utils/funnelBeacon.ts, and it runs before any beacon below.
+  // The address alone marks this page load, so blocked storage changes nothing.
+  var probeInUrl = false;
   try {
-    if (new URLSearchParams(window.location.search).get('probe') === '1') {
-      localStorage.setItem(LS_PROBE, '1');
-    }
-  } catch (e) { /* storage or URL unavailable — the browser stays unmarked */ }
+    probeInUrl = new URLSearchParams(window.location.search).get('probe') === '1';
+    if (probeInUrl) localStorage.setItem(LS_PROBE, '1');
+  } catch (e) { /* storage or URL unavailable: nothing is stored */ }
   function probeField() {
+    if (probeInUrl) return 1;
     try { return localStorage.getItem(LS_PROBE) === '1' ? 1 : undefined; }
     catch (e) { return undefined; }
   }

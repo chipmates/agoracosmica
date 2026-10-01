@@ -457,6 +457,27 @@ describe('agc-public.js: the audio play counter', () => {
   });
 });
 
+describe('agc-public.js: the in-house marker', () => {
+  it('marks a page opened with ?probe=1 from its address when storage is blocked', () => {
+    const blocked = () => { throw new DOMException('blocked', 'SecurityError'); };
+    // The suite's localStorage is a plain stand-in object, so its two methods are swapped by hand.
+    const store = localStorage as unknown as Record<'setItem' | 'getItem', unknown>;
+    const { setItem, getItem } = store;
+    store.setItem = blocked;
+    store.getItem = blocked;
+    try {
+      loadPage('/figures/rumi/?probe=1');
+    } finally {
+      store.setItem = setItem;
+      store.getItem = getItem;
+    }
+    const page = fetches.filter((f) => f.url.endsWith('/v1/page'));
+    expect(page).toHaveLength(1);
+    expect(page[0].body.probe).toBe(1);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+});
+
 describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;
