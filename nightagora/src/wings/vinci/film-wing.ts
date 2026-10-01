@@ -597,7 +597,7 @@ export function createWing(): WingModule {
     p.dataset['certainty'] = label.certainty
     p.append(make('span', 'vinci-certainty-word', text(vinciCertaintyWords[label.certainty])), document.createTextNode(' ' + text(label)))
     host.append(p)
-    into.append(make('p', 'vinci-statement', text(label.record ?? label)), make('small', 'vinci-citation', label.source))
+    into.append(make('p', 'vinci-statement', text(label.record ?? label)), make('small', 'vinci-citation', text(label.sourceShown)))
   }
   function fold(host: HTMLElement, full: HTMLElement): void {
     const details = make('details', 'vinci-record-fold')
