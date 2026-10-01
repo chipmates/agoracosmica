@@ -312,3 +312,8 @@
   .vitrine-date {inset:0 0 28px;gap:2px;}
   .vitrine-date-year {font-size:30px;}
 }
+/* A HOST THAT KEEPS ITS FOOT ROW UNDER THE WINDOW (the phone form) walks the
+   set from that row: the work before in the book's seat, gold the work after,
+   and the one close is the mark over the work. The card's own steps and its
+   second close stand down, so every way stands in one place. */
+[data-keeps-foot] > .vitrine[data-narrow='true'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) {display:none;}

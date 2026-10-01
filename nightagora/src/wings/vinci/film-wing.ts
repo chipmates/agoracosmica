@@ -26,7 +26,7 @@ import cardsSource from './data/cards.json?raw'
 import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEvening, type FilmRelease } from '../picture/film'
 import { walkedClip } from '../../../forge/film/walks.mjs'
 import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
-import type { FilmLook } from './film-look'
+import type { FilmLook, FilmLookWays } from './film-look'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import type { DeskOverviewCell } from '../overview'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
@@ -72,6 +72,7 @@ const atBirth = (age: VinciText): boolean => text(age) === text(deskControl('dat
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4', ARROW_UP = 'M8 13V3M4 7l4-4 4 4', ARROW_DOWN = 'M8 3v10M4 9l4 4 4-4'
 const BOOK = 'M8 3.2a4.8 4.8 0 1 0 0 9.6a4.8 4.8 0 1 0 0-9.6M8 6.2v3.6M6.2 8h3.6'
 const TRIANGLE_BACK = 'M11 3.5L4.5 8 11 12.5z'
+const STEP_BACK = 'M10 3L5 8l5 5'
 const RING = 2 * Math.PI * 20.5
 
 /** The release the address names: `?film=<name>` under the origin's `/film/`. */
@@ -313,7 +314,7 @@ export function createWing(): WingModule {
     return how === 'walk' || how === 'dip'
   }
   function chrome(): { left: number; top: number; right: number; bottom: number } | null {
-    const node = hosts?.stage.querySelector<HTMLElement>(wide ? '.desk-low' : '.film-box')
+    const node = hosts?.stage.parentElement?.querySelector<HTMLElement>(wide ? '.desk-low' : '.film-box')
     const r = node?.getBoundingClientRect()
     return r && r.height > 0 ? { left: r.left, top: r.top, right: r.right, bottom: r.bottom } : null
   }
@@ -453,12 +454,14 @@ export function createWing(): WingModule {
 
   /* ---- the close look, loaded after the first picture ---- */
   const standing = (): boolean => picture?.state().kind === 'rest'
-  /* ONE TEXT AT A TIME: on the phone the box stands down before a close look
-     opens, so the work takes the whole glass and the vitrine's card is the text */
+  /* ONE TEXT AT A TIME: on the phone the box keeps only its foot row while a
+     close look stands (the way back, the work before, gold on to the work
+     after), so the work takes the glass and the vitrine's card is the text */
   function standDown(down: boolean): void {
     if (!phone) return
-    phone.root.hidden = down
+    phone.root.dataset['look'] = String(down)
     if (down && drawerOpen) setDrawer(false)
+    paintGold()
   }
   let look: FilmLook | undefined
   let lookLoading: Promise<FilmLook> | undefined
@@ -628,7 +631,7 @@ export function createWing(): WingModule {
   let phone: {
     root: HTMLElement; name: HTMLElement; line: HTMLElement; drawer: HTMLElement; keys: HTMLElement
     more: HTMLButtonElement; from: HTMLButtonElement; count: HTMLElement
-    back: HTMLButtonElement; book: HTMLButtonElement; talk: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
+    back: HTMLButtonElement; book: HTMLButtonElement; earlier: HTMLButtonElement; talk: HTMLButtonElement; gold: HTMLButtonElement; goldName: HTMLElement; ringLine: SVGCircleElement
     goldPath: SVGPathElement
   } | undefined
   let drawerOpen = false
@@ -673,9 +676,15 @@ export function createWing(): WingModule {
     const goldIcon = icon(ARROW_ON)
     arrow.append(ring, goldIcon)
     gold.append(goldName, arrow)
-    foot.append(back, book, talk, gold)
+    // in a close look the book's seat is the work before, as the live phone form stands it
+    const earlier = make('button', 'film-book vinci-phone-earlier')
+    earlier.type = 'button'
+    earlier.append(icon(STEP_BACK))
+    earlier.addEventListener('click', () => look?.ways()?.step(-1))
+    foot.append(back, book, earlier, talk, gold)
     root.append(name, line, drawer, keys, foot)
-    h.stage.append(root)
+    // over the close look's layer, as the live phone form stands it, so its foot row stays lit under a look
+    h.labels.append(root)
     // whether the age had to drop under a long heading, read wherever the row's size changes;
     // written a frame later, since the answer resizes the row it observes
     const rows = new ResizeObserver(() => requestAnimationFrame(() => {
@@ -687,21 +696,23 @@ export function createWing(): WingModule {
     watchGoldName(goldName, signal)
     more.addEventListener('click', () => setDrawer(!drawerOpen))
     from.addEventListener('click', () => { paintSources(null); sources?.select('station'); sources?.setOpen(true) })
-    back.addEventListener('click', () => { if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
+    back.addEventListener('click', () => { if (look?.id) { look.back(); return } if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) })
     book.addEventListener('click', () => document.getElementById('rail-instruments')?.click())
     talk.addEventListener('click', () => { endWith('talk') })
     gold.addEventListener('click', () => pressOn())
     // a swipe up raises the words, a swipe down or a tap on the picture folds them
-    let fromY = 0, held = false
-    root.addEventListener('pointerdown', e => { held = true; fromY = e.clientY }, { signal })
+    let fromX = 0, fromY = 0, held = false
+    root.addEventListener('pointerdown', e => { held = true; fromX = e.clientX; fromY = e.clientY }, { signal })
     root.addEventListener('pointerup', e => {
       if (!held) return
       held = false
-      const dy = e.clientY - fromY
+      const dy = e.clientY - fromY, dx = e.clientX - fromX
+      // sideways in a close look it steps the set, as the foot row's two ways do
+      if (look?.id && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) { look.ways()?.step(dx < 0 ? 1 : -1); return }
       if (dy < -24 && !drawerOpen) setDrawer(true)
       else if (dy > 24 && drawerOpen) setDrawer(false)
     }, { signal })
-    phone = { root, name, line, drawer, keys, more, from, count, back, book, talk, gold, goldName, ringLine, goldPath: goldIcon.querySelector('path')! }
+    phone = { root, name, line, drawer, keys, more, from, count, back, book, earlier, talk, gold, goldName, ringLine, goldPath: goldIcon.querySelector('path')! }
   }
   function setDrawer(open: boolean): void {
     if (!phone) return
@@ -746,6 +757,10 @@ export function createWing(): WingModule {
     paintGold()
   }
   let goldWalking: boolean | null = null
+  /** the open look's ways as last painted, so a look stepped in place repaints gold */
+  let lookWays = ''
+  let lookFrames = 0
+  const waysKey = (ways: FilmLookWays | null): string => ways ? `${look?.id}|${ways.previous}|${ways.next?.title}|${text(ways.next?.word ?? { en: '', de: '' })}` : ''
   function paintGold(): void {
     if (!phone) return
     const s = picture?.state()
@@ -754,9 +769,17 @@ export function createWing(): WingModule {
     // WAITING, the words stay and the gold keeps its name; its ring counts the bytes
     phone.gold.dataset['wait'] = String(s?.kind === 'wait')
     const to = nextIndex()
+    const ways = look?.id ? look.ways() : null
     phone.root.dataset['walking'] = String(walking)
     phone.gold.dataset['leg'] = String(walking)
-    if (walking) {
+    phone.earlier.disabled = !ways?.previous
+    phone.earlier.setAttribute('aria-label', ways?.previous ?? text(CARDS.controls.date.previous))
+    lookWays = waysKey(ways)
+    if (ways?.next && !walking) {
+      // the set's next work by name, or the word alone where a page turns in the same book
+      keepLast(phone.goldName, ways.next.title || text(ways.next.word))
+      phone.gold.setAttribute('aria-label', ways.next.title ? `${text(ways.next.word)} · ${ways.next.title}` : text(ways.next.word))
+    } else if (walking) {
       phone.goldName.textContent = text(deskControl('walk', 'walk_faster'))
       phone.gold.setAttribute('aria-label', `${text(deskControl('walk', 'walking'))} · ${text(deskControl('walk', 'walk_faster'))}`)
     } else if (to !== null) {
@@ -773,15 +796,18 @@ export function createWing(): WingModule {
       keepLast(said, text(deskControl('ending', 'talk')))
       phone.talk.replaceChildren(said)
     }
-    phone.gold.dataset['end'] = String(!walking && to === null)
-    phone.root.dataset['end'] = String(!walking && to === null)
-    phone.goldPath.setAttribute('d', !walking && to === null ? ARROW_UP : ARROW_ON)
+    const end = !walking && to === null && !ways?.next
+    phone.gold.dataset['end'] = String(end)
+    phone.root.dataset['end'] = String(end)
+    phone.goldPath.setAttribute('d', end ? ARROW_UP : ARROW_ON)
     phone.gold.disabled = false
     fitGoldName(phone.goldName)
   }
   function pressOn(): void {
     const s = picture?.state()
     if (s && s.kind !== 'rest') { picture?.hurry(); return }
+    const ways = look?.id ? look.ways() : null
+    if (ways?.next) { ways.step(1); return }
     const to = nextIndex()
     if (to !== null) hosts?.navigate(to)
     else if (!endWith('lookup')) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
@@ -917,9 +943,13 @@ export function createWing(): WingModule {
     requestAnimationFrame(() => wing?.querySelector<HTMLElement>(wide ? '.desk-on' : '.film-gold')?.focus({ preventScroll: true }))
   }
 
+  /** the frame hides its labels' layer from assistive technology; the close look, the record and the phone's box stand in it */
+  let labelsHidden: string | null = null
   async function mount(h: WingHosts): Promise<void> {
     hosts = h
     wide = !narrow()
+    labelsHidden = h.labels.getAttribute('aria-hidden')
+    h.labels.removeAttribute('aria-hidden')
     const wing = h.stage.parentElement!
     h.stage.textContent = ''
     wing.dataset['wing'] = 'vinci'
@@ -1023,6 +1053,17 @@ export function createWing(): WingModule {
     })
     if (!wide) {
       buildPhone(h)
+      /* A CLOSE LOOK STANDS OVER THE FOOT ROW, which the box keeps (standDown),
+         and a sideways swipe on its card steps the set as the row's two ways do */
+      h.labels.dataset['keepsFoot'] = ''
+      let swipeX = 0, swipeY = 0, swiping = false
+      h.labels.addEventListener('pointerdown', e => { swiping = Boolean(look?.id) && Boolean((e.target as Element | null)?.closest?.('.vitrine-card')); swipeX = e.clientX; swipeY = e.clientY }, { signal })
+      h.labels.addEventListener('pointerup', e => {
+        if (!swiping) return
+        swiping = false
+        const dx = e.clientX - swipeX, dy = e.clientY - swipeY
+        if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5) look?.ways()?.step(dx < 0 ? 1 : -1)
+      }, { signal })
       /* THE BOOK OPENS THE MUSEUM'S PANEL, and the wing's own row stands at its
          head, Lobby first, as the desktop's panel publishes it */
       const lobbyWord = (): string => wing.querySelector('.wing-lobby')?.textContent?.trim() || text(WING_TEXT.lobby)
@@ -1148,6 +1189,8 @@ export function createWing(): WingModule {
         marksAt = ''
       }
       if (phone && (goldWalking !== underWay || phone.gold.dataset['wait'] !== String(s.kind === 'wait'))) paintGold()
+      // a look that stepped in place (a page turned, a topic on) renames gold
+      else if (phone && look?.id && ++lookFrames % 8 === 0) { if (waysKey(look.ways()) !== lookWays) paintGold() }
       if (phone) {
         const share = s.kind === 'walk' || s.kind === 'wait' ? s.share : 0
         phone.ringLine.setAttribute('stroke-dasharray', `${(RING * share).toFixed(1)} ${RING.toFixed(1)}`)
@@ -1164,6 +1207,7 @@ export function createWing(): WingModule {
       controller.abort()
       desk?.dispose(); desk = undefined
       look?.dispose(); look = undefined; lookLoading = undefined
+      phone?.root.remove(); phone = undefined
       sources?.dispose(); sources = undefined
       sourceButton?.remove(); sourceButton = undefined
       picture?.dispose(); picture = undefined
@@ -1178,6 +1222,8 @@ export function createWing(): WingModule {
       if (hosts) {
         const wing = hosts.stage.parentElement!
         delete wing.dataset['wing']; delete wing.dataset['film']; delete wing.dataset['cut']; delete wing.dataset['evening']
+        delete hosts.labels.dataset['keepsFoot']
+        if (labelsHidden !== null) hosts.labels.setAttribute('aria-hidden', labelsHidden)
         hosts.stage.textContent = ''
       }
       hosts = undefined

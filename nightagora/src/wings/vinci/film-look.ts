@@ -20,7 +20,7 @@ import { hangCatalogue } from './collection/catalogue'
 import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF } from './film-look-kinds'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { createPlacePayload } from '../vitrine/place'
-import type { VitrinePlace } from '../vitrine/types'
+import type { VitrineExhibit, VitrinePlace } from '../vitrine/types'
 import type { ShowpiecePayload } from '../vitrine/showpiece'
 import { createCyclePayload, type FilmCycle } from '../picture/cycle'
 import { createIslandPayload, islandChoice, type IslandPayload } from '../picture/island'
@@ -113,6 +113,15 @@ function screwLeaf(): PageRecord | undefined {
   return pages.find(page => page.page_kind === 'facsimile' && page.codex === 'B' && page.folio === 83 && page.side === 'verso')
 }
 
+/** a close look's two ways along its set, as the phone's foot row stands them */
+export interface FilmLookWays {
+  /** the work before by name, or null at the set's start */
+  previous: string | null
+  /** the way on: the next work's name ('' where the set does not know it) and the word for the step */
+  next: { title: string; word: VinciText } | null
+  step(direction: 1 | -1): void
+}
+
 export function createFilmLook(h: FilmLookHost) {
   let assets: ManifestIndex | undefined
   const closeLook = createVinciCloseLook({ host: h.host, narrow: h.narrow, room: () => vinciRoomName(h.station(), { en: h.room(), de: h.room() }),
@@ -128,6 +137,14 @@ export function createFilmLook(h: FilmLookHost) {
     return button
   }
   const shut = (up: (() => void) | null = null): HTMLButtonElement => control(VINCI_VITRINE_WORDS.close, up ?? (() => closeLook.close()), 'close')
+  /** the open look's two steps along its set, read by the phone's foot row as the desk's band reads them */
+  let walked: readonly HTMLElement[] = []
+  let kicker: string | null = null
+  function openLook(exhibit: VitrineExhibit, from: HTMLElement | null, how: 'enter' | 'advance'): void {
+    walked = exhibit.walk ?? []
+    kicker = exhibit.onKicker ?? null
+    closeLook.open(exhibit, from, how)
+  }
   const tier = () => h.stack.tierName()
 
   /** A WORK'S OWN NAME, for the way on that walks to it: the name its own
@@ -211,9 +228,9 @@ export function createFilmLook(h: FilmLookHost) {
       const { set, walk } = stand(id)
       h.standDown(true)
       // ONE VIEW OF A PAINTING, the live wing's own: the deep plate with its zoom and its rule
-      if (plate) closeLook.open({ ...createVinciPaintingView({ id, title, line: vinciLine(id), work, entries, plate, ...vinciLimits(id), controls,
+      if (plate) openLook({ ...createVinciPaintingView({ id, title, line: vinciLine(id), work, entries, plate, ...vinciLimits(id), controls,
         from: () => null, standing: h.standing, narrow: h.narrow(), catalogue, tier }), walk, set, certainty }, from, how)
-      else closeLook.open({ id, title, line: vinciLine(id), card: [createWindowWorkLabel(work, entries, lang(), h.narrow(), Boolean(catalogue?.kind))],
+      else openLook({ id, title, line: vinciLine(id), card: [createWindowWorkLabel(work, entries, lang(), h.narrow(), Boolean(catalogue?.kind))],
         payload: null, controls, walk, ...vinciLimits(id), set, certainty, catalogue }, from, how)
       return
     }
@@ -255,7 +272,7 @@ export function createFilmLook(h: FilmLookHost) {
       machine = { payload, island: () => island, cycle: () => cycle }
       const { set, walk } = stand(id)
       h.standDown(true)
-      closeLook.open({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
+      openLook({ id, title, line: vinciLine(id), card: words.card, after: words.after, payload,
         controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], walk, ...vinciLimits(id), set, certainty: 'reconstructed' }, from, how)
     }
   }
@@ -274,8 +291,24 @@ export function createFilmLook(h: FilmLookHost) {
       : createPlacePayload({ title: place.title, standing: h.standing })
     const { set, walk } = stand(id)
     h.standDown(true)
-    closeLook.open({ id, title: place.title, line: vinciLine(id), card: place.card, after: place.after, payload,
+    openLook({ id, title: place.title, line: vinciLine(id), card: place.card, after: place.after, payload,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()], walk, ...vinciLimits(id), set, certainty: place.certainty }, from, how)
+  }
+  /** THE OPEN LOOK'S WAYS ALONG ITS SET, for the phone's foot row: the band's
+      own reading (the set's two steps, else the payload's own page steps)
+      and its word for the way on, the next work named where the set knows it */
+  function ways(): FilmLookWays | null {
+    if (!closeLook.id) return null
+    const live = (node?: HTMLElement | null): HTMLElement | null => node && !(node as HTMLButtonElement).disabled ? node : null
+    const steps = h.host.querySelectorAll<HTMLElement>('.vitrine-payload-controls .vitrine-step')
+    const on = live(walked[1] ?? steps[1]), back = live(walked[0] ?? steps[0])
+    const kind = h.host.querySelector<HTMLElement>('.vitrine')?.dataset['payload'] ?? ''
+    const own = deskControl('walk', 'next_manuscript')
+    const word: VinciText = kicker ? { en: kicker, de: kicker } : !walked[1] ? deskControl('walk', 'next_page')
+      : kind === 'machine' ? deskControl('walk', 'next_machine') : kind === 'manuscript' && own.en && own.de ? own : deskControl('walk', 'next_work')
+    const title = on && walked.includes(on) ? on.getAttribute('aria-label') ?? '' : on?.dataset['title'] ?? ''
+    return { previous: back ? back.getAttribute('aria-label') || null : null, next: on ? { title, word } : null,
+      step: direction => (direction > 0 ? on : back)?.click() }
   }
   /** the machine standing open, for the rigs' readout and the recording's hand */
   let machine: { payload: IslandPayload; island(): TurntablePayload | null; cycle(): ReturnType<typeof createCyclePayload> | null } | null = null
@@ -328,7 +361,7 @@ export function createFilmLook(h: FilmLookHost) {
         colour: certaintyColour('documented'), head: null, holder: '' }],
       stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
       start: 'screw-leaf', words: vinciManuscriptWords(), tier: () => 'standard' })
-    closeLook.open({ id: door, title, line: null, card: [], payload: reader,
+    openLook({ id: door, title, line: null, card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, () => h.openRecord(door, { en: named?.en ?? '', de: named?.de ?? '' }, 'documented',
         host => { for (const line of [shows, scan.licence ?? '']) if (line) host.append(make('p', 'vinci-statement', line)) }), 'record'),
       ...(back ? [control(VINCI_VITRINE_WORDS.back, back, 'back')] : []), shut()],
@@ -350,7 +383,7 @@ export function createFilmLook(h: FilmLookHost) {
     // the station's own row walks on from the film as from any work in it
     const { set, walk } = stand(show.id)
     h.standDown(true)
-    closeLook.open({ id: show.id, title, line: vinciLine(show.id), card: [], payload,
+    openLook({ id: show.id, title, line: vinciLine(show.id), card: [], payload,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut(up)], walk, set, certainty: show.certainty,
       ...(up ? { up, shut: up } : {}) }, from, how)
   }
@@ -384,7 +417,7 @@ export function createFilmLook(h: FilmLookHost) {
     }
     const up = h.above?.(id) ?? null
     h.standDown(true)
-    closeLook.open({ id: door, title: opened.title, line: vinciLine(id), card: [], payload: reader,
+    openLook({ id: door, title: opened.title, line: vinciLine(id), card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut(up)], ...vinciLimits(id), set: stand(id).set, certainty: 'documented',
       ...(up ? { up, shut: up } : {}) }, from, how)
   }
@@ -411,7 +444,7 @@ export function createFilmLook(h: FilmLookHost) {
     back.setAttribute('aria-label', text(VINCI_VITRINE_WORDS.back))
     back.addEventListener('click', () => openShowpiece(show, null, 'advance'))
     const up = h.above?.(show.id) ?? null
-    closeLook.open({ id: door, title: sheet.title, line: vinciLine(show.id), card: [], payload: reader,
+    openLook({ id: door, title: sheet.title, line: vinciLine(show.id), card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut(up)], walk: [back],
       set: null, certainty: 'documented', ...(up ? { up, shut: up } : {}) }, null, 'advance')
   }
@@ -442,7 +475,7 @@ export function createFilmLook(h: FilmLookHost) {
       openRecord: recordOf, openBook: book => void open(book === EDITION_EXHIBIT ? EDITION_WHOLE : book, null),
       openShelf: () => closeLook.close(), close: () => closeLook.close() })
     h.standDown(true)
-    closeLook.open(look.exhibit, from, closeLook.id ? 'advance' : 'enter')
+    openLook(look.exhibit, from, closeLook.id ? 'advance' : 'enter')
   }
   /** A WHOLE BOOK OF THE SHELF, as a source: its own reader, walked book to book. */
   function bookWalk(id: string): HTMLElement[] {
@@ -466,7 +499,7 @@ export function createFilmLook(h: FilmLookHost) {
       more: text(VINCI_VITRINE_WORDS.more), colour: certaintyColour('documented'), tier: () => 'standard', changed: () => undefined,
       openBook: next => void open(next, null), openLeaf: () => void open(EDITION_WHOLE, null) })
     h.standDown(true)
-    closeLook.open({ id, title: text(book.title), line: text(book.title), card: [], payload: reader,
+    openLook({ id, title: text(book.title), line: text(book.title), card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, () => recordOf(id, book.title, host => reader.renderRecord(host)), 'record'), shut()],
       walk: bookWalk(id), set: null, certainty: 'documented' }, from, closeLook.id ? 'advance' : 'enter')
   }
@@ -483,7 +516,7 @@ export function createFilmLook(h: FilmLookHost) {
       openBook: next => void open(next, null) })
     const title = text(SHELF_BOOKS[0]?.official ?? { en: SHELF_UI.en.edition, de: SHELF_UI.de.edition })
     h.standDown(true)
-    closeLook.open({ id: EDITION_WHOLE, title, line: null, card: [], payload: reader,
+    openLook({ id: EDITION_WHOLE, title, line: null, card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, () => recordOf(EDITION_WHOLE, { en: title, de: title }, host => reader.renderRecord(host)), 'record'), shut()],
       walk: bookWalk(EDITION_WHOLE), set: null, certainty: 'documented' }, from, closeLook.id ? 'advance' : 'enter')
   }
@@ -580,6 +613,9 @@ export function createFilmLook(h: FilmLookHost) {
     open,
     warm,
     close: (pop = true) => closeLook.close(pop),
+    /** one level up, the look's own way back */
+    back: () => closeLook.back(),
+    ways,
     key: (event: KeyboardEvent): boolean => closeLook.key(event),
     layout: () => closeLook.layout(),
     update: (dt: number) => closeLook.update(dt),
