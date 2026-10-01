@@ -105,7 +105,7 @@ import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VI
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciEveningSky, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
+import { vinciShownSource, vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciEveningSky, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 // the phone's box wears the film player's own classes, so both phones look alike
 import filmWingCss from './film-wing.css?inline'
@@ -3476,7 +3476,7 @@ export function createWing():VinciWingModule {
     }
     if(s.outdoor){
       appendEvidence('foundation',foundationPlinthProvenance.label,'reconstructed','vinci/shell',foundationPlinthProvenance.source.join(' · '))
-      appendStatement(galleryBankCapProvenance.label,'conjectural','vinci/terrain-mesh','GENERATED',galleryBankCapProvenance.source.join(' · '),galleryBankCapProvenance.record,{en:'The cadastre and the registered site plan guide its outline.',de:'Das Kataster und der registrierte Lageplan bestimmen seinen Umriss.'})
+      appendStatement(galleryBankCapProvenance.label,'conjectural','vinci/terrain-mesh','GENERATED',text(vinciShownSource(galleryBankCapProvenance.source.join(' · '))),galleryBankCapProvenance.record,{en:'The cadastre and the registered site plan guide its outline.',de:'Das Kataster und der registrierte Lageplan bestimmen seinen Umriss.'})
       appendEvidence('minerals',mineralSurfaceProvenance.label,'reconstructed','vinci/surfaces','A-MATERIAL · A-MASONRY · materials.csv · Q124 · Q130')
       appendEvidence('finish',closeSurfaceProvenance.label,'conjectural','vinci/surfaces','A-MATERIAL · materials.csv · Q019 · Q124 · Q127')
       const constructionSources=[
@@ -3489,13 +3489,13 @@ export function createWing():VinciWingModule {
     }
     if(s.outdoor||collectionView)appendEvidence('haze',displayedHorizonHazeProvenance.label,'conjectural','vinci/sky',displayedHorizonHazeProvenance.source.join(' · '))
     if(s.id==='garden'||!s.outdoor||collectionView){
-      appendEvidence('collection',collectionProvenance.label,'reconstructed','vinci/collection',collectionProvenance.source.join(' · '))
-      appendEvidence('collectionDesign',collectionProvenance.parameterLabel,'reconstructed','vinci/collection','COMMISSION § Judges list10 · maquette.ts COLLECTION')
-      appendEvidence('approach',collectionProvenance.approachLabel,'reconstructed','vinci/collection','maquette.ts garden approach · A-SITE terrace · modern exhibition design')
+      appendEvidence('collection',collectionProvenance.label,'reconstructed','vinci/collection',text(vinciShownSource(collectionProvenance.source.join(' · '))))
+      appendEvidence('collectionDesign',collectionProvenance.parameterLabel,'reconstructed','vinci/collection',text(vinciShownSource('COMMISSION § Judges list10 · maquette.ts COLLECTION')))
+      appendEvidence('approach',collectionProvenance.approachLabel,'reconstructed','vinci/collection',text(vinciShownSource('maquette.ts garden approach · A-SITE terrace · modern exhibition design')))
     }
     if(s.id==='courtyard'||s.id==='garden'||!s.outdoor){
-      appendEvidence('access',collectionAccessProvenance.label,'reconstructed','vinci/collection-access',collectionAccessProvenance.source.join(' · '))
-      appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access','A-SITE retained court and terrace · modern museum access proposal')
+      appendEvidence('access',collectionAccessProvenance.label,'reconstructed','vinci/collection-access',text(vinciShownSource(collectionAccessProvenance.source.join(' · '))))
+      appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access',text(vinciShownSource('A-SITE retained court and terrace · modern museum access proposal')))
     }
     // The court's own four stand in every frame that holds the court.
     if(s.id==='arrival'||s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)){
@@ -3507,7 +3507,7 @@ export function createWing():VinciWingModule {
     if(s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)||activeView.startsWith('entry-')){
       appendEvidence('entry',entryPassageProvenance.label,'reconstructed','vinci/entry-passage',entryPassageProvenance.source.join(' · '))
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
-      appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},hallLedgeProvenance.source.join(' · '),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
+      appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},text(vinciShownSource(hallLedgeProvenance.source.join(' · '))),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
     }
     // The great hall behind the passage, and the few things of the period in it.
     if(s.id==='hall'&&hosts?.world.stack.tierName()!=='calm'){
@@ -3525,7 +3525,7 @@ export function createWing():VinciWingModule {
     const wingCredits=[
       ...appendRecord({en:'© OpenStreetMap contributors · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometry and surfaces: procedural reconstruction.',de:'© OpenStreetMap-Mitwirkende · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometrie und Oberflächen: prozedurale Rekonstruktion.'},'OpenStreetMap · IGN'),
       ...appendRecord({en:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Library material surrogates; no site photography sampled.',de:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Materialersatz aus der Bibliothek. Keine Standortfotografie als Textur verwendet.'},'CC0 material library'),
-      ...appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},'brief/BUILDING-DOSSIER.md'),
+      ...appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},text(vinciShownSource('brief/BUILDING-DOSSIER.md'))),
     ]
     const recordButton=make('button','vinci-record-toggle',lang()==='de'?'Vollständiger Nachweis':'Full record')
     recordButton.id='vinci-record-toggle'

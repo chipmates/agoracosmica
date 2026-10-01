@@ -357,6 +357,31 @@ const shownSources: Readonly<Record<string, VinciText>> = {
   'brief/CONCEPT-OPUS.md §3 S19; verification qualified in brief/collection/timeline.json': {
     en: 'The museum’s own research notes. Its timeline qualifies the verification.',
     de: 'Die eigenen Forschungsnotizen des Museums. Seine Zeitleiste schränkt die Prüfung ein.' },
+  // the provenance objects the live wing cites by their joined source codes, and one literal
+  'A-SITE · A-LAYOUT · OSM-AREA': {
+    en: 'The museum’s own site notes and layout, and the OpenStreetMap area.',
+    de: 'Die eigenen Geländenotizen und der Grundriss des Museums, und die OpenStreetMap-Fläche.' },
+  'brief/COMMISSION.md § Judges list 10 · brief/maquette/maquette.ts COLLECTION, collectionCut and garden approach · brief/CONCEPT.md §2 two grounds': {
+    en: 'The museum’s commission notes, its maquette of the collection and the garden approach, and its concept notes on the two grounds.',
+    de: 'Die Auftragsnotizen des Museums, seine Maquette der Sammlung und des Gartenzugangs und seine Konzeptnotizen zu den beiden Geländeebenen.' },
+  'COMMISSION § Judges list10 · maquette.ts COLLECTION': {
+    en: 'The museum’s commission notes and its maquette of the collection.',
+    de: 'Die Auftragsnotizen des Museums und seine Maquette der Sammlung.' },
+  'maquette.ts garden approach · A-SITE terrace · modern exhibition design': {
+    en: 'The museum’s maquette of the garden approach and its site notes on the terrace. A modern exhibition design.',
+    de: 'Die Maquette des Museums für den Gartenzugang und seine Geländenotizen zur Terrasse. Ein moderner Ausstellungsentwurf.' },
+  'brief/COMMISSION.md § Judges list 10 · src/wings/vinci/data/closluce.json retained courtyard and terrace platforms': {
+    en: 'The museum’s commission notes and its building record of the house, the retained courtyard and terrace platforms.',
+    de: 'Die Auftragsnotizen des Museums und sein Bauverzeichnis des Hauses, die erhaltenen Hof- und Terrassenebenen.' },
+  'A-SITE retained court and terrace · modern museum access proposal': {
+    en: 'The museum’s site notes on the retained court and terrace. A modern museum access proposal.',
+    de: 'Die Geländenotizen des Museums zum erhaltenen Hof und zur Terrasse. Ein Vorschlag für einen modernen Museumszugang.' },
+  'A-LAYOUT · modern museum fitting': {
+    en: 'The museum’s layout notes. A modern museum fitting.',
+    de: 'Die Grundrissnotizen des Museums. Ein moderner Einbau des Museums.' },
+  'brief/BUILDING-DOSSIER.md': {
+    en: 'The museum’s research dossier on the building.',
+    de: 'Das Forschungsdossier des Museums zum Gebäude.' },
 };
 export function vinciShownSource(source: string): VinciText {
   const shown = shownSources[source];
