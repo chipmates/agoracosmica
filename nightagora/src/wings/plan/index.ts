@@ -198,7 +198,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       host: drawing, language, standing,
       namePx: options.reading?.() ? PLATE_READING_PX : narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
       nameFloor: options.reading?.() ? PLATE_READING_PX : narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide,
-      ...(options.reading?.() ? { numberPx: PLATE_READING_PX, farther: true } : {}),
+      ...(options.reading?.() ? { numberPx: PLATE_READING_PX, reading: true } : {}),
     })
     dialog.dataset['reading'] = String(Boolean(options.reading?.()))
     // The marks are DOM over the drawing, so the two share one pixel exactly.

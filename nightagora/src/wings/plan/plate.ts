@@ -115,6 +115,14 @@ function crosses(seg: Seg, box: Box): boolean {
   return near <= far
 }
 
+/** two segments cross (touching ends count), for a numeral that must stay on its dot's side of a wall */
+function segmentsMeet(a: Seg, b: Seg): boolean {
+  const side = (px: number, py: number, s: Seg): number => Math.sign((s.bx - s.ax) * (py - s.ay) - (s.by - s.ay) * (px - s.ax))
+  return side(b.ax, b.ay, a) * side(b.bx, b.by, a) <= 0 && side(a.ax, a.ay, b) * side(a.bx, a.by, b) <= 0
+    && Math.max(a.ax, a.bx) >= Math.min(b.ax, b.bx) && Math.max(b.ax, b.bx) >= Math.min(a.ax, a.bx)
+    && Math.max(a.ay, a.by) >= Math.min(b.ay, b.by) && Math.max(b.ay, b.by) >= Math.min(a.ay, a.by)
+}
+
 export interface PlanMark {
   /** the stations this one standing place carries, in rail order */
   stations: string[]
@@ -153,9 +161,10 @@ export interface PlanPlateOptions {
   nameFloor?: number
   /** the numeral's size where a stage reads it larger than the plate's own */
   numberPx?: number
-  /** names at a reading size need more places to stand: on longer leaders
-   * and off the corners, tried after the plate's own four */
-  farther?: boolean
+  /** A PHONE'S READING SIZE needs more care of the drawing's lines: names
+   * may stand on longer leaders and off the corners, no leader touches a mark
+   * or a numeral, and a numeral hugs its own dot clear of every line */
+  reading?: boolean
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -356,13 +365,53 @@ export function drawPlanPlate(
   /** EIGHT WAYS ROUND A MARK, at three distances, and the first that is free
    * of every ring, every numeral already placed and the north arrow. */
   const compass = [[1, -1], [-1, -1], [1, 1], [-1, 1], [0, -1], [0, 1], [1, 0], [-1, 0]] as const
+  /** AT A READING SIZE, SIXTEEN WAYS ROUND, nearest first: a numeral that
+   * stands off its dot names the dot beside it, and one on a line is crossed */
+  const FACING = Math.cos(55 * Math.PI / 180)
+  const sixteen = [-45, -135, 45, 135, -90, 90, 0, 180, -22.5, -67.5, -112.5, -157.5, 22.5, 67.5, 112.5, 157.5]
+    .map(degrees => [Math.cos(degrees * Math.PI / 180), Math.sin(degrees * Math.PI / 180)] as const)
   for (const mark of marks) {
     const words = String(mark.number)
     const w = textWidth(words, numberPx, NUMBER_TRACKING), h = numberPx
     const reach = mark.here ? RING_HERE : RING
     let first: { dx: number; dy: number; box: Box } | null = null
     let chosen: { dx: number; dy: number; box: Box } | null = null
+    if (options.reading) {
+      const others = marks.filter(other => other !== mark)
+      // a numeral turned toward a dot close by reads as that dot's
+      const facing = (dx: number, dy: number): boolean => others.some(other => {
+        const ox = other.x - mark.x, oy = other.y - mark.y, d = Math.hypot(ox, oy), off = Math.hypot(dx, dy)
+        return d < off * 3 && (ox * dx + oy * dy) / (d * off) > FACING
+      })
+      // the strictest pass first: close by, clear of every line, on its dot's
+      // side of every wall, turned from the near dots; then each care let go
+      for (const [lines, side, turned, near, far] of [[true, true, true, .85, 6], [true, false, true, 1, 6], [true, false, false, 1, 21], [false, false, false, 1, 21]] as const) {
+        for (const step of [0, 2, 4, 6, 9, 12, 16, 21]) {
+          if (step > far) break
+          for (const [cx, cy] of sixteen) {
+            const edge = Math.min(Math.abs(cx) > 1e-6 ? w / 2 / Math.abs(cx) : Infinity, Math.abs(cy) > 1e-6 ? h / 2 / Math.abs(cy) : Infinity)
+            const off = reach + 3 + step + edge
+            const dx = cx * off, dy = cy * off
+            const place = around(mark.x + dx, mark.y + dy, w, h)
+            first ??= { dx, dy, box: place }
+            const test = grown(place, CLEAR)
+            if (!inside(test)) continue
+            if (taken.some(held => meets(test, held))) continue
+            // it names its own dot: nearer to it than to any other, on the same side of every wall
+            if (others.some(other => Math.hypot(mark.x + dx - other.x, mark.y + dy - other.y) * near < Math.hypot(dx, dy))) continue
+            if (lines && walls.some(wall => crosses(wall, grown(place, 1.5)))) continue
+            if (side && walls.some(wall => segmentsMeet(wall, { ax: mark.x, ay: mark.y, bx: mark.x + dx, by: mark.y + dy }))) continue
+            if (turned && facing(dx, dy)) continue
+            chosen = { dx, dy, box: place }
+            break
+          }
+          if (chosen) break
+        }
+        if (chosen) break
+      }
+    }
     for (const bounded of [true, false]) {
+      if (chosen) break
       for (let step = 0; step < 3 && !chosen; step++) for (const [sx, sy] of compass) {
         // A diagonal reaches the ring at its own angle, so it leans in.
         const lean = sx !== 0 && sy !== 0 ? .72 : 1
@@ -423,7 +472,7 @@ export function drawPlanPlate(
       { x: mid.x, y: entry.room.t - LEADER_GAP - tall / 2, from: { x: mid.x, y: entry.room.t } },
       { x: mid.x, y: entry.room.b + LEADER_GAP + tall / 2, from: { x: mid.x, y: entry.room.b } },
     ]
-    if (options.farther) for (const reach of [2, 3.5]) {
+    if (options.reading) for (const reach of [2, 3.5]) {
       const gap = LEADER_GAP * reach
       beside.push(
         { x: entry.room.r + gap + out / 2, y: mid.y, from: { x: entry.room.r, y: mid.y } },
@@ -459,8 +508,10 @@ export function drawPlanPlate(
       if (!inside(test)) continue
       if (taken.some(hold => meets(test, hold))) continue
       if (walls.some(wall => crosses(wall, test))) continue
-      // a long leader may not cut through a mark, a numeral or another name
+      // a long leader may not cut through a mark, a numeral or another name;
+      // at a reading size no leader comes near one
       if (spot.far && spot.leader && taken.some(hold => crosses(spot.leader!, hold))) continue
+      if (options.reading && spot.leader && taken.some(hold => crosses(spot.leader!, grown(hold, 3)))) continue
       put = { ...spot, box: place }
       break
     }

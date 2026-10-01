@@ -511,6 +511,9 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 
 /* ---- THE PLAN'S PLATE AT A PHONE'S READING SIZE, both forms ---- */
 #wing .wing-plan[data-reading='true'] :is(.wing-plan-number, .wing-plan-north-letter) { font-size: 13px; }
+/* each word stands in a halo of the sheet's ground, so a line passing near it never reads through it */
+#wing .wing-plan[data-reading='true'] .wing-plan-number { text-shadow: 0 0 2px #0d171f, 0 0 2px #0d171f, 0 0 4px #0d171f; }
+#wing .wing-plan[data-reading='true'] .wing-plan-room-name { paint-order: stroke; stroke: #0d171f; stroke-width: 3px; stroke-linejoin: round; }
 
 /* ---- THE LIFE'S PLACES, upright: every period in view at once ---- */
 #wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-spine { flex-wrap: wrap; overflow: visible; row-gap: 6px; }
