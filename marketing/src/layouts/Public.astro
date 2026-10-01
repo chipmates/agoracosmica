@@ -49,6 +49,9 @@ interface Props {
   /** Pages with a full hero (like the homepage): the mobile sticky CTA starts
    *  hidden and slides in on first scroll, instead of showing from first paint. */
   heroReveal?: boolean;
+  /** Pages people come to read (a figure, a theme, poems, quotes, a source
+   *  text): marks <main> so agc-public.js counts a read on them. */
+  reading?: boolean;
 }
 
 const props = Astro.props;
@@ -80,7 +83,7 @@ const revealSticky = isHome || props.heroReveal === true;
         altEn={props.altEn}
         altDe={props.altDe}
       />
-      <main class="pub-main" id="main-content">
+      <main class="pub-main" id="main-content" data-agc-read={props.reading === true ? '' : undefined}>
         <slot />
       </main>
       <Footer lang={props.lang} />

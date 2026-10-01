@@ -1341,6 +1341,46 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('a read is the page path and the language, and nothing else', async () => {
+    const row = await funnelBeacon({
+      step: 'read', path: '/figures/rumi/poems/', language: 'de-DE',
+      figureId: 'rumi', mode: 'hero', outcome: 'watched', bucket: 3, source: 'search', gclid: 'TESTCLICKID0001',
+    });
+    assert(row !== undefined, 'read wrote no row');
+    assertEqual(row.blobs.length, 9, 'the nine funnel slots, no tenth');
+    assertEqual(row.blobs[0], 'read', 'the step name is blob1');
+    assertEqual(row.blobs[1], '/figures/rumi/poems/', 'the path, never the figure id');
+    assertEqual(row.blobs[2], '', 'no door and no mode');
+    assertEqual(row.blobs[3], 'de', 'the language is blob4');
+    assertEqual(row.blobs[4], '200', 'the outcome is pinned');
+    assertEqual(row.blobs[7], '', 'no source class');
+    assertEqual(row.blobs[8], '', 'unmarked');
+    assertEqual(row.doubles[0], 0, 'no bucket: neither the seconds nor the depth leave the page');
+    assert(!JSON.stringify(row).includes('TESTCLICKID0001'), 'an unknown field is never stored');
+    assertEqual(row.indexes[0], 'read', 'indexed by the step');
+  });
+
+  await test('a read from a marked browser carries the probe constant', async () => {
+    const row = await funnelBeacon({ step: 'read', path: '/themes/moral-life/', language: 'en', probe: 1 });
+    assertEqual(row.blobs[8], 'probe', 'the marker in blob9');
+  });
+
+  await test('a read and a CTA click share one path rule', async () => {
+    const longest = '/figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant/';
+    for (const step of ['read', 'cta_click', 'ad_consent_shown']) {
+      const kept = await funnelBeacon({ step, path: longest, language: 'en' });
+      assertEqual(kept.blobs[1], longest, `${step} keeps the longest poem path`);
+      for (const bad of [
+        '/figures/rumi/?gclid=TESTCLICKID0001', '/figures/rumi/#top', 'figures/rumi/',
+        'https://example.invalid/figures/rumi/', '/figures/rumi/poems/a b', `/${'a'.repeat(120)}`, 7,
+      ]) {
+        const row = await funnelBeacon({ step, path: bad, language: 'en' });
+        assert(row !== undefined, `${step} still counts with a bad path`);
+        assertEqual(row.blobs[1], '', `${step} drops ${JSON.stringify(bad).slice(0, 40)}`);
+      }
+    }
+  });
+
   // -------------------------------------------------------------------------
   // The museum's steps on the funnel route
   // -------------------------------------------------------------------------

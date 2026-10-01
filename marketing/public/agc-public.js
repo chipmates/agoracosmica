@@ -8,6 +8,8 @@
 //   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
 //     opened the visit and carrying the source class of that arrival, plus the
 //     paid-arrival counter on a fresh navigation to a paid landing URL
+//   - Count a read on the reading pages (thirty visible seconds, or a scroll
+//     past the middle of the text), once per page load
 //   - Click handlers on [data-agc-cta] elements (entry intent)
 //   - Mobile burger menu toggle in the navbar
 //
@@ -152,6 +154,29 @@
     } catch (e) { /* storage blocked — app falls back */ }
   }
 
+  function pageLanguage() {
+    var docLang = (document.documentElement.lang || 'en').toLowerCase();
+    return docLang.indexOf('de') === 0 ? 'de' : 'en';
+  }
+
+  // One keyless funnel row. Absolute worker URL on purpose (agoracosmica.org
+  // has no /v1/* route, see the conversion fetch above). sendBeacon survives a
+  // navigation that follows the count, and text/plain keeps it a simple CORS
+  // request so no preflight gets lost on the way out.
+  function postFunnel(payload) {
+    var body = JSON.stringify(payload);
+    if (navigator.sendBeacon &&
+        navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
+      return;
+    }
+    fetch(FUNNEL_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: body,
+      keepalive: true,
+    }).catch(function () { /* never surface */ });
+  }
+
   // Anonymous funnel counter: how many visitors click Start Exploring at all
   // (cta_click / homepage page-views = the CTA rate). Unlike the conversion
   // above it is keyless and unconditional: no gclid, no user dimension, same
@@ -166,31 +191,16 @@
     if (ctaCounted) return;
     ctaCounted = true;
     try {
-      var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var payload = {
         step: 'cta_click',
         path: window.location.pathname,
-        language: docLang.indexOf('de') === 0 ? 'de' : 'en',
+        language: pageLanguage(),
         probe: probeField(),
       };
       // Which door on the page was used, in the row's existing mode slot. A
       // position label like "council_play", never a user dimension.
       if (door && DOOR_RE.test(door)) payload.mode = door;
-      var body = JSON.stringify(payload);
-      // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route,
-      // see the conversion fetch above). sendBeacon survives the navigation
-      // to /app that follows the click; text/plain keeps it a simple CORS
-      // request so no preflight gets lost during the transition.
-      if (navigator.sendBeacon &&
-          navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
-        return;
-      }
-      fetch(FUNNEL_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: body,
-        keepalive: true,
-      }).catch(function () { /* never surface */ });
+      postFunnel(payload);
     } catch (e) { /* no-op */ }
   }
 
@@ -385,29 +395,104 @@
   // paid split never captures a click ID, and this changes nothing about that.
   function sendPaidArrivalBeacon() {
     try {
-      var docLang = (document.documentElement.lang || 'en').toLowerCase();
-      var body = JSON.stringify({
+      postFunnel({
         step: 'paid_arrival',
-        language: docLang.indexOf('de') === 0 ? 'de' : 'en',
+        language: pageLanguage(),
         probe: probeField(),
       });
-      // Absolute worker URL on purpose, same reason as the page beacon above.
-      if (navigator.sendBeacon &&
-          navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
-        return;
-      }
-      fetch(FUNNEL_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: body,
-        keepalive: true,
-      }).catch(function () { /* never surface */ });
     } catch (e) { /* no-op */ }
+  }
+
+  // Anonymous read counter for the reading pages, whose <main> the layout
+  // marks with data-agc-read. One row per page load, on whichever comes first:
+  // the page has been visible for thirty seconds in total, or the visitor has
+  // scrolled past the middle of the main content. A tab in the background
+  // accrues nothing and counts nothing. The row is the cta_click row without
+  // a door: step, path, language, and the probe constant from a marked
+  // browser. The clock and the one-shot flag live in page memory only.
+  var READ_VISIBLE_MS = 30000;
+
+  function armReadCounter() {
+    var main = document.querySelector('main[data-agc-read]');
+    if (!main) return;
+    var counted = false;
+    var bankedMs = 0;      // visible time from earlier stretches
+    var visibleSince = -1; // start of the running stretch, -1 while hidden
+    var timer = 0;
+
+    function now() {
+      try { return performance.now(); } catch (e) { return Date.now(); }
+    }
+    function isVisible() {
+      return document.visibilityState !== 'hidden';
+    }
+
+    function count() {
+      if (counted) return;
+      counted = true;
+      clearTimeout(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('scroll', onScroll);
+      try {
+        postFunnel({
+          step: 'read',
+          path: window.location.pathname,
+          language: pageLanguage(),
+          probe: probeField(),
+        });
+      } catch (e) { /* no-op */ }
+    }
+
+    function stopClock() {
+      if (visibleSince < 0) return;
+      bankedMs += now() - visibleSince;
+      visibleSince = -1;
+      clearTimeout(timer);
+    }
+    function startClock() {
+      if (counted || visibleSince >= 0) return;
+      visibleSince = now();
+      timer = setTimeout(onTimer, Math.max(0, READ_VISIBLE_MS - bankedMs));
+    }
+    // A timer can outlive the moment the tab went away, so it re-checks.
+    function onTimer() {
+      if (!isVisible()) { stopClock(); return; }
+      count();
+    }
+    function onVisibility() {
+      if (isVisible()) startClock();
+      else stopClock();
+    }
+
+    // The middle of the main content has come up into the viewport. A middle
+    // that is already on the first screen cannot be scrolled past, so on a
+    // short page only the clock counts.
+    function pastMiddle() {
+      var rect = main.getBoundingClientRect();
+      var viewport = window.innerHeight || document.documentElement.clientHeight || 0;
+      if (!viewport || !rect.height) return false;
+      var scrolled = window.scrollY || window.pageYOffset || 0;
+      var middle = rect.top + rect.height / 2;
+      if (middle + scrolled <= viewport) return false;
+      return middle <= viewport;
+    }
+    function onScroll() {
+      if (isVisible() && pastMiddle()) count();
+    }
+
+    document.addEventListener('visibilitychange', onVisibility);
+    if (isVisible()) startClock();
+    // A reload, a restored tab or an address with an anchor puts the visitor
+    // mid-page without a scroll of their own, so there only the clock counts.
+    if (isFreshNavigation() && !window.location.hash) {
+      window.addEventListener('scroll', onScroll, { passive: true });
+    }
   }
 
   captureGclidFromUrl();
   sendPageBeacon();
   if (hasPaidParam() && isFreshNavigation()) sendPaidArrivalBeacon();
+  armReadCounter();
   markDoors();
 
   // Doors an island renders after this script ran get the class when used.

@@ -62,6 +62,15 @@ function door(attrs: Record<string, string>, href = '/app/'): HTMLAnchorElement 
   return a;
 }
 
+/** The browser's navigation entry for the next page load, or none at all (null). */
+function setNavigation(type: string | null): void {
+  Object.defineProperty(performance, 'getEntriesByType', {
+    configurable: true,
+    writable: true,
+    value: (kind: string) => (kind === 'navigation' && type ? [{ type }] : []),
+  });
+}
+
 beforeEach(() => {
   added = [];
   beacons = [];
@@ -88,6 +97,7 @@ afterEach(() => {
     target.removeEventListener(type, fn, opts as EventListenerOptions);
   }
   Reflect.deleteProperty(navigator, 'sendBeacon');
+  Reflect.deleteProperty(performance, 'getEntriesByType');
   window.history.replaceState({}, '', '/');
 });
 
@@ -173,17 +183,6 @@ describe('agc-public.js: the ad click ID', () => {
 });
 
 describe('agc-public.js: a paid arrival is a fresh navigation', () => {
-  // The browser's navigation entry, or none at all (type null).
-  function setNavigation(type: string | null): void {
-    Object.defineProperty(performance, 'getEntriesByType', {
-      configurable: true,
-      writable: true,
-      value: (kind: string) => (kind === 'navigation' && type ? [{ type }] : []),
-    });
-  }
-  afterEach(() => {
-    Reflect.deleteProperty(performance, 'getEntriesByType');
-  });
   const paidRows = () => beacons.filter((b) => b.body.step === 'paid_arrival');
 
   it('counts a navigation to a paid landing URL once', async () => {
@@ -219,6 +218,144 @@ describe('agc-public.js: a paid arrival is a fresh navigation', () => {
     loadPage('/marcus-aurelius/?gclid=TESTCLICKID0001');
     await new Promise((r) => setTimeout(r, 0));
     expect(paidRows()).toHaveLength(0);
+  });
+});
+
+describe('agc-public.js: the read counter', () => {
+  const VIEWPORT = 800;
+  let visibility: 'visible' | 'hidden' = 'visible';
+
+  /** A reading page whose main content is `height` px tall, starting at the top. */
+  function readingPage(height: number, marked = true): void {
+    const main = document.createElement('main');
+    if (marked) main.setAttribute('data-agc-read', '');
+    main.getBoundingClientRect = () =>
+      ({ top: -window.scrollY, height, bottom: height - window.scrollY }) as DOMRect;
+    document.body.appendChild(main);
+  }
+  function scrollTo(y: number): void {
+    Object.defineProperty(window, 'scrollY', { value: y, configurable: true, writable: true });
+    window.dispatchEvent(new Event('scroll'));
+  }
+  function setVisibility(state: 'visible' | 'hidden'): void {
+    visibility = state;
+    document.dispatchEvent(new Event('visibilitychange'));
+  }
+  // The recorded bodies land a tick late, so "nothing yet" is read off the
+  // transport itself, which is called in the same tick as the count.
+  const sentSoFar = () => vi.mocked(navigator.sendBeacon).mock.calls.length;
+  /** Leave the fake clock and let the recorded beacons land. */
+  async function reads(): Promise<Record<string, unknown>[]> {
+    vi.useRealTimers();
+    await new Promise((r) => setTimeout(r, 0));
+    return beacons.filter((b) => b.body.step === 'read').map((b) => b.body);
+  }
+
+  beforeEach(() => {
+    visibility = 'visible';
+    Object.defineProperty(document, 'visibilityState', { configurable: true, get: () => visibility });
+    Object.defineProperty(window, 'innerHeight', { value: VIEWPORT, configurable: true, writable: true });
+    Object.defineProperty(window, 'scrollY', { value: 0, configurable: true, writable: true });
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'Date', 'performance'] });
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+    Reflect.deleteProperty(document, 'visibilityState');
+  });
+
+  it('counts one read after thirty visible seconds, with the path and the language only', async () => {
+    readingPage(4000);
+    loadPage('/figures/rumi/poems/?utm_source=x#top', 'de');
+    vi.advanceTimersByTime(29_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
+    expect(sentSoFar()).toBe(1);
+    vi.advanceTimersByTime(120_000);
+    expect(sentSoFar()).toBe(1);
+    const rows = await reads();
+    expect(rows).toEqual([{ step: 'read', path: '/figures/rumi/poems/', language: 'de' }]);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  it('counts on a scroll past the middle of the main content, and only once', async () => {
+    readingPage(4000); // middle at 2000
+    loadPage('/themes/moral-life/');
+    scrollTo(1100); // viewport bottom at 1900
+    vi.advanceTimersByTime(1_000);
+    expect(sentSoFar()).toBe(0);
+    scrollTo(1250); // viewport bottom at 2050
+    expect(sentSoFar()).toBe(1);
+    scrollTo(3000);
+    vi.advanceTimersByTime(60_000);
+    expect(await reads()).toEqual([{ step: 'read', path: '/themes/moral-life/', language: 'en' }]);
+  });
+
+  it('does not take a scroll on a page whose middle is on the first screen', async () => {
+    readingPage(1200); // middle at 600, already in view
+    loadPage('/figures/william-blake/poems/the-tyger/');
+    scrollTo(300);
+    vi.advanceTimersByTime(29_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
+    expect(await reads()).toHaveLength(1);
+  });
+
+  it('counts nothing while the tab is in the background', async () => {
+    visibility = 'hidden';
+    readingPage(4000);
+    loadPage('/figures/marcus-aurelius/meditations/');
+    scrollTo(3000);
+    vi.advanceTimersByTime(300_000);
+    expect(sentSoFar()).toBe(0);
+    setVisibility('visible');
+    vi.advanceTimersByTime(29_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
+    expect(await reads()).toHaveLength(1);
+  });
+
+  it('adds up visible stretches and leaves the hidden ones out', async () => {
+    readingPage(4000);
+    loadPage('/figures/marcus-aurelius/');
+    vi.advanceTimersByTime(20_000);
+    setVisibility('hidden');
+    vi.advanceTimersByTime(600_000);
+    setVisibility('visible');
+    vi.advanceTimersByTime(9_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
+    expect(await reads()).toHaveLength(1);
+  });
+
+  it('takes no scroll on a reload, a restored tab or an address with an anchor', async () => {
+    for (const [type, url] of [['reload', '/themes/moral-life/'], ['back_forward', '/themes/moral-life/'], ['navigate', '/themes/moral-life/#debate']]) {
+      setNavigation(type);
+      readingPage(4000);
+      loadPage(url);
+      scrollTo(3000);
+    }
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(29_000);
+    expect(sentSoFar()).toBe(0);
+    vi.advanceTimersByTime(1_000);
+    // Three page loads, each counted by its own clock.
+    expect(await reads()).toHaveLength(3);
+  });
+
+  it('stays silent on a page the layout has not marked for reading', async () => {
+    readingPage(4000, false);
+    loadPage('/about/');
+    scrollTo(3000);
+    vi.advanceTimersByTime(120_000);
+    expect(await reads()).toEqual([]);
+  });
+
+  it('carries the probe constant from a marked browser', async () => {
+    readingPage(4000);
+    loadPage('/figures/rumi/poems/?probe=1');
+    vi.advanceTimersByTime(30_000);
+    expect(await reads()).toEqual([{ step: 'read', path: '/figures/rumi/poems/', language: 'en', probe: 1 }]);
   });
 });
 
