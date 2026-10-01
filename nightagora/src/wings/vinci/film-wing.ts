@@ -11,6 +11,7 @@ import { LOBBY_TEXT } from '../../content/lobby'
 import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciContent, vinciEveningSky, vinciGrounds, vinciHourArithmetic, vinciHourIntegrity, vinciHourLabel,
   vinciReconstruction, vinciRightsPolicy, vinciRoomStationIds, vinciSourcesHeadings, vinciWingCounts,
   type VinciCertainty, type VinciStatement, type VinciStationId, type VinciText } from './content'
+import { shownCitation } from './citations'
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
@@ -586,7 +587,7 @@ export function createWing(): WingModule {
     panel.append(make('p', 'vinci-promise', text(s.promise)))
     const full = make('div', 'vinci-record')
     setRegister(full, 'record')
-    full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', text(s.promiseSourceShown)))
+    full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', text(shownCitation(s.promiseSource))))
     panel.append(full)
     panel.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
     paintRoomAndWing()
@@ -597,7 +598,7 @@ export function createWing(): WingModule {
     p.dataset['certainty'] = label.certainty
     p.append(make('span', 'vinci-certainty-word', text(vinciCertaintyWords[label.certainty])), document.createTextNode(' ' + text(label)))
     host.append(p)
-    into.append(make('p', 'vinci-statement', text(label.record ?? label)), make('small', 'vinci-citation', text(label.sourceShown)))
+    into.append(make('p', 'vinci-statement', text(label.record ?? label)), make('small', 'vinci-citation', text(shownCitation(label.source))))
   }
   function fold(host: HTMLElement, full: HTMLElement): void {
     const details = make('details', 'vinci-record-fold')
@@ -620,7 +621,7 @@ export function createWing(): WingModule {
       const full = make('div', 'vinci-record')
       setRegister(full, 'record')
       for (const label of station.labels) statement(section, label, full)
-      full.append(make('p', 'vinci-statement', text(station.record ?? station.promise)), make('small', 'vinci-citation', text(station.promiseSourceShown)))
+      full.append(make('p', 'vinci-statement', text(station.record ?? station.promise)), make('small', 'vinci-citation', text(shownCitation(station.promiseSource))))
       const absences = vinciAbsences[id]
       if (absences?.length) {
         section.append(make('h3', '', text(vinciSourcesHeadings.elsewhere)))

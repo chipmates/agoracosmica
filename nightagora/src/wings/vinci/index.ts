@@ -105,7 +105,8 @@ import { vinciWallById, vinciWallEndVertex, vinciWallIsEnd, vinciWallOrderOf, VI
 import { pathSpecifications } from './paths'
 import { roadGradeProvenance } from './road-grade'
 import { apronProvenance } from './apron'
-import { vinciShownSource, vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciEveningSky, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
+import { shownCitation } from './citations'
+import { vinciContent, vinciPlanRooms, vinciThroughLine, vinciLifeBands, vinciLifePeople, vinciLifeSecondLine, vinciLifeCut, vinciLifeWorksRow, vinciLifeWorksCount, vinciLifeWorksEmpty, vinciLifeCertaintyCounted, vinciLifeHourMark, vinciLifeFloorCount, vinciHourValues, vinciWelcomeText, vinciLegacyStationIds, vinciConstructionStatus, vinciReconstruction, vinciCollectionThreshold, vinciRoomStationIds, vinciHourArithmetic, vinciHourSpoken, vinciViewNames, vinciHourLabel, vinciHourIntegrity, vinciEveningSky, vinciCertaintyWords, vinciPlantingAssumptions, vinciWeatherAssumptions, vinciAbsences, vinciGrounds, vinciRightsPolicy, vinciWingCounts, vinciSourcesHeadings, type VinciCertainty, type VinciStatement, type VinciStationContent, type VinciStationId, type VinciText } from './content'
 import wingCss from './wing.css?inline'
 // the phone's box wears the film player's own classes, so both phones look alike
 import filmWingCss from './film-wing.css?inline'
@@ -3293,7 +3294,7 @@ export function createWing():VinciWingModule {
   }
   function appendLabel(label:VinciStatement):void {
     const carrier=label.carrier??(label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell')
-    appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',text(label.sourceShown),label.record??label,label.humanSource)
+    appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',text(shownCitation(label.source)),label.record??label,label.humanSource)
   }
   /** The spoken half stands on the surface, the machine chain goes to the
    * record the tab folds away, so a source key never meets an unasked eye. */
@@ -3303,7 +3304,7 @@ export function createWing():VinciWingModule {
     paragraph.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[label.certainty])),document.createTextNode(' '+text(label)))
     if(label.humanSource)paragraph.append(make('span','vinci-human-source',text(label.humanSource)))
     const full=make('div','vinci-record');setRegister(full,'record')
-    full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',text(label.sourceShown)))
+    full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',text(shownCitation(label.source))))
     host.append(paragraph)
     ;(into??host).append(full)
   }
@@ -3387,7 +3388,7 @@ export function createWing():VinciWingModule {
       section.append(make('h2','',text(station.name)),make('p','vinci-promise',text(station.promise)))
       const full=make('div','vinci-record');setRegister(full,'record')
       for(const label of station.labels)appendSourceStatement(section,label,full)
-      full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',text(station.promiseSourceShown)))
+      full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',text(shownCitation(station.promiseSource))))
       const sources=exhibits?.pictureSources()??[]
       if(id==='picture-room'||id==='supper-wall'){
         const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
@@ -3446,7 +3447,7 @@ export function createWing():VinciWingModule {
     drawer.append(title,make('h2','',text(exhibitSources?.title??s.name)))
     for(const label of s.labels)appendLabel(label)
     if(!s.labels.includes(vinciReconstruction))appendLabel(vinciReconstruction)
-    drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,text(s.promiseSourceShown))
+    drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,text(shownCitation(s.promiseSource)))
     if(s.id==='picture-room'||s.id==='supper-wall'){
       const sources=exhibits?.pictureSources()??[]
       const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))
@@ -3476,7 +3477,7 @@ export function createWing():VinciWingModule {
     }
     if(s.outdoor){
       appendEvidence('foundation',foundationPlinthProvenance.label,'reconstructed','vinci/shell',foundationPlinthProvenance.source.join(' · '))
-      appendStatement(galleryBankCapProvenance.label,'conjectural','vinci/terrain-mesh','GENERATED',text(vinciShownSource(galleryBankCapProvenance.source.join(' · '))),galleryBankCapProvenance.record,{en:'The cadastre and the registered site plan guide its outline.',de:'Das Kataster und der registrierte Lageplan bestimmen seinen Umriss.'})
+      appendStatement(galleryBankCapProvenance.label,'conjectural','vinci/terrain-mesh','GENERATED',text(shownCitation(galleryBankCapProvenance.source.join(' · '))),galleryBankCapProvenance.record,{en:'The cadastre and the registered site plan guide its outline.',de:'Das Kataster und der registrierte Lageplan bestimmen seinen Umriss.'})
       appendEvidence('minerals',mineralSurfaceProvenance.label,'reconstructed','vinci/surfaces','A-MATERIAL · A-MASONRY · materials.csv · Q124 · Q130')
       appendEvidence('finish',closeSurfaceProvenance.label,'conjectural','vinci/surfaces','A-MATERIAL · materials.csv · Q019 · Q124 · Q127')
       const constructionSources=[
@@ -3489,13 +3490,13 @@ export function createWing():VinciWingModule {
     }
     if(s.outdoor||collectionView)appendEvidence('haze',displayedHorizonHazeProvenance.label,'conjectural','vinci/sky',displayedHorizonHazeProvenance.source.join(' · '))
     if(s.id==='garden'||!s.outdoor||collectionView){
-      appendEvidence('collection',collectionProvenance.label,'reconstructed','vinci/collection',text(vinciShownSource(collectionProvenance.source.join(' · '))))
-      appendEvidence('collectionDesign',collectionProvenance.parameterLabel,'reconstructed','vinci/collection',text(vinciShownSource('COMMISSION § Judges list10 · maquette.ts COLLECTION')))
-      appendEvidence('approach',collectionProvenance.approachLabel,'reconstructed','vinci/collection',text(vinciShownSource('maquette.ts garden approach · A-SITE terrace · modern exhibition design')))
+      appendEvidence('collection',collectionProvenance.label,'reconstructed','vinci/collection',text(shownCitation(collectionProvenance.source.join(' · '))))
+      appendEvidence('collectionDesign',collectionProvenance.parameterLabel,'reconstructed','vinci/collection',text(shownCitation('COMMISSION § Judges list10 · maquette.ts COLLECTION')))
+      appendEvidence('approach',collectionProvenance.approachLabel,'reconstructed','vinci/collection',text(shownCitation('maquette.ts garden approach · A-SITE terrace · modern exhibition design')))
     }
     if(s.id==='courtyard'||s.id==='garden'||!s.outdoor){
-      appendEvidence('access',collectionAccessProvenance.label,'reconstructed','vinci/collection-access',text(vinciShownSource(collectionAccessProvenance.source.join(' · '))))
-      appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access',text(vinciShownSource('A-SITE retained court and terrace · modern museum access proposal')))
+      appendEvidence('access',collectionAccessProvenance.label,'reconstructed','vinci/collection-access',text(shownCitation(collectionAccessProvenance.source.join(' · '))))
+      appendEvidence('accessDesign',collectionAccessProvenance.parameterLabel,'reconstructed','vinci/collection-access',text(shownCitation('A-SITE retained court and terrace · modern museum access proposal')))
     }
     // The court's own four stand in every frame that holds the court.
     if(s.id==='arrival'||s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)){
@@ -3507,7 +3508,7 @@ export function createWing():VinciWingModule {
     if(s.id==='courtyard'||['hall','oratory','study','chamber'].includes(s.id)||activeView.startsWith('entry-')){
       appendEvidence('entry',entryPassageProvenance.label,'reconstructed','vinci/entry-passage',entryPassageProvenance.source.join(' · '))
       appendEvidence('entryFinish',entryMineralSurfaceProvenance.label,'reconstructed','vinci/entry-mineral-surface',entryMineralSurfaceProvenance.source.join(' · '))
-      appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},text(vinciShownSource(hallLedgeProvenance.source.join(' · '))),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
+      appendRecord({en:hallLedgeProvenance.recipe,de:hallLedgeProvenance.recipeDe},text(shownCitation(hallLedgeProvenance.source.join(' · '))),'reconstructed',hallLedgeProvenance.manifestId,'GENERATED')
     }
     // The great hall behind the passage, and the few things of the period in it.
     if(s.id==='hall'&&hosts?.world.stack.tierName()!=='calm'){
@@ -3525,7 +3526,7 @@ export function createWing():VinciWingModule {
     const wingCredits=[
       ...appendRecord({en:'© OpenStreetMap contributors · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometry and surfaces: procedural reconstruction.',de:'© OpenStreetMap-Mitwirkende · ODbL 1.0. IGN · Licence Ouverte 2.0. Geometrie und Oberflächen: prozedurale Rekonstruktion.'},'OpenStreetMap · IGN'),
       ...appendRecord({en:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Library material surrogates; no site photography sampled.',de:'CC0 1.0 · ambientCG · stone-tuffeau, earth-packed, grass-short. Materialersatz aus der Bibliothek. Keine Standortfotografie als Textur verwendet.'},'CC0 material library'),
-      ...appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},text(vinciShownSource('brief/BUILDING-DOSSIER.md'))),
+      ...appendRecord({en:'Assumed dimensions: brick 0.22–0.27 × 0.035–0.055 m; wall 0.45–0.80 m; main eaves 7.0–8.4 m. Basis: BUILDING-DOSSIER, Q001/Q124/Q127.',de:'Angenommene Maße: Ziegel 0.22–0.27 × 0.035–0.055 m; Mauer 0.45–0.80 m; Haupttraufe 7.0–8.4 m. Grundlage: BUILDING-DOSSIER, Q001/Q124/Q127.'},text(shownCitation('brief/BUILDING-DOSSIER.md'))),
     ]
     const recordButton=make('button','vinci-record-toggle',lang()==='de'?'Vollständiger Nachweis':'Full record')
     recordButton.id='vinci-record-toggle'
