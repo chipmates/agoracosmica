@@ -17,9 +17,10 @@ export const COLLECTIONS = [
     name: 'timeline', file: 'src/wings/vinci/line/data/timeline.json',
     // The public copy carries the life view's record corrections: the event's and the date's
     // certainty apart, every reading in a disputed label, the calendar-style and editor notes,
-    // named source links and German gap sentences. The sealed original does not.
+    // named source links, German gap sentences and the German document and holder lines.
+    // The sealed original does not.
     originalSHA256: '01d568f9f6ddb2c1534d2cd73e061f07624b8eda484d718e84be57782b66ee1d',
-    normalizedSHA256: 'e955004745ef7fd7477652e899f9e7ee6cd45f5e0de15e74159cad75dee6fd82',
+    normalizedSHA256: '5d523a9595db84d14d54d3a9742a9bd9b7866e13ad3d6236fd68423488e0e29b',
     expected: { studs: 56 },
   },
   {
