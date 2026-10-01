@@ -556,8 +556,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Dieses Ende der Halle zeigt, was auf dem Land und im Wasser arbeitete. Schleusentore und Wasserschraube gab es vor ihm, seine Blätter halten sie fest, statt sie zu erfinden. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
   },
   flight: {
-    en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fifteen of his machines are rebuilt in this museum: nine here in this hall, three out in the court, the parachute among them because it stands taller than this roof, and three in the house. Twenty-seven others give too little to build and stay records in the sources. No flight of his own is documented.',
-    de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Fünfzehn seiner Maschinen sind in diesem Museum gebaut: neun hier in dieser Halle, drei draußen im Hof, darunter der Fallschirm, weil er höher steht als dieses Dach, und drei im Haus. Siebenundzwanzig weitere geben zu wenig her, sie bleiben Aufzeichnung in den Quellen. Kein eigener Flug von ihm ist belegt.',
+    en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fifteen of his machines are rebuilt in this museum. Nine stand here in this hall and three in the house. Three stand out in the court. The parachute is one of them, because it is taller than this roof. Twenty-seven others give too little to build and stay records in the sources. No flight of his own is documented.',
+    de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Fünfzehn seiner Maschinen sind in diesem Museum gebaut. Neun stehen hier in dieser Halle und drei im Haus. Drei stehen draußen im Hof. Der Fallschirm ist einer von ihnen, weil er höher ist als dieses Dach. Siebenundzwanzig weitere geben zu wenig her, sie bleiben Aufzeichnungen in den Quellen. Kein eigener Flug von ihm ist belegt.',
   },
   'supper-wall': {
     en: 'The Last Supper measures 460 by 880 cm, and this field in the court is its size. The painting itself is a refectory wall in Milan and cannot travel, because he painted it dry on the plaster instead of into it. Inside the outline hangs a reproduction with its own source and licence.',
@@ -615,8 +615,8 @@ const seeds: readonly StationSeed[] = [
     { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
     [], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('flight', { en: 'The mechanism hall, one: flight', de: 'Die Maschinenhalle, eins: Flug' },
-    { en: 'Fifteen of Leonardo da Vinci’s machines can be rebuilt from what the sheets actually say. Twenty-seven cannot, and they are here as sheets.',
-      de: 'Fünfzehn von Leonardo da Vincis Maschinen lassen sich nach dem rekonstruieren, was die Blätter tatsächlich zeigen. Siebenundzwanzig nicht, und sie sind hier als Blätter zu sehen.' },
+    { en: 'Fifteen of Leonardo da Vinci’s machines are rebuilt here from what the sources actually give, fourteen from his sheets and the lion from old accounts. Twenty-seven cannot be, and they are here as sheets.',
+      de: 'Fünfzehn von Leonardo da Vincis Maschinen sind hier nach dem rekonstruiert, was die Quellen tatsächlich hergeben, vierzehn nach seinen Blättern und der Löwe nach alten Berichten. Siebenundzwanzig nicht, und sie sind hier als Blätter zu sehen.' },
     [vinciNoBodies], 'brief/CONCEPT-OPUS.md §3 S15'),
   seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
