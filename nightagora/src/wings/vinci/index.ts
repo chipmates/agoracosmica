@@ -1024,6 +1024,9 @@ export function createWing():VinciWingModule {
     houseUp=0
     house=buildTheHouse()
     houseStep()
+    // every work a press on the film's picture can reach, the line's dates aside (their floor is the whole gallery's);
+    // handed over outside the house's build, which keys every frame of the film
+    if(FILM_EXPORT)void import('./film').then(m=>m.setFilmRegions(()=>hosts?vinciWorkRegions(picks.filter(entry=>entry.openable&&entry.kind!=='stud'),hosts.world.camera,occluders,innerWidth,deskStageHeight()):[]))
   }
   /** A frame's worth of the house, and the line counts every step of it.
    * One step a frame would pay a whole frame for a seam that costs a
@@ -1164,9 +1167,7 @@ export function createWing():VinciWingModule {
     authority=createRailGeometryAuthority(collectRailSolids(scene))
     rail=createRail(camera,clock,authority);measurement=createMeasurement(h.labels,stack)
     // the film's hand on the rail, fetched only by the export's own address
-    if(FILM_EXPORT)void import('./film').then(m=>m.installFilm({rail:()=>rail,walk:WALK,narrow,walkPose:vinciWalkPose,approachPose:vinciApproachPose,placePose:vinciWalkPoseOf,
-      // every work a press on the picture can reach, the line's dates aside: their floor is the whole gallery's
-      regions:()=>hosts?vinciWorkRegions(picks.filter(entry=>entry.openable&&entry.kind!=='stud'),hosts.world.camera,occluders,innerWidth,deskStageHeight()):[]}))
+    if(FILM_EXPORT)void import('./film').then(m=>m.installFilm({rail:()=>rail,walk:WALK,narrow,walkPose:vinciWalkPose,approachPose:vinciApproachPose,placePose:vinciWalkPoseOf}))
     yield
     source=make('button','vinci-source',sourcesWord());source.type='button';source.setAttribute('aria-keyshortcuts','l');source.setAttribute('aria-controls','vinci-source-card');source.addEventListener('click',()=>{mode=mode===2?1:2;paintDock()});barEl=h.stage.parentElement!.querySelector('.wing-rail-group');barEl!.append(source)
     // THE PLAN STANDS IN THE BAR'S OWN GROUP, beside the sources of the
