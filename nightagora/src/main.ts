@@ -1116,8 +1116,18 @@ function pressOutside(event: Event): void {
   setInstruments(false)
 }
 
+/* THE DETAIL LEVEL DRAWS NOTHING IN A FILM: a film wing is one video at every
+   level, so the row stands down while one stands. What the level still drives
+   there (the machine's live island, the lobby on the way back) keeps the
+   automatic choice or the one made in the lobby. */
+const tierRow = instrumentsEl.querySelector<HTMLElement>('[data-tier-choice]')?.closest('fieldset') ?? null
+function markTiers(): void {
+  if (tierRow) tierRow.hidden = phase === 'wing' && Boolean(document.querySelector('#wing[data-film]:not([hidden])'))
+}
+
 function setInstruments(open: boolean, focus = true): void {
   const sheet = panelIsSheet()
+  if (open) markTiers()
   instrumentsEl.hidden = !open
   if (instPlan) instPlan.disabled = phase !== 'wing'
   railInstruments?.setAttribute('aria-expanded', String(open))
