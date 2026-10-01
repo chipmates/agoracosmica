@@ -93,16 +93,17 @@ export const shakespeareSonnets = [
 ];
 
 /** URL segment per sonnet: the Quarto number, as the collection page numbers
- *  them, fixed here rather than derived at build time. */
+ *  them, fixed here rather than derived at build time. `indexable` is the
+ *  sonnet page's own crawl flag. */
 export const shakespeareOrder = [
-  { key: 's18', slug: '18' },
-  { key: 's29', slug: '29' },
-  { key: 's30', slug: '30' },
-  { key: 's60', slug: '60' },
-  { key: 's65', slug: '65' },
-  { key: 's73', slug: '73' },
-  { key: 's116', slug: '116' },
-  { key: 's130', slug: '130' },
+  { key: 's18', slug: '18', indexable: true },
+  { key: 's29', slug: '29', indexable: true },
+  { key: 's30', slug: '30', indexable: true },
+  { key: 's60', slug: '60', indexable: true },
+  { key: 's65', slug: '65', indexable: true },
+  { key: 's73', slug: '73', indexable: true },
+  { key: 's116', slug: '116', indexable: true },
+  { key: 's130', slug: '130', indexable: true },
 ];
 
 /** The collection page's source note, shown verbatim on every sonnet page. */

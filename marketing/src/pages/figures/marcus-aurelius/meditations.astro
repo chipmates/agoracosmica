@@ -20,7 +20,7 @@ import {
   meditationsPassages,
   passagesByTheme,
 } from '../../../data/texts/aurelius.mjs';
-import { POEM_PAGES_INDEXABLE } from '../../../data/poems/index.mjs';
+import { isIndexable, readingPages } from '../../../data/poems/index.mjs';
 
 const lang = 'en' as const;
 // Slot 4 of the app's ask contract is this page's own question: the door skips
@@ -139,7 +139,7 @@ const schemas = [
   ogImage={figureImage('aurelius', 'main', 1200)}
   ogImageAlt="AI-generated portrait: Marcus Aurelius"
   noHreflang={true}
-  noindex={!POEM_PAGES_INDEXABLE}
+  noindex={!isIndexable(readingPages.meditations)}
   robots="noindex, follow"
   stickyCta={false}
   reading={true}

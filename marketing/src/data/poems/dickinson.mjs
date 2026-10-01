@@ -6,13 +6,19 @@
 // Boston Public Library (no known copyright restrictions), Amherst College
 // Archives and Special Collections (non-commercial and educational use, with
 // attribution), Houghton Library at Harvard (publication of its public-domain
-// material permitted, with credit).
+// material permitted, with credit and a notice to the library).
+// Only poems first printed more than 95 years ago are hosted: a later first
+// printing is still in copyright in the United States, however old the
+// manuscript.
 // Plain ESM, not TypeScript: the Node sitemap script imports this module too.
 
-/** @type {Record<string, { firstLine: string; text: string }>} */
+/** `firstPrinted` is the year the poem first reached print: in a newspaper in
+ *  her lifetime where there was one, otherwise in the first book that held it.
+ *  @type {Record<string, { firstLine: string; firstPrinted: number; text: string }>} */
 export const dickinsonPoems = {
   chariot: {
     firstLine: 'Because I could not stop for Death',
+    firstPrinted: 1890,
     text: `Because I could not stop for Death –
 He kindly stopped for me –
 The Carriage held but just Ourselves –
@@ -45,6 +51,7 @@ Were toward Eternity –`,
   },
   dying: {
     firstLine: 'I heard a Fly buzz – when I died',
+    firstPrinted: 1896,
     text: `I heard a Fly buzz – when I died –
 The Stillness in the Room
 Was like the Stillness in the Air –
@@ -67,6 +74,7 @@ I could not see to see –`,
   },
   alabaster: {
     firstLine: 'Safe in their Alabaster Chambers',
+    firstPrinted: 1862,
     text: `Safe in their Alabaster Chambers –
 Untouched by Morning – and untouched by Noon –
 Sleep the meek members of the Resurrection –
@@ -79,6 +87,7 @@ Soundless as Dots, On a Disc of Snow –`,
   },
   nobody: {
     firstLine: "I'm Nobody! Who are you?",
+    firstPrinted: 1891,
     text: `I'm Nobody! Who are you?
 Are you – Nobody – too?
 Then there's a pair of us!
@@ -91,6 +100,7 @@ To an admiring Bog!`,
   },
   loadedgun: {
     firstLine: 'My Life had stood – a Loaded Gun',
+    firstPrinted: 1929,
     text: `My Life had stood – a Loaded Gun –
 In Corners – till a Day
 The Owner passed – identified –
@@ -123,6 +133,7 @@ Without – the power to die –`,
   },
   exclusion: {
     firstLine: 'The Soul selects her own Society',
+    firstPrinted: 1890,
     text: `The Soul selects her own Society –
 Then – shuts the Door –
 To her divine Majority –
@@ -140,6 +151,7 @@ Like Stone –`,
   },
   letter: {
     firstLine: 'This is my letter to the World',
+    firstPrinted: 1890,
     text: `This is my letter to the World
 That never wrote to Me –
 The simple News that Nature told –
@@ -152,6 +164,7 @@ Judge tenderly – of Me`,
   },
   hope: {
     firstLine: '"Hope" is the thing with feathers',
+    firstPrinted: 1891,
     text: `"Hope" is the thing with feathers –
 That perches in the soul –
 And sings the tune without the words –
@@ -169,6 +182,7 @@ It asked a crumb – of Me.`,
   },
   success: {
     firstLine: 'Success is counted sweetest',
+    firstPrinted: 1864,
     text: `Success – is counted sweetest
 By those who ne'er succeed –
 To comprehend a Nectar
@@ -186,6 +200,7 @@ Burst – agonized – and Clear!`,
   },
   slant: {
     firstLine: "There's a certain Slant of light",
+    firstPrinted: 1890,
     text: `There's a certain Slant of light,
 Winter Afternoons –
 That oppresses, like the Heft
@@ -208,6 +223,7 @@ On the look of Death –`,
   },
   funeral: {
     firstLine: 'I felt a Funeral, in my Brain',
+    firstPrinted: 1896,
     text: `I felt a Funeral, in my Brain,
 And Mourners to and fro
 Kept treading – treading – till it seemed
@@ -235,6 +251,7 @@ And Finished knowing – then –`,
   },
   snake: {
     firstLine: 'A narrow Fellow in the Grass',
+    firstPrinted: 1866,
     text: `A narrow Fellow in the Grass
 Occasionally rides –
 You may have met him? did you not
@@ -267,6 +284,7 @@ And Zero at the Bone.`,
   },
   garden: {
     firstLine: 'A Bird, came down the Walk',
+    firstPrinted: 1891,
     text: `A Bird came down the Walk –
 He did not know I saw –
 He bit an Angleworm in halves
@@ -292,19 +310,9 @@ Too silver for a seam,
 Or Butterflies, off Banks of Noon
 Leap, plashless as they swim.`,
   },
-  tellslant: {
-    firstLine: 'Tell all the truth but tell it slant',
-    text: `Tell all the truth but tell it slant –
-Success in Circuit lies
-Too bright for our infirm delight
-The truth's superb surprise
-As Lightning to the Children eased
-With explanation kind
-The truth must dazzle gradually
-Or every man be blind –`,
-  },
   brain: {
     firstLine: 'The Brain – is wider than the Sky',
+    firstPrinted: 1896,
     text: `The Brain – is wider than the Sky –
 For – put them side by side –
 The One the Other will contain
@@ -322,6 +330,7 @@ As Syllable from Sound –`,
   },
   frigate: {
     firstLine: 'There is no Frigate like a Book',
+    firstPrinted: 1894,
     text: `There is no Frigate like a Book
 To take us Lands away
 Nor any Coursers like a Page
@@ -333,6 +342,7 @@ That bears the Human soul –`,
   },
   wildnights: {
     firstLine: 'Wild nights – Wild nights!',
+    firstPrinted: 1891,
     text: `Wild nights – Wild nights!
 Were I with thee
 Wild nights should be
@@ -358,7 +368,6 @@ export const dickinsonFacsimileLeaves = {
   alabaster: ['safe-alabaster-1', 'safe-alabaster-2'],
   success: ['success-1', 'success-2'],
   garden: ['bird-walk-1', 'bird-walk-2', 'bird-walk-3'],
-  tellslant: ['tell-truth'],
   brain: ['brain-sky'],
   frigate: ['frigate-book'],
   // Houghton/Harvard (publication permitted, credit Houghton)
@@ -389,34 +398,38 @@ export const dickinsonFacsimileSources = {
   funeral: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 53c' },
   snake: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.5 (letter to Susan Dickinson)' },
   garden: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #96' },
-  tellslant: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #372' },
   brain: { repo: 'Amherst College, Archives & Special Collections', cite: 'fascicle 84' },
   frigate: { repo: 'Amherst College, Archives & Special Collections', cite: 'Amherst Manuscript #462' },
   wildnights: { repo: 'Houghton Library, Harvard', cite: 'MS Am 1118.3, 38b' },
 };
 
 /** Reading order of the collection page. The slug is the poem page's URL
- *  segment, fixed here so a re-transcription can never move a live page. */
+ *  segment, fixed here so a re-transcription can never move a live page.
+ *  `indexable` is the poem page's own crawl flag. It is false for the two
+ *  poems that carry a stanza their first printing left out, until it is
+ *  settled when those stanzas first reached print. */
 export const dickinsonOrder = [
-  { key: 'chariot', slug: 'because-i-could-not-stop-for-death' },
-  { key: 'dying', slug: 'i-heard-a-fly-buzz-when-i-died' },
-  { key: 'alabaster', slug: 'safe-in-their-alabaster-chambers' },
-  { key: 'nobody', slug: 'im-nobody-who-are-you' },
-  { key: 'loadedgun', slug: 'my-life-had-stood-a-loaded-gun' },
-  { key: 'exclusion', slug: 'the-soul-selects-her-own-society' },
-  { key: 'letter', slug: 'this-is-my-letter-to-the-world' },
-  { key: 'hope', slug: 'hope-is-the-thing-with-feathers' },
-  { key: 'success', slug: 'success-is-counted-sweetest' },
-  { key: 'snake', slug: 'a-narrow-fellow-in-the-grass' },
-  { key: 'garden', slug: 'a-bird-came-down-the-walk' },
-  { key: 'tellslant', slug: 'tell-all-the-truth-but-tell-it-slant' },
-  { key: 'brain', slug: 'the-brain-is-wider-than-the-sky' },
-  { key: 'frigate', slug: 'there-is-no-frigate-like-a-book' },
-  { key: 'slant', slug: 'theres-a-certain-slant-of-light' },
-  { key: 'funeral', slug: 'i-felt-a-funeral-in-my-brain' },
-  { key: 'wildnights', slug: 'wild-nights-wild-nights' },
+  { key: 'chariot', slug: 'because-i-could-not-stop-for-death', indexable: false },
+  { key: 'dying', slug: 'i-heard-a-fly-buzz-when-i-died', indexable: true },
+  { key: 'alabaster', slug: 'safe-in-their-alabaster-chambers', indexable: true },
+  { key: 'nobody', slug: 'im-nobody-who-are-you', indexable: true },
+  { key: 'loadedgun', slug: 'my-life-had-stood-a-loaded-gun', indexable: true },
+  { key: 'exclusion', slug: 'the-soul-selects-her-own-society', indexable: true },
+  { key: 'letter', slug: 'this-is-my-letter-to-the-world', indexable: true },
+  { key: 'hope', slug: 'hope-is-the-thing-with-feathers', indexable: true },
+  { key: 'success', slug: 'success-is-counted-sweetest', indexable: true },
+  { key: 'snake', slug: 'a-narrow-fellow-in-the-grass', indexable: true },
+  { key: 'garden', slug: 'a-bird-came-down-the-walk', indexable: true },
+  { key: 'brain', slug: 'the-brain-is-wider-than-the-sky', indexable: true },
+  { key: 'frigate', slug: 'there-is-no-frigate-like-a-book', indexable: true },
+  { key: 'slant', slug: 'theres-a-certain-slant-of-light', indexable: true },
+  { key: 'funeral', slug: 'i-felt-a-funeral-in-my-brain', indexable: false },
+  { key: 'wildnights', slug: 'wild-nights-wild-nights', indexable: true },
 ];
 
-/** The collection page's source note, shown verbatim on every poem page. */
+const printYears = Object.values(dickinsonPoems).map((poem) => poem.firstPrinted);
+
+/** The collection page's source note, shown verbatim on every poem page. The
+ *  years are read from the poems, so the sentence holds when the list changes. */
 export const dickinsonSourceNote =
-  'The poems here are transcribed from Dickinson\'s own manuscripts, which are in the public domain. Her dashes, capital letters, and spellings are kept as she wrote them, so these read differently from the smoothed versions printed after her death. The manuscript images are reproduced courtesy of the libraries that hold them: the Boston Public Library (no known copyright restrictions), Amherst College Archives and Special Collections (free for non-commercial and educational use, with credit), and the Houghton Library at Harvard University, whose policy permits publishing images of its public-domain holdings. The modern dash-faithful scholarly editions remain under copyright and are not used here.';
+  `The poems here are transcribed from Dickinson's own manuscripts. They were first printed between ${Math.min(...printYears)} and ${Math.max(...printYears)} and are in the public domain. Her dashes, capital letters, and spellings are kept as she wrote them, so these read differently from the smoothed versions printed after her death. The manuscript images are reproduced courtesy of the libraries that hold them: the Boston Public Library (no known copyright restrictions), Amherst College Archives and Special Collections (free for non-commercial and educational use, with credit), and the Houghton Library at Harvard University, whose policy permits publishing images of its public-domain holdings and asks that the library be credited and told. The modern dash-faithful scholarly editions remain under copyright and are not used here.`;

@@ -17,12 +17,22 @@ import {
   shakespeareOrder,
   shakespeareSourceNote,
 } from './shakespeare.mjs';
+import { MEDITATIONS_PATH } from '../texts/aurelius.mjs';
 
-/** The one switch for the crawl status of the poem pages and of the other
- *  reading pages that wait with them (the Meditations passages): the robots
- *  meta on every page and their sitemap membership both read it, so the gate
- *  is one line. */
-export const POEM_PAGES_INDEXABLE = false;
+/** The master switch for the crawl status of the poem pages and of the other
+ *  reading pages that go with them. A page is crawlable only when this is true
+ *  and its own `indexable` flag is too; the robots meta on each page and its
+ *  sitemap membership both read `isIndexable`. */
+export const POEM_PAGES_INDEXABLE = true;
+
+/** Whether a poem record or a reading page below may be indexed. */
+export const isIndexable = (page) => POEM_PAGES_INDEXABLE && page.indexable === true;
+
+/** Reading pages that hold several texts on one page, each with its own flag. */
+export const readingPages = {
+  rumi: { path: '/figures/rumi/poems', indexable: true },
+  meditations: { path: MEDITATIONS_PATH, indexable: true },
+};
 
 /** A poem counts as short at or under this many verse lines. */
 export const SHORT_POEM_MAX_LINES = 12;
@@ -104,12 +114,13 @@ const verseLines = (text) => text.split('\n').filter((line) => line.trim()).leng
 
 const firstVerseLine = (text) => (text.split('\n').find((line) => line.trim()) || '').trim();
 
-const dickinsonRecords = dickinsonOrder.map(({ key, slug }) => {
+const dickinsonRecords = dickinsonOrder.map(({ key, slug, indexable }) => {
   const poem = dickinsonPoems[key];
   return {
     poet: 'dickinson',
     key,
     slug,
+    indexable,
     path: `${poets.dickinson.collectionPath}${slug}/`,
     title: poem.firstLine,
     metaTitle: `${poem.firstLine} by Emily Dickinson`,
@@ -128,7 +139,7 @@ const dickinsonRecords = dickinsonOrder.map(({ key, slug }) => {
 const blakeByKey = new Map(
   blakeGroups.flatMap((group) => group.poems.map((poem) => [poem.key, { group, poem }])),
 );
-const blakeRecords = blakeOrder.map(({ key, slug }) => {
+const blakeRecords = blakeOrder.map(({ key, slug, indexable }) => {
   const { group, poem } = blakeByKey.get(key);
   const text = blakePoems[key].text;
   // Two poems share the title "The Chimney Sweeper", so the half of the book
@@ -142,6 +153,7 @@ const blakeRecords = blakeOrder.map(({ key, slug }) => {
     poet: 'blake',
     key,
     slug,
+    indexable,
     path: `${poets.blake.collectionPath}${slug}/`,
     title: poem.title,
     metaTitle: `${metaName} by William Blake`,
@@ -156,13 +168,14 @@ const blakeRecords = blakeOrder.map(({ key, slug }) => {
 });
 
 const sonnetByKey = new Map(shakespeareSonnets.map((sonnet) => [sonnet.key, sonnet]));
-const shakespeareRecords = shakespeareOrder.map(({ key, slug }) => {
+const shakespeareRecords = shakespeareOrder.map(({ key, slug, indexable }) => {
   const sonnet = sonnetByKey.get(key);
   const text = shakespearePoems[key].text;
   return {
     poet: 'shakespeare',
     key,
     slug,
+    indexable,
     path: `${poets.shakespeare.collectionPath}${slug}/`,
     title: `Sonnet ${sonnet.num}`,
     metaTitle: `Sonnet ${sonnet.num} by William Shakespeare`,
@@ -198,7 +211,6 @@ const SECTION_REFS = {
     'dickinson:hope',
     'dickinson:nobody',
     'dickinson:dying',
-    'dickinson:tellslant',
     'dickinson:wildnights',
     'blake:tyger',
     'blake:lamb',
@@ -245,7 +257,6 @@ const SECTION_REFS = {
     'dickinson:letter',
     'dickinson:loadedgun',
     'dickinson:brain',
-    'dickinson:tellslant',
     'dickinson:frigate',
     'dickinson:slant',
     'blake:infantjoy',
@@ -301,5 +312,9 @@ export const poemSections = [
   },
 ];
 
-/** Every route this data adds, for the sitemap script. */
-export const poemRoutes = [POEM_INDEX_PATH, ...poems.map((poem) => poem.path)];
+/** The routes of this data that may be indexed, for the sitemap script: the
+ *  index page, which follows the master switch alone, and each poem page that
+ *  passes `isIndexable`. */
+export const poemRoutes = POEM_PAGES_INDEXABLE
+  ? [POEM_INDEX_PATH, ...poems.filter(isIndexable).map((poem) => poem.path)]
+  : [];

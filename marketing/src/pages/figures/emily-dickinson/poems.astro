@@ -1,14 +1,14 @@
 ---
 // Emily Dickinson's poems, grouped by theme. The text is transcribed verbatim
-// from her own manuscripts (public domain; she died in 1886), not from the
-// copyrighted Johnson 1955 / Franklin 1998 editions, so her dashes, capitals,
-// and spellings are kept as she wrote them. Manuscript images are served from
-// the media CDN, reproduced courtesy of the holding libraries:
+// from her own manuscripts, not from the copyrighted Johnson 1955 / Franklin
+// 1998 editions, so her dashes, capitals, and spellings are kept as she wrote
+// them. Manuscript images are served from the media CDN, reproduced courtesy
+// of the holding libraries:
 //   - Boston Public Library (Digital Commonwealth): no known copyright restrictions.
 //   - Amherst College, Archives & Special Collections: free for non-commercial
 //     and educational use, with attribution.
 //   - Houghton Library, Harvard University: publishing images of its public-domain
-//     material is permitted, with credit.
+//     material is permitted, with credit and a notice to the library.
 // The poem text is quoted primary source; her dashes are intentional, not house style.
 
 import Public from '../../../layouts/Public.astro';
@@ -18,6 +18,7 @@ import {
   dickinsonPoems as POEMS,
   dickinsonFacsimileLeaves as FACS_LEAVES,
   dickinsonFacsimileSources as FACS,
+  dickinsonSourceNote,
 } from '../../../data/poems/dickinson.mjs';
 import { poemsByPoet, quoted } from '../../../data/poems/index.mjs';
 import { breadcrumbSchema } from '../../../lib/schemas';
@@ -94,10 +95,10 @@ const THEMES = [
   },
   {
     id: 'mind',
-    title: 'The mind, truth, and books',
+    title: 'The mind, and books',
     framing:
-      'How much truth can a person take at once, and where do we go to escape? She thought a book could carry you further than any ship, and that the truth is best told a little sideways.',
-    poems: ['tellslant', 'brain', 'frigate'],
+      'How far can a mind reach, and where do we go to escape? She thought the brain was wider than the sky, and that a book could carry you further than any ship.',
+    poems: ['brain', 'frigate'],
   },
   {
     id: 'despair',
@@ -268,7 +269,7 @@ const schemas = [
                           </div>
                         </div>
                         <figcaption class="ed-hand__caption">
-                          In her own hand · {FACS[key].repo} · {FACS_LEAVES[key].length} pages
+                          In her own hand · {FACS[key].repo}, {FACS[key].cite} · {FACS_LEAVES[key].length} pages
                           <span class="ed-hand__zoom"> · swipe, or open full size</span>
                         </figcaption>
                       </figure>
@@ -292,7 +293,7 @@ const schemas = [
                           </a>
                         </div>
                         <figcaption class="ed-hand__caption">
-                          In her own hand · {FACS[key].repo}
+                          In her own hand · {FACS[key].repo}, {FACS[key].cite}
                           <span class="ed-hand__zoom"> · open full size</span>
                         </figcaption>
                       </figure>
@@ -376,18 +377,7 @@ const schemas = [
     </script>
 
     <footer class="ed-sources">
-      <p>
-        The poems here are transcribed from Dickinson's own manuscripts, which
-        are in the public domain. Her dashes, capital letters, and spellings are
-        kept as she wrote them, so these read differently from the smoothed
-        versions printed after her death. The manuscript images are reproduced
-        courtesy of the libraries that hold them: the Boston Public Library (no
-        known copyright restrictions), Amherst College Archives and Special
-        Collections (free for non-commercial and educational use, with credit),
-        and the Houghton Library at Harvard University, whose policy permits
-        publishing images of its public-domain holdings. The modern dash-faithful
-        scholarly editions remain under copyright and are not used here.
-      </p>
+      <p>{dickinsonSourceNote}</p>
     </footer>
   </div>
 </Public>

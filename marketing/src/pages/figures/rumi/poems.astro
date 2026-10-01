@@ -19,12 +19,13 @@ import PoemDoor from '../../../components/PoemDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
+import { isIndexable, readingPages } from '../../../data/poems/index.mjs';
 
 const lang = 'en' as const;
 // Slot 4 of the app's ask contract is this page's own question: the door skips
 // the mode choice and opens Free Talk about the poem the visitor just read.
 const DOOR_HREF = '/app?figure=rumi&lang=en&ask=f:rumi:4';
-const PAGE_PATH = '/figures/rumi/poems';
+const PAGE_PATH = readingPages.rumi.path;
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
 const metaTitle = "Rumi's Poems in Early English Translation";
@@ -164,6 +165,8 @@ const schemas = [
   ogImage={figureImage('rumi', 'main', 1200)}
   ogImageAlt="AI-generated portrait: Rumi"
   noHreflang={true}
+  noindex={!isIndexable(readingPages.rumi)}
+  robots="noindex, follow"
   stickyCta={false}
   reading={true}
   schemas={schemas}
@@ -265,8 +268,8 @@ const schemas = [
         preface states that the Masnavi quotations are used by permission of
         E. H. Whinfield, from his rendering of the Masnavi in Trübner's
         Oriental Series. All passages above come from that volume's Masnavi
-        section and are reproduced verbatim. Translator and author are long
-        out of copyright. The introductions are ours.
+        section and are reproduced verbatim. Rumi's verse and Whinfield's
+        translation are long out of copyright. The introductions are ours.
       </p>
     </footer>
   </div>

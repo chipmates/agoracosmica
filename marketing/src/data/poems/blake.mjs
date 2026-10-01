@@ -138,20 +138,20 @@ export const blakeGroups = [
 
 /** URL segment per poem, fixed here so a re-transcription cannot move a page.
  *  The two Chimney Sweeper poems share a title, so their slugs name the half
- *  of the book they come from. */
+ *  of the book they come from. `indexable` is the poem page's own crawl flag. */
 export const blakeOrder = [
-  { key: 'introduction', slug: 'introduction' },
-  { key: 'lamb', slug: 'the-lamb' },
-  { key: 'chimneyi', slug: 'the-chimney-sweeper-innocence' },
-  { key: 'divine', slug: 'the-divine-image' },
-  { key: 'infantjoy', slug: 'infant-joy' },
-  { key: 'tyger', slug: 'the-tyger' },
-  { key: 'london', slug: 'london' },
-  { key: 'sickrose', slug: 'the-sick-rose' },
-  { key: 'poisontree', slug: 'a-poison-tree' },
-  { key: 'clodpebble', slug: 'the-clod-and-the-pebble' },
-  { key: 'gardenlove', slug: 'the-garden-of-love' },
-  { key: 'chimneye', slug: 'the-chimney-sweeper-experience' },
+  { key: 'introduction', slug: 'introduction', indexable: true },
+  { key: 'lamb', slug: 'the-lamb', indexable: true },
+  { key: 'chimneyi', slug: 'the-chimney-sweeper-innocence', indexable: true },
+  { key: 'divine', slug: 'the-divine-image', indexable: true },
+  { key: 'infantjoy', slug: 'infant-joy', indexable: true },
+  { key: 'tyger', slug: 'the-tyger', indexable: true },
+  { key: 'london', slug: 'london', indexable: true },
+  { key: 'sickrose', slug: 'the-sick-rose', indexable: true },
+  { key: 'poisontree', slug: 'a-poison-tree', indexable: true },
+  { key: 'clodpebble', slug: 'the-clod-and-the-pebble', indexable: true },
+  { key: 'gardenlove', slug: 'the-garden-of-love', indexable: true },
+  { key: 'chimneye', slug: 'the-chimney-sweeper-experience', indexable: true },
 ];
 
 /** The collection page's source note, shown verbatim on every poem page. */

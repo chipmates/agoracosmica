@@ -7,11 +7,10 @@ import { execSync } from 'child_process';
 import { existsSync, writeFileSync } from 'fs';
 import { join } from 'path';
 // The poem pages render from this module, so their routes and their crawl
-// status cannot drift from what the sitemap claims. The Meditations page waits
-// behind the same flag.
-import { POEM_PAGES_INDEXABLE, poemRoutes } from '../../marketing/src/data/poems/index.mjs';
+// status cannot drift from what the sitemap claims. The Rumi and Meditations
+// pages carry their flag in the same module.
+import { isIndexable, poemRoutes, readingPages } from '../../marketing/src/data/poems/index.mjs';
 import { SHAKESPEARE_QUOTES_INDEXABLE, SHAKESPEARE_QUOTES_PATH } from '../../marketing/src/data/quotes/shakespeare.mjs';
-import { MEDITATIONS_PATH } from '../../marketing/src/data/texts/aurelius.mjs';
 
 const SITE_URL = 'https://agoracosmica.org';
 const SCRIPTS_DIR = import.meta.dirname;
@@ -215,7 +214,9 @@ urls.push(url('/figures/emily-dickinson/poems', '0.6', gitLastModified('marketin
 // school pages.
 urls.push(url('/figures/william-blake/poems', '0.6', gitLastModified('marketing/src/pages/figures/william-blake/poems.astro')));
 urls.push(url('/figures/william-shakespeare/sonnets', '0.6', gitLastModified('marketing/src/pages/figures/william-shakespeare/sonnets.astro')));
-urls.push(url('/figures/rumi/poems', '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
+if (isIndexable(readingPages.rumi)) {
+  urls.push(url(readingPages.rumi.path, '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
+}
 urls.push(url('/talk-to-historical-figures', '0.7', gitLastModified('marketing/src/pages/talk-to-historical-figures.astro')));
 
 // The Shakespeare quotes page, English only; its flag also sets its noindex.
@@ -227,9 +228,9 @@ if (SHAKESPEARE_QUOTES_INDEXABLE) {
   )));
 }
 
-// Poem pages, the poems index and the Meditations passages, English only. The
-// flag that puts noindex on them also keeps them out of the sitemap.
-if (POEM_PAGES_INDEXABLE) {
+// Poem pages, the poems index and the Meditations passages, English only. A
+// page that carries noindex is left out: both read the same flags.
+if (poemRoutes.length > 0) {
   const POEM_MOD = gitLastModified(
     'marketing/src/data/poems/index.mjs',
     'marketing/src/components/PoemPage.astro',
@@ -240,9 +241,11 @@ if (POEM_PAGES_INDEXABLE) {
     NO_HREFLANG_PATHS.add(path);
     urls.push(url(path, '0.5', POEM_MOD));
   }
-  NO_HREFLANG_PATHS.add(MEDITATIONS_PATH);
+}
+if (isIndexable(readingPages.meditations)) {
+  NO_HREFLANG_PATHS.add(readingPages.meditations.path);
   urls.push(url(
-    MEDITATIONS_PATH,
+    readingPages.meditations.path,
     '0.6',
     gitLastModified(
       'marketing/src/pages/figures/marcus-aurelius/meditations.astro',

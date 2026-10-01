@@ -10,7 +10,7 @@ import PoemDoor from './PoemDoor.astro';
 import { figureImage } from '../lib/figureImages';
 import { breadcrumbSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../lib/urls';
-import { poets, poemsByPoet, POEM_PAGES_INDEXABLE } from '../data/poems/index.mjs';
+import { poets, poemsByPoet, isIndexable } from '../data/poems/index.mjs';
 
 interface Props {
   /** One record from the poem data module. */
@@ -18,6 +18,8 @@ interface Props {
     poet: string;
     key: string;
     slug: string;
+    /** The poem page's own crawl flag; the master switch has to agree. */
+    indexable: boolean;
     path: string;
     title: string;
     metaTitle: string;
@@ -89,7 +91,7 @@ const schemas = [
   ogImage={figureImage(poet.id, 'main', 1200)}
   ogImageAlt={`AI-generated portrait: ${poet.name}`}
   noHreflang={true}
-  noindex={!POEM_PAGES_INDEXABLE}
+  noindex={!isIndexable(poem)}
   robots="noindex, follow"
   stickyCta={false}
   reading={true}
@@ -129,7 +131,7 @@ const schemas = [
           rel="noopener"
         >See it in her own hand</a>
         <span class="pm-hand__credit">
-          {poem.manuscript.repo}{poem.manuscript.leaves.length > 1 ? `, page 1 of ${poem.manuscript.leaves.length}` : ''}
+          {poem.manuscript.repo}, {poem.manuscript.cite}{poem.manuscript.leaves.length > 1 ? `, page 1 of ${poem.manuscript.leaves.length}` : ''}
         </span>
       </p>
     )}
