@@ -2236,7 +2236,7 @@ async function loadOverview() {
     // group by path and classify in JS by prefix + exact-match lookup. The
     // landing flag (blob8) and the source class (blob3) ride along so the app's
     // loads can be split by where they came from, out of this one query.
-    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path, landing, source ORDER BY c DESC LIMIT 1000", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
     // Signups (total new-account beacons; distinct from gclid-gated profile_created)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Content completed total (blob8='completed' OR legacy empty blob8 — see analytics.ts trackPlayback comment).
@@ -2253,7 +2253,7 @@ async function loadOverview() {
     // Entry previous period (funnel ghost bar)
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Page paths previous period (classified into marketing/app for the ghost)
-    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path, landing, source ORDER BY c DESC LIMIT 1000", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
     // Daily Conversations (chat) current + previous period for the ghost trend line
     S.range > 1
       ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
