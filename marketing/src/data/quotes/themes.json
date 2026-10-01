@@ -1,4 +1,494 @@
 {
   "about": "The only quotes a theme page may show, each read against its source before it was added. Fields and checks: src/lib/themeQuotes.ts. A page draws its block from the entries that list it, in the order they stand here.",
-  "quotes": []
+  "quotes": [
+    {
+      "id": "aurelius-meditations-6-2",
+      "lang": "en",
+      "figure": "aurelius",
+      "themes": [
+        "meaning-purpose",
+        "moral-life"
+      ],
+      "text": "Let it make no difference to thee whether thou art cold or warm, if thou art doing thy duty; and whether thou art drowsy or satisfied with sleep; and whether ill-spoken of or praised; and whether dying or doing something else.",
+      "source": {
+        "author": "Marcus Aurelius",
+        "work": "Meditations",
+        "translator": "George Long",
+        "year": "1862",
+        "place": "VI. 2",
+        "line": "_Meditations_ VI. 2, translated by George Long (1862)"
+      },
+      "rights": "Public domain. George Long's translation was first published in 1862.",
+      "checked": "Project Gutenberg ebook 15877",
+      "cap": 226
+    },
+    {
+      "id": "aurelius-meditations-2-11",
+      "lang": "en",
+      "figure": "aurelius",
+      "themes": [
+        "loss-grief"
+      ],
+      "text": "Since it is possible that thou mayest depart from life this very moment, regulate every act and thought accordingly.",
+      "source": {
+        "author": "Marcus Aurelius",
+        "work": "Meditations",
+        "translator": "George Long",
+        "year": "1862",
+        "place": "II. 11",
+        "line": "_Meditations_ II. 11, translated by George Long (1862)"
+      },
+      "rights": "Public domain. George Long's translation was first published in 1862.",
+      "checked": "Project Gutenberg ebook 15877, footnote marks left out"
+    },
+    {
+      "id": "kahlo-time-1953",
+      "lang": "en",
+      "figure": "kahlo",
+      "themes": [
+        "loss-grief"
+      ],
+      "text": "They thought I was a Surrealist, but I wasn't. I never painted dreams. I painted my own reality.",
+      "source": {
+        "author": "Frida Kahlo",
+        "work": "Time",
+        "year": "27 April 1953",
+        "line": "quoted in _Time_ magazine, 27 April 1953"
+      },
+      "rights": "Kahlo died in 1954. The English wording is the magazine's, one remark quoted with its source."
+    },
+    {
+      "id": "blake-marriage-deities",
+      "lang": "en",
+      "figure": "blake",
+      "themes": [
+        "faith-death-mystery"
+      ],
+      "text": "All deities reside in the human breast.",
+      "source": {
+        "author": "William Blake",
+        "work": "The Marriage of Heaven and Hell",
+        "place": "plate 11",
+        "year": "1790 to 1793",
+        "line": "_The Marriage of Heaven and Hell_ (1790 to 1793), plate 11"
+      },
+      "rights": "Public domain.",
+      "checked": "Project Gutenberg ebook 45315"
+    },
+    {
+      "id": "aurelius-meditations-4-23",
+      "lang": "en",
+      "figure": "aurelius",
+      "themes": [
+        "faith-death-mystery"
+      ],
+      "text": "Everything harmonizes with me, which is harmonious to thee, O Universe. Nothing for me is too early nor too late, which is in due time for thee.",
+      "source": {
+        "author": "Marcus Aurelius",
+        "work": "Meditations",
+        "translator": "George Long",
+        "year": "1862",
+        "place": "IV. 23",
+        "line": "_Meditations_ IV. 23, translated by George Long (1862)"
+      },
+      "rights": "Public domain. George Long's translation was first published in 1862.",
+      "checked": "Project Gutenberg ebook 15877"
+    },
+    {
+      "id": "campbell-death-birth",
+      "lang": "en",
+      "figure": "campbell",
+      "themes": [
+        "loss-grief",
+        "faith-death-mystery"
+      ],
+      "text": "Unless there is death, there cannot be birth.",
+      "source": {
+        "author": "Joseph Campbell",
+        "work": "The Power of Myth",
+        "place": "episode 4, “Sacrifice and Bliss”",
+        "year": "1988",
+        "line": "_The Power of Myth_, episode 4, “Sacrifice and Bliss” (PBS, 1988)"
+      },
+      "rights": "Campbell died in 1987, so the series is in copyright. One short sentence, quoted with its source."
+    },
+    {
+      "id": "austen-pride-36",
+      "lang": "en",
+      "figure": "austen",
+      "themes": [
+        "who-am-i"
+      ],
+      "text": "Till this moment, I never knew myself.",
+      "speaker": "Elizabeth Bennet",
+      "source": {
+        "author": "Jane Austen",
+        "work": "Pride and Prejudice",
+        "place": "chapter 36",
+        "year": "1813",
+        "line": "chapter 36"
+      },
+      "rights": "Public domain.",
+      "checked": "Project Gutenberg ebook 1342"
+    },
+    {
+      "id": "mandela-congress-1990",
+      "lang": "en",
+      "figure": "mandela",
+      "themes": [
+        "freedom-justice"
+      ],
+      "text": "To deny people their human rights is to challenge their very humanity.",
+      "source": {
+        "author": "Nelson Mandela",
+        "work": "address to the Joint Session of the United States Congress",
+        "year": "26 June 1990",
+        "line": "address to the Joint Session of the United States Congress, 26 June 1990"
+      },
+      "rights": "Mandela died in 2013, so his speeches are in copyright. One sentence from a public address to a parliament, quoted with its source."
+    },
+    {
+      "id": "tubman-liberty-or-death",
+      "lang": "en",
+      "figure": "tubman",
+      "themes": [
+        "who-am-i",
+        "freedom-justice"
+      ],
+      "text": "I had reasoned this out in my mind; there was one of two things I had a right to, liberty, or death; if I could not have one, I would have the other.",
+      "source": {
+        "author": "Harriet Tubman",
+        "work": "Harriet, the Moses of Her People",
+        "year": "1886",
+        "line": "as told to Sarah H. Bradford, _Harriet, the Moses of Her People_ (1886), spelling standardised"
+      },
+      "rights": "Public domain. Bradford's book was published in 1886.",
+      "checked": "Project Gutenberg ebook 9999, which prints her speech in dialect spelling"
+    },
+    {
+      "id": "blake-london-manacles",
+      "lang": "en",
+      "figure": "blake",
+      "themes": [
+        "freedom-justice"
+      ],
+      "text": "In every cry of every man,\nIn every infant's cry of fear,\nIn every voice, in every ban,\nThe mind-forged manacles I hear:",
+      "source": {
+        "author": "William Blake",
+        "work": "Songs of Experience",
+        "place": "“London”",
+        "year": "1794",
+        "line": "“London”, _Songs of Experience_ (1794)"
+      },
+      "rights": "Public domain.",
+      "checked": "Project Gutenberg ebook 574, the text of the poem page on this site"
+    },
+    {
+      "id": "einstein-what-i-believe",
+      "lang": "en",
+      "figure": "einstein",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "The most beautiful thing we can experience is the mysterious. It is the source of all true art and science.",
+      "source": {
+        "author": "Albert Einstein",
+        "work": "“What I Believe”",
+        "place": "Forum and Century",
+        "year": "October 1930",
+        "line": "“What I Believe”, _Forum and Century_, October 1930"
+      },
+      "rights": "Einstein died in 1955. Out of copyright in Germany since 2026, and this 1930 printing in the United States since 2026.",
+      "checked": "archive.org, scan of the Forum and Century printing (item what-i-believe-albert-einstein-1930)"
+    },
+    {
+      "id": "hildegard-feather",
+      "lang": "en",
+      "figure": "bingen",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "I am a feather on the breath of God.",
+      "source": {
+        "author": "Hildegard of Bingen",
+        "work": "letter to Odo of Paris",
+        "year": "about 1148",
+        "line": "from a letter to Odo of Paris, about 1148, shortened"
+      },
+      "rights": "Hildegard died in 1179. The line is the short form in which modern English renders a longer passage of the letter."
+    },
+    {
+      "id": "blake-milton-imagination",
+      "lang": "en",
+      "figure": "blake",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "The Imagination is not a State: it is the Human Existence itself.\nAffection or Love becomes a State when divided from Imagination.",
+      "source": {
+        "author": "William Blake",
+        "work": "Milton: A Poem",
+        "place": "plate 32",
+        "year": "1804 to 1811",
+        "line": "_Milton: A Poem_ (1804 to 1811), plate 32"
+      },
+      "rights": "Public domain.",
+      "checked": "Wikisource, page scan of The Prophetic Books of William Blake: Milton (1907), page 51"
+    },
+    {
+      "id": "austen-northanger-14",
+      "lang": "en",
+      "figure": "austen",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "The person, be it gentleman or lady, who has not pleasure in a good novel, must be intolerably stupid.",
+      "speaker": "Henry Tilney",
+      "source": {
+        "author": "Jane Austen",
+        "work": "Northanger Abbey",
+        "place": "chapter 14",
+        "year": "1818",
+        "line": "chapter 14"
+      },
+      "rights": "Public domain.",
+      "checked": "Project Gutenberg ebook 121"
+    },
+    {
+      "id": "rumi-masnavi-astrolabe",
+      "lang": "en",
+      "figure": "rumi",
+      "themes": [
+        "love-connection"
+      ],
+      "text": "Love is the astrolabe of God's mysteries.\nA lover may hanker after this love or that love,\nBut at the last he is drawn to the KING of Love.",
+      "source": {
+        "author": "Rumi",
+        "work": "Masnavi",
+        "translator": "E. H. Whinfield",
+        "year": "1907",
+        "line": "_Masnavi_, translated by E. H. Whinfield, as printed in F. Hadland Davis, _The Persian Mystics: Jalálu'd-dín Rúmí_ (1907)"
+      },
+      "rights": "Public domain. E. H. Whinfield died in 1922.",
+      "checked": "Project Gutenberg ebook 45159, the text of the Rumi page on this site"
+    },
+    {
+      "id": "shakespeare-hamlet-2-2",
+      "lang": "en",
+      "figure": "shakespeare",
+      "themes": [
+        "moral-life"
+      ],
+      "text": "There is nothing either good or bad but thinking makes it so.",
+      "speaker": "Hamlet",
+      "source": {
+        "author": "William Shakespeare",
+        "work": "Hamlet",
+        "place": "act 2, scene 2",
+        "line": "act 2, scene 2"
+      },
+      "rights": "Public domain.",
+      "checked": "Project Gutenberg ebook 100, the text of the quotes page on this site"
+    },
+    {
+      "id": "aurel-selbstbetrachtungen-2-11",
+      "lang": "de",
+      "figure": "aurelius",
+      "themes": [
+        "loss-grief"
+      ],
+      "text": "All dein Tun und Denken sei so beschaffen, als solltest du möglicherweise im Augenblick aus diesem Leben scheiden.",
+      "source": {
+        "author": "Marcus Aurelius",
+        "work": "Selbstbetrachtungen",
+        "translator": "Albert Wittstock",
+        "place": "II, 11",
+        "line": "_Selbstbetrachtungen_ II, 11, übersetzt von Albert Wittstock (Reclam)"
+      },
+      "rights": "Public domain. Albert Wittstock died in 1903.",
+      "checked": "projekt-gutenberg.org, Des Kaisers Marcus Aurelius Antonius Selbstbetrachtungen (Reclam)"
+    },
+    {
+      "id": "tubman-zug",
+      "lang": "de",
+      "figure": "tubman",
+      "themes": [
+        "loss-grief"
+      ],
+      "text": "Ich habe meinen Zug nie entgleisen lassen und niemals einen Passagier verloren.",
+      "source": {
+        "author": "Harriet Tubman",
+        "translator": "eigene Übersetzung",
+        "year": "1896",
+        "line": "1896, eigene Übersetzung"
+      },
+      "rights": "Public domain. Tubman died in 1913. The German is our own translation of a remark she made in 1896."
+    },
+    {
+      "id": "austen-stolz-31",
+      "lang": "de",
+      "figure": "austen",
+      "themes": [
+        "who-am-i"
+      ],
+      "text": "Es gibt eine Hartnäckigkeit in mir, die es nie ertragen kann, durch den Willen anderer eingeschüchtert zu werden. Mein Mut wächst stets mit jedem Versuch, mich einzuschüchtern.",
+      "speaker": "Elizabeth Bennet",
+      "source": {
+        "author": "Jane Austen",
+        "work": "Stolz und Vorurteil",
+        "place": "Kapitel 31",
+        "translator": "eigene Übersetzung",
+        "year": "1813",
+        "line": "Kapitel 31, eigene Übersetzung"
+      },
+      "rights": "Public domain. The German is our own translation."
+    },
+    {
+      "id": "campbell-tod-geburt",
+      "lang": "de",
+      "figure": "campbell",
+      "themes": [
+        "who-am-i"
+      ],
+      "text": "Wenn es keinen Tod gibt, kann es keine Geburt geben.",
+      "source": {
+        "author": "Joseph Campbell",
+        "work": "The Power of Myth",
+        "place": "Folge 4",
+        "translator": "eigene Übersetzung",
+        "year": "1988",
+        "line": "_The Power of Myth_, Folge 4 (PBS, 1988), eigene Übersetzung"
+      },
+      "rights": "Campbell died in 1987, so the series is in copyright. One short sentence in our own translation, quoted with its source."
+    },
+    {
+      "id": "blake-milton-imagination-de",
+      "lang": "de",
+      "figure": "blake",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "Die Imagination ist kein Zustand: sie ist die menschliche Existenz selbst. Zuneigung oder Liebe wird zu einem Zustand, wenn sie von der Imagination getrennt ist.",
+      "source": {
+        "author": "William Blake",
+        "work": "Milton",
+        "place": "Tafel 32",
+        "translator": "eigene Übersetzung",
+        "year": "1804 bis 1811",
+        "line": "_Milton_ (1804 bis 1811), Tafel 32, eigene Übersetzung"
+      },
+      "rights": "Public domain. The German is our own translation."
+    },
+    {
+      "id": "laozi-tao-te-king-8",
+      "lang": "de",
+      "figure": "laozi",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "Höchste Güte ist wie das Wasser.\nDes Wassers Güte ist es,\nallen Wesen zu nützen ohne Streit.\nEs weilt an Orten, die alle Menschen verachten.\nDrum steht es nahe dem Sinn.",
+      "source": {
+        "author": "Laozi",
+        "work": "Tao Te King",
+        "translator": "Richard Wilhelm",
+        "year": "1911",
+        "place": "Kapitel 8",
+        "line": "_Tao Te King_, Kapitel 8, übersetzt von Richard Wilhelm (1911)"
+      },
+      "rights": "Public domain. Richard Wilhelm died in 1930.",
+      "checked": "projekt-gutenberg.org, Tao Te King (the Diederichs printing of 1919)"
+    },
+    {
+      "id": "austen-northanger-14-de",
+      "lang": "de",
+      "figure": "austen",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "Die Person, sei es Herr oder Dame, die kein Vergnügen an einem guten Roman findet, muss unerträglich dumm sein.",
+      "speaker": "Henry Tilney",
+      "source": {
+        "author": "Jane Austen",
+        "work": "Northanger Abbey",
+        "place": "Kapitel 14",
+        "translator": "eigene Übersetzung",
+        "year": "1818",
+        "line": "Kapitel 14, eigene Übersetzung"
+      },
+      "rights": "Public domain. The German is our own translation."
+    },
+    {
+      "id": "hildegard-feder",
+      "lang": "de",
+      "figure": "bingen",
+      "themes": [
+        "mind-creativity"
+      ],
+      "text": "Ich bin eine Feder im Atem Gottes.",
+      "source": {
+        "author": "Hildegard von Bingen",
+        "work": "Brief an Odo von Paris",
+        "year": "um 1148",
+        "line": "aus einem Brief an Odo von Paris, um 1148, verkürzt wiedergegeben"
+      },
+      "rights": "Hildegard died in 1179. The line is the short form in which a longer passage of the letter is usually given."
+    },
+    {
+      "id": "shakespeare-hamlet-2-2-de",
+      "lang": "de",
+      "figure": "shakespeare",
+      "themes": [
+        "moral-life"
+      ],
+      "text": "An sich ist nichts weder gut noch böse, das Denken macht es erst dazu.",
+      "speaker": "Hamlet",
+      "source": {
+        "author": "William Shakespeare",
+        "work": "Hamlet",
+        "place": "2. Aufzug, 2. Szene",
+        "translator": "August Wilhelm Schlegel",
+        "line": "2. Aufzug, 2. Szene, übersetzt von August Wilhelm Schlegel"
+      },
+      "rights": "Public domain. August Wilhelm Schlegel died in 1845.",
+      "checked": "zeno.org, the Schlegel and Tieck text (Aufbau, 1975). Another printing of Schlegel reads „schlimm“ for „böse“."
+    },
+    {
+      "id": "laozi-tao-te-king-38",
+      "lang": "de",
+      "figure": "laozi",
+      "themes": [
+        "moral-life"
+      ],
+      "text": "Wer das Leben hochhält, weiß nichts vom Leben;\ndarum hat er Leben.\nWer das Leben nicht hochhält,\nsucht das Leben nicht zu verlieren;\ndarum hat er kein Leben.",
+      "source": {
+        "author": "Laozi",
+        "work": "Tao Te King",
+        "translator": "Richard Wilhelm",
+        "year": "1911",
+        "place": "Kapitel 38",
+        "line": "_Tao Te King_, Kapitel 38, übersetzt von Richard Wilhelm (1911)"
+      },
+      "rights": "Public domain. Richard Wilhelm died in 1930.",
+      "checked": "projekt-gutenberg.org, Tao Te King (the Diederichs printing of 1919)"
+    },
+    {
+      "id": "aurel-selbstbetrachtungen-6-2",
+      "lang": "de",
+      "figure": "aurelius",
+      "themes": [
+        "moral-life"
+      ],
+      "text": "Bei Erfüllung deiner Pflicht soll dir nichts darauf ankommen, ob du vor Kälte starrst oder vor Hitze glühst, ob du schläfrig bist oder genug geschlafen hast, ob man dich tadelt oder lobt, ob du darüber dem Tode nahe kommst oder etwas anderes der Art zu leiden hast.",
+      "source": {
+        "author": "Marcus Aurelius",
+        "work": "Selbstbetrachtungen",
+        "translator": "Albert Wittstock",
+        "place": "VI, 2",
+        "line": "_Selbstbetrachtungen_ VI, 2, übersetzt von Albert Wittstock (Reclam)"
+      },
+      "rights": "Public domain. Albert Wittstock died in 1903.",
+      "checked": "projekt-gutenberg.org, Des Kaisers Marcus Aurelius Antonius Selbstbetrachtungen (Reclam)",
+      "cap": 265
+    }
+  ]
 }
