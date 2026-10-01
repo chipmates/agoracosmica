@@ -578,6 +578,18 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
   display: flex; order: 1; flex: 1 0 100%; gap: 4px;
 }
 #wing[data-film='upright'] .vitrine[data-narrow='true']:has(.reader:not([data-lined='true'])) .reader-row .reader-zoom .vitrine-control { flex: 1 1 0; }
+/* a machine's leaf stands in its clock's row, as a showpiece's door does: one
+   row of controls, so the card's words keep their room and nothing waits faded */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls:has(> .vitrine-views > .vitrine-folio-glass:only-child) { flex-wrap: nowrap; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls > .vitrine-views:has(> .vitrine-folio-glass:only-child) { order: 2; flex: 0 0 auto; width: auto; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls:has(> .vitrine-views > .vitrine-folio-glass:only-child) > .vitrine-clock { order: 1; flex: 1 1 auto; min-width: 0; }
+/* the leaf reads as a way in: its picture in a gold ring, a gold arrow out at its corner */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass { position: relative; inset: auto; overflow: visible; box-shadow: 0 0 0 1.5px #d2a557; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio-glass .vitrine-folio-thumb { border-radius: 50%; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass::after {
+  content: '\2197'; position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; border-radius: 50%;
+  background: #0d171f; box-shadow: 0 0 0 1px #d2a557; color: #edcc8c; font: 400 11px/18px var(--sans); text-align: center;
+}
 /* a machine's Mehr follows what the card already says and opens the rest under it */
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-body { display: flex; flex-direction: column; }
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-after { order: 1; }
