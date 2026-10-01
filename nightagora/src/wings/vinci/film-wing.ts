@@ -974,6 +974,8 @@ export function createWing(): WingModule {
       const at = LIFE.findIndex((s, i) => carried(i) && stationOf(s.station).group === 'collection')
       if (at >= 0 && hosts) { hosts.navigate(at); return }
     }
+    // the door's third way is the life, opened as its own control opens it
+    if (route === 'life') { const life = wing?.querySelector<HTMLElement>('.wing-life-open'); if (life) { life.click(); return } }
     requestAnimationFrame(() => wing?.querySelector<HTMLElement>(wide ? '.desk-on' : '.film-gold')?.focus({ preventScroll: true }))
   }
 
@@ -1002,7 +1004,7 @@ export function createWing(): WingModule {
     const early = document.documentElement.dataset['naDoor'] === 'early'
     const mayDescend = card === 0 && !namedEntry && !new URLSearchParams(location.search).has('export')
     if (doorWanted()) {
-      welcome = createVinciWelcome(h.labels, route => leaveDoor(route), { life: false })
+      welcome = createVinciWelcome(h.labels, route => leaveDoor(route))
       if (early && !mayDescend) openDoor()
     } else if (early) {
       delete document.documentElement.dataset['naDoor']
