@@ -586,7 +586,7 @@ export function createWing(): WingModule {
     panel.append(make('p', 'vinci-promise', text(s.promise)))
     const full = make('div', 'vinci-record')
     setRegister(full, 'record')
-    full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', s.promiseSource))
+    full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', text(s.promiseSourceShown)))
     panel.append(full)
     panel.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
     paintRoomAndWing()
@@ -620,7 +620,7 @@ export function createWing(): WingModule {
       const full = make('div', 'vinci-record')
       setRegister(full, 'record')
       for (const label of station.labels) statement(section, label, full)
-      full.append(make('p', 'vinci-statement', text(station.record ?? station.promise)), make('small', 'vinci-citation', station.promiseSource))
+      full.append(make('p', 'vinci-statement', text(station.record ?? station.promise)), make('small', 'vinci-citation', text(station.promiseSourceShown)))
       const absences = vinciAbsences[id]
       if (absences?.length) {
         section.append(make('h3', '', text(vinciSourcesHeadings.elsewhere)))

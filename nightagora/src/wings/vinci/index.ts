@@ -3293,7 +3293,7 @@ export function createWing():VinciWingModule {
   }
   function appendLabel(label:VinciStatement):void {
     const carrier=label.carrier??(label.id==='planting-assumptions'?'vinci/vegetation':label.id==='weather-assumptions'?'vinci/sky':'vinci/shell')
-    appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',label.source,label.record??label,label.humanSource)
+    appendStatement(label,label.certainty,label.target==='carrier'?carrier:`vinci/source/${label.id}`,label.target==='carrier'?'GENERATED':'procedural',text(label.sourceShown),label.record??label,label.humanSource)
   }
   /** The spoken half stands on the surface, the machine chain goes to the
    * record the tab folds away, so a source key never meets an unasked eye. */
@@ -3303,7 +3303,7 @@ export function createWing():VinciWingModule {
     paragraph.append(make('span','vinci-certainty-word',text(vinciCertaintyWords[label.certainty])),document.createTextNode(' '+text(label)))
     if(label.humanSource)paragraph.append(make('span','vinci-human-source',text(label.humanSource)))
     const full=make('div','vinci-record');setRegister(full,'record')
-    full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',label.source))
+    full.append(make('p','vinci-statement',text(label.record??label)),make('small','vinci-citation',text(label.sourceShown)))
     host.append(paragraph)
     ;(into??host).append(full)
   }
@@ -3387,7 +3387,7 @@ export function createWing():VinciWingModule {
       section.append(make('h2','',text(station.name)),make('p','vinci-promise',text(station.promise)))
       const full=make('div','vinci-record');setRegister(full,'record')
       for(const label of station.labels)appendSourceStatement(section,label,full)
-      full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',station.promiseSource))
+      full.append(make('p','vinci-statement',text(station.record??station.promise)),make('small','vinci-citation',text(station.promiseSourceShown)))
       const sources=exhibits?.pictureSources()??[]
       if(id==='picture-room'||id==='supper-wall'){
         const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(id==='supper-wall')).map(({work})=>[work.id,work]))
@@ -3446,7 +3446,7 @@ export function createWing():VinciWingModule {
     drawer.append(title,make('h2','',text(exhibitSources?.title??s.name)))
     for(const label of s.labels)appendLabel(label)
     if(!s.labels.includes(vinciReconstruction))appendLabel(vinciReconstruction)
-    drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,s.promiseSource)
+    drawer.append(make('p','vinci-promise',text(s.promise)));appendRecord(s.record??s.promise,text(s.promiseSourceShown))
     if(s.id==='picture-room'||s.id==='supper-wall'){
       const sources=exhibits?.pictureSources()??[]
       const works=new Map(sources.filter(({work})=>(work.id==='last-supper')===(s.id==='supper-wall')).map(({work})=>[work.id,work]))
