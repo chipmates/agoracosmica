@@ -348,7 +348,7 @@ html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sou
 /* THE FOOT UNDER THE CLOSE on every tall sheet: what scrolls fades into it and
    never runs under the circle */
 html:has(#wing[data-film='upright']) :is(#instruments:not([hidden]), #wing .wing-life[open])::after {
-  content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(80px + env(safe-area-inset-bottom));
+  content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(106px + env(safe-area-inset-bottom));
   background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px); pointer-events: none;
 }
 html:has(#wing[data-film='upright']) #instruments:not([hidden])::after { background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0b1a2a) 0%, transparent), var(--na-abyss, #0b1a2a) 26px); }
@@ -479,4 +479,12 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record summary {
   display: flex; align-items: center; min-height: 44px; cursor: pointer; color: #e6d6b8; font: 400 .875rem/1.4 var(--sans);
+}
+
+/* ---- THE PANEL, upright: the wing's own rows at its foot ---- */
+/* Lobby, Plan, Life and Chapters stand nearest the close and the thumb, the
+   museum's settings and links above them; one hairline between the two */
+html:has(#wing[data-film='upright']) #instruments .inst-links { display: flex; flex-direction: column; }
+html:has(#wing[data-film='upright']) #instruments .inst-wing {
+  order: 1; margin: 6px 0 0; padding: 6px 0 0; box-shadow: inset 0 1px 0 var(--press-hairline);
 }

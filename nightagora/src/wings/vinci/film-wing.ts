@@ -1171,7 +1171,7 @@ export function createWing(): WingModule {
       h.labels.append(phoneList.element)
       // the panel's rows are the film's ways' own where the phone stood upright at the mount
       cinema = createFilmCinema({ wing, box: phone!.root, stop: () => LIFE[card]!.id, rows: form === 'cinema',
-        count: () => `${card + 1} / ${LIFE.length}`, signal })
+        count: () => `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`, signal })
       cinema.set(form === 'cinema')
       /* A CLOSE LOOK STANDS OVER THE FOOT ROW, which the box keeps (standDown),
          and a sideways swipe on its card steps the set as the row's two ways do */

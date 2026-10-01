@@ -222,7 +222,8 @@ export function mountFilmWays(host: FilmWaysHost): void {
       { id: 'lobby', label: wing.querySelector('.wing-lobby')?.textContent?.trim() || say(WING_TEXT.lobby), mark: 'back' },
       { id: 'plan', label: planControl.textContent ?? '' },
       { id: 'life', label: lifeControl.textContent ?? '' },
-      { id: 'chapters', label: say(deskControl('ways', 'chapters')), count: `${host.standing() + 1} / ${host.stops.length}` },
+      // the count as the phone's own key row writes it
+      { id: 'chapters', label: say(deskControl('ways', 'chapters')), count: `${String(host.standing() + 1).padStart(2, '0')} / ${host.stops.length}` },
     ]
     const line = JSON.stringify(rows)
     if (line === said) return
