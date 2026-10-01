@@ -221,7 +221,7 @@ export function createFilmLook(h: FilmLookHost) {
         const full = createPictureRecord(work, entries, evidence)
         full.hidden = false
         // the record speaks the page's language, as the label does
-        for (const column of full.querySelectorAll<HTMLElement>('.picture-label-language')) if (column.lang !== lang()) column.remove()
+        for (const column of full.querySelectorAll<HTMLElement>('.picture-label-language, .picture-fact[lang]')) if (column.lang !== lang()) column.remove()
         host.append(full)
         for (const slot of ['limit', 'visual_note']) { const empty = make('p', 'vinci-statement'); empty.dataset['slot'] = slot; empty.hidden = true; full.append(empty) }
         fillVinciLimitSlots(id, full)

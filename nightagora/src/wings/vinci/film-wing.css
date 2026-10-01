@@ -446,3 +446,25 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-sources-tabs button:focus-visible {
   outline: none; background: none; color: #fff5e3; box-shadow: inset 0 -2px 0 #edcc8c;
 }
+
+/* a painting's record: the live record's paragraphs and rules, at the phone's
+   reading size, so its lines no longer run together as one block */
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record .picture-policy-label {
+  margin: 0; font: 400 .875rem/1.55 var(--sans); color: #d8cdb6; overflow-wrap: anywhere;
+}
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record p { margin: 0 0 10px; }
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record :is(.picture-first, .picture-first-de) {
+  margin-bottom: 6px; font: 400 1.0625rem/1.4 var(--serif); color: #eadbc1;
+}
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record :is(.picture-label-licences, .picture-label-evidence, .picture-machine-chain) {
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid #a9977344;
+}
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record a {
+  display: block; min-height: 44px; padding: 10px 0; box-sizing: border-box; color: #e6d6b8;
+}
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record .picture-source-hash {
+  color: #a8a397; font: 400 .8125rem/1.5 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere;
+}
+#wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record summary {
+  display: flex; align-items: center; min-height: 44px; cursor: pointer; color: #e6d6b8; font: 400 .875rem/1.4 var(--sans);
+}
