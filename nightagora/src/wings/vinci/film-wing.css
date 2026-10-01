@@ -379,3 +379,34 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
 }
 .film-drawer .desk-ov-open:focus-visible { outline: 1px solid var(--gold); outline-offset: 2px; }
 .film-drawer .desk-ov-open[hidden] { display: none; }
+
+/* THE CLOSE LOOK'S WORDS AT A PHONE'S READING SIZE: its controls, its label's
+   small rows and its certainty at 13 px and over, as the box's own words are */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-control:not(.reader-zoom .vitrine-control) { font-size: .875rem; }
+/* the reader's row holds six seats at 390: its two worded ones at 13 px keep air inside their frames */
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .reader-row .vitrine-control:not(.reader-zoom .vitrine-control) { font-size: .8125rem; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
+  .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-stand p, .deep-rule-label) { font-size: .8125rem; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio { font-size: .8125rem; }
+
+/* THE PLAN AND THE LIFE AS THE PHONE'S TALL SHEETS, the record's and the
+   list's own form: from 44 px under the top, the full width, solid, so the
+   stop's words never show through the reading */
+#wing[data-film='upright'] :is(.wing-plan, .wing-life)[data-narrow='true'][open] {
+  inset: 44px 0 0 0; width: auto; height: auto; max-width: none; max-height: none; margin: 0;
+  border: 0; border-top: 1px solid #a9977355; border-radius: 14px 14px 0 0; background: #0d171f;
+}
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] :is(.wing-plan-number, .wing-plan-entry-number) { font-size: .8125rem; }
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-work { font-size: .875rem; }
+/* the current station's ring clears its number, and the works under it keep the name's left edge */
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-entry { padding-left: 8px; }
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-works { margin-left: 44px; }
+#wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-foot .wing-life-door { font-size: .875rem; }
+
+/* THE INSTRUMENTS' SMALL WORDS at 13 px, the size the box keeps */
+html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size: .8125rem; }
+
+/* THE ROOM'S LIST ON THE PHONE: a work's whole name, three rows at most, so
+   the German names of the sheets and the machines are read, not cut */
+#wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname { -webkit-line-clamp: 3; }
