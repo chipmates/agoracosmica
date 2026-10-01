@@ -11,6 +11,8 @@ import { join } from 'path';
 // pages carry their flag in the same module.
 import { isIndexable, poemRoutes, readingPages } from '../../marketing/src/data/poems/index.mjs';
 import { SHAKESPEARE_QUOTES_INDEXABLE, SHAKESPEARE_QUOTES_PATH } from '../../marketing/src/data/quotes/shakespeare.mjs';
+// The theme pages print the same date as their JSON-LD dateModified.
+import { themeLastmod } from '../../marketing/src/lib/themeLastmod.mjs';
 
 const SITE_URL = 'https://agoracosmica.org';
 const SCRIPTS_DIR = import.meta.dirname;
@@ -146,11 +148,6 @@ const FIGURE_TEMPLATE_MOD = gitLastModified(
   'marketing/src/pages/de/figures/[slug].astro',
   'marketing/src/components/FigureDetailContent.astro',
 );
-const THEME_TEMPLATE_MOD = gitLastModified(
-  'marketing/src/pages/themes/[theme].astro',
-  'marketing/src/pages/de/themes/[theme].astro',
-  'marketing/src/components/ThemeDetailContent.astro',
-);
 
 function figureLastmod(slug) {
   const figureId = SLUG_TO_ID[slug];
@@ -160,15 +157,6 @@ function figureLastmod(slug) {
     'client/src/data/public/figureSeo.ts',
   );
   return [FIGURE_TEMPLATE_MOD, contentMod].sort().reverse()[0];
-}
-
-function themeLastmod() {
-  // Theme content lives in public-en.json / public-de.json under themes.*
-  const contentMod = gitLastModified(
-    'client/src/assets/translations/public-en.json',
-    'client/src/assets/translations/public-de.json',
-  );
-  return [THEME_TEMPLATE_MOD, contentMod].sort().reverse()[0];
 }
 
 const LEGAL_MOD = {
@@ -310,11 +298,11 @@ const METHODOLOGY_MOD = gitLastModified(
 );
 urls.push(...crossPair('/methodology', '/de/methodik', '0.6', METHODOLOGY_MOD));
 
-// Theme detail pages
+// Theme detail pages, each dated by its own strings and quotes in its own
+// language, so a round that edits one theme moves one date.
 for (const theme of THEME_IDS) {
-  const mod = themeLastmod();
-  urls.push(url(`/themes/${theme}`, '0.8', mod));
-  urls.push(deUrl(`/themes/${theme}`, '0.8', mod));
+  urls.push(url(`/themes/${theme}`, '0.8', themeLastmod(theme, 'en')));
+  urls.push(deUrl(`/themes/${theme}`, '0.8', themeLastmod(theme, 'de')));
 }
 
 // Legal pages (German only, no hreflang pairs, no /de/ prefix)

@@ -6,7 +6,7 @@ import ThemeDetailContent from '../../../components/ThemeDetailContent.astro';
 import { getT } from '../../../i18n';
 import { articleSchema, breadcrumbSchema, faqSchema } from '../../../lib/schemas';
 import { canonicalUrl, publicUrl, SITE_URL, MEDIA_URL } from '../../../lib/urls';
-import { themeContentLastmod } from '../../../lib/lastmod';
+import { themeLastmod } from '../../../lib/themeLastmod.mjs';
 import { THEMES, type ThemeId } from '@client/data/councilCatalog';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import publicDe from '@client/assets/translations/public-de.json';
@@ -76,7 +76,7 @@ const schemas = [
     lang,
     image: themeOgImage,
     datePublished: LAUNCH_DATE,
-    dateModified: themeContentLastmod(),
+    dateModified: themeLastmod(themeId, lang),
   }),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
