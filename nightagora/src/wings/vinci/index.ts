@@ -1666,7 +1666,7 @@ export function createWing():VinciWingModule {
     add(here==='de'?stud.date_label_de:stud.date_label_en)
     add(here==='de'?stud.date_note_de:stud.date_note_en)
     add(SOURCE_READINGS[stud.id]?.[here])
-    add(stud.document);add(stud.holder)
+    add(here==='de'?(stud.document_de??stud.document):stud.document);add(here==='de'?(stud.holder_de??stud.holder):stud.holder)
     add(here==='de'?stud.qualifications_de:stud.qualifications_en)
     for(const gap of here==='de'?stud.gaps_de:stud.gaps)add(gap)
     // A link names the source as a person would, never the field it filled.
