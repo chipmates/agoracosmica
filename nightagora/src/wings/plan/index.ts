@@ -27,6 +27,8 @@ import type { PlanSite } from './types'
 export type { PlanHighlight, PlanRoom, PlanShape, PlanSite, PlanStation, RecapEntry } from './types'
 
 const HISTORY_MARK = 'wingPlan'
+/** the plate's words where a phone reads them: the museum's floor for any text */
+const PLATE_READING_PX = 13
 
 /** THE WIDE STAGE: the plate takes two thirds of the sheet, the reading
  * stands beside it, and the sheet takes the stage's own height. */
@@ -59,6 +61,9 @@ export interface WingPlanOptions {
    * are the wing's own, so the plan stands the control and knows nothing
    * about what it opens; a wing without a life view passes nothing. */
   life?(): { word: string; open(): void } | null
+  /** THE PLATE'S WORDS AT A PHONE'S READING SIZE, upright or sideways: the
+   * room names, the numerals and the north letter at 13 px */
+  reading?(): boolean
   /** where the hand goes when the sheet closes */
   returnFocus(): void
   /** True when an exhibit already pushed the entry this sheet should take,
@@ -191,9 +196,11 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     // page before it decides where the name may stand.
     plate = drawPlanPlate(site, area, {
       host: drawing, language, standing,
-      namePx: narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
-      nameFloor: narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide,
+      namePx: options.reading?.() ? PLATE_READING_PX : narrow ? PLATE_NAME_PX.narrow : PLATE_NAME_PX.wide,
+      nameFloor: options.reading?.() ? PLATE_READING_PX : narrow ? PLATE_NAME_FLOOR.narrow : PLATE_NAME_FLOOR.wide,
+      ...(options.reading?.() ? { numberPx: PLATE_READING_PX, farther: true } : {}),
     })
+    dialog.dataset['reading'] = String(Boolean(options.reading?.()))
     // The marks are DOM over the drawing, so the two share one pixel exactly.
     drawing.style.width = `${plate.width.toFixed(2)}px`
     drawing.style.height = `${plate.height.toFixed(2)}px`

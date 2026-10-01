@@ -93,6 +93,8 @@ export function mountFilmWays(host: FilmWaysHost): void {
         station: id => { const index = host.stops.findIndex(stop => stop.id === id); if (index >= 0) hosts.navigate(index) },
         highlight: id => openWork(id),
         life: () => ({ word: say(LIFE_WORDS.life), open: () => openLife() }),
+        // a phone's glass, upright or sideways, reads the plate's words at 13 px
+        reading: () => wing.dataset['film'] === 'upright' || wing.dataset['film'] === 'cinema',
         returnFocus, adopt: () => planAdopt })
       const life = m.createWingLife({ host: hosts.labels, lang, narrow: host.narrow, floor: host.floor,
         record: () => m.vinciLifeRecord(hangs),

@@ -488,3 +488,6 @@ html:has(#wing[data-film='upright']) #instruments .inst-links { display: flex; f
 html:has(#wing[data-film='upright']) #instruments .inst-wing {
   order: 1; margin: 6px 0 0; padding: 6px 0 0; box-shadow: inset 0 1px 0 var(--press-hairline);
 }
+
+/* ---- THE PLAN'S PLATE AT A PHONE'S READING SIZE, both forms ---- */
+#wing .wing-plan[data-reading='true'] :is(.wing-plan-number, .wing-plan-north-letter) { font-size: 13px; }

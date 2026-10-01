@@ -151,6 +151,11 @@ export interface PlanPlateOptions {
   standing: string
   namePx?: number
   nameFloor?: number
+  /** the numeral's size where a stage reads it larger than the plate's own */
+  numberPx?: number
+  /** names at a reading size need more places to stand: on longer leaders
+   * and off the corners, tried after the plate's own four */
+  farther?: boolean
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -212,6 +217,7 @@ export function drawPlanPlate(
   const { language } = options
   const namePx = options.namePx ?? PLATE_NAME_PX.wide
   const nameFloor = options.nameFloor ?? PLATE_NAME_FLOOR.wide
+  const numberPx = options.numberPx ?? PLATE_NUMBER_PX
   const box = bounds(site)
   const spanEast = Math.max(1, box.east - box.west + PLATE_PAD_M * 2)
   const spanNorth = Math.max(1, box.north - box.south + PLATE_PAD_M * 2)
@@ -330,11 +336,11 @@ export function drawPlanPlate(
   const head = node('polygon', 'wing-plan-north-head')
   head.setAttribute('points', `${x},${top - 6} ${x - 4},${top + 2} ${x + 4},${top + 2}`)
   const letter = node('text', 'wing-plan-north-letter')
-  letter.setAttribute('x', String(x)); letter.setAttribute('y', String(tail + 11))
+  letter.setAttribute('x', String(x)); letter.setAttribute('y', String(tail + 2 + numberPx))
   letter.textContent = 'N'
   arrow.append(stem, head, letter)
   element.append(arrow)
-  taken.push({ l: x - 9, t: top - 8, r: x + 9, b: tail + 14 })
+  taken.push({ l: x - 9, t: top - 8, r: x + 9, b: tail + 5 + numberPx })
 
   /* THE MARKS, then their numerals, then the names. The order is the order
      of what a mark is worth: a dot without its numeral says nothing, and a
@@ -352,7 +358,7 @@ export function drawPlanPlate(
   const compass = [[1, -1], [-1, -1], [1, 1], [-1, 1], [0, -1], [0, 1], [1, 0], [-1, 0]] as const
   for (const mark of marks) {
     const words = String(mark.number)
-    const w = textWidth(words, PLATE_NUMBER_PX, NUMBER_TRACKING), h = PLATE_NUMBER_PX
+    const w = textWidth(words, numberPx, NUMBER_TRACKING), h = numberPx
     const reach = mark.here ? RING_HERE : RING
     let first: { dx: number; dy: number; box: Box } | null = null
     let chosen: { dx: number; dy: number; box: Box } | null = null
@@ -384,7 +390,7 @@ export function drawPlanPlate(
   const named: string[] = []
   for (const entry of [...wanted].sort((a, b) => b.area - a.area)) {
     const mid = { x: (entry.room.l + entry.room.r) / 2, y: (entry.room.t + entry.room.b) / 2 }
-    const tries: { x: number; y: number; size: number; leader: Seg | null }[] = []
+    const tries: { x: number; y: number; size: number; leader: Seg | null; far?: boolean }[] = []
     const held = nameSize(entry.words, entry.room.r - entry.room.l, namePx, nameFloor)
     if (held !== null) {
       const tall = measured(entry.words, held).h
@@ -417,7 +423,20 @@ export function drawPlanPlate(
       { x: mid.x, y: entry.room.t - LEADER_GAP - tall / 2, from: { x: mid.x, y: entry.room.t } },
       { x: mid.x, y: entry.room.b + LEADER_GAP + tall / 2, from: { x: mid.x, y: entry.room.b } },
     ]
-    for (const spot of beside) {
+    if (options.farther) for (const reach of [2, 3.5]) {
+      const gap = LEADER_GAP * reach
+      beside.push(
+        { x: entry.room.r + gap + out / 2, y: mid.y, from: { x: entry.room.r, y: mid.y } },
+        { x: entry.room.l - gap - out / 2, y: mid.y, from: { x: entry.room.l, y: mid.y } },
+        { x: mid.x, y: entry.room.t - gap - tall / 2, from: { x: mid.x, y: entry.room.t } },
+        { x: mid.x, y: entry.room.b + gap + tall / 2, from: { x: mid.x, y: entry.room.b } },
+        { x: entry.room.r + gap / 2 + out / 2, y: entry.room.t - gap / 2 - tall / 2, from: { x: entry.room.r, y: entry.room.t } },
+        { x: entry.room.l - gap / 2 - out / 2, y: entry.room.t - gap / 2 - tall / 2, from: { x: entry.room.l, y: entry.room.t } },
+        { x: entry.room.r + gap / 2 + out / 2, y: entry.room.b + gap / 2 + tall / 2, from: { x: entry.room.r, y: entry.room.b } },
+        { x: entry.room.l - gap / 2 - out / 2, y: entry.room.b + gap / 2 + tall / 2, from: { x: entry.room.l, y: entry.room.b } },
+      )
+    }
+    for (const [index, spot] of beside.entries()) {
       // THE LEADER TOUCHES THE THING IT NAMES: a room's own edge, and for an
       // outline the outline itself and not the corner of its box. It stops
       // where the name's halo starts.
@@ -427,7 +446,7 @@ export function drawPlanPlate(
       const edge = Math.min(Math.abs(dx) > .01 ? (out / 2 + CLEAR) / Math.abs(dx) * span : Infinity,
         Math.abs(dy) > .01 ? (tall / 2 + CLEAR) / Math.abs(dy) * span : Infinity, span)
       tries.push({
-        x: spot.x, y: spot.y, size: namePx,
+        x: spot.x, y: spot.y, size: namePx, far: index >= 4,
         leader: { ax: foot.x, ay: foot.y, bx: spot.x + dx / span * edge, by: spot.y + dy / span * edge },
       })
     }
@@ -440,6 +459,8 @@ export function drawPlanPlate(
       if (!inside(test)) continue
       if (taken.some(hold => meets(test, hold))) continue
       if (walls.some(wall => crosses(wall, test))) continue
+      // a long leader may not cut through a mark, a numeral or another name
+      if (spot.far && spot.leader && taken.some(hold => crosses(spot.leader!, hold))) continue
       put = { ...spot, box: place }
       break
     }
