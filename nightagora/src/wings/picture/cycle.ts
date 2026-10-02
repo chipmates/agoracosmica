@@ -9,6 +9,7 @@ import cycleCss from './cycle.css?inline'
 import type { PictureBox, PictureFraming } from './seam'
 import type { VitrinePayload, VitrinePayloadHost } from '../vitrine/types'
 import { islandFit } from '../vitrine/fit'
+import { deskStageHeight } from '../desk-stage'
 import { paintSlider } from '../vitrine/slider'
 import { folioDoor, type FolioSheet } from '../vitrine/folio'
 
@@ -26,6 +27,10 @@ export interface FilmCycleFraming {
   poster: CycleFile
   /** each step's frame, and the outline of the part it names */
   steps: { frame: number; outline: CycleFile | null }[]
+  /** THE MACHINE OVER ITS WHOLE RUN in this frame, CSS pixels [left, top,
+      right, bottom]: every body, every moving part, its travel; never its
+      shadow. A cycle recorded before the extent was measured has none. */
+  extent?: { box: [number, number, number, number] }
 }
 
 export interface FilmCycle {
@@ -43,11 +48,74 @@ const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?:
   if (text !== undefined) node.textContent = text
   return node
 }
-/** the smallest rung that still carries the box's device pixels, within a tenth */
-function rungFor(files: Record<string, CycleFile>, box: PictureBox, aspect: number): string {
+/** the smallest rung that still carries the box's device pixels, or the frame's as it is shown where that is wider, within a tenth */
+function rungFor(files: Record<string, CycleFile>, box: PictureBox, aspect: number, shown: number): string {
   const rungs = Object.keys(files).map(k => k.split('x').map(Number) as [number, number]).sort((a, b) => a[0] - b[0])
-  const across = Math.max(box.width, box.height * aspect) * (devicePixelRatio || 1)
+  const across = Math.max(box.width, box.height * aspect, shown) * (devicePixelRatio || 1)
   return (rungs.find(r => r[0] >= across * 0.9) ?? rungs[rungs.length - 1]!).join('x')
+}
+
+/** the air left round the machine on every side, a share of the free box's shorter side */
+export const CYCLE_MARGIN = 0.04
+
+export interface CycleFit { left: number; top: number; width: number; height: number; scale: number; covers: boolean }
+
+/** one axis: where the frame's near edge stands. The machine keeps its margin
+    inside the box (`lo` to `hi`); the frame covers `from` to `to` where it can.
+    Covering never moves the machine out of its box. */
+function placeAxis(centred: number, span: number, lo: number, hi: number, from: number, to: number): number {
+  const c0 = to - span, c1 = from
+  if (c0 > c1) return centred
+  const a = Math.max(lo, c0), b = Math.min(hi, c1)
+  if (a <= b) return Math.min(b, Math.max(a, centred))
+  return c1 < lo ? lo : hi
+}
+
+/** THE MACHINE AS BIG AS ITS BOX ALLOWS: the largest scale at which the
+    machine's extent, with an even margin, fits the free box, the extent
+    centred on it; the frame is then moved, never scaled, to cover what it
+    must, as far as the machine stays inside its box. A frame with no extent
+    is fitted by the island's fitting box, centred, as before. */
+export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' | 'extent'>, box: PictureBox, cover: PictureBox,
+  margin = CYCLE_MARGIN): CycleFit {
+  const W = frame.master[0] / frame.dpr, H = frame.master[1] / frame.dpr
+  const [x0, y0, x1, y1] = frame.extent?.box ?? [(W - frame.fit[0]) / 2, (H - frame.fit[1]) / 2, (W + frame.fit[0]) / 2, (H + frame.fit[1]) / 2]
+  const air = frame.extent ? margin * Math.min(box.width, box.height) : 0
+  const scale = Math.min((box.width - 2 * air) / Math.max(1, x1 - x0), (box.height - 2 * air) / Math.max(1, y1 - y0))
+  const width = W * scale, height = H * scale
+  const left = placeAxis(box.left + box.width / 2 - ((x0 + x1) / 2) * scale, width,
+    box.left + air - x0 * scale, box.left + box.width - air - x1 * scale, cover.left, cover.left + cover.width)
+  const top = placeAxis(box.top + box.height / 2 - ((y0 + y1) / 2) * scale, height,
+    box.top + air - y0 * scale, box.top + box.height - air - y1 * scale, cover.top, cover.top + cover.height)
+  const covers = left <= cover.left + 0.5 && top <= cover.top + 0.5
+    && left + width >= cover.left + cover.width - 0.5 && top + height >= cover.top + cover.height - 0.5
+  return { left, top, width, height, scale, covers }
+}
+
+/** THE GROUND BESIDE A FRAME THAT CANNOT COVER: the frame's outermost rows and
+    columns drawn out to the cover's edge at a quarter of its pixels, so the
+    air and the floor run on and no room stands beside the machine. The strip
+    drawn out is this share of the source's width. */
+const GROUND = { scale: 0.25, strip: 0.008 }
+export function paintGround(canvas: HTMLCanvasElement, source: CanvasImageSource, size: [number, number], at: PictureBox, frame: PictureBox): void {
+  const k = GROUND.scale
+  const w = Math.max(1, Math.ceil(at.width * k)), h = Math.max(1, Math.ceil(at.height * k))
+  if (canvas.width !== w) canvas.width = w
+  if (canvas.height !== h) canvas.height = h
+  const ink = canvas.getContext('2d')
+  if (!ink) return
+  const [sw, sh] = size
+  const fx0 = (frame.left - at.left) * k, fy0 = (frame.top - at.top) * k
+  const fx1 = fx0 + frame.width * k, fy1 = fy0 + frame.height * k
+  const p = Math.max(1, Math.round(sw * GROUND.strip))
+  // three columns and three rows of the source, each drawn over its part of the cover: the middle is the frame itself
+  const cols = [[0, p, 0, fx0], [0, sw, fx0, fx1 - fx0], [sw - p, p, fx1, w - fx1]] as const
+  const rows = [[0, p, 0, fy0], [0, sh, fy0, fy1 - fy0], [sh - p, p, fy1, h - fy1]] as const
+  ink.imageSmoothingEnabled = true
+  for (const [sx, sWidth, dx, dWidth] of cols) {
+    if (dWidth <= 0) continue
+    for (const [sy, sHeight, dy, dHeight] of rows) if (dHeight > 0) ink.drawImage(source, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+  }
 }
 
 export function createCyclePayload(options: {
@@ -70,6 +138,9 @@ export function createCyclePayload(options: {
   const { cycle, steps } = options
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, video: HTMLVideoElement | undefined, poster: HTMLImageElement | undefined
+  let ground: HTMLCanvasElement | undefined
+  /** where the frame stands now, and the part of the screen its ground fills where it cannot cover */
+  let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false
   let outline: HTMLImageElement | undefined
   let play: HTMLButtonElement | undefined, slider: HTMLInputElement | undefined
   let stepButtons: HTMLButtonElement[] = []
@@ -93,20 +164,58 @@ export function createCyclePayload(options: {
     return found
   }
 
-  /** THE MACHINE WHERE THE ISLAND WOULD STAND IT: the frame scaled as the
-      island's fitting box is, and centred on it; the frame's margins cover the box */
+  /** WHAT THE FRAME MUST COVER: the glass on the phone, the stage over the band on the desktop */
+  function coverOf(h: VitrinePayloadHost): PictureBox {
+    if (!h.narrow) return { left: 0, top: 0, width: innerWidth, height: deskStageHeight() }
+    const r = h.element.getBoundingClientRect()
+    return { left: r.left, top: r.top, width: r.width, height: r.height }
+  }
+  /** THE MACHINE AS BIG AS ITS BOX ALLOWS, never cut (`cycleFit`); where the
+      frame cannot cover the glass as well, its ground does, over the glass's
+      breadth and as high as the frame stands on the screen */
   function fit(): void {
     if (!root || !host) return
     const f = at()
     if (!f) return
-    const box = islandFit(host)
-    // on the phone the frame always covers the glass's width: a short glass (a browser's own bar
-    // showing) would otherwise shrink it to a column with the room standing beside it
-    const cover = host.narrow ? host.element.getBoundingClientRect().width / (f.master[0] / f.dpr) : 0
-    const scale = Math.max(cover, Math.min(box.width / f.fit[0], box.height / f.fit[1]))
-    const width = (f.master[0] / f.dpr) * scale, height = (f.master[1] / f.dpr) * scale
-    Object.assign(root.style, { left: `${box.left + (box.width - width) / 2}px`, top: `${box.top + (box.height - height) / 2}px`,
-      width: `${width}px`, height: `${height}px` })
+    const cover = coverOf(host)
+    fitted = cycleFit(f, islandFit(host), cover)
+    Object.assign(root.style, { left: `${fitted.left}px`, top: `${fitted.top}px`, width: `${fitted.width}px`, height: `${fitted.height}px` })
+    if (fitted.covers) groundAt = null
+    else if (!host.narrow) groundAt = cover
+    else {
+      const top = Math.min(cover.top, Math.max(0, fitted.top))
+      const bottom = Math.max(cover.top + cover.height, Math.min(innerHeight, fitted.top + fitted.height))
+      groundAt = { left: cover.left, top, width: cover.width, height: bottom - top }
+    }
+    if (ground) {
+      ground.hidden = true
+      if (groundAt) {
+        Object.assign(ground.style, { left: `${groundAt.left}px`, top: `${groundAt.top}px`, width: `${groundAt.width}px`, height: `${groundAt.height}px` })
+        drawGround()
+        followGround()
+      }
+    }
+  }
+  function groundSource(): { source: CanvasImageSource; size: [number, number] } | null {
+    if (video && shown && video.readyState >= 2 && video.videoWidth) return { source: video, size: [video.videoWidth, video.videoHeight] }
+    if (poster?.complete && poster.naturalWidth) return { source: poster, size: [poster.naturalWidth, poster.naturalHeight] }
+    return null
+  }
+  function drawGround(): void {
+    if (!ground || !groundAt || !fitted) return
+    const from = groundSource()
+    if (!from) return
+    paintGround(ground, from.source, from.size, groundAt, fitted)
+    ground.hidden = false
+  }
+  /** a running clip's ground is drawn again at each of its frames */
+  function followGround(): void {
+    if (!video || !groundAt || groundAsked || video.paused) return
+    groundAsked = true
+    const next = (): void => { groundAsked = false; drawGround(); followGround() }
+    const withCallback = video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number }
+    if (withCallback.requestVideoFrameCallback) withCallback.requestVideoFrameCallback(next)
+    else requestAnimationFrame(next)
   }
 
   function paint(): void {
@@ -188,16 +297,23 @@ export function createCyclePayload(options: {
     outline = make('img', 'na-cycle-outline')
     outline.alt = ''
     root.append(style, poster, video, outline)
-    options.host.append(root)
+    ground = make('canvas', 'na-cycle-ground')
+    ground.setAttribute('aria-hidden', 'true')
+    ground.hidden = true
+    Object.assign(ground.style, { position: 'fixed', pointerEvents: 'none' })
+    options.host.append(ground, root)
+    poster.addEventListener('load', drawGround, { signal })
+    video.addEventListener('seeked', drawGround, { signal })
+    video.addEventListener('play', followGround, { signal })
     fit()
     if (f) {
       poster.src = address(f.poster.file)
-      const rung = rungFor(f.files, options.box(), f.master[0] / f.master[1])
+      const rung = rungFor(f.files, options.box(), f.master[0] / f.master[1], fitted?.width ?? 0)
       video.src = address(f.files[rung]!.file)
       video.dataset['rung'] = rung
     }
     // the clip is shown only once its first frame is presented over the poster
-    const reveal = (): void => { if (!video || shown) return; shown = true; video.classList.add('shown') }
+    const reveal = (): void => { if (!video || shown) return; shown = true; video.classList.add('shown'); drawGround() }
     const withCallback = video as HTMLVideoElement & { requestVideoFrameCallback?: (cb: () => void) => number }
     video.addEventListener('loadeddata', () => {
       if (withCallback.requestVideoFrameCallback) withCallback.requestVideoFrameCallback(() => reveal())
@@ -318,8 +434,8 @@ export function createCyclePayload(options: {
       poster!.src = address(f.poster.file)
       shown = false
       video.classList.remove('shown')
-      video.src = address(f.files[rungFor(f.files, options.box(), f.master[0] / f.master[1])]!.file)
-      video.addEventListener('loadeddata', () => { shown = true; video?.classList.add('shown'); land(step) }, { once: true, signal })
+      video.src = address(f.files[rungFor(f.files, options.box(), f.master[0] / f.master[1], fitted?.width ?? 0)]!.file)
+      video.addEventListener('loadeddata', () => { shown = true; video?.classList.add('shown'); land(step); drawGround() }, { once: true, signal })
     },
     key(event) {
       if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') { turn(event.key === 'ArrowRight' ? 1 : -1); return true }
@@ -329,7 +445,9 @@ export function createCyclePayload(options: {
       listening.abort()
       if (video) { video.pause(); video.removeAttribute('src'); video.load() }
       root?.remove()
-      root = undefined; video = undefined; poster = undefined; outline = undefined
+      ground?.remove()
+      root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined
+      fitted = null; groundAt = null
       host = undefined
     },
     landed: () => landed,
