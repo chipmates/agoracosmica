@@ -30,6 +30,7 @@ import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEveni
 import { walkedClip } from '../../../forge/film/walks.mjs'
 import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook, FilmLookWays } from './film-look'
+import type { VitrineOnward } from '../vitrine'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { createDeskOverview, type DeskOverview, type DeskOverviewCell } from '../overview'
 import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
@@ -78,6 +79,9 @@ const BOOK = 'M8 3.2a4.8 4.8 0 1 0 0 9.6a4.8 4.8 0 1 0 0-9.6M8 6.2v3.6M6.2 8h3.6
 const TRIANGLE_BACK = 'M11 3.5L4.5 8 11 12.5z'
 const STEP_BACK = 'M10 3L5 8l5 5'
 const RING = 2 * Math.PI * 20.5
+/** the most a mark is lifted to stand clear of the phone's box: sideways
+    takes 28, upright the Baptism's mark on Safari's short glass needs 37 */
+const MARK_LIFT = 40
 
 /** The release the address names: `?film=<name>` under the origin's `/film/`. */
 export function filmReleaseBase(): string {
@@ -364,7 +368,12 @@ export function createWing(): WingModule {
         if (clear === null) continue
         y = clear
         if (crowded(x, y, dots)) continue
-      } else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) continue
+      } else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) {
+        // upright a mark the box would swallow stands just above it, and gives way past the lift or beside another mark
+        const lifted = avoid.top - 4 - 22
+        if (y - lifted > MARK_LIFT || crowded(x, lifted, dots)) continue
+        y = lifted
+      }
       const walks = routable(mark.id)
       const dot = make('button', 'vinci-dot vinci-exhibit-dot film-dot')
       dot.type = 'button'
@@ -509,6 +518,8 @@ export function createWing(): WingModule {
      The hall is one room under two stations, and both hold its one row. */
   let cellsNow: DeskOverviewCell[] = []
   let cellsFor = ''
+  /** the room the cells now held were read for: until the next room's land, the phone counts nothing */
+  let cellsAt = ''
   function setOf(station: string): string[] {
     const sets = release?.sets ?? {}
     if (station === 'flight' || station === 'works') return [...(sets['flight'] ?? []), ...(sets['works'] ?? [])]
@@ -518,13 +529,14 @@ export function createWing(): WingModule {
     return sets[station] ?? []
   }
   const atTable = (): boolean => stationOf(LIFE[card]!.station).id === 'reading-table'
+  // the release's sets are read into the key: a look that loads before the release counts again once it lands
+  const roomKey = (): string => `${stationOf(LIFE[card]!.station).id}|${lang()}|${release ? 'sets' : ''}`
   function refreshCells(): void {
     const station = stationOf(LIFE[card]!.station).id
-    // the release's sets are read into the key: a look that loads before the release counts again once it lands
-    const key = `${station}|${lang()}|${release ? 'sets' : ''}`
+    const key = roomKey()
     if (!look || key === cellsFor) return
     cellsFor = key
-    void look.cells(setOf(station)).then(cells => { if (cellsFor === key) { cellsNow = cells; paintDesk() } })
+    void look.cells(setOf(station)).then(cells => { if (cellsFor === key) { cellsNow = cells; cellsAt = key; paintDesk(); phoneList?.paint() } })
   }
   /** THE CLOSE LOOK'S WAYS ALONG ITS SET: the room's own row, and a step to a
       neighbour goes as its mark goes, the look shut where it stands (not up
@@ -543,7 +555,7 @@ export function createWing(): WingModule {
       list: () => { if (!phoneList) return false; phoneList.control.click(); return phoneList.standing() },
     }
   }
-  /** THE ROOM'S LIST, the same on the desk's band and in the phone's drawer */
+  /** THE ROOM'S LIST, the same on the desk's band and in the phone's key row */
   function listHost(): NonNullable<Parameters<typeof createDeskChrome>[0]['overview']> {
     return {
       cells: () => cellsNow,
@@ -679,10 +691,11 @@ export function createWing(): WingModule {
     goldPath: SVGPathElement
   } | undefined
   let drawerOpen = false
-  /* THE ROOM'S LIST ON THE PHONE: its word stands at the drawer's foot under
-     the door's ask, since the key row has no room for it at 390 and a row of
-     its own at rest would take the picture under two thirds; it opens the set
-     as a sheet at the glass's tall height */
+  /* THE ROOM'S LIST ON THE PHONE: its count stands in the key row at rest,
+     between "Mehr lesen" and the stop's number, as the desktop's band stands
+     it beside "Mehr lesen"; the record takes the drawer's foot, one step
+     deeper, as the desktop keeps it. It opens the set as a sheet at the
+     glass's tall height. */
   let phoneList: DeskOverview | undefined
   function buildPhone(h: WingHosts): void {
     const root = make('div', 'film-box')
@@ -696,13 +709,14 @@ export function createWing(): WingModule {
     const more = make('button', 'film-key film-more')
     more.type = 'button'
     more.setAttribute('aria-controls', drawer.id)
-    const from = make('button', 'film-key film-from')
+    // the record's row at the drawer's foot, under the door's ask (paintPhone)
+    const from = make('button', 'film-ask film-from')
     from.type = 'button'
     // the count is the way into the story's index, as the panel's chapters row with the same count is
     const count = make('button', 'film-key film-count')
     count.type = 'button'
     count.setAttribute('aria-haspopup', 'dialog')
-    keys.append(more, from, count)
+    keys.append(more, count)
     const foot = make('div', 'film-foot')
     const back = make('button', 'film-back')
     back.type = 'button'
@@ -802,12 +816,20 @@ export function createWing(): WingModule {
         ask.addEventListener('click', () => door.click())
         phone.drawer.append(ask)
       }
-      if (phoneList) { phoneList.paint(); phone.drawer.append(phoneList.control) }
     }
     phone.more.textContent = ''
     phone.more.append(document.createTextNode(text(drawerOpen ? LOBBY_TEXT.close : deskControl('shared', 'read_more'))), icon(drawerOpen ? ARROW_DOWN : ARROW_UP))
     phone.more.hidden = !stop?.drawer
+    // the record is the drawer's last row; a stop without a drawer keeps it in the key row
+    const sheltered = Boolean(stop?.drawer)
+    phone.from.className = sheltered ? 'film-ask film-from' : 'film-key film-from'
     phone.from.textContent = text(deskControl('machine', 'provenance'))
+    if (sheltered) {
+      phone.from.append(icon(ARROW_UP, 'film-ic film-ic-out'))
+      if (drawerOpen) phone.drawer.append(phone.from)
+      else phone.from.remove()
+    } else if (phone.from.parentElement !== phone.keys) phone.keys.insertBefore(phone.from, phone.count)
+    phoneList?.paint()
     phone.count.textContent = `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`
     phone.count.setAttribute('aria-label', `${text(deskControl('ways', 'chapters'))} ${card + 1} / ${LIFE.length}`)
     const back = backIndex()
@@ -1169,8 +1191,11 @@ export function createWing(): WingModule {
     })
     if (form !== 'desk') {
       buildPhone(h)
-      phoneList = createDeskOverview({ ...listHost(), columns: () => 2, lang, mark: deskMark, sheet: true })
+      // the phone counts only the room it stands in: walking into the next room the key waits for that room's cells
+      phoneList = createDeskOverview({ ...listHost(), cells: () => (cellsAt === roomKey() ? cellsNow : []), columns: () => 2, lang, mark: deskMark, sheet: true })
       h.labels.append(phoneList.element)
+      phoneList.control.classList.add('film-key')
+      phone!.keys.insertBefore(phoneList.control, phone!.count)
       // the panel's rows are the film's ways' own where the phone stood upright at the mount
       cinema = createFilmCinema({ wing, box: phone!.root, stop: () => LIFE[card]!.id, rows: form === 'cinema',
         count: () => `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`, signal })
@@ -1224,6 +1249,19 @@ export function createWing(): WingModule {
       if (!desk && (e.key === ' ' || e.key === 'Spacebar') && !target.closest('button,a')) { e.preventDefault(); pressOn(); return }
       if (e.key === 'ArrowRight' || e.key === 'ArrowDown') { e.preventDefault(); pressOn() }
       if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') { e.preventDefault(); if (up()) return; const to = backIndex(); if (to !== null) h.navigate(to) }
+    }, { signal })
+    /* THE DESKTOP'S GOLD AT A SET'S END carries the stop's own way on, as the
+       phone's gold does there: the next stop by its chapter, or the look up at
+       the last. Asked by the close look's band (vitrine's VITRINE_ONWARD, named
+       here, since the vitrine loads after the first picture). */
+    h.labels.addEventListener('na-vitrine-onward', event => {
+      const asked = (event as CustomEvent<{ onward: VitrineOnward | null }>).detail
+      if (form !== 'desk' || !asked) return
+      const to = nextIndex()
+      asked.onward = to !== null
+        ? { kicker: text(CARDS.controls.date.next), title: text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name), go: () => hosts?.navigate(to) }
+        : { kicker: text(deskControl('walk', 'the_end')), title: text(deskControl('ending', 'lookup')), up: true,
+          go: () => { if (!endWith('lookup')) wing.querySelector<HTMLElement>('.wing-lobby')?.click() } }
     }, { signal })
     // the grave's talk choice opens the library's door, as in the live wing
     addEventListener('na-wing-ending', e => {

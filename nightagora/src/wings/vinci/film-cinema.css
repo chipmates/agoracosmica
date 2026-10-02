@@ -154,13 +154,13 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* the column's parts keep their own heights: shrunk to fit, the age stood on
    the line under it and the keys lost their foot */
 #wing[data-film='cinema'] .cinema-panel > * { flex-shrink: 0; }
-/* the drawer's two ways, the Echo and the room's list, share one row, so the
-   list stands in view under the words as the Echo's question does */
-#wing[data-film='cinema'] .cinema-panel > .film-drawer:not([hidden]):has(> .film-ask + .desk-ov-open:not([hidden])) {
+/* the drawer's two ways, the Echo and the record, share one row, so the
+   record stands in view under the words as the Echo's question does */
+#wing[data-film='cinema'] .cinema-panel > .film-drawer:not([hidden]):has(> .film-ask + .film-from) {
   display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); column-gap: 16px;
 }
-#wing[data-film='cinema'] .cinema-panel > .film-drawer > :not(.film-ask, .desk-ov-open) { grid-column: 1 / -1; }
-#wing[data-film='cinema'] .cinema-panel > .film-drawer > :is(.film-ask, .desk-ov-open) { margin-top: 6px; }
+#wing[data-film='cinema'] .cinema-panel > .film-drawer > :not(.film-ask) { grid-column: 1 / -1; }
+#wing[data-film='cinema'] .cinema-panel > .film-drawer > .film-ask { margin-top: 6px; }
 #wing[data-film='cinema'] .cinema-panel > .film-drawer > .vinci-phone-question { margin-top: 8px; }
 /* the way back to the strip stays at the column's foot while the words scroll by */
 #wing[data-film='cinema'] .cinema-panel > .film-keys {

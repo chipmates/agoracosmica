@@ -52,6 +52,18 @@ export interface Vitrine {
   dispose(): void
 }
 
+/** THE WAY ON PAST A SET'S END. Where the set ends, the band's gold asks the
+ * window's host with this event on the host element; a host that answers
+ * fills `detail.onward` in the page's language, and the gold carries it. */
+export const VITRINE_ONWARD = 'na-vitrine-onward'
+export interface VitrineOnward {
+  kicker: string
+  title: string
+  /** the way leads up, not on: the walk's last stop */
+  up?: boolean
+  go(): void
+}
+
 const HISTORY_MARK = 'vinciExhibit'
 /** A resized canvas is a cleared canvas: it draws this many frames of the
  * room before a held payload may hold it again. */
@@ -604,6 +616,8 @@ export function createVitrine(options: {
     // shelf the gold rests, and the book's own arrows keep turning its pages.
     const on = walk[1] ?? live(steps[1]) ?? null
     const back = walk[0] ?? live(steps[0]) ?? null
+    // past the set's end the host may hand the gold its own way on
+    const onward = live(on) ? null : onwardOf()
     // A MACHINE'S STEPS ARE THE RUN'S CAPTIONS, one at a time under the work,
     // so the list of them does not stand in the label as well.
     const paged = next.payload?.kind !== 'machine'
@@ -623,13 +637,26 @@ export function createVitrine(options: {
       record: roles.get('record') ?? null,
       text: roles.get('text') ?? null,
       back,
-      on,
+      on: onward ? onwardPress(onward) : on,
       // the work the way on leads to, where the set knows its name
-      onTitle: on && walk.includes(on) ? on.getAttribute('aria-label') : null,
+      onTitle: onward ? onward.title : on && walk.includes(on) ? on.getAttribute('aria-label') : null,
       // no walk of the wing's: the way on is the payload's own page, or none
-      paging: !walk[1],
-      onKicker: next.onKicker ?? null,
+      paging: !onward && !walk[1],
+      onKicker: onward?.kicker ?? next.onKicker ?? null,
+      onUp: Boolean(onward?.up),
     })
+  }
+  function onwardOf(): VitrineOnward | null {
+    const asked = new CustomEvent<{ onward: VitrineOnward | null }>(VITRINE_ONWARD, { detail: { onward: null } })
+    host.dispatchEvent(asked)
+    return asked.detail.onward
+  }
+  /** the band presses a node, so the host's way on is one it never shows */
+  function onwardPress(onward: VitrineOnward): HTMLElement {
+    const press = make('button', '')
+    press.type = 'button'
+    press.addEventListener('click', () => onward.go())
+    return press
   }
 
   /** Our own entry, so a visitor's Back dismisses the exhibit and nothing

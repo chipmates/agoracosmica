@@ -118,6 +118,9 @@ const STAND_CLEAR = 22
 
 /** One step nearer, which is what a press and a key each take. */
 const ZOOM_STEP = 1.4
+/** A double tap's one step in from the whole, a reading size for a line of
+ * a page shown whole on a phone; the ceiling caps it. */
+const READING_STEP = 3
 /** Frames the room draws at the standing eye before it is held, so the
  * frame the viewer seats on is the arrival and not the last stride. */
 const SETTLE_FRAMES = 2
@@ -404,6 +407,19 @@ export function createDeepPlatePayload(options: {
       made.tileCache = new loaded.TileCache({ maxImageCacheCount: Math.round(cap / 2) })
     }
     made.addHandler('canvas-key', event => { event.preventDefaultAction = true })
+    // ON A PHONE A FINGER'S DOUBLE TAP goes in toward the finger at the whole
+    // and back to the whole anywhere else; a mouse keeps the library's own
+    made.addHandler('canvas-double-click', event => {
+      const said = event.originalEvent as (Event & { pointerType?: string }) | undefined
+      const finger = said?.pointerType === 'touch' || said?.pointerType === 'pen' || Boolean(said && 'touches' in said)
+      if (!host?.narrow || !finger) return
+      event.preventDefaultAction = true
+      const now = host.reducedMotion
+      if (homeZoom && Math.abs(made.viewport.getZoom(true) - homeZoom) <= homeZoom * .02) {
+        made.viewport.zoomTo(homeZoom * READING_STEP, made.viewport.pointFromPixel(event.position, true), now)
+        made.viewport.applyConstraints(now)
+      } else fitHome(now)
+    })
     // The first page seats itself on the room's own frame; every page after
     // it opens at Home in a window that already stands.
     made.addHandler('open', () => { placeGround(); if (seated) fitHome(true); else seatNow() })
@@ -474,10 +490,14 @@ export function createDeepPlatePayload(options: {
     viewer.viewport.applyConstraints(now)
   }
 
-  function press(label: string, run: () => void): HTMLButtonElement {
+  /** Every control here acts on the picture, and says how, as the reader's
+   * own row says it: a host that keeps the picture's controls apart from its
+   * words reads the role. */
+  function press(label: string, run: () => void, role: 'whole' | 'nearer' | 'further' | 'detail'): HTMLButtonElement {
     const button = host!.element.ownerDocument.createElement('button')
     button.type = 'button'
     button.className = 'vitrine-control'
+    button.dataset['zoom'] = role
     button.textContent = label
     button.addEventListener('click', run)
     return button
@@ -521,14 +541,14 @@ export function createDeepPlatePayload(options: {
       next.describe(shown.description ?? shown.title)
       next.controls.append(press(options.words.whole, () => {
         fitHome(host?.reducedMotion ?? false)
-      }))
+      }, 'whole'))
       // A HAND THAT CANNOT SPIN A WHEEL still reaches the ceiling: the two
       // steps stand beside the fit, at the row's own size.
-      next.controls.append(press(options.words.nearer, () => zoom(ZOOM_STEP)),
-        press(options.words.further, () => zoom(1 / ZOOM_STEP)))
+      next.controls.append(press(options.words.nearer, () => zoom(ZOOM_STEP), 'nearer'),
+        press(options.words.further, () => zoom(1 / ZOOM_STEP), 'further'))
       // ONE CONTROL PER LINE THAT POINTS: the name is the one the wing's own
       // register already carries, in both languages.
-      for (const detail of shown.details ?? []) next.controls.append(press(detail.name, () => frame(detail)))
+      for (const detail of shown.details ?? []) next.controls.append(press(detail.name, () => frame(detail), 'detail'))
       settled = 0
       arrived = !options.standing
       if (arrived) arrive()

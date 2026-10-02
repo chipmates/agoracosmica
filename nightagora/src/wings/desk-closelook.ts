@@ -58,6 +58,8 @@ export interface CloseLookView {
   paging: boolean
   /** the gold control's word where the set names its own next object */
   onKicker?: string | null
+  /** the way on leads up, the walk's last way, and the gold's arrow says so */
+  onUp?: boolean
 }
 
 export interface CloseLookBand {
@@ -79,6 +81,7 @@ export interface CloseLookBand {
 
 const SVG = 'http://www.w3.org/2000/svg'
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
+const ARROW_UP = 'M8 13V3M4 7l4-4 4 4'
 const ARROW_BACK = 'M13 8H3M7 4L3 8l4 4'
 const STEP_BACK = 'M10 3L5 8l5 5'
 
@@ -257,6 +260,7 @@ export function createCloseLookBand(options: {
     onTitle.hidden = !target
     on.disabled = !on_ || on_.disabled
     on.setAttribute('aria-label', `${onKicker.textContent}${onTitle.hidden ? '' : ` · ${onTitle.textContent}`}`)
+    onArrow.querySelector('path')?.setAttribute('d', view.onUp ? ARROW_UP : ARROW_ON)
     const back = view.back as HTMLButtonElement | null
     backWay.disabled = !back || back.disabled
     backWay.setAttribute('aria-label', back?.getAttribute('aria-label') ?? '')
