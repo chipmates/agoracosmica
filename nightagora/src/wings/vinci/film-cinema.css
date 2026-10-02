@@ -308,17 +308,17 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot[hidden],
 #wing[data-film='cinema'] .vitrine[data-look-open] .vitrine-clockfoot { display: none; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-track { flex: 1 1 auto; min-height: 44px; }
-/* the track a quiet line, the steps marked in the text's colour, gold only where you are */
+/* the track a quiet line, the steps and the knob in the text's colour: gold is the way on, amber a certainty, neither is a knob */
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-webkit-slider-runnable-track {
   height: 2px; border-radius: 0; background: color-mix(in srgb, var(--ui-text) 46%, transparent);
 }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-track { height: 2px; border-radius: 0; background: color-mix(in srgb, var(--ui-text) 46%, transparent); }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-progress { height: 2px; background: transparent; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-webkit-slider-thumb {
-  width: 14px; height: 14px; margin-top: -6px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
+  width: 14px; height: 14px; margin-top: -6px; background: var(--ui-text); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
 }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-thumb {
-  width: 14px; height: 14px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
+  width: 14px; height: 14px; background: var(--ui-text); box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
 }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-tick {
   top: 18px; width: 1.5px; height: 8px; margin-left: -.75px; background: color-mix(in srgb, var(--ui-text) 72%, transparent);
