@@ -20,7 +20,7 @@
 // `extent` where their recorded stage is the one measured now.
 //
 //   node forge/film/cycle.mjs --extent-only --base=https://127.0.0.1:5551 --release=job
-//     --film=<release>/film.json [--slug=aerial-screw|all] [--framings=wide,upright] [--report=<json>]
+//     --film=<release>/film.json [--slug=aerial-screw|all] [--framings=wide,upright] [--report=<json>] [--missing]
 import { chromium } from 'playwright'
 import sharp from 'sharp'
 import { spawn } from 'node:child_process'
@@ -52,6 +52,8 @@ const LIMIT = flags.has('limit') ? Number(flags.get('limit')) : null
 const EXTENT_ONLY = flags.has('extent-only')
 const FILM_FILE = flags.has('film') ? resolve(String(flags.get('film'))) : null
 const REPORT = flags.has('report') ? resolve(String(flags.get('report'))) : null
+/** the extent-only pass leaves a framing that already has one */
+const MISSING = flags.has('missing')
 /** THE FRAME IS THE ISLAND'S, WITH MARGINS. The machine is drawn in the fitting
     box the island has at the reference windows (1920×1080 and 390×844 CSS),
     centred on a larger stage, so the player can scale and centre the frame on
@@ -183,10 +185,12 @@ function outlineOf(lit, dark, w, h, ring) {
   return { rgba, count, area: mask.reduce((a, v) => a + v, 0) }
 }
 
-/** THE ISLAND OPEN AND FRAMED on the recording's stage, the export open on its canvas */
-async function openIsland(browser, framing, sink, { slug, station }) {
+/** THE ISLAND OPEN AND FRAMED on the recording's stage, the export open on its canvas.
+    `taller`: CSS px added to the window, for a band that has grown since a recording */
+async function openIsland(browser, framing, sink, { slug, station, taller = 0 }) {
   const stage = STAGE[framing]
-  const ctx = await browser.newContext({ viewport: stage.css, deviceScaleFactor: stage.dsf, ignoreHTTPSErrors: true, locale: 'en-GB',
+  const viewport = { width: stage.css.width, height: stage.css.height + taller }
+  const ctx = await browser.newContext({ viewport, deviceScaleFactor: stage.dsf, ignoreHTTPSErrors: true, locale: 'en-GB',
     ...(stage.phone ? { isMobile: true, hasTouch: true } : {}) })
   await ctx.addInitScript(() => { try { sessionStorage.setItem('vinci-welcome', '1'); localStorage.setItem('agc_probe', '1') } catch { /* seen */ } })
   await ctx.addInitScript(installVirtualClock)
@@ -351,8 +355,19 @@ async function extentsOnly(browser) {
     for (const framing of FRAMINGS) {
       const held = cycle.framings?.[framing]
       if (!held) { log(`${id} ${framing}: not in the release, skipped`); continue }
+      if (MISSING && held.extent) { log(`${id} ${framing}: measured before, kept`); continue }
       const t0 = Date.now()
-      const { ctx, page, errors, stage, film, canvas } = await openIsland(browser, framing, sink, { slug, station })
+      let opened = await openIsland(browser, framing, sink, { slug, station })
+      /* THE STAGE ON FILE: the canvas is the window less the close look's band,
+         whose height follows its words; the island's camera reads only the
+         canvas, so a window taller by what the band grew draws the frames on file */
+      const grown = (held.master[1] - even(opened.canvas[1])) / opened.stage.dsf
+      if (grown !== 0 && Math.abs(grown) <= 64 && opened.canvas[0] === held.master[0]) {
+        log(`${id} ${framing}: the canvas is ${opened.canvas.join('x')} against ${held.master.join('x')} on file; the window ${grown} px taller`)
+        await opened.ctx.close()
+        opened = await openIsland(browser, framing, sink, { slug, station, taller: grown })
+      }
+      const { ctx, page, errors, stage, film, canvas } = opened
       try {
         const frames = Math.round(film.period * FPS)
         const stepFrames = film.lands.map((u) => Math.min(frames - 1, Math.round(u * film.period * FPS)))
