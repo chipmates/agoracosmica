@@ -75,6 +75,10 @@ export const DEATHBED_LABEL = (() => {
   return { width, left: x - width / 2, top, face: z + .085, titleSize, slot }
 })()
 
+/** A flat face in the grave's frame, its corners wound counter-clockwise
+ * seen from outside the solid it bounds. */
+export type GraveFace = readonly (readonly [number, number, number])[]
+
 /** One run of words in the grave's frame: its setting, and the matrix that
  * lays the outline's XY (top-left at the origin, running down -Y) onto the
  * stone it belongs to. */
@@ -88,6 +92,8 @@ export interface GraveLetters {
   matrix: Matrix4
   /** the stone's own ink, or its bronze */
   finish: 'ink' | 'bronze'
+  /** the faces of the solids that can stand between the run and the eye */
+  behind?: readonly GraveFace[]
 }
 
 function run(id: string, text: string, size: number, maxWidth: number, at: [number, number, number], frame?: Matrix4): GraveLetters {
@@ -97,6 +103,39 @@ function run(id: string, text: string, size: number, maxWidth: number, at: [numb
 }
 const composed = (position: readonly [number, number, number], rotationX = 0, scale = 1): Matrix4 =>
   new Matrix4().compose(new Vector3(...position), new Quaternion().setFromAxisAngle(new Vector3(1, 0, 0), rotationX), new Vector3().setScalar(scale))
+
+/** The six faces of a box from `min` to `max`, carried by `matrix`. */
+function boxFaces(min: readonly [number, number, number], max: readonly [number, number, number], matrix: Matrix4): GraveFace[] {
+  const corner = (i: number, j: number, k: number): [number, number, number] => {
+    const v = new Vector3(i ? max[0] : min[0], j ? max[1] : min[1], k ? max[2] : min[2]).applyMatrix4(matrix)
+    return [v.x, v.y, v.z]
+  }
+  return ([
+    [[0, 0, 1], [1, 0, 1], [1, 1, 1], [0, 1, 1]], [[0, 0, 0], [0, 1, 0], [1, 1, 0], [1, 0, 0]],
+    [[1, 0, 0], [1, 1, 0], [1, 1, 1], [1, 0, 1]], [[0, 0, 0], [0, 0, 1], [0, 1, 1], [0, 1, 0]],
+    [[0, 1, 0], [0, 1, 1], [1, 1, 1], [1, 1, 0]], [[0, 0, 0], [1, 0, 0], [1, 0, 1], [0, 0, 1]],
+  ] as const).map(face => face.map(([i, j, k]) => corner(i, j, k)))
+}
+
+/** THE GABLE MODEL AS A SOLID, in the grave's frame: the bronze box with its
+ * linen back (`diagram.ts`), the two posts and the reading ledge (`index.ts`).
+ * The box's strips and the posts' span are copied from those files, so a
+ * change there is made here too. The page's words know no wall, and from the
+ * model's own look the deathbed label lies behind it. */
+export function graveGableFaces(mobile = false): GraveFace[] {
+  const { scale, shift } = graveGable(mobile)
+  const gable = composed(shift, 0, scale)
+  const { x, y, z, width, height } = GRAVE_FRAME
+  // the strips stand .045 outside the ground and run .40 deep from .22 behind
+  // its plane, under a .006 bevel; the linen ground closes the back
+  const faces = boxFaces([x - width / 2 - .051, y - height / 2 - .051, z - .285], [x + width / 2 + .051, y + height / 2 + .051, z + .186], gable)
+  const span = mobile ? 1.50 : 1.42, depth = mobile ? .15 : .16
+  for (const side of [-1, 1]) faces.push(...boxFaces([x + side * span - .045, 0, z - .02 - depth / 2], [x + side * span + .045, 1.20, z - .02 + depth / 2], gable))
+  const ledge = graveLedge(mobile)
+  faces.push(...boxFaces([-ledge.width / 2, -ledge.height / 2 - .003, -.0375], [ledge.width / 2, ledge.height / 2 + .003, .0375],
+    gable.clone().multiply(composed(ledge.position, ledge.rotationX))))
+  return faces
+}
 
 /** The words of the plaque and of the gable model's ledge, in the grave's frame. */
 export function graveLettering(language: Language, mobile = false): GraveLetters[] {
@@ -117,14 +156,16 @@ export function graveLettering(language: Language, mobile = false): GraveLetters
   return out
 }
 
-/** The words of the deathbed painting's label, in the grave's frame. */
-export function graveDeathbedLettering(language: Language): GraveLetters[] {
+/** The words of the deathbed painting's label, in the grave's frame. The
+ * gable model stands between them and the model's own look. */
+export function graveDeathbedLettering(language: Language, mobile = false): GraveLetters[] {
   const L = DEATHBED_LABEL
   const title = language === 'en' ? DEATHBED.title_en : DEATHBED.title_de
   // one line in any language: a longer title takes a smaller cap, never a second line
   const size = Math.min(L.titleSize, L.width / Math.max(1e-6, textAdvance(title, 1)) * .985)
+  const behind = graveGableFaces(mobile)
   return [
     run('grave-deathbed-title', title, size, L.width, [L.left, L.top, L.face]),
     run('grave-deathbed-enlarged', language === 'en' ? GRAVE_WORDS.enlarged.en : GRAVE_WORDS.enlarged.de, .058, L.width, [L.left, L.top - L.slot - .40, L.face]),
-  ]
+  ].map(letters => ({ ...letters, behind }))
 }
