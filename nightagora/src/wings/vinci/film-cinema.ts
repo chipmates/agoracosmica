@@ -136,6 +136,9 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   function set(want: boolean): void {
     if (want === on) return
     on = want
+    /* THE DOOR'S INVITATION TO TURN THE PHONE belongs here, on the upright
+       glass at the door: shown once, gone on the turn, never over the way in.
+       It waits for its words (data/cards.json) and is not drawn until then. */
     if (on) {
       const kept = ['film-name', 'film-line', 'film-drawer', 'film-keys'].map(part).filter((n): n is HTMLElement => Boolean(n))
       panel.append(...kept)

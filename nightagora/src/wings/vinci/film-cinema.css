@@ -443,7 +443,9 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vinci-dock {
   left: 0; right: 0; top: 0; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
   max-width: none; max-height: none;
-  padding: 0 max(var(--cinema-r), calc((100vw - 680px) / 2)) 0 max(var(--cinema-l), calc((100vw - 680px) / 2));
+  /* on the looks' grid: the words start where a look's work starts, right of the tools' column
+     (the window's CINEMA.tools and toolsGap, 104 + 16), at a measure of 560 at most */
+  padding: 0 max(var(--cinema-r), calc(100vw - var(--cinema-l) - 120px - 560px)) 0 calc(var(--cinema-l) + 120px);
   border: 0; border-radius: 0;
   background: var(--ui-ground-sheet);
 }
