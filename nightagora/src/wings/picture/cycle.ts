@@ -94,29 +94,47 @@ export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' 
   return { left, top, width, height, scale, covers }
 }
 
-/** THE GROUND BESIDE A FRAME THAT CANNOT COVER: the frame's outermost rows and
-    columns drawn out to the cover's edge at a quarter of its pixels, so the
-    air and the floor run on and no room stands beside the machine. The strip
-    drawn out is this share of the source's width. */
-const GROUND = { scale: 0.25, strip: 0.008 }
-export function paintGround(canvas: HTMLCanvasElement, source: CanvasImageSource, size: [number, number], at: PictureBox, frame: PictureBox): void {
+/** THE GROUND BESIDE A FRAME THAT CANNOT COVER: each bare side is the
+    frame's outer strip (this share of its breadth) averaged across into one
+    column or row and drawn out to the cover's edge, at a quarter of the
+    cover's pixels: the air, the horizon and the floor run on, the room never
+    stands beside the machine, and no line or shadow crossing the strip is
+    smeared out. Along the side the average is softened over `soft` of the
+    ground's pixels, so a shadow reaching the frame's edge fades out. */
+const GROUND = { scale: 0.25, strip: 0.04, soft: 4 }
+export function paintGround(canvas: HTMLCanvasElement, lane: HTMLCanvasElement, source: CanvasImageSource, size: [number, number],
+  at: PictureBox, frame: PictureBox): void {
   const k = GROUND.scale
   const w = Math.max(1, Math.ceil(at.width * k)), h = Math.max(1, Math.ceil(at.height * k))
   if (canvas.width !== w) canvas.width = w
   if (canvas.height !== h) canvas.height = h
-  const ink = canvas.getContext('2d')
-  if (!ink) return
+  const ink = canvas.getContext('2d'), mix = lane.getContext('2d')
+  if (!ink || !mix) return
   const [sw, sh] = size
   const fx0 = (frame.left - at.left) * k, fy0 = (frame.top - at.top) * k
-  const fx1 = fx0 + frame.width * k, fy1 = fy0 + frame.height * k
-  const p = Math.max(1, Math.round(sw * GROUND.strip))
-  // three columns and three rows of the source, each drawn over its part of the cover: the middle is the frame itself
-  const cols = [[0, p, 0, fx0], [0, sw, fx0, fx1 - fx0], [sw - p, p, fx1, w - fx1]] as const
-  const rows = [[0, p, 0, fy0], [0, sh, fy0, fy1 - fy0], [sh - p, p, fy1, h - fy1]] as const
-  ink.imageSmoothingEnabled = true
-  for (const [sx, sWidth, dx, dWidth] of cols) {
-    if (dWidth <= 0) continue
-    for (const [sy, sHeight, dy, dHeight] of rows) if (dHeight > 0) ink.drawImage(source, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+  const fw = frame.width * k, fh = frame.height * k, fx1 = fx0 + fw, fy1 = fy0 + fh
+  const p = Math.max(1, Math.round(Math.min(sw, sh) * GROUND.strip))
+  const cols = Math.max(1, Math.ceil(fw / GROUND.soft)), rows = Math.max(1, Math.ceil(fh / GROUND.soft))
+  if (lane.width < Math.max(cols, 2)) lane.width = Math.max(cols, 2)
+  if (lane.height < Math.max(rows, 2)) lane.height = Math.max(rows, 2)
+  for (const c of [ink, mix]) { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high' }
+  /** a strip of the source averaged into the lane's first column (or row), then drawn out over its part of the cover */
+  const side = (sx: number, sy: number, sWidth: number, sHeight: number, along: boolean, dx: number, dy: number, dw: number, dh: number): void => {
+    if (dw <= 0 || dh <= 0) return
+    if (along) { mix.drawImage(source, sx, sy, sWidth, sHeight, 0, 0, 1, rows); ink.drawImage(lane, 0, 0, 1, rows, dx, dy, dw, dh) }
+    else { mix.drawImage(source, sx, sy, sWidth, sHeight, 0, 0, cols, 1); ink.drawImage(lane, 0, 0, cols, 1, dx, dy, dw, dh) }
+  }
+  ink.drawImage(source, 0, 0, sw, sh, fx0, fy0, fw, fh)
+  side(0, 0, p, sh, true, 0, fy0, fx0, fh)
+  side(sw - p, 0, p, sh, true, fx1, fy0, w - fx1, fh)
+  side(0, 0, sw, p, false, fx0, 0, fw, fy0)
+  side(0, sh - p, sw, p, false, fx0, fy1, fw, h - fy1)
+  // the corners take the corner's own average
+  for (const [sx, sy, dx, dy, dw, dh] of [[0, 0, 0, 0, fx0, fy0], [sw - p, 0, fx1, 0, w - fx1, fy0],
+    [0, sh - p, 0, fy1, fx0, h - fy1], [sw - p, sh - p, fx1, fy1, w - fx1, h - fy1]] as const) {
+    if (dw <= 0 || dh <= 0) continue
+    mix.drawImage(source, sx, sy, p, p, 0, 0, 1, 1)
+    ink.drawImage(lane, 0, 0, 1, 1, dx, dy, dw, dh)
   }
 }
 
@@ -140,7 +158,7 @@ export function createCyclePayload(options: {
   const { cycle, steps } = options
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, video: HTMLVideoElement | undefined, poster: HTMLImageElement | undefined
-  let ground: HTMLCanvasElement | undefined
+  let ground: HTMLCanvasElement | undefined, lane: HTMLCanvasElement | undefined
   /** where the frame stands now, and the part of the screen its ground fills where it cannot cover */
   let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false
   let outline: HTMLImageElement | undefined
@@ -209,7 +227,8 @@ export function createCyclePayload(options: {
     if (!ground || !groundAt || !fitted) return
     const from = groundSource()
     if (!from) return
-    paintGround(ground, from.source, from.size, groundAt, fitted)
+    lane ??= document.createElement('canvas')
+    paintGround(ground, lane, from.source, from.size, groundAt, fitted)
     ground.hidden = false
   }
   /** a running clip's ground is drawn again at each of its frames */
@@ -450,7 +469,7 @@ export function createCyclePayload(options: {
       if (video) { video.pause(); video.removeAttribute('src'); video.load() }
       root?.remove()
       ground?.remove()
-      root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined
+      root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined; lane = undefined
       fitted = null; groundAt = null
       host = undefined
     },
