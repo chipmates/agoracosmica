@@ -1299,6 +1299,108 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // The museum's steps on the funnel route
+  // -------------------------------------------------------------------------
+
+  const museumBeacon = async (payload: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    const { kv, puts } = auditedKv();
+    await handleFunnel(
+      new Request('https://example.invalid/v1/funnel', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.31' },
+        body: JSON.stringify(payload),
+      }),
+      fakeEnv({ RATE_LIMITS: kv }),
+    );
+    return { row: analyticsRows[0], rows: analyticsRows.length, puts };
+  };
+
+  await test('each museum step writes its row with the hold in blob10', async () => {
+    const cases: [Record<string, unknown>, string][] = [
+      [{ step: 'museum_arrival', wing: 'vinci', hold: 'upright', language: 'de' }, ''],
+      [{ step: 'museum_stop', wing: 'vinci', stop: 2, hold: 'sideways', language: 'en' }, '2'],
+      [{ step: 'museum_look', wing: 'vinci', look: 'machine', hold: 'wide', language: 'en' }, 'machine'],
+      [{ step: 'museum_use', wing: 'vinci', hold: 'sideways', language: 'de' }, ''],
+    ];
+    for (const [payload, label] of cases) {
+      const { row, rows } = await museumBeacon({ ...payload, probe: 1 });
+      assertEqual(rows, 1, `${payload.step} wrote one row`);
+      assertEqual(row.blobs.length, 10, `${payload.step} has ten blobs`);
+      assertEqual(row.blobs[0], payload.step, 'the step is blob1');
+      assertEqual(row.blobs[1], 'vinci', 'the wing is blob2');
+      assertEqual(row.blobs[2], label, 'the stop or the kind is blob3');
+      assertEqual(row.blobs[3], payload.language, 'the language is blob4');
+      assertEqual(row.blobs[4], '200', 'the counter outcome is blob5');
+      assertEqual(row.blobs[7], '', 'no source class');
+      assertEqual(row.blobs[8], 'probe', 'the probe constant is blob9');
+      assertEqual(row.blobs[9], payload.hold, 'the hold is blob10');
+      assertEqual(row.doubles[0], 0, 'double1 stays 0');
+      assertEqual(row.indexes[0], payload.step, 'indexed by the step');
+    }
+  });
+
+  await test('a museum row without a listed hold or wing is not written, and costs no KV write', async () => {
+    for (const hold of [undefined, '', 'portrait', 'landscape', 'UPRIGHT', 1, { hold: 'wide' }, '390x844']) {
+      const { rows, puts } = await museumBeacon({ step: 'museum_arrival', wing: 'vinci', hold, language: 'en' });
+      assertEqual(rows, 0, `hold ${JSON.stringify(hold)} recorded`);
+      assertEqual(puts.length, 0, `hold ${JSON.stringify(hold)} cost a KV write`);
+    }
+    for (const wing of [undefined, '', 'leonardo', 'Vinci', '__proto__', 'aurelius', 7]) {
+      const { rows } = await museumBeacon({ step: 'museum_stop', wing, stop: 1, hold: 'upright' });
+      assertEqual(rows, 0, `wing ${JSON.stringify(wing)} recorded`);
+    }
+  });
+
+  await test('a museum stop is a whole number inside its wing\'s walk, a look a listed kind', async () => {
+    for (const stop of [1, 17]) {
+      const { row } = await museumBeacon({ step: 'museum_stop', wing: 'vinci', stop, hold: 'upright' });
+      assertEqual(row?.blobs[2], String(stop), `stop ${stop} kept`);
+    }
+    for (const stop of [0, 18, -1, 2.5, '3', null, undefined, 1e9]) {
+      const { rows } = await museumBeacon({ step: 'museum_stop', wing: 'vinci', stop, hold: 'upright' });
+      assertEqual(rows, 0, `stop ${JSON.stringify(stop)} recorded`);
+    }
+    for (const look of ['painting', 'machine', 'sheet', 'book', 'film', 'place']) {
+      const { row } = await museumBeacon({ step: 'museum_look', wing: 'vinci', look, hold: 'wide' });
+      assertEqual(row?.blobs[2], look, `kind ${look} kept`);
+    }
+    for (const look of [undefined, '', 'record', 'picture', 'machine/aerial-screw', 'Painting', 3]) {
+      const { rows } = await museumBeacon({ step: 'museum_look', wing: 'vinci', look, hold: 'wide' });
+      assertEqual(rows, 0, `kind ${JSON.stringify(look)} recorded`);
+    }
+  });
+
+  await test('nothing else rides along with a museum row', async () => {
+    const forged = {
+      wing: 'vinci', hold: 'sideways', language: 'en',
+      figureId: 'aurelius', path: '/w/vinci', mode: 'story', outcome: 'error', bucket: 3, source: 'search',
+      stop: 4, look: 'painting', width: 844, height: 390, clientId: 'abc',
+    };
+    const arrival = await museumBeacon({ step: 'museum_arrival', ...forged });
+    assertEqual(arrival.row.blobs[2], '', 'an arrival keeps no stop and no kind');
+    const stop = await museumBeacon({ step: 'museum_stop', ...forged });
+    assertEqual(stop.row.blobs[2], '4', 'a stop keeps its number, not the kind');
+    const look = await museumBeacon({ step: 'museum_look', ...forged });
+    assertEqual(look.row.blobs[2], 'painting', 'a look keeps its kind, not the number');
+    for (const { row } of [arrival, stop, look]) {
+      assertEqual(row.blobs[1], 'vinci', 'no figure or path in the wing slot');
+      assertEqual(row.blobs[4], '200', 'no outcome');
+      assertEqual(row.blobs[7], '', 'no source class');
+      assertEqual(row.doubles[0], 0, 'no bucket');
+      assertEqual(JSON.stringify(row).includes('abc'), false, 'no client id');
+      assertEqual(JSON.stringify(row).includes('844'), false, 'no screen size');
+    }
+  });
+
+  await test('the app\'s funnel rows ignore a hold and keep their nine blobs', async () => {
+    const row = await funnelBeacon({ step: 'figure_selected', figureId: 'aurelius', mode: 'story', language: 'en', hold: 'sideways', wing: 'vinci' });
+    assertEqual(row.blobs.length, 9, 'nine blobs');
+    assertEqual(row.blobs[1], 'aurelius', 'the figure is unchanged');
+    assert(!row.blobs.includes('sideways'), 'no hold on an app row');
+  });
+
+  // -------------------------------------------------------------------------
   // The landing's source class on the entry and first-chat rows
   // -------------------------------------------------------------------------
 

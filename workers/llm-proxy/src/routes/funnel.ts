@@ -1,9 +1,10 @@
 // Anonymous funnel-step beacon
 // Fires from the marketing pages (cta_click and paid_arrival via
-// agc-public.js, the ad_consent_* counters via the AdConsentPrompt island) and
+// agc-public.js, the ad_consent_* counters via the AdConsentPrompt island),
 // from the client app (cinematic_start / cinematic_end / welcome_shown /
 // first_turn / figure_selected / mode_selected / first_reply / engaged via
-// utils/funnelBeacon.ts).
+// utils/funnelBeacon.ts) and from the museum (the museum_* steps via
+// nightagora/src/core/museum-count.ts).
 // Lights up the dark zone between the page-load beacon and the entry/signup
 // beacons: does the intro play, is it watched or skipped, does the consent
 // screen open, does a first conversation start, does the first reply arrive.
@@ -14,7 +15,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { trackFunnel, trackMuseum, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
 import type { Env } from '../utils/types';
 
 interface FunnelPayload {
@@ -28,6 +29,11 @@ interface FunnelPayload {
   // The landing's source class, kept on the first-chat steps only.
   source?: unknown;
   probe?: unknown;
+  // The museum's fields, read on the museum_* steps only.
+  wing?: unknown;
+  stop?: unknown;
+  look?: unknown;
+  hold?: unknown;
 }
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
@@ -113,6 +119,46 @@ const VALID_STEPS = new Set([
   ...CONSENT_STEPS,
 ]);
 
+// The museum's steps, plain totals with no join key between them:
+// museum_arrival = a wing opened (once per wing per page load), museum_stop =
+// a stop of its walk reached (once per stop per page load), museum_look = a
+// close look opened at a work (once per work per page load), museum_use = the
+// first moment the visit did more than arrive, a second stop reached or a look
+// opened (once per wing per page load). Every field of such a row comes from a
+// closed list below, and a row with a field outside its list is not written,
+// so a forged row cannot carry anything the lists do not name.
+const MUSEUM_STEPS = new Set(['museum_arrival', 'museum_stop', 'museum_look', 'museum_use']);
+// How the screen stood when the step happened, from the wing's own form test:
+// a glass narrower than tall, a phone held sideways, or a desktop's window.
+const MUSEUM_HOLDS = new Set(['upright', 'sideways', 'wide']);
+// Each wing and the number of stops its walk has. A stop number is a label on
+// the content, like a chapter number, and only the wing's own range is kept.
+const MUSEUM_WING_STOPS: ReadonlyMap<string, number> = new Map([['vinci', 17]]);
+// The kind of work a close look opened, never which work.
+const MUSEUM_LOOKS = new Set(['painting', 'machine', 'sheet', 'book', 'film', 'place']);
+
+interface MuseumRow { wing: string; label: string; hold: string }
+
+/** The museum row a payload makes, or null when any field is off its list. */
+function readMuseumRow(step: string, payload: FunnelPayload): MuseumRow | null {
+  const hold = typeof payload.hold === 'string' && MUSEUM_HOLDS.has(payload.hold) ? payload.hold : '';
+  const wing = typeof payload.wing === 'string' ? payload.wing : '';
+  const stops = MUSEUM_WING_STOPS.get(wing);
+  if (!hold || stops === undefined) return null;
+  if (step === 'museum_stop') {
+    const stop = payload.stop;
+    return typeof stop === 'number' && Number.isInteger(stop) && stop >= 1 && stop <= stops
+      ? { wing, label: String(stop), hold }
+      : null;
+  }
+  if (step === 'museum_look') {
+    return typeof payload.look === 'string' && MUSEUM_LOOKS.has(payload.look)
+      ? { wing, label: payload.look, hold }
+      : null;
+  }
+  return { wing, label: '', hold };
+}
+
 // Which half of the product the visit engaged with, in the mode slot on
 // 'engaged'. A closed vocabulary: an engaged row without one of these three
 // cannot be read and would inflate the total, so it is dropped instead.
@@ -180,7 +226,8 @@ const MAX_BUCKET = 5;
 
 // Rate limit: 200 funnel beacons per IP per hour. A single session emits
 // several funnel events (one per step), so the cap sits higher than entry's
-// 50. The plain IP appears only inside this short-lived KV key (1-hour TTL,
+// 50. The museum's rows share it: a whole walk is about twenty rows, plus one
+// per work looked at. The plain IP appears only inside this short-lived KV key (1-hour TTL,
 // auto-deleted) and never in any stored analytics row.
 const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 200;
@@ -200,7 +247,13 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
 
   // Step allowlist first: an unknown step never costs a KV write or a row.
   const step = typeof payload.step === 'string' ? payload.step : '';
-  if (!VALID_STEPS.has(step)) {
+  const museum = MUSEUM_STEPS.has(step);
+  if (!VALID_STEPS.has(step) && !museum) {
+    return new Response(null, { status: 204 });
+  }
+  // A museum row is checked whole before it costs a KV write.
+  const museumRow = museum ? readMuseumRow(step, payload) : null;
+  if (museum && !museumRow) {
     return new Response(null, { status: 204 });
   }
 
@@ -211,6 +264,26 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
   await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+
+  const lang = (typeof payload.language === 'string') && VALID_LANGS.has(payload.language.slice(0, 2).toLowerCase())
+    ? payload.language.slice(0, 2).toLowerCase()
+    : '';
+
+  // The museum's row takes only its own fields: no path, figure, mode,
+  // outcome, bucket or source from the payload can ride along with it.
+  if (museumRow) {
+    trackMuseum(env, {
+      step,
+      wing: museumRow.wing,
+      label: museumRow.label,
+      hold: museumRow.hold,
+      language: lang,
+      country: readCountry(request),
+      device: readDevice(request),
+      probe: readProbe(payload.probe),
+    });
+    return new Response(null, { status: 204 });
+  }
 
   // blob2: figureId wins over path; anything that fails validation becomes ''
   // so the row is still recorded with a clean content slot.
@@ -231,9 +304,6 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
   if (step === 'engaged' && !ENGAGED_ARMS.has(mode)) {
     return new Response(null, { status: 204 });
   }
-  const lang = (typeof payload.language === 'string') && VALID_LANGS.has(payload.language.slice(0, 2).toLowerCase())
-    ? payload.language.slice(0, 2).toLowerCase()
-    : '';
   const outcome = (typeof payload.outcome === 'string' && VALID_OUTCOMES.has(payload.outcome))
     ? payload.outcome
     : '200';

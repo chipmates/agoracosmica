@@ -387,6 +387,61 @@ export function trackFunnel(
 }
 
 /**
+ * Track one of the museum's steps (museum_arrival, museum_stop, museum_look,
+ * museum_use), sent by the museum to the funnel route. Keyless like every
+ * funnel row: no join key between the steps, no user dimension, every field
+ * from a closed list checked by the route.
+ *
+ * dataset: agora_llm
+ * blobs: [step, wing, stop|look|'', language, '200', device, country, '', probe, hold]
+ * doubles: [0]
+ * indexes: [step]
+ *
+ * blob2 is the wing ('vinci'), in the figure slot of the app's rows. blob3 is
+ * the stop's number in the wing's walk ('1' to '17') on museum_stop and the
+ * kind of work ('painting', 'machine', 'sheet', 'book', 'film', 'place') on
+ * museum_look, empty on the other two. blob5 stays '200' as on every counter
+ * row of the funnel. blob10, on museum rows only, is how the screen stood when
+ * the step happened: 'upright', 'sideways' or 'wide'. The share of
+ * museum_stop rows that are 'sideways' is the share of the walk done with a
+ * phone held sideways.
+ */
+export function trackMuseum(
+  env: Env,
+  data: {
+    step: string;
+    wing: string;
+    label: string;
+    hold: string;
+    language: string;
+    country: string;
+    device: string;
+    probe: string;
+  }
+): void {
+  try {
+    env.ANALYTICS.writeDataPoint({
+      blobs: [
+        data.step,
+        data.wing,
+        data.label,
+        data.language,
+        '200',
+        data.device,
+        data.country,
+        '',
+        data.probe,
+        data.hold,
+      ],
+      doubles: [0],
+      indexes: [data.step],
+    });
+  } catch {
+    // Analytics must never break the request path
+  }
+}
+
+/**
  * Track a spend-governor threshold crossing or an availability fallback.
  * dataset: agora_llm
  * blobs: ['governor', event, endpoint, model, '', device, country]
