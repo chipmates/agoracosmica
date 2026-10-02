@@ -542,18 +542,26 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     view.distance = a.distance + (b.distance - a.distance) * k
     view.target.lerpVectors(a.target, b.target, k)
   }
-  /** The eye along the run's views, by the clock; under reduced motion it
-   * cuts to a stage's view once that stage's move would have ended. */
-  function carry(dt: number): void {
-    const at = schedule.kind === 'loop' && period ? state.clock % period : state.clock
+  /** How far along the run's views the eye belongs at a clock of the run. */
+  function runViewAt(clock: number): number {
+    const at = schedule.kind === 'loop' && period ? clock % period : clock
     let want = 0
     runViews.forEach((stage, i) => {
       if (at <= stage.from) return
       const u = Math.min(1, (at - stage.from) / Math.max(1e-3, stage.to - stage.from))
       want = i + u * u * (3 - 2 * u)
     })
+    return want
+  }
+  /** The eye along the run's views, by the clock; under reduced motion it
+   * cuts to a stage's view once that stage's move would have ended. */
+  function carry(dt: number): void {
+    const want = runViewAt(state.clock)
     if (host?.reducedMotion) carried = Math.floor(want + 1e-6)
     else carried += (want - carried) * (1 - Math.exp(-dt / CARRY_FOLLOW_S))
+    standCarried()
+  }
+  function standCarried(): void {
     carryViews ??= [goalFor('whole'), ...runViews.map(stage => goalFor(stage.view, stage))]
     const i = Math.min(runViews.length - 1, Math.floor(carried))
     blend(carryViews[i]!, carryViews[i + 1]!, carried - i)
@@ -943,14 +951,15 @@ export function createTurntablePayload(options: TurntableOptions): TurntablePayl
     lands: steps.map((_, i) => landOf(i)),
     pose(clock, how) {
       tapped = null
-      // the recorded cycle is the whole view's
-      if (carrying) {
-        carrying = false; carried = 0
-        if (standing && !goal && chosen === 'whole') Object.assign(view, goalFor('whole'))
-      }
       dark = !how.lit
       state = { clock: schedule.kind === 'finite' ? Math.min(period, Math.max(0, clock)) : Math.max(0, clock), playing: how.playing, fixed: !how.playing }
       active = -2
+      // the recorded run carries the eye as the live run does, by its clock alone
+      if (runViews.length && standing && !goal && chosen === 'whole') {
+        carrying = false
+        carried = runViewAt(state.clock)
+        standCarried()
+      }
       if (standing) { body.animate(state.clock, 0); paint() }
     },
     frame(box) {
