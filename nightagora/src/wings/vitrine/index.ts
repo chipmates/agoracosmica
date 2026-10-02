@@ -243,6 +243,10 @@ export function createVitrine(options: {
   for (const kind of ['page', 'count', 'leaves']) toolSlots.set(kind, pager)
   /** where each tool stood before the form took it, so it goes back to the same place */
   const lent = new Map<HTMLElement, Comment>()
+  /** a payload that marks no tools of its own (the live island) is read by its controls' own classes */
+  const UNMARKED: readonly (readonly [string, string])[] = [['vitrine-play', 'play'], ['vitrine-track', 'clock'], ['vitrine-viewpoint', 'way'], ['vitrine-folio-glass', 'source']]
+  const toolOf = (node: HTMLElement): string | undefined => node.dataset['tool']
+    ?? (payloadControls.contains(node) ? UNMARKED.find(([cls]) => node.classList.contains(cls))?.[1] : undefined)
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
   // the viewport and its controls follow it in the tab order.
   root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark, tools, clockFoot)
@@ -283,6 +287,7 @@ export function createVitrine(options: {
   function paintHole(): void {
     // SIDEWAYS A WORK OF ITS OWN HANGS ON THE MUSEUM'S WALL: the room behind
     // it stands down whole, from the first frame
+    if (cinemaFrame) root.dataset['lookWall'] = String(onWall())
     if (onWall()) { hole.hidden = true; scrim.hidden = false; return }
     // In the band the work is fitted to the stage's box and no longer stands
     // in its own rectangle on the room's frame, so there is no hole to cut.
@@ -436,7 +441,7 @@ export function createVitrine(options: {
 
   /** True while a work of the payload's own hangs on the wall: sideways, a
    * payload that knows its shape draws its own picture; a place is the room's. */
-  const onWall = (): boolean => cinemaFrame !== null && typeof exhibit?.payload?.aspect === 'function'
+  const onWall = (): boolean => cinemaFrame !== null && typeof exhibit?.payload?.aspect === 'function' && surface !== 'own'
 
   /** THE LOOK SIDEWAYS. A work whose shape gives it more area beside a label
    * column stands BESIDE it at the stage's full height; a wider work, a film
@@ -447,7 +452,7 @@ export function createVitrine(options: {
     const safe = frame.safe, right = safe.left + safe.width
     const left = safe.left + CINEMA.tools + CINEMA.toolsGap, top = safe.top + CINEMA.air
     const column = Math.round(Math.min(CINEMA.columnMost, Math.max(CINEMA.columnLeast, width * CINEMA.columnShare)))
-    const filmed = Boolean(root.querySelector('[data-tool="clock"]'))
+    const filmed = Boolean(root.querySelector('[data-tool="clock"], .vitrine-clockfoot .vitrine-track, .vitrine-payload-controls .vitrine-track'))
     const beside: VitrineRect = { left, top, width: right - column - CINEMA.columnGap - left, height: height - CINEMA.air - top }
     const under: VitrineRect = { left, top, width: right - left, height: frame.row.top - CINEMA.rowGap - top }
     const aspect = exhibit?.payload?.aspect?.() ?? null
@@ -498,7 +503,7 @@ export function createVitrine(options: {
    * the zone names its own box; one that runs to the glass is the zone's. */
   function placeFilm(): void {
     const filmed = root.hasAttribute('data-look-film')
-    clockFoot.hidden = !filmed || !clockFoot.querySelector('[data-tool]')
+    clockFoot.hidden = !filmed || !clockFoot.firstElementChild
     if (!filmed) return
     const zone = rects.view
     const own = exhibit?.payload?.filmBox?.() ?? null
@@ -521,23 +526,24 @@ export function createVitrine(options: {
   function gatherTools(): void {
     if (!cinemaFrame) return
     let clocked = false
-    for (const node of root.querySelectorAll<HTMLElement>('[data-tool]')) {
+    for (const node of root.querySelectorAll<HTMLElement>('[data-tool], .vitrine-payload-controls :is(.vitrine-play, .vitrine-track, .vitrine-viewpoint, .vitrine-folio-glass)')) {
       if (lent.has(node)) continue
-      const slot = toolSlots.get(node.dataset['tool'] ?? '')
+      const kind = toolOf(node)
+      const slot = toolSlots.get(kind ?? '')
       if (!slot) continue
       const mark = document.createComment('')
       node.before(mark)
       lent.set(node, mark)
       slot.append(node)
-      if (node.dataset['tool'] === 'clock') clocked = true
+      if (kind === 'clock') clocked = true
       // a step drawn as a glyph keeps its word as its name and its hint
-      if (node.dataset['tool'] === 'zoom') {
+      if (kind === 'zoom') {
         const word = node.textContent?.trim() ?? ''
         if (!node.hasAttribute('aria-label')) { node.setAttribute('aria-label', word); node.dataset['toolNamed'] = '' }
         if (!node.title) { node.title = node.getAttribute('aria-label') ?? word; node.dataset['toolHint'] = '' }
       }
     }
-    tools.hidden = !tools.querySelector('[data-tool]')
+    tools.hidden = !tools.querySelector('.vitrine-tools-slot > *')
     arrangePager()
     // a clock that arrives after the look was laid out lays the film's foot again
     if (clocked && !root.hasAttribute('data-look-film')) queueMicrotask(() => layout())
