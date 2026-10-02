@@ -350,6 +350,11 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-certainty { font-size: .8125rem; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
+/* a key inside the words reads as a key: an underlined word, as the column's foot row */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body .vitrine-more {
+  display: inline-flex; align-items: center; width: auto; min-width: 44px; min-height: 44px; margin: -6px 0 0; padding: 0; border: 0; font: 400 .9375rem/20px var(--sans);
+  text-decoration: underline; text-decoration-color: var(--ui-line-strong); text-underline-offset: 4px; text-decoration-thickness: 1px;
+}
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-rule-label { font-size: .8125rem; }
 /* a book's pager under its seat: the step back, the count, the step on; the leaves behind the count */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: -4px 0 8px; }

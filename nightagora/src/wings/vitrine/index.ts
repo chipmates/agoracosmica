@@ -228,6 +228,13 @@ export function createVitrine(options: {
   const lookArrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
   lookArrow.append(lookArrowPath)
   lookMore.append(lookMoreWord, lookArrow)
+  /** and its other key, wherever the column stands open or read on: back to the strip, or to the column's head */
+  const lookLess = make('button', 'vitrine-look-more vitrine-look-less')
+  lookLess.type = 'button'
+  const lookLessWord = make('span', 'vitrine-look-more-word')
+  const lessArrow = lookArrow.cloneNode(true) as SVGSVGElement
+  const lessArrowPath = lessArrow.firstElementChild as SVGPathElement
+  lookLess.append(lookLessWord, lessArrow)
   /* SIDEWAYS THE WORK'S OWN TOOLS STAND BY THE LEFT HAND, over the walk's
      seats: a payload marks each with `data-tool`, and the window stands it
      in its place here while the form stands, and back where it was after */
@@ -614,24 +621,35 @@ export function createVitrine(options: {
   }
   const toolWatch = new MutationObserver(() => gatherTools())
   /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
+  const UP = 'M8 13V3M4 7l4-4 4 4', DOWN = 'M8 3v10M4 9l4 4 4-4'
   function paintLookMore(): void {
     const frame = cinemaFrame
-    if (!frame) { lookMore.remove(); return }
+    if (!frame) { lookMore.remove(); lookLess.remove(); return }
     if (lookMore.parentElement !== controls) controls.prepend(lookMore)
-    const under = root.dataset['lookForm'] === 'under'
-    const back = under && raised
-    lookMoreWord.textContent = back ? frame.less : frame.more
-    lookMore.setAttribute('aria-expanded', String(back))
-    lookArrowPath.setAttribute('d', under && !back ? 'M8 13V3M4 7l4-4 4 4' : 'M8 3v10M4 9l4 4 4-4')
-    // beside, the key stands only while lines wait below the column's cut
-    if (!under) lookMore.hidden = !cut?.below
-    else lookMore.hidden = false
+    if (lookLess.parentElement !== controls) lookMore.after(lookLess)
+    const opened = root.hasAttribute('data-look-open')
+    const strip = root.dataset['lookForm'] === 'under' && !opened
+    lookMoreWord.textContent = frame.more
+    lookLessWord.textContent = frame.less
+    // in the strip the key raises the words; in a column it reads on, while lines wait below
+    lookArrowPath.setAttribute('d', strip ? UP : DOWN)
+    lookMore.setAttribute('aria-expanded', String(opened))
+    const readOn = Boolean(cut?.below)
+    lookMore.hidden = !strip && !readOn
+    /* closing goes back down to the strip from an opened column; a column at
+       home has one key, which turns back up to its head once its end is read */
+    lessArrowPath.setAttribute('d', opened ? DOWN : UP)
+    lookLess.hidden = strip || !(opened || (!readOn && Boolean(cut?.above)))
   }
   lookMore.addEventListener('click', () => {
     if (root.dataset['lookForm'] === 'under') { setRaised(!raised); return }
     // the next page begins on the first line the column hid
     const next = cut?.next ?? body.clientHeight - 44
     body.scrollBy({ top: Math.max(22, next), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
+  })
+  lookLess.addEventListener('click', () => {
+    if (root.hasAttribute('data-look-open')) { setRaised(false); return }
+    body.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' })
   })
   // a detail pressed in the raised column folds it, so the work it moves to stands in view
   payloadControls.addEventListener('click', event => {
@@ -646,6 +664,7 @@ export function createVitrine(options: {
     stripLine.textContent = ''
     for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below']) stage.style.removeProperty(name)
     lookMore.remove()
+    lookLess.remove()
     toolWatch.disconnect()
     returnTools()
     pager.remove()
