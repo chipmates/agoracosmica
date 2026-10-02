@@ -447,6 +447,55 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
 #wing[data-film='cinema'] .na-plate[data-form='door'] .na-door-arrow { width: 36px; height: 36px; flex-basis: 36px; border: 0;
   background: color-mix(in srgb, var(--ui-on-way) 12%, transparent); color: var(--ui-on-way); }
 
+/* THE DOOR'S PLATE SIDEWAYS, a label in two columns: the question and its two
+   ways at the left, the plate's three sentences at the right, every one in
+   view before the press (a 76 px box once hid the Echo's sentence and the
+   terms), the ways in sentence case */
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'][open] {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 1fr);
+  grid-template-rows: auto 1fr;
+  grid-template-areas: 'wall words' 'foot words';
+  column-gap: 28px;
+  width: min(720px, calc(100vw - var(--cinema-l) - var(--cinema-r)));
+  max-height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 8px);
+  margin: auto;
+  inset: var(--cinema-t) var(--cinema-r) var(--cinema-b) var(--cinema-l);
+  padding: 20px 24px 18px;
+  overflow-y: auto;
+  background: var(--ui-ground-sheet);
+  backdrop-filter: none;
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-wall { grid-area: wall; padding: 0; }
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-title {
+  margin: 0 0 8px; font: 400 .875rem/20px var(--sans); letter-spacing: 0; color: var(--ui-text-quiet);
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .wing-door-asked {
+  margin: 0; font: 400 1.25rem/27px var(--serif); color: var(--ui-text); text-wrap: pretty;
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .wing-door-words {
+  grid-area: words; align-self: start; height: auto; max-height: none; overflow: visible;
+  margin: 0; padding: 0 0 0 20px; border: 0; box-shadow: inset 1px 0 0 var(--ui-line);
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .wing-door-word {
+  margin: 0 0 10px; font: 400 .8125rem/19px var(--sans); color: var(--ui-text-quiet); text-wrap: pretty;
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .wing-door-word:last-child { margin-bottom: 0; }
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-foot { grid-area: foot; align-self: end; margin: 18px 0 0; padding: 0; border: 0; }
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-controls { flex-wrap: nowrap; gap: 20px; }
+/* the plate's one way on is gold, as the foot row's gold under it; its other way a quiet word */
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-primary {
+  flex: 0 0 auto; min-height: 48px; padding: 0 20px; border: 0; border-radius: var(--ui-r-way);
+  background: var(--ui-way); color: var(--ui-on-way); font: 400 1.0625rem/1 var(--serif); letter-spacing: 0; text-transform: none;
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-primary:hover { background: var(--ui-way-press); }
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] .na-plate-second {
+  flex: 0 0 auto; min-height: 44px; padding: 0; border: 0; background: none;
+  font: 400 .9375rem/1 var(--sans); letter-spacing: 0; text-transform: none; color: var(--ui-text);
+  text-decoration: underline; text-decoration-color: var(--ui-line-strong); text-underline-offset: 4px; text-decoration-thickness: 1px;
+}
+#wing[data-film='cinema'] .wing-door-plate[data-form='band'] :is(.na-plate-primary, .na-plate-second):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 3px; }
+
 /* THE LIFE over the glass's height: at 390 px its head, drawing and words
    left the list no room, so the body scrolls as one column down to the list,
    whose two columns keep their own scroll */
