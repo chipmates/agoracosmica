@@ -14,6 +14,7 @@ import { setRegister } from '../frame'
 import { deskAny, deskOn } from '../desk-switches'
 import { createCloseLookBand, type CloseLookBand } from '../desk-closelook'
 import { noteOpened } from '../visit'
+import { uiSure } from '../ui-sure'
 import css from './vitrine.css?inline'
 import type { VitrineExhibit, VitrinePayloadHost, VitrinePeek, VitrinePlace, VitrineRect, VitrineSurface } from './types'
 
@@ -418,7 +419,7 @@ export function createVitrine(options: {
     naming.hidden = !said
     naming.lang = options.lang()
     namingDot.hidden = !certainty
-    if (certainty) namingDot.style.setProperty('--certainty', certainty)
+    if (certainty) namingDot.style.setProperty('--certainty', uiSure(certainty))
     else namingDot.style.removeProperty('--certainty')
     if (said) {
       card.setAttribute('aria-labelledby', naming.id)

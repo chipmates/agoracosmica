@@ -24,6 +24,7 @@
 import { lang } from '../../content'
 import { deskOn } from '../../desk-switches'
 import { DESK_SET_CHANGED } from '../../overview'
+import { uiSure } from '../../ui-sure'
 import cardsRaw from '../data/cards.json?raw'
 
 type Words = { en: string; de: string }
@@ -294,7 +295,7 @@ export function createVinciHangStrip(options: {
       }
       const dot = document.createElement('span')
       dot.className = 'vinci-strip-dot'
-      dot.style.setProperty('--certainty', entry.colour)
+      dot.style.setProperty('--certainty', uiSure(entry.colour))
       button.append(dot)
       if (entry.openable) button.addEventListener('click', () => onOpen(entry.id, button))
       buttons.push(button)

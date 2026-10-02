@@ -9,6 +9,7 @@ import { lang } from '../content'
 import { vinciCertaintyWords, type VinciCertainty, type VinciText } from './content'
 import { getWork, findEvidencePlates, findPlateEntries } from './pictures/register'
 import { createPictureRecord, createWindowWorkLabel, policyLabelText, PICTURE_CERTAINTY_KEY } from './pictures/policy-label'
+import { uiSureWithin } from '../ui-sure'
 import { validatePaintingRecord } from './pictures/policy'
 import { machineCatalog, type MachineSlug } from './machines/catalog'
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciShowpieceRecord, vinciDeathbedCard,
@@ -237,7 +238,7 @@ export function createFilmLook(h: FilmLookHost) {
       const evidence = face === 'front' ? findEvidencePlates(work, assets) : []
       const certainty = pictureCertainty(policyLabelText(work, entries).colour)
       const record = (): void => h.openRecord(id, { en: work.title_en, de: work.title_de }, certainty, host => {
-        const full = createPictureRecord(work, entries, evidence)
+        const full = uiSureWithin(createPictureRecord(work, entries, evidence))
         full.hidden = false
         // the record speaks the page's language, as the label does
         for (const column of full.querySelectorAll<HTMLElement>('.picture-label-language, .picture-fact[lang]')) if (column.lang !== lang()) column.remove()
@@ -253,7 +254,7 @@ export function createFilmLook(h: FilmLookHost) {
       // ONE VIEW OF A PAINTING, the live wing's own: the deep plate with its zoom and its rule
       if (plate) openLook({ ...createVinciPaintingView({ id, title, line: vinciLine(id), work, entries, plate, ...vinciLimits(id), controls,
         from: () => null, standing: h.standing, narrow: h.narrow(), catalogue, tier }), walk, set, certainty }, from, how)
-      else openLook({ id, title, line: vinciLine(id), card: [createWindowWorkLabel(work, entries, lang(), h.narrow(), Boolean(catalogue?.kind))],
+      else openLook({ id, title, line: vinciLine(id), card: [uiSureWithin(createWindowWorkLabel(work, entries, lang(), h.narrow(), Boolean(catalogue?.kind)))],
         payload: null, controls, walk, ...vinciLimits(id), set, certainty, catalogue }, from, how)
       return
     }

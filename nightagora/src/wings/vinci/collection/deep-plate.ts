@@ -21,6 +21,7 @@ import type { PictureWork, ResolvedPicturePlate } from '../pictures/register'
 import cardsRaw from '../data/cards.json?raw'
 import linesRaw from '../data/lines.json?raw'
 import platesRaw from '../data/plate-descriptions.json?raw'
+import { uiSureWithin } from '../../ui-sure'
 
 type Words = { en: string; de: string }
 const CARDS = JSON.parse(cardsRaw) as {
@@ -224,7 +225,7 @@ export function createVinciPaintingView(options: {
   const language = lang()
   const registration = pictureDisplayWindow(options.plate.plate)
   const cut = registration ? pictureDisplayUV(registration) : null
-  const label = createWindowWorkLabel(options.work, options.entries, language, options.narrow, Boolean(options.catalogue?.kind))
+  const label = uiSureWithin(createWindowWorkLabel(options.work, options.entries, language, options.narrow, Boolean(options.catalogue?.kind)))
   // THE DEEP SOURCE WHERE THE STORE HOLDS ONE. Its pixels are the view's
   // ceiling and the rule's own scale, so the centimetres are measured
   // against the source that stands in the window, not the wall's plate.

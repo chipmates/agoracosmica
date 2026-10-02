@@ -15,6 +15,7 @@
  */
 import { createDeepPlatePayload, type DeepPlatePayload, type DeepPlateSource, type DeepPlateTier, type DeepPlateWindow } from './deep-plate'
 import css from './reader.css?inline'
+import { uiSure } from '../ui-sure'
 import type { VitrinePayload, VitrinePayloadHost, VitrinePeek } from './types'
 
 /** One way of looking at one side. The first is what stands when the side
@@ -360,7 +361,7 @@ export function createReaderPayload(options: {
     const folio = make('p', 'deep-stand-folio')
     if (here.colour) {
       const dot = make('span', 'deep-stand-dot')
-      dot.style.setProperty('--certainty', here.colour)
+      dot.style.setProperty('--certainty', uiSure(here.colour))
       dot.setAttribute('aria-hidden', 'true')
       folio.append(dot)
     }

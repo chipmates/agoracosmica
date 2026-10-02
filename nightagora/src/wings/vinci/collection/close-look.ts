@@ -37,6 +37,7 @@ import type { FolioSheet } from '../../vitrine/folio'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
 import { validateSheetRecord, type SheetManifestEntry } from '../pictures/sheet-record'
 import { vinciSheetTitle } from './strip'
+import { uiSure } from '../../ui-sure'
 
 export type VinciCloseLook = Vitrine
 export type VinciCloseLookExhibit = VitrineExhibit
@@ -322,7 +323,7 @@ export function vinciMachineCard(slug: MachineSlug, narrow: boolean, certainty: 
 function machineAfter(slug: MachineSlug, certainty: { word: string; colour: string }, language: 'en' | 'de'): HTMLElement[] {
   const after: HTMLElement[] = []
   const word = make('p', 'vitrine-certainty', certainty.word)
-  word.style.setProperty('--certainty', certainty.colour)
+  word.style.setProperty('--certainty', uiSure(certainty.colour))
   after.push(word)
   const said = SIZES[slug]?.[language]
   after.push(make('p', 'vitrine-meta', said ?? machineEnvelope(slug, language)))
@@ -567,7 +568,7 @@ function recordRoot(host: HTMLElement): HTMLElement {
 }
 function certaintyWord(certainty: { word: string; colour: string }): HTMLElement {
   const word = make('p', 'vitrine-certainty', certainty.word)
-  word.style.setProperty('--certainty', certainty.colour)
+  word.style.setProperty('--certainty', uiSure(certainty.colour))
   return word
 }
 function drawer(...texts: string[]): HTMLElement {
