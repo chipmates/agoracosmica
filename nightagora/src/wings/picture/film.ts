@@ -6,6 +6,7 @@
    this element and reads it through the seam. */
 
 import { route } from '../../../forge/film/router.mjs'
+import { samePlace } from '../../../forge/film/same-place.mjs'
 import filmCss from './film.css?inline'
 import type { FilmCycle } from './cycle'
 import {
@@ -155,6 +156,20 @@ const KEPT_CLIPS = 6
 /** THE EVENING'S DIP where the desktop's band gives its strip back to the
     picture, down and up, as the live wing's own (`index.ts` BAND_DOWN, BAND_UP) */
 const EVENING_DOWN_MS = 300, EVENING_UP_MS = 600
+/** A PHONE TURNED IN MID-WALK: the most the clip laid into the new glass waits
+    for its leg in the new framing, from the turn to that clip sought and
+    ready, before the leg lands by the dissolve. Half the gold way's wait: here
+    a picture already moves, and longer laid it reads as a state, not a turn. */
+const TURN_WAIT_MS = 1500
+/** the other framing is sought this far ahead of the clip on screen, in the
+    walk's own seconds, to cover its seek; doubled and tripled when too short */
+const TURN_LEAD_S = 0.25
+/** the first frame of a clip set playing comes within a few frames, or never */
+const FIRST_FRAME_MOST_MS = 600
+/** HOW A CLIP STANDS IN THE OTHER FRAMING'S GLASS until its own framing's
+    takes over: whole and centred on the museum's night (film.css). Covering
+    it instead crops it to a picture neither framing composed. */
+const LAID = 'contain'
 
 type RouterGraph = Parameters<typeof route>[0]
 type RouterPlan = ReturnType<typeof route>
@@ -166,6 +181,7 @@ const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string): HTMLE
 }
 const frame = (): Promise<void> => new Promise(resolve => requestAnimationFrame(() => resolve()))
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms))
+const within = <T>(promise: Promise<T>, ms: number): Promise<T | null> => Promise.race([promise, sleep(ms).then(() => null)])
 const reduced = (): boolean => matchMedia('(prefers-reduced-motion: reduce)').matches
 
 /** the router's own graph, one per framing: the clips this release carries */
@@ -187,6 +203,32 @@ function pickRung(rungs: readonly [number, number][], aspect: number, box: Pictu
 }
 
 interface Held { url: string; bytes: number; got: number; blob: Blob | null; head: ArrayBuffer | null; fetching: Promise<Blob | null> | null; abort: AbortController | null; used: number }
+
+/** THE CLIP ON SCREEN. After a turn in mid-walk its element, bytes, framing
+    and track are the other framing's, and the leg's end is watched there. */
+interface Playing {
+  video: HTMLVideoElement
+  edge: FilmEdgeRecord
+  track: CameraPrint[] | null
+  frame: number
+  framing: PictureFraming
+  /** the bytes' address, let go when the clip leaves */
+  src: string
+  /** its first frame presented: a turn may begin */
+  shown: boolean
+  /** laid into the glass of the other framing (LAID) */
+  laid: boolean
+  /** crossed to on a turn: its share is held from running back */
+  turned: boolean
+  /** a cross under way, which a second turn waits for */
+  crossing: boolean
+  /** each turn and each undoing of one counts up; a turn under way that sees another number stands down */
+  turning: number
+  /** where the leg's end is watched; null once the leg has ended */
+  watch: ((video: HTMLVideoElement) => void) | null
+  /** ends the leg now: it lands at the arrival's still by the dissolve */
+  land: (() => void) | null
+}
 
 export function createFilmSource(options: FilmOptions): PictureSource & { readout(): Record<string, unknown>[]; evening: FilmEvening } {
   const { release, host, base } = options
@@ -231,6 +273,9 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   let here: PictureNode = release.nodes[options.at] ? options.at : release.story.find(n => release.nodes[n]) ?? Object.keys(release.nodes)[0]!
   let state: PictureState = { kind: 'rest', node: here }
   let shownFraming: PictureFraming = options.framing()
+  /** the node whose still stands in the still element, and in the cross-fade over it */
+  let stillAt: PictureNode = here
+  let crossAt: PictureNode = here
   let busy = false
   /* the rest a leg ends on is told while the leg still counts as busy, so the
      gold way's next clip asked for then is fetched once the leg is done */
@@ -239,7 +284,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   let carried = 0
   let hurried = false
   let disposed = false
-  let playing: { video: HTMLVideoElement; edge: FilmEdgeRecord; track: CameraPrint[] | null; frame: number } | null = null
+  let playing: Playing | null = null
   let dipSkip: (() => void) | null = null
   /** every hand-over as it happened, for the rigs: how long a press waited for its first
       frame, which frame was on screen when the clip was shown, how the end was handed back */
@@ -327,6 +372,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     await decode(url)
     if (still.src !== url) {
       still.src = url
+      stillAt = node
       await still.decode().catch(() => undefined)
     }
     shownFraming = f
@@ -431,8 +477,9 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
     video.pause()
     video.removeAttribute('src')
     delete video.dataset['src']
+    delete video.dataset['laid']
     video.load()
-    video.classList.remove('shown', 'leaving')
+    video.classList.remove('shown', 'leaving', 'crossing')
   }
   /** THE VIDEO IS SHOWN ONLY ONCE ITS FIRST FRAME IS PRESENTED, so the still
       hands over to the same picture: the frame callback where the engine has
@@ -512,11 +559,21 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       then reaches its stop by a dissolve. */
   async function playClip(edge: FilmEdgeRecord, target: PictureNode): Promise<boolean> {
     const pressed = performance.now()
-    const f = framingOf()
+    let f = framingOf()
     if (f !== shownFraming) await showStill(edge.from, f)
-    const arrival = stillFile(edge.to, f)
-    const arrived = arrival ? decode(arrival) : Promise.resolve()
-    const src = await bytesInTime(edge, f, target)
+    let arrival = stillFile(edge.to, f)
+    let arrived = arrival ? decode(arrival) : Promise.resolve()
+    let src = await bytesInTime(edge, f, target)
+    // A PHONE TURNED WHILE THE BYTES CAME waits once more, for its own framing's
+    if (src && !disposed && framingOf() !== f) {
+      for (const v of videos) if (v.dataset['src'] === src) tearDown(v)
+      if (src.startsWith('blob:')) URL.revokeObjectURL(src)
+      f = framingOf()
+      if (f !== shownFraming) await showStill(edge.from, f)
+      arrival = stillFile(edge.to, f)
+      arrived = arrival ? decode(arrival) : Promise.resolve()
+      src = await bytesInTime(edge, f, target)
+    }
     if (!src || disposed) return false
     /* THE PRESS IS ANSWERED AT ONCE: the walk begins for the chrome now, and the
        picture moves when the clip's first frame is presented over its own still */
@@ -536,61 +593,247 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       if (src.startsWith('blob:')) URL.revokeObjectURL(src)
       return false
     }
-    playing = { video, edge, track: null, frame: 0 }
-    void track.then(list => { if (playing?.edge === edge) playing.track = list })
+    const p: Playing = { video, edge, track: null, frame: 0, framing: f, src, shown: false, laid: false, turned: false, crossing: false, turning: 0, watch: null, land: null }
+    playing = p
+    void track.then(list => { if (playing === p && p.framing === f) p.track = list })
     watchFrames(video)
     await firstFrame(video)
     video.classList.add('shown')
+    p.shown = true
     set({ kind: 'walk', from: edge.from, to: edge.to, target, clip: edge.id, share: 0 })
     const record: Record<string, unknown> = { clip: edge.id, framing: f, rung: rungNow(f), src: src.startsWith('blob:') ? 'bytes' : 'network',
       pressToShownMs: Math.round(performance.now() - pressed), shownAtMediaTime: Math.round(video.currentTime * 1000) / 1000,
       stillUnder: still.currentSrc.replace(/^.*\//, '') }
     readouts.push(record)
     await new Promise<void>(resolve => {
-      // a clip that never says it ended is ended by its own length, and a little air
-      const bound = setTimeout(() => done(), ((video.duration || 30) / Math.max(0.25, video.playbackRate) + 3) * 1000)
-      const done = (): void => { clearTimeout(bound); video.removeEventListener('ended', done); resolve() }
-      video.addEventListener('ended', done)
+      let off = (): void => undefined
+      // the end is watched on the clip on screen, which a turn may hand to the other framing's
+      p.watch = (v: HTMLVideoElement): void => {
+        off()
+        // a clip that never says it ended is ended by its own length, and a little air
+        const bound = setTimeout(() => done(), ((v.duration || 30) / Math.max(0.25, v.playbackRate) + 3) * 1000)
+        const done = (): void => { off(); resolve() }
+        v.addEventListener('ended', done)
+        off = () => { clearTimeout(bound); v.removeEventListener('ended', done) }
+      }
+      p.land = () => { off(); resolve() }
+      p.watch(video)
     })
+    p.watch = p.land = null
+    const shown = p.video
     /* THE CUT AT THE STOP IS INVISIBLE: the arrival's still is decoded and
        swapped in under the clip's last frame, and the clip only leaves on the
        frame after, dissolving over what the codec left */
     const ended = performance.now()
-    record['endedAtMediaTime'] = Math.round(video.currentTime * 1000) / 1000
-    record['duration'] = Math.round(video.duration * 1000) / 1000
-    await arrived
-    if (arrival && still.src !== arrival) {
-      still.src = arrival
-      await still.decode().catch(() => undefined)
+    record['endedAtMediaTime'] = Math.round(shown.currentTime * 1000) / 1000
+    record['duration'] = Math.round(shown.duration * 1000) / 1000
+    if (p.laid) {
+      // A LEG LANDING IN A TURNED GLASS: the arrival in the framing that stands now, the laid clip dissolving over it
+      const g = framingOf(), there = stillFile(edge.to, g)
+      if (there) {
+        await decode(there)
+        still.src = there
+        stillAt = edge.to
+        await still.decode().catch(() => undefined)
+      }
+      shownFraming = g
+    } else {
+      // a clip crossed to on a turn arrives at its own framing's still
+      if (p.framing !== f) { arrival = stillFile(edge.to, p.framing); arrived = arrival ? decode(arrival) : Promise.resolve() }
+      await arrived
+      if (arrival && still.src !== arrival) {
+        still.src = arrival
+        stillAt = edge.to
+        await still.decode().catch(() => undefined)
+      }
+      shownFraming = p.framing
     }
     await frame()
     record['endToDissolveMs'] = Math.round(performance.now() - ended)
-    const quality = (video as HTMLVideoElement & { getVideoPlaybackQuality?: () => { droppedVideoFrames: number; totalVideoFrames: number } }).getVideoPlaybackQuality?.()
+    const quality = (shown as HTMLVideoElement & { getVideoPlaybackQuality?: () => { droppedVideoFrames: number; totalVideoFrames: number } }).getVideoPlaybackQuality?.()
     if (quality) record['dropped'] = `${quality.droppedVideoFrames} of ${quality.totalVideoFrames}`
-    video.classList.add('leaving')
-    await sleep(END_DISSOLVE_MS + 20)
-    tearDown(video)
-    if (src.startsWith('blob:')) URL.revokeObjectURL(src)
-    if (playing?.video === video) playing = null
+    shown.classList.add('leaving')
+    await sleep((p.laid ? STILL_DISSOLVE_MS : END_DISSOLVE_MS) + 20)
+    tearDown(shown)
+    if (p.src.startsWith('blob:')) URL.revokeObjectURL(p.src)
+    if (playing === p) playing = null
     here = edge.to
     return true
   }
 
   /** still to still, the picture never dark: reduced motion and a late clip */
   async function dissolveTo(node: PictureNode): Promise<void> {
-    const url = stillFile(node, framingOf())
+    let f = framingOf()
+    let url = stillFile(node, f)
     if (!url) { here = node; return }
     await decode(url)
     cross.src = url
+    crossAt = node
     await cross.decode().catch(() => undefined)
     cross.classList.add('shown')
     await sleep(STILL_DISSOLVE_MS + 20)
+    // a phone turned during the dissolve lands in the framing it holds now
+    if (framingOf() !== f) {
+      const now = stillFile(node, framingOf())
+      if (now) { await decode(now); f = framingOf(); url = now }
+    }
     still.src = url
+    stillAt = node
     await still.decode().catch(() => undefined)
     cross.classList.remove('shown')
     cross.removeAttribute('src')
-    shownFraming = framingOf()
+    // the framing dissolved to, so a phone turned meanwhile is picked again
+    shownFraming = f
     here = node
+  }
+
+  /* ---- a phone turned in mid-walk ---- */
+  const frameOf = (video: HTMLVideoElement): number => Math.round(video.currentTime * release.fps)
+  const shareOf = (video: HTMLVideoElement): number => (video.duration > 0 ? Math.min(1, video.currentTime / video.duration) : 0)
+  function loaded(video: HTMLVideoElement): Promise<boolean> {
+    if (video.readyState >= 1) return Promise.resolve(true)
+    return new Promise(resolve => {
+      video.addEventListener('loadedmetadata', () => resolve(true), { once: true })
+      video.addEventListener('error', () => resolve(false), { once: true })
+    })
+  }
+  /** THE OTHER FRAMING'S CLIP MADE READY TO CROSS TO: its bytes loaded, sought
+      to the place `place` gives for a moment a little ahead of the clip on
+      screen, set playing at its rate once that clip reaches the moment, and
+      its first frame presented. */
+  async function readyAt(video: HTMLVideoElement, old: HTMLVideoElement, src: string, place: (oldTime: number) => number | null,
+    left: () => number, stale: () => boolean): Promise<'ok' | 'late' | 'no shared place' | 'stale'> {
+    video.preload = 'auto'
+    video.src = src
+    video.dataset['src'] = src
+    video.load()
+    if (!(await within(loaded(video), left())) || !(video.duration > 0)) return stale() ? 'stale' : 'late'
+    for (let tries = 1; ; tries++) {
+      if (stale()) return 'stale'
+      const lead = TURN_LEAD_S * tries * old.playbackRate
+      const at = old.currentTime + lead
+      // the clip on screen arrives before the other could take over
+      if (!(old.duration > 0) || at > old.duration - lead) return 'late'
+      const t = place(at)
+      if (t === null) return 'no shared place'
+      const sought = new Promise<boolean>(resolve => video.addEventListener('seeked', () => resolve(true), { once: true }))
+      video.currentTime = Math.max(0, Math.min(t, video.duration - 0.1))
+      if (!(await within(sought, left()))) return stale() ? 'stale' : 'late'
+      // the moment is waited for on screen; a seek that took longer than the lead is tried once more, further ahead
+      if (old.currentTime <= at || tries === 3) {
+        while (!stale() && !old.ended && old.currentTime < at) await frame()
+        break
+      }
+    }
+    if (stale()) return 'stale'
+    video.playbackRate = old.playbackRate
+    try { await video.play() } catch { return stale() ? 'stale' : 'late' }
+    if ((await within(firstFrame(video).then(() => true), FIRST_FRAME_MOST_MS)) === null) return stale() ? 'stale' : 'late'
+    return stale() ? 'stale' : 'ok'
+  }
+  /** A PHONE TURNED IN MID-WALK. At once the clip on screen is laid whole into
+      the new glass; then the same leg in the new framing is fetched, sought to
+      the same place on the way (`same-place.mjs`) and crossed to, and the walk
+      goes on to its arrival in the new framing. What is not ready within
+      TURN_WAIT_MS, a leg with no shared place, a lean line and reduced motion
+      land at the arrival's still in the new framing by the dissolve. */
+  async function turnWalk(p: Playing, to: PictureFraming): Promise<void> {
+    const seq = ++p.turning
+    const turned = performance.now()
+    const from = p.framing, old = p.video
+    const record: Record<string, unknown> = { turn: `${from}>${to}`, clip: p.edge.id, atShare: Math.round(shareOf(old) * 1000) / 1000, atFrame: frameOf(old) }
+    readouts.push(record)
+    old.dataset['laid'] = LAID
+    p.laid = true
+    const stale = (): boolean => disposed || playing !== p || p.turning !== seq || !p.watch
+    const land = (why: string): void => {
+      record['landed'] = 'dissolve'
+      record['why'] = why
+      record['ms'] = Math.round(performance.now() - turned)
+      if (!stale()) p.land?.()
+    }
+    const file = clipFile(p.edge, to)
+    if (!file) { land('no clip in this framing'); return }
+    if (lean()) { land('lean line'); return }
+    if (reduced()) { land('reduced motion'); return }
+    const left = (): number => Math.max(0, turned + TURN_WAIT_MS - performance.now())
+    const blob = await within(fetchWhole(file.url, file.bytes), left())
+    if (stale()) return
+    if (!blob) { land('bytes late'); return }
+    const tracks = await within(Promise.all([trackOf(p.edge, from), trackOf(p.edge, to)]), left())
+    if (stale()) return
+    const video = idleVideo()
+    const src = URL.createObjectURL(blob)
+    // the clip crossed to stands over the one it replaces
+    old.after(video)
+    const place = (oldTime: number): number | null => {
+      const [a, b] = tracks ?? [null, null]
+      if (!a || !b) return (oldTime / old.duration) * video.duration
+      const m = samePlace(a, oldTime * release.fps, b)
+      if (m) { record['eye'] = Math.round(m.eye * 100) / 100; record['look'] = Math.round((m.look * 180) / Math.PI) }
+      return m ? (m.frame + 0.5) / release.fps : null
+    }
+    const ready = await readyAt(video, old, src, place, left, stale)
+    if (ready !== 'ok') {
+      tearDown(video)
+      URL.revokeObjectURL(src)
+      if (ready !== 'stale') land(ready)
+      return
+    }
+    /* THE CROSS: the same walk in the new framing dissolves in over the laid
+       clip, and from its first frame it is the walk */
+    video.classList.add('crossing', 'shown')
+    const oldSrc = p.src
+    Object.assign(p, { video, src, framing: to, laid: false, turned: true, crossing: true, track: tracks?.[1] ?? null, frame: frameOf(video) })
+    shownFraming = to
+    p.watch?.(video)
+    watchFrames(video)
+    Object.assign(record, { landed: 'cross', ms: Math.round(performance.now() - turned), fromFrame: frameOf(old), toFrame: frameOf(video) })
+    await sleep(STILL_DISSOLVE_MS + 20)
+    tearDown(old)
+    if (oldSrc.startsWith('blob:')) URL.revokeObjectURL(oldSrc)
+    video.classList.remove('crossing')
+    p.crossing = false
+  }
+  /** a turn undone before its cross: the clip on screen is its own framing's again */
+  function unlay(p: Playing): void {
+    p.turning++
+    p.laid = false
+    delete p.video.dataset['laid']
+  }
+  let restilling = false
+  /** BETWEEN CLIPS a turned phone's still is picked again at once: under a
+      wait, a dip, a dissolve or the moment at a middle node */
+  async function restill(f: PictureFraming): Promise<void> {
+    const node = stillAt, over = cross.hasAttribute('src') ? crossAt : null
+    const url = stillFile(node, f), overUrl = over ? stillFile(over, f) : null
+    if (!url) return
+    restilling = true
+    try {
+      await Promise.all([decode(url), overUrl ? decode(overUrl) : undefined])
+      if (disposed || playing || framingOf() !== f) return
+      // the dissolve's still coming in, then the one under it; a still the walk laid meanwhile is its own
+      if (overUrl && crossAt === over && cross.hasAttribute('src')) cross.src = overUrl
+      if (stillAt !== node) return
+      still.src = url
+      await still.decode().catch(() => undefined)
+      shownFraming = f
+    } finally {
+      restilling = false
+    }
+  }
+  /** what a turn asks of a walk under way; nothing at all where the phone kept its framing */
+  function turnedInWalk(): void {
+    const want = framingOf()
+    if (duskWatch) { turnedInEvening(want); return }
+    const p = playing
+    if (p) {
+      if (!p.shown || !p.watch || p.crossing) return
+      if (p.laid && want === p.framing) unlay(p)
+      else if (!p.laid && want !== p.framing) void turnWalk(p, want)
+      return
+    }
+    if (want !== shownFraming && !restilling) void restill(want)
   }
 
   /** THE JUMP: down to the museum's dark, the place it goes to named where a
@@ -598,13 +841,22 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   async function dip(node: PictureNode, title: PictureWords | null, quiet = false): Promise<void> {
     set({ kind: 'dip', from: here, to: node, title, ...(quiet ? { quiet: true as const } : {}) }, 'dip')
     dark.classList.add('shown')
-    const url = stillFile(node, framingOf())
+    let f = framingOf()
+    let url = stillFile(node, f)
     await Promise.all([sleep(reduced() ? 0 : DIP_MS), url ? decode(url) : Promise.resolve()])
-    if (url) { still.src = url; await still.decode().catch(() => undefined) }
-    shownFraming = framingOf()
+    // A PHONE TURNED IN THE DARK comes up in the framing it holds now
+    if (framingOf() !== f) {
+      f = framingOf()
+      url = stillFile(node, f)
+      if (url) await decode(url)
+    }
+    if (url) { still.src = url; stillAt = node; await still.decode().catch(() => undefined) }
+    shownFraming = f
     here = node
     await Promise.race([sleep(quiet ? QUIET_HOLD_MS : options.hold(title)), new Promise<void>(resolve => { dipSkip = resolve })])
     dipSkip = null
+    // and one turned while the title stood, under the dark still
+    if (framingOf() !== shownFraming) await showStill(node)
     dark.classList.remove('shown')
     await sleep(reduced() ? 0 : DIP_MS)
   }
@@ -743,6 +995,72 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
   let eveningDone: (() => void) | null = null
   let eveningCut = false
   let eveningSrc = ''
+  /** THE EVENING ON SCREEN: its own element, or after a turn the idle clip
+      element holding its other framing; where its end is watched while it plays */
+  let dusk = nightfall
+  let duskFraming: PictureFraming = shownFraming
+  let duskWatch: ((video: HTMLVideoElement) => void) | null = null
+  let duskTurning = 0
+  let duskLaid = false
+  let duskCrossing = false
+  /** A PHONE TURNED WHILE THE EVENING PLAYS: laid at once as a walk's clip is,
+      then crossed to its other framing at the same moment, both framings
+      rendered on one clock. Its end is the dark every glass holds alike, so
+      the evening waits for those bytes as long as it plays, laid; a lean line
+      fetches nothing and plays it out laid. */
+  async function turnEvening(to: PictureFraming): Promise<void> {
+    const seq = ++duskTurning
+    const turned = performance.now()
+    const from = duskFraming, old = dusk
+    const record: Record<string, unknown> = { turn: `${from}>${to}`, evening: release.evening?.id, atMediaTime: Math.round(old.currentTime * 1000) / 1000 }
+    readouts.push(record)
+    old.dataset['laid'] = LAID
+    duskLaid = true
+    const stale = (): boolean => disposed || eveningCut || !duskWatch || duskTurning !== seq || dusk !== old
+    const at = release.evening?.framings[to], was = release.evening?.framings[from]
+    const file = at ? at.files[rungNow(to)] ?? Object.values(at.files)[0] : undefined
+    if (!file || lean()) { record['landed'] = 'laid to its end'; return }
+    const url = address(file.file)
+    // until a second before its end, past which the cross would come with the dark
+    const left = (): number => Math.max(0, ((old.duration || 0) - old.currentTime) * 1000 / Math.max(0.25, old.playbackRate) - 1000)
+    const blob = await within(fetchWhole(url, file.bytes), left())
+    if (stale()) return
+    if (!blob) { record['landed'] = 'laid to its end'; record['why'] = 'bytes late'; return }
+    disarm()
+    const video = [nightfall, ...videos].find(v => v !== dusk)!
+    const src = URL.createObjectURL(blob)
+    old.after(video)
+    const place = (oldTime: number): number => (at && was && at.frames === was.frames ? oldTime : (oldTime / old.duration) * video.duration)
+    const ready = await readyAt(video, old, src, place, left, stale)
+    if (ready !== 'ok') {
+      tearDown(video)
+      URL.revokeObjectURL(src)
+      if (ready !== 'stale') { record['landed'] = 'laid to its end'; record['why'] = ready }
+      return
+    }
+    video.classList.add('crossing', 'shown')
+    duskCrossing = true
+    dusk = video
+    duskFraming = to
+    duskLaid = false
+    duskWatch?.(video)
+    Object.assign(record, { landed: 'cross', ms: Math.round(performance.now() - turned) })
+    const oldSrc = eveningSrc
+    eveningSrc = src
+    await sleep(STILL_DISSOLVE_MS + 20)
+    tearDown(old)
+    if (oldSrc && oldSrc !== src) URL.revokeObjectURL(oldSrc)
+    video.classList.remove('crossing')
+    duskCrossing = false
+  }
+  function turnedInEvening(want: PictureFraming): void {
+    if (duskCrossing) return
+    if (duskLaid && want === duskFraming) {
+      duskTurning++
+      duskLaid = false
+      delete dusk.dataset['laid']
+    } else if (!duskLaid && want !== duskFraming) void turnEvening(want)
+  }
   /** the evening's bytes in hand, or its address where the line is lean and it
       plays through in time; three seconds at most under the hairline, counted */
   async function eveningBytes(file: { url: string; bytes: number }): Promise<string | null> {
@@ -790,6 +1108,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       if (!file || busy || disposed) return 'none'
       busy = true
       eveningCut = false
+      dusk = nightfall
+      duskFraming = framingOf()
       try {
         const src = nightfall.dataset['src'] === file.url && nightfall.readyState >= 3 ? file.url : await eveningBytes(file)
         if (!src || disposed || eveningCut) return eveningCut ? 'cut' : 'none'
@@ -818,20 +1138,29 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
         }
         if (eveningCut) return 'cut'
         await new Promise<void>(resolve => {
-          // an evening that never says it ended is ended by its own length, and a little air
-          const bound = setTimeout(() => done(), ((nightfall.duration || release.evening!.seconds) + 3) * 1000)
-          const done = (): void => { clearTimeout(bound); nightfall.removeEventListener('ended', done); eveningDone = null; resolve() }
-          eveningDone = done
-          nightfall.addEventListener('ended', done)
+          let off = (): void => undefined
+          // the end is watched on the evening on screen, which a turn may hand to its other framing's element
+          duskWatch = (v: HTMLVideoElement): void => {
+            off()
+            // an evening that never says it ended is ended by its own length, and a little air
+            const bound = setTimeout(() => done(), ((v.duration || release.evening!.seconds) + 3) * 1000)
+            const done = (): void => { off(); eveningDone = null; resolve() }
+            eveningDone = done
+            v.addEventListener('ended', done)
+            off = () => { clearTimeout(bound); v.removeEventListener('ended', done) }
+          }
+          duskWatch(nightfall)
         })
         return eveningCut ? 'cut' : 'ended'
       } finally {
         busy = false
+        duskWatch = null
+        duskTurning++
       }
     },
     stop() {
       eveningCut = true
-      nightfall.pause()
+      dusk.pause()
       eveningDone?.()
     },
   }
@@ -888,6 +1217,8 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
         points: r.points.map(([u, v]) => { const p = onBox(PICTURE_ASPECT[f], box, u, v); return [p.x, p.y] as const }) }))
     },
     project(point) {
+      // a clip laid into the other framing's glass carries no words
+      if (playing?.laid) return null
       const f = shownFraming
       const box = fit()
       let print: CameraPrint | null = null
@@ -911,12 +1242,16 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       fit()
       if (playing && state.kind === 'walk') {
         const v = playing.video
-        const share = v.duration > 0 ? Math.min(1, v.currentTime / v.duration) : 0
+        let share = v.duration > 0 ? Math.min(1, v.currentTime / v.duration) : 0
         if (!(v as HTMLVideoElement & { requestVideoFrameCallback?: unknown }).requestVideoFrameCallback) playing.frame = Math.round(v.currentTime * release.fps)
+        // a walk crossed to its other framing never runs its share back
+        if (playing.turned) share = Math.max(share, state.share)
         if (Math.abs(share - state.share) >= 0.004) state = { ...state, share }
       }
       // a turned phone is another render: at rest the picture is picked again
       if (!busy && state.kind === 'rest' && framingOf() !== shownFraming) void showStill(here)
+      // and under way: the clip laid and crossed, the still between clips picked again, the evening laid and crossed
+      else if (busy) turnedInWalk()
     },
     veil(hidden) {
       root.classList.toggle('veiled', hidden)

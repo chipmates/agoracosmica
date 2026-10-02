@@ -1093,6 +1093,8 @@ export function createWing(): WingModule {
     if (!hosts) return
     form = next
     wide = next !== 'upright'
+    // the picture's box and a clip under way follow in this same task, before the turned glass is painted
+    picture?.update()
     hosts.stage.parentElement!.dataset['film'] = next
     cinema?.set(next === 'cinema')
     clearMarks()

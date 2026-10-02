@@ -27,6 +27,13 @@
 .na-film > video { opacity: 0; }
 .na-film > video.shown { opacity: 1; }
 .na-film > video.shown.leaving { opacity: 0; transition: opacity 120ms linear; }
+/* A PHONE TURNED IN MID-WALK: the clip on screen stands whole in the other
+   framing's glass on the museum's night, opaque so it dissolves as one
+   picture, until the same walk in the new framing comes in over it, or it
+   leaves over the arrival's still at the still dissolve's pace */
+.na-film > video[data-laid='contain'] { object-fit: contain; background: var(--na-abyss); }
+.na-film > video.crossing { transition: opacity 200ms linear; }
+.na-film > video.shown.leaving[data-laid] { transition-duration: 200ms; }
 .na-film > .na-film-cross { opacity: 0; }
 .na-film > .na-film-cross.shown { opacity: 1; transition: opacity 200ms linear; }
 .na-film > .na-film-cross:not([src]) { display: none; }
