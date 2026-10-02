@@ -45,6 +45,7 @@ import filmWingCss from './film-wing.css?inline'
 import { fitGoldName, watchGoldName } from './gold-fit'
 import { setWalkingLeg, walkingRing } from './labels'
 import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, MARK_TARGET, type FilmCinema, type FilmForm } from './film-cinema'
+import { createTurnLine, TURN_LINE_CSS } from './turn-line'
 import { countArrival, countStop } from '../../core/museum-count'
 
 const text = (value: VinciText): string => value[lang()]
@@ -192,6 +193,8 @@ export function createWing(): WingModule {
   let doorLeaving = 0
   const controller = new AbortController()
   const signal = controller.signal
+  /** the upright phone's one offer of the sideways film, under the first way in it meets */
+  const turnLine = createTurnLine(signal)
   /** the desktop's band, the phone upright, or the phone held sideways (film-cinema.ts) */
   let form: FilmForm = 'desk'
   let cinema: FilmCinema | undefined
@@ -1042,7 +1045,7 @@ export function createWing(): WingModule {
   /** THE DESCENT: the walk's start to the first stop, after the opening and the door */
   async function descend(): Promise<void> {
     if (!above || !hosts) return
-    await awaitOpening(hosts.labels)
+    await awaitOpening(hosts.labels, { under: way => turnLine.under(way) })
     if (doorStanding) await new Promise<void>(resolve => { doorDone = resolve })
     const s = picture?.state()
     if (!above || !picture || s?.kind !== 'rest' || s.node !== release?.start) return
@@ -1062,6 +1065,8 @@ export function createWing(): WingModule {
     doorStanding = true
     document.documentElement.dataset['naDoor'] = 'open'
     welcome.open()
+    const way = welcome.element.querySelector<HTMLElement>('.na-plate-primary')
+    if (way) turnLine.under(way)
   }
   function leaveDoor(route: 'house' | 'collection' | 'life'): void {
     doorStanding = false
@@ -1122,7 +1127,7 @@ export function createWing(): WingModule {
     if (form === 'desk') applyDeskSteps(wing)
     else delete wing.dataset['desk']
     const style = make('style', '')
-    style.textContent = [wingCss, deskTypeCss, deskCss, deskCloseLookCss, deskPanelCss, deskMarksCss, deskOverviewCss, filmWingCss, FILM_CINEMA_CSS].join('\n')
+    style.textContent = [wingCss, deskTypeCss, deskCss, deskCloseLookCss, deskPanelCss, deskMarksCss, deskOverviewCss, filmWingCss, FILM_CINEMA_CSS, TURN_LINE_CSS].join('\n')
     h.stage.append(style)
     tall = make('div', 'film-tall')
     h.stage.append(tall)

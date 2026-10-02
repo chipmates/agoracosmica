@@ -1,0 +1,24 @@
+/* THE TURN LINE: the door's quiet size and colour, no box, no icon; it
+   only ever stands on the upright glass. */
+
+.turn-line {
+  margin: 8px 0 0;
+  font: 400 .9375rem/1.35 var(--sans);
+  letter-spacing: .01em;
+  color: var(--ui-text-quiet);
+  text-align: center;
+  text-wrap: balance;
+  transition: opacity 160ms ease;
+}
+.turn-line[data-gone] { opacity: 0; }
+@media not all and (max-aspect-ratio: 9/10) { .turn-line { display: none; } }
+@media (prefers-reduced-motion: reduce) { .turn-line { transition: none; } }
+body.forge .turn-line { transition: none; }
+
+/* the opening card's gold leaves its corner for the band's flow, on the same
+   right edge and the same air above it, so the line can stand under it */
+@media (max-aspect-ratio: 9/10) {
+  .arno-band:has(> .turn-line) { padding-bottom: calc(20px + env(safe-area-inset-bottom)); }
+  .arno-band:has(> .turn-line) > .arno-start { position: static; width: fit-content; margin: 12px -4px 0 auto; }
+  .arno-band > .turn-line { margin-right: -4px; text-align: right; }
+}

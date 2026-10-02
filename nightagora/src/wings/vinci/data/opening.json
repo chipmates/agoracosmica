@@ -6,6 +6,7 @@
     "rule": "The line opens with his birth and keeps the facts sheet's limits: born 15 April 1452 in Vinci (the town and its country, never a house or Anchiano); earliest DATED drawing, never 'first'; his age at it, 21; the Arno valley country near Vinci, his home town, never a valley he grew up in, a named viewpoint or 'the view of his birthplace'. The birth outside marriage stays with the doors. The start word is the owner's own. No-break spaces stand inside every date, in 'in Vinci' and in the German closing sentence, so none splits across rows.",
     "facts": "briefs/walk-monday-0928/FACTS-PICTURE-ROOM.md section 5; the birth facts in briefs/walk-monday-0928/BRIEF-ARNO-BIRTH.md",
     "start_word": "the owner's own words from the walk (FINDINGS item 23)",
+    "turn_line": "opening.turn.line stands under the first way in an upright phone meets, the card's or the door's, once a visit; the words passed a blind read on 2026-10-02 and are fixed.",
     "written": "2026-09-28, the wave 4 words round after the owner's walk; the birth sentence added 2026-09-29 on the owner's ask, revised the same day after two blind reads (a verb in the drawing's sentence, Vinci named once, the German written as German with 'vom', then the valley anchored to his home town rather than his childhood to the valley). The German says 'Blatt' for the sheet, the wing's own word, because 'Zeichnung' takes a third row on the desktop. Measured on the card: 4/4/2 rows EN and 5/4/2 rows DE at 360/390/1440."
   },
   "opening": {
@@ -29,6 +30,12 @@
       "credit": {
         "en": "Leonardo da Vinci, 1473. Uffizi, Florence, inv. 8 P. Photo: Tangopaso, public domain.",
         "de": "Leonardo da Vinci, 1473. Uffizien, Florenz, Inv. 8 P. Foto: Tangopaso, gemeinfrei."
+      }
+    },
+    "turn": {
+      "line": {
+        "en": "Sideways, you see more of each room.",
+        "de": "Im Querformat siehst du mehr von jedem Raum."
       }
     }
   }

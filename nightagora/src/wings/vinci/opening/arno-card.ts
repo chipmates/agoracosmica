@@ -40,6 +40,8 @@ export interface ArnoCardOptions {
   manifest?: ManifestIndex
   /** the card leaves at once, without a start, when this aborts */
   signal?: AbortSignal
+  /** lays a line in under the way in before the card's first frame */
+  under?: (way: HTMLButtonElement) => void
 }
 
 const MONTHS = 'January|February|March|April|May|June|July|August|September|October|November|December|Januar|Februar|März|Mai|Juni|Juli|Oktober|Dezember'
@@ -161,6 +163,7 @@ export async function openArnoCard(host: HTMLElement, options: ArnoCardOptions =
   arrow.append(icon(ARROW_ON, 'arno-start-icon'))
   start.append(make('span', 'arno-start-word', said.start), arrow)
   band.append(words, start)
+  options.under?.(start)
   card.append(style, stage, band)
 
   function setLabel(open: boolean): void {
