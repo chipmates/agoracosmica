@@ -1,15 +1,15 @@
 /**
  * RoseFilmGround — the two who stand before the rose (after Doré's plate for
- * Paradiso XXXI). He is there from the first frame, a dark figure looking up.
- * She arrives as a light and stays as a figure of light: the film draws her
- * out of many small lights (cosmos/rose-film/guide.ts), and this drawing only
- * lays a soft glow behind them. The ridge they stand on is drawn by the film itself.
+ * Paradiso XXXI): two cloaked figures on a rock, seen from behind, dark
+ * against the light. He is there from the first frame. She arrives as a
+ * light (cosmos/rose-film/guide.ts) and then stands beside him. The rock they
+ * stand on is drawn by the film itself.
  */
 import { FC } from 'react';
 import { GUIDE_OUTLINE } from '../../../cosmos/rose-film/guide';
 
-// Feet at the origin, heads near y = -90. He is seen from behind, in a short
-// cape over a long robe, his head back to look up at the rose.
+// Feet at the origin, heads near y = -90. He wears a short cape over a long
+// robe, his head back to look up at the rose.
 const DANTE_BODY =
   'M-11.6,0.4 C-10.6,-10 -9.2,-24 -8.4,-36 C-8.2,-41 -8.4,-45 -8.8,-47.4 L-10.6,-48.4 ' +
   'C-11.2,-55 -10.6,-62 -9,-67 C-8,-70 -6.4,-72 -4.4,-73 L-2.2,-74.2 L-2,-77.2 L3.4,-77 L3.8,-74 ' +
@@ -28,88 +28,47 @@ const RoseFilmGround: FC = () => (
   <div className="rose-film-ground">
     <svg viewBox="0 0 120 116" focusable="false">
       <defs>
-        {/* The rose's light comes from above and to the right. */}
-        <linearGradient id="rfg-fall" gradientUnits="userSpaceOnUse" x1="12" y1="-92" x2="-6" y2="-6">
+        {/* The rose's light comes from above and behind them. */}
+        <linearGradient id="rfg-fall" gradientUnits="userSpaceOnUse" x1="0" y1="-92" x2="0" y2="-6">
           <stop offset="0" className="rfg-fall-near" />
           <stop offset="0.5" className="rfg-fall-mid" />
           <stop offset="1" className="rfg-fall-far" />
         </linearGradient>
-        {/* Her light reaches him from the side. */}
-        <linearGradient id="rfg-side" gradientUnits="userSpaceOnUse" x1="18" y1="-60" x2="-6" y2="-60">
-          <stop offset="0" className="rfg-side-near" />
-          <stop offset="1" className="rfg-side-far" />
-        </linearGradient>
-        <linearGradient id="rfg-light" gradientUnits="userSpaceOnUse" x1="0" y1="-92" x2="0" y2="-6">
-          <stop offset="0" className="rfg-light-top" />
-          <stop offset="0.5" className="rfg-light-mid" />
-          <stop offset="1" className="rfg-light-foot" />
-        </linearGradient>
-        <radialGradient id="rfg-halo" gradientUnits="userSpaceOnUse" cx="1" cy="-79.6" r="12">
-          <stop offset="0" className="rfg-halo-near" />
-          <stop offset="1" className="rfg-halo-far" />
-        </radialGradient>
-        <radialGradient id="rfg-pool" gradientUnits="objectBoundingBox" cx="0.5" cy="0.5" r="0.5">
-          <stop offset="0" className="rfg-pool-near" />
-          <stop offset="1" className="rfg-pool-far" />
-        </radialGradient>
         <g id="rfg-dante-shape">
           <path d={DANTE_BODY} />
           <path d={DANTE_FLAP} transform={DANTE_HEAD_FIT} />
           <path d={DANTE_HEAD} transform={DANTE_HEAD_FIT} />
         </g>
-        <clipPath id="rfg-dante">
-          <path d={DANTE_BODY} />
-          <path d={DANTE_FLAP} transform={DANTE_HEAD_FIT} />
-          <path d={DANTE_HEAD} transform={DANTE_HEAD_FIT} />
-        </clipPath>
-        <clipPath id="rfg-beatrice">
-          {GUIDE_OUTLINE.map((d) => (
-            <path key={d} d={d} />
-          ))}
-        </clipPath>
+        <path id="rfg-beatrice-shape" d={GUIDE_OUTLINE} />
         <filter id="rfg-soft" x="-20%" y="-10%" width="140%" height="120%">
           <feGaussianBlur stdDeviation="0.3" />
         </filter>
         <filter id="rfg-turn" x="-30%" y="-20%" width="160%" height="140%">
-          <feGaussianBlur stdDeviation="0.45" />
+          <feGaussianBlur stdDeviation="0.5" />
         </filter>
-        {/* Light only where his form turns towards it: the shape less its own shadow. */}
-        <mask id="rfg-from-rose" maskUnits="userSpaceOnUse" x="-30" y="-100" width="70" height="110">
-          <use href="#rfg-dante-shape" className="rfg-mask-on" />
-          <use href="#rfg-dante-shape" className="rfg-mask-off" transform="translate(-0.8 0.7)" filter="url(#rfg-turn)" />
-        </mask>
-        <mask id="rfg-from-her" maskUnits="userSpaceOnUse" x="-30" y="-100" width="70" height="110">
-          <use href="#rfg-dante-shape" className="rfg-mask-on" />
-          <use href="#rfg-dante-shape" className="rfg-mask-off" transform="translate(-1.2 0.1)" filter="url(#rfg-turn)" />
-        </mask>
-        <filter id="rfg-glow" x="-150%" y="-40%" width="400%" height="180%">
-          <feGaussianBlur stdDeviation="4.6" result="wide" />
-          <feGaussianBlur in="SourceGraphic" stdDeviation="1.3" result="near" />
-          <feMerge>
-            <feMergeNode in="wide" />
-            <feMergeNode in="near" />
-          </feMerge>
+        <filter id="rfg-aura" x="-150%" y="-40%" width="400%" height="180%">
+          <feGaussianBlur stdDeviation="3.4" />
         </filter>
+        {/* Light only on the edge that turns towards it: the shape less its own shadow. */}
+        <mask id="rfg-dante-edge" maskUnits="userSpaceOnUse" x="-30" y="-100" width="70" height="110">
+          <use href="#rfg-dante-shape" className="rfg-mask-on" />
+          <use href="#rfg-dante-shape" className="rfg-mask-off" transform="translate(-0.2 0.9)" filter="url(#rfg-turn)" />
+        </mask>
+        <mask id="rfg-beatrice-edge" maskUnits="userSpaceOnUse" x="-30" y="-100" width="70" height="110">
+          <use href="#rfg-beatrice-shape" className="rfg-mask-on" />
+          <use href="#rfg-beatrice-shape" className="rfg-mask-off" transform="translate(0.2 0.9)" filter="url(#rfg-turn)" />
+        </mask>
       </defs>
 
-      {/* Her light lies on the ground around her feet. */}
-      <ellipse className="rfg-her" cx="78" cy="113" rx="28" ry="3.2" fill="url(#rfg-pool)" />
-
-      <g className="rfg-him" transform="translate(42 113)">
-        <use href="#rfg-dante-shape" className="rfg-dark" filter="url(#rfg-soft)" />
-        <g clipPath="url(#rfg-dante)">
-          <rect x="-30" y="-100" width="70" height="110" fill="url(#rfg-fall)" mask="url(#rfg-from-rose)" className="rfg-lit" />
-          <rect x="-30" y="-100" width="70" height="110" fill="url(#rfg-side)" mask="url(#rfg-from-her)" className="rfg-her" />
-        </g>
+      <g className="rfg-her" transform="translate(70 112.6)">
+        <use href="#rfg-beatrice-shape" className="rfg-her-aura" filter="url(#rfg-aura)" />
+        <use href="#rfg-beatrice-shape" className="rfg-her-dark" filter="url(#rfg-soft)" />
+        <rect x="-30" y="-100" width="70" height="110" fill="url(#rfg-fall)" mask="url(#rfg-beatrice-edge)" className="rfg-lit" />
       </g>
 
-      <g className="rfg-her" transform="translate(78 112)">
-        <circle cx="1" cy="-79.6" r="12" fill="url(#rfg-halo)" />
-        <g filter="url(#rfg-glow)" className="rfg-her-body">
-          <g clipPath="url(#rfg-beatrice)">
-            <rect x="-20" y="-94" width="46" height="98" fill="url(#rfg-light)" />
-          </g>
-        </g>
+      <g className="rfg-him" transform="translate(49 113)">
+        <use href="#rfg-dante-shape" className="rfg-dark" filter="url(#rfg-soft)" />
+        <rect x="-30" y="-100" width="70" height="110" fill="url(#rfg-fall)" mask="url(#rfg-dante-edge)" className="rfg-lit" />
       </g>
     </svg>
   </div>

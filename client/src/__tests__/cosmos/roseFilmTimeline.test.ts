@@ -4,11 +4,13 @@ import {
   FILM_DURATION,
   MEET_START,
   MEET_TRAVEL,
+  RING_RADIUS,
   RISE_TRAVEL,
+  ROSE,
   SEAT_COUNT,
   filmState,
-  rosePoint,
   seatParams,
+  seatWorld,
 } from '../../cosmos/rose-film/timeline';
 
 const LAYOUTS = [
@@ -65,19 +67,24 @@ describe('rose film timeline', () => {
     expect(last.flash).toBe(1);
   });
 
-  it('seats thirty lights on the rims of the rose, each from its own place on the horizon', () => {
+  it('seats thirty lights on the crown around the round, each from its own place on the horizon', () => {
     const seats = Array.from({ length: SEAT_COUNT }, (_, i) => seatParams(i));
-    expect(new Set(seats.map((s) => s.theta)).size).toBe(SEAT_COUNT);
+    expect(new Set(seats.map((s) => s.angle)).size).toBe(SEAT_COUNT);
     expect(new Set(seats.map((s) => s.startX)).size).toBe(SEAT_COUNT);
     for (const seat of seats) {
-      const [x, y, z] = rosePoint(seat.theta, seat.x1);
-      expect(Math.hypot(x, y)).toBeLessThanOrEqual(1.05);
-      expect(Number.isFinite(z)).toBe(true);
+      const [x, y] = seatWorld(seat, FILM_DURATION);
+      expect(Math.hypot(x, y)).toBeGreaterThan(RING_RADIUS);
+      expect(Math.hypot(x, y)).toBeLessThan(ROSE.rim);
       expect(seat.startX).toBeGreaterThan(0);
       expect(seat.startX).toBeLessThan(1);
       expect(seat.seed).toBeGreaterThanOrEqual(0);
       expect(seat.seed).toBeLessThan(1);
     }
+  });
+
+  it('builds the rose from the sun outwards: tiers inside the round, a wreath outside it', () => {
+    const radii = [...ROSE.tiers, RING_RADIUS, ...ROSE.wreath, ROSE.rim];
+    for (let i = 1; i < radii.length; i++) expect(radii[i]).toBeGreaterThan(radii[i - 1]);
   });
 
   it('kindles each light before it rises, the earliest life first, and seats them all before the end', () => {
@@ -92,11 +99,10 @@ describe('rose film timeline', () => {
     });
   });
 
-  it('holds the full wall of names for at least a second and a half', () => {
-    const seats = Array.from({ length: SEAT_COUNT }, (_, i) => seatParams(i));
-    // A name takes 0.7 s to appear beside its light.
-    const allLit = seats[SEAT_COUNT - 1].kindle + 0.7;
-    expect(seats[0].lift - allLit).toBeGreaterThanOrEqual(1.5);
+  it('lets the sun rise only after the tiers have begun to fill', () => {
+    expect(filmState(8.5, LAYOUTS[0]).sun).toBe(0);
+    expect(filmState(8.5, LAYOUTS[0]).bloom).toBeGreaterThan(0.3);
+    expect(filmState(CUES.verse[0] + 0.5, LAYOUTS[0]).sun).toBe(1);
   });
 
   it('brings the light that becomes Beatrice down before the last line has stood for two seconds', () => {

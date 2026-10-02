@@ -7,21 +7,19 @@
  */
 import {
   ACCUM_FS,
-  BEE_VS,
   BLUR_FS,
   COMPOSITE_FS,
-  GUIDE_VS,
+  DOT_FS,
   DOWN_FS,
-  HEART_FS,
-  HEART_VS,
-  MESH_FS,
-  MESH_VS,
+  GUIDE_VS,
   POINT_FS,
   POINT_VS,
   QUAD_VS,
   SEAT_FS,
   SEAT_VS,
   STAR_VS,
+  SUN_FS,
+  SUN_VS,
 } from './shaders';
 import { guideLights } from './guide';
 import {
@@ -33,6 +31,7 @@ import {
   MEET_TRAVEL,
   RING_RADIUS,
   RISE_TRAVEL,
+  ROSE,
   SEAT_COUNT,
   SEATS,
   type FilmLayout,
@@ -42,8 +41,11 @@ export type RoseFilmTier = 'desktop' | 'mobile' | 'mobile-low';
 export type Rgb = [number, number, number];
 
 export interface RoseFilmPalette {
+  /** The night's four tones: around the rose, at the foot, at the rim, and one lighter veil. */
   night: Rgb;
   void: Rgb;
+  abyss: Rgb;
+  veil: Rgb;
   gold: Rgb;
   goldBright: Rgb;
   white: Rgb;
@@ -57,15 +59,8 @@ export interface RoseFilm {
   setQuality(scale: number): void;
   /** Draw the moving light once per frame only. The first relief for a device that falls behind. */
   setSingleStep(single: boolean): void;
-  /**
-   * Where each of the thirty waits on the horizon: x and y as shares of the
-   * frame (y from the foot). With lifts, also when each leaves for the rose.
-   */
-  setSeatStarts(starts: ArrayLike<number>, lifts?: ArrayLike<number>): void;
   /** The words' box (centre and half size, shares of the frame, y from the foot) and how present they are. */
   setWords(cx: number, cy: number, hw: number, hh: number, on: number): void;
-  /** The same for the block of names. */
-  setNames(cx: number, cy: number, hw: number, hh: number, on: number): void;
   render(t: number, dt: number): void;
   seek(t: number): void;
   dispose(): void;
@@ -74,28 +69,29 @@ export interface RoseFilm {
 interface Budget {
   points: number;
   stars: number;
-  bees: number;
+  /** The share of the rose's figures that are drawn (the rows keep their order, with wider gaps). */
+  figures: number;
   dprCap: number;
   maxPixels: number;
   /** How often the moving light is drawn per 60th of a second, so its fading lines stay unbroken. */
   substeps: number;
-  /** Samples per pixel while the rose has a body, so the petals' edges are smooth. */
-  samples: number;
-  /** The small lights the guide is made of. */
+  /** The small lights the guide unfolds into. */
   guide: number;
 }
 
 const BUDGET: Record<RoseFilmTier, Budget> = {
-  desktop: { points: 130000, stars: 2600, bees: 520, dprCap: 2, maxPixels: 2.8e6, substeps: 4, samples: 4, guide: 2600 },
-  mobile: { points: 56000, stars: 1500, bees: 260, dprCap: 2, maxPixels: 1.5e6, substeps: 3, samples: 4, guide: 1900 },
-  'mobile-low': { points: 26000, stars: 900, bees: 120, dprCap: 1.5, maxPixels: 0.9e6, substeps: 2, samples: 0, guide: 1100 },
+  desktop: { points: 130000, stars: 2600, figures: 1, dprCap: 2, maxPixels: 2.8e6, substeps: 4, guide: 2600 },
+  mobile: { points: 56000, stars: 1500, figures: 0.8, dprCap: 2, maxPixels: 1.5e6, substeps: 3, guide: 1900 },
+  'mobile-low': { points: 26000, stars: 900, figures: 0.55, dprCap: 1.5, maxPixels: 0.9e6, substeps: 2, guide: 1100 },
 };
 
 const FOV_Y = (40 * Math.PI) / 180;
+// How far the sun's light and rays reach, in the picture's own measure.
+const SUN_REACH = 1.95;
+// Grains per pixel at which a grain shines at its own strength: thicker, each is dimmer.
+const DENSE_REF = 0.1;
 const RING_R = RING_RADIUS;
 const TWO_PI = Math.PI * 2;
-// The petal spiral starts on a petal's edge, so the outermost petal is whole.
-const SPIRAL_START = (-5 / 3) * Math.PI;
 
 function mulberry32(seed: number) {
   let a = seed >>> 0;
@@ -195,32 +191,70 @@ export function createRoseFilm(
   const N = budget.points;
   const pa = new Float32Array(N * 4);
   const pb = new Float32Array(N * 4);
-  for (let i = 0; i < N; i++) {
+  const pc = new Float32Array(N * 2);
+  const gauss = () => probit(0.002 + 0.996 * rnd());
+  // Its place in the river: a rank along it, a place across it and in its depth, a seed.
+  const river = (i: number) => {
     const u0 = rnd();
-    const theta = SPIRAL_START + (15 * Math.PI - SPIRAL_START) * Math.pow(u0, 1.55);
-    const pick = rnd();
-    // Rims draw the petals' outlines, rows are the tiers of seats, the rest
-    // fills the faces. A few points are sparks, a few a soft haze.
-    let x1: number;
-    let kind: number;
-    if (pick < 0.44) {
-      x1 = 1 - 0.035 * rnd() * rnd();
-      kind = 0.1 + 0.3 * rnd();
-    } else if (pick < 0.86) {
-      x1 = 1 - (Math.floor(rnd() * 10) + 1) * 0.045 + (rnd() - 0.5) * 0.006;
-      kind = 0.4 + 0.3 * rnd();
-    } else {
-      x1 = Math.sqrt(0.02 + 0.98 * rnd());
-      kind = 0.7 + 0.3 * rnd();
-    }
-    const special = rnd();
-    if (special < 0.03) kind = special;
     pa[i * 4] = u0;
     pa[i * 4 + 1] = probit(Math.min(0.999, Math.max(0.001, 0.8 * u0 + 0.2 * rnd())));
-    pa[i * 4 + 2] = probit(0.002 + 0.996 * rnd());
+    pa[i * 4 + 2] = gauss();
     pa[i * 4 + 3] = rnd();
-    pb[i * 4] = theta;
-    pb[i * 4 + 1] = x1;
+  };
+
+  // The figures first, row by row: every tier inside the round carries two
+  // rows of them, the round itself two rows of wings, the wreath its loose rows.
+  const tiers = ROSE.tiers;
+  let n = 0;
+  const row = (radius: number, spread: number, pitch: number, winged: number) => {
+    const count = Math.max(8, Math.round(((TWO_PI / pitch) * budget.figures)));
+    const turn = rnd() * TWO_PI;
+    for (let j = 0; j < count && n < N; j++) {
+      river(n);
+      pb[n * 4] = turn + (TWO_PI * (j + 0.7 * (rnd() - 0.5))) / count;
+      pb[n * 4 + 1] = radius + spread * gauss();
+      pb[n * 4 + 2] = rnd();
+      pb[n * 4 + 3] = 0.5;
+      pc[n * 2] = 0.001 + 0.999 * rnd();
+      pc[n * 2 + 1] = rnd() < winged ? 1 : 0;
+      n++;
+    }
+  };
+  tiers.forEach((r, i) => {
+    const gap = (i + 1 < tiers.length ? tiers[i + 1] : RING_R - 0.08) - r;
+    row(r - 0.2 * gap, 0.05 * gap, 0.085 * 0.7, 0.65);
+    row(r + 0.2 * gap, 0.05 * gap, 0.085 * 0.7, 0.65);
+  });
+  row(RING_R - 0.04, 0.012, 0.085 * 0.9, 0.9);
+  row(RING_R + 0.05, 0.012, 0.085 * 0.9, 0.9);
+  ROSE.wreath.forEach((r) => row(r, 0.045, 0.125 * 1.3, 1));
+  row(1.53, 0.1, 0.125 * 2.6, 1);
+  const figures = n;
+
+  // Then the grains of light: most gather on the tiers, a third stays on the round, the rest drifts in the wreath.
+  const tierWeight = tiers.map((r) => Math.pow(r, 1.25));
+  const tierSum = tierWeight.reduce((a, b) => a + b, 0);
+  for (let i = figures; i < N; i++) {
+    river(i);
+    const zone = rnd();
+    let radius: number;
+    if (zone < 0.5) {
+      let pick = rnd() * tierSum;
+      let k = 0;
+      while (k < tiers.length - 1 && pick > tierWeight[k]) pick -= tierWeight[k++];
+      const gap = (k + 1 < tiers.length ? tiers[k + 1] : RING_R - 0.08) - tiers[k];
+      radius = tiers[k] + 0.2 * gap * gauss();
+    } else if (zone < 0.82) {
+      radius = RING_R + 0.038 * gauss();
+    } else {
+      radius = RING_R + 0.1 + 0.62 * Math.pow(rnd(), 1.6);
+    }
+    let kind = 0.1 + 0.9 * rnd();
+    // A few points are sparks in the river, a few a soft haze.
+    const special = rnd();
+    if (special < 0.03) kind = special;
+    pb[i * 4] = rnd() * TWO_PI;
+    pb[i * 4 + 1] = Math.max(0.12, radius);
     pb[i * 4 + 2] = rnd();
     pb[i * 4 + 3] = kind;
   }
@@ -246,8 +280,8 @@ export function createRoseFilm(
     const s = i < SEAT_COUNT ? SEATS[i] : null;
     for (let j = 0; j < SEAT_SUBS; j++) {
       const k = i * SEAT_SUBS + j;
-      seats[k * 4] = s ? s.theta : 0;
-      seats[k * 4 + 1] = s ? s.x1 : 0;
+      seats[k * 4] = s ? s.angle : 0;
+      seats[k * 4 + 1] = s ? s.radius : 0;
       seats[k * 4 + 2] = s ? s.seed : 0.37;
       seats[k * 4 + 3] = s ? 0 : 1;
       seatSub[k] = j / (SEAT_SUBS - 1);
@@ -257,40 +291,6 @@ export function createRoseFilm(
   // Her lights in the drawing's own measure, and the same placed on the frame.
   const guideShape = guideLights(budget.guide, rnd);
   const guide = new Float32Array(budget.guide * 4);
-
-  const bees = new Float32Array(budget.bees * 4);
-  for (let i = 0; i < budget.bees; i++) {
-    // The swarm keeps to the inner tiers, inside the bowl.
-    bees[i * 4] = TWO_PI + 9 * Math.PI * rnd();
-    bees[i * 4 + 1] = 0.5 + 0.4 * rnd();
-    bees[i * 4 + 2] = rnd();
-    bees[i * 4 + 3] = rnd();
-  }
-
-  const NT = 1400;
-  const NX = 24;
-  const meshUv = new Float32Array((NT + 1) * (NX + 1) * 2);
-  for (let i = 0; i <= NT; i++) {
-    for (let j = 0; j <= NX; j++) {
-      const k = (i * (NX + 1) + j) * 2;
-      meshUv[k] = -TWO_PI + (17 * Math.PI * i) / NT;
-      meshUv[k + 1] = j / NX;
-    }
-  }
-  const meshIdx = new Uint16Array(NT * NX * 6);
-  let mi = 0;
-  for (let i = 0; i < NT; i++) {
-    for (let j = 0; j < NX; j++) {
-      const a = i * (NX + 1) + j;
-      const b = a + NX + 1;
-      meshIdx[mi++] = a;
-      meshIdx[mi++] = b;
-      meshIdx[mi++] = a + 1;
-      meshIdx[mi++] = a + 1;
-      meshIdx[mi++] = b;
-      meshIdx[mi++] = b + 1;
-    }
-  }
 
   const buffers: WebGLBuffer[] = [];
   const vaos: WebGLVertexArrayObject[] = [];
@@ -315,29 +315,28 @@ export function createRoseFilm(
     vaos.push(v);
     return v;
   }
-  const pointVao = vao([{ data: pa, size: 4 }, { data: pb, size: 4 }]);
+  const pointVao = vao([{ data: pa, size: 4 }, { data: pb, size: 4 }, { data: pc, size: 2 }]);
   const starVao = vao([{ data: stars, size: 4 }]);
   const seatVao = vao([{ data: seats, size: 4 }, { data: seatSub, size: 1 }, { data: seatStart, size: 4 }]);
   const seatStartBuf = buffers[buffers.length - 1];
   const guideVao = vao([{ data: guide, size: 4 }]);
   const guideBuf = buffers[buffers.length - 1];
-  const beeVao = vao([{ data: bees, size: 4 }]);
-  const meshVao = vao([{ data: meshUv, size: 2 }], meshIdx);
   const quadVao = vao([{ data: new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]), size: 2 }]);
 
   // ---- programs -------------------------------------------------------------
-  const meshP = link(gl, MESH_VS, MESH_FS);
   const pointP = link(gl, POINT_VS, POINT_FS);
-  const starP = link(gl, STAR_VS, POINT_FS);
+  const starP = link(gl, STAR_VS, DOT_FS);
   const seatP = link(gl, SEAT_VS, SEAT_FS);
-  const beeP = link(gl, BEE_VS, POINT_FS);
-  const guideP = link(gl, GUIDE_VS, POINT_FS);
-  const heartP = link(gl, HEART_VS, HEART_FS);
+  const guideP = link(gl, GUIDE_VS, DOT_FS);
+  const sunP = link(gl, SUN_VS, SUN_FS);
   const accumP = link(gl, QUAD_VS, ACCUM_FS);
   const downP = link(gl, QUAD_VS, DOWN_FS);
   const blurP = link(gl, QUAD_VS, BLUR_FS);
   const compP = link(gl, QUAD_VS, COMPOSITE_FS);
-  const programs = [meshP, pointP, starP, seatP, beeP, guideP, heartP, accumP, downP, blurP, compP];
+  const programs = [pointP, starP, seatP, guideP, sunP, accumP, downP, blurP, compP];
+  // A figure is one point: no larger than this device draws a point.
+  const pointRange = gl.getParameter(gl.ALIASED_POINT_SIZE_RANGE) as Float32Array | null;
+  const figMax = Math.max(8, ((pointRange ? pointRange[1] : 64) || 64) / 2 - 1);
 
   // ---- targets --------------------------------------------------------------
   let W = 0;
@@ -345,17 +344,12 @@ export function createRoseFilm(
   let cssW = 0;
   let cssH = 0;
   let scene: Target | null = null;
-  let sceneDepth: WebGLRenderbuffer | null = null;
-  // The same picture with several samples per pixel, resolved into `scene`.
-  let fine: { fbo: WebGLFramebuffer; color: WebGLRenderbuffer; depth: WebGLRenderbuffer } | null = null;
-  let fineInUse = false;
   let accum: [Target, Target] | null = null;
   let glow: { a: Target; b: Target }[] = [];
   let accumIdx = 0;
   let quality = 1;
   let singleStep = false;
   const words = new Float32Array([0.5, 0.86, 0.3, 0.05, 0]);
-  const namesBox = new Float32Array([0.5, 0.25, 0.4, 0.06, 0]);
   const chest = new Float32Array([0.5, 0.2]);
 
   function makeTarget(w: number, h: number): Target {
@@ -373,41 +367,6 @@ export function createRoseFilm(
     return { fbo, tex, w, h };
   }
 
-  function makeFine(w: number, h: number) {
-    if (budget.samples < 2) return null;
-    const format = hdr ? gl!.RGBA16F : gl!.RGBA8;
-    const offered = gl!.getInternalformatParameter(gl!.RENDERBUFFER, format, gl!.SAMPLES) as Int32Array | null;
-    const samples = Math.min(budget.samples, offered && offered.length ? Math.max(...Array.from(offered)) : 0);
-    if (samples < 2) return null;
-    const color = gl!.createRenderbuffer()!;
-    gl!.bindRenderbuffer(gl!.RENDERBUFFER, color);
-    gl!.renderbufferStorageMultisample(gl!.RENDERBUFFER, samples, format, w, h);
-    const depth = gl!.createRenderbuffer()!;
-    gl!.bindRenderbuffer(gl!.RENDERBUFFER, depth);
-    gl!.renderbufferStorageMultisample(gl!.RENDERBUFFER, samples, gl!.DEPTH_COMPONENT24, w, h);
-    const fbo = gl!.createFramebuffer()!;
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, fbo);
-    gl!.framebufferRenderbuffer(gl!.FRAMEBUFFER, gl!.COLOR_ATTACHMENT0, gl!.RENDERBUFFER, color);
-    gl!.framebufferRenderbuffer(gl!.FRAMEBUFFER, gl!.DEPTH_ATTACHMENT, gl!.RENDERBUFFER, depth);
-    if (gl!.checkFramebufferStatus(gl!.FRAMEBUFFER) !== gl!.FRAMEBUFFER_COMPLETE) {
-      gl!.deleteFramebuffer(fbo);
-      gl!.deleteRenderbuffer(color);
-      gl!.deleteRenderbuffer(depth);
-      return null;
-    }
-    return { fbo, color, depth };
-  }
-
-  // Bring the many-sampled picture down into `scene`, where the next pass reads it.
-  function resolveFine() {
-    if (!fineInUse || !fine) return;
-    gl!.bindFramebuffer(gl!.READ_FRAMEBUFFER, fine.fbo);
-    gl!.bindFramebuffer(gl!.DRAW_FRAMEBUFFER, scene!.fbo);
-    gl!.blitFramebuffer(0, 0, W, H, 0, 0, W, H, gl!.COLOR_BUFFER_BIT, gl!.NEAREST);
-    gl!.bindFramebuffer(gl!.READ_FRAMEBUFFER, null);
-    gl!.bindFramebuffer(gl!.DRAW_FRAMEBUFFER, null);
-  }
-
   function freeTarget(t: Target | null) {
     if (!t) return;
     gl!.deleteFramebuffer(t.fbo);
@@ -416,20 +375,12 @@ export function createRoseFilm(
 
   function freeTargets() {
     freeTarget(scene);
-    if (sceneDepth) gl!.deleteRenderbuffer(sceneDepth);
-    if (fine) {
-      gl!.deleteFramebuffer(fine.fbo);
-      gl!.deleteRenderbuffer(fine.color);
-      gl!.deleteRenderbuffer(fine.depth);
-    }
-    fine = null;
     if (accum) accum.forEach(freeTarget);
     glow.forEach((g) => {
       freeTarget(g.a);
       freeTarget(g.b);
     });
     scene = null;
-    sceneDepth = null;
     accum = null;
     glow = [];
   }
@@ -455,12 +406,6 @@ export function createRoseFilm(
     canvas.height = H;
     freeTargets();
     scene = makeTarget(W, H);
-    sceneDepth = gl!.createRenderbuffer()!;
-    gl!.bindRenderbuffer(gl!.RENDERBUFFER, sceneDepth);
-    gl!.renderbufferStorage(gl!.RENDERBUFFER, gl!.DEPTH_COMPONENT24, W, H);
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, scene.fbo);
-    gl!.framebufferRenderbuffer(gl!.FRAMEBUFFER, gl!.DEPTH_ATTACHMENT, gl!.RENDERBUFFER, sceneDepth);
-    fine = makeFine(W, H);
     accum = [makeTarget(W, H), makeTarget(W, H)];
     accum.forEach(clearTarget);
     let gw = W;
@@ -471,6 +416,7 @@ export function createRoseFilm(
       glow.push({ a: makeTarget(gw, gh), b: makeTarget(gw, gh) });
     }
     gl!.bindFramebuffer(gl!.FRAMEBUFFER, null);
+    place();
   }
 
   // ---- matrices -------------------------------------------------------------
@@ -483,7 +429,7 @@ export function createRoseFilm(
     return { aspect, portrait: aspect < 0.8 };
   }
 
-  function setCamera(dist: number, centerX: number, centerY: number, tilt: number) {
+  function setCamera(dist: number, centerX: number, centerY: number) {
     const aspect = W / H;
     const f = 1 / Math.tan(FOV_Y / 2);
     const near = 0.1;
@@ -503,12 +449,16 @@ export function createRoseFilm(
     view[10] = 1;
     view[15] = 1;
     view[14] = -dist;
-    // Lean the rose back so its face turns up towards the viewer's eye line.
-    const c = Math.cos(tilt);
-    const s = Math.sin(tilt);
-    model[0] = 1; model[1] = 0; model[2] = 0;
-    model[3] = 0; model[4] = c; model[5] = -s;
-    model[6] = 0; model[7] = s; model[8] = c;
+    // The rose faces the two who look up into it.
+    model.fill(0);
+    model[0] = 1;
+    model[4] = 1;
+    model[8] = 1;
+  }
+
+  // The camera's distance at a moment of the film: the round fills a set share of the short side.
+  function distanceAt(st: { halfShort: number; zoom: number }): number {
+    return st.halfShort / (Math.tan(FOV_Y / 2) * Math.min(1, W / H)) / st.zoom;
   }
 
   const pal = opts.palette;
@@ -534,43 +484,22 @@ export function createRoseFilm(
   // One moment of the moving light, added to the fading lines.
   function drawLight(t: number, dt: number, lay: FilmLayout) {
     const st = filmState(t, lay);
-    const aspect = W / H;
-
-    // Fit: the ring fills a set share of the short side.
-    const tanShort = Math.tan(FOV_Y / 2) * Math.min(1, aspect);
-    const dist = st.halfShort / tanShort / st.zoom;
-    setCamera(dist, st.centerX, st.centerY, st.tilt);
+    const dist = distanceAt(st);
+    setCamera(dist, st.centerX, st.centerY);
     const px = H / 2 / Math.tan(FOV_Y / 2);
     const sizeMul = Math.pow(H / cssH, 0.75) * (lay.portrait ? 0.85 : 1);
 
-    // Once the rose has a body, its petals are drawn with several samples per pixel.
-    fineInUse = !!fine && st.morph > 0.1;
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, fineInUse ? fine!.fbo : scene!.fbo);
+    gl!.bindFramebuffer(gl!.FRAMEBUFFER, scene!.fbo);
     gl!.viewport(0, 0, W, H);
     gl!.clearColor(0, 0, 0, 1);
-    gl!.clearDepth(1);
-    gl!.depthMask(true);
-    gl!.clear(gl!.COLOR_BUFFER_BIT | gl!.DEPTH_BUFFER_BIT);
-
-    gl!.enable(gl!.DEPTH_TEST);
-    gl!.depthFunc(gl!.LEQUAL);
-    gl!.disable(gl!.BLEND);
-
-    if (st.morph > 0.1) {
-      setCommon(meshP, t, st.rot, px);
-      gl!.uniform1f(meshP.u.uBloom, st.bloom);
-      gl!.uniform1f(meshP.u.uBody, st.body * st.fade);
-      gl!.uniform1f(meshP.u.uCoverage, fineInUse ? 1 : 0);
-      gl!.uniform1f(meshP.u.uSeatPx, Math.pow(H / cssH, 0.7));
-      if (fineInUse) gl!.enable(gl!.SAMPLE_ALPHA_TO_COVERAGE);
-      gl!.bindVertexArray(meshVao);
-      gl!.drawElements(gl!.TRIANGLES, meshIdx.length, gl!.UNSIGNED_SHORT, 0);
-      gl!.disable(gl!.SAMPLE_ALPHA_TO_COVERAGE);
-    }
-
-    gl!.depthMask(false);
+    gl!.clear(gl!.COLOR_BUFFER_BIT);
+    gl!.disable(gl!.DEPTH_TEST);
     gl!.enable(gl!.BLEND);
     gl!.blendFunc(gl!.ONE, gl!.ONE);
+
+    // How thickly the grains lie in the finished rose on this screen.
+    const pxEnd = px / distanceAt(filmState(FILM_DURATION - 2, lay));
+    const dense = (N - figures) / (Math.PI * ROSE.rim * ROSE.rim * pxEnd * pxEnd);
 
     setCommon(pointP, t, st.rot, px);
     gl!.uniform1f(pointP.u.uBloom, st.bloom);
@@ -580,34 +509,26 @@ export function createRoseFilm(
     gl!.uniform1f(pointP.u.uRiverRot, st.riverRot);
     gl!.uniform1f(pointP.u.uWidth, st.width);
     gl!.uniform1f(pointP.u.uRingness, st.ringness);
-    gl!.uniform1f(pointP.u.uMorph, st.morph);
     gl!.uniform1f(pointP.u.uSizeMul, sizeMul * st.grain);
     gl!.uniform1f(pointP.u.uFade, st.fade);
     gl!.uniform1f(pointP.u.uPour, st.pour);
     gl!.uniform1f(pointP.u.uShear, st.shear);
+    gl!.uniform1f(pointP.u.uFigMax, figMax);
+    gl!.uniform1f(pointP.u.uDense, Math.min(3, Math.max(0.5, dense / DENSE_REF)));
     gl!.bindVertexArray(pointVao);
     gl!.drawArrays(gl!.POINTS, 0, N);
 
-    if (st.bees > 0.01 && budget.bees > 0) {
-      setCommon(beeP, t, st.rot, px);
-      gl!.uniform1f(beeP.u.uBloom, st.bloom);
-      gl!.uniform1f(beeP.u.uBees, st.bees * st.fade);
-      gl!.uniform1f(beeP.u.uSizeMul, sizeMul);
-      gl!.bindVertexArray(beeVao);
-      gl!.drawArrays(gl!.POINTS, 0, budget.bees);
-    }
-
-    gl!.disable(gl!.DEPTH_TEST);
-
-    setCommon(heartP, t, st.rot, px);
-    gl!.uniform1f(heartP.u.uHeartSize, st.heartSize * Math.min(1, aspect) * st.zoom);
-    gl!.uniform1f(heartP.u.uAspect, aspect);
-    gl!.uniform1f(heartP.u.uHeart, st.heart * st.fade);
-    gl!.uniform1f(heartP.u.uPoint, st.point * st.fade);
+    setCommon(sunP, t, st.rot, px);
+    gl!.uniform1f(sunP.u.uSunR, SUN_REACH);
+    gl!.uniform1f(sunP.u.uPxWorld, px / dist);
+    gl!.uniform1f(sunP.u.uHeart, st.heart * st.fade);
+    gl!.uniform1f(sunP.u.uPoint, st.point * st.fade);
+    gl!.uniform1f(sunP.u.uSun, st.sun * st.fade);
+    gl!.uniform1f(sunP.u.uBody, st.body * st.fade);
+    gl!.uniform1f(sunP.u.uRingR, RING_R);
     drawQuad();
 
     gl!.disable(gl!.BLEND);
-    resolveFine();
 
     const prev = accum![accumIdx];
     const next = accum![1 - accumIdx];
@@ -643,9 +564,8 @@ export function createRoseFilm(
     const sizeMul = Math.pow(H / cssH, 0.75) * (lay.portrait ? 0.85 : 1);
     const next = accum[accumIdx];
 
-    // ---- the thirty, outside the fading lines: each carries its own tail -------
-    // The last moment's depth is still there, so the rose hides the stars behind it.
-    gl!.bindFramebuffer(gl!.FRAMEBUFFER, fineInUse ? fine!.fbo : scene.fbo);
+    // ---- the stars and the thirty, outside the fading lines: each of the thirty carries its own tail
+    gl!.bindFramebuffer(gl!.FRAMEBUFFER, scene.fbo);
     gl!.viewport(0, 0, W, H);
     gl!.clearColor(0, 0, 0, 0);
     gl!.clear(gl!.COLOR_BUFFER_BIT);
@@ -653,9 +573,6 @@ export function createRoseFilm(
     gl!.enable(gl!.BLEND);
     gl!.blendFunc(gl!.ONE, gl!.ONE);
 
-    gl!.enable(gl!.DEPTH_TEST);
-    gl!.depthFunc(gl!.LEQUAL);
-    gl!.depthMask(false);
     // The stars leave the alpha alone: it marks the lights that stand before the far ridge.
     gl!.colorMask(true, true, true, false);
     setCommon(starP, t, st.rot, px);
@@ -665,22 +582,19 @@ export function createRoseFilm(
     gl!.uniform3f(starP.u.uStarFrame, start.centerX, start.centerY, aspect);
     gl!.uniform4f(starP.u.uWords, words[0], words[1], words[2], words[3]);
     gl!.uniform1f(starP.u.uWordsOn, words[4]);
-    gl!.uniform4f(starP.u.uNames, namesBox[0], namesBox[1], namesBox[2], namesBox[3]);
-    gl!.uniform1f(starP.u.uNamesOn, namesBox[4]);
+    gl!.uniform4f(starP.u.uRose, st.centerX, st.centerY, (ROSE.rim * px) / distanceAt(st) / H, st.body);
     gl!.bindVertexArray(starVao);
     gl!.drawArrays(gl!.POINTS, 0, budget.stars);
     gl!.colorMask(true, true, true, true);
-    gl!.disable(gl!.DEPTH_TEST);
 
     if (t > SEATS[0].kindle) {
       const halfH = st.halfShort / Math.min(1, aspect) / st.zoom;
       setCommon(seatP, t, st.rot, px);
-      gl!.uniform1f(seatP.u.uBloom, st.bloom);
       gl!.uniform4f(seatP.u.uFrame, halfH * aspect, halfH, st.centerX, st.centerY);
       gl!.uniform1f(seatP.u.uSizeMul, sizeMul);
       gl!.uniform1f(seatP.u.uFade, st.fade);
       gl!.uniform1f(seatP.u.uTail, 0.26);
-      gl!.uniform1f(seatP.u.uWait, lay.portrait ? 1 : 1.4);
+      gl!.uniform1f(seatP.u.uWait, lay.portrait ? 0.8 : 1);
       gl!.uniform1f(seatP.u.uTravel, RISE_TRAVEL);
       gl!.bindVertexArray(seatVao);
       gl!.drawArrays(gl!.POINTS, 0, SEAT_COUNT * SEAT_SUBS);
@@ -702,7 +616,6 @@ export function createRoseFilm(
       gl!.drawArrays(gl!.POINTS, 0, budget.guide);
     }
     gl!.disable(gl!.BLEND);
-    resolveFine();
 
     // ---- glow -----------------------------------------------------------------
     let src: Target = next;
@@ -752,6 +665,8 @@ export function createRoseFilm(
     gl!.uniform3fv(compP.u.uBlue, pal.blue);
     gl!.uniform3fv(compP.u.uNight, pal.night);
     gl!.uniform3fv(compP.u.uVoid, pal.void);
+    gl!.uniform3fv(compP.u.uAbyss, pal.abyss);
+    gl!.uniform3fv(compP.u.uVeil, pal.veil);
     gl!.uniform3fv(compP.u.uGoldBright, pal.goldBright);
     gl!.uniform2f(compP.u.uHeartUv, 0.5 + st.centerX * 0.5, 0.5 + st.centerY * 0.5);
     gl!.uniform1f(compP.u.uRays, st.rays);
@@ -765,8 +680,6 @@ export function createRoseFilm(
     gl!.uniform1f(compP.u.uHeartLight, st.heart * st.fade);
     gl!.uniform4f(compP.u.uWords, words[0], words[1], words[2], words[3]);
     gl!.uniform1f(compP.u.uWordsOn, words[4]);
-    gl!.uniform4f(compP.u.uNames, namesBox[0], namesBox[1], namesBox[2], namesBox[3]);
-    gl!.uniform1f(compP.u.uNamesOn, namesBox[4]);
     drawQuad();
     gl!.bindVertexArray(null);
   }
@@ -796,28 +709,28 @@ export function createRoseFilm(
     singleStep = single;
   }
 
-  function setSeatStarts(starts: ArrayLike<number>, lifts?: ArrayLike<number>) {
+  // Where the thirty wait and where she lands. It depends on the frame's shape.
+  function place() {
     const lay = layout();
     const g = lay.portrait ? GROUND.portrait : GROUND.landscape;
+    const boxW = (g.figure * FIGURE_BOX.aspect) / lay.aspect;
     for (let i = 0; i < LIGHTS; i++) {
       const seat = i < SEAT_COUNT ? SEATS[i] : null;
-      // She lands where her drawing stands, at the height of her chest.
-      const boxW = (g.figure * FIGURE_BOX.aspect) / lay.aspect;
-      const x = seat ? starts[i * 2] : g.standX + (FIGURE_BOX.beatriceX - 0.5) * boxW;
-      const y = seat ? starts[i * 2 + 1] : g.top + g.figure * FIGURE_BOX.chestY;
+      // The thirty kindle along the far ranges. She lands where her drawing stands, at the height of her chest.
+      const x = seat ? seat.startX : g.standX + (FIGURE_BOX.beatriceX - 0.5) * boxW;
+      const y = seat ? g.top + 0.062 + 0.026 * ((i * 7) % 4) : g.top + g.figure * FIGURE_BOX.chestY;
       for (let j = 0; j < SEAT_SUBS; j++) {
         const k = (i * SEAT_SUBS + j) * 4;
         seatStart[k] = x;
         seatStart[k + 1] = y;
         seatStart[k + 2] = seat ? seat.kindle : 0;
-        seatStart[k + 3] = seat ? (lifts ? lifts[i] : seat.lift) : MEET_START;
+        seatStart[k + 3] = seat ? seat.lift : MEET_START;
       }
     }
     gl!.bindBuffer(gl!.ARRAY_BUFFER, seatStartBuf);
     gl!.bufferSubData(gl!.ARRAY_BUFFER, 0, seatStart);
 
     // The guide's lights, from the drawing's measure to shares of the frame.
-    const boxW = (g.figure * FIGURE_BOX.aspect) / lay.aspect;
     const left = g.standX - boxW / 2;
     const foot = g.top - 0.009;
     for (let i = 0; i < budget.guide; i++) {
@@ -840,27 +753,6 @@ export function createRoseFilm(
     words[4] = on;
   }
 
-  function setNames(cx: number, cy: number, hw: number, hh: number, on: number) {
-    namesBox[0] = cx;
-    namesBox[1] = cy;
-    namesBox[2] = hw;
-    namesBox[3] = hh;
-    namesBox[4] = on;
-  }
-
-  // Until the words' layout places them, the thirty wait in a row above the ridge.
-  function defaultStarts() {
-    const lay = layout();
-    const g = lay.portrait ? GROUND.portrait : GROUND.landscape;
-    const starts = new Float32Array(SEAT_COUNT * 2);
-    SEATS.forEach((seat, i) => {
-      starts[i * 2] = seat.startX;
-      starts[i * 2 + 1] = g.top + 0.06 + 0.03 * (i % 3);
-    });
-    setSeatStarts(starts);
-  }
-
   resize();
-  defaultStarts();
-  return { duration: FILM_DURATION, resize, setQuality, setSingleStep, setSeatStarts, setWords, setNames, render, seek, dispose };
+  return { duration: FILM_DURATION, resize, setQuality, setSingleStep, setWords, render, seek, dispose };
 }

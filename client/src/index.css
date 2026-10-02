@@ -280,6 +280,18 @@ button {
   --star-blue-glow: #b4d2ff;     /* For star glow effects */
   
   /* =================
+     ENTRY FILM (the museum's slate night)
+     ================= */
+  --film-abyss: #05070D;        /* the rim of the frame */
+  --film-slate-deep: #141B2C;   /* the foot of the frame, the ground */
+  --film-slate: #1B2438;        /* the night around the rose */
+  --film-slate-veil: #3A4560;   /* one lighter veil, off centre */
+  --film-ivory: #F3EFE2;        /* the light itself */
+  --film-gold: #E0B96A;         /* the sun, the thirty, the words */
+  --film-gold-deep: #B8863B;    /* small gold, far gold */
+  --film-mist: #8D93AD;         /* the coolest lights */
+
+  /* =================
      UTILITY COLORS
      ================= */
   --utility-pure-black: #000000;  /* OLED optimization only */

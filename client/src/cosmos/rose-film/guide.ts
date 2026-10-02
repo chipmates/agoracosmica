@@ -1,59 +1,44 @@
 /**
- * cosmos/rose-film/guide — the figure of light that stands beside the seeker.
+ * cosmos/rose-film/guide — the one who comes to stand beside the seeker.
  *
- * She is not drawn: her body is a fine grain of light, with brighter lights
- * in it, inside a standing figure with one arm raised to the rose.
- * Coordinates are those of the foreground drawing (feet at the origin, y up
- * is negative).
+ * She arrives as a light. Where it lands it unfolds into many small lights
+ * that fill her shape, and as they dim she stands there, cloaked and veiled,
+ * seen from behind like him. Coordinates are those of the foreground drawing
+ * (feet at the origin, y up is negative).
  */
 
 type Point = [number, number];
 
-function ellipse(cx: number, cy: number, rx: number, ry: number, n = 16): Point[] {
-  const out: Point[] = [];
-  for (let i = 0; i < n; i++) {
-    const a = (i / n) * Math.PI * 2;
-    out.push([cx + Math.cos(a) * rx, cy + Math.sin(a) * ry]);
-  }
-  return out;
-}
-
-// A limb: a line with its half width at every point.
-function limb(line: Point[], half: number[]): Point[] {
-  const left: Point[] = [];
-  const right: Point[] = [];
-  for (let i = 0; i < line.length; i++) {
-    const a = line[Math.max(0, i - 1)];
-    const b = line[Math.min(line.length - 1, i + 1)];
-    const dx = b[0] - a[0];
-    const dy = b[1] - a[1];
-    const l = Math.hypot(dx, dy) || 1;
-    left.push([line[i][0] - (dy / l) * half[i], line[i][1] + (dx / l) * half[i]]);
-    right.push([line[i][0] + (dy / l) * half[i], line[i][1] - (dx / l) * half[i]]);
-  }
-  return [...left, ...right.reverse()];
-}
-
-const WAIST = -58;
-const HEM = -1;
-
-// Her outline, part by part, with how bright each part is.
-const PARTS: { shape: Point[]; weight: number }[] = [
-  { shape: ellipse(1, -79.6, 2.9, 3.7), weight: 1 },
-  // Her hair, gathered at the nape.
-  { shape: [[-1.6, -82.2], [-2.9, -79], [-3.1, -75], [-2.2, -72.2], [0.4, -72.4], [0.2, -76.5]], weight: 0.7 },
-  { shape: [[-0.5, -76.4], [2.2, -76.4], [2.6, -72.2], [-1.2, -72.2]], weight: 0.8 },
-  { shape: [[-5, -71], [-2, -72.6], [3.2, -72.8], [5.6, -71.2], [4.6, -64], [3.6, WAIST], [-3.2, WAIST], [-4.4, -64]], weight: 0.9 },
-  { shape: [[-3.2, WAIST], [3.6, WAIST], [4.8, -44], [6.6, -26], [8.4, -10], [9.4, HEM], [-11.6, HEM], [-9.2, -10], [-6.6, -26], [-4.6, -44]], weight: 0 },
-  // One arm raised to the rose, the other at her side.
-  { shape: limb([[4.6, -70.6], [10.4, -76], [14.6, -85.4], [16.2, -90.2]], [1.5, 1.25, 0.8, 0.5]), weight: 0.85 },
-  { shape: limb([[-4.6, -70.4], [-6, -62], [-5.4, -53.5]], [1.4, 1.1, 0.7]), weight: 0.75 },
+// Her outline, from the hem up her left side, over the veiled head, down her right.
+// The veil falls from her head onto her shoulders, so no neck shows.
+const OUTLINE: Point[] = [
+  [-9.6, 0.4], [-9, -10], [-8.2, -24], [-7.5, -38], [-7.4, -48], [-7.9, -56], [-8.2, -61.5],
+  [-7.8, -65.4], [-6.8, -68.4], [-5.6, -70.8], [-5, -73.6], [-4.9, -77], [-4.6, -80.4],
+  [-3.4, -83.4], [-1.2, -85.2], [1.2, -85.5], [3.3, -84.2], [4.6, -81.6], [5, -78.2],
+  [4.9, -74.6], [5.6, -71.4], [6.9, -68.8], [7.9, -65.6], [8.3, -61.5], [8, -56], [7.5, -48],
+  [7.7, -38], [8.5, -24], [9.5, -10], [10.3, 0.2], [6.8, 0.9], [3.4, 0], [0.2, 0.6],
+  [-3.1, 1.1], [-6.5, 0.3],
 ];
 
-/** Her outline as closed paths, for the soft glow drawn behind her lights. */
-export const GUIDE_OUTLINE: string[] = PARTS.map(
-  ({ shape }) => `M${shape.map(([x, y]) => `${x.toFixed(2)},${y.toFixed(2)}`).join(' L')} Z`
-);
+const HEM = 0;
+const CROWN = -85;
+
+// A closed, rounded curve through the outline's points.
+function roundedPath(points: Point[]): string {
+  const n = points.length;
+  const at = (i: number) => points[((i % n) + n) % n];
+  let d = `M${at(0)[0].toFixed(2)},${at(0)[1].toFixed(2)}`;
+  for (let i = 0; i < n; i++) {
+    const [p0, p1, p2, p3] = [at(i - 1), at(i), at(i + 1), at(i + 2)];
+    const c1: Point = [p1[0] + (p2[0] - p0[0]) / 6, p1[1] + (p2[1] - p0[1]) / 6];
+    const c2: Point = [p2[0] - (p3[0] - p1[0]) / 6, p2[1] - (p3[1] - p1[1]) / 6];
+    d += ` C${c1[0].toFixed(2)},${c1[1].toFixed(2)} ${c2[0].toFixed(2)},${c2[1].toFixed(2)} ${p2[0].toFixed(2)},${p2[1].toFixed(2)}`;
+  }
+  return `${d} Z`;
+}
+
+/** Her outline as one closed path, for the foreground drawing. */
+export const GUIDE_OUTLINE: string = roundedPath(OUTLINE);
 
 function inPolygon(x: number, y: number, poly: Point[]): boolean {
   let inside = false;
@@ -68,28 +53,23 @@ function inPolygon(x: number, y: number, poly: Point[]): boolean {
 /**
  * Her lights: x, y, seed, weight for each. A positive weight is a light, a
  * negative one a grain of her body; its size says how bright it is. Most
- * light is at the head and the heart, least at the hem: she has no hem.
+ * light is at the head and the shoulders, least at the hem.
  */
 export function guideLights(count: number, rnd: () => number): Float32Array {
   const out = new Float32Array(count * 4);
   let k = 0;
   let tries = 0;
   while (k < count && tries++ < count * 400) {
-    const x = -13 + 31 * rnd();
-    const y = -92 + 92 * rnd();
-    let weight = -1;
-    for (const part of PARTS) {
-      if (inPolygon(x, y, part.shape)) weight = Math.max(weight, part.weight);
-    }
-    if (weight < 0) {
-      // A few loose lights drift just outside her, mostly about her head and hand.
-      if (rnd() > 0.006 * Math.max(0, (y - HEM) / -90)) continue;
+    const x = -11 + 23 * rnd();
+    const y = CROWN - 2 + (HEM - CROWN + 3) * rnd();
+    const high = Math.min(1, Math.max(0, (y - HEM) / (CROWN - HEM)));
+    let weight: number;
+    if (inPolygon(x, y, OUTLINE)) {
+      weight = 0.35 + 0.6 * high;
+    } else {
+      // A few loose lights drift just outside her, mostly about her head.
+      if (rnd() > 0.01 * high) continue;
       weight = 0.25;
-    } else if (weight === 0) {
-      // The gown stays whole and only dissolves just above the ground.
-      const high = (y - HEM) / (WAIST - HEM);
-      if (rnd() > 0.3 + 0.7 * Math.min(1, high / 0.3)) continue;
-      weight = 0.4 + 0.45 * high;
     }
     const light = rnd() < 0.1;
     out[k * 4] = x;

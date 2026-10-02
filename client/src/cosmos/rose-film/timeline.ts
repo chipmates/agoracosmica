@@ -10,19 +10,35 @@ export const FILM_DURATION = 18;
 export const SEAT_COUNT = 30;
 
 /**
- * The ground, in shares of the frame: the height of the ridge where the two
+ * The ground, in shares of the frame: the height of the rock where the two
  * stand, where they stand across the frame, and how tall they are.
  */
 export const GROUND = {
-  landscape: { top: 0.118, standX: 0.47, figure: 0.215 },
-  portrait: { top: 0.104, standX: 0.47, figure: 0.182 },
+  landscape: { top: 0.118, standX: 0.5, figure: 0.165 },
+  portrait: { top: 0.104, standX: 0.5, figure: 0.132 },
 } as const;
 
-/** The foreground drawing's box is 120 wide and 116 high. In it, he stands at 42 and she at 78. */
-export const FIGURE_BOX = { aspect: 120 / 116, danteX: 42 / 120, beatriceX: 78 / 120, chestY: 0.54 } as const;
+/** The foreground drawing's box is 120 wide and 116 high. In it, he stands at 49 and she at 70. */
+export const FIGURE_BOX = { aspect: 120 / 116, danteX: 49 / 120, beatriceX: 70 / 120, chestY: 0.54 } as const;
 
-/** The round of light before it opens: its radius in the picture's own measure. */
+/** The round of light: its radius in the picture's own measure. It stays as the rose's great ring. */
 export const RING_RADIUS = 1.15;
+
+/**
+ * The rose, seen from where the two stand (after Doré's plate for Paradiso
+ * XXXI): a sun at its heart, tiers of the blessed inside the round, a wreath
+ * of wings outside it. Radii in the picture's own measure.
+ */
+export const ROSE = {
+  /** The tiers inside the round, from the sun outwards. Each is wider than the one before. */
+  tiers: [0.2, 0.26, 0.335, 0.43, 0.55, 0.7, 0.89],
+  /** The loose rows of the wreath outside the round. */
+  wreath: [1.4, 1.66],
+  /** Where the thirty take their seats: a crown just outside the round. */
+  seat: 1.285,
+  /** Past this radius the rose has given way to the night. */
+  rim: 1.9,
+} as const;
 
 export interface FilmLayout {
   aspect: number;
@@ -38,17 +54,16 @@ export interface FilmState {
   ringness: number;
   morph: number;
   bloom: number;
-  tilt: number;
   body: number;
   rot: number;
   starRot: number;
   zoom: number;
   halfShort: number;
   centerY: number;
-  bees: number;
   heart: number;
-  heartSize: number;
   point: number;
+  /** 0..1: the sun at the heart of the rose, and how far its rays reach. */
+  sun: number;
   rays: number;
   flash: number;
   trail: number;
@@ -71,9 +86,9 @@ export interface FilmState {
 export const CUES = {
   card1: [0.8, 2.8],
   card2: [3.4, 5.1],
-  card3: [5.7, 9.0],
-  card4: [9.6, 12.0],
-  verse: [12.6, 17.7],
+  card3: [5.7, 8.3],
+  card4: [8.9, 11.4],
+  verse: [12.0, 17.7],
 } as const;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
@@ -89,7 +104,7 @@ const smoother = (a: number, b: number, x: number) => {
 const mix = (a: number, b: number, t: number) => a + (b - a) * t;
 
 // The turning: slow while the river flows, quick as it closes, calm in the rose.
-const omega = (t: number) => 0.09 + 0.17 * smooth(2.4, 6.0, t) - 0.19 * smooth(6.8, 11.5, t);
+const omega = (t: number) => 0.09 + 0.17 * smooth(2.4, 6.0, t) - 0.2 * smooth(6.8, 11.5, t);
 const ROT_STEP = 1 / 60;
 const ROT_TABLE = (() => {
   const n = Math.ceil((FILM_DURATION + 1) / ROT_STEP) + 1;
@@ -113,16 +128,17 @@ function lookup(table: Float32Array, t: number): number {
   return mix(table[i], table[Math.min(table.length - 1, i + 1)], f);
 }
 
+const MORPH_START = 6.3;
+const MORPH_END = 10.3;
+
 export function filmState(t: number, layout: FilmLayout): FilmState {
   const p = layout.portrait;
   const bend = smoother(2.6, 6.4, t);
-  // The rose comes forward as it forms, and takes its place above the two
-  // once the names below it have gone.
-  const approach = smooth(8.6, 12.9, t);
-  const tableau = smoother(10.8, 13.3, t);
-  const rot = lookup(ROT_TABLE, t);
+  // The rose comes forward as it forms, until it fills the frame above the two.
+  const approach = smooth(7.2, 12.2, t);
+  const tableau = smoother(8.6, 12.6, t);
   const zoomOpen = p ? 1.31 : 2.77;
-  const zoomTableau = p ? 1.74 : 2.3;
+  const zoomTableau = p ? 1.2 : 1.56;
   return {
     fade: smooth(0, 0.35, t),
     bend,
@@ -131,23 +147,22 @@ export function filmState(t: number, layout: FilmLayout): FilmState {
     width: mix(0.21, 0.125, bend),
     ringness: smooth(5.2, 6.8, t),
     morph: lin(MORPH_START, MORPH_END, t),
-    // The petals open on the same clock, a little behind their light.
+    // The tiers fill on this clock: from the round inwards, then the wreath outside it.
     bloom: Math.min(1.3, Math.max(0, (t - MORPH_START) / (MORPH_END - MORPH_START))),
-    tilt: tiltAt(t),
     body: smooth(6.6, 8.4, t),
-    rot,
+    rot: lookup(ROT_TABLE, t),
     starRot: lookup(STAR_TABLE, t),
     zoom: mix(mix(zoomOpen, 1, smoother(2.2, 6.8, t)), zoomTableau, approach),
     // The ring takes the same share of the frame's height on a phone and on a tablet held upright.
     halfShort: p ? Math.max(1.7, 3.13 * layout.aspect) : 3.8,
-    // The round stands high, clear of the names above the seeker's head.
-    centerY: p ? mix(0.24, 0.09, tableau) : mix(0.32, 0.165, tableau),
+    // The round stands high above the seeker, then the rose settles around the frame's middle.
+    centerY: p ? mix(0.24, 0.02, tableau) : mix(0.32, -0.075, tableau),
     centerX: 0,
-    bees: smooth(12.2, 14.2, t),
     heart: 0.1 + 0.5 * smooth(6, 7.6, t) + 0.4 * smooth(7.6, 11.5, t),
-    heartSize: mix(0.1, 0.26, smooth(6, 7.8, t)),
-    point: 1 - smooth(6.2, 7.8, t),
-    rays: (p ? 0.3 : 0.5) * smooth(8.5, 12.5, t),
+    // The first point of light stands until the sun takes its place.
+    point: 1 - smooth(9.0, 10.2, t),
+    sun: smooth(9.0, 11.4, t),
+    rays: (p ? 0.22 : 0.3) * smooth(8.5, 12.5, t),
     flash: smooth(17.1, FILM_DURATION, t),
     // Lines behind moving light: long while the river bends, short as it gathers, gone in the rose.
     trail: mix(mix(mix(0.035, 0.11, smooth(2.6, 4.6, t)), 0.045, smooth(6.2, 7.6, t)), 0.012, smooth(8.2, 9.4, t)),
@@ -162,99 +177,60 @@ export function filmState(t: number, layout: FilmLayout): FilmState {
   };
 }
 
-const MORPH_START = 6.3;
-const MORPH_END = 10.3;
-const TILT_MAX = 0.62;
-const tiltAt = (t: number) => TILT_MAX * smoother(7.0, 11.8, t);
-
-// The thirty: each light kindles on the horizon with its name, waits, then rises to its seat.
-export const KINDLE_START = 5.2;
+// The thirty: each light kindles on the horizon, waits, then rises to its seat.
+export const KINDLE_START = 5.4;
 const KINDLE_SPREAD = 1.2;
-const RISE_START = 9.5;
-const RISE_STAGGER = 1.5;
+const RISE_START = 8.8;
+const RISE_STAGGER = 1.6;
 export const RISE_TRAVEL = 2.0;
 // One more light comes down from the rose to stand beside the seeker.
-export const MEET_START = 11.3;
+export const MEET_START = 10.8;
 export const MEET_TRAVEL = 1.9;
 
-/** The open rose's surface, as the shaders draw it at full bloom. */
-export function rosePoint(theta: number, x1: number): [number, number, number] {
-  const tn = (theta + 2 * Math.PI) / (17 * Math.PI);
-  const u0 = 1 - (((3.6 * theta) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI) / Math.PI;
-  // No two petals alike: each has its own length, lean and tip (as in the shaders).
-  const k = Math.floor((3.6 * theta) / (2 * Math.PI));
-  const own = 1 - u0 * u0;
-  // The outermost petals are a little shorter, so the rose keeps a round outline.
-  const len = mix(1, 0.2, Math.pow(clamp01(tn), 0.6)) * mix(0.72, 1, smooth(0.02, 0.1, tn)) * (1 + 0.17 * Math.sin(k * 2.4 + 0.7) * own);
-  const phi = mix(1.02, 0.46, tn) + 0.36 * x1 * x1 * x1 + 0.1 * Math.sin(k * 4.1 + 2.0) * own;
-  const u = u0 + 0.14 * Math.sin(k * 3.3 + 1.1) * own;
-  const a = 1.25 * u * u - 0.25;
-  const X = 1 - 0.5 * a * a;
-  const b = 1.27689 * x1 - 1;
-  const y = 1.2 * x1 * x1 * b * b * Math.sin(phi);
-  const r = len * X * (x1 * Math.sin(phi) + y * Math.cos(phi));
-  const z = len * X * (x1 * Math.cos(phi) - y * Math.sin(phi));
-  return [r * Math.sin(theta), r * Math.cos(theta), z - 0.3];
-}
-
-/** A point of the rose in the picture's world, turned and leaned as at time t. */
-export function roseWorld(theta: number, x1: number, t: number): [number, number, number] {
-  const [x, y, z] = rosePoint(theta, x1);
-  const rot = lookup(ROT_TABLE, t);
-  const c = Math.cos(rot);
-  const s = Math.sin(rot);
-  const sx = x * c + y * s;
-  const sy = -x * s + y * c;
-  const tilt = tiltAt(t);
-  const ct = Math.cos(tilt);
-  const st = Math.sin(tilt);
-  return [sx, sy * ct + z * st, -sy * st + z * ct];
-}
-
 export interface SeatParams {
-  theta: number;
-  x1: number;
+  /** Its seat on the crown around the round: the angle and the radius, before the rose's turning. */
+  angle: number;
+  radius: number;
   seed: number;
   /** Film seconds: when its light kindles on the horizon, and when it leaves for the rose. */
   kindle: number;
   lift: number;
-  /** Where it waits, across the frame (0..1), before the words' layout places it. */
+  /** Where it waits, across the frame (0..1). */
   startX: number;
 }
 
+/** A seat's place in the picture's world at time t: the crown turns with the rose. */
+export function seatWorld(seat: Pick<SeatParams, 'angle' | 'radius'>, t: number): [number, number] {
+  const a = seat.angle - lookup(ROT_TABLE, t);
+  return [seat.radius * Math.cos(a), seat.radius * Math.sin(a)];
+}
+
 /**
- * Where the thirty sit on the rose and when each sets out. They go in the
- * order given (the earliest life first) and take the tiers from the heart
- * outwards. Each starts below its own seat, so the rising lines fan out and
- * do not cross.
+ * Where the thirty sit and when each sets out. They go in the order given
+ * (the earliest life first) and take their seats all around the crown. Each
+ * starts below its own seat, so the rising lines fan out and do not cross.
  */
 export const SEATS: readonly SeatParams[] = (() => {
-  const x1 = 0.985;
+  const GOLDEN = Math.PI * (3 - Math.sqrt(5));
   const seats = Array.from({ length: SEAT_COUNT }, (_, i) => {
     const rank = i / (SEAT_COUNT - 1);
-    const lift = RISE_START + rank * RISE_STAGGER;
     return {
-      theta: 7.4 * Math.PI - 8.7 * Math.PI * ((i + 0.5) / SEAT_COUNT),
-      x1,
+      angle: (i * GOLDEN) % (2 * Math.PI),
+      radius: ROSE.seat + 0.035 * ((i % 3) - 1),
       seed: (i * 0.6180339887) % 1,
       kindle: KINDLE_START + rank * KINDLE_SPREAD,
-      lift,
+      lift: RISE_START + rank * RISE_STAGGER,
       startX: 0,
     };
   });
-  const byArrival = seats
-    .map((seat, i) => ({ i, x: roseWorld(seat.theta, x1, seat.lift + RISE_TRAVEL)[0] }))
-    .sort((a, b) => a.x - b.x);
-  byArrival.forEach(({ i }, slot) => {
-    seats[i].startX = 0.06 + (0.88 * (slot + 0.5)) / SEAT_COUNT;
-  });
+  seats
+    .map((seat, i) => ({ i, x: seatWorld(seat, seat.lift + RISE_TRAVEL)[0] }))
+    .sort((a, b) => a.x - b.x)
+    .forEach(({ i }, slot) => {
+      seats[i].startX = 0.05 + (0.9 * (slot + 0.5)) / SEAT_COUNT;
+    });
   return seats;
 })();
-
-/** When the light in a given place of the leaving order sets out (0 leaves first). */
-export function riseTime(slot: number): number {
-  return RISE_START + (slot / (SEAT_COUNT - 1)) * RISE_STAGGER;
-}
 
 export function seatParams(i: number): SeatParams {
   return SEATS[i];
