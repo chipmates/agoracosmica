@@ -69,7 +69,7 @@
 .wing-plan-list {margin:0;padding:0;list-style:none;}
 .wing-plan-item {border-bottom:1px solid var(--ui-line);}
 .wing-plan-entry {display:flex;align-items:center;gap:10px;width:100%;min-height:44px;padding:6px 6px 6px 2px;text-align:left;
-  background:none;border:0;color:var(--ui-text-quiet);font:14px/1.35 var(--serif);cursor:pointer;}
+  background:none;border:0;border-radius:var(--ui-r-square);color:var(--ui-text-quiet);font:14px/1.35 var(--serif);cursor:pointer;}
 .wing-plan-entry-number {flex:0 0 26px;font:10px/1 var(--sans);letter-spacing:.1em;color:var(--ui-text-quiet);}
 .wing-plan-entry-name {min-width:0;}
 .wing-plan-row {display:flex;align-items:stretch;}
@@ -88,7 +88,7 @@
 .wing-plan-entry[aria-current='true'] .wing-plan-entry-number {color:var(--ui-way);}
 .wing-plan-entry:focus-visible,.wing-plan-work:focus-visible,.wing-plan-close:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 .wing-plan-works {margin:0 0 6px 38px;padding:0;list-style:none;}
-.wing-plan-work {display:block;width:100%;min-height:44px;padding:4px 6px 4px 0;text-align:left;background:none;border:0;
+.wing-plan-work {display:block;width:100%;min-height:44px;padding:4px 6px 4px 0;text-align:left;background:none;border:0;border-radius:var(--ui-r-square);
   color:var(--ui-text-quiet);font:13px/1.4 var(--sans);cursor:pointer;}
 /* THE WORD READ OUT AND NOT SHOWN: the walk already lights what it has stood at. */
 .wing-plan-said {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
