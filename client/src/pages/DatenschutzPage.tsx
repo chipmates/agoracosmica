@@ -399,13 +399,6 @@ const DatenschutzPage: FC = () => {
         </section>
 
         <section className="legal-section">
-          <h2>Hinweis zu verwendeter Musik</h2>
-          <p>
-            Einige der auf dieser Webseite verwendeten Musikstücke wurden mit der KI-basierten Musikgenerationsplattform Udio erstellt. Die Musikdateien werden als statische Dateien von unseren Servern ausgeliefert. Es findet keine Datenübermittlung an Udio oder andere Dritte beim Abspielen statt. Weitere Musikstücke sind ordnungsgemäß lizenziert (siehe <a href="/impressum">Impressum</a> für Musik-Credits).
-          </p>
-        </section>
-
-        <section className="legal-section">
           <h2>Streitschlichtung</h2>
           <p>
             Wir sind nicht bereit oder verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.
