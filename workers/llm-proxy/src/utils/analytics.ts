@@ -402,9 +402,9 @@ export function trackFunnel(
  * kind of work ('painting', 'machine', 'sheet', 'book', 'film', 'place') on
  * museum_look, empty on the other two. blob5 stays '200' as on every counter
  * row of the funnel. blob10, on museum rows only, is how the screen stood when
- * the step happened: 'upright', 'sideways' or 'wide'. The share of
- * museum_stop rows that are 'sideways' is the share of the walk done with a
- * phone held sideways.
+ * the step happened: 'upright', 'sideways' or 'wide'. Among museum_stop rows
+ * from phones, the share that are 'sideways' is the share of stops reached on
+ * a phone held sideways (a short desktop window also reads 'sideways').
  */
 export function trackMuseum(
   env: Env,
