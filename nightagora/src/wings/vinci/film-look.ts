@@ -392,7 +392,7 @@ export function createFilmLook(h: FilmLookHost) {
     const title = text(STUDY_SHEET_WORDS.title), shows = text(STUDY_SHEET_WORDS.shows)
     const door = `${VINCI_STUDY_LEAF}/leaf`
     const reader = createLeafReader({
-      book: Promise.resolve({ sides: [{ id: 'study-sheet', label: title, shows, ways: [], head: null,
+      book: Promise.resolve({ sides: [{ id: 'study-sheet', label: title, shows: '', ways: [],
         source: { pyramid: null, file: assetAddress(sheet.page), width: sheet.page.width ?? 0, height: sheet.page.height ?? 0 },
         thumb: assetAddress(sheet.thumb), colour: certaintyColour('documented'), holder: sheet.page.holder ?? '' }],
       stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
@@ -401,7 +401,8 @@ export function createFilmLook(h: FilmLookHost) {
       for (const line of [text(STUDY_SHEET_WORDS.shows), (lang() === 'de' ? sheet.page.honesty_de : sheet.page.honesty_en) ?? ''])
         if (line) host.append(make('p', 'vinci-statement', line))
     })
-    openLook({ id: door, title, line: null, card: [], payload: reader,
+    // the line under the sheet is the card's own (the side names no head, so it stays)
+    openLook({ id: door, title, line: shows || null, card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()],
       set: stand(VINCI_STUDY_LEAF).set, certainty: 'documented' }, from, how)
   }
