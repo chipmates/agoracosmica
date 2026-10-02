@@ -108,6 +108,43 @@ export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' 
     release's media may be cross-origin): the canvas's own compositing does it,
     and every line has a canvas of its own size, so no filter reads past it. */
 const GROUND = { scale: 0.25, strip: 0.04, soft: 4, close: 0.08, fade: 0.35 }
+/** SIDEWAYS A FRAME THAT CANNOT COVER FADES INTO ITS GROUND on each side
+    that stands inside the glass, over this share of its breadth: the
+    machine's extent stands clear of it in every cycle, and no edge of the
+    frame is left as a line on the glass */
+export const SOFT_EDGE = 0.09
+/** the breadth, in screen pixels, over which the frame fades on each side */
+export type SoftSides = { left: number; right: number; top: number; bottom: number }
+const NO_SOFT: SoftSides = { left: 0, right: 0, top: 0, bottom: 0 }
+export function softSides(frame: PictureBox, cover: PictureBox): SoftSides {
+  const bare = (gap: number, breadth: number): number => (gap > 0.5 ? Math.round(breadth * SOFT_EDGE) : 0)
+  return {
+    left: bare(frame.left - cover.left, frame.width),
+    right: bare(cover.left + cover.width - frame.left - frame.width, frame.width),
+    top: bare(frame.top - cover.top, frame.height),
+    bottom: bare(cover.top + cover.height - frame.top - frame.height, frame.height),
+  }
+}
+/** a fade's stops, eased so its inner end shows no band: from `from` px to `to` px, or none */
+function fadeStops(at: (px: number) => string, from: number, to: number, out: boolean): string[] {
+  if (from === to) return []
+  return [0, 0.25, 0.5, 0.75, 1].map(t => {
+    const ease = t * t * (3 - 2 * t)
+    const alpha = out ? 1 - ease : ease
+    return `rgba(0, 0, 0, ${alpha.toFixed(3)}) ${at(from + (to - from) * t)}`
+  })
+}
+/** the mask that fades a frame's soft sides: across times down */
+export function softMask(soft: SoftSides): string | null {
+  if (!soft.left && !soft.right && !soft.top && !soft.bottom) return null
+  const px = (n: number): string => `${n.toFixed(1)}px`
+  const back = (n: number): string => `calc(100% - ${n.toFixed(1)}px)`
+  const axis = (to: string, a: number, b: number): string => {
+    const stops = [...fadeStops(px, 0, a, false), ...fadeStops(back, b, 0, true)]
+    return `linear-gradient(${to}, ${stops.length ? stops.join(', ') : '#000, #000'})`
+  }
+  return `${axis('to right', soft.left, soft.right)}, ${axis('to bottom', soft.top, soft.bottom)}`
+}
 /** the fade's own resolution across, stretched over the side */
 const EDGE = 8
 export type GroundLines = { raw: HTMLCanvasElement; wide: HTMLCanvasElement; closed: HTMLCanvasElement; edge: HTMLCanvasElement }
@@ -123,7 +160,7 @@ function sized(c: HTMLCanvasElement, w: number, h: number): CanvasRenderingConte
   return x
 }
 export function paintGround(canvas: HTMLCanvasElement, lines: GroundLines, source: CanvasImageSource, size: [number, number],
-  at: PictureBox, frame: PictureBox): void {
+  at: PictureBox, frame: PictureBox, soft: SoftSides = NO_SOFT): void {
   const k = GROUND.scale
   const w = Math.max(1, Math.ceil(at.width * k)), h = Math.max(1, Math.ceil(at.height * k))
   const ink = sized(canvas, w, h)
@@ -172,14 +209,16 @@ export function paintGround(canvas: HTMLCanvasElement, lines: GroundLines, sourc
     else ink.drawImage(lines.edge, dx, frameFirst ? dy : dy + dh - reach, dw, reach)
   }
   const rows = Math.max(1, Math.ceil(fh / GROUND.soft)), cols = Math.max(1, Math.ceil(fw / GROUND.soft))
+  // a side the frame fades out on runs on under that fade, so the frame dissolves into it
+  const sl = soft.left * k, sr = soft.right * k, st = soft.top * k, sb = soft.bottom * k
   // the sides, each with the corners above and below it from its own line's ends
-  for (const [sx, dx, dw, frameFirst] of [[0, 0, fx0, false], [sw - p, fx1, w - fx1, true]] as const) {
+  for (const [sx, dx, dw, frameFirst] of [[0, 0, fx0 + sl, false], [sw - p, fx1 - sr, w - fx1 + sr, true]] as const) {
     if (dw <= 0 || !line(sx, 0, p, sh, true, rows)) continue
     lay(true, rows, frameFirst, dx, fy0, dw, fh)
-    if (fy0 > 0) ink.drawImage(lines.closed, 0, 0, 1, 1, dx, 0, dw, fy0)
-    if (fy1 < h) ink.drawImage(lines.closed, 0, rows - 1, 1, 1, dx, fy1, dw, h - fy1)
+    if (fy0 > 0) ink.drawImage(lines.closed, 0, 0, 1, 1, dx, 0, dw, fy0 + st)
+    if (fy1 < h) ink.drawImage(lines.closed, 0, rows - 1, 1, 1, dx, fy1 - sb, dw, h - fy1 + sb)
   }
-  for (const [sy, dy, dh, frameFirst] of [[0, 0, fy0, false], [sh - p, fy1, h - fy1, true]] as const) {
+  for (const [sy, dy, dh, frameFirst] of [[0, 0, fy0 + st, false], [sh - p, fy1 - sb, h - fy1 + sb, true]] as const) {
     if (dh <= 0 || !line(0, sy, sw, p, false, cols)) continue
     lay(false, cols, frameFirst, fx0, dy, fw, dh)
   }
@@ -207,7 +246,7 @@ export function createCyclePayload(options: {
   let root: HTMLDivElement | undefined, video: HTMLVideoElement | undefined, poster: HTMLImageElement | undefined
   let ground: HTMLCanvasElement | undefined, lines: GroundLines | undefined
   /** where the frame stands now, and the part of the screen its ground fills where it cannot cover */
-  let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false
+  let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false, soft: SoftSides = NO_SOFT
   /** what the last fit was laid out from, so a frame that changes nothing writes nothing */
   let laid = '', grounded = false, groundedFor = ''
   let outline: HTMLImageElement | undefined
@@ -294,6 +333,13 @@ export function createCyclePayload(options: {
       const bottom = Math.max(cover.top + cover.height, Math.min(innerHeight, fitted.top + fitted.height))
       groundAt = { left: cover.left, top, width: cover.width, height: bottom - top }
     }
+    soft = sideways && groundAt ? softSides(fitted, groundAt) : NO_SOFT
+    const mask = softMask(soft)
+    for (const name of ['mask-image', '-webkit-mask-image']) {
+      if (mask) root.style.setProperty(name, mask); else root.style.removeProperty(name)
+    }
+    if (mask) { root.style.setProperty('mask-composite', 'intersect'); root.style.setProperty('-webkit-mask-composite', 'source-in') }
+    else { root.style.removeProperty('mask-composite'); root.style.removeProperty('-webkit-mask-composite') }
     if (ground) {
       ground.hidden = true
       if (groundAt) {
@@ -313,7 +359,7 @@ export function createCyclePayload(options: {
     const from = groundSource()
     if (!from) return
     lines ??= groundLines()
-    paintGround(ground, lines, from.source, from.size, groundAt, fitted)
+    paintGround(ground, lines, from.source, from.size, groundAt, fitted, soft)
     ground.hidden = false
   }
   /** a running clip's ground is drawn again at each of its frames */
