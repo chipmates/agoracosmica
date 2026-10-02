@@ -143,13 +143,19 @@
   border: 0;
   border-radius: var(--ui-r-seat);
   background: var(--glass);
-  /* the seats stand over the film: a short halo of the wall keeps the ring 3 to 1 on a sunlit floor */
-  box-shadow: inset 0 0 0 1px var(--glass-ring), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+  box-shadow: inset 0 0 0 1px var(--glass-ring);
   color: var(--ui-text);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
+}
+/* the seats stand over the film: a short halo of the wall keeps the ring 3 to 1 on a sunlit floor.
+   It is cut to the seat's own corner: a spread shadow would round its corner by the halo's width. */
+.film-back::before, .film-book::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+  clip-path: inset(-3px round var(--ui-r-seat));
 }
 /* the two glass seats stand as a pair, and gold keeps 16 px clear of the
    book at its widest (the gold's max-width below) */
@@ -285,7 +291,7 @@
   border-radius: var(--ui-r-way);
   background: var(--glass);
   /* the second way is an outline in the strong line, so the gold pill beside it leads */
-  box-shadow: inset 0 0 0 1px var(--ui-line-strong), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
   color: var(--ink-bright);
   font: 400 .9375rem/18px var(--serif);
   text-align: left;
@@ -293,6 +299,12 @@
   cursor: pointer;
 }
 .film-talk::after { content: ''; position: absolute; left: -4px; right: -4px; top: -4px; bottom: -4px; }
+/* its halo is the seats' own, cut to its corner */
+.film-box[data-end='true'] .film-talk::before {
+  content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  box-shadow: 0 0 0 6px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+  clip-path: inset(-3px round var(--ui-r-way));
+}
 .film-box[data-end='true'] .film-gold { justify-content: space-between; }
 /* A CLOSE LOOK AT THE LAST STOP keeps every look's own row: the work before
    in the book's seat, gold looking up beside it; the talk stands again once
