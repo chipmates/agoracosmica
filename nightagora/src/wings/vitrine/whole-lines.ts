@@ -14,6 +14,8 @@ export interface LineCut {
   below: boolean
   /** where the first line hidden below begins, in the same pixels */
   next: number | null
+  /** the controls and pictures that lie wholly outside the cut */
+  away: Element[]
 }
 
 /** what is read as one box, never split into lines: a control, a picture, a strip of leaves */
@@ -26,7 +28,7 @@ const SENTENCE_REACH = 56
 const SENTENCE_END = /[.!?…]["'“”„»«)\]]*(?=\s|$)/g
 
 /** a rule is an element's own border line: it never stands alone at a cut, away from the words it divides */
-type Box = { top: number; bottom: number; block: Element; rule?: boolean }
+type Box = { top: number; bottom: number; block: Element; rule?: boolean; whole?: boolean }
 
 /** Every line box and every whole box inside `root`, and the foot of every line a sentence ends, in viewport pixels. */
 function read(root: HTMLElement): { boxes: Box[]; stops: number[] } {
@@ -61,7 +63,7 @@ function read(root: HTMLElement): { boxes: Box[]; stops: number[] } {
     if (style.display === 'none' || style.visibility === 'hidden') return
     const r = (node as Element).getBoundingClientRect()
     if ((node as Element).matches(WHOLE)) {
-      if (r.height > 0 && r.width > 0) found.push({ top: r.top, bottom: r.bottom, block: node as Element })
+      if (r.height > 0 && r.width > 0) found.push({ top: r.top, bottom: r.bottom, block: node as Element, whole: true })
       return
     }
     const above = parseFloat(style.borderTopWidth) || 0, below = parseFloat(style.borderBottomWidth) || 0
@@ -111,18 +113,35 @@ export function wholeLines(scroller: HTMLElement): LineCut {
   // words wait below only where a line or a box does; a page read on starts at the first thing hidden, its rule too
   const hidden = list.filter(b => b.top >= foot - 0.5)
   const below = hidden.some(b => !b.rule)
+  // each cut stands midway in the gap between two lines: ink that overhangs a line's box, or an edge
+  // the screen snaps to its own pixel, stays on its side of the cut
+  const shown = inside()
+  if (shown.length) {
+    const first = Math.min(...shown.map(b => b.top)), last = Math.max(...shown.map(b => b.bottom))
+    if (top > 0.5 && first > top) top = (top + first) / 2
+    if (foot < height - 0.5 && last < foot) foot = (foot + last) / 2
+  }
   return {
     top, foot,
     above: scroller.scrollTop > 0.5,
     below,
     next: below ? Math.min(...hidden.map(b => b.top)) : null,
+    away: list.filter(b => b.whole && (b.bottom <= top + 0.5 || b.top >= foot - 0.5)).map(b => b.block),
   }
+}
+
+/** A control's ring can paint past a scroller's mask at the clip's edge (WebKit), so what lies outside the cut is also made clear;
+ * it stays focusable, and focusing it scrolls it in, which cuts again. */
+function setAway(scroller: HTMLElement, away: Element[]): void {
+  for (const el of scroller.querySelectorAll('[data-line-cut]')) if (!away.includes(el)) (el as HTMLElement).removeAttribute('data-line-cut')
+  for (const el of away) el.setAttribute('data-line-cut', '')
 }
 
 /** Show only the whole lines: the mask cuts between lines, or stands down where nothing is cut. */
 export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
   const style = scroller.style
   const height = scroller.clientHeight
+  setAway(scroller, cut.away)
   if (cut.top < 0.5 && cut.foot > height - 0.5) {
     style.removeProperty('mask-image'); style.removeProperty('-webkit-mask-image')
     return
@@ -136,6 +155,7 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
 
 /** Take the mask down again. */
 export function unmaskLines(scroller: HTMLElement): void {
+  setAway(scroller, [])
   scroller.style.removeProperty('mask-image')
   scroller.style.removeProperty('-webkit-mask-image')
 }

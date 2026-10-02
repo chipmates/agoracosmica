@@ -336,6 +336,7 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body::-webkit-scrollbar { display: none; }
 /* the column shows whole lines only: index.ts cuts its mask between two lines (whole-lines.ts), never through one; no fade of the phone's sheet */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body { -webkit-mask-image: none; mask-image: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body [data-line-cut] { opacity: 0; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name { margin: 0 0 6px; gap: 8px; font: 400 1.3125rem/27px var(--serif); }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-dot { transform: translateY(-3px); }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-number { font: 400 .8125rem/27px var(--sans); color: var(--ui-text-quiet); }
