@@ -533,6 +533,10 @@ export function createVitrine(options: {
     if (root.dataset['lookForm'] === 'under') { setRaised(!raised); return }
     body.scrollBy({ top: Math.max(44, body.clientHeight - 44), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
   })
+  // a detail pressed in the raised column folds it, so the work it moves to stands in view
+  payloadControls.addEventListener('click', event => {
+    if (cinemaFrame && raised && root.dataset['lookForm'] === 'under' && (event.target as Element | null)?.closest('button')) setRaised(false)
+  })
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
     for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover']) delete root.dataset[key]
