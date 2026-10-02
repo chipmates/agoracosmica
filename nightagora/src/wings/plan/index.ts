@@ -22,6 +22,7 @@ import { windowOwnsTheScreen } from '../window-chrome'
 import { deskAny } from '../desk-switches'
 import { drawPlanPlate, PLATE_NAME_FLOOR, PLATE_NAME_PX, type PlanPlate } from './plate'
 import { PLAN_WORDS } from './words'
+import { deskControl } from '../desk-story'
 import type { PlanSite } from './types'
 
 export type { PlanHighlight, PlanRoom, PlanShape, PlanSite, PlanStation, RecapEntry } from './types'
@@ -96,6 +97,15 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     return element
   }
   const say = <T extends { en: string; de: string }>(value: T): string => value[options.lang()]
+  const chevron = (): SVGSVGElement => {
+    const svg = document_.createElementNS('http://www.w3.org/2000/svg', 'svg')
+    svg.setAttribute('viewBox', '0 0 12 12')
+    svg.setAttribute('aria-hidden', 'true')
+    const line = document_.createElementNS('http://www.w3.org/2000/svg', 'path')
+    line.setAttribute('d', 'M2.5 4.5 6 8l3.5-3.5')
+    svg.append(line)
+    return svg
+  }
 
   const dialog = document_.createElement('dialog')
   dialog.className = 'wing-plan'
@@ -126,6 +136,8 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
   host.append(dialog)
 
   let live = true, open = false, marked = false, popping = false
+  /** the stations whose works stand open; the sheet opens on the standing one alone */
+  let unfolded = new Set<string>()
   let plate: PlanPlate | null = null
 
   /** Our own entry, so Back dismisses the plan and nothing else. */
@@ -249,10 +261,35 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       if (stood.has(station.id) && station.id !== standing)
         entry.append(make('span', 'wing-plan-said', say(PLAN_WORDS.stood)))
       entry.addEventListener('click', () => press(() => options.station(station.id)))
-      item.append(entry)
+      const row = make('div', 'wing-plan-row')
+      row.dataset['current'] = String(station.id === standing)
+      row.append(entry)
+      item.append(row)
       const works = site.highlights.filter(highlight => highlight.station === station.id)
       if (works.length) {
         const inner = make('ul', 'wing-plan-works')
+        inner.id = `wing-plan-works-${station.number}`
+        /* A STATION'S WORKS FOLD UNDER ITS COUNT: the name still walks there,
+           the count beside it opens what the station holds. */
+        const fold = make('button', 'wing-plan-fold')
+        fold.type = 'button'
+        fold.setAttribute('aria-controls', inner.id)
+        const holds = works.length === 1 ? works[0]!.title[language] : say(deskControl('overview', 'things_to_see')).replace('{n}', String(works.length))
+        fold.setAttribute('aria-label', `${station.name[language]}, ${holds}`)
+        fold.append(make('span', 'wing-plan-fold-count', String(works.length)), chevron())
+        const shown = (on: boolean): void => { fold.setAttribute('aria-expanded', String(on)); inner.hidden = !on }
+        shown(unfolded.has(station.id))
+        fold.addEventListener('click', () => {
+          const on = !unfolded.has(station.id)
+          if (on) unfolded.add(station.id)
+          else unfolded.delete(station.id)
+          shown(on)
+          // what opens below the reading's edge rises into it, the station's own row kept in view
+          if (!on) return
+          const pane = reading.getBoundingClientRect(), over = inner.getBoundingClientRect().bottom - pane.bottom
+          if (over > 0) reading.scrollTop += Math.min(over, row.getBoundingClientRect().top - pane.top)
+        })
+        row.append(fold)
         for (const work of works) {
           const line = make('li', '')
           const button = make('button', 'wing-plan-work', work.title[language])
@@ -325,6 +362,7 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       open = true
       dialog.dataset['narrow'] = String(options.narrow())
       if (!dialog.open) dialog.showModal()
+      unfolded = new Set([options.standing()])
       mark()
       layout()
       // THE READING OPENS WHERE THE VISITOR STANDS, with their own room's
