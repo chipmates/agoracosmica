@@ -279,6 +279,45 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* what the tools left behind in the card stands down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-clock, .vitrine-views, .reader-zoom):not(:has(*)) { display: none; }
 
+/* ---- A FILM SIDEWAYS, a machine's cycle or the heart's film, under: its
+   step's line is its subtitle and its clock runs along its foot, both on the
+   film over a soft fall of the deep ground. The machine's film runs on to the
+   glass's edges behind the chrome; the machine itself stands clear of it ---- */
+#wing[data-film='cinema'] .film-cycle-layer:has(> .na-cycle) { position: fixed; inset: 0; pointer-events: none; background: var(--ui-ground-deep); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .showpiece-line { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-film] .vitrine-view::before {
+  content: ''; position: absolute; z-index: 1; left: var(--fall-left, 0px); width: var(--fall-width, 100%);
+  bottom: calc(0px - var(--fall-below, 0px)); height: calc(120px + max(0px, var(--fall-below, 0px))); pointer-events: none;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--ui-ground-deep) 52%, transparent) 44px,
+    color-mix(in srgb, var(--ui-ground-deep) 80%, transparent) 112px, color-mix(in srgb, var(--ui-ground-deep) 80%, transparent));
+}
+#wing[data-film='cinema'] .vitrine[data-look-film] .vitrine-caption {
+  z-index: 2; left: var(--film-left, 0px); right: auto; width: var(--film-width, 100%); bottom: calc(var(--film-foot, 0px) + 44px);
+  max-width: none; margin: 0; box-sizing: border-box; padding: 0 max(24px, calc((var(--film-width, 100%) - 560px) / 2));
+  background: none; border: 0; border-radius: 0;
+  font: 400 1rem/22px var(--serif); color: var(--ui-text); text-align: center; text-wrap: balance;
+  text-shadow: 0 1px 2px color-mix(in srgb, var(--ui-ground-deep) 90%, transparent), 0 0 14px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
+}
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot { position: fixed; z-index: 3; display: flex; align-items: center; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot[hidden],
+#wing[data-film='cinema'] .vitrine[data-look-open] .vitrine-clockfoot { display: none; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-track { flex: 1 1 auto; min-height: 44px; }
+/* the track a quiet line, the steps marked in the text's colour, gold only where you are */
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-webkit-slider-runnable-track {
+  height: 2px; border-radius: 0; background: color-mix(in srgb, var(--ui-text) 46%, transparent);
+}
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-track { height: 2px; border-radius: 0; background: color-mix(in srgb, var(--ui-text) 46%, transparent); }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-progress { height: 2px; background: transparent; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-webkit-slider-thumb {
+  width: 14px; height: 14px; margin-top: -6px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
+}
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-slider::-moz-range-thumb {
+  width: 14px; height: 14px; box-shadow: 0 0 0 2px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
+}
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-tick {
+  top: 18px; width: 1.5px; height: 8px; margin-left: -.75px; background: color-mix(in srgb, var(--ui-text) 72%, transparent);
+}
+
 /* ---- BESIDE: the label column on the wall ---- */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-card {
   display: flex; flex-direction: column; overflow: hidden; padding: 0;

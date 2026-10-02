@@ -57,6 +57,8 @@ function rungFor(files: Record<string, CycleFile>, box: PictureBox, aspect: numb
 
 /** the air left round the machine on every side, a share of the free box's shorter side */
 export const CYCLE_MARGIN = 0.04
+/** sideways, the air between the machine's box and the step's line over the clock */
+const LINES_AIR = 6
 
 export interface CycleFit { left: number; top: number; width: number; height: number; scale: number; covers: boolean }
 
@@ -237,28 +239,56 @@ export function createCyclePayload(options: {
     const r = h.element.getBoundingClientRect()
     return { left: r.left, top: r.top, width: r.width, height: r.height }
   }
+  /** THE LINES' BOX SIDEWAYS: the longest step's rows in the caption's own
+      type at its width, measured once per width and language, so the machine
+      never moves when a step gives way to the next */
+  let linesFor = '', linesBox = 0
+  function linesHeight(h: VitrinePayloadHost): number {
+    const key = `${Math.round(h.viewport().width)}|${h.lang}|${steps.length}`
+    if (key === linesFor) return linesBox
+    const probe = h.caption.cloneNode(false) as HTMLElement
+    probe.removeAttribute('aria-live')
+    probe.setAttribute('aria-hidden', 'true')
+    probe.style.visibility = 'hidden'
+    h.caption.after(probe)
+    let most = 0
+    for (const step of steps) { probe.textContent = step.text; most = Math.max(most, probe.getBoundingClientRect().height) }
+    probe.remove()
+    linesFor = key
+    linesBox = Math.ceil(most)
+    return linesBox
+  }
+  /** SIDEWAYS THE MACHINE STANDS CLEAR OF EVERY WORD: the zone less its foot,
+      where the clock runs and the step's line stands over it */
+  function clearOf(h: VitrinePayloadHost): PictureBox {
+    const zone = h.viewport()
+    const under = parseFloat(getComputedStyle(h.caption).bottom) || 0
+    return { left: zone.left, top: zone.top, width: zone.width, height: Math.max(80, zone.height - under - linesHeight(h) - LINES_AIR) }
+  }
   /** THE MACHINE AS BIG AS ITS BOX ALLOWS, never cut (`cycleFit`); where the
       frame cannot cover the glass as well, its ground does, over the glass's
-      breadth and as high as the frame stands on the screen */
+      breadth and as high as the frame stands on the screen. Sideways the frame
+      covers the whole glass where it can, behind the look's own chrome. */
   function fit(): void {
     if (!root || !host) return
     const f = at()
     if (!f) return
-    // a layer that paints a ground of its own holds the frame on it (the cinema form): nothing to cover
+    const sideways = host.cinema?.() === true
+    // a layer that paints a ground of its own holds the frame on it: nothing to cover
     const size = `${innerWidth}x${innerHeight}`
     if (size !== groundedFor) {
       groundedFor = size
       grounded = !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor)
     }
-    const cover = grounded ? null : coverOf(host)
-    const next = cycleFit(f, islandFit(host), cover)
+    const cover = sideways ? { left: 0, top: 0, width: innerWidth, height: innerHeight } : grounded ? null : coverOf(host)
+    const next = cycleFit(f, sideways ? clearOf(host) : islandFit(host), cover)
     const key = [framing, next.left, next.top, next.width, next.height, cover?.left, cover?.top, cover?.width, cover?.height].join()
     if (key === laid) return
     laid = key
     fitted = next
     Object.assign(root.style, { left: `${fitted.left}px`, top: `${fitted.top}px`, width: `${fitted.width}px`, height: `${fitted.height}px` })
     if (fitted.covers || !cover) groundAt = null
-    else if (!host.narrow) groundAt = cover
+    else if (!host.narrow || sideways) groundAt = cover
     else {
       const top = Math.min(cover.top, Math.max(0, fitted.top))
       const bottom = Math.max(cover.top + cover.height, Math.min(innerHeight, fitted.top + fitted.height))
@@ -358,7 +388,7 @@ export function createCyclePayload(options: {
   function build(next: VitrinePayloadHost): void {
     const f = at()
     root = make('div', 'na-cycle')
-    laid = ''; groundedFor = ''
+    laid = ''; groundedFor = ''; linesFor = ''
     root.setAttribute('aria-hidden', 'true')
     const style = make('style', '')
     style.textContent = cycleCss
@@ -441,6 +471,7 @@ export function createCyclePayload(options: {
       turn(event.key === 'ArrowRight' ? 1 : -1)
     }, { signal })
     const track = make('div', 'vitrine-track')
+    track.dataset['tool'] = 'clock'
     track.append(slider)
     for (const frame of stepFrames()) {
       const tick = make('span', 'vitrine-tick')

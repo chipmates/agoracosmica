@@ -99,8 +99,8 @@ const CINEMA = {
   air: 10, rowGap: 12,
   /** the strip in the foot row, and the width its raised column takes at most */
   strip: 52, raised: 420,
-  /** the clock's band under a film */
-  clock: 44,
+  /** the clock's band along a film's foot, and its inset from the film's sides */
+  clock: 44, clockInset: 16,
 }
 
 export function createVitrine(options: {
@@ -232,11 +232,15 @@ export function createVitrine(options: {
     tools.append(slot)
     return [kind, slot]
   }))
+  /** a film's clock runs along the film's own foot, over it */
+  const clockFoot = make('div', 'vitrine-clockfoot')
+  clockFoot.hidden = true
+  toolSlots.set('clock', clockFoot)
   /** where each tool stood before the form took it, so it goes back to the same place */
   const lent = new Map<HTMLElement, Comment>()
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
   // the viewport and its controls follow it in the tab order.
-  root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark, tools)
+  root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark, tools, clockFoot)
 
   /* THE CLOSE LOOK IN VARIANT B. On a wide stage, behind its own switch, the
    * work takes the whole picture box and every word about it stands in one
@@ -420,6 +424,7 @@ export function createVitrine(options: {
     else delete document.documentElement.dataset['naWindow']
     paintHole()
     exhibit?.payload?.layout?.()
+    if (cinemaFrame) placeFilm()
     fadeWords()
     markMore()
   }
@@ -446,6 +451,7 @@ export function createVitrine(options: {
     root.dataset['form'] = 'cinema'
     root.dataset['lookForm'] = form
     root.toggleAttribute('data-look-open', form === 'under' && raised)
+    root.toggleAttribute('data-look-film', filmed)
     root.dataset['lookWall'] = String(onWall())
     root.dataset['lookAspect'] = aspect ? aspect.toFixed(3) : ''
     // the shape where both forms give a work the same area: wider than this, it stands under
@@ -459,8 +465,7 @@ export function createVitrine(options: {
     payloadControls.style.cssText = ''
     paintLine(null)
     nameIt(namingText.textContent ?? '', named.certainty ?? sureOf(exhibit?.certainty))
-    // a film keeps a band under it for its clock
-    rects.view = form === 'under' && filmed ? { ...under, height: under.height - CINEMA.clock } : form === 'under' ? under : beside
+    rects.view = form === 'under' ? under : beside
     place(stage, rects.view)
     if (form === 'beside') {
       const head = safe.top + CINEMA.columnTop
@@ -483,9 +488,34 @@ export function createVitrine(options: {
     if (!tools.hidden) place(tools, { left: safe.left, top, width: CINEMA.tools - 8, height: frame.row.top - CINEMA.rowGap - top })
     paintLookMore()
   }
+  /** A FILM'S FOOT: its clock along the film's lower edge, its line centred
+   * over the clock, both on the film itself. A film that stands smaller than
+   * the zone names its own box; one that runs to the glass is the zone's. */
+  function placeFilm(): void {
+    const filmed = root.hasAttribute('data-look-film')
+    clockFoot.hidden = !filmed || !clockFoot.querySelector('[data-tool]')
+    if (!filmed) return
+    const zone = rects.view
+    const own = exhibit?.payload?.filmBox?.() ?? null
+    const left = Math.max(zone.left, own?.left ?? zone.left)
+    const right = Math.min(zone.left + zone.width, own ? own.left + own.width : zone.left + zone.width)
+    const foot = Math.min(zone.top + zone.height, own ? own.top + own.height : zone.top + zone.height)
+    place(clockFoot, { left: left + CINEMA.clockInset, top: foot - CINEMA.clock, width: Math.max(44, right - left - 2 * CINEMA.clockInset), height: CINEMA.clock })
+    const zoneFoot = zone.top + zone.height
+    stage.style.setProperty('--film-left', `${Math.round(left - zone.left)}px`)
+    stage.style.setProperty('--film-width', `${Math.round(right - left)}px`)
+    stage.style.setProperty('--film-foot', `${Math.round(zoneFoot - foot)}px`)
+    // the fall under the line: over the film's own width, or over the glass to its foot where the film runs on there
+    const glass = { left: -zone.left, width: view.innerWidth, below: view.innerHeight - zoneFoot }
+    const fall = own ? { left: left - zone.left, width: right - left, below: foot - zoneFoot } : glass
+    stage.style.setProperty('--fall-left', `${Math.round(fall.left)}px`)
+    stage.style.setProperty('--fall-width', `${Math.round(fall.width)}px`)
+    stage.style.setProperty('--fall-below', `${Math.round(fall.below)}px`)
+  }
   /** The payload's tools into the form's own places; one the form has no place for stays where it is. */
   function gatherTools(): void {
     if (!cinemaFrame) return
+    let clocked = false
     for (const node of root.querySelectorAll<HTMLElement>('[data-tool]')) {
       if (lent.has(node)) continue
       const slot = toolSlots.get(node.dataset['tool'] ?? '')
@@ -494,6 +524,7 @@ export function createVitrine(options: {
       node.before(mark)
       lent.set(node, mark)
       slot.append(node)
+      if (node.dataset['tool'] === 'clock') clocked = true
       // a step drawn as a glyph keeps its word as its name and its hint
       if (node.dataset['tool'] === 'zoom') {
         const word = node.textContent?.trim() ?? ''
@@ -502,6 +533,8 @@ export function createVitrine(options: {
       }
     }
     tools.hidden = !tools.querySelector('[data-tool]')
+    // a clock that arrives after the look was laid out lays the film's foot again
+    if (clocked && !root.hasAttribute('data-look-film')) queueMicrotask(() => layout())
   }
   /** Every tool back where its payload put it. */
   function returnTools(): void {
@@ -513,6 +546,7 @@ export function createVitrine(options: {
     }
     lent.clear()
     tools.hidden = true
+    clockFoot.hidden = true
   }
   const toolWatch = new MutationObserver(() => gatherTools())
   /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
@@ -539,7 +573,8 @@ export function createVitrine(options: {
   })
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
-    for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover']) delete root.dataset[key]
+    for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
+    for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below']) stage.style.removeProperty(name)
     lookMore.remove()
     toolWatch.disconnect()
     returnTools()

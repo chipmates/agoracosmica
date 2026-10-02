@@ -63,7 +63,10 @@ export function createShowpiecePayload(options: {
   /** ON THE PHONE THE LINE IS THE CARD'S: it stands in the sheet under the
       work's name, as the phone form's line does, and never over the film */
   let said: HTMLParagraphElement | undefined
-  const lineHost = (): HTMLElement | undefined => (host?.narrow ? said : host?.caption)
+  /** SIDEWAYS THE LINE IS THE FILM'S SUBTITLE, over its foot */
+  const lineHost = (): HTMLElement | undefined => (host?.narrow && !host.cinema?.() ? said : host?.caption)
+  /** where the line was last written, so a turned phone moves it and leaves no copy behind */
+  let wrote: HTMLElement | undefined
 
   const cutOf = (f: ShowpieceFraming): ShowpieceCut | undefined => options.cuts[f] ?? options.cuts.wide ?? options.cuts.upright
   const aspect = (): number => { const c = cutOf(framing); return c ? c.poster.width / c.poster.height : 16 / 9 }
@@ -113,6 +116,7 @@ export function createShowpiecePayload(options: {
     if (!host || !root) return
     const box = host.element.getBoundingClientRect()
     if (box.width < 2 || box.height < 2) return
+    if (host.cinema?.()) { fitWall(box); return }
     if (host.narrow) { fitGlass(box); return }
     const lanes = !host.narrow && door ? 2 * (door.offsetWidth + LANE) : 0
     const room = { width: Math.max(LEAST, box.width - lanes), height: Math.max(LEAST, box.height - measureLines() - GAP) }
@@ -145,6 +149,16 @@ export function createShowpiecePayload(options: {
     let top = (above - height) / 2
     if (height > above) top = Math.min(0, Math.max(above - height, top))
     film = { left: Math.round(-box.left), top: Math.round(top - box.top), width: Math.round(width), height: Math.round(height) }
+    Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
+  }
+
+  /** SIDEWAYS THE FILM STANDS WHOLE ON THE WALL, as large as the zone holds
+      it: its line and its clock stand over its foot */
+  function fitWall(box: DOMRect): void {
+    if (!root) return
+    const a = aspect()
+    const width = Math.min(box.width, box.height * a), height = width / a
+    film = { left: Math.round((box.width - width) / 2), top: Math.round((box.height - height) / 2), width: Math.round(width), height: Math.round(height) }
     Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
   }
 
@@ -216,9 +230,11 @@ export function createShowpiecePayload(options: {
       else play.removeAttribute('title')
     }
     const at = lineAt(t)
-    if (at === line) return
-    line = at
     const into = lineHost()
+    if (at === line && into === wrote) return
+    line = at
+    if (wrote && wrote !== into) wrote.textContent = ''
+    wrote = into
     if (!into) return
     into.textContent = lines[at]?.text ?? ''
     into.lang = host.lang
@@ -271,6 +287,7 @@ export function createShowpiecePayload(options: {
     }, { signal })
     slider.addEventListener('change', () => { dragging = false; paint() }, { signal })
     const track = make(doc, 'div', 'vitrine-track')
+    track.dataset['tool'] = 'clock'
     track.append(slider)
     // a tick where a line gives way to the next: the moment the film is about
     for (const each of lines) {
@@ -303,6 +320,7 @@ export function createShowpiecePayload(options: {
       listening = new AbortController()
       framing = options.framing()
       line = -1
+      wrote = undefined
       measuredAt = ''
       build(next)
       next.element.tabIndex = 0
@@ -323,6 +341,7 @@ export function createShowpiecePayload(options: {
       if (!host || !video) return
       measuredAt = ''
       fit()
+      paint()
       // a turned phone is the other framing's film, at the second it stood at
       const turned = options.framing()
       if (turned === framing || !options.cuts[turned]) return
@@ -355,6 +374,11 @@ export function createShowpiecePayload(options: {
       film = null
     },
     aspect,
+    filmBox: () => {
+      if (!host || !film) return null
+      const box = host.element.getBoundingClientRect()
+      return { left: box.left + film.left, top: box.top + film.top, width: film.width, height: film.height }
+    },
     standing: () => shown || root?.dataset['ready'] === 'true',
     readout: () => ({ framing, rung, time: now(), playing: Boolean(video && !video.paused && !video.ended), ended: Boolean(video?.ended),
       line, poster: root?.dataset['ready'] === 'true', video: shown, film }),
