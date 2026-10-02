@@ -12,6 +12,7 @@ import { deskControl, deskStoryStop } from '../desk-story'
 import type { DeskPanelRow } from '../desk-panel'
 import type { PictureFraming, PictureSource } from '../picture/seam'
 import type { VitrineCinema } from '../vitrine/types'
+import { wholeLines as lineCut } from '../vitrine/whole-lines'
 import { LOBBY_TEXT } from '../../content/lobby'
 import css from './film-cinema.css?inline'
 
@@ -83,6 +84,8 @@ const SVG = 'http://www.w3.org/2000/svg'
 const CAPTION_LEAST = 300
 /** the air a whole line keeps above or below a box's foot */
 const LINE_AIR = 2
+/** the air between the record's last whole line and its close */
+const RECORD_AIR = 8
 /** what a box's foot keeps whole besides its lines of words */
 const CONTROLS = 'button, a[href], input, select, summary, [role="button"]'
 const ARROW_UP = 'M8 13V3M4 7l4-4 4 4'
@@ -151,6 +154,7 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
       caption.remove()
       for (const scroller of cut) scroller.style.removeProperty('--cinema-cut')
       cut.clear()
+      recordLines()
     }
   }
 
@@ -258,6 +262,7 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     for (const record of records) {
       const target = record.target as Element
       if (target.matches('.wing-life[open]')) target.querySelector<HTMLElement>('.wing-life-body')?.scrollTo({ top: 0 })
+      if (target.matches('.vinci-dock')) askRecord()
       // the plan opens at the visitor's own row; its list then ends on a whole row
       if (target.matches('.wing-plan[open]')) {
         const reading = target.querySelector<HTMLElement>('.wing-plan-reading')
@@ -337,6 +342,31 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   addEventListener('na-language', () => requestAnimationFrame(() => requestAnimationFrame(panelLines)), { signal })
   document.querySelector('#instruments')?.addEventListener('toggle', () => requestAnimationFrame(panelLines), { capture: true, signal })
   signal.addEventListener('abort', () => panelWatch.disconnect())
+
+  /* ---- the record ends on whole lines ---- */
+  /** The record's foot above its close and the cover under its tabs stand
+      between two lines, never across one: --record-foot and --record-head,
+      which only this form's rules read, are cut again at every scroll, tab,
+      fold and turn. */
+  let recordAsked = false
+  function recordLines(): void {
+    recordAsked = false
+    for (const dock of wing.querySelectorAll<HTMLElement>('.vinci-dock')) {
+      if (!on || !dock.matches('[open]')) { dock.style.removeProperty('--record-head'); dock.style.removeProperty('--record-foot'); continue }
+      const edge = dock.getBoundingClientRect().top + dock.clientTop
+      const bar = dock.querySelector<HTMLElement>('.vinci-sources-toolbar')?.getBoundingClientRect()
+      const close = dock.querySelector<HTMLElement>('.vinci-sources-close')?.getBoundingClientRect()
+      const from = bar ? bar.bottom + 1 - edge : 0
+      const reach = close && close.height ? close.top - RECORD_AIR - edge : dock.clientHeight
+      const at = lineCut(dock, { from, reach })
+      dock.style.setProperty('--record-head', `${Math.max(0, Math.ceil(at.top - from))}px`)
+      dock.style.setProperty('--record-foot', `${Math.max(0, Math.ceil(dock.clientHeight - at.foot))}px`)
+    }
+  }
+  const askRecord = (): void => { if (recordAsked) return; recordAsked = true; requestAnimationFrame(recordLines) }
+  const inRecord = (event: Event): void => { if ((event.target as Element | null)?.closest?.('.vinci-dock')) askRecord() }
+  for (const type of ['scroll', 'click', 'toggle']) wing.addEventListener(type, inRecord, { capture: true, passive: true, signal })
+  addEventListener('resize', askRecord, { signal })
 
   /* ---- the marks clear of the foot row ---- */
   /** a mark keeps clear of the row's controls themselves, not of the air

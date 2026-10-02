@@ -75,18 +75,20 @@ function read(root: HTMLElement): { boxes: Box[]; stops: number[] } {
   return { boxes: found, stops }
 }
 
-/** The window of whole lines a scroller shows now. */
-export function wholeLines(scroller: HTMLElement): LineCut {
+/** The window of whole lines a scroller shows now: its whole height, or the band from `from` to `reach`
+ * where a sheet's own head and foot stand over its words. */
+export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?: number } = {}): LineCut {
   const frame = scroller.getBoundingClientRect()
   const edge = frame.top + scroller.clientTop
-  const height = scroller.clientHeight
+  const from = band.from ?? 0
+  const height = band.reach ?? scroller.clientHeight
   const seen = read(scroller)
   const list = seen.boxes.map(b => ({ ...b, top: b.top - edge, bottom: b.bottom - edge }))
   const stops = seen.stops.map(s => s - edge)
   // a cut that falls inside a box moves to that box's far side, until no box straddles it
   const straddles = (at: number): Box | undefined =>
     list.find(b => b.top < at - 0.5 && b.bottom > at + 0.5)
-  let top = 0, foot = height
+  let top = from, foot = height
   for (let hit = straddles(top); hit; hit = straddles(top)) top = hit.bottom
   for (let hit = straddles(foot); hit; hit = straddles(foot)) foot = hit.top
   const inside = (): Box[] => list.filter(b => b.top >= top - 0.5 && b.bottom <= foot + 0.5)
@@ -118,7 +120,7 @@ export function wholeLines(scroller: HTMLElement): LineCut {
   const shown = inside()
   if (shown.length) {
     const first = Math.min(...shown.map(b => b.top)), last = Math.max(...shown.map(b => b.bottom))
-    if (top > 0.5 && first > top) top = (top + first) / 2
+    if (top > from + 0.5 && first > top) top = (top + first) / 2
     if (foot < height - 0.5 && last < foot) foot = (foot + last) / 2
   }
   return {

@@ -542,13 +542,18 @@ html:has(#wing[data-film='cinema'])[data-na-panel='open'] #instruments .inst-lin
 html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none; }
 
 /* the record's words scroll into a foot of their own, which ends the scroll:
-   it fades them out above the close and is solid from there down, so no line
-   runs under the close; under the toolbar's layer, which carries the close */
+   solid from between two lines down (film-cinema.ts sets --record-foot), so no
+   line runs under the close or stands cut; under the toolbar's layer, which
+   carries the close */
 #wing[data-film='cinema'] .vinci-dock::after {
   content: ''; display: block; position: sticky; bottom: 0; z-index: 0;
-  height: calc(var(--cinema-b) + 48px + 8px + 24px);
-  background: linear-gradient(to bottom, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent), var(--ui-ground-sheet) 24px);
+  height: var(--record-foot, calc(var(--cinema-b) + 48px + 8px + 24px));
+  background: var(--ui-ground-sheet);
   pointer-events: none;
+}
+/* and a line scrolling under the tabs is covered whole, down to between two lines (--record-head) */
+#wing[data-film='cinema'] .vinci-dock[open] .vinci-sources-toolbar::after {
+  height: var(--record-head, 16px); background: var(--ui-ground-sheet);
 }
 
 /* THE DOOR AT THE FIRST STOP: the wall's words at the left, the way in, the
