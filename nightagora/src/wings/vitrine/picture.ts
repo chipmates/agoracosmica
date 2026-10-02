@@ -88,6 +88,7 @@ export function createPlatePayload(options: {
   return {
     kind: 'picture',
     fill: options.fill,
+    aspect: () => shownAspect,
     mount(next) {
       host = next
       const document = next.element.ownerDocument

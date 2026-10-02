@@ -349,6 +349,7 @@ export function createShowpiecePayload(options: {
       host = undefined
       film = null
     },
+    aspect,
     standing: () => shown || root?.dataset['ready'] === 'true',
     readout: () => ({ framing, rung, time: now(), playing: Boolean(video && !video.paused && !video.ended), ended: Boolean(video?.ended),
       line, poster: root?.dataset['ready'] === 'true', video: shown, film }),

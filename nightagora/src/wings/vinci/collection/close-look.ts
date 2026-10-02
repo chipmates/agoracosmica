@@ -6,7 +6,7 @@
  * wing's marks and row open, and composes what the vitrine shows of this
  * wing out of its registers: the line, the steps, the card's words.
  */
-import { createVitrine, type Vitrine, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
+import { createVitrine, type Vitrine, type VitrineCinema, type VitrineExhibit, type VitrinePayload } from '../../vitrine'
 import { createTurntablePayload, type TurntableEye, type TurntableOptions, type TurntablePayload, type TurntableViewpoint } from '../../vitrine/turntable'
 import type { ReaderSide, ReaderWords } from '../../vitrine/reader'
 import { MIRROR_EXPLANATION } from '../table/content'
@@ -56,6 +56,8 @@ export function createVinciCloseLook(options: {
   /** The room the one step back of a close look leads to, in the page's
    * language, which is the station the visitor is standing in. */
   room?(): string
+  /** the phone held sideways, as the wing measures it */
+  cinema?(): VitrineCinema | null
 }): VinciCloseLook {
   // The window owns no words: the mark that dismisses it and the grabber
   // that raises its card take the wing's own, in the page's language.

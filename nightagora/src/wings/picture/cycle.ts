@@ -529,6 +529,7 @@ export function createCyclePayload(options: {
       fitted = null; groundAt = null
       host = undefined
     },
+    aspect: () => { const f = at(); return f ? f.master[0] / f.master[1] : null },
     landed: () => landed,
     standing: () => shown || root?.dataset['ready'] === 'true',
   }

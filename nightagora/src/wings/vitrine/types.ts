@@ -53,6 +53,24 @@ export interface VitrinePayloadHost {
    * here is. */
   rename?(title: string, head?: string | null, certainty?: string | null,
     place?: VitrinePlace | null, note?: string | null, peek?: VitrinePeek | null): void
+  /** True while the look stands in the cinema form (a phone held sideways):
+   * the window then stands the payload's `data-tool` controls in its own
+   * places, and `viewport()` is the work's zone on the wall. Read at layout:
+   * a turned phone changes it under a mounted payload. */
+  cinema?(): boolean
+}
+
+/** THE PHONE HELD SIDEWAYS, as the host measures it: the glass inside its
+ * safe areas and the walk's own foot row, which a close look keeps. */
+export interface VitrineCinema {
+  /** the glass inside its safe areas */
+  safe: VitrineRect
+  /** the foot row: its top and foot, the right edge of the seats at its
+   * left, and gold's left edge */
+  row: { top: number; bottom: number; seats: number; gold: number }
+  /** the look's one key to its words, in the page's language: more, and back */
+  more: string
+  less: string
 }
 
 /** WHERE A WORK STANDS IN ITS SET: counted from one; a book that reads by its
@@ -102,6 +120,14 @@ export interface VitrinePayload {
   update?(dt: number): void
   /** The viewport moved or the stage changed size. */
   layout?(): void
+  /** THE WORK'S SHAPE, its shown width over its height, where the payload
+   * draws a picture of its own; null while it is not known, absent where the
+   * picture is the room's. The cinema form lays a work beside its label or
+   * under it by this. */
+  aspect?(): number | null
+  /** Where a film stands inside the viewport, on the screen, where it does
+   * not fill it: its clock is laid along this foot. */
+  filmBox?(): VitrineRect | null
   /** True when the payload took the key. */
   key?(event: KeyboardEvent): boolean
   /** Leave the stage as it was found. The window resumes the room after it. */

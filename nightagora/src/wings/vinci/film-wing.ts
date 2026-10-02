@@ -505,6 +505,7 @@ export function createWing(): WingModule {
         cycle: id => { const cycle = release?.cycles?.[id]; return cycle ? { cycle, base: filmReleaseBase() } : null },
         cycleLayer: () => cycleLayer!,
         box, framing: () => (wide ? 'wide' : 'upright'),
+        cinema: () => (form === 'cinema' ? cinema?.frame() ?? null : null),
         ...filmLookWays() })
       lookCard = m.FILM_LOOK_CARD
       marksAt = ''
@@ -1204,7 +1205,7 @@ export function createWing(): WingModule {
       phone!.keys.insertBefore(phoneList.control, phone!.count)
       // the panel's rows are the film's ways' own where the phone stood upright at the mount
       cinema = createFilmCinema({ wing, box: phone!.root, stop: () => LIFE[card]!.id, rows: form === 'cinema',
-        count: () => `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`, signal })
+        count: () => `${String(card + 1).padStart(2, '0')} / ${LIFE.length}`, signal, relayout: () => look?.layout() })
       cinema.set(form === 'cinema')
       /* A CLOSE LOOK STANDS OVER THE FOOT ROW, which the box keeps (standDown),
          and a sideways swipe on its card steps the set as the row's two ways do */

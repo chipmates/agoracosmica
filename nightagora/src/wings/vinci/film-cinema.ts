@@ -11,6 +11,8 @@ import { deskMark } from '../desk-chrome'
 import { deskControl, deskStoryStop } from '../desk-story'
 import type { DeskPanelRow } from '../desk-panel'
 import type { PictureFraming, PictureSource } from '../picture/seam'
+import type { VitrineCinema } from '../vitrine/types'
+import { LOBBY_TEXT } from '../../content/lobby'
 import css from './film-cinema.css?inline'
 
 export type FilmForm = 'desk' | 'upright' | 'cinema'
@@ -61,6 +63,8 @@ export interface FilmCinemaHost {
   rows: boolean
   count(): string
   signal: AbortSignal
+  /** the open look lays itself out again: the row it keeps changed size */
+  relayout?(): void
 }
 
 export interface FilmCinema {
@@ -70,6 +74,8 @@ export interface FilmCinema {
   /** where a mark at (x, y) stands clear of the foot row's controls: its own
       height, a short lift above them, or nowhere (null) */
   clear(x: number, y: number, half: number): number | null
+  /** the glass and the foot row a close look lays itself out by, while the form stands */
+  frame(): VitrineCinema | null
 }
 
 const SVG = 'http://www.w3.org/2000/svg'
@@ -140,7 +146,6 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
       for (const node of [...panel.children]) box.insertBefore(node, panel)
       panel.remove()
       caption.remove()
-      lowerLooks()
       for (const scroller of cut) scroller.style.removeProperty('--cinema-cut')
       cut.clear()
     }
@@ -215,24 +220,30 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     box.style.setProperty('--cinema-text-width', `${Math.round(Math.max(r.width, right - r.left))}px`)
   }
 
-  /* ---- the close look's card stands whole beside the work ---- */
-  /** the looks this form raised, lowered again where the phone stands upright */
-  const raised = new WeakSet<HTMLElement>()
-  function raiseLooks(): void {
-    if (!on) return
-    const vitrine = wing.querySelector<HTMLElement>('.vitrine[data-peek="true"]:not([hidden])')
-    const grab = vitrine?.querySelector<HTMLElement>('.vitrine-grab')
-    if (!vitrine || !grab) return
-    raised.add(vitrine)
-    grab.click()
+  /* ---- the close look's measure: the glass inside the form's margins and the row it keeps ---- */
+  /** set by the same variables the row reads, so a look and the row agree to the pixel */
+  const probe = make('div', 'cinema-probe')
+  probe.setAttribute('aria-hidden', 'true')
+  document.body.append(probe)
+  function frame(): VitrineCinema | null {
+    if (!on || !foot) return null
+    const glass = probe.getBoundingClientRect()
+    const seen = (node: Element | null): DOMRect | null => {
+      if (!(node instanceof HTMLElement) || node.hidden || getComputedStyle(node).display === 'none') return null
+      const r = node.getBoundingClientRect()
+      return r.width && r.height ? r : null
+    }
+    const seats = [...foot.querySelectorAll(':scope > :is(.film-back, .film-book)')].map(seen).filter((r): r is DOMRect => r !== null)
+    const way = seen(gold)
+    const all = way ? [...seats, way] : seats
+    return {
+      safe: { left: glass.left, top: glass.top, width: glass.width, height: glass.height },
+      row: { top: all.length ? Math.min(...all.map(r => r.top)) : glass.bottom - 48, bottom: all.length ? Math.max(...all.map(r => r.bottom)) : glass.bottom,
+        seats: seats.length ? Math.max(...seats.map(r => r.right)) : glass.left, gold: way ? way.left : glass.right },
+      more: say(deskControl('shared', 'read_more')), less: say(LOBBY_TEXT.close),
+    }
   }
-  function lowerLooks(): void {
-    const vitrine = wing.querySelector<HTMLElement>('.vitrine[data-peek="false"]:not([hidden])')
-    if (!vitrine || !raised.has(vitrine)) return
-    raised.delete(vitrine)
-    vitrine.querySelector<HTMLElement>('.vitrine-grab[aria-expanded="true"]')?.click()
-  }
-  const watch = new MutationObserver(() => { if (on) { raiseLooks(); paint(); cardLater() } })
+  const watch = new MutationObserver(() => { if (on) paint() })
   watch.observe(wing, { subtree: true, attributes: true, attributeFilter: ['data-peek', 'data-drawer', 'hidden'] })
   const lineWatch = new MutationObserver(() => paint())
   const phoneLine = part('film-line')
@@ -252,12 +263,12 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     }
   })
   lifeWatch.observe(wing, { subtree: true, attributes: true, attributeFilter: ['open'] })
-  addEventListener('resize', () => { said = ''; requestAnimationFrame(() => { paint(); panelLines() }); cardLater() }, { signal })
-  // gold's name settles its own width a frame late, and the row its own at a turn: the caption takes what is left
-  const goldWatch = new ResizeObserver(() => requestAnimationFrame(() => paint()))
+  addEventListener('resize', () => { said = ''; requestAnimationFrame(() => { paint(); panelLines() }) }, { signal })
+  // gold's name settles its own width a frame late, and the row its own at a turn: the caption and an open look take what is left
+  const goldWatch = new ResizeObserver(() => requestAnimationFrame(() => { paint(); if (on) host.relayout?.() }))
   if (gold) goldWatch.observe(gold)
   if (foot) goldWatch.observe(foot)
-  signal.addEventListener('abort', () => { watch.disconnect(); lineWatch.disconnect(); lifeWatch.disconnect(); goldWatch.disconnect(); set(false) })
+  signal.addEventListener('abort', () => { watch.disconnect(); lineWatch.disconnect(); lifeWatch.disconnect(); goldWatch.disconnect(); probe.remove(); set(false) })
 
   /* ---- a scrolling box ends on a whole line at rest ---- */
   /** the boxes whose foot this form has moved, restored when it leaves */
@@ -322,20 +333,7 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   panelWatch.observe(document.documentElement, { attributes: true, attributeFilter: ['data-na-panel'] })
   addEventListener('na-language', () => requestAnimationFrame(() => requestAnimationFrame(panelLines)), { signal })
   document.querySelector('#instruments')?.addEventListener('toggle', () => requestAnimationFrame(panelLines), { capture: true, signal })
-  /** the close look's card, once its words have settled after a change */
-  const cards = new WeakSet<HTMLElement>()
-  const cardWatch = new MutationObserver(() => cardLater())
-  let cardTimer = 0
-  function cardLater(): void {
-    clearTimeout(cardTimer)
-    cardTimer = window.setTimeout(() => requestAnimationFrame(() => {
-      const card = wing.querySelector<HTMLElement>('.vitrine[data-narrow="true"]:not([hidden]) .vitrine-card')
-      if (!on || !card) return
-      if (!cards.has(card)) { cards.add(card); cardWatch.observe(card, { childList: true, subtree: true, characterData: true }) }
-      wholeLines(card)
-    }), 160)
-  }
-  signal.addEventListener('abort', () => { panelWatch.disconnect(); cardWatch.disconnect(); clearTimeout(cardTimer) })
+  signal.addEventListener('abort', () => panelWatch.disconnect())
 
   /* ---- the marks clear of the foot row ---- */
   /** a mark keeps clear of the row's controls themselves, not of the air
@@ -382,5 +380,5 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     addEventListener('na-language', () => { rowsSaid = ''; publish() }, { signal })
   }
 
-  return { set, paint, clear }
+  return { set, paint, clear, frame }
 }

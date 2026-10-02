@@ -24,7 +24,7 @@ import { GRAVE_DEATHBED } from './grave/placement'
 import { GRAVE_LIGHT } from './grave/light-words'
 import { keepTogetherIn } from './keep-together'
 import { createPlacePayload } from '../vitrine/place'
-import type { VitrineExhibit, VitrinePlace } from '../vitrine/types'
+import type { VitrineCinema, VitrineExhibit, VitrinePlace } from '../vitrine/types'
 import type { ShowpiecePayload } from '../vitrine/showpiece'
 import { createCyclePayload, type FilmCycle } from '../picture/cycle'
 import { createIslandPayload, islandChoice, type IslandPayload } from '../picture/island'
@@ -96,6 +96,8 @@ export interface FilmLookHost {
   /** the picture's box and its framing, which a filmed cycle covers as the island's canvas does */
   box(): PictureBox
   framing(): PictureFraming
+  /** the phone held sideways, as the wing measures it; null in every other form */
+  cinema?(): VitrineCinema | null
 }
 
 const text = (value: VinciText): string => value[lang()]
@@ -144,7 +146,7 @@ export interface FilmLookWays {
 export function createFilmLook(h: FilmLookHost) {
   let assets: ManifestIndex | undefined
   const closeLook = createVinciCloseLook({ host: h.host, narrow: h.narrow, room: () => vinciRoomName(h.station(), { en: h.room(), de: h.room() }),
-    returnFocus: h.returnFocus, floor: h.floor,
+    returnFocus: h.returnFocus, floor: h.floor, ...(h.cinema ? { cinema: h.cinema } : {}),
     // the film has already walked there: the window opens where the eye stands
     onOpen: () => false,
     onClose: () => { h.veil(false); h.standDown(false); h.onClose() } })
@@ -289,10 +291,12 @@ export function createFilmLook(h: FilmLookHost) {
           sheet: vinciMachineSheet(slug, openFolio ?? record), land: step > 0 ? step : null })
         return cycle
       } : null
-      const payload = createIslandPayload({ choice: live ? choice : { mode: 'filmed', why: choice.why }, live: makeLive, filmed: makeFilmed,
+      const payload = Object.assign(createIslandPayload({ choice: live ? choice : { mode: 'filmed', why: choice.why }, live: makeLive, filmed: makeFilmed,
         // the film stands over the canvas until the island's first frame is drawn, never an empty stage
         stood: () => h.veil(true),
-        stepOf: () => Math.max(0, [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')), asked })
+        stepOf: () => Math.max(0, [...h.host.querySelectorAll('.vitrine-step-item')].findIndex(b => b.getAttribute('aria-current') === 'step')), asked }),
+      // the machine's shape for the window is its film's frame, the island's or the cycle's alike
+      { aspect: () => { const frame = filmed?.cycle.framings.wide; return frame ? frame.master[0] / frame.master[1] : 16 / 9 } })
       machine = { payload, island: () => island, cycle: () => cycle }
       const { set, walk } = stand(id)
       h.standDown(true)

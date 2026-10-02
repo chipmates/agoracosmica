@@ -671,6 +671,7 @@ export function createReaderPayload(options: {
       if (index >= 0) go(index)
     },
     columnOpen() { return reading },
+    aspect: () => shownAspect(),
     refresh() {
       paintBeside()
       paintWords()

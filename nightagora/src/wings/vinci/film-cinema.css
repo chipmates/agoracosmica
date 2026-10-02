@@ -192,126 +192,133 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* sideways the row has room for both endings and the book: the panel's ways stay one press away at the end */
 #wing[data-film='cinema'] .film-box[data-end='true'] .film-foot > .film-book:not(.vinci-phone-earlier) { display: flex; }
 
-/* ---- THE CLOSE LOOK SIDE BY SIDE: the work at the left, its card as a
-   column at the right, the foot row under both. The window lays itself out
-   for the phone; these lines move its boxes, which it measures again. ---- */
-html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] { --vitrine-peek: 0px !important; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-view {
-  left: var(--cinema-l) !important;
-  top: calc(var(--cinema-t) + 8px) !important;
-  width: calc(100vw - var(--cinema-l) - var(--cinema-r) - var(--cinema-card) - 12px) !important;
-  height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px) !important;
-}
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-card, .vitrine-sheet) {
-  left: auto !important;
-  right: var(--cinema-r) !important;
-  top: calc(var(--cinema-t) + 8px) !important;
-  width: var(--cinema-card) !important;
-  height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px) !important;
-}
-/* the card's words end on a whole line at rest: film-cinema.ts shortens the scroll by --cinema-cut */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card {
-  height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px - var(--cinema-cut, 0px)) !important;
-}
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-sheet { border-radius: var(--ui-r-box-side); }
-/* the card's own ground lies over the sheet: its corners are the sheet's in every rounded form */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card { border-radius: var(--ui-r-square); }
-/* the card in the phone's own order and type: the window's phone rules key on the glass's shape, so they are carried
-   here at a weight under the window's own rules for a kind (the reader's row, the zoom's glyphs) */
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-card { padding: 12px 14px; background: transparent; border: 0; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-view { border: 1px solid var(--ui-line); border-radius: var(--ui-r-square); overflow: hidden; box-sizing: border-box; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-name { margin-bottom: 6px; font-size: 17px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-line { margin-bottom: 8px; font-size: 16px; line-height: 1.32; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-catalogue { margin: -3px 0 6px; font-size: 13px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-words p { font-size: 14px; line-height: 1.42; margin: 5px 0; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-controls { gap: 6px; margin-top: 8px; padding-top: 8px; flex-wrap: nowrap; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-control { flex: 1 1 0; min-width: 0; padding: 10px 8px; font-size: 13px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-walk { margin-top: 6px; gap: 6px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-step { flex: 1 1 0; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-caption { font-size: 14px; padding: 6px 10px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-payload-controls { position: static; flex: 0 0 auto; padding: 8px 0 0; justify-content: stretch; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-payload-controls .vitrine-control { flex: 1 1 0; background: transparent; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'][data-payload='deep-plate'] .vitrine-payload-controls > .vitrine-control:nth-child(n+4) { flex: 1 0 100%; }
-/* the machine's clock, its views and its folio glass, as the phone stands them */
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-views { order: -1; width: 100%; gap: 6px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-views .vitrine-control { flex: 1 1 0; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-clock { flex: 1 1 100%; max-width: none; gap: 6px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-play { flex: 0 0 auto !important; min-width: 84px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-step-item { font-size: 14px; min-height: 44px; padding: 7px 2px; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass { position: static; flex: 0 0 44px; width: 44px; height: 44px;
-  min-width: 44px; max-width: 44px; margin-left: auto; padding: 0; overflow: hidden; border-radius: var(--ui-r-seat); }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-folio-glass .vitrine-folio-thumb { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-folio-leaf { width: 20px; height: 24px; fill: none; stroke: var(--ui-way); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'][data-payload='machine'] .vitrine-card:has(.vitrine-more[aria-expanded='false']) .vitrine-steps { display: none; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-part-name { max-width: 200px; font-size: 13px; }
-/* THE CARD READS AS ONE COLUMN: the name, the line and the work's own row
-   first, the label's words under them, the whole card one scroll */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card { overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-body { display: contents; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-card > *, .vitrine-body > *) { flex-shrink: 0; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls { order: 1; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-body > :is(.vitrine-words, .vitrine-aside, .vitrine-after) { order: 2; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card > :is(.vitrine-controls, .vitrine-foot) { order: 3; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-grab { display: none !important; }
+/* ---- THE CLOSE LOOK SIDEWAYS (vitrine/index.ts, its cinema branch). The
+   window lays out its boxes from the glass and the walk's foot row, which
+   the look keeps: the instruments' column at the left over the seats, the
+   work on the museum's wall, its words BESIDE it in a label column at the
+   right, or UNDER it in the foot row's strip, where the walk's caption
+   stands. These lines are its type and its grounds. ---- */
+.cinema-probe { position: fixed; left: var(--cinema-l); right: var(--cinema-r); top: var(--cinema-t); bottom: var(--cinema-b);
+  visibility: hidden; pointer-events: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-sheet,
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-grab { display: none; }
 /* one close for a look, the foot row's first seat drawn as the cross, as on the upright phone */
 #wing[data-film='cinema'] .vitrine-shut { display: none !important; }
 #wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-ic-fill { display: none; }
 #wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-cross { display: block; width: 10px; height: 10px; background: var(--film-cross); }
 
-/* the close look's small words at a phone's reading size, as the upright phone sets them */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
-  .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-rule-label, .vitrine-folio) { font-size: .8125rem; }
-
-/* THE MACHINE'S FILMED CYCLE INSIDE ITS FRAME: the wide cycle is cut to the
-   frame and stands on the frame's own ground, its lower edge fading into it,
-   so the step's words under the machine read on that ground */
-#wing[data-film='cinema'] .film-cycle-layer:has(> .na-cycle) {
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  clip-path: inset(calc(var(--cinema-t) + 9px) calc(var(--cinema-r) + var(--cinema-card) + 13px)
-    calc(var(--cinema-b) + var(--cinema-row) + 5px) calc(var(--cinema-l) + 1px));
-  background: var(--ui-ground-deep);
+/* THE MUSEUM'S WALL behind a work of its own: the figure page's grey-blue
+   light opening behind the work, a darker fall to the foot */
+#wing[data-film='cinema'] .vitrine[data-look-wall='true'] .vitrine-scrim {
+  background-color: var(--ui-ground-deep);
+  background-image:
+    radial-gradient(ellipse 46% 70% at 36% 46%, color-mix(in srgb, var(--ui-ground-raised) 92%, transparent) 0%, transparent 78%),
+    radial-gradient(ellipse 60% 80% at 78% 30%, color-mix(in srgb, var(--ui-ground) 80%, transparent) 0%, transparent 80%),
+    radial-gradient(ellipse 150% 88% at 60% 110%, color-mix(in srgb, var(--ui-ground-sheet) 70%, transparent) 0%, transparent 60%);
 }
-#wing[data-film='cinema'] .film-cycle-layer > .na-cycle {
-  -webkit-mask-image: linear-gradient(to bottom, #000 84%, transparent);
-  mask-image: linear-gradient(to bottom, #000 84%, transparent);
+#wing[data-film='cinema'] .vitrine[data-look-wall='true'][data-look-form='under'] .vitrine-scrim {
+  background-image:
+    radial-gradient(ellipse 58% 64% at 56% 40%, color-mix(in srgb, var(--ui-ground-raised) 92%, transparent) 0%, transparent 80%),
+    radial-gradient(ellipse 150% 70% at 50% 112%, color-mix(in srgb, var(--ui-ground-sheet) 70%, transparent) 0%, transparent 60%);
+}
+/* the work hangs on the wall, no box round it */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-plate[data-seated='true'] { background: transparent; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-stand { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .reader :is(.reader-ground, .reader-stage) { bottom: 0; }
+/* the faint hairline between the work and its label, the figure page's */
+#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-view::after {
+  content: ''; position: absolute; top: 8px; bottom: 8px; right: -14px; width: 1px; pointer-events: none;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--ui-way) 26%, transparent) 16%, color-mix(in srgb, var(--ui-way) 26%, transparent) 84%, transparent);
 }
 
-/* THE WORK'S SCALE STANDS UNDER THE WORK, never on it: the plate keeps a
-   strip at its foot for the rule, which reads on one line there. The strip
-   stands from the first frame: the viewer fits the work once, to the box it
-   opens in, and a stage shortened after that cut the work at top and foot */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-plate .deep-plate-stage { bottom: 30px; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-rule {
-  left: 10px; bottom: 7px; flex-direction: row; align-items: center; gap: 8px;
-  padding: 0; background: none; border: 0;
+/* ---- BESIDE: the label column on the wall ---- */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-card {
+  display: flex; flex-direction: column; overflow: hidden; padding: 0;
+  background: none; border: 0; border-radius: var(--ui-r-box-side); box-shadow: none;
 }
-/* the card names the page, so nothing stands on the page itself, as on the upright phone */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .deep-stand { display: none; }
+/* a place's picture is the room's, so its label keeps a ground of its own over the dimmed room */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-wall='false'] .vitrine-card { padding: 12px 14px 0; background: var(--ui-ground); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body {
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 0 12px;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body::-webkit-scrollbar { display: none; }
+/* scrolled on down, the column's head fades as its foot does */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body[data-top='false'][data-more='true'] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - var(--fade, 16px)), transparent);
+  mask-image: linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - var(--fade, 16px)), transparent);
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body[data-top='false'][data-more='false'] {
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22px); mask-image: linear-gradient(to bottom, transparent, #000 22px);
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name { margin: 0 0 6px; gap: 8px; font: 400 1.3125rem/27px var(--serif); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-dot { transform: translateY(-3px); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-number { font: 400 .8125rem/27px var(--sans); color: var(--ui-text-quiet); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-catalogue { margin: 0 0 11px; font: 400 .8125rem/19px var(--sans); color: var(--ui-text-quiet); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-line { margin: 0 0 10px; font: 400 1.0625rem/24px var(--serif); color: var(--ui-text); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-note { margin: -4px 0 10px; font: 400 .8125rem/19px var(--sans); color: var(--ui-text-quiet); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-seat { margin: -2px 0 4px; font: 400 .8125rem/19px var(--sans); color: var(--ui-text-quiet); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-words, .vitrine-aside) :is(p, li) { margin: 0 0 8px; font: 400 .9375rem/22px var(--serif); color: var(--ui-text); }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-words, .vitrine-aside) :is(.vitrine-meta, .picture-holder, .picture-source-reading, .picture-column-note) {
+  font: 400 .8125rem/19px var(--sans); color: var(--ui-text-quiet);
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-certainty { font-size: .8125rem; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-rule-label { font-size: .8125rem; }
+/* the work's own details as quiet framed words: a press moves the work there */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body > .vitrine-payload-controls {
+  position: static; display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 14px; padding: 0; justify-content: flex-start;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body > .vitrine-payload-controls:empty { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body > .vitrine-payload-controls .vitrine-control {
+  flex: 0 1 auto; min-height: 44px; padding: 0 14px; border: 0; border-radius: var(--ui-r-control);
+  background: none; box-shadow: inset 0 0 0 1px var(--ui-line-strong); font: 400 .875rem/1.2 var(--sans); color: var(--ui-text);
+}
+/* the column's foot row: the key to more words while they wait below, the record, a book's whole text */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls {
+  flex: 0 0 auto; display: flex; flex-wrap: wrap; align-items: center; column-gap: 20px; row-gap: 0;
+  margin: 0; padding: 2px 0 0; border: 0;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls .vitrine-control,
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more {
+  flex: 0 0 auto; display: inline-flex; align-items: center; min-width: 0; min-height: 44px; height: 44px; padding: 0;
+  border: 0; border-radius: 0; background: none; box-shadow: none; white-space: nowrap;
+  font: 400 .9375rem/20px var(--sans); color: var(--ui-text);
+  text-decoration: underline; text-decoration-color: var(--ui-line-strong); text-underline-offset: 4px; text-decoration-thickness: 1px;
+  cursor: pointer;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more { color: var(--key); }
+/* the walk's seats and gold are the look's steps and its one close: the card's own stand down */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more[hidden] { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-arrow {
+  width: 13px; height: 13px; margin-left: 5px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-controls .vitrine-control, .vitrine-look-more):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 3px; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls .vitrine-control[aria-pressed='true'] { text-decoration-color: var(--ui-way); }
 
-/* THE READER AS THE PHONE STANDS IT: the page down to the frame's foot, the
-   two zoom steps as the row's own glyphs beside the ways, so the card's words
-   begin above its fold; the book's card is a little wider for that row */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'][data-payload='manuscript'] { --cinema-card: min(400px, 48vw); }
-#wing[data-film='cinema'] .reader[data-dock='card'] :is(.reader-ground, .reader-stage) { bottom: 8px; }
-#wing[data-film='cinema'] .vitrine-payload-controls .reader-shelf { position: static; height: 44px; margin: 0; padding: 0; gap: 4px; }
-#wing[data-film='cinema'] .vitrine-payload-controls .reader-page { width: 44px; height: 44px; min-width: 44px; }
-#wing[data-film='cinema'] .vitrine-payload-controls :is(.reader-absence, .reader-part) { height: 44px; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row { gap: 4px; row-gap: 8px; width: 100%; flex-wrap: wrap; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-way { flex: 1 1 0; min-width: 0; padding: 10px 2px; font-size: .8125rem; }
-/* a book's named details keep their words, each on a row of its own under the ways */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='detail'] { order: 2; flex: 1 0 100%; padding: 10px 8px; font-size: .875rem; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .vitrine-step { flex: 0 0 44px; }
-/* the side's own words read as paragraphs, at the close look's line */
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-aside :is(p, li) { margin: 0 0 8px; line-height: 1.42; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom { display: contents; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='whole'] { display: none; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom .vitrine-control { flex: 0 0 44px; min-width: 44px; padding: 0; font-size: 0; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='nearer']::before { content: '+'; font: 400 20px/1 var(--sans); }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom [data-zoom='further']::before { content: '\2212'; font: 400 20px/1 var(--sans); }
+/* ---- UNDER: the work over the foot row, its words in the walk's strip ---- */
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-card {
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; column-gap: 14px;
+  padding: 0 12px; background: var(--ui-ground); border-radius: var(--ui-r-box-side);
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-body {
+  overflow: hidden; padding: 0; -webkit-mask-image: none; mask-image: none;
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-body > :not(.vitrine-name, .vitrine-line) { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name {
+  margin: 0; font-size: 1.0625rem; line-height: 22px; white-space: nowrap; overflow: hidden;
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name-text { overflow: hidden; text-overflow: ellipsis; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name-number { line-height: 22px; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-line {
+  margin: 0; font-size: .9375rem; line-height: 20px; color: var(--ui-text-quiet); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls > :not(.vitrine-look-more) { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls { padding: 0; }
+/* opened: the walk's own column, risen from the strip */
+#wing[data-film='cinema'] .vitrine[data-look-form='under'][data-look-open] .vitrine-card {
+  padding: 12px 16px 0; background: var(--ui-ground); border-radius: var(--ui-r-box-side-tall);
+}
 
 /* ---- THE SHEETS OVER THE WHOLE GLASS, one close at the lower left ---- */
 /* the record */

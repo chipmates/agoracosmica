@@ -584,6 +584,10 @@ export function createDeepPlatePayload(options: {
       corner.hidden = nodes.length === 0
     },
     drawn() { return drawn },
+    aspect() {
+      const across = width * (cut.right - cut.left), down = height * (cut.bottom - cut.top)
+      return across > 0 && down > 0 ? across / down : null
+    },
     home() {
       if (!viewer || !homeZoom) return true
       return viewer.viewport.getZoom(true) <= homeZoom * 1.02
