@@ -654,6 +654,8 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   height: 1px;
   background: var(--ui-line-strong);
 }
+/* the key beside the word stands clear of its line, moved without moving the word */
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) .desk-word-control .desk-key { translate: 0 -2px; }
 /* anything you can press stands in the text colour, as the words beside it */
 #wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door,
 #wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door,

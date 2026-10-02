@@ -180,6 +180,8 @@
   height: 1px;
   background: var(--ui-line-strong);
 }
+/* the key beside the word stands clear of its line, moved without moving the word */
+#wing[data-desk~='closelook'] .desk-clb .desk-word-control .desk-key { translate: 0 -2px; }
 #wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):hover::after,
 #wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):focus-visible::after {
   height: 1.5px;
