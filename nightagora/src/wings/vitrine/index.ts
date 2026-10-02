@@ -158,6 +158,12 @@ export function createVitrine(options: {
   /** THE PANEL SAYS WHAT THE THING IS CALLED, FIRST. Every caller already
    * hands the window the exhibit's own name in the page's language; the card
    * reads it at its head and takes it as its accessible name. */
+  /* THE STRIP'S TWO ROWS end on a whole word: what they show is a copy cut
+     at a word's end, or the first whole sentence; the name and the line
+     themselves stay whole for a screen reader */
+  const stripName = make('span', 'vitrine-strip-copy vitrine-strip-name')
+  const stripLine = make('p', 'vitrine-strip-copy vitrine-strip-line')
+  for (const copy of [stripName, stripLine]) copy.setAttribute('aria-hidden', 'true')
   const naming = make('h2', 'vitrine-name')
   naming.id = `${options.id}-name`
   setRegister(naming, 'label')
@@ -167,7 +173,7 @@ export function createVitrine(options: {
   // the number cast on the work's frame, before its name
   const namingNumber = make('span', 'vitrine-name-number')
   namingNumber.hidden = true
-  naming.append(namingDot, namingNumber, namingText)
+  naming.append(namingDot, namingNumber, namingText, stripName)
   // the catalogue's own row under the name: the date and where the original is
   const entryRow = make('p', 'vitrine-catalogue')
   entryRow.hidden = true
@@ -187,7 +193,7 @@ export function createVitrine(options: {
   const words = make('div', 'vitrine-words')
   const aside = make('div', 'vitrine-aside')
   const after = make('div', 'vitrine-words vitrine-after')
-  body.append(naming, seat, entryRow, line, note, words, aside, after)
+  body.append(naming, seat, entryRow, line, stripLine, note, words, aside, after)
   const controls = make('div', 'vitrine-controls')
   const foot = make('div', 'vitrine-foot')
   /** THE CARD IS A SHEET ON THE PHONE. The grabber raises it over the work
@@ -496,7 +502,31 @@ export function createVitrine(options: {
     gatherTools()
     toolWatch.observe(root, { childList: true, subtree: true })
     if (!tools.hidden) place(tools, { left: safe.left, top, width: CINEMA.tools - 8, height: frame.row.top - CINEMA.rowGap - top })
+    fitStrip()
     paintLookMore()
+  }
+  /** The strip's two rows, each cut at a word's end where it does not fit whole. */
+  function fitStrip(): void {
+    const strip = root.dataset['lookForm'] === 'under'
+    if (!strip) return
+    fitWords(stripName, namingText.textContent ?? '')
+    fitWords(stripLine, line.hidden ? '' : line.textContent ?? '')
+  }
+  /** A row's words, whole, or its first whole sentence, or as many whole words as fit with a mark of more. */
+  function fitWords(row: HTMLElement, said: string): void {
+    const text = said.trim().replace(/\s+/g, ' ')
+    row.textContent = text
+    if (!text || row.scrollWidth <= row.clientWidth + 0.5) return
+    const sentence = /^.+?[.!?](?=\s)/.exec(text)?.[0]
+    if (sentence) { row.textContent = sentence; if (row.scrollWidth <= row.clientWidth + 0.5) return }
+    const words = text.split(' ')
+    let lo = 1, hi = words.length - 1, best = 1
+    const tryWords = (n: number): boolean => {
+      row.textContent = `${words.slice(0, n).join(' ').replace(/[,;:–-]+$/, '')} …`
+      return row.scrollWidth <= row.clientWidth + 0.5
+    }
+    while (lo <= hi) { const mid = (lo + hi) >> 1; if (tryWords(mid)) { best = mid; lo = mid + 1 } else hi = mid - 1 }
+    tryWords(best)
   }
   /** A FILM'S FOOT: its clock along the film's lower edge, its line centred
    * over the clock, both on the film itself. A film that stands smaller than
@@ -597,6 +627,8 @@ export function createVitrine(options: {
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
     for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
+    stripName.textContent = ''
+    stripLine.textContent = ''
     for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below']) stage.style.removeProperty(name)
     lookMore.remove()
     toolWatch.disconnect()
@@ -643,6 +675,7 @@ export function createVitrine(options: {
     if (!open) return
     if (options.narrow() && root.dataset['peek'] === 'true') layout()
     else if (cinemaFrame && raised && root.dataset['lookForm'] === 'under') layout()
+    else if (cinemaFrame) { fitStrip(); fadeWords(); markMore() }
     else { fadeWords(); markMore() }
   })
   for (const part of [naming, seat, entryRow, line, note, words, aside, after]) wordsResized.observe(part)

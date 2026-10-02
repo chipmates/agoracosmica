@@ -428,14 +428,21 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-body {
   overflow: hidden; padding: 0; -webkit-mask-image: none; mask-image: none;
 }
-#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-body > :not(.vitrine-name, .vitrine-line) { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-body > :not(.vitrine-name, .vitrine-line, .vitrine-strip-line) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name {
   margin: 0; font-size: 1.0625rem; line-height: 22px; white-space: nowrap; overflow: hidden;
 }
-#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name-text { overflow: hidden; text-overflow: ellipsis; }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-name-number { line-height: 22px; }
-#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-line {
-  margin: 0; font-size: .9375rem; line-height: 20px; color: var(--ui-text-quiet); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+/* the strip shows its rows' copies, each cut at a word's end; the name and the line stay for a screen reader */
+.vitrine-strip-copy { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) :is(.vitrine-name-text, .vitrine-body > .vitrine-line) {
+  position: absolute; width: 1px; height: 1px; margin: 0; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-strip-name {
+  display: block; flex: 1 1 auto; min-width: 0; overflow: hidden; white-space: nowrap;
+}
+#wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-strip-line {
+  display: block; margin: 0; font: 400 .9375rem/20px var(--serif); color: var(--ui-text-quiet); white-space: nowrap; overflow: hidden;
 }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls > :not(.vitrine-look-more) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls { padding: 0; }
