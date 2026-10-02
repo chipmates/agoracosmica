@@ -8,8 +8,9 @@ import { isCollectionBook } from './table/codex-shelf'
 
 /** the line's floor, which opens the life view whole (`LINE_FLOOR_PICK`) */
 export const FILM_LINE_FLOOR = 'line/floor'
-/** the leaf on the study's support (`VINCI_STUDY_LEAF`) */
-export const FILM_STUDY_LEAF = 'leaf/paris-B-83v'
+/** the sheet on the study's support (`VINCI_STUDY_LEAF`) and the store's name for it (`VINCI_STUDY_SHEET`) */
+export const FILM_STUDY_LEAF = 'study-sheet/deluge'
+export const FILM_STUDY_SHEET = 'deluge'
 /** the painting at the grave, read under a place's card, not the hang's */
 export const FILM_DEATHBED = 'picture/deathbed-painting/front'
 /** the store's reproduction the painting at the grave hangs (`PLATES.ingres`) */

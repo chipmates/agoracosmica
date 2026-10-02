@@ -17,7 +17,8 @@ import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePa
   VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCertainty, type VinciPlaceId, type VinciShowpiece } from './collection/close-look'
 import { createVinciPaintingView, vinciPlateWords } from './collection/deep-plate'
 import { hangCatalogue } from './collection/catalogue'
-import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF } from './film-look-kinds'
+import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF, FILM_STUDY_SHEET } from './film-look-kinds'
+import { STUDY_SHEET_WORDS } from './study-sheet-words'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { GRAVE_LIGHT } from './grave/light-words'
 import { keepTogetherIn } from './keep-together'
@@ -35,12 +36,12 @@ import { createReaderPayload as createLeafReader } from '../vitrine/reader'
 import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { assetAddress } from '../../stack/materials'
-import { loadManifest, type ManifestIndex } from '../../manifest'
+import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../manifest'
 import type { DeskOverviewCell } from '../overview'
 import { deskControl } from '../desk-story'
 import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfSource, topicExhibit, topicPages, topicPagesWord } from './table/best-of'
 import { createBestOfLook } from './table/best-of-look'
-import { CODEX_ENTRIES, EDITION_EXHIBIT, SHELF_BOOKS, shelfBook, shelfPlate } from './table/codex-shelf'
+import { EDITION_EXHIBIT, SHELF_BOOKS, shelfBook, shelfPlate } from './table/codex-shelf'
 import { shownAbsences } from './table/absences'
 import { createCodexReaderPayload } from './table/codex-reader'
 import { createReaderPayload as createEditionReader } from './table/reader'
@@ -118,6 +119,18 @@ function screwLeaf(): PageRecord | undefined {
   return pages.find(page => page.page_kind === 'facsimile' && page.codex === 'B' && page.folio === 83 && page.side === 'verso')
 }
 
+/** THE STORE'S TWO RECORDS OF THE SHEET ON THE STUDY'S SUPPORT, admitted for
+    display only with their size and both record lines, as the live wing reads them */
+type StudySheetRecord = ManifestEntry & { width?: number; height?: number; honesty_en?: string; honesty_de?: string }
+function studySheetRecords(index: ManifestIndex): { page: StudySheetRecord; thumb: StudySheetRecord } | null {
+  const shown = (role: 'sheet-page' | 'sheet-thumb'): StudySheetRecord | null => {
+    const entry = index.byId.get(`vinci/${role}/${FILM_STUDY_SHEET}`) as StudySheetRecord | undefined
+    return entry && entry.display === true && entry.width && entry.height && entry.honesty_en && entry.honesty_de ? entry : null
+  }
+  const page = shown('sheet-page'), thumb = shown('sheet-thumb')
+  return page && thumb ? { page, thumb } : null
+}
+
 /** a close look's two ways along its set, as the phone's foot row stands them */
 export interface FilmLookWays {
   /** the work before by name, or null at the set's start */
@@ -164,6 +177,7 @@ export function createFilmLook(h: FilmLookHost) {
     }
     if (id.startsWith('machine/')) return machineCatalog[id.slice('machine/'.length) as MachineSlug]?.title[lang()] ?? ''
     if (id.startsWith('sheet/')) return assets ? vinciSheetRecords(id, assets)?.title ?? '' : ''
+    if (id === VINCI_STUDY_LEAF) return text(STUDY_SHEET_WORDS.title)
     return ''
   }
   /** THE WAY ON AND BACK walk the set to a named work: a press goes as the
@@ -364,14 +378,32 @@ export function createFilmLook(h: FilmLookHost) {
   }
 
   /** THE SHEET: the leaf the screw was read from, opened in the reader where
-      the visitor stands, as the live wing opens the study's own leaf */
+      the visitor stands */
   function openLeaf(machine: string): void {
     readLeaf(`${machine}/leaf`, () => void open(machine, null), null, 'advance')
   }
-  /** THE PAGE ON THE STUDY'S SUPPORT, the same leaf, opened where the visitor stands */
+  /** THE SHEET ON THE STUDY'S SUPPORT, opened where the visitor stands, as the
+      live wing opens it: one side, the sheet's own scan with its zoom; its
+      record is what the sheet shows and the store's line for the reproduction */
   function openStudyLeaf(from: HTMLElement | null, how: 'enter' | 'advance'): void {
+    const sheet = assets ? studySheetRecords(assets) : null
+    if (!sheet) return
     h.standDown(true)
-    readLeaf(`${VINCI_STUDY_LEAF}/leaf`, null, from, how)
+    const title = text(STUDY_SHEET_WORDS.title), shows = text(STUDY_SHEET_WORDS.shows)
+    const door = `${VINCI_STUDY_LEAF}/leaf`
+    const reader = createLeafReader({
+      book: Promise.resolve({ sides: [{ id: 'study-sheet', label: title, shows, ways: [], head: null,
+        source: { pyramid: null, file: assetAddress(sheet.page), width: sheet.page.width ?? 0, height: sheet.page.height ?? 0 },
+        thumb: assetAddress(sheet.thumb), colour: certaintyColour('documented'), holder: sheet.page.holder ?? '' }],
+      stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
+      start: 'study-sheet', words: vinciManuscriptWords(), tier: () => 'standard' })
+    const record = (): void => h.openRecord(door, STUDY_SHEET_WORDS.title, 'documented', host => {
+      for (const line of [text(STUDY_SHEET_WORDS.shows), (lang() === 'de' ? sheet.page.honesty_de : sheet.page.honesty_en) ?? ''])
+        if (line) host.append(make('p', 'vinci-statement', line))
+    })
+    openLook({ id: door, title, line: null, card: [], payload: reader,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()],
+      set: stand(VINCI_STUDY_LEAF).set, certainty: 'documented' }, from, how)
   }
   function readLeaf(door: string, back: (() => void) | null, from: HTMLElement | null, how: 'enter' | 'advance'): void {
     const leaf = screwLeaf()
@@ -394,7 +426,7 @@ export function createFilmLook(h: FilmLookHost) {
       controls: [control(VINCI_VITRINE_WORDS.provenance, () => h.openRecord(door, { en: named?.en ?? '', de: named?.de ?? '' }, 'documented',
         host => { for (const line of [shows, scan.licence ?? '']) if (line) host.append(make('p', 'vinci-statement', line)) }), 'record'),
       ...(back ? [control(VINCI_VITRINE_WORDS.back, back, 'back')] : []), shut()],
-      set: back ? null : stand(VINCI_STUDY_LEAF).set, certainty: 'documented' }, from, how)
+      set: null, certainty: 'documented' }, from, how)
   }
 
   /** THE FILM OF WHAT A SHEET DESCRIBES, as the sheet's close look: the film
@@ -626,10 +658,10 @@ export function createFilmLook(h: FilmLookHost) {
       return sheet ? { id, kind: 'sheet', openable: true, title: sheet.title, certainty: 'documented', preview: assetAddress(sheet.thumb) } : null
     }
     if (id === VINCI_STUDY_LEAF) {
-      // a leaf is named by the codex its stem carries, as the live row names it
-      const codex = CODEX_ENTRIES.find(entry => entry.id === id.slice('leaf/'.length).replace(/-\d+[rv]$/, ''))
-      return { id, kind: 'manuscript', openable: true, title: codex ? (lang() === 'de' ? codex.de : codex.en) : '', certainty: 'documented',
-        preview: preview(`vinci/folio-thumb/${id.slice('leaf/'.length).toLowerCase()}`) }
+      // the sheet is named by its own words, as the live row names it
+      const sheet = studySheetRecords(index)
+      return sheet ? { id, kind: 'manuscript', openable: true, title: text(STUDY_SHEET_WORDS.title), certainty: 'documented',
+        preview: assetAddress(sheet.thumb) } : null
     }
     return undefined
   }

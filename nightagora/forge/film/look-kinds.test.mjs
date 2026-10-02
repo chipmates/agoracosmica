@@ -42,6 +42,7 @@ function resolves(id, kind) {
 test('the ids the kinds module writes out are the live wing\'s own', () => {
   assert.equal(kinds.FILM_LINE_FLOOR, approaches.LINE_FLOOR_PICK)
   assert.equal(kinds.FILM_STUDY_LEAF, approaches.VINCI_STUDY_LEAF)
+  assert.equal(kinds.FILM_STUDY_SHEET, approaches.VINCI_STUDY_SHEET)
   assert.equal(kinds.FILM_EDITION, shelf.EDITION_EXHIBIT)
   assert.equal(kinds.FILM_DEATHBED, approaches.vinciPlateExhibitId('deathbed-painting', 'front'))
   assert.equal(kinds.FILM_DEATHBED_PLATE, bench.PLATES.ingres)
@@ -54,7 +55,7 @@ test('every exhibit the live wing can mark opens a film look', () => {
   const broken = ids.filter((id) => !resolves(id, kinds.filmLookKind(id)))
   assert.deepEqual(broken, [], `no record stands behind ${broken.join(', ')}`)
   // the five kinds that opened nothing before
-  for (const [id, kind] of [['grave', 'place'], ['grave-diagram', 'place'], ['line/floor', 'life'], ['leaf/paris-B-83v', 'study-leaf'], ['sheet/rcin-919006', 'sheet']])
+  for (const [id, kind] of [['grave', 'place'], ['grave-diagram', 'place'], ['line/floor', 'life'], ['study-sheet/deluge', 'study-leaf'], ['sheet/rcin-919006', 'sheet']])
     assert.equal(kinds.filmLookKind(id), kind, id)
   if (marksFile) assert.ok(readIds.length > 0, `the marks file ${marksFile} carries marks`)
 })

@@ -50,6 +50,7 @@ import { createRoadDressing, roadDressingProvenance } from './road-dressing'
 import { createCourtObjects, createInnerCourtDressing, courtObjectsProvenance, innerCourtProvenance, courtDressingProvenance } from './inner-court'
 import { createGatePassage, gatePassageProvenance } from './gate-passage'
 import { createStudySheet, type StudySheet } from './study-sheet'
+import { STUDY_SHEET_WORDS } from './study-sheet-words'
 import { createEntryPassage, entryPassageProvenance, hallLedgeProvenance } from './entry-passage'
 import { createHallTablePieces } from './hall-table-pieces'
 import { createGround } from './ground'
@@ -73,7 +74,7 @@ import { createMeasurement, type VinciMeasurement } from './measurement'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { collectVinciLabelOccluders, createVinciExhibitDots, createVinciLabelAnchor, vinciSightBlocked, vinciWorkRegions, type VinciExhibitDots, type VinciExhibitMark, type VinciLabelAnchor, type VinciLabelMode, type VinciLabelRect } from './labels'
 import { pickVinciExhibit, readVinciExhibits, vinciMachineRoom, type VinciPickEntry } from './collection/pick'
-import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, vinciApproachPose, vinciApproachStation, vinciApproachesAreNeighbours, vinciStudIndex } from './collection/approaches'
+import { LINE_FLOOR_PICK, VINCI_STUDY_LEAF, VINCI_STUDY_SHEET, vinciApproachPose, vinciApproachStation, vinciApproachesAreNeighbours, vinciStudIndex } from './collection/approaches'
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciMachineRecord, renderVinciShowpieceRecord, vinciSheetSides, vinciShowpiece, vinciDeathbedCard, vinciLimits, vinciLine, vinciMachineCard, vinciPlaceCard, vinciPlaceTitle, vinciManuscriptWords, VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCard, type VinciPlaceCertainty, type VinciPlaceId } from './collection/close-look'
 import { createPlacePayload } from '../vitrine/place'
 import { readingTableOf } from './table'
@@ -83,8 +84,7 @@ import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfSource, isTopicExhibi
 import { createBestOfLook } from './table/best-of-look'
 import { createCodexReaderPayload, type CodexReaderPayload } from './table/codex-reader'
 import type { ReadingTable } from './table'
-import { FAMOUS_FOLIOS, SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
-import { vinciLeafSource } from './collection/deep-plate'
+import { SHELF_UI, TABLE_UI, type PageRecord } from './table/content'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { createReaderPayload, type ReaderPayload } from './table/reader'
 import { createReaderPayload as createVitrineReaderPayload, type ReaderPayload as ReaderPayloadOfWall } from '../vitrine/reader'
@@ -95,7 +95,7 @@ import cardsSource from './data/cards.json?raw'
 import { CERTAINTY as LINE_CERTAINTY } from './line'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { GRAVE_COURT_ORIGIN, LEAF } from './grave/court-plan'
-import { loadManifest, type ManifestIndex } from '../../manifest'
+import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../manifest'
 import { createPlatePayload } from '../vitrine/picture'
 import { createVinciPaintingView } from './collection/deep-plate'
 import type { VitrineRect } from '../vitrine'
@@ -1493,6 +1493,7 @@ export function createWing():VinciWingModule {
     return stem?CODEX_ENTRIES.find(entry=>entry.id===stem):undefined
   }
   function exhibitTitleBi(pick:VinciPickEntry):VinciText|null {
+    if(pick.id===VINCI_STUDY_LEAF)return STUDY_SHEET_WORDS.title
     if(pick.kind==='machine'){const slug=pick.id.slice('machine/'.length);return isMachineSlug(slug)?machineCatalog[slug].title:null}
     if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station);return here?here.name:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{en:stud.date_label_en,de:stud.date_label_de}:null}
@@ -2306,6 +2307,7 @@ export function createWing():VinciWingModule {
     if(pick.id===LINE_FLOOR_PICK){const here=vinciContent.find(entry=>entry.id===pick.station)
       return here?{title:text(here.name),colour:certaintyColour('documented')}:null}
     if(pick.kind==='stud'){const stud=LINE_STUDS[vinciStudIndex(pick.id)];return stud?{title:lang()==='de'?stud.date_label_de:stud.date_label_en,colour:LINE_CERTAINTY[stud.certainty as keyof typeof LINE_CERTAINTY].colour}:null}
+    if(pick.id===VINCI_STUDY_LEAF)return {title:text(STUDY_SHEET_WORDS.title),colour:certaintyColour('documented')}
     if(pick.kind==='manuscript'){const codex=pickCodex(pick.id);return codex?{title:lang()==='de'?codex.de:codex.en,colour:certaintyColour('documented')}:null}
     if(pick.kind!=='place'&&pick.workId!==DEATHBED_WORK)return null
     const named=vinciPlaceTitle(pick.id as VinciPlaceId)
@@ -2622,6 +2624,7 @@ export function createWing():VinciWingModule {
    * the pose its own approach leaves the eye in, and stands in the store under
    * the folder of its kind, so no cell of any row in this wing is blank. */
   function exhibitPreview(pick:VinciPickEntry):string|null {
+    if(pick.id===VINCI_STUDY_LEAF){const thumb=assets?.byId.get(`vinci/sheet-thumb/${VINCI_STUDY_SHEET}`);return thumb?assetAddress(thumb):null}
     // A LEAF'S CELL IS THE PAGE. An admitted sheet has its own thumb in the
     // store, so the cell shows the manuscript and not the fitting it lies on.
     if(pick.id.startsWith('leaf/')) {
@@ -2720,9 +2723,6 @@ export function createWing():VinciWingModule {
    * the body wall and a folio beside a machine each open their page in the
    * reader over the held frame, with no walk out and none back. */
   const LEAF_DOOR='/leaf'
-  /** The one admitted leaf the study's support is read at, in the table's own
-   * key: manuscript B, folio 83 verso, the sheet the screw was read from. */
-  const STUDY_LEAF_KEY='B:83v'
   const isLeafDoor=(id:string|null):boolean=>Boolean(id?.endsWith(LEAF_DOOR))
   /** The reading table of this collection, wherever the visitor stands. */
   function theBook():ReadingTable|undefined {
@@ -2742,24 +2742,33 @@ export function createWing():VinciWingModule {
     const own=(page:PageRecord)=>page.page_kind==='facsimile'&&page.machine_slugs.includes(slug)
     openLeafReading(table?.pages.find(own),base,back,{only:own,upLabel:machineCatalog[slug].title[lang()]})
   }
-  /** THE PAGE THE STUDY'S SUPPORT IS READ AT. Read from the edition's own
-   * record and not from the reading table, because the table is built when a
-   * visitor reaches the gallery and this support stands in the house. */
-  let studyLeaf:PageRecord|undefined|null=null
-  function studyLeafPage():PageRecord|undefined {
-    if(studyLeaf!==null)return studyLeaf
+  /** THE LEAF THE EDITION'S PLATE SHOWS: manuscript B, folio 83 verso, the
+   * aerial screw's page. Read from the edition's own record and not from the
+   * reading table, which is built only when a visitor reaches the gallery. */
+  let screwLeaf:PageRecord|undefined|null=null
+  function screwLeafPage():PageRecord|undefined {
+    if(screwLeaf!==null)return screwLeaf
     const pages=(JSON.parse(studyPageMap) as {pages:PageRecord[]}).pages
-    studyLeaf=pages.find(page=>page.page_kind==='facsimile'&&page.codex==='B'&&page.folio===83&&page.side==='verso')
-    return studyLeaf
+    screwLeaf=pages.find(page=>page.page_kind==='facsimile'&&page.codex==='B'&&page.folio===83&&page.side==='verso')
+    return screwLeaf
   }
-  /** THE LEAF ON THE SUPPORT, from the same record the reader opens: the
+  /** THE STORE'S TWO RECORDS OF THE SUPPORT'S SHEET, admitted for display
+   * only with their size and both record lines: the scan and its thumb. */
+  type StudySheetRecord=ManifestEntry&{width?:number;height?:number;honesty_en?:string;honesty_de?:string}
+  function studySheetRecords():{page:StudySheetRecord;thumb:StudySheetRecord}|null {
+    const shown=(role:'sheet-page'|'sheet-thumb'):StudySheetRecord|null=>{
+      const entry=assets?.byId.get(`vinci/${role}/${VINCI_STUDY_SHEET}`) as StudySheetRecord|undefined
+      return entry&&entry.display===true&&entry.width&&entry.height&&entry.honesty_en&&entry.honesty_de?entry:null
+    }
+    const page=shown('sheet-page'),thumb=shown('sheet-thumb')
+    return page&&thumb?{page,thumb}:null
+  }
+  /** THE SHEET ON THE SUPPORT, from the same record the reader opens: the
    * display scan on the live tiers, its thumb where the budget is calm. */
   function supplyStudySheet():void {
-    const leaf=studyLeafPage()
     if(!studySheet||!assets)return
-    const stem=leaf?leafStem(leaf):''
-    const calm=hosts?.world.stack.tierName()==='calm'
-    studySheet.supply(leaf?assets.byId.get(`vinci/${calm?'ms-thumb':'ms-page'}/${stem}`):undefined)
+    const sheet=studySheetRecords(), calm=hosts?.world.stack.tierName()==='calm'
+    studySheet.supply((calm?sheet?.thumb:sheet?.page)??undefined)
   }
   /** The stem the store keys this leaf's records by. */
   const leafStem=(page:PageRecord):string=>page.file.replace(/^.*\//,'').replace(/\.[a-z]+$/,'')
@@ -2847,41 +2856,34 @@ export function createWing():VinciWingModule {
   }
   /** The edition's plate on the shelf's row: the page the volume lies open at. */
   function editionPlate():string|null {
-    const cover=studyLeafPage()
+    const cover=screwLeafPage()
     const thumb=cover?assets?.byId.get(`vinci/ms-thumb/${leafStem(cover)}`):undefined
     return thumb?assetAddress(thumb):null
   }
-  /** THE PAGE ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side, the
-   * admitted leaf's own, read from its pyramid where the store has cut one.
-   * Its words are the edition's own record and the sheet's licence line. */
+  /** THE SHEET ON THE SUPPORT, OPENED WHERE THE VISITOR STANDS. One side,
+   * the sheet's own scan with its zoom; its record is what the sheet shows
+   * and the store's line for the reproduction. */
   function openStudyLeaf(from:HTMLElement|null,how:'enter'|'advance'):void {
-    const leaf=studyLeafPage()
-    if(!leaf||!assets||!closeLook)return
-    const stem=leafStem(leaf)
-    const near=assets.byId.get(`vinci/ms-page-near/${stem}`)??assets.byId.get(`vinci/ms-page/${stem}`)
-    const thumb=assets.byId.get(`vinci/ms-thumb/${stem}`)
-    if(!near)return
-    const scan=near as typeof near&{width?:number;height?:number;licence?:string}
-    const named=FAMOUS_FOLIOS.find(folio=>folio.folio==='83v')
-    const title=lang()==='de'?named?.de??'':named?.en??''
-    const shows=lang()==='de'?leaf.what_it_shows_de:leaf.what_it_shows_en
-    const source=vinciLeafSource(assets,leaf.file,{file:assetAddress(near),
-      width:scan.width??0,height:scan.height??0})
+    const sheet=studySheetRecords()
+    if(!sheet||!closeLook)return
+    const title=text(STUDY_SHEET_WORDS.title), shows=text(STUDY_SHEET_WORDS.shows)
     const door=`${VINCI_STUDY_LEAF}${LEAF_DOOR}`
     const openRecord=()=>{
-      exhibitSources={id:door,title:{en:named?.en??'',de:named?.de??''},certainty:'documented',renderStation(host){
+      exhibitSources={id:door,title:STUDY_SHEET_WORDS.title,certainty:'documented',renderStation(host){
         const block=make('div','vinci-record');block.dataset['register']='record'
-        for(const line of [shows,scan.licence??''])if(line)block.append(make('p','vinci-statement',line))
+        for(const line of [text(STUDY_SHEET_WORDS.shows),(lang()==='de'?sheet.page.honesty_de:sheet.page.honesty_en)??''])
+          if(line)block.append(make('p','vinci-statement',line))
         host.append(block)
       }}
       sources.resetScroll();sources.select('station');mode=2;paintDock()
     }
     const reader=createVitrineReaderPayload({
-      book:Promise.resolve({sides:[{id:'study-leaf',label:title,shows,source,
-        thumb:thumb?assetAddress(thumb):null,ways:[],colour:certaintyColour('documented'),
-        head:null,holder:''}],
+      book:Promise.resolve({sides:[{id:'study-sheet',label:title,shows,
+        source:{pyramid:null,file:assetAddress(sheet.page),width:sheet.page.width??0,height:sheet.page.height??0},
+        thumb:assetAddress(sheet.thumb),ways:[],colour:certaintyColour('documented'),
+        head:null,holder:sheet.page.holder??''}],
         stripLabel:()=>text(hereContent().name),holder:'',honesty:text(VINCI_PAGE_HONESTY)}),
-      start:'study-leaf',words:vinciManuscriptWords(),
+      start:'study-sheet',words:vinciManuscriptWords(),
       tier:()=>hosts?.world.stack.tierName()??'standard'})
     closeLook.open({id:door,title,line:null,card:[],payload:reader,
       controls:[control(VINCI_VITRINE_WORDS.provenance,openRecord),control(VINCI_VITRINE_WORDS.close,()=>closeLook?.close())],

@@ -54,8 +54,8 @@
   },
   {
    "file": "src/wings/vinci/collection/approaches.ts",
-   "sha256": "739d7e9401bcfcce270d6deee0302fc1f474aecb01a53c21e75da438b23849e6",
-   "bytes": 33885,
+   "sha256": "ae3facfa1cae829ecccc495367103d39e6ebbc0e899ca2ef73dc6db764c8f092",
+   "bytes": 34060,
    "unchangedDuringAudit": true
   },
   {
@@ -17446,7 +17446,7 @@
   {
    "viewport": "desktop",
    "station": "study",
-   "exhibit": "leaf/paris-B-83v",
+   "exhibit": "study-sheet/deluge",
    "fromPose": {
     "eye": [
      0.5,
@@ -20922,7 +20922,7 @@
   {
    "viewport": "phone",
    "station": "study",
-   "exhibit": "leaf/paris-B-83v",
+   "exhibit": "study-sheet/deluge",
    "fromPose": {
     "eye": [
      5.2,

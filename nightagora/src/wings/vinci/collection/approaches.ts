@@ -429,7 +429,7 @@ function otherKinds(): Placed[] {
     else if (isHallTablePiece(slug)) add(`machine/${slug}`, 'machine', 'hall', narrow => tablePiecePose(slug, narrow))
     else add(`machine/${slug}`, 'machine', MACHINE_EYES[slug].station, narrow => machinePose(slug, narrow))
   }
-  // THE STUDY'S PAGE, on its support below the window the visit was written
+  // THE STUDY'S SHEET, on its support below the window the visit was written
   // under. The eye stands a stride off the board, on the line in from the
   // station's own eye, and the reading itself opens in the reader.
   add(VINCI_STUDY_LEAF, 'manuscript', 'study', narrow =>
@@ -573,10 +573,13 @@ export function vinciApproachesAreNeighbours(a: string, b: string): boolean {
 }
 
 
-/** THE ONE PAGE THE STUDY OPENS. Manuscript B 83v, of the fifteen leaves this
- * museum has admitted, read on the court's support below the study's window.
- * Nothing ties this page to this room: it is the page the reading opens at. */
-export const VINCI_STUDY_LEAF='leaf/paris-B-83v'
+/** THE ONE SHEET THE STUDY OPENS: a late Deluge drawing (Windsor, RCIN
+ * 912380), a loose sheet the museum lays on the court's support below the
+ * study's window. The museum places it there; no record says it lay there.
+ * Its kind stays 'manuscript' because 'sheet' is the body wall's book. */
+export const VINCI_STUDY_LEAF='study-sheet/deluge'
+/** the store's own name for that sheet (`vinci/sheet-page/<name>`) */
+export const VINCI_STUDY_SHEET='deluge'
 
 /** The identity the registry joins a mounted plate to. */
 export const vinciPlateExhibitId = exhibitId
