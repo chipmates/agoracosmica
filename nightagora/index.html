@@ -74,12 +74,15 @@
       --na-gold-deep: #b8863b;
       --na-starlight: #f3efe2;
       --na-mist: #8d93ad;
+      /* the film's slate, the ground its chrome stands on, and that ground lifted */
+      --na-slate: #08121c;
+      --na-slate-lift: #142333;
       --serif: Georgia, 'Times New Roman', serif;
       --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
       /* ---- THE PRESS — the shell's one letterpress voice. Every surface of
          the night reads its ink, its rules and its plates out of this block.
-         Nothing below invents a hue: the seven colours above are the whole
+         Nothing below invents a hue: the nine colours above are the whole
          palette. ---- */
 
       /* type on the night: a hard close shadow so the letter has an edge,
@@ -792,10 +795,9 @@ body.forge #door-measure .door-fill { transition: none !important; }
     body.forge .star-chip, body.forge #constellation-plate, body.forge #sky-invite,
     body.forge #chapter-marks { transition: none !important; }
 
-    /* a figure holds the whole frame while it is open. The scrim was thin
-       enough that the sky's own letterpress read straight through the pane
-       on a phone and collided with the names (round 1), so it deepens, and
-       the layer under it steps back with it.
+    /* a figure holds the whole frame while it is open, on the film's own
+       slate and opaque: a thinner scrim let the sky's letterpress read
+       through the pane on a phone and collide with the names.
 
        IT IS ALSO A PLANE, AND NO PLANE IN THIS MUSEUM IS ONE COLOUR. Deep
        enough to hold a portrait, it measured a range of one or two levels
@@ -807,14 +809,12 @@ body.forge #door-measure .door-fill { transition: none !important; }
     #figure-pane {
       position: fixed; inset: 0; z-index: 5;
       display: flex; align-items: center; justify-content: center;
-      background-color: rgba(1, 2, 5, 0.95);
+      background-color: var(--na-slate);
       background-image:
         url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.64 0 0 0 0 0.66 0 0 0 0 0.8 0.34 0.34 0.34 0 0'/%3E%3C/filter%3E%3Crect width='168' height='168' filter='url(%23t)' opacity='0.17'/%3E%3C/svg%3E"),
-        radial-gradient(ellipse 62% 72% at 14% 10%, rgba(64, 71, 104, 0.9) 0%, rgba(64, 71, 104, 0) 78%),
-        radial-gradient(ellipse 32% 36% at 76% 20%, rgba(46, 52, 84, 0.55) 0%, rgba(46, 52, 84, 0) 80%),
-        radial-gradient(ellipse 96% 74% at 30% 34%, rgba(28, 34, 58, 0.9) 0%, rgba(28, 34, 58, 0) 78%),
-        radial-gradient(ellipse 150% 88% at 84% 104%, rgba(22, 27, 50, 0.9) 0%, rgba(22, 27, 50, 0) 56%);
-      background-size: 168px 168px, auto, auto, auto, auto;
+        radial-gradient(ellipse 70% 80% at 28% 42%, var(--na-slate-lift) 0%, transparent 72%),
+        radial-gradient(ellipse 120% 90% at 80% 100%, color-mix(in srgb, var(--na-slate) 70%, var(--na-slate-lift)) 0%, transparent 60%);
+      background-size: 168px 168px, auto, auto;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.8s ease, visibility 0s linear 0.8s;
     }
