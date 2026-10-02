@@ -96,7 +96,7 @@ body.door .status { animation: none; }
   background:
     linear-gradient(var(--press-muted), var(--press-muted)) center / 10px 1px no-repeat,
     radial-gradient(ellipse at 35% 20%, color-mix(in srgb, var(--na-starlight) 12%, transparent), transparent 68%);
-  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--na-abyss) 60%, transparent);
+  /* the glass fills its frame: an inner ring would read as a second box in a square one */
   transition: border-color .4s ease, box-shadow .4s ease;
 }
 #rail-instruments::after {

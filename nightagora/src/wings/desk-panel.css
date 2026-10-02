@@ -36,10 +36,10 @@
   transition: opacity 240ms cubic-bezier(.22, .61, .36, 1) 500ms, color .3s ease;
 }
 :root[data-na-panel='open'] #rail-instruments { color: var(--na-starlight); }
-/* on the band the glass ring is a control's whole edge: the strong line, 3 to 1 on the wall */
+/* on the band the glass ring is a control's whole edge: the strong line, 3 to 1 on the wall;
+   the glass fills it, as an inner ring would read as a second box in a square one */
 :root[data-na-panel] #rail-instruments::after {
   border-color: var(--ui-line-strong);
-  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
 }
 :root[data-na-panel] #rail-instruments:is(:hover, :focus-visible, [aria-expanded='true'])::after { border-color: var(--ui-way); }
 /* IN A CLOSE LOOK THE CONTROL STANDS ON THE BAND'S FIRST ROW, at the right of
