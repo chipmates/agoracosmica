@@ -74,13 +74,14 @@
 .wing-plan-row .wing-plan-entry {flex:1 1 auto;min-width:0;}
 .wing-plan-row[data-current='true'] {background:#edcc8c14;}
 .wing-plan-entry[aria-current='true'] {color:#fff5e3;}
-/* the count that opens a station's works: a 44 px target at the row's end */
-.wing-plan-fold {flex:0 0 auto;display:flex;align-items:center;justify-content:flex-end;gap:6px;min-width:56px;min-height:44px;
-  padding:0 10px 0 8px;background:none;border:0;color:#a8b3b7;font:11px/1 var(--sans);letter-spacing:.06em;cursor:pointer;}
+/* the count that says a station opens: at the row's end, the row itself the target */
+.wing-plan-fold {display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:10px;color:#a8b3b7;
+  font:11px/1 var(--sans);letter-spacing:.06em;}
 .wing-plan-fold svg {width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.4;transition:transform .2s ease;}
-.wing-plan-fold[aria-expanded='true'] {color:#edcc8c;}
-.wing-plan-fold[aria-expanded='true'] svg {transform:rotate(180deg);}
-.wing-plan-fold:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.wing-plan-entry[aria-expanded='true'] .wing-plan-fold {color:#edcc8c;}
+.wing-plan-entry[aria-expanded='true'] .wing-plan-fold svg {transform:rotate(180deg);}
+/* the line that walks to the stop itself, first in what it holds */
+.wing-plan-there {color:#e6d6b8;}
 .wing-plan-works[hidden] {display:none;}
 .wing-plan-entry[aria-current='true'] .wing-plan-entry-number {color:#edcc8c;}
 .wing-plan-entry:focus-visible,.wing-plan-work:focus-visible,.wing-plan-close:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}

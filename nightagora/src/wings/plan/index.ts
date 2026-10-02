@@ -260,47 +260,57 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       )
       if (stood.has(station.id) && station.id !== standing)
         entry.append(make('span', 'wing-plan-said', say(PLAN_WORDS.stood)))
-      entry.addEventListener('click', () => press(() => options.station(station.id)))
       const row = make('div', 'wing-plan-row')
       row.dataset['current'] = String(station.id === standing)
       row.append(entry)
       item.append(row)
       const works = site.highlights.filter(highlight => highlight.station === station.id)
-      if (works.length) {
-        const inner = make('ul', 'wing-plan-works')
-        inner.id = `wing-plan-works-${station.number}`
-        /* A STATION'S WORKS FOLD UNDER ITS COUNT: the name still walks there,
-           the count beside it opens what the station holds. */
-        const fold = make('button', 'wing-plan-fold')
-        fold.type = 'button'
-        fold.setAttribute('aria-controls', inner.id)
-        const holds = works.length === 1 ? works[0]!.title[language] : say(deskControl('overview', 'things_to_see')).replace('{n}', String(works.length))
-        fold.setAttribute('aria-label', `${station.name[language]}, ${holds}`)
-        fold.append(make('span', 'wing-plan-fold-count', String(works.length)), chevron())
-        const shown = (on: boolean): void => { fold.setAttribute('aria-expanded', String(on)); inner.hidden = !on }
-        shown(unfolded.has(station.id))
-        fold.addEventListener('click', () => {
-          const on = !unfolded.has(station.id)
-          if (on) unfolded.add(station.id)
-          else unfolded.delete(station.id)
-          shown(on)
-          // what opens below the reading's edge rises into it, the station's own row kept in view
-          if (!on) return
-          const pane = reading.getBoundingClientRect(), over = inner.getBoundingClientRect().bottom - pane.bottom
-          if (over > 0) reading.scrollTop += Math.min(over, row.getBoundingClientRect().top - pane.top)
-        })
-        row.append(fold)
-        for (const work of works) {
-          const line = make('li', '')
-          const button = make('button', 'wing-plan-work', work.title[language])
-          button.type = 'button'
-          button.dataset['kind'] = work.kind
-          button.addEventListener('click', () => press(() => options.highlight(work.id)))
-          line.append(button)
-          inner.append(line)
-        }
-        item.append(inner)
+      if (!works.length) {
+        entry.addEventListener('click', () => press(() => options.station(station.id)))
+        list.append(item)
+        continue
       }
+      /* A STATION THAT HOLDS WORKS OPENS UNDER ITS ROW: the first line walks to
+         the stop itself, the lines under it to each work it holds. */
+      const inner = make('ul', 'wing-plan-works')
+      inner.id = `wing-plan-works-${station.number}`
+      entry.setAttribute('aria-controls', inner.id)
+      const holds = works.length === 1 ? works[0]!.title[language] : say(deskControl('overview', 'things_to_see')).replace('{n}', String(works.length))
+      entry.setAttribute('aria-label', `${station.number} ${station.name[language]}, ${holds}`)
+      const fold = make('span', 'wing-plan-fold')
+      fold.setAttribute('aria-hidden', 'true')
+      fold.append(make('span', 'wing-plan-fold-count', String(works.length)), chevron())
+      entry.append(fold)
+      const shown = (on: boolean): void => { entry.setAttribute('aria-expanded', String(on)); inner.hidden = !on }
+      shown(unfolded.has(station.id))
+      entry.addEventListener('click', () => {
+        const on = !unfolded.has(station.id)
+        if (on) unfolded.add(station.id)
+        else unfolded.delete(station.id)
+        shown(on)
+        // what opens below the reading's edge rises into it, the station's own row kept in view
+        if (!on) return
+        const pane = reading.getBoundingClientRect(), over = inner.getBoundingClientRect().bottom - pane.bottom
+        if (over > 0) reading.scrollTop += Math.min(over, row.getBoundingClientRect().top - pane.top)
+      })
+      if (station.id !== standing) {
+        const there = make('li', '')
+        const walk = make('button', 'wing-plan-work wing-plan-there', say(deskControl('walk', 'walk_there')))
+        walk.type = 'button'
+        walk.addEventListener('click', () => press(() => options.station(station.id)))
+        there.append(walk)
+        inner.append(there)
+      }
+      for (const work of works) {
+        const line = make('li', '')
+        const button = make('button', 'wing-plan-work', work.title[language])
+        button.type = 'button'
+        button.dataset['kind'] = work.kind
+        button.addEventListener('click', () => press(() => options.highlight(work.id)))
+        line.append(button)
+        inner.append(line)
+      }
+      item.append(inner)
       list.append(item)
     }
     reading.append(heading, list)
