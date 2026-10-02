@@ -3,7 +3,9 @@
 // service and encoded with a key frame at every step, so a pressed step lands
 // exactly on its own frame. Each step also gets a thin outline of the part it
 // names: the island drawn once with the step's light and once without, and the
-// pixels the light changed are drawn round.
+// pixels the light changed are drawn round. Last, the machine's extent: the
+// union over the run of the pixels its bodies cover (`cycle-extent.mjs`),
+// which the player fits into the glass.
 //
 //   node forge/film/cycle.mjs --base=https://127.0.0.1:5551 --release=w6 --out=<release dir>
 //     [--slug=aerial-screw] [--station=flight] [--framings=wide,upright] [--draws=8]
@@ -12,6 +14,13 @@
 // and posed by `window.__naIsland`, a frame is drawn by `window.__naExport`
 // (the shutter's jittered draws summed in linear light), and the frames leave
 // by the sink into ffmpeg. The release's film.json gains `cycles[<id>]`.
+//
+// THE EXTENT ALONE, for cycle files already made: no frame is encoded and no
+// file is written but the one film.json named, whose cycle framings gain
+// `extent` where their recorded stage is the one measured now.
+//
+//   node forge/film/cycle.mjs --extent-only --base=https://127.0.0.1:5551 --release=job
+//     --film=<release>/film.json [--slug=aerial-screw|all] [--framings=wide,upright] [--report=<json>]
 import { chromium } from 'playwright'
 import sharp from 'sharp'
 import { spawn } from 'node:child_process'
@@ -22,6 +31,7 @@ import { browserArgs, FRAME_TIME_FLAGS } from '../rig.mjs'
 import { installVirtualClock } from '../prerender/clock.mjs'
 import { openSink, unpack } from './sink.mjs'
 import { MIN_DRAWS, SHUTTER, X264, RUNGS, jitterOf } from './export.mjs'
+import { EXTENT_DIV, measureExtent, toCss } from './cycle-extent.mjs'
 
 const FPS = 30
 const flags = new Map(process.argv.slice(2).filter((a) => a.startsWith('--')).map((a) => {
@@ -38,6 +48,10 @@ const FRAMINGS = String(flags.get('framings') ?? 'wide,upright').split(',')
 const DRAWS = Number(flags.get('draws') ?? MIN_DRAWS)
 /** a smoke run: this many frames, no release written */
 const LIMIT = flags.has('limit') ? Number(flags.get('limit')) : null
+/** the extent alone, into the film.json named (`--film`), for cycles already recorded */
+const EXTENT_ONLY = flags.has('extent-only')
+const FILM_FILE = flags.has('film') ? resolve(String(flags.get('film'))) : null
+const REPORT = flags.has('report') ? resolve(String(flags.get('report'))) : null
 /** THE FRAME IS THE ISLAND'S, WITH MARGINS. The machine is drawn in the fitting
     box the island has at the reference windows (1920×1080 and 390×844 CSS),
     centred on a larger stage, so the player can scale and centre the frame on
@@ -116,7 +130,7 @@ function inboxOf() {
       const { head, parts } = unpack(buf)
       if (head.t !== 'frame') return
       const key = `${head.tag}#${head.i}`
-      const frame = { head, rgb: parts[0] }
+      const frame = { head, rgb: parts[0], parts }
       const w = waiting.get(key)
       if (w) { waiting.delete(key); w(frame) } else held.set(key, frame)
     },
@@ -169,7 +183,8 @@ function outlineOf(lit, dark, w, h, ring) {
   return { rgba, count, area: mask.reduce((a, v) => a + v, 0) }
 }
 
-async function renderFraming(browser, framing, sink, inbox) {
+/** THE ISLAND OPEN AND FRAMED on the recording's stage, the export open on its canvas */
+async function openIsland(browser, framing, sink, { slug, station }) {
   const stage = STAGE[framing]
   const ctx = await browser.newContext({ viewport: stage.css, deviceScaleFactor: stage.dsf, ignoreHTTPSErrors: true, locale: 'en-GB',
     ...(stage.phone ? { isMobile: true, hasTouch: true } : {}) })
@@ -179,11 +194,11 @@ async function renderFraming(browser, framing, sink, inbox) {
   const errors = []
   page.on('pageerror', (e) => errors.push(e.message.slice(0, 200)))
   try {
-    await page.goto(`${BASE}/w/vinci?film=${RELEASE}&order=life&probe=1&tier=max&export=1&pr=${stage.dsf}&lang=en#s=${STATION}`, { waitUntil: 'load', timeout: 120000 })
+    await page.goto(`${BASE}/w/vinci?film=${RELEASE}&order=life&probe=1&tier=max&export=1&pr=${stage.dsf}&lang=en#s=${station}`, { waitUntil: 'load', timeout: 120000 })
     await page.waitForFunction(() => document.querySelector('.na-film')?.dataset.state === 'rest' && Boolean(window.__naIsland && window.__naExport), null, { timeout: 120000, polling: 200 })
     const said = await page.evaluate(() => ({ backend: document.body.dataset.backend, tier: document.body.dataset.tier }))
-    log(`${framing}: backend ${said.backend}, tier ${said.tier}`)
-    await page.evaluate((slug) => window.__naIsland.open(slug), SLUG)
+    log(`${slug} ${framing}: backend ${said.backend}, tier ${said.tier}`)
+    await page.evaluate((s) => window.__naIsland.open(s), slug)
     await page.waitForFunction(() => window.__naIsland.readout()?.standing === true, null, { timeout: 120000, polling: 100 })
     await page.evaluate(([width, height]) => window.__naIsland.frame({ width, height }), stage.fit)
     await page.waitForTimeout(3000)
@@ -203,7 +218,29 @@ async function renderFraming(browser, framing, sink, inbox) {
       if (!named) throw err
       return openAt([Number(named[1]), Number(named[2])])
     })
-    const [w, h] = opened.canvas
+    return { ctx, page, errors, stage, film, canvas: opened.canvas }
+  } catch (err) {
+    await ctx.close()
+    throw err
+  }
+}
+
+/** THE EXTENT of the framing standing open: the export opened again at the extent's id division and armed */
+async function extentOf(page, sink, inbox, { framing, canvas, frames, stepFrames, dpr, start }) {
+  await page.evaluate((o) => window.__naExport.open(o), { width: canvas[0], height: canvas[1], scale: 1, idDiv: EXTENT_DIV, socket: sink.url })
+  const armed = await page.evaluate(() => window.__naExport.arm())
+  const t0 = Date.now()
+  const measured = await measureExtent(page, (tag, i) => inbox.next(tag, i), { tag: `extent ${framing}`, frames, steps: stepFrames, fps: FPS, dpr, canvas, start,
+    log: (line) => log(`${framing}: ${line}`) })
+  const r = measured.record
+  log(`${framing}: extent ${r.box.join(', ')} CSS px over ${r.samples} frames (stride ${r.stride}, ${measured.bodies} of ${armed.bodies} bodies the machine's), widest at frame ${r.widest}${r.frameEdges ? `; THE RUN LEAVES THE FRAME at ${r.frameEdges.join(', ')}` : ''}${r.emptyFrames ? `; ${r.emptyFrames} frames show no body` : ''}, ${((Date.now() - t0) / 1000).toFixed(0)} s`)
+  return measured
+}
+
+async function renderFraming(browser, framing, sink, inbox) {
+  const { ctx, page, errors, stage, film, canvas: opened } = await openIsland(browser, framing, sink, { slug: SLUG, station: STATION })
+  try {
+    const [w, h] = opened
     const mh = even(h), mw = even(w)
     if (mw !== w) throw new Error(`an odd canvas width ${w}`)
     const frames = Math.round(film.period * FPS)
@@ -260,37 +297,92 @@ async function renderFraming(browser, framing, sink, inbox) {
       steps.push({ frame: f, outline })
       log(`${framing}: step ${k + 1} at frame ${f}: the part covers ${area} px, its outline ${count} px; the clip's frame redrawn differs by at most ${drift} of 255`)
     }
+    // the extent last: the clip and its outlines are drawn before the ids are armed
+    const measured = await extentOf(page, sink, inbox, { framing, canvas: [w, h], frames: drawn, stepFrames: stepFrames.filter((f) => f < drawn), dpr: stage.dsf, start: t })
     await page.evaluate(() => window.__naExport.close())
-    return { framing: { master: [mw, mh], dpr: stage.dsf, fit: stage.fit, files, poster, steps }, period: film.period, frames, errors, keys, missed }
+    return { framing: { master: [mw, mh], dpr: stage.dsf, fit: stage.fit, files, poster, steps, extent: measured.record }, period: film.period, frames, errors, keys, missed,
+      boxes: perFrame(measured, stage.dsf) }
   } finally {
     await ctx.close()
+  }
+}
+
+/** every sampled frame's own box in the frame's CSS pixels, for the report */
+const perFrame = ({ boxes, div }, dpr) => Object.fromEntries([...boxes].map(([i, box]) => [i, box ? toCss(box, div, dpr) : null]))
+
+/** THE RECORDING: every framing drawn, encoded, outlined and measured, the release's film.json and the report written */
+async function record(browser) {
+  const framings = {}, boxes = {}
+  let period = 0, frames = 0
+  const report = { base: BASE, release: RELEASE, slug: SLUG, station: STATION, draws: DRAWS, shutter: SHUTTER, x264: { ...X264, stepCrf: STEP_CRF }, runs: {} }
+  for (const framing of FRAMINGS) {
+    const t0 = Date.now()
+    const r = await renderFraming(browser, framing, sink, inbox)
+    framings[framing] = r.framing
+    boxes[framing] = r.boxes
+    period = r.period; frames = r.frames
+    report.runs[framing] = { seconds: Math.round((Date.now() - t0) / 1000), errors: r.errors, keys: r.keys, missed: r.missed }
+    log(`${framing}: done in ${report.runs[framing].seconds} s, page errors ${r.errors.length}`)
+  }
+  const filmFile = join(OUT, 'film.json')
+  if (!LIMIT && existsSync(filmFile)) {
+    const release = JSON.parse(readFileSync(filmFile, 'utf8'))
+    release.cycles = { ...(release.cycles ?? {}), [`machine/${SLUG}`]: { period, fps: FPS, frames, framings: { ...(release.cycles?.[`machine/${SLUG}`]?.framings ?? {}), ...framings } } }
+    writeFileSync(filmFile, `${JSON.stringify(release, null, 1)}\n`)
+    log(`film.json: cycles['machine/${SLUG}'] written`)
+  }
+  writeFileSync(join(OUT, 'cycles', SLUG, 'report.json'), `${JSON.stringify({ ...report, framings, extentBoxes: boxes }, null, 1)}\n`)
+}
+
+/** THE EXTENTS ALONE, into the film.json named: a framing gains `extent` only
+    where the frames on file were drawn on the stage and the clock drawn now */
+async function extentsOnly(browser) {
+  if (!FILM_FILE || !existsSync(FILM_FILE)) throw new Error('--extent-only writes into the film.json that --film names')
+  const text = readFileSync(FILM_FILE, 'utf8')
+  const release = JSON.parse(text)
+  const ids = SLUG === 'all' ? Object.keys(release.cycles ?? {}) : [`machine/${SLUG}`]
+  const out = {}
+  for (const id of ids) {
+    const cycle = release.cycles?.[id]
+    if (!cycle) throw new Error(`${FILM_FILE} holds no cycle ${id}`)
+    const slug = id.slice('machine/'.length)
+    const station = flags.has('station') ? STATION : release.nodes?.[`view:${id}`]?.station
+    if (!station) throw new Error(`${FILM_FILE} names no station for ${id}: pass --station`)
+    for (const framing of FRAMINGS) {
+      const held = cycle.framings?.[framing]
+      if (!held) { log(`${id} ${framing}: not in the release, skipped`); continue }
+      const t0 = Date.now()
+      const { ctx, page, errors, stage, film, canvas } = await openIsland(browser, framing, sink, { slug, station })
+      try {
+        const frames = Math.round(film.period * FPS)
+        const stepFrames = film.lands.map((u) => Math.min(frames - 1, Math.round(u * film.period * FPS)))
+        const master = [even(canvas[0]), even(canvas[1])]
+        const same = (a, b) => JSON.stringify(a) === JSON.stringify(b)
+        if (!same(held.master, master) || held.dpr !== stage.dsf || !same(held.fit, stage.fit) || cycle.frames !== frames || !same(held.steps.map((x) => x.frame), stepFrames))
+          throw new Error(`${id} ${framing}: the frames on file were drawn on another stage or clock (master ${held.master} against ${master}, frames ${cycle.frames} against ${frames})`)
+        const start = await page.evaluate(() => window.__pre.virtualTime())
+        const measured = await extentOf(page, sink, inbox, { framing, canvas, frames, stepFrames, dpr: stage.dsf, start })
+        await page.evaluate(() => window.__naExport.close())
+        held.extent = measured.record
+        ;(out[id] ??= {})[framing] = { extent: measured.record, seconds: Math.round((Date.now() - t0) / 1000), errors, boxes: perFrame(measured, stage.dsf) }
+      } finally {
+        await ctx.close()
+      }
+    }
+    // after every machine, in the file's own form, so a pass that stops keeps what it measured
+    writeFileSync(FILM_FILE, text.startsWith('{\n') ? `${JSON.stringify(release, null, 1)}\n` : JSON.stringify(release))
+    log(`${FILM_FILE}: cycles['${id}'] extents written`)
+    if (REPORT) writeFileSync(REPORT, `${JSON.stringify(out, null, 1)}\n`)
   }
 }
 
 const inbox = inboxOf()
 const sink = await openSink((buf) => inbox.take(buf))
 const browser = await chromium.launch({ args: [...browserArgs(), ...FRAME_TIME_FLAGS] })
-const framings = {}
-let period = 0, frames = 0
-const report = { base: BASE, release: RELEASE, slug: SLUG, station: STATION, draws: DRAWS, shutter: SHUTTER, x264: { ...X264, stepCrf: STEP_CRF }, runs: {} }
 try {
-  for (const framing of FRAMINGS) {
-    const t0 = Date.now()
-    const r = await renderFraming(browser, framing, sink, inbox)
-    framings[framing] = r.framing
-    period = r.period; frames = r.frames
-    report.runs[framing] = { seconds: Math.round((Date.now() - t0) / 1000), errors: r.errors, keys: r.keys, missed: r.missed }
-    log(`${framing}: done in ${report.runs[framing].seconds} s, page errors ${r.errors.length}`)
-  }
+  if (EXTENT_ONLY) await extentsOnly(browser)
+  else await record(browser)
 } finally {
   await browser.close()
   await sink.close()
 }
-const filmFile = join(OUT, 'film.json')
-if (!LIMIT && existsSync(filmFile)) {
-  const release = JSON.parse(readFileSync(filmFile, 'utf8'))
-  release.cycles = { ...(release.cycles ?? {}), [`machine/${SLUG}`]: { period, fps: FPS, frames, framings: { ...(release.cycles?.[`machine/${SLUG}`]?.framings ?? {}), ...framings } } }
-  writeFileSync(filmFile, `${JSON.stringify(release, null, 1)}\n`)
-  log(`film.json: cycles['machine/${SLUG}'] written`)
-}
-writeFileSync(join(OUT, 'cycles', SLUG, 'report.json'), `${JSON.stringify({ ...report, framings }, null, 1)}\n`)
