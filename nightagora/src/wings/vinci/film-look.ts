@@ -19,6 +19,7 @@ import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePa
 import { createVinciPaintingView, vinciPlateWords } from './collection/deep-plate'
 import { hangCatalogue } from './collection/catalogue'
 import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF, FILM_STUDY_SHEET } from './film-look-kinds'
+import { countLook } from '../../core/museum-count'
 import { STUDY_SHEET_WORDS } from './study-sheet-words'
 import { GRAVE_DEATHBED } from './grave/placement'
 import { GRAVE_LIGHT } from './grave/light-words'
@@ -215,6 +216,7 @@ export function createFilmLook(h: FilmLookHost) {
     const asked = performance.now()
     assets ??= await loadManifest()
     const kind = filmLookKind(id)
+    countLook(id, kind === 'sheet' && vinciShowpiece(id, assets) ? 'film' : kind)
     // THE BOOK ON THE TABLE OPENS THE BEST-OF at the leaf it lies open at
     if (kind === 'edition') { openTopic(BEST_OF_OPENING.topic, BEST_OF_OPENING.page, from, EDITION_EXHIBIT); return }
     if (kind === 'topic') { openTopic(id.slice('topic/'.length), undefined, from); return }

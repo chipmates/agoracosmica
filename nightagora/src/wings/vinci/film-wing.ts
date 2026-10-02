@@ -45,6 +45,7 @@ import filmWingCss from './film-wing.css?inline'
 import { fitGoldName, watchGoldName } from './gold-fit'
 import { setWalkingLeg, walkingRing } from './labels'
 import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, MARK_TARGET, type FilmCinema, type FilmForm } from './film-cinema'
+import { countArrival, countStop } from '../../core/museum-count'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -1109,6 +1110,7 @@ export function createWing(): WingModule {
   let labelsHidden: string | null = null
   async function mount(h: WingHosts): Promise<void> {
     hosts = h
+    countArrival('vinci')
     form = filmForm()
     wide = form !== 'upright'
     labelsHidden = h.labels.getAttribute('aria-hidden')
@@ -1171,6 +1173,7 @@ export function createWing(): WingModule {
       // a work of a wall belongs to the story stop before it along the wall
       const atStop = LIFE.findIndex(s => stopNode(s.id) === state.node)
       const at = atStop >= 0 ? atStop : wallStop(state.node) ?? -1
+      if (at >= 0) countStop(at + 1)
       if (at >= 0 && at !== card) { card = at; paint() }
       else { paintDesk(); paintPhone() }
       // at a machine's view too: a walk through a stop to a view moved the card
