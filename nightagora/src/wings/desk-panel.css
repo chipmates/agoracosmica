@@ -138,7 +138,7 @@
 :root[data-na-panel='open'] #instruments .inst-tiers small,
 :root[data-na-panel='open'] #instruments .inst-labels p { font-size: 14px; }
 :root[data-na-panel='open'] #instruments :is(.inst-options, .inst-pace) button {
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   box-shadow: inset 0 0 0 1px var(--press-hairline);
 }
 :root[data-na-panel='open'] #instruments :is(.inst-options, .inst-pace) button[aria-pressed='true'] {
@@ -244,7 +244,7 @@
   display: inline-flex;
   align-items: center;
   border: 0;
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   /* the second way at the end is an outline in the strong line, so the gold box beside it leads */
   background: var(--ui-ground);
   box-shadow: inset 0 0 0 1px var(--ui-line-strong);

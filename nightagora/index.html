@@ -97,6 +97,26 @@
       --ui-sure-conjectural: #df9385;
       --ui-sure-unknown: #a8b3b7;
 
+      /* ---- THE SHAPES: the corner of every control, box and sheet, by kind.
+         The values are today's, kind by kind; a circle that carries a
+         meaning (a look mark, a certainty mark, a station on the plan, the
+         leg's ring and the arrow's seat it is drawn around) is drawn round
+         where it stands and is not here. ---- */
+      --ui-r-control: 3px;        /* a framed control: a chip, an option, an ending, the Echo's door */
+      --ui-r-control-look: 2px;   /* the desktop close look's framed controls; the frame's own bar */
+      --ui-r-key: 4px;            /* the key cap beside a word */
+      --ui-r-box: 3px;            /* a plate on the wall: the drawer, the door's glass */
+      --ui-r-box-side: 10px;      /* held sideways: the caption, the close look's card */
+      --ui-r-box-side-tall: 12px; /* held sideways: the drawer */
+      --ui-r-square: 0px;         /* the controls and boxes drawn square: the record's, the plan's and the life's windows and their buttons, a close look's frame, card and buttons, the scale's plate, the figure page's way in */
+      --ui-r-sheet: 14px;         /* a sheet rising on the phone: its two top corners */
+      --ui-r-sheet-plate: 20px;   /* the plate rising on the phone: its two top corners */
+      --ui-r-seat: 50%;           /* a seat: back, the book, a close, a step, the ring before a word, a folio's glass */
+      --ui-r-way: 24px;           /* the gold way on and the talk beside it, 48 px tall */
+      --ui-r-way-tall: 26px;      /* the door's way in on the phone, 52 px tall */
+      --ui-r-way-desk: 3px;       /* the desktop's way-on box and the opening's way in */
+      --ui-r-bar: 2px;            /* a handle, a track, the thread's segments */
+
       --serif: Georgia, 'Times New Roman', serif;
       --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
@@ -1019,7 +1039,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
     .pane-enter,
 #enter-museum {
       display: inline-block; margin-top: 18px;
-      background: none; cursor: pointer;
+      background: none; cursor: pointer; border-radius: var(--ui-r-square);
       border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
       min-height: 44px; padding: 13px 28px;
       font-family: var(--sans);

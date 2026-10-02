@@ -11,7 +11,7 @@
    as a plan on the left, the walk read as a list on the right, and the same
    two stacked on a narrow stage. The weights are the museum's own. */
 .wing-plan {position:fixed;box-sizing:border-box;flex-direction:column;margin:0;padding:0;max-width:none;max-height:none;
-  background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);overflow:hidden;}
+  background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);overflow:hidden;}
 /* A closed dialog paints nothing, and an open one takes the pointer: the
    sheet hangs in a label layer that ignores it by default. */
 .wing-plan[open] {display:flex;pointer-events:auto;}
@@ -74,7 +74,7 @@
 .wing-plan-entry-name {min-width:0;}
 .wing-plan-row {display:flex;align-items:stretch;}
 .wing-plan-row .wing-plan-entry {flex:1 1 auto;min-width:0;}
-.wing-plan-row[data-current='true'] {background:color-mix(in srgb, var(--ui-way) 8%, transparent);}
+.wing-plan-row[data-current='true'] {background:color-mix(in srgb, var(--ui-way) 8%, transparent);border-radius:var(--ui-r-square);}
 .wing-plan-entry[aria-current='true'] {color:var(--ui-text);}
 /* the count that says a station opens: at the row's end, the row itself the target */
 .wing-plan-fold {display:flex;align-items:center;gap:6px;margin-left:auto;padding-left:10px;color:var(--ui-text-quiet);
@@ -94,14 +94,14 @@
 .wing-plan-said {position:absolute;width:1px;height:1px;margin:-1px;padding:0;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
 
 .wing-plan-foot {flex:0 0 auto;display:flex;justify-content:flex-end;gap:8px;padding:10px 20px;border-top:1px solid var(--ui-line);}
-.wing-plan-close {min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid var(--ui-line-strong);color:var(--ui-text);
+.wing-plan-close {min-width:120px;min-height:44px;padding:10px 16px;background:transparent;border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);
   font:12px/1.2 var(--sans);cursor:pointer;}
 /* THE DOOR TO THE LIFE stands at the other end of the foot from the way out,
    at the weight of the control beside it. Scoped to the foot, and setting what
    it must not inherit: the same class names a quieter underlined control in
    the wing's welcome, and that rule reaches every button that carries it. */
 .wing-plan-foot .wing-life-door {display:inline-block;margin:0 auto 0 0;min-width:120px;min-height:44px;padding:10px 16px;
-  background:transparent;border:1px solid var(--ui-line-strong);color:var(--ui-text);font:12px/1.2 var(--sans);letter-spacing:normal;
+  background:transparent;border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);font:12px/1.2 var(--sans);letter-spacing:normal;
   text-transform:none;text-decoration:none;cursor:pointer;}
 .wing-plan-foot .wing-life-door[hidden] {display:none;}
 .wing-plan-foot .wing-life-door:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
@@ -111,7 +111,7 @@
    it, so the foot carries the one door into the life and nothing else. */
 .wing-plan[data-narrow='true'] .wing-plan-close {display:none;}
 .wing-plan-shut {position:absolute;z-index:3;top:6px;right:6px;display:none;align-items:center;justify-content:center;
-  box-sizing:border-box;min-width:44px;min-height:44px;padding:0;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);
+  box-sizing:border-box;min-width:44px;min-height:44px;padding:0;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);
   color:var(--ui-text);font:15px/1 var(--sans);cursor:pointer;}
 .wing-plan[data-narrow='true'] .wing-plan-shut {display:flex;}
 .wing-plan-shut:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}

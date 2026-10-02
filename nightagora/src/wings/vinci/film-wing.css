@@ -141,7 +141,7 @@
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--ui-r-seat);
   background: var(--glass);
   /* the seats stand over the film: a short halo of the wall keeps the ring 3 to 1 on a sunlit floor */
   box-shadow: inset 0 0 0 1px var(--glass-ring), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
@@ -169,7 +169,7 @@
   min-width: 48px;
   height: 48px;
   border: 0;
-  border-radius: 24px;
+  border-radius: var(--ui-r-way);
   background: var(--gold);
   color: var(--gold-ink);
   /* a grid, not a flex box: WebKit leaves a flex button's padding out of its
@@ -217,9 +217,11 @@
 #wing[data-film='upright'][data-walking] .film-box > .film-drawer,
 #wing[data-film='upright'][data-walking] .film-box > .film-keys { background: none; }
 #wing[data-film='upright'][data-walking] .film-back { opacity: .45; }
+/* while a leg runs gold is the leg's ring, a circle in every corner language */
 .film-gold[data-leg='true'] {
   left: auto;
   width: 48px;
+  border-radius: 50%;
   padding: 0;
   justify-content: center;
   background: color-mix(in srgb, var(--ui-ground) 87%, transparent);
@@ -280,7 +282,7 @@
   align-items: center;
   padding: 0 12px;
   border: 0;
-  border-radius: 24px;
+  border-radius: var(--ui-r-way);
   background: var(--glass);
   /* the second way is an outline in the strong line, so the gold pill beside it leads */
   box-shadow: inset 0 0 0 1px var(--ui-line-strong), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
@@ -305,7 +307,7 @@
   left: 0; right: 0; top: 44px; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
   max-width: none; max-height: none;
   padding: 0 16px calc(112px + env(safe-area-inset-bottom));
-  border: 0; border-top: 6px solid var(--ui-ground-sheet); border-radius: 14px 14px 0 0;
+  border: 0; border-top: 6px solid var(--ui-ground-sheet); border-radius: var(--ui-r-sheet) var(--ui-r-sheet) 0 0;
   box-shadow: 0 -1px 0 var(--ui-line-strong);
   background: var(--ui-ground-sheet);
 }
@@ -338,7 +340,7 @@
 html:has(#wing[data-film='upright']) #instruments {
   left: 0; right: 0; top: 44px; bottom: 0; width: auto; max-width: none; max-height: none;
   padding: 22px 24px calc(16px + env(safe-area-inset-bottom));
-  border-radius: 14px 14px 0 0;
+  border-radius: var(--ui-r-sheet) var(--ui-r-sheet) 0 0;
 }
 html:has(#wing[data-film='upright']) #instruments:not([hidden]) { display: flex; flex-direction: column; }
 /* the panel's rows scroll above the foot that carries its close */
@@ -359,7 +361,7 @@ html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sou
   position: fixed; left: 16px; right: auto; top: auto; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 4;
   display: grid; place-items: center; box-sizing: border-box; flex: none;
   width: 44px; height: 44px; min-width: 44px; max-width: 44px; min-height: 44px; margin: 0; padding: 0;
-  border: 0; border-radius: 50%; background: var(--ui-ground-raised); box-shadow: inset 0 0 0 1px var(--ui-line-strong); color: var(--ui-text);
+  border: 0; border-radius: var(--ui-r-seat); background: var(--ui-ground-raised); box-shadow: inset 0 0 0 1px var(--ui-line-strong); color: var(--ui-text);
   font-size: 0; letter-spacing: 0; line-height: 0; text-indent: 0;
 }
 html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
@@ -456,7 +458,7 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
    stop's words never show through the reading */
 #wing[data-film='upright'] :is(.wing-plan, .wing-life)[data-narrow='true'][open] {
   inset: 44px 0 0 0; width: auto; height: auto; max-width: none; max-height: none; margin: 0;
-  border: 0; border-top: 1px solid var(--ui-line-strong); border-radius: 14px 14px 0 0; background: var(--ui-ground-sheet);
+  border: 0; border-top: 1px solid var(--ui-line-strong); border-radius: var(--ui-r-sheet) var(--ui-r-sheet) 0 0; background: var(--ui-ground-sheet);
 }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] :is(.wing-plan-number, .wing-plan-entry-number) { font-size: .8125rem; }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-work { font-size: .875rem; }
@@ -663,9 +665,9 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls:has(> .vitrine-views > .vitrine-folio-glass:only-child) > .vitrine-clock { order: 1; flex: 1 1 auto; min-width: 0; }
 /* the leaf reads as a way in: its picture in a gold ring, a gold arrow out at its corner */
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass { position: relative; inset: auto; overflow: visible; box-shadow: 0 0 0 1.5px var(--ui-way); }
-#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio-glass .vitrine-folio-thumb { border-radius: 50%; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio-glass .vitrine-folio-thumb { border-radius: var(--ui-r-seat); }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass::after {
-  content: '\2197'; position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; border-radius: 50%;
+  content: '\2197'; position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; border-radius: var(--ui-r-seat);
   background: var(--ui-ground-sheet); box-shadow: 0 0 0 1px var(--ui-way); color: var(--ui-way); font: 400 11px/18px var(--sans); text-align: center;
 }
 /* a machine's Mehr follows what the card already says and opens the rest under it */

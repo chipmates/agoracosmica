@@ -9,7 +9,7 @@
 .vitrine-scrim[hidden],.vitrine-hole[hidden] {display:none;}
 /* THE CARD STANDS OVER THE WORK, never under it: on the narrow stage a
    raised card covers the viewport it was peeking over. */
-.vitrine-sheet {position:fixed;display:none;z-index:1;pointer-events:auto;background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);border:1px solid var(--ui-line);}
+.vitrine-sheet {position:fixed;display:none;z-index:1;pointer-events:auto;background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);border:1px solid var(--ui-line);border-radius:0 0 var(--ui-r-square) var(--ui-r-square);}
 .vitrine[data-narrow='true'] .vitrine-sheet {display:block;}
 .vitrine-view {position:fixed;z-index:0;pointer-events:none;}
 .vitrine-payload {position:absolute;inset:0;pointer-events:auto;touch-action:none;outline:none;}
@@ -28,7 +28,7 @@
    ground of its own in its place, as the page's line does, so lit linen
    never takes its contrast */
 .vitrine[data-payload='machine'] .vitrine-caption {width:fit-content;max-width:min(640px,calc(100% - 28px));box-sizing:border-box;
-  padding:6px 12px;background:color-mix(in srgb, var(--ui-ground-sheet) 88%, transparent);border:1px solid var(--ui-line);text-shadow:none;}
+  padding:6px 12px;background:color-mix(in srgb, var(--ui-ground-sheet) 88%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);text-shadow:none;}
 
 /* THE CARD. The name first, then the line in its own type, then the module's
    own label sentences, the payload's text, and the controls where a hand
@@ -79,7 +79,7 @@
 .vitrine-controls {flex:0 0 auto;display:flex;flex-wrap:nowrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--ui-line);}
 .vitrine[data-narrow='false'] .vitrine-caption {bottom:64px;}
 .vitrine-control {flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
-  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid var(--ui-line-strong);color:var(--ui-text);
+  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);
   font:12px/1.2 var(--sans);text-align:center;text-decoration:none;cursor:pointer;}
 .vitrine-control:focus-visible,.vitrine-more:focus-visible,.vitrine-words .picture-label-more:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 .vitrine-control[aria-pressed='true'] {border-color:var(--ui-way);color:var(--ui-text);}
@@ -101,7 +101,7 @@
 
 @media(max-aspect-ratio:9/10) {
   .vitrine-card {padding:10px 12px 12px;background:transparent;border:0;}
-  .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;box-sizing:border-box;}
+  .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;border-radius:var(--ui-r-square);box-sizing:border-box;}
   .vitrine-name {margin-bottom:6px;font-size:16px;}
   .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
   .vitrine-catalogue {margin:-3px 0 6px;font-size:13px;}
@@ -132,7 +132,7 @@
 /* ONE MARK DISMISSES THE WINDOW, at the corner of the work, where the card's
    own row has stood down behind a peek. */
 .vitrine-shut {position:fixed;z-index:4;display:none;align-items:center;justify-content:center;box-sizing:border-box;
-  min-width:44px;min-height:44px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);
+  min-width:44px;min-height:44px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);
   font:15px/1 var(--sans);cursor:pointer;pointer-events:auto;}
 .vitrine[data-narrow='true'] .vitrine-shut {display:flex;}
 .vitrine-shut[hidden] {display:none;}
@@ -143,7 +143,7 @@
 .vitrine-grab {display:none;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-grab {flex:0 0 auto;display:flex;align-items:center;
   justify-content:center;width:100%;min-height:44px;margin:0;padding:0;background:none;border:0;cursor:pointer;}
-.vitrine-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:color-mix(in srgb, var(--ui-text-quiet) 67%, transparent);}
+.vitrine-grab::after {content:'';width:38px;height:3px;border-radius:var(--ui-r-bar);background:color-mix(in srgb, var(--ui-text-quiet) 67%, transparent);}
 .vitrine-grab:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 /* AT THE PEEK THE CARD IS THE WORK'S OWN NAME AND NOTHING ELSE: the volume's
    line, the row and the walk come up with the card. */
@@ -223,13 +223,13 @@
 .vitrine-track {position:relative;flex:1 1 auto;display:flex;align-items:center;min-height:44px;}
 .vitrine-slider {width:100%;min-height:44px;margin:0;accent-color:var(--ui-way);background:transparent;cursor:pointer;
   -webkit-appearance:none;appearance:none;}
-.vitrine-slider::-webkit-slider-runnable-track {height:4px;border-radius:2px;
+.vitrine-slider::-webkit-slider-runnable-track {height:4px;border-radius:var(--ui-r-bar);
   background:linear-gradient(to right,var(--ui-way) var(--fill,0%),color-mix(in srgb, var(--ui-text-quiet) 25%, transparent) var(--fill,0%));}
-.vitrine-slider::-moz-range-track {height:4px;border-radius:2px;background:color-mix(in srgb, var(--ui-text-quiet) 25%, transparent);}
-.vitrine-slider::-moz-range-progress {height:4px;border-radius:2px;background:var(--ui-way);}
-.vitrine-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:18px;height:18px;margin-top:-7px;border:0;border-radius:50%;
+.vitrine-slider::-moz-range-track {height:4px;border-radius:var(--ui-r-bar);background:color-mix(in srgb, var(--ui-text-quiet) 25%, transparent);}
+.vitrine-slider::-moz-range-progress {height:4px;border-radius:var(--ui-r-bar);background:var(--ui-way);}
+.vitrine-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:18px;height:18px;margin-top:-7px;border:0;border-radius:var(--ui-r-seat);
   background:var(--ui-way);box-shadow:0 0 0 3px var(--ui-ground-sheet);}
-.vitrine-slider::-moz-range-thumb {width:18px;height:18px;border:0;border-radius:50%;background:var(--ui-way);box-shadow:0 0 0 3px var(--ui-ground-sheet);}
+.vitrine-slider::-moz-range-thumb {width:18px;height:18px;border:0;border-radius:var(--ui-r-seat);background:var(--ui-way);box-shadow:0 0 0 3px var(--ui-ground-sheet);}
 .vitrine-slider:disabled {cursor:default;opacity:.5;}
 .vitrine-slider:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 .vitrine-tick {position:absolute;top:8px;width:2px;height:8px;margin-left:-1px;background:color-mix(in srgb, var(--ui-way) 80%, transparent);pointer-events:none;}
@@ -259,7 +259,7 @@
   .vitrine-folio-thumb {width:64px;}
   /* THE MACHINE'S FOLIO IS A GLASS in the views' row: the model keeps its box whole */
   .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;margin-left:auto;
-    padding:0;overflow:hidden;border-radius:50%;}
+    padding:0;overflow:hidden;border-radius:var(--ui-r-seat);}
   .vitrine-folio-glass .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
   .vitrine-folio-leaf {width:20px;height:24px;fill:none;stroke:var(--ui-way);stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;}
   /* ONE TEXT AT A TIME: the run's caption is the step's one sentence, and the

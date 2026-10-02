@@ -20,7 +20,7 @@
    its own backing, the corner's chip, because a plate's white border or a
    light passage swallows a thin numeral whatever its shadow. */
 .deep-rule {position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:none;
-  padding:7px 10px 6px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);}
+  padding:7px 10px 6px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);}
 .deep-rule[hidden] {display:none;}
 /* A MEASUREMENT IS READ OVER WHATEVER THE PLATE IS: deep in a light passage
    the ground under these marks is near white, so each one carries a tight
@@ -34,7 +34,7 @@
 /* THE CORNER THE RULE WOULD HAVE HAD, for a page whose centimetres are not
    known: what the page is, named on the glass, in the rule's own weight. */
 .deep-stand {position:absolute;left:14px;bottom:14px;max-width:min(40%,270px);display:flex;flex-direction:column;gap:2px;
-  box-sizing:border-box;padding:7px 10px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);pointer-events:none;}
+  box-sizing:border-box;padding:7px 10px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);pointer-events:none;}
 .deep-stand[hidden] {display:none;}
 .deep-stand p {margin:0;font:12px/1.35 var(--sans);color:var(--ui-text);text-shadow:0 1px 8px var(--ui-ground-deep),0 0 3px var(--ui-ground-deep),0 0 1px var(--ui-ground-deep);}
 .deep-stand .deep-stand-folio {display:flex;align-items:center;gap:7px;font:15px/1.3 var(--serif);color:var(--ui-text);}

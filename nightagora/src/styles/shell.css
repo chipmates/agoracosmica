@@ -91,7 +91,7 @@ body.door .status { animation: none; }
 #rail-instruments { right: var(--frame-margin); }
 #rail-sound::before, #rail-instruments::after {
   width: 26px; height: 26px;
-  border-radius: 50%;
+  border-radius: var(--ui-r-seat);
   border: 1px solid var(--press-hairline);
   background:
     linear-gradient(var(--press-muted), var(--press-muted)) center / 10px 1px no-repeat,

@@ -55,7 +55,7 @@
   height: 44px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--ui-r-seat);
   background: none;
   display: grid;
   place-items: center;
@@ -273,7 +273,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   border-top: 1px solid var(--ui-line-strong);
-  border-radius: 14px 14px 0 0;
+  border-radius: var(--ui-r-sheet) var(--ui-r-sheet) 0 0;
   background: var(--ui-ground-sheet);
   --desk-title: var(--ui-text);
   --desk-quiet: var(--ui-text-quiet);

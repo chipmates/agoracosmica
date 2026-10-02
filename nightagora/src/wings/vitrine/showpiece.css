@@ -22,7 +22,7 @@
    on the phone it is the glass at the clock row's right end, as a machine's folio is. */
 .vitrine[data-narrow='false'] .showpiece-door {position:absolute;right:auto;bottom:auto;}
 .vitrine[data-narrow='true'] .vitrine-clock .showpiece-door {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;
-  padding:0;overflow:hidden;border-radius:50%;}
+  padding:0;overflow:hidden;border-radius:var(--ui-r-seat);}
 .vitrine[data-narrow='true'] .vitrine-clock .showpiece-door .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
 
 /* ON THE PHONE the film's line is the card's own, under the work's name, in

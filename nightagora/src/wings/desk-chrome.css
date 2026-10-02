@@ -139,12 +139,12 @@
   display: block;
   width: 100%;
   height: 2px;
-  border-radius: 1px;
+  border-radius: var(--ui-r-bar);
   background: color-mix(in srgb, var(--na-starlight) 36%, transparent);
 }
 .desk-seg[data-stood='true'] .desk-seg-bar { background: color-mix(in srgb, var(--na-starlight) 92%, transparent); }
 .desk-seg[data-quiet='true'][data-stood='true'] .desk-seg-bar { background: color-mix(in srgb, var(--na-starlight) 78%, transparent); }
-.desk-seg[data-here='true'] .desk-seg-bar { height: 4px; border-radius: 2px; background: var(--na-gold); }
+.desk-seg[data-here='true'] .desk-seg-bar { height: 4px; border-radius: var(--ui-r-bar); background: var(--na-gold); }
 .desk-seg[data-here='true'][data-walking='true'] .desk-seg-bar {
   background: linear-gradient(90deg, var(--na-gold) var(--desk-leg, 0%),
     color-mix(in srgb, var(--na-starlight) 36%, transparent) var(--desk-leg, 0%));
@@ -167,7 +167,7 @@
   padding: 0 13px;
   display: flex;
   align-items: center;
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   background: color-mix(in srgb, var(--na-abyss) 90%, transparent);
   box-shadow: inset 0 0 0 1px var(--desk-edge);
   font: 500 0.9375rem/1 var(--sans);
@@ -232,7 +232,7 @@
   align-items: center;
   gap: 9px;
   border: 0;
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   background: color-mix(in srgb, var(--na-abyss) 55%, transparent);
   box-shadow: inset 0 0 0 1px var(--desk-edge);
   font: 500 0.9375rem/1 var(--sans);
@@ -248,7 +248,7 @@
   min-width: 22px;
   height: 22px;
   padding: 0 6px;
-  border-radius: 4px;
+  border-radius: var(--ui-r-key);
   box-shadow: inset 0 0 0 1px var(--ui-line-strong);
   font: 500 0.875rem/20px var(--sans);
   color: var(--desk-quiet);
@@ -267,7 +267,7 @@
   width: min(744px, var(--desk-read));
   max-height: 45vh;
   padding: 20px 24px 16px;
-  border-radius: 3px;
+  border-radius: var(--ui-r-box);
   background: linear-gradient(
     color-mix(in srgb, var(--ui-ground-sheet) 97%, transparent),
     color-mix(in srgb, var(--na-abyss) 98%, transparent) 70%);
@@ -333,7 +333,7 @@
   margin: 0;
   padding: 0 16px;
   border: 0;
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   box-shadow: inset 0 0 0 1px var(--rule);
   font: 600 0.875rem/1 var(--sans);
   letter-spacing: 0.12em;
@@ -356,7 +356,7 @@
   height: 56px;
   padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--ui-r-seat);
   background: var(--desk-glass);
   box-shadow: inset 0 0 0 1px var(--desk-edge);
   display: grid;
@@ -375,7 +375,7 @@
   align-items: center;
   gap: 20px;
   border: 0;
-  border-radius: 3px;
+  border-radius: var(--ui-r-way-desk);
   /* a raised field on the wall inside its gold ring: the one lighter plaque in the band */
   background: var(--ui-ground-raised);
   box-shadow: inset 0 0 0 1px var(--ui-way);
@@ -478,7 +478,7 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   width: fit-content;
   max-width: calc(100vw - var(--desk-g) * 2);
   padding: 8px 14px;
-  border-radius: 3px;
+  border-radius: var(--ui-r-box);
   background: color-mix(in srgb, var(--na-abyss) 55%, transparent);
   box-shadow: inset 0 0 0 1px var(--desk-edge);
   justify-content: flex-start;
@@ -556,7 +556,7 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
   margin: 0;
   padding: 0 16px;
   border: 0;
-  border-radius: 3px;
+  border-radius: var(--ui-r-control);
   box-shadow: inset 0 0 0 1px var(--rule);
   font: 600 0.875rem/1 var(--sans);
   letter-spacing: 0.12em;

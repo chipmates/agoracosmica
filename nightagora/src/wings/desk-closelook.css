@@ -268,7 +268,7 @@
   height: 44px;
   padding: 0 14px;
   border: 0;
-  border-radius: 2px;
+  border-radius: var(--ui-r-control-look);
   background: none;
   box-shadow: inset 0 0 0 1px var(--desk-edge);
   font: 500 0.9375rem/1 var(--sans);
@@ -407,6 +407,7 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
   right: calc(var(--reader-beside) + 32px);
 }
 #wing[data-desk~='closelook'] .reader-beside {
+  border-radius: var(--ui-r-square);
   position: absolute;
   top: 0;
   right: 0;
@@ -483,7 +484,7 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
   gap: 10px;
   padding: 0 14px;
   border-color: var(--desk-edge);
-  border-radius: 2px;
+  border-radius: var(--ui-r-control-look);
   font: 500 0.9375rem/1 var(--sans);
   color: var(--desk-title);
 }
