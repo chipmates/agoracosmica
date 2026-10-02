@@ -332,17 +332,11 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* a place's picture is the room's, so its label keeps a ground of its own over the dimmed room */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-wall='false'] .vitrine-card { padding: 12px 14px 0; background: var(--ui-ground); }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body {
-  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 0 12px;
+  flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 0 4px;
 }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body::-webkit-scrollbar { display: none; }
-/* scrolled on down, the column's head fades as its foot does */
-#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body[data-top='false'][data-more='true'] {
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - var(--fade, 16px)), transparent);
-  mask-image: linear-gradient(to bottom, transparent, #000 22px, #000 calc(100% - var(--fade, 16px)), transparent);
-}
-#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body[data-top='false'][data-more='false'] {
-  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22px); mask-image: linear-gradient(to bottom, transparent, #000 22px);
-}
+/* the column shows whole lines only: index.ts cuts its mask between two lines (whole-lines.ts), never through one; no fade of the phone's sheet */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body { -webkit-mask-image: none; mask-image: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name { margin: 0 0 6px; gap: 8px; font: 400 1.3125rem/27px var(--serif); }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-dot { transform: translateY(-3px); }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-name-number { font: 400 .8125rem/27px var(--sans); color: var(--ui-text-quiet); }

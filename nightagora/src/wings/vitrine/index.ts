@@ -16,6 +16,7 @@ import { createCloseLookBand, type CloseLookBand } from '../desk-closelook'
 import { noteOpened } from '../visit'
 import { uiSure } from '../ui-sure'
 import css from './vitrine.css?inline'
+import { maskWholeLines, unmaskLines, wholeLines, type LineCut } from './whole-lines'
 import type { VitrineCinema, VitrineExhibit, VitrinePayloadHost, VitrinePeek, VitrinePlace, VitrineRect, VitrineSurface } from './types'
 
 export type { VitrineCinema, VitrineExhibit, VitrinePayload, VitrinePayloadHost, VitrinePlace, VitrineRect, VitrineSurface } from './types'
@@ -443,6 +444,7 @@ export function createVitrine(options: {
     if (cinemaFrame) placeFilm()
     fadeWords()
     markMore()
+    if (cinemaFrame) { clampWords(); paintLookMore() }
   }
 
   /** True while a work of the payload's own hangs on the wall: sideways, a
@@ -528,6 +530,15 @@ export function createVitrine(options: {
     while (lo <= hi) { const mid = (lo + hi) >> 1; if (tryWords(mid)) { best = mid; lo = mid + 1 } else hi = mid - 1 }
     tryWords(best)
   }
+  /** THE COLUMN SHOWS WHOLE LINES ONLY, at rest and while it scrolls. */
+  let cut: LineCut | null = null, cutAsked = false
+  function clampWords(): void {
+    cutAsked = false
+    if (!cinemaFrame || root.dataset['lookForm'] !== 'beside') { cut = null; unmaskLines(body); return }
+    cut = wholeLines(body)
+    maskWholeLines(body, cut)
+  }
+  const askClamp = (): void => { if (cutAsked) return; cutAsked = true; requestAnimationFrame(() => { clampWords(); paintLookMore() }) }
   /** A FILM'S FOOT: its clock along the film's lower edge, its line centred
    * over the clock, both on the film itself. A film that stands smaller than
    * the zone names its own box; one that runs to the glass is the zone's. */
@@ -612,13 +623,15 @@ export function createVitrine(options: {
     lookMoreWord.textContent = back ? frame.less : frame.more
     lookMore.setAttribute('aria-expanded', String(back))
     lookArrowPath.setAttribute('d', under && !back ? 'M8 13V3M4 7l4-4 4 4' : 'M8 3v10M4 9l4 4 4-4')
-    // beside, the key stands only while words wait below in the column
-    if (!under) lookMore.hidden = !(body.scrollHeight - body.scrollTop - body.clientHeight > 1)
+    // beside, the key stands only while lines wait below the column's cut
+    if (!under) lookMore.hidden = !cut?.below
     else lookMore.hidden = false
   }
   lookMore.addEventListener('click', () => {
     if (root.dataset['lookForm'] === 'under') { setRaised(!raised); return }
-    body.scrollBy({ top: Math.max(44, body.clientHeight - 44), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
+    // the next page begins on the first line the column hid
+    const next = cut?.next ?? body.clientHeight - 44
+    body.scrollBy({ top: Math.max(22, next), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
   })
   // a detail pressed in the raised column folds it, so the work it moves to stands in view
   payloadControls.addEventListener('click', event => {
@@ -627,6 +640,8 @@ export function createVitrine(options: {
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
     for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
+    unmaskLines(body)
+    cut = null
     stripName.textContent = ''
     stripLine.textContent = ''
     for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below']) stage.style.removeProperty(name)
@@ -642,7 +657,7 @@ export function createVitrine(options: {
   function markMore(): void {
     body.dataset['more'] = String(open && body.scrollHeight - body.scrollTop - body.clientHeight > 1)
     body.dataset['top'] = String(open && body.scrollTop < 1)
-    if (cinemaFrame) paintLookMore()
+    if (cinemaFrame) askClamp()
   }
   body.addEventListener('scroll', markMore, { passive: true })
 
@@ -675,7 +690,7 @@ export function createVitrine(options: {
     if (!open) return
     if (options.narrow() && root.dataset['peek'] === 'true') layout()
     else if (cinemaFrame && raised && root.dataset['lookForm'] === 'under') layout()
-    else if (cinemaFrame) { fitStrip(); fadeWords(); markMore() }
+    else if (cinemaFrame) { fitStrip(); askClamp() }
     else { fadeWords(); markMore() }
   })
   for (const part of [naming, seat, entryRow, line, note, words, aside, after]) wordsResized.observe(part)
