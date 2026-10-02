@@ -437,9 +437,10 @@ export function createDeepPlatePayload(options: {
     // measured fits in the old box, and the viewer carries a zoom across a
     // resize by the diagonal: a plate still at its fit is fitted again to the
     // box it now has, after the viewer's own resize. A view the visitor made
-    // stays, and a window with no band keeps the viewer's own rule.
+    // stays, and a window with no band keeps the viewer's own rule. Sideways
+    // the work steps aside when its words open, and stands whole there too.
     made.addHandler('resize', () => {
-      if (!host?.banded || !seated || framed || !homeZoom) return
+      if (!(host?.banded || host?.cinema?.()) || !seated || framed || !homeZoom) return
       if (Math.abs(made.viewport.getZoom(false) - homeZoom) > homeZoom * .02) return
       queueMicrotask(() => fitHome(true))
     })

@@ -98,8 +98,8 @@ const CINEMA = {
   columnLeast: 256, columnMost: 300, columnShare: .31, columnGap: 28, columnTop: 18,
   /** the air at the glass's top and foot, and over the foot row */
   air: 10, rowGap: 12,
-  /** the strip in the foot row, and the width its raised column takes at most */
-  strip: 52, raised: 420,
+  /** the strip in the foot row */
+  strip: 52,
   /** the clock's band along a film's foot, and its inset from the film's sides */
   clock: 44, clockInset: 16,
 }
@@ -289,7 +289,7 @@ export function createVitrine(options: {
   let spoken: { head: string | null; note: string | null; short: string | null; restNote: string | null; restSource: string | null
     own: VitrinePeek['own'] } = { head: null, note: null, short: null, restNote: null, restSource: null, own: null }
   const reducedMotion = view.matchMedia('(prefers-reduced-motion: reduce)')
-  const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect }
+  const rects = { view: { left: 0, top: 0, width: 0, height: 0 } as VitrineRect, field: null as VitrineRect | null }
 
   function setSurface(kind: VitrineSurface): void {
     surface = kind
@@ -472,10 +472,13 @@ export function createVitrine(options: {
     const under: VitrineRect = { left, top, width: right - left, height: frame.row.top - CINEMA.rowGap - top }
     const aspect = exhibit?.payload?.aspect?.() ?? null
     const area = (shape: number, box: VitrineRect): number => { const across = Math.min(box.width, box.height * shape); return across * across / shape }
-    const form = aspect && area(aspect, under) > area(aspect, beside) ? 'under' : 'beside'
+    // a work that stands under steps aside when its words open: the words take the label column, the work the place beside it
+    const home = aspect && area(aspect, under) > area(aspect, beside) ? 'under' : 'beside'
+    const form = home === 'under' && raised ? 'beside' : home
     root.dataset['form'] = 'cinema'
     root.dataset['lookForm'] = form
-    root.toggleAttribute('data-look-open', form === 'under' && raised)
+    root.dataset['lookHome'] = home
+    root.toggleAttribute('data-look-open', home === 'under' && raised)
     root.toggleAttribute('data-look-film', filmed)
     root.dataset['lookWall'] = String(onWall())
     root.dataset['lookAspect'] = aspect ? aspect.toFixed(3) : ''
@@ -499,15 +502,10 @@ export function createVitrine(options: {
       const stripTop = Math.round((frame.row.top + frame.row.bottom - CINEMA.strip) / 2)
       const from = Math.max(left, frame.row.seats + CINEMA.rowGap)
       const across = Math.max(120, frame.row.gold - 16 - from)
-      if (!raised) place(card, { left: from, top: stripTop, width: across, height: CINEMA.strip })
-      else {
-        // the raised column grows up from the strip's foot, as tall as its words, never past the glass's head
-        const foot = stripTop + CINEMA.strip, most = foot - (safe.top + 8), wide = Math.min(CINEMA.raised, across)
-        place(card, { left: from, top: foot - most, width: wide, height: most })
-        const asked = Math.min(most, raisedAsked())
-        place(card, { left: from, top: foot - asked, width: wide, height: asked })
-      }
+      place(card, { left: from, top: stripTop, width: across, height: CINEMA.strip })
     }
+    // the part of the glass a film may run to: all of it under the strip, all but the label column beside it
+    rects.field = form === 'under' ? { left: 0, top: 0, width, height } : { left: 0, top: 0, width: right - column - CINEMA.columnGap / 2, height }
     gatherTools()
     toolWatch.observe(root, { childList: true, subtree: true })
     if (!tools.hidden) place(tools, { left: safe.left, top, width: CINEMA.tools - 8, height: frame.row.top - CINEMA.rowGap - top })
@@ -564,7 +562,8 @@ export function createVitrine(options: {
     stage.style.setProperty('--film-width', `${Math.round(right - left)}px`)
     stage.style.setProperty('--film-foot', `${Math.round(zoneFoot - foot)}px`)
     // the fall under the line: over the film's own width, or over the glass to its foot where the film runs on there
-    const glass = { left: -zone.left, width: view.innerWidth, below: view.innerHeight - zoneFoot }
+    const field = rects.field ?? { left: 0, top: 0, width: view.innerWidth, height: view.innerHeight }
+    const glass = { left: field.left - zone.left, width: field.width, below: field.top + field.height - zoneFoot }
     const fall = own ? { left: left - zone.left, width: right - left, below: foot - zoneFoot } : glass
     stage.style.setProperty('--fall-left', `${Math.round(fall.left)}px`)
     stage.style.setProperty('--fall-width', `${Math.round(fall.width)}px`)
@@ -627,8 +626,8 @@ export function createVitrine(options: {
     if (!frame) { lookMore.remove(); lookLess.remove(); return }
     if (lookMore.parentElement !== controls) controls.prepend(lookMore)
     if (lookLess.parentElement !== controls) lookMore.after(lookLess)
+    const strip = root.dataset['lookForm'] === 'under'
     const opened = root.hasAttribute('data-look-open')
-    const strip = root.dataset['lookForm'] === 'under' && !opened
     lookMoreWord.textContent = frame.more
     lookLessWord.textContent = frame.less
     // in the strip the key raises the words; in a column it reads on, while lines wait below
@@ -642,7 +641,7 @@ export function createVitrine(options: {
     lookLess.hidden = strip || !(opened || (!readOn && Boolean(cut?.above)))
   }
   lookMore.addEventListener('click', () => {
-    if (root.dataset['lookForm'] === 'under') { setRaised(!raised); return }
+    if (root.dataset['lookForm'] === 'under') { setRaised(true); return }
     // the next page begins on the first line the column hid
     const next = cut?.next ?? body.clientHeight - 44
     body.scrollBy({ top: Math.max(22, next), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
@@ -651,13 +650,13 @@ export function createVitrine(options: {
     if (root.hasAttribute('data-look-open')) { setRaised(false); return }
     body.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' })
   })
-  // a detail pressed in the raised column folds it, so the work it moves to stands in view
+  // a detail pressed in an opened column folds it, so the work it moves to stands in its own place
   payloadControls.addEventListener('click', event => {
-    if (cinemaFrame && raised && root.dataset['lookForm'] === 'under' && (event.target as Element | null)?.closest('button')) setRaised(false)
+    if (cinemaFrame && root.hasAttribute('data-look-open') && (event.target as Element | null)?.closest('button')) setRaised(false)
   })
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
-    for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
+    for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
     unmaskLines(body)
     cut = null
     stripName.textContent = ''
@@ -708,7 +707,6 @@ export function createVitrine(options: {
   const wordsResized = new ResizeObserver(() => {
     if (!open) return
     if (options.narrow() && root.dataset['peek'] === 'true') layout()
-    else if (cinemaFrame && raised && root.dataset['lookForm'] === 'under') layout()
     else if (cinemaFrame) { fitStrip(); askClamp() }
     else { fadeWords(); markMore() }
   })
@@ -874,6 +872,7 @@ export function createVitrine(options: {
     reducedMotion: reducedMotion.matches,
     banded: inBand(),
     cinema: () => cinemaFrame !== null,
+    field: () => (cinemaFrame && rects.field ? { ...rects.field } : null),
     viewport: () => ({ ...rects.view }),
     work: () => (inBand() ? null : exhibit?.work?.() ?? null),
     surface: setSurface,

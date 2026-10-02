@@ -319,7 +319,7 @@ export function createCyclePayload(options: {
       groundedFor = size
       grounded = !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor)
     }
-    const cover = sideways ? { left: 0, top: 0, width: innerWidth, height: innerHeight } : grounded ? null : coverOf(host)
+    const cover = sideways ? host.field?.() ?? { left: 0, top: 0, width: innerWidth, height: innerHeight } : grounded ? null : coverOf(host)
     const next = cycleFit(f, sideways ? clearOf(host) : islandFit(host), cover)
     const key = [framing, next.left, next.top, next.width, next.height, cover?.left, cover?.top, cover?.width, cover?.height].join()
     if (key === laid) return
@@ -334,6 +334,12 @@ export function createCyclePayload(options: {
       groundAt = { left: cover.left, top, width: cover.width, height: bottom - top }
     }
     soft = sideways && groundAt ? softSides(fitted, groundAt) : NO_SOFT
+    // sideways the frame ends where its field does: beside an open label column it never runs on behind the words
+    if (sideways && cover) {
+      const inset = [cover.top - fitted.top, fitted.left + fitted.width - cover.left - cover.width,
+        fitted.top + fitted.height - cover.top - cover.height, cover.left - fitted.left].map(n => `${Math.max(0, Math.round(n))}px`)
+      root.style.clipPath = `inset(${inset.join(' ')})`
+    } else root.style.removeProperty('clip-path')
     const mask = softMask(soft)
     for (const name of ['mask-image', '-webkit-mask-image']) {
       if (mask) root.style.setProperty(name, mask); else root.style.removeProperty(name)

@@ -58,6 +58,9 @@ export interface VitrinePayloadHost {
    * places, and `viewport()` is the work's zone on the wall. Read at layout:
    * a turned phone changes it under a mounted payload. */
   cinema?(): boolean
+  /** SIDEWAYS, the part of the glass a film may run to: the whole glass
+   * under the strip, all but the label column beside it; null elsewhere. */
+  field?(): VitrineRect | null
 }
 
 /** THE PHONE HELD SIDEWAYS, as the host measures it: the glass inside its

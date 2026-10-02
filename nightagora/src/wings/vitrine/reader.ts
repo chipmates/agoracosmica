@@ -284,6 +284,7 @@ export function createReaderPayload(options: {
       narrow: outer.narrow,
       reducedMotion: outer.reducedMotion,
       banded: outer.banded,
+      cinema: () => outer.cinema?.() ?? false,
       // The viewer seats itself in the box it actually stands in, which is
       // the viewport less the strip under the page.
       viewport: () => {
