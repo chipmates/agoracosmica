@@ -215,10 +215,12 @@ html:has(#wing[data-film='cinema']) { --cinema-card: min(340px, 42vw); }
   height: calc(100dvh - var(--cinema-t) - 8px - var(--cinema-b) - var(--cinema-row) - 4px - var(--cinema-cut, 0px)) !important;
 }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-sheet { border-radius: var(--ui-r-box-side); }
+/* the card's own ground lies over the sheet: its corners are the sheet's in every rounded form */
+#wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-card { border-radius: var(--ui-r-square); }
 /* the card in the phone's own order and type: the window's phone rules key on the glass's shape, so they are carried
    here at a weight under the window's own rules for a kind (the reader's row, the zoom's glyphs) */
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-card { padding: 12px 14px; background: transparent; border: 0; }
-:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-view { border: 1px solid var(--ui-line); border-radius: var(--ui-r-square); box-sizing: border-box; }
+:where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-view { border: 1px solid var(--ui-line); border-radius: var(--ui-r-square); overflow: hidden; box-sizing: border-box; }
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-name { margin-bottom: 6px; font-size: 17px; }
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-line { margin-bottom: 8px; font-size: 16px; line-height: 1.32; }
 :where(#wing[data-film='cinema']) .vitrine[data-narrow='true'] .vitrine-catalogue { margin: -3px 0 6px; font-size: 13px; }

@@ -101,7 +101,7 @@
 
 @media(max-aspect-ratio:9/10) {
   .vitrine-card {padding:10px 12px 12px;background:transparent;border:0;}
-  .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;border-radius:var(--ui-r-square);box-sizing:border-box;}
+  .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;border-radius:var(--ui-r-square);overflow:hidden;box-sizing:border-box;}
   .vitrine-name {margin-bottom:6px;font-size:16px;}
   .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
   .vitrine-catalogue {margin:-3px 0 6px;font-size:13px;}
@@ -197,7 +197,7 @@
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-place {display:none;}
 /* the grab raises the card, so the peek carries no second raise */
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .reader-raise {display:none;}
-.vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);}
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);border-radius:0 0 var(--ui-r-square) var(--ui-r-square);}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the
    reader gives it the same ground its page label has, and stands it above
