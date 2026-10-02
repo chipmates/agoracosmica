@@ -94,47 +94,92 @@ export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' 
   return { left, top, width, height, scale, covers }
 }
 
-/** THE GROUND BESIDE A FRAME THAT CANNOT COVER: each bare side is the
-    frame's outer strip (this share of its breadth) averaged across into one
-    column or row and drawn out to the cover's edge, at a quarter of the
-    cover's pixels: the air, the horizon and the floor run on, the room never
-    stands beside the machine, and no line or shadow crossing the strip is
-    smeared out. Along the side the average is softened over `soft` of the
-    ground's pixels, so a shadow reaching the frame's edge fades out. */
-const GROUND = { scale: 0.25, strip: 0.04, soft: 4 }
-export function paintGround(canvas: HTMLCanvasElement, lane: HTMLCanvasElement, source: CanvasImageSource, size: [number, number],
+/** THE GROUND BESIDE A FRAME THAT CANNOT COVER, drawn from the frame's own
+    edges at a quarter of the cover's pixels. Each bare side is the frame's
+    outer strip (`strip` of its breadth) averaged across into one line,
+    softened along it over `soft` ground pixels and drawn out to the cover's
+    edge, so the air, the horizon and the floor run on. Next to the frame that
+    line is drawn as it is, fading out over `fade` of the side; beyond, its dark
+    dips are closed (the brightest of the neighbours within `close` of its
+    length, then the darkest), so a shadow or a dark part reaching the frame's
+    edge fades out instead of running on as a bar. No pixel is read back (the
+    release's media may be cross-origin): the canvas's own compositing does it,
+    and every line has a canvas of its own size, so no filter reads past it. */
+const GROUND = { scale: 0.25, strip: 0.04, soft: 4, close: 0.08, fade: 0.35 }
+/** the fade's own resolution across, stretched over the side */
+const EDGE = 8
+export type GroundLines = { raw: HTMLCanvasElement; wide: HTMLCanvasElement; closed: HTMLCanvasElement; edge: HTMLCanvasElement }
+export const groundLines = (): GroundLines => ({
+  raw: document.createElement('canvas'), wide: document.createElement('canvas'),
+  closed: document.createElement('canvas'), edge: document.createElement('canvas'),
+})
+function sized(c: HTMLCanvasElement, w: number, h: number): CanvasRenderingContext2D | null {
+  if (c.width !== w) c.width = w
+  if (c.height !== h) c.height = h
+  const x = c.getContext('2d')
+  if (x) { x.globalCompositeOperation = 'source-over'; x.imageSmoothingEnabled = true; x.imageSmoothingQuality = 'high' }
+  return x
+}
+export function paintGround(canvas: HTMLCanvasElement, lines: GroundLines, source: CanvasImageSource, size: [number, number],
   at: PictureBox, frame: PictureBox): void {
   const k = GROUND.scale
   const w = Math.max(1, Math.ceil(at.width * k)), h = Math.max(1, Math.ceil(at.height * k))
-  if (canvas.width !== w) canvas.width = w
-  if (canvas.height !== h) canvas.height = h
-  const ink = canvas.getContext('2d'), mix = lane.getContext('2d')
-  if (!ink || !mix) return
+  const ink = sized(canvas, w, h)
+  if (!ink) return
   const [sw, sh] = size
   const fx0 = (frame.left - at.left) * k, fy0 = (frame.top - at.top) * k
   const fw = frame.width * k, fh = frame.height * k, fx1 = fx0 + fw, fy1 = fy0 + fh
   const p = Math.max(1, Math.round(Math.min(sw, sh) * GROUND.strip))
-  const cols = Math.max(1, Math.ceil(fw / GROUND.soft)), rows = Math.max(1, Math.ceil(fh / GROUND.soft))
-  if (lane.width < Math.max(cols, 2)) lane.width = Math.max(cols, 2)
-  if (lane.height < Math.max(rows, 2)) lane.height = Math.max(rows, 2)
-  for (const c of [ink, mix]) { c.imageSmoothingEnabled = true; c.imageSmoothingQuality = 'high' }
-  /** a strip of the source averaged into the lane's first column (or row), then drawn out over its part of the cover */
-  const side = (sx: number, sy: number, sWidth: number, sHeight: number, along: boolean, dx: number, dy: number, dw: number, dh: number): void => {
-    if (dw <= 0 || dh <= 0) return
-    if (along) { mix.drawImage(source, sx, sy, sWidth, sHeight, 0, 0, 1, rows); ink.drawImage(lane, 0, 0, 1, rows, dx, dy, dw, dh) }
-    else { mix.drawImage(source, sx, sy, sWidth, sHeight, 0, 0, cols, 1); ink.drawImage(lane, 0, 0, cols, 1, dx, dy, dw, dh) }
-  }
   ink.drawImage(source, 0, 0, sw, sh, fx0, fy0, fw, fh)
-  side(0, 0, p, sh, true, 0, fy0, fx0, fh)
-  side(sw - p, 0, p, sh, true, fx1, fy0, w - fx1, fh)
-  side(0, 0, sw, p, false, fx0, 0, fw, fy0)
-  side(0, sh - p, sw, p, false, fx0, fy1, fw, h - fy1)
-  // the corners take the corner's own average
-  for (const [sx, sy, dx, dy, dw, dh] of [[0, 0, 0, 0, fx0, fy0], [sw - p, 0, fx1, 0, w - fx1, fy0],
-    [0, sh - p, 0, fy1, fx0, h - fy1], [sw - p, sh - p, fx1, fy1, w - fx1, h - fy1]] as const) {
-    if (dw <= 0 || dh <= 0) continue
-    mix.drawImage(source, sx, sy, p, p, 0, 0, 1, 1)
-    ink.drawImage(lane, 0, 0, 1, 1, dx, dy, dw, dh)
+
+  /** a strip of the source averaged into a line `n` long (down a side or across one), raw and with its dark dips closed */
+  const line = (sx: number, sy: number, sWidth: number, sHeight: number, down: boolean, n: number): boolean => {
+    const [lw, lh] = down ? [1, n] : [n, 1]
+    const raw = sized(lines.raw, lw, lh), wide = sized(lines.wide, lw, lh), closed = sized(lines.closed, lw, lh)
+    if (!raw || !wide || !closed) return false
+    raw.drawImage(source, sx, sy, sWidth, sHeight, 0, 0, lw, lh)
+    const r = Math.max(1, Math.round(n * GROUND.close))
+    const spread = (into: CanvasRenderingContext2D, from: HTMLCanvasElement, mode: GlobalCompositeOperation): void => {
+      into.imageSmoothingEnabled = false
+      into.drawImage(from, 0, 0)
+      into.globalCompositeOperation = mode
+      for (let d = 1; d <= r; d++) for (const o of [d, -d]) into.drawImage(from, down ? 0 : o, down ? o : 0)
+      into.globalCompositeOperation = 'source-over'
+    }
+    spread(wide, lines.raw, 'lighten')
+    spread(closed, lines.wide, 'darken')
+    return true
+  }
+  /** the closed line over the whole side, the raw line next to the frame fading out away from it */
+  const lay = (down: boolean, n: number, frameFirst: boolean, dx: number, dy: number, dw: number, dh: number): void => {
+    ink.drawImage(lines.closed, dx, dy, dw, dh)
+    const breadth = down ? dw : dh
+    const reach = Math.min(breadth, Math.max(3, breadth * GROUND.fade))
+    const [ew, eh] = down ? [EDGE, n] : [n, EDGE]
+    const edge = sized(lines.edge, ew, eh)
+    if (!edge) return
+    edge.drawImage(lines.raw, 0, 0, ew, eh)
+    edge.globalCompositeOperation = 'destination-in'
+    const fall = down ? edge.createLinearGradient(0, 0, EDGE, 0) : edge.createLinearGradient(0, 0, 0, EDGE)
+    fall.addColorStop(0, `rgba(0, 0, 0, ${frameFirst ? 1 : 0})`)
+    fall.addColorStop(1, `rgba(0, 0, 0, ${frameFirst ? 0 : 1})`)
+    edge.fillStyle = fall
+    edge.fillRect(0, 0, ew, eh)
+    edge.globalCompositeOperation = 'source-over'
+    if (down) ink.drawImage(lines.edge, frameFirst ? dx : dx + dw - reach, dy, reach, dh)
+    else ink.drawImage(lines.edge, dx, frameFirst ? dy : dy + dh - reach, dw, reach)
+  }
+  const rows = Math.max(1, Math.ceil(fh / GROUND.soft)), cols = Math.max(1, Math.ceil(fw / GROUND.soft))
+  // the sides, each with the corners above and below it from its own line's ends
+  for (const [sx, dx, dw, frameFirst] of [[0, 0, fx0, false], [sw - p, fx1, w - fx1, true]] as const) {
+    if (dw <= 0 || !line(sx, 0, p, sh, true, rows)) continue
+    lay(true, rows, frameFirst, dx, fy0, dw, fh)
+    if (fy0 > 0) ink.drawImage(lines.closed, 0, 0, 1, 1, dx, 0, dw, fy0)
+    if (fy1 < h) ink.drawImage(lines.closed, 0, rows - 1, 1, 1, dx, fy1, dw, h - fy1)
+  }
+  for (const [sy, dy, dh, frameFirst] of [[0, 0, fy0, false], [sh - p, fy1, h - fy1, true]] as const) {
+    if (dh <= 0 || !line(0, sy, sw, p, false, cols)) continue
+    lay(false, cols, frameFirst, fx0, dy, fw, dh)
   }
 }
 
@@ -158,7 +203,7 @@ export function createCyclePayload(options: {
   const { cycle, steps } = options
   let host: VitrinePayloadHost | undefined
   let root: HTMLDivElement | undefined, video: HTMLVideoElement | undefined, poster: HTMLImageElement | undefined
-  let ground: HTMLCanvasElement | undefined, lane: HTMLCanvasElement | undefined
+  let ground: HTMLCanvasElement | undefined, lines: GroundLines | undefined
   /** where the frame stands now, and the part of the screen its ground fills where it cannot cover */
   let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false
   /** what the last fit was laid out from, so a frame that changes nothing writes nothing */
@@ -237,8 +282,8 @@ export function createCyclePayload(options: {
     if (!ground || !groundAt || !fitted) return
     const from = groundSource()
     if (!from) return
-    lane ??= document.createElement('canvas')
-    paintGround(ground, lane, from.source, from.size, groundAt, fitted)
+    lines ??= groundLines()
+    paintGround(ground, lines, from.source, from.size, groundAt, fitted)
     ground.hidden = false
   }
   /** a running clip's ground is drawn again at each of its frames */
@@ -480,7 +525,7 @@ export function createCyclePayload(options: {
       if (video) { video.pause(); video.removeAttribute('src'); video.load() }
       root?.remove()
       ground?.remove()
-      root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined; lane = undefined
+      root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined; lines = undefined
       fitted = null; groundAt = null
       host = undefined
     },
