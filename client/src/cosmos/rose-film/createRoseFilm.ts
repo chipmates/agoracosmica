@@ -59,6 +59,8 @@ export interface RoseFilm {
   setQuality(scale: number): void;
   /** Draw the moving light once per frame only. The first relief for a device that falls behind. */
   setSingleStep(single: boolean): void;
+  /** How much of the frame's height the closing verse takes, from the top (0..1). The rose keeps below it. */
+  setClearTop(share: number): void;
   /** The words' box (centre and half size, shares of the frame, y from the foot) and how present they are. */
   setWords(cx: number, cy: number, hw: number, hh: number, on: number): void;
   render(t: number, dt: number): void;
@@ -350,6 +352,7 @@ export function createRoseFilm(
   let quality = 1;
   let singleStep = false;
   const words = new Float32Array([0.5, 0.86, 0.3, 0.05, 0]);
+  let clearTop: number | undefined;
   const chest = new Float32Array([0.5, 0.2]);
 
   function makeTarget(w: number, h: number): Target {
@@ -426,7 +429,7 @@ export function createRoseFilm(
 
   function layout(): FilmLayout {
     const aspect = cssW / cssH;
-    return { aspect, portrait: aspect < 0.8 };
+    return { aspect, portrait: aspect < 0.8, clearTop };
   }
 
   function setCamera(dist: number, centerX: number, centerY: number) {
@@ -746,6 +749,10 @@ export function createRoseFilm(
     chest[1] = g.top + g.figure * FIGURE_BOX.chestY;
   }
 
+  function setClearTop(share: number) {
+    clearTop = Math.min(0.6, Math.max(0.05, share));
+  }
+
   function setWords(cx: number, cy: number, hw: number, hh: number, on: number) {
     words[0] = cx;
     words[1] = cy;
@@ -755,5 +762,5 @@ export function createRoseFilm(
   }
 
   resize();
-  return { duration: FILM_DURATION, resize, setQuality, setSingleStep, setWords, render, seek, dispose };
+  return { duration: FILM_DURATION, resize, setQuality, setSingleStep, setClearTop, setWords, render, seek, dispose };
 }

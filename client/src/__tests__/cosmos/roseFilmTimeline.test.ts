@@ -4,6 +4,7 @@ import {
   FILM_DURATION,
   MEET_START,
   MEET_TRAVEL,
+  GROUND,
   RING_RADIUS,
   RISE_TRAVEL,
   ROSE,
@@ -97,6 +98,26 @@ describe('rose film timeline', () => {
         expect(seat.lift).toBeGreaterThan(seats[i - 1].lift);
       }
     });
+  });
+
+  it('keeps the finished rose between the verse and the ground on every frame shape', () => {
+    // From a folded phone to an ultrawide screen, with the verse taking a little or a lot of the frame.
+    for (let aspect = 0.36; aspect <= 2.6; aspect += 0.02) {
+      for (let clearTop = 0.12; clearTop <= 0.42; clearTop += 0.03) {
+        const portrait = aspect < 0.8;
+        const st = filmState(16, { aspect, portrait, clearTop });
+        const halfHeight = st.halfShort / Math.min(1, aspect) / st.zoom;
+        const radius = ROSE.reach / halfHeight / 2;
+        const centre = (1 - st.centerY) / 2;
+        const ground = portrait ? GROUND.portrait : GROUND.landscape;
+        const at = `aspect ${aspect.toFixed(2)}, verse to ${clearTop.toFixed(2)}`;
+        expect(centre - radius, at).toBeGreaterThanOrEqual(clearTop - 1e-6);
+        expect(centre + radius, at).toBeLessThanOrEqual(1 - ground.top + 0.03);
+        // The rose never shrinks to a mark, and the round itself stays inside the frame's width.
+        expect(2 * radius, at).toBeGreaterThan(0.3);
+        expect(RING_RADIUS / (st.halfShort / st.zoom), at).toBeLessThan(portrait ? 0.8 : 1);
+      }
+    }
   });
 
   it('lets the sun rise only after the tiers have begun to fill', () => {

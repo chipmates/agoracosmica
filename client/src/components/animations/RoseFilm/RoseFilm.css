@@ -143,5 +143,36 @@
   .rose-film-words {
     top: calc(env(safe-area-inset-top, 0px) + 9dvh);
   }
+}
 
+/* A phone browser with its bars showing leaves a short frame: the words take less of it. */
+@media (max-width: 767px) and (max-height: 720px) {
+  .rose-film-words {
+    top: calc(env(safe-area-inset-top, 0px) + 5dvh);
+    font-size: 1.3rem;
+  }
+
+  .rose-film-verse .rose-film-verse-original {
+    margin-top: 0.5rem;
+  }
+
+  .rose-film-verse .rose-film-verse-ref {
+    margin-top: 0.6rem;
+  }
+}
+
+/* A very short, wide window: the same, with even less height. */
+@media (max-height: 480px) and (orientation: landscape) {
+  .rose-film-words {
+    top: calc(env(safe-area-inset-top, 0px) + 4vh);
+    font-size: 1.15rem;
+  }
+
+  .rose-film-verse .rose-film-verse-original {
+    margin-top: 0.3rem;
+  }
+
+  .rose-film-verse .rose-film-verse-ref {
+    margin-top: 0.4rem;
+  }
 }

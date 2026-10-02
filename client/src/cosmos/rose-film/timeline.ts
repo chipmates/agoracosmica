@@ -36,6 +36,8 @@ export const ROSE = {
   wreath: [1.4, 1.66],
   /** Where the thirty take their seats: a crown just outside the round. */
   seat: 1.285,
+  /** How far the wreath's outer figures reach: the rose's size in a frame. */
+  reach: 1.76,
   /** Past this radius the rose has given way to the night. */
   rim: 1.9,
 } as const;
@@ -43,6 +45,12 @@ export const ROSE = {
 export interface FilmLayout {
   aspect: number;
   portrait: boolean;
+  /**
+   * How much of the frame's height the closing verse takes, from the top
+   * (0..1), as the page measures it. A phone browser's bars leave a far
+   * shorter frame than the screen, so this cannot be a constant.
+   */
+  clearTop?: number;
 }
 
 export interface FilmState {
@@ -138,7 +146,22 @@ export function filmState(t: number, layout: FilmLayout): FilmState {
   const approach = smooth(7.2, 12.2, t);
   const tableau = smoother(8.2, 12.0, t);
   const zoomOpen = p ? 1.31 : 2.77;
-  const zoomTableau = p ? 1.12 : 1.52;
+  const halfShort = p ? Math.max(1.7, 3.13 * layout.aspect) : 3.8;
+  // The finished rose stands between the verse and the ground, whatever the
+  // frame's shape. It never grows past its share of the short side. On a tall
+  // phone its foot ends at the two's heads. Where the frame is short it goes
+  // down behind them to the rock, as on a wide frame, before it gets smaller.
+  const ground = p ? GROUND.portrait : GROUND.landscape;
+  const top = layout.clearTop ?? (p ? 0.24 : 0.18);
+  const zoomShort = p ? halfShort / 1.52 : 1.6;
+  const footLow = 1 - ground.top + 0.02;
+  const footHigh = 1 - ground.top - 0.62 * ground.figure;
+  const sizeShort = (ROSE.reach * layout.aspect) / (halfShort / zoomShort);
+  const foot = p ? Math.min(footLow, Math.max(footHigh, top + sizeShort)) : footLow;
+  const band = Math.max(0.2, foot - top);
+  const zoomFit = (band * halfShort) / (Math.min(1, layout.aspect) * ROSE.reach);
+  const zoomTableau = Math.min(zoomShort, zoomFit);
+  const centerTableau = 1 - (top + foot);
   return {
     fade: smooth(0, 0.35, t),
     bend,
@@ -154,9 +177,9 @@ export function filmState(t: number, layout: FilmLayout): FilmState {
     starRot: lookup(STAR_TABLE, t),
     zoom: mix(mix(zoomOpen, 1, smoother(2.2, 6.8, t)), zoomTableau, approach),
     // The ring takes the same share of the frame's height on a phone and on a tablet held upright.
-    halfShort: p ? Math.max(1.7, 3.13 * layout.aspect) : 3.8,
+    halfShort,
     // The round stands high above the seeker, then the rose settles around the frame's middle.
-    centerY: p ? mix(0.24, -0.005, tableau) : mix(0.32, -0.105, tableau),
+    centerY: mix(p ? 0.24 : 0.32, centerTableau, tableau),
     centerX: 0,
     heart: 0.1 + 0.5 * smooth(6, 7.6, t) + 0.4 * smooth(7.6, 11.5, t),
     // The first point of light stands until the sun takes its place.

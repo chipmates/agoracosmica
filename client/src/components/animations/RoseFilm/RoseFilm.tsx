@@ -28,6 +28,7 @@ declare global {
       ready: boolean;
       seek: (t: number) => void;
       step: (t: number) => void;
+      quality: (scale: number) => void;
       info: () => Record<string, unknown>;
     };
   }
@@ -115,15 +116,21 @@ const RoseFilm: FC<RoseFilmProps> = ({ tier, onEnd, onFail }) => {
     const wordsBox = [0.5, 0.86, 0.3, 0.05];
     let wordsAxis = 0;
 
-    // Where the two stand on the rock.
+    // Where the two stand on the rock, and how far down the closing verse reaches:
+    // the rose fits itself between the two. Layout sizes, so a line's fade does not move them.
     const relayout = () => {
       const aspect = root.clientWidth / Math.max(1, root.clientHeight);
       const g = aspect < 0.8 ? GROUND.portrait : GROUND.landscape;
       root.style.setProperty('--rose-ground-top', String(g.top));
       root.style.setProperty('--rose-stand-x', String(g.standX));
       root.style.setProperty('--rose-figure', String(g.figure));
+      const words = wordsRef.current;
+      const verse = words?.querySelector<HTMLElement>('[data-cue="verse"]');
+      if (words && verse) film.setClearTop((words.offsetTop + verse.offsetHeight) / Math.max(1, root.clientHeight) + 0.018);
     };
     relayout();
+    // The reading face may arrive after the first frame and change the verse's height.
+    document.fonts?.ready.then(relayout).catch(() => {});
 
     // The film dims its light behind the line of words on screen.
     const measureWords = (name: CueName | null) => {
@@ -202,6 +209,9 @@ const RoseFilm: FC<RoseFilmProps> = ({ tier, onEnd, onFail }) => {
       measureWords(shownCue);
     };
     window.addEventListener('resize', onResize);
+    // A phone browser's bars can change the frame after the resize event has passed.
+    const watcher = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(onResize);
+    watcher?.observe(root);
 
     const onLost = (e: Event) => {
       e.preventDefault();
@@ -229,6 +239,8 @@ const RoseFilm: FC<RoseFilmProps> = ({ tier, onEnd, onFail }) => {
             film.render(Math.min(t, FILM_DURATION), 1 / 60);
           }
         },
+        // The picture a slow device gets after the relief steps.
+        quality: (scale: number) => film.setQuality(scale),
         info: () => {
           const sorted = frameMs.slice(5).sort((a, b) => a - b);
           const at = (q: number) => (sorted.length ? Math.round(sorted[Math.floor((sorted.length - 1) * q)] * 10) / 10 : 0);
@@ -240,6 +252,7 @@ const RoseFilm: FC<RoseFilmProps> = ({ tier, onEnd, onFail }) => {
     return () => {
       cancelAnimationFrame(raf);
       window.removeEventListener('resize', onResize);
+      watcher?.disconnect();
       canvas.removeEventListener('webglcontextlost', onLost);
       if (import.meta.env.DEV) delete window.__roseFilm;
       film.dispose();
