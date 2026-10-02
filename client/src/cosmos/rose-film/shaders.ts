@@ -50,7 +50,9 @@ vec3 rosePoint(float theta, float x1) {
 }
 
 vec3 roseNormal(float theta, float x1, vec3 p) {
-  vec3 dt = rosePoint(theta + 0.02, x1) - p;
+  // Measured along the petal's own face, never across the border to the next petal.
+  float toBorder = 2.0 * PI - mod(3.6 * theta, 2.0 * PI);
+  vec3 dt = toBorder > 0.08 ? rosePoint(theta + 0.02, x1) - p : p - rosePoint(theta - 0.02, x1);
   vec3 dx = rosePoint(theta, x1 - 0.02) - p;
   vec3 n = cross(dt, dx);
   float l = length(n);
@@ -87,7 +89,6 @@ out vec3 vViewP;
 out vec3 vViewN;
 out float vTn;
 out float vX1;
-out float vU;
 out float vTheta;
 void main() {
   float theta = aUV.x, x1 = aUV.y;
@@ -103,9 +104,9 @@ void main() {
   vViewN = mat3(uView) * wn;
   vTn = petalRank(theta);
   vX1 = x1;
-  vU = 1.0 - mod(3.6 * theta, 2.0 * PI) / PI;
   gl_Position = uProj * v;
-  gl_Position.z += 0.0035 * gl_Position.w;
+  // Behind the points of light. Where two tiers almost touch, the inner one is in front.
+  gl_Position.z += (0.0035 - 0.0034 * vTn) * gl_Position.w;
 }
 `;
 
@@ -117,7 +118,6 @@ in vec3 vViewP;
 in vec3 vViewN;
 in float vTn;
 in float vX1;
-in float vU;
 in float vTheta;
 uniform vec3 uGoldBright;
 uniform vec3 uWhite;
@@ -158,33 +158,42 @@ void main() {
   // one turn of the spiral further in.
   float cover = petalLen(vTn + 0.1176) / petalLen(vTn);
   float foot = 0.32 + 0.68 * smoothstep(cover - 0.4, cover + 0.3, vX1);
-  foot *= 0.85 + 0.15 * (1.0 - vU * vU);
+  // The place across the petal comes from the winding itself, so it is exact
+  // at every pixel, also where one petal ends and the next begins.
+  float u = 1.0 - mod(3.6 * vTheta, 6.2831853) / 3.14159265;
+  foot *= 0.85 + 0.15 * (1.0 - u * u);
 
   // The seats: rows of small lights across the petal, some empty. Each keeps
   // its size on the screen, so a petal is made of lights at any distance.
-  float len = petalLen(vTn);
+  // One grid for a whole petal, sized at its middle: a grid that changed
+  // along the petal would cut the lights where it steps.
+  float k = floor(3.6 * vTheta / 6.2831853);
+  float len = petalLen(((k + 0.5) * 1.7453293 + 6.2831853) / 53.407075);
   float nRows = max(3.0, floor(len * 20.0 + 0.5));
   float rowF = vX1 * nRows;
   float rowId = floor(rowF);
   float nCols = max(3.0, floor(len * (rowId + 0.5) / nRows * 32.0 + 0.5));
-  float colF = (vU * 0.5 + 0.5) * nCols + 0.5 * mod(rowId, 2.0);
-  float k = floor(3.6 * vTheta / 6.2831853);
+  float colF = (u * 0.5 + 0.5) * nCols + 0.5 * mod(rowId, 2.0);
   vec2 id = vec2(floor(colF) + 37.0 * k, rowId + 11.0);
   float h = hash2(id);
   float h2 = hash2(id + 71.3);
   float h3 = hash2(id + 13.7);
   vec2 cell = vec2(fract(colF) - 0.5, fract(rowF) - 0.5) - 0.14 * (vec2(h2, h3) - 0.5);
   // The same offset in pixels, so a light stays round however the petal lies.
-  vec2 gc = vec2(dFdx(colF), dFdy(colF));
-  vec2 gr = vec2(dFdx(rowF), dFdy(rowF));
+  // (Taken from the smooth coordinates: the grid's own steps would leave lines.)
+  vec2 gc = vec2(dFdx(vTheta), dFdy(vTheta)) * (-1.8 / 3.14159265) * nCols;
+  vec2 gr = vec2(dFdx(vX1), dFdy(vX1)) * nRows;
   float det = gc.x * gr.y - gc.y * gr.x;
   vec2 cellPx = vec2(gr.y * cell.x - gc.y * cell.y, gc.x * cell.y - gr.x * cell.x) / (abs(det) > 1e-7 ? det : 1e-7);
   float bright = h * h * h;
   float sigma = (0.9 + 0.55 * bright) * uSeatPx;
   float d2 = dot(cellPx, cellPx);
   float seat = (exp(-d2 / (2.0 * sigma * sigma)) + 0.14 * exp(-d2 / (12.0 * sigma * sigma))) * step(0.12, h3);
+  // A light ends inside its own place, and none sits on a petal's border.
+  seat *= 1.0 - smoothstep(0.24, 0.42, length(cell));
+  seat *= 1.0 - smoothstep(0.88, 0.97, abs(u));
   // Where the rows are too fine for single lights they melt into an even shimmer.
-  float fw = max(fwidth(rowF), fwidth(colF));
+  float fw = max(length(gr), length(gc));
   seat = mix(seat, 0.1, smoothstep(0.2, 0.42, fw));
   float tw = 0.75 + 0.25 * sin(uT * (0.5 + 1.7 * h) + h * 60.0);
   // The lowest rows lie under the petal in front.
@@ -196,7 +205,7 @@ void main() {
   face = mix(face, uBlue, 0.05 * smoothstep(0.7, 1.2, dist));
   float heartLight = 1.0 / (1.0 + 3.1 * dist * dist);
   // Seen from behind, a petal glows with the light that passes through it.
-  float through = (0.3 + 0.5 * back) * heartLight * foot * step(lam, 0.0);
+  float through = (0.3 + 0.5 * back) * heartLight * foot * smoothstep(0.12, -0.12, lam);
   // A petal is a thin veil: it shows the heart's light and little of its own.
   // A young rose is all lights and rims: its veils fill with the heart's light as it opens.
   float age = mix(0.16, 1.0, smoothstep(0.85, 1.3, uBloom));
@@ -394,7 +403,7 @@ layout(location = 1) in float aSub;  // 0..1: how far back along its own tail th
 layout(location = 2) in vec4 aStart; // where it waits (x, y as shares of the frame), when it kindles, when it leaves
 uniform float uTail;     // seconds of path the tail covers
 uniform float uTravel;   // seconds from the ground to the seat
-uniform float uWait;     // how large a light is while it waits by its name
+uniform float uWait;     // how large a light is at rest, by its name and on its seat
 uniform vec4 uFrame;     // half width and half height of the view at the origin plane, the picture's centre shift (x, y)
 uniform float uSizeMul;
 uniform float uFade;
@@ -429,7 +438,7 @@ void main() {
   float since = uT - lift - uTravel;
   float flare = seated * exp(-max(since, 0.0) * 1.8);
   float glint = seated * pow(max(0.0, sin(uT * 0.9 - seed * 6.2831853)), 10.0);
-  float rest = mix(1.0, 3.5 + 1.4 * flare + 0.9 * glint, seated);
+  float rest = mix(1.0, (3.5 + 1.4 * flare + 0.9 * glint) * uWait, seated);
   // On the horizon it is a light in its own right, larger and warmer than any star.
   float breath = 0.85 + 0.15 * sin(uT * (1.3 + seed) + seed * 40.0);
   rest = mix(rest, (3.9 + 0.6 * fract(seed * 7.7)) * breath * uWait, waiting);
@@ -686,7 +695,7 @@ void main() {
 
   // The light steps back behind the words.
   vec2 wq = (vUv - uWords.xy) / max(uWords.zw, vec2(0.001));
-  float behind = (1.0 - smoothstep(0.4, 1.6, length(wq * vec2(1.0, 0.9)))) * uWordsOn;
+  float behind = (1.0 - smoothstep(0.4, 1.6, length(wq * vec2(1.0, 0.9)))) * smoothstep(0.0, 0.25, uWordsOn);
   // And behind the names: a box with soft edges. The thirty's own lights stay as they are.
   vec2 nq = max(abs(vUv - uNames.xy) - uNames.zw, 0.0) * vec2(uAspect, 1.0);
   float under = (1.0 - smoothstep(0.0, 0.07, length(nq))) * uNamesOn;
