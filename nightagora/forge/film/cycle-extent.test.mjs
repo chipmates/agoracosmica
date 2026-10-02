@@ -95,6 +95,17 @@ test('covering moves the frame, never the machine out of its box', () => {
   assert.ok(inside(roomy, [120, 560, 300, 700], box, CYCLE_MARGIN * 300))
 })
 
+test('a layer with a ground of its own asks no cover: the machine stands centred in its box', () => {
+  const extent = [80, 410, 350, 840]
+  const fit = cycleFit({ ...UPRIGHT, extent: { box: extent } }, BOX, null)
+  const air = CYCLE_MARGIN * Math.min(BOX.width, BOX.height)
+  assert.ok(inside(fit, extent, BOX, air))
+  assert.ok(fit.covers)
+  const mid = (a, b) => (a + b) / 2
+  assert.ok(Math.abs(fit.left + mid(extent[0], extent[2]) * fit.scale - (BOX.left + BOX.width / 2)) < 1e-9)
+  assert.ok(Math.abs(fit.top + mid(extent[1], extent[3]) * fit.scale - (BOX.top + BOX.height / 2)) < 1e-9)
+})
+
 test('a cycle without an extent is fitted as before: the fitting box scaled into the box and centred', () => {
   const fit = cycleFit(UPRIGHT, BOX, GLASS)
   const scale = Math.min(BOX.width / 372, BOX.height / 421)

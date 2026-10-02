@@ -74,18 +74,20 @@ function placeAxis(centred: number, span: number, lo: number, hi: number, from: 
 /** THE MACHINE AS BIG AS ITS BOX ALLOWS: the largest scale at which the
     machine's extent, with an even margin, fits the free box, the extent
     centred on it; the frame is then moved, never scaled, to cover what it
-    must, as far as the machine stays inside its box. A frame with no extent
-    is fitted by the island's fitting box, centred, as before. */
-export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' | 'extent'>, box: PictureBox, cover: PictureBox,
+    must (null: nothing), as far as the machine stays inside its box. A frame
+    with no extent is fitted by the island's fitting box, centred, as before. */
+export function cycleFit(frame: Pick<FilmCycleFraming, 'master' | 'dpr' | 'fit' | 'extent'>, box: PictureBox, cover: PictureBox | null,
   margin = CYCLE_MARGIN): CycleFit {
   const W = frame.master[0] / frame.dpr, H = frame.master[1] / frame.dpr
   const [x0, y0, x1, y1] = frame.extent?.box ?? [(W - frame.fit[0]) / 2, (H - frame.fit[1]) / 2, (W + frame.fit[0]) / 2, (H + frame.fit[1]) / 2]
   const air = frame.extent ? margin * Math.min(box.width, box.height) : 0
   const scale = Math.min((box.width - 2 * air) / Math.max(1, x1 - x0), (box.height - 2 * air) / Math.max(1, y1 - y0))
   const width = W * scale, height = H * scale
-  const left = placeAxis(box.left + box.width / 2 - ((x0 + x1) / 2) * scale, width,
+  const centred = { left: box.left + box.width / 2 - ((x0 + x1) / 2) * scale, top: box.top + box.height / 2 - ((y0 + y1) / 2) * scale }
+  if (!cover) return { ...centred, width, height, scale, covers: true }
+  const left = placeAxis(centred.left, width,
     box.left + air - x0 * scale, box.left + box.width - air - x1 * scale, cover.left, cover.left + cover.width)
-  const top = placeAxis(box.top + box.height / 2 - ((y0 + y1) / 2) * scale, height,
+  const top = placeAxis(centred.top, height,
     box.top + air - y0 * scale, box.top + box.height - air - y1 * scale, cover.top, cover.top + cover.height)
   const covers = left <= cover.left + 0.5 && top <= cover.top + 0.5
     && left + width >= cover.left + cover.width - 0.5 && top + height >= cover.top + cover.height - 0.5
@@ -177,10 +179,12 @@ export function createCyclePayload(options: {
     if (!root || !host) return
     const f = at()
     if (!f) return
-    const cover = coverOf(host)
+    // a layer that paints a ground of its own holds the frame on it (the cinema form): nothing to cover
+    const grounded = /^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor) === false
+    const cover = grounded ? null : coverOf(host)
     fitted = cycleFit(f, islandFit(host), cover)
     Object.assign(root.style, { left: `${fitted.left}px`, top: `${fitted.top}px`, width: `${fitted.width}px`, height: `${fitted.height}px` })
-    if (fitted.covers) groundAt = null
+    if (fitted.covers || !cover) groundAt = null
     else if (!host.narrow) groundAt = cover
     else {
       const top = Math.min(cover.top, Math.max(0, fitted.top))
