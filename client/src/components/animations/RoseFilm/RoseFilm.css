@@ -1,0 +1,196 @@
+/* RoseFilm.css — the entry film's frame, words and foreground. */
+
+.rose-film {
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--bg-deep-space);
+  --rose-fade: 0;
+  --rose-heart: 0;
+  --rose-her: 0;
+  --rose-flash: 0;
+  --rose-ground-top: 0.118;
+  --rose-stand-x: 0.2;
+  --rose-figure: 0.215;
+  --rose-axis: 0;
+}
+
+.rose-film-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+/* ====== WORDS ====== */
+
+.rose-film-words {
+  position: absolute;
+  /* Over the heart of the picture, which the script reports in --rose-axis. */
+  left: calc(50% + var(--rose-axis) * 1%);
+  top: calc(env(safe-area-inset-top, 0px) + 7.5vh);
+  transform: translateX(-50%);
+  width: min(88vw, 60rem);
+  text-align: center;
+  z-index: 3;
+  font-size: clamp(1.4rem, 1.5vw + 0.95rem, 2.3rem);
+  /* The words leave with the picture. */
+  opacity: calc(1 - var(--rose-flash));
+}
+
+.rose-film-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 0;
+  margin: 0;
+  font-family: var(--font-content);
+  font-style: italic;
+  font-weight: 400;
+  font-size: 1em;
+  line-height: 1.4;
+  text-wrap: balance;
+  color: var(--gold-primary);
+  text-shadow:
+    0 0 22px color-mix(in srgb, var(--gold-subtle) 45%, transparent),
+    0 1px 14px color-mix(in srgb, var(--bg-void) 85%, transparent);
+  /* The script fades each line on the film's own clock. */
+  opacity: 0;
+  will-change: opacity, transform;
+}
+
+.rose-film-verse p {
+  margin: 0;
+}
+
+.rose-film-verse .rose-film-ink {
+  display: inline-block;
+}
+
+.rose-film-verse .rose-film-verse-line {
+  font-size: 0.92em;
+  line-height: 1.32;
+}
+
+.rose-film-verse .rose-film-verse-original {
+  font-size: max(0.6em, 0.84rem);
+  letter-spacing: 0.05em;
+  color: color-mix(in srgb, var(--gold-primary) 82%, transparent);
+  margin-top: 0.8rem;
+}
+
+/* The source stands apart: upright, small, widely spaced. */
+.rose-film-verse .rose-film-verse-ref {
+  font-style: normal;
+  font-size: max(0.4em, 0.66rem);
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--gold-primary) 66%, transparent);
+  margin-top: 0.95rem;
+}
+
+/* ====== THE THIRTY NAMES ====== */
+
+/* Each name waits beside its light on the horizon. The script places them. */
+.rose-film-names {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--font-content);
+  font-size: 1.02rem;
+  letter-spacing: 0.03em;
+  color: color-mix(in srgb, var(--text-primary) 78%, var(--gold-active));
+}
+
+.rose-film-names li {
+  position: absolute;
+  left: 0;
+  top: 0;
+  white-space: nowrap;
+  line-height: 1;
+  opacity: 0;
+  text-shadow: 0 0 10px color-mix(in srgb, var(--bg-void) 90%, transparent);
+  will-change: opacity, transform;
+}
+
+.rose-film-name-short {
+  display: none;
+}
+
+/* ====== FOREGROUND: Dante and Beatrice ====== */
+
+/* They stand on the crest of the film's ridge (GROUND in cosmos/rose-film/timeline.ts). */
+.rose-film-ground {
+  position: absolute;
+  left: calc(var(--rose-stand-x) * 100%);
+  bottom: calc(var(--rose-ground-top) * 100% - 0.9%);
+  height: calc(var(--rose-figure) * 100%);
+  aspect-ratio: 120 / 116;
+  z-index: 2;
+  opacity: calc(var(--rose-fade) * (1 - var(--rose-flash)));
+  transform: translateX(-50%);
+}
+
+.rose-film-ground svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.rfg-dark { fill: color-mix(in srgb, var(--bg-void) 55%, var(--utility-pure-black)); }
+.rfg-mask-on { fill: var(--utility-pure-white); }
+.rfg-mask-off { fill: var(--utility-pure-black); }
+/* He takes the rose's light as it grows: almost none before it is there. */
+.rfg-lit { opacity: calc(var(--rose-heart) * 1.12 - 0.07); }
+.rfg-fall-near { stop-color: color-mix(in srgb, var(--text-primary) 78%, var(--gold-active)); stop-opacity: 0.95; }
+.rfg-fall-mid { stop-color: color-mix(in srgb, var(--text-primary) 60%, var(--gold-active)); stop-opacity: 0.55; }
+.rfg-fall-far { stop-color: var(--gold-subtle); stop-opacity: 0.12; }
+.rfg-side-near { stop-color: color-mix(in srgb, var(--text-primary) 55%, var(--gold-active)); stop-opacity: 0.9; }
+.rfg-side-far { stop-color: var(--gold-active); stop-opacity: 0.35; }
+
+/* She is made of the film's own lights. The drawing gives them a soft body only. */
+.rfg-her { opacity: var(--rose-her); }
+.rfg-her-body { opacity: 0.42; }
+.rfg-light-top { stop-color: color-mix(in srgb, var(--text-primary) 94%, var(--gold-active)); stop-opacity: 0.95; }
+.rfg-light-mid { stop-color: color-mix(in srgb, var(--text-primary) 62%, var(--gold-active)); stop-opacity: 0.6; }
+.rfg-light-foot { stop-color: var(--gold-primary); stop-opacity: 0; }
+.rfg-halo-near { stop-color: var(--text-primary); stop-opacity: 0.3; }
+.rfg-halo-far { stop-color: var(--gold-active); stop-opacity: 0; }
+.rfg-pool-near { stop-color: color-mix(in srgb, var(--text-primary) 60%, var(--gold-active)); stop-opacity: 0.45; }
+.rfg-pool-far { stop-color: var(--gold-active); stop-opacity: 0; }
+
+/* ====== HAND-OFF ====== */
+
+.rose-film-flash {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  background: var(--bg-deep-space);
+  opacity: 0;
+}
+
+@media (max-width: 767px) {
+  .rose-film-words {
+    top: calc(env(safe-area-inset-top, 0px) + 9dvh);
+  }
+
+  .rose-film-names {
+    font-size: 0.78rem;
+  }
+
+  /* A narrow frame has room for the short forms only. */
+  .rose-film-name-full {
+    display: none;
+  }
+
+  .rose-film-name-short {
+    display: inline;
+  }
+}

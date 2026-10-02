@@ -158,7 +158,7 @@ const VARIANT_STYLES: Record<number, VariantStyle> = {
     coreOuter: 'radial-gradient(ellipse, rgba(255,242,170,0.3) 0%, rgba(255,228,110,0.1) 35%, rgba(255,215,80,0.03) 55%, transparent 75%)',
     coreShadow: '0 0 30px rgba(255,240,130,0.5), 0 0 80px rgba(255,225,90,0.25), 0 0 150px rgba(240,200,60,0.1)',
     coreInnerSize: '12vmin', coreOuterSize: '28vmin',
-    quote: { line: "L\u2019amor che move il sole e l\u2019altre stelle", sub: 'The love that moves the sun and the other stars', subDe: 'Die Liebe, die kreisen macht die Sonne wie die Sterne', ref: 'Dante, Paradiso XXXIII' },
+    quote: { line: "L\u2019amor che move il sole e l\u2019altre stelle", sub: 'The love that moves the sun and the other stars', subDe: 'Die Liebe, die die Sonne bewegt und die anderen Sterne', ref: 'Dante, Paradiso XXXIII' },
   },
   // V9 — Paradiso: V5 refined — smaller steady core, thinner bands
   9: {
