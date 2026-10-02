@@ -231,6 +231,54 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--ui-way) 26%, transparent) 16%, color-mix(in srgb, var(--ui-way) 26%, transparent) 84%, transparent);
 }
 
+/* ---- THE INSTRUMENTS' COLUMN, over the walk's two seats and as wide as
+   they are: the work's ways, its zoom, its whole, a film's pause and its
+   sheet, the work's measure lowest. Each control 44 px; + and − and pause
+   are drawn, their words stay their names ---- */
+#wing[data-film='cinema'] .vitrine .vitrine-tools { position: fixed; z-index: 3; display: flex; flex-direction: column; justify-content: flex-end;
+  align-items: stretch; gap: 10px; pointer-events: none; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools[hidden],
+#wing[data-film='cinema'] .vitrine .vitrine-tools-slot:not(:has(> [data-tool]:not([hidden]))) { display: none; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools-slot { display: flex; flex-direction: column; gap: 6px; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools-zoom { flex-direction: row; gap: 8px; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools-slot > * { pointer-events: auto; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass) {
+  position: relative; inset: auto; flex: 0 0 auto; box-sizing: border-box; min-width: 44px; max-width: none; width: 100%; height: 44px; min-height: 44px; margin: 0; padding: 0 6px;
+  border: 0; border-radius: var(--ui-r-control); background: color-mix(in srgb, var(--ui-ground-deep) 62%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong); color: var(--ui-text);
+  font: 400 .875rem/1.15 var(--sans); letter-spacing: 0; text-align: center; white-space: normal; cursor: pointer;
+}
+#wing[data-film='cinema'] .vitrine .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 2px; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way { font-size: .8125rem; color: var(--ui-text-quiet); }
+#wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way[hidden] { display: none; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way[aria-pressed='true'] {
+  color: var(--ui-text); background: color-mix(in srgb, var(--ui-text) 12%, var(--ui-ground-deep)); box-shadow: inset 0 0 0 1px var(--ui-text-quiet);
+}
+/* + and −, and pause or play, drawn */
+#wing[data-film='cinema'] .vitrine .vitrine-tools :is([data-tool='zoom'], [data-tool='play']) { width: 44px; flex: 0 0 44px; font-size: 0; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools [data-tool='zoom']::before,
+#wing[data-film='cinema'] .vitrine .vitrine-tools [data-zoom='nearer']::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 15px; height: 1.5px; background: var(--ui-text); translate: -50% -50%;
+}
+#wing[data-film='cinema'] .vitrine .vitrine-tools [data-zoom='nearer']::after { rotate: 90deg; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools [data-tool='play']::before {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 11px; height: 14px; translate: -50% -50%;
+  background: linear-gradient(var(--ui-text), var(--ui-text)) 0 0 / 3.5px 100% no-repeat, linear-gradient(var(--ui-text), var(--ui-text)) 100% 0 / 3.5px 100% no-repeat;
+}
+#wing[data-film='cinema'] .vitrine .vitrine-tools [data-tool='play'][aria-pressed='false']::before {
+  width: 12px; translate: -40% -50%; background: var(--ui-text); clip-path: polygon(0 0, 100% 50%, 0 100%);
+}
+#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass { width: 44px; padding: 0; overflow: hidden; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass .vitrine-folio-thumb { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-leaf { width: 20px; height: 24px; fill: none; stroke: var(--ui-way); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+/* the work's measure on the wall beside it, never on it: its length bounded by the column */
+#wing[data-film='cinema'] .vitrine .vitrine-tools .deep-rule {
+  position: static; flex-direction: column; align-items: flex-start; gap: 7px; padding: 0 0 2px; background: none; border: 0;
+}
+#wing[data-film='cinema'] .vitrine .vitrine-tools .deep-rule-label { font: 400 .8125rem/1 var(--sans); letter-spacing: .02em; color: var(--ui-text-quiet); text-shadow: none; }
+/* what the tools left behind in the card stands down */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-clock, .vitrine-views, .reader-zoom):not(:has(*)) { display: none; }
+
 /* ---- BESIDE: the label column on the wall ---- */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-card {
   display: flex; flex-direction: column; overflow: hidden; padding: 0;

@@ -738,6 +738,7 @@ export function createReaderPayload(options: {
       row.append(steps.previous)
       for (let index = 0; index < 4; index++) {
         const button = control('reader-way', '', () => chooseWay(index))
+        button.dataset['tool'] = 'way'
         button.hidden = true
         ways.push(button)
         row.append(button)

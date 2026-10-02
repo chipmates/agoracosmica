@@ -106,6 +106,8 @@ const tileMB = (pixels: number): number => pixels * 4 / 1e6
  * these bounds of the viewport's own width. */
 const RULE_SHORTEST = 24
 const RULE_SHARE = .42
+/** What a rule stood beside the work keeps clear of the work's edge. */
+const RULE_CLEAR = 8
 
 /** THE PAGE'S OWN NAME STANDS BESIDE THE PAGE, not on it, wherever the view
  * leaves a margin wide enough to read it in. Narrower than this and the name
@@ -230,7 +232,14 @@ export function createDeepPlatePayload(options: {
     const perCm = options.pxPerCm, zoom = magnification()
     if (!perCm || !(zoom > 0) || !options.words.rule.length) { rule.hidden = true; return }
     const steps = [...options.words.rule].sort((a, b) => a.cm - b.cm)
-    const most = root.clientWidth * RULE_SHARE
+    let most = root.clientWidth * RULE_SHARE
+    // A RULE STOOD BESIDE THE WORK by its window never reaches into it: its
+    // length ends short of the work's left edge as the glass shows it
+    if (!root.contains(rule)) {
+      const item = viewer?.world.getItemAt(0), box = root.getBoundingClientRect()
+      const edge = item && library ? Math.max(box.left, box.left + item.imageToViewerElementCoordinates(new library.Point(0, 0)).x) : box.left
+      most = Math.min(most, edge - RULE_CLEAR - rule.getBoundingClientRect().left)
+    }
     let chosen = steps[0]!
     for (const step of steps) if (step.cm * perCm * zoom <= most) chosen = step
     const width = chosen.cm * perCm * zoom
@@ -498,6 +507,8 @@ export function createDeepPlatePayload(options: {
     button.type = 'button'
     button.className = 'vitrine-control'
     button.dataset['zoom'] = role
+    // the window may stand the plate's own three by the hand that holds it; a detail stays with the words
+    if (role !== 'detail') button.dataset['tool'] = role === 'whole' ? 'whole' : 'zoom'
     button.textContent = label
     button.addEventListener('click', run)
     return button
@@ -523,6 +534,7 @@ export function createDeepPlatePayload(options: {
       stage.className = 'deep-plate-stage'
       rule = document.createElement('div')
       rule.className = 'deep-rule'
+      rule.dataset['tool'] = 'rule'
       rule.hidden = true
       ruleBar = document.createElement('div')
       ruleBar.className = 'deep-rule-bar'

@@ -307,6 +307,9 @@ export function createCyclePayload(options: {
       const text = video.paused ? options.words.play : options.words.pause
       if (play.textContent !== text) play.textContent = text
       play.setAttribute('aria-pressed', String(!video.paused))
+      // drawn as a glyph sideways, the word stays the button's name and its hint
+      if (host.cinema?.()) play.title = text
+      else play.removeAttribute('title')
     }
     if (step === active) return
     active = step
@@ -409,6 +412,7 @@ export function createCyclePayload(options: {
     const clock = make('div', 'vitrine-clock')
     play = make('button', 'vitrine-control vitrine-play', options.words.play)
     play.type = 'button'
+    play.dataset['tool'] = 'play'
     play.addEventListener('click', toggle, { signal })
     slider = make('input', 'vitrine-slider')
     slider.type = 'range'
@@ -469,6 +473,7 @@ export function createCyclePayload(options: {
     }
     if (options.sheet) {
       const sheet = folioDoor(next.element.ownerDocument, options.sheet, next.narrow, signal, () => root !== undefined)
+      sheet.dataset['tool'] = 'source'
       if (next.narrow) views.append(sheet)
       else next.element.append(sheet)
     }

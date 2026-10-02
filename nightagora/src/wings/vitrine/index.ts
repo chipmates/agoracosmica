@@ -221,9 +221,22 @@ export function createVitrine(options: {
   const lookArrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
   lookArrow.append(lookArrowPath)
   lookMore.append(lookMoreWord, lookArrow)
+  /* SIDEWAYS THE WORK'S OWN TOOLS STAND BY THE LEFT HAND, over the walk's
+     seats: a payload marks each with `data-tool`, and the window stands it
+     in its place here while the form stands, and back where it was after */
+  const tools = make('div', 'vitrine-tools')
+  tools.hidden = true
+  const TOOL_ORDER = ['way', 'zoom', 'whole', 'play', 'source', 'rule'] as const
+  const toolSlots = new Map<string, HTMLElement>(TOOL_ORDER.map(kind => {
+    const slot = make('div', `vitrine-tools-slot vitrine-tools-${kind}`)
+    tools.append(slot)
+    return [kind, slot]
+  }))
+  /** where each tool stood before the form took it, so it goes back to the same place */
+  const lent = new Map<HTMLElement, Comment>()
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
   // the viewport and its controls follow it in the tab order.
-  root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark)
+  root.append(style, scrim, hole, sheet, card, stage, payloadControls, shutMark, tools)
 
   /* THE CLOSE LOOK IN VARIANT B. On a wide stage, behind its own switch, the
    * work takes the whole picture box and every word about it stands in one
@@ -465,8 +478,43 @@ export function createVitrine(options: {
         place(card, { left: from, top: foot - asked, width: wide, height: asked })
       }
     }
+    gatherTools()
+    toolWatch.observe(root, { childList: true, subtree: true })
+    if (!tools.hidden) place(tools, { left: safe.left, top, width: CINEMA.tools - 8, height: frame.row.top - CINEMA.rowGap - top })
     paintLookMore()
   }
+  /** The payload's tools into the form's own places; one the form has no place for stays where it is. */
+  function gatherTools(): void {
+    if (!cinemaFrame) return
+    for (const node of root.querySelectorAll<HTMLElement>('[data-tool]')) {
+      if (lent.has(node)) continue
+      const slot = toolSlots.get(node.dataset['tool'] ?? '')
+      if (!slot) continue
+      const mark = document.createComment('')
+      node.before(mark)
+      lent.set(node, mark)
+      slot.append(node)
+      // a step drawn as a glyph keeps its word as its name and its hint
+      if (node.dataset['tool'] === 'zoom') {
+        const word = node.textContent?.trim() ?? ''
+        if (!node.hasAttribute('aria-label')) { node.setAttribute('aria-label', word); node.dataset['toolNamed'] = '' }
+        if (!node.title) { node.title = node.getAttribute('aria-label') ?? word; node.dataset['toolHint'] = '' }
+      }
+    }
+    tools.hidden = !tools.querySelector('[data-tool]')
+  }
+  /** Every tool back where its payload put it. */
+  function returnTools(): void {
+    for (const [node, mark] of lent) {
+      if (node.dataset['toolNamed'] !== undefined) { node.removeAttribute('aria-label'); delete node.dataset['toolNamed'] }
+      if (node.dataset['toolHint'] !== undefined) { node.removeAttribute('title'); delete node.dataset['toolHint'] }
+      if (mark.isConnected) mark.replaceWith(node)
+      else { mark.remove(); node.remove() }
+    }
+    lent.clear()
+    tools.hidden = true
+  }
+  const toolWatch = new MutationObserver(() => gatherTools())
   /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
   function paintLookMore(): void {
     const frame = cinemaFrame
@@ -489,6 +537,8 @@ export function createVitrine(options: {
   function leaveCinema(): void {
     for (const key of ['form', 'lookForm', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover']) delete root.dataset[key]
     lookMore.remove()
+    toolWatch.disconnect()
+    returnTools()
     cinemaFrame = null
     nameIt(namingText.textContent ?? '', named.certainty)
   }
@@ -811,6 +861,8 @@ export function createVitrine(options: {
   }
   /** The payload leaves the stage as it found it, and the room draws again. */
   function unmountPayload(): void {
+    // the tools go home first, so the payload takes down its own
+    returnTools()
     const payload = exhibit?.payload
     if (payload) {
       try { payload.unmount() } catch (error) { console.error(error) }
@@ -995,6 +1047,7 @@ export function createVitrine(options: {
       band?.dispose()
       band = null
       wordsResized.disconnect()
+      toolWatch.disconnect()
       leaving.abort()
       delete document.documentElement.dataset['naWindow']
       root.remove()

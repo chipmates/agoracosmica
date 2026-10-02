@@ -211,6 +211,9 @@ export function createShowpiecePayload(options: {
       const word = playing ? options.words.pause : options.words.play
       if (play.textContent !== word) play.textContent = word
       play.setAttribute('aria-pressed', String(playing))
+      // drawn as a glyph sideways, the word stays the button's name and its hint
+      if (host.cinema?.()) play.title = word
+      else play.removeAttribute('title')
     }
     const at = lineAt(t)
     if (at === line) return
@@ -253,6 +256,7 @@ export function createShowpiecePayload(options: {
     const clock = make(doc, 'div', 'vitrine-clock')
     play = make(doc, 'button', 'vitrine-control vitrine-play', options.words.play)
     play.type = 'button'
+    play.dataset['tool'] = 'play'
     play.setAttribute('aria-pressed', 'false')
     play.addEventListener('click', toggle, { signal })
     slider = make(doc, 'input', 'vitrine-slider')
@@ -281,6 +285,7 @@ export function createShowpiecePayload(options: {
     if (options.sheet) {
       door = folioDoor(doc, options.sheet, next.narrow, signal, () => root !== undefined)
       door.classList.add('showpiece-door')
+      door.dataset['tool'] = 'source'
       // on the phone the sheet's glass closes the clock's own row, so the card keeps its peek
       if (next.narrow) clock.append(door)
       else next.element.append(door)
