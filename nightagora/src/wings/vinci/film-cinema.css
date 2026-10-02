@@ -249,7 +249,11 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   box-shadow: inset 0 0 0 1px var(--ui-line-strong), 0 0 0 1px color-mix(in srgb, var(--ui-ground-deep) 72%, transparent); color: var(--ui-text);
   font: 400 .875rem/1.15 var(--sans); letter-spacing: 0; text-align: center; white-space: normal; cursor: pointer;
 }
-#wing[data-film='cinema'] .vitrine[data-look-film] .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass) { background: color-mix(in srgb, var(--ui-ground-deep) 84%, transparent); }
+/* over a lit film the face is firmer and the ring brighter, so the edge holds 3 to 1 on either side of it */
+#wing[data-film='cinema'] .vitrine[data-look-film] .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass) {
+  background: color-mix(in srgb, var(--ui-ground-deep) 84%, transparent);
+  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-text-quiet) 76%, transparent), 0 0 0 1px color-mix(in srgb, var(--ui-ground-deep) 72%, transparent);
+}
 #wing[data-film='cinema'] .vitrine .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 2px; }
 #wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way { font-size: .8125rem; color: var(--ui-text-quiet); }
 #wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way[hidden] { display: none; }
