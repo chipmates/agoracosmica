@@ -660,7 +660,7 @@ void main() {
     c += (uBlue * 0.012 + haze * 0.03 * uHeartLight * below) * mist;
     // Cloud banks lie behind the rock and take the rose's light on their crowns.
     float billow = fbm(vec2(xs * 4.2 + uT * 0.006, vUv.y * 9.0 + 1.0));
-    float bank = smoothstep(0.42, 0.7, billow + 0.5 * exp(-max(-depth, 0.0) * 16.0)) * exp(-max(-depth, 0.0) * 11.0) * step(depth, 2.0 * uPixel);
+    float bank = smoothstep(0.3, 1.0, 1.7 * billow - 0.35 + 0.45 * exp(-max(-depth, 0.0) * 16.0)) * exp(-max(-depth, 0.0) * 11.0) * step(depth, 2.0 * uPixel);
     c += (uBlue * 0.02 + haze * 0.05 * uHeartLight * (0.4 + 0.6 * below)) * bank;
     float crest = exp(-max(depth, 0.0) * 150.0);
     float slope = exp(-max(depth, 0.0) * 14.0);

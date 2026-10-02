@@ -717,8 +717,9 @@ export function createRoseFilm(
     for (let i = 0; i < LIGHTS; i++) {
       const seat = i < SEAT_COUNT ? SEATS[i] : null;
       // The thirty kindle along the far ranges. She lands where her drawing stands, at the height of her chest.
-      const x = seat ? seat.startX : g.standX + (FIGURE_BOX.beatriceX - 0.5) * boxW;
-      const y = seat ? g.top + 0.062 + 0.026 * ((i * 7) % 4) : g.top + g.figure * FIGURE_BOX.chestY;
+      // No rows and no even steps: each light has its own place over the ranges.
+      const x = seat ? seat.startX + 0.022 * (((seat.seed * 7.31) % 1) - 0.5) : g.standX + (FIGURE_BOX.beatriceX - 0.5) * boxW;
+      const y = seat ? g.top + 0.058 + 0.09 * ((seat.seed * 3.17) % 1) : g.top + g.figure * FIGURE_BOX.chestY;
       for (let j = 0; j < SEAT_SUBS; j++) {
         const k = (i * SEAT_SUBS + j) * 4;
         seatStart[k] = x;

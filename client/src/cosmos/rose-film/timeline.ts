@@ -129,16 +129,16 @@ function lookup(table: Float32Array, t: number): number {
 }
 
 const MORPH_START = 6.3;
-const MORPH_END = 10.3;
+const MORPH_END = 9.8;
 
 export function filmState(t: number, layout: FilmLayout): FilmState {
   const p = layout.portrait;
   const bend = smoother(2.6, 6.4, t);
   // The rose comes forward as it forms, until it fills the frame above the two.
   const approach = smooth(7.2, 12.2, t);
-  const tableau = smoother(8.6, 12.6, t);
+  const tableau = smoother(8.2, 12.0, t);
   const zoomOpen = p ? 1.31 : 2.77;
-  const zoomTableau = p ? 1.2 : 1.56;
+  const zoomTableau = p ? 1.12 : 1.52;
   return {
     fade: smooth(0, 0.35, t),
     bend,
@@ -149,19 +149,19 @@ export function filmState(t: number, layout: FilmLayout): FilmState {
     morph: lin(MORPH_START, MORPH_END, t),
     // The tiers fill on this clock: from the round inwards, then the wreath outside it.
     bloom: Math.min(1.3, Math.max(0, (t - MORPH_START) / (MORPH_END - MORPH_START))),
-    body: smooth(6.6, 8.4, t),
+    body: smooth(6.2, 7.8, t),
     rot: lookup(ROT_TABLE, t),
     starRot: lookup(STAR_TABLE, t),
     zoom: mix(mix(zoomOpen, 1, smoother(2.2, 6.8, t)), zoomTableau, approach),
     // The ring takes the same share of the frame's height on a phone and on a tablet held upright.
     halfShort: p ? Math.max(1.7, 3.13 * layout.aspect) : 3.8,
     // The round stands high above the seeker, then the rose settles around the frame's middle.
-    centerY: p ? mix(0.24, 0.02, tableau) : mix(0.32, -0.075, tableau),
+    centerY: p ? mix(0.24, -0.005, tableau) : mix(0.32, -0.105, tableau),
     centerX: 0,
     heart: 0.1 + 0.5 * smooth(6, 7.6, t) + 0.4 * smooth(7.6, 11.5, t),
     // The first point of light stands until the sun takes its place.
-    point: 1 - smooth(9.0, 10.2, t),
-    sun: smooth(9.0, 11.4, t),
+    point: 1 - smooth(8.6, 9.8, t),
+    sun: smooth(8.6, 10.9, t),
     rays: (p ? 0.22 : 0.3) * smooth(8.5, 12.5, t),
     flash: smooth(17.1, FILM_DURATION, t),
     // Lines behind moving light: long while the river bends, short as it gathers, gone in the rose.

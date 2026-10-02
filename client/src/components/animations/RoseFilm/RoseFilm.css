@@ -31,7 +31,7 @@
   position: absolute;
   /* Over the heart of the picture, which the script reports in --rose-axis. */
   left: calc(50% + var(--rose-axis) * 1%);
-  top: calc(env(safe-area-inset-top, 0px) + 7.5vh);
+  top: calc(env(safe-area-inset-top, 0px) + 6.5vh);
   transform: translateX(-50%);
   width: min(88vw, 60rem);
   text-align: center;
