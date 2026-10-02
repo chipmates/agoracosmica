@@ -205,6 +205,9 @@ export function createReaderPayload(options: {
   const cellOf: number[] = []
   const ways: HTMLButtonElement[] = []
   const steps: { previous?: HTMLButtonElement; next?: HTMLButtonElement } = {}
+  /** SIDEWAYS THE PAGER'S MIDDLE: where the side stands in its book, which
+      opens the strip of its leaves; it stands only while the form does */
+  let count: HTMLButtonElement | undefined
   const listening = new AbortController()
 
   const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, text?: string): HTMLElementTagNameMap[K] => {
@@ -401,6 +404,7 @@ export function createReaderPayload(options: {
     // The two that step the book are painted before the label reads them,
     // or the band would take the last side's state for this one's.
     paintControls()
+    paintCount()
     // THE CARD IS THE SIDE'S, not the side the window opened at: a wall of
     // sheets renames its card as the hand walks it.
     // where the side stands in its book goes with the name: a label that
@@ -481,6 +485,18 @@ export function createReaderPayload(options: {
       if (step && there && (there.volume !== here?.volume || there.part !== here?.part)) step.dataset['title'] = there.label
       else if (step) delete step.dataset['title']
     }
+  }
+
+  /** The count sideways says the place the reader's own row would, and opens the leaves behind it. */
+  function paintCount(): void {
+    if (!count || !host || !book) return
+    const sideways = host.cinema?.() === true
+    const inside = volume(), place = inside.indexOf(at), here = side()
+    const leaves = Boolean(shelf && !shelf.hidden && shelf.isConnected)
+    if (!sideways || !leaves || inside.length < 2 || !here) { count.remove(); return }
+    count.textContent = here.leaf ?? options.words.place.replace('{n}', String(place + 1)).replace('{total}', String(inside.length))
+    count.setAttribute('aria-expanded', String(shelf?.hasAttribute('data-open') ?? false))
+    if (!count.isConnected) host.controls.append(count)
   }
 
   function control(cls: string, label: string, run: () => void, name?: string): HTMLButtonElement {
@@ -735,6 +751,18 @@ export function createReaderPayload(options: {
       const row = make('div', 'reader-row')
       steps.previous = control('vitrine-step', '‹', () => go(at - 1), options.words.previous)
       steps.next = control('vitrine-step', '›', () => go(at + 1), options.words.next)
+      // sideways the two that step the book stand in the label's pager, round the count
+      for (const [step, page] of [[steps.previous, 'previous'], [steps.next, 'next']] as const) { step.dataset['tool'] = 'page'; step.dataset['page'] = page }
+      count = control('reader-count', '', () => {
+        if (!shelf) return
+        shelf.toggleAttribute('data-open')
+        paintCount()
+        markShelf()
+      })
+      count.dataset['tool'] = 'count'
+      shelf.dataset['tool'] = 'leaves'
+      shelf.id = `${next.element.id || 'vitrine'}-leaves`
+      count.setAttribute('aria-controls', shelf.id)
       row.append(steps.previous)
       for (let index = 0; index < 4; index++) {
         const button = control('reader-way', '', () => chooseWay(index))
@@ -793,6 +821,7 @@ export function createReaderPayload(options: {
     layout() {
       dockShelf()
       plate?.layout?.()
+      paintCount()
       markShelf()
       // The card rose or went back down: the control that moves it says
       // which way it now goes.
@@ -819,6 +848,8 @@ export function createReaderPayload(options: {
       options.room?.leave()
       root?.remove()
       shelf?.remove()
+      count?.remove()
+      count = undefined
       root = undefined; stage = undefined; ground = undefined; shelf = undefined; beside = undefined; zoomRow = undefined
       cells.length = 0
       ways.length = 0

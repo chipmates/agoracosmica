@@ -236,6 +236,11 @@ export function createVitrine(options: {
   const clockFoot = make('div', 'vitrine-clockfoot')
   clockFoot.hidden = true
   toolSlots.set('clock', clockFoot)
+  /** A BOOK'S PAGER under its seat in the label column: the step back, the
+   * count, the step on, and the strip of its leaves behind the count */
+  const pager = make('div', 'vitrine-pager')
+  pager.hidden = true
+  for (const kind of ['page', 'count', 'leaves']) toolSlots.set(kind, pager)
   /** where each tool stood before the form took it, so it goes back to the same place */
   const lent = new Map<HTMLElement, Comment>()
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
@@ -317,7 +322,7 @@ export function createVitrine(options: {
     if (laidAs !== as) {
       if (as !== 'cinema') leaveCinema()
       laidAs = as
-      if (frame) body.insertBefore(payloadControls, words)
+      if (frame) { body.insertBefore(payloadControls, words); seat.after(pager) }
       else if (narrow) card.insertBefore(payloadControls, controls)
       else if (!inBand()) root.append(payloadControls)
     }
@@ -533,8 +538,18 @@ export function createVitrine(options: {
       }
     }
     tools.hidden = !tools.querySelector('[data-tool]')
+    arrangePager()
     // a clock that arrives after the look was laid out lays the film's foot again
     if (clocked && !root.hasAttribute('data-look-film')) queueMicrotask(() => layout())
+  }
+  /** The pager's middle is the book's own count, or the window's where the book names none. */
+  function arrangePager(): void {
+    const pages = [...pager.querySelectorAll<HTMLElement>('[data-tool="page"]')].filter(page => !page.hidden)
+    const own = pager.querySelector<HTMLElement>('[data-tool="count"]')
+    const borrow = pages.length > 0 && !own && !countButton.hidden
+    if (borrow && countButton.parentElement !== pager) pager.append(countButton)
+    else if (!borrow && countButton.parentElement !== seat) seat.append(countButton)
+    pager.hidden = pages.length === 0
   }
   /** Every tool back where its payload put it. */
   function returnTools(): void {
@@ -547,6 +562,8 @@ export function createVitrine(options: {
     lent.clear()
     tools.hidden = true
     clockFoot.hidden = true
+    if (countButton.parentElement !== seat) seat.append(countButton)
+    pager.hidden = true
   }
   const toolWatch = new MutationObserver(() => gatherTools())
   /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
@@ -578,6 +595,7 @@ export function createVitrine(options: {
     lookMore.remove()
     toolWatch.disconnect()
     returnTools()
+    pager.remove()
     cinemaFrame = null
     nameIt(namingText.textContent ?? '', named.certainty)
   }
@@ -660,6 +678,7 @@ export function createVitrine(options: {
     countButton.textContent = count
     countButton.hidden = !count
     countButton.disabled = !exhibit?.onCount
+    if (cinemaFrame) arrangePager()
   }
   countButton.addEventListener('click', () => exhibit?.onCount?.())
 

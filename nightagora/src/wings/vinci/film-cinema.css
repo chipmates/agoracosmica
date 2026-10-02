@@ -351,6 +351,34 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-certainty { font-size: .8125rem; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-rule-label { font-size: .8125rem; }
+/* a book's pager under its seat: the step back, the count, the step on; the leaves behind the count */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-pager { display: flex; flex-wrap: wrap; align-items: center; gap: 0 2px; margin: -4px 0 8px; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-pager[hidden] { display: none; }
+#wing[data-film='cinema'] .vitrine-pager [data-page='previous'] { order: 1; }
+#wing[data-film='cinema'] .vitrine-pager :is(.vitrine-count, [data-tool='count']) { order: 2; }
+#wing[data-film='cinema'] .vitrine-pager [data-page='next'] { order: 3; }
+#wing[data-film='cinema'] .vitrine-pager [data-tool='leaves'] { order: 4; flex: 1 0 100%; }
+#wing[data-film='cinema'] .vitrine-pager .vitrine-step {
+  flex: 0 0 44px; width: 44px; min-width: 44px; height: 44px; margin: 0; padding: 0; border: 0; border-radius: var(--ui-r-control);
+  background: none; box-shadow: none; font: 400 1.25rem/1 var(--sans); color: var(--ui-text); cursor: pointer;
+}
+#wing[data-film='cinema'] .vitrine-pager .vitrine-step[hidden] { display: none; }
+#wing[data-film='cinema'] .vitrine-pager .vitrine-step:disabled { color: var(--ui-text-quiet); opacity: .45; cursor: default; }
+#wing[data-film='cinema'] .vitrine-pager .vitrine-step:focus-visible { outline: 1px solid var(--ui-way); outline-offset: -2px; }
+#wing[data-film='cinema'] .vitrine-pager :is(.vitrine-count, [data-tool='count']) {
+  flex: 0 1 auto; min-width: 0; min-height: 44px; height: 44px; margin: 0; padding: 0 6px; border: 0; border-radius: 0; background: none; box-shadow: none;
+  font: 400 .875rem/44px var(--sans); color: var(--ui-text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  text-decoration: underline; text-decoration-color: var(--ui-line-strong); text-underline-offset: 4px; text-decoration-thickness: 1px; cursor: pointer;
+}
+#wing[data-film='cinema'] .vitrine-pager .vitrine-count:disabled { text-decoration: none; cursor: default; }
+#wing[data-film='cinema'] .vitrine-pager [data-tool='leaves']:not([data-open]) { display: none; }
+#wing[data-film='cinema'] .vitrine-pager [data-tool='leaves'] { position: static; height: 64px; margin: 6px 0 4px; padding: 0; gap: 4px; }
+#wing[data-film='cinema'] .vitrine-pager .reader-page { width: 44px; min-width: 44px; height: 64px; }
+#wing[data-film='cinema'] .vitrine-pager :is(.reader-absence, .reader-part) { height: 64px; }
+/* the place the pager says, said once */
+#wing[data-film='cinema'] .vitrine[data-form='cinema']:has(.vitrine-pager:not([hidden])) .reader-place { display: none; }
+/* the reader's row, its tools lent out, stands down */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .reader-row:not(:has(> :not([hidden]))) { display: none; }
 /* the column holds the label whole: its second door, for a card that folds, stands down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .picture-label-rest { display: block; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .picture-label-more { display: none; }
