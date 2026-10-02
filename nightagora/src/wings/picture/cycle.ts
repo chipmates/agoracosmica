@@ -100,7 +100,10 @@ export function createCyclePayload(options: {
     const f = at()
     if (!f) return
     const box = islandFit(host)
-    const scale = Math.min(box.width / f.fit[0], box.height / f.fit[1])
+    // on the phone the frame always covers the glass's width: a short glass (a browser's own bar
+    // showing) would otherwise shrink it to a column with the room standing beside it
+    const cover = host.narrow ? host.element.getBoundingClientRect().width / (f.master[0] / f.dpr) : 0
+    const scale = Math.max(cover, Math.min(box.width / f.fit[0], box.height / f.fit[1]))
     const width = (f.master[0] / f.dpr) * scale, height = (f.master[1] / f.dpr) * scale
     Object.assign(root.style, { left: `${box.left + (box.width - width) / 2}px`, top: `${box.top + (box.height - height) / 2}px`,
       width: `${width}px`, height: `${height}px` })
