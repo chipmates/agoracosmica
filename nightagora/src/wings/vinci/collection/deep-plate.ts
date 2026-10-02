@@ -9,7 +9,7 @@
 import { lang } from '../../content'
 import { assetAddress, assetPyramidBase } from '../../../stack/materials'
 import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../../manifest'
-import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlatePayload, type DeepPlateSource, type DeepPlateTier } from '../../vitrine/deep-plate'
+import { createDeepPlatePayload, type DeepPlateDetail, type DeepPlatePayload, type DeepPlateSource, type DeepPlateTier, type DeepPlateWords } from '../../vitrine/deep-plate'
 import type { DeepTilePyramid } from '../../vitrine/deep-viewer'
 import type { VitrineExhibit, VitrineRect } from '../../vitrine'
 import { validatePaintingRecord } from '../pictures/policy'
@@ -55,6 +55,14 @@ function centimetres(label: string): number {
  * needs a control. */
 export const NEARER: Words = CARDS.controls.picture.zoom_in
 export const FURTHER: Words = CARDS.controls.picture.zoom_out
+
+/** The deep viewer's words as the hang's paintings read them, for a plate
+ * the register does not hold. */
+export const vinciPlateWords = (): DeepPlateWords => {
+  const language = lang()
+  return { whole: CARDS.controls.machine.viewpoints[0]![language], nearer: NEARER[language],
+    further: FURTHER[language], ceiling: CARDS.zoom_ceiling[language], rule: RULE }
+}
 
 /** What is on the plate, in the page's language, for a visitor who cannot
  * see it. Null where no one has written it yet. */

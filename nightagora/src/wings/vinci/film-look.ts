@@ -15,7 +15,7 @@ import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePa
   vinciLine, vinciLimits, vinciMachineCard, vinciMachineClockWords, vinciMachineSheet, vinciMachineSteps, vinciManuscriptWords, vinciPlaceCard,
   vinciPlaceTitle, vinciRoomName, vinciSheetRecords, vinciSheetSides, vinciShowpiece, vinciWorkTitle,
   VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCertainty, type VinciPlaceId, type VinciShowpiece } from './collection/close-look'
-import { createVinciPaintingView } from './collection/deep-plate'
+import { createVinciPaintingView, vinciPlateWords } from './collection/deep-plate'
 import { hangCatalogue } from './collection/catalogue'
 import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF } from './film-look-kinds'
 import { GRAVE_DEATHBED } from './grave/placement'
@@ -29,6 +29,7 @@ import type { PictureBox, PictureFraming } from '../picture/seam'
 import type { TurntablePayload } from '../vitrine/turntable'
 import { vinciLeafSource } from './collection/deep-plate'
 import { createPlatePayload } from '../vitrine/picture'
+import { createDeepPlatePayload } from '../vitrine/deep-plate'
 import { createReaderPayload as createLeafReader } from '../vitrine/reader'
 import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
 import studyPageMap from './table/data/msb-pages.json?raw'
@@ -294,10 +295,16 @@ export function createFilmLook(h: FilmLookHost) {
     const record = (): void => h.openRecord(id, { en: place.title, de: place.title }, place.certainty, host => place.record(host))
     /* ON THE PHONE THE PLACE TAKES THE GLASS, as every other work does: the
        held frame (the stones) or the painting above, the card folded under */
-    const payload = painting
-      ? createPlatePayload({ title: place.title, aspect: GRAVE_DEATHBED.imageWidth / GRAVE_DEATHBED.imageHeight, window: null, standing: h.standing,
-        fill: h.narrow(), ...(plate ? { src: assetAddress(plate) } : {}) })
-      : { ...createPlacePayload({ title: place.title, standing: h.standing }), fill: h.narrow() }
+    // the painting at the grave reads as the hang's paintings do: its zoom and its rule, from its measured canvas
+    const payload = painting && plate
+      ? Object.assign(createDeepPlatePayload({ title: place.title, window: null, words: vinciPlateWords(),
+        source: { pyramid: null, file: assetAddress(plate), width: GRAVE_DEATHBED.imageWidth, height: GRAVE_DEATHBED.imageHeight },
+        from: () => null, standing: h.standing, tier,
+        pxPerCm: Math.max(GRAVE_DEATHBED.imageWidth / (GRAVE_DEATHBED.originalWidth * 100), GRAVE_DEATHBED.imageHeight / (GRAVE_DEATHBED.originalHeight * 100)) }),
+      h.narrow() ? { fill: true } : {})
+      : painting
+        ? createPlatePayload({ title: place.title, aspect: GRAVE_DEATHBED.imageWidth / GRAVE_DEATHBED.imageHeight, window: null, standing: h.standing, fill: h.narrow() })
+        : { ...createPlacePayload({ title: place.title, standing: h.standing }), fill: h.narrow() }
     const { set, walk } = stand(id)
     h.standDown(true)
     openLook({ id, title: place.title, line: vinciLine(id), card: place.card, after: place.after, payload,
