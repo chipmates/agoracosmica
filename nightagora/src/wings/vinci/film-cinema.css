@@ -312,6 +312,9 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-certainty { font-size: .8125rem; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-rule-label { font-size: .8125rem; }
+/* the column holds the label whole: its second door, for a card that folds, stands down */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .picture-label-rest { display: block; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .picture-label-more { display: none; }
 /* the work's own details as quiet framed words: a press moves the work there */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body > .vitrine-payload-controls {
   position: static; display: flex; flex-wrap: wrap; gap: 8px; margin: 2px 0 14px; padding: 0; justify-content: flex-start;
