@@ -161,6 +161,8 @@ export function createCyclePayload(options: {
   let ground: HTMLCanvasElement | undefined, lane: HTMLCanvasElement | undefined
   /** where the frame stands now, and the part of the screen its ground fills where it cannot cover */
   let fitted: CycleFit | null = null, groundAt: PictureBox | null = null, groundAsked = false
+  /** what the last fit was laid out from, so a frame that changes nothing writes nothing */
+  let laid = '', grounded = false, groundedFor = ''
   let outline: HTMLImageElement | undefined
   let play: HTMLButtonElement | undefined, slider: HTMLInputElement | undefined
   let stepButtons: HTMLButtonElement[] = []
@@ -198,9 +200,17 @@ export function createCyclePayload(options: {
     const f = at()
     if (!f) return
     // a layer that paints a ground of its own holds the frame on it (the cinema form): nothing to cover
-    const grounded = /^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor) === false
+    const size = `${innerWidth}x${innerHeight}`
+    if (size !== groundedFor) {
+      groundedFor = size
+      grounded = !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor)
+    }
     const cover = grounded ? null : coverOf(host)
-    fitted = cycleFit(f, islandFit(host), cover)
+    const next = cycleFit(f, islandFit(host), cover)
+    const key = [framing, next.left, next.top, next.width, next.height, cover?.left, cover?.top, cover?.width, cover?.height].join()
+    if (key === laid) return
+    laid = key
+    fitted = next
     Object.assign(root.style, { left: `${fitted.left}px`, top: `${fitted.top}px`, width: `${fitted.width}px`, height: `${fitted.height}px` })
     if (fitted.covers || !cover) groundAt = null
     else if (!host.narrow) groundAt = cover
@@ -300,6 +310,7 @@ export function createCyclePayload(options: {
   function build(next: VitrinePayloadHost): void {
     const f = at()
     root = make('div', 'na-cycle')
+    laid = ''; groundedFor = ''
     root.setAttribute('aria-hidden', 'true')
     const style = make('style', '')
     style.textContent = cycleCss
