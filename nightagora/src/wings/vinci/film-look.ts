@@ -19,6 +19,7 @@ import { createVinciPaintingView, vinciPlateWords } from './collection/deep-plat
 import { hangCatalogue } from './collection/catalogue'
 import { filmLookKind, FILM_DEATHBED as DEATHBED, FILM_DEATHBED_PLATE, FILM_EDITION_WHOLE as EDITION_WHOLE, FILM_PLACES as PLACES, FILM_STUDY_LEAF as VINCI_STUDY_LEAF } from './film-look-kinds'
 import { GRAVE_DEATHBED } from './grave/placement'
+import { GRAVE_LIGHT } from './grave/light-words'
 import { keepTogetherIn } from './keep-together'
 import { createPlacePayload } from '../vitrine/place'
 import type { VitrineExhibit, VitrinePlace } from '../vitrine/types'
@@ -292,6 +293,18 @@ export function createFilmLook(h: FilmLookHost) {
     const painting = id === DEATHBED
     const plate = painting ? assets?.byId.get(FILM_DEATHBED_PLATE) : undefined
     const place = painting ? vinciDeathbedCard(placeCertainty('conjectural'), plate?.licence ?? null) : vinciPlaceCard(id as VinciPlaceId, placeCertainty)
+    // the light model's card and record read its own words, which the bench's file cannot carry
+    if (id === 'grave-diagram') {
+      for (const line of place.card[0]?.querySelectorAll('p') ?? []) line.textContent = GRAVE_LIGHT[lang()]
+      const record = place.record
+      place.record = host => {
+        record(host)
+        // the record closes on the card's own lines, one paragraph per language
+        for (const line of [...host.querySelectorAll<HTMLElement>('.vinci-record > p[lang]')].slice(-2)) {
+          line.textContent = GRAVE_LIGHT[line.lang === 'de' ? 'de' : 'en']
+        }
+      }
+    }
     const record = (): void => h.openRecord(id, { en: place.title, de: place.title }, place.certainty, host => place.record(host))
     /* ON THE PHONE THE PLACE TAKES THE GLASS, as every other work does: the
        held frame (the stones) or the painting above, the card folded under */
