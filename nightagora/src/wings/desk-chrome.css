@@ -8,16 +8,16 @@
   --desk-g: max(64px, (100vw - 1680px) / 2);
   --desk-foot: clamp(48px, 7.1vh, 72px);
   --desk-read: clamp(560px, 53vw, 780px);
-  --desk-title: #fff5e3;
-  --desk-clock: #ecd09a;
-  --desk-quiet: #b9bdc9;
+  --desk-title: var(--ui-text);
+  --desk-clock: var(--ui-text-quiet);
+  --desk-quiet: var(--ui-text-quiet);
   /* the wing's own four, cut for the certainty classes it already carries */
-  --desk-sure-documented: #8cba8b;
-  --desk-sure-reconstructed: #d2a557;
-  --desk-sure-conjectural: #df9385;
-  --desk-sure-unknown: #a8b3b7;
-  --desk-glass: color-mix(in srgb, var(--na-abyss) 74%, transparent);
-  --desk-edge: color-mix(in srgb, var(--na-starlight) 32%, transparent);
+  --desk-sure-documented: var(--ui-sure-documented);
+  --desk-sure-reconstructed: var(--ui-sure-reconstructed);
+  --desk-sure-conjectural: var(--ui-sure-conjectural);
+  --desk-sure-unknown: var(--ui-sure-unknown);
+  --desk-glass: color-mix(in srgb, var(--ui-ground) 86%, transparent);
+  --desk-edge: var(--ui-line-strong);
   --desk-press: 90ms;
   --desk-release: 160ms;
 }
@@ -249,7 +249,7 @@
   height: 22px;
   padding: 0 6px;
   border-radius: 4px;
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-starlight) 34%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
   font: 500 0.875rem/20px var(--sans);
   color: var(--desk-quiet);
   text-align: center;
@@ -269,10 +269,10 @@
   padding: 20px 24px 16px;
   border-radius: 3px;
   background: linear-gradient(
-    color-mix(in srgb, #0e1736 97%, transparent),
+    color-mix(in srgb, var(--ui-ground-sheet) 97%, transparent),
     color-mix(in srgb, var(--na-abyss) 98%, transparent) 70%);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 34%, transparent),
-    0 22px 64px color-mix(in srgb, #020308 55%, transparent);
+  box-shadow: inset 0 0 0 1px var(--ui-line),
+    0 22px 64px color-mix(in srgb, var(--ui-ground-deep) 55%, transparent);
   color: var(--na-starlight);
   pointer-events: auto;
 }
@@ -376,10 +376,9 @@
   gap: 20px;
   border: 0;
   border-radius: 3px;
-  background:
-    linear-gradient(color-mix(in srgb, var(--na-gold) 17%, transparent), color-mix(in srgb, var(--na-gold) 17%, transparent)),
-    color-mix(in srgb, var(--na-abyss) 80%, transparent);
-  box-shadow: inset 0 0 0 1px var(--na-gold);
+  /* a raised field on the wall inside its gold ring: the one lighter plaque in the band */
+  background: var(--ui-ground-raised);
+  box-shadow: inset 0 0 0 1px var(--ui-way);
   cursor: pointer;
   text-align: left;
   transition: background var(--desk-release) ease, transform var(--desk-release) ease;
@@ -411,10 +410,10 @@
   color: var(--na-gold);
 }
 .desk-on-arrow .desk-ic { width: 18px; height: 18px; stroke-width: 1.8; }
-.desk-on:hover { background: linear-gradient(color-mix(in srgb, var(--na-gold) 27%, transparent), color-mix(in srgb, var(--na-gold) 27%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent); }
+.desk-on:hover { background: color-mix(in srgb, var(--ui-way) 10%, var(--ui-ground-raised)); }
 .desk-on:active {
   transform: scale(0.98);
-  background: linear-gradient(color-mix(in srgb, var(--na-gold) 36%, transparent), color-mix(in srgb, var(--na-gold) 36%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent);
+  background: color-mix(in srgb, var(--ui-way) 20%, var(--ui-ground-raised));
   transition-duration: var(--desk-press);
 }
 .desk-on:disabled { opacity: 0.45; cursor: default; }
@@ -576,8 +575,8 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
 
 /* ================= THE STAGE AND THE LABEL BAND =========================
    The picture keeps a box of its own and the museum stands under it: the
-   canvas is the window less the band, and the band is solid night with one
-   gold hairline at its top edge. Nothing of the museum is laid over the
+   canvas is the window less the band, and the band is solid wall with one
+   lit hairline at its top edge. Nothing of the museum is laid over the
    picture here, so this block draws no ground, no glass and no shade. */
 #wing[data-desk~='stage'] {
   /* THE LADDER THE BAND IS SIZED BY: air, the name row, two rows of the line
@@ -594,13 +593,13 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
 #wing[data-desk~='stage'] .desk-low {
   padding: var(--desk-band-air) var(--desk-g) var(--desk-band-foot);
   gap: 24px;
-  background: var(--na-abyss);
+  background: var(--ui-ground);
   /* the band is wall, not glass: a hand that lands on it is not a hand on
      the picture, so a drag here never moves the eye */
   pointer-events: auto;
   /* the one ornament of the design: on a dark station the picture's foot
-     would vanish into the band, and this edge is what keeps it legible */
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+     would vanish into the band, and this lit edge is what keeps it legible */
+  box-shadow: inset 0 1px 0 var(--ui-line);
 }
 #wing[data-desk~='stage'] .desk-line { min-height: calc(var(--desk-line-row) * 2); }
 #wing[data-desk~='stage'] .desk-foot { margin-top: 5px; }
@@ -646,32 +645,32 @@ body.forge .desk-cap, body.forge .desk-on { transition: none !important; }
 }
 #wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) .desk-word-control::after,
 #wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door::after,
-#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door::after {
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot :is(.wing-door, .vinci-source)::after {
   content: '';
   position: absolute;
   left: 0;
   right: 0;
   bottom: 10px;
   height: 1px;
-  background: color-mix(in srgb, var(--na-starlight) 44%, transparent);
+  background: var(--ui-line-strong);
 }
+/* anything you can press stands in the text colour, as the words beside it */
 #wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door,
 #wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door,
-#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .vinci-source { color: var(--desk-clock); }
-#wing[data-desk~='stage'][data-desk~='ways'] .desk-foot .wing-door::after,
-#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .wing-door::after {
-  background: color-mix(in srgb, var(--desk-clock) 50%, transparent);
-}
+#wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .vinci-source { color: var(--ui-text); }
 /* the way to what a station rests on is a word and not a heading: the row
    reads left to right as the visitor meets the layers */
 #wing[data-desk~='stage'][data-desk~='drawer'] .desk-drawer-foot .vinci-source {
+  /* placed for its underline only: the window's own corner offsets stand down */
+  position: relative;
+  inset: auto;
   text-transform: none;
   letter-spacing: normal;
   text-indent: 0;
   font: 500 0.9375rem/1 var(--sans);
 }
-#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door):hover::after,
-#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door):focus-visible::after {
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door, .vinci-source):hover::after,
+#wing[data-desk~='stage'] :is(.desk-foot, .desk-drawer-foot) :is(.desk-word-control, .wing-door, .vinci-source):focus-visible::after {
   height: 1.5px;
   background: var(--na-starlight);
 }

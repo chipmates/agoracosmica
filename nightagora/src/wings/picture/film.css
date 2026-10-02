@@ -34,7 +34,7 @@
 .na-film-dark {
   position: absolute;
   inset: 0;
-  background: #0b141b;
+  background: var(--ui-ground-deep);
   opacity: 0;
   transition: opacity 450ms ease;
 }
@@ -50,7 +50,7 @@
   width: 132px;
   height: 1px;
   margin-left: -66px;
-  background: var(--rule-faint, color-mix(in srgb, var(--na-starlight, #f3efe2) 18%, transparent));
+  background: var(--rule-faint, color-mix(in srgb, var(--na-starlight, var(--ui-text)) 18%, transparent));
   opacity: 0;
   transition: opacity 300ms ease;
 }

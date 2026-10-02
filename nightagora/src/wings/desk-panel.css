@@ -36,6 +36,12 @@
   transition: opacity 240ms cubic-bezier(.22, .61, .36, 1) 500ms, color .3s ease;
 }
 :root[data-na-panel='open'] #rail-instruments { color: var(--na-starlight); }
+/* on the band the glass ring is a control's whole edge: the strong line, 3 to 1 on the wall */
+:root[data-na-panel] #rail-instruments::after {
+  border-color: var(--ui-line-strong);
+  box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+}
+:root[data-na-panel] #rail-instruments:is(:hover, :focus-visible, [aria-expanded='true'])::after { border-color: var(--ui-way); }
 /* IN A CLOSE LOOK THE CONTROL STANDS ON THE BAND'S FIRST ROW, at the right of
    the step back and in its box: the kind's instruments own the row under it,
    so each has one place at every height the band takes */
@@ -73,7 +79,7 @@
   padding: 0;
   overflow: hidden;
   border: 0;
-  box-shadow: inset 0 1px 0 var(--rule), inset 1px 0 0 var(--press-hairline);
+  box-shadow: inset 0 1px 0 var(--ui-line), inset 1px 0 0 var(--ui-line);
 }
 /* the kicker, the handle and Close do not move: only the rows between them
    scroll, so the way out is on the screen the whole time */
@@ -103,7 +109,7 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--na-gold) 42%, transparent) transparent;
+  scrollbar-color: var(--ui-line-strong) transparent;
 }
 :root[data-na-panel='open'] #instruments .inst-close {
   position: absolute;
@@ -120,6 +126,13 @@
 :root[data-na-panel='open'] #instruments :is(.inst-links button, .inst-links a, .inst-links summary) {
   font-size: 15px;
   gap: 18px;
+}
+/* a link in the panel is a word in the text colour; a hand on it underlines it */
+:root[data-na-panel='open'] #instruments .inst-links a:is(:hover, :focus-visible) {
+  color: var(--ui-text);
+  text-decoration: underline;
+  text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 5px;
 }
 :root[data-na-panel='open'] #instruments .inst-setting legend,
 :root[data-na-panel='open'] #instruments .inst-tiers small,
@@ -232,14 +245,15 @@
   align-items: center;
   border: 0;
   border-radius: 3px;
-  background: color-mix(in srgb, var(--na-abyss) 80%, transparent);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--na-gold) 60%, transparent);
-  color: var(--desk-title, var(--na-starlight));
+  /* the second way at the end is an outline in the strong line, so the gold box beside it leads */
+  background: var(--ui-ground);
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong);
+  color: var(--desk-title, var(--ui-text));
   font: 400 1.1875rem/1.5rem var(--serif);
   text-align: left;
   cursor: pointer;
 }
-.desk-panel-talk:hover { background: linear-gradient(color-mix(in srgb, var(--na-gold) 12%, transparent), color-mix(in srgb, var(--na-gold) 12%, transparent)), color-mix(in srgb, var(--na-abyss) 80%, transparent); }
+.desk-panel-talk:hover { background: var(--ui-ground-raised); box-shadow: inset 0 0 0 1px var(--ui-text); }
 .desk-panel-talk:focus-visible { outline: 2px solid var(--na-gold); outline-offset: 2px; }
 .desk-panel-talk[hidden] { display: none; }
 
@@ -260,8 +274,8 @@
   padding: 26px var(--desk-panel-g, 64px) 9px;
   border: 0;
   border-radius: 0;
-  background: var(--na-abyss);
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+  background: var(--ui-ground);
+  box-shadow: inset 0 1px 0 var(--ui-line);
   backdrop-filter: none;
   overflow: visible;
 }
@@ -282,7 +296,7 @@
   letter-spacing: .01em;
   /* the same rows, evened out, so no word of the question stands alone */
   text-wrap: balance;
-  color: var(--desk-title, #fff5e3);
+  color: var(--desk-title, var(--ui-text));
 }
 #wing[data-desk~='panel'] .wing-door-plate[data-form='band'] .wing-door-word {
   margin: 0;

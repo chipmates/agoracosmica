@@ -4,47 +4,47 @@
 #wing[data-wing='vinci'] .wing-labels > button,#wing[data-wing='vinci'] .vinci-dock { pointer-events:auto; }
 /* the scrim has to end BELOW the last line: at padding 0 its edge cut the
    descenders of the disclosure line on every desktop frame */
-#wing[data-wing='vinci'] .wing-doorblock { bottom:18px; padding:18px 24px 10px; background:linear-gradient(transparent,rgba(13,19,25,.88) 52%); }
+#wing[data-wing='vinci'] .wing-doorblock { bottom:18px; padding:18px 24px 10px; background:linear-gradient(transparent,color-mix(in srgb, var(--ui-ground-deep) 88%, transparent) 52%); }
 #wing[data-wing='vinci'] .wing-note { margin-top:6px; font-size:9px; }
-#wing[data-wing='vinci'] .wing-rail-group { padding:0 8px 0 0; background:rgba(16,24,29,.82); border:1px solid #a997732b; border-radius:2px; }
+#wing[data-wing='vinci'] .wing-rail-group { padding:0 8px 0 0; background:color-mix(in srgb, var(--ui-ground-sheet) 82%, transparent); border:1px solid var(--ui-line); border-radius:2px; }
 #wing[data-wing='vinci'] .wing-rail { padding:0; background:none; gap:0; }
 #wing[data-wing='vinci'] .wing-step[data-target='true']::after { height:4px;box-sizing:border-box;border:1px solid var(--na-gold);background:transparent;transition:none; }
-#wing[data-wing='vinci'] .wing-rail-group .wing-lobby { min-width:76px;min-height:44px;padding:8px 12px;border-right:1px solid #a9977355;font-size:9px;letter-spacing:.2em;text-indent:.2em; }
+#wing[data-wing='vinci'] .wing-rail-group .wing-lobby { min-width:76px;min-height:44px;padding:8px 12px;border-right:1px solid var(--ui-line-strong);font-size:9px;letter-spacing:.2em;text-indent:.2em; }
 #wing[data-wing='vinci'] .wing-question { user-select:text; }
-.vinci-heading { position:absolute;left:46px;top:114px;max-width:550px;pointer-events:none;text-shadow:0 2px 20px #14212dcc; }
-.vinci-kicker { font:10px var(--sans);letter-spacing:.27em;color:#f0e8d9; }
-.vinci-title { margin:9px 0 0;font:400 clamp(23px,3vw,37px)/1.14 var(--serif);max-width:530px;color:#fff5e3;text-wrap:balance; }
-.vinci-construction { left:50%;top:43%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 40px));padding:28px;background:rgba(12,22,29,.92);border:1px solid #aa9b7955;text-align:center; }
+.vinci-heading { position:absolute;left:46px;top:114px;max-width:550px;pointer-events:none;text-shadow:0 2px 20px color-mix(in srgb, var(--ui-ground-raised) 80%, transparent); }
+.vinci-kicker { font:10px var(--sans);letter-spacing:.27em;color:var(--ui-text); }
+.vinci-title { margin:9px 0 0;font:400 clamp(23px,3vw,37px)/1.14 var(--serif);max-width:530px;color:var(--ui-text);text-wrap:balance; }
+.vinci-construction { left:50%;top:43%;transform:translate(-50%,-50%);width:min(560px,calc(100vw - 40px));padding:28px;background:color-mix(in srgb, var(--ui-ground-sheet) 92%, transparent);border:1px solid var(--ui-line-strong);text-align:center; }
 .vinci-construction .vinci-title { font-size:28px; }
-.vinci-status { margin:18px 0 12px;font:10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:#aaa99f; }
-.vinci-promise,.vinci-threshold { font:16px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty; }
-.vinci-threshold { margin-top:16px;font-size:13px;color:#c6bfb0; }
-.vinci-source {position:fixed;right:26px;top:22px;min-width:100px;min-height:44px;border:1px solid #c8bda655;background:#16242ecc;color:#eee4d3;font:10px var(--sans);letter-spacing:.15em;text-transform:uppercase;cursor:pointer; }
+.vinci-status { margin:18px 0 12px;font:10px var(--sans);letter-spacing:.2em;text-transform:uppercase;color:var(--ui-text-quiet); }
+.vinci-promise,.vinci-threshold { font:16px/1.5 var(--serif);color:var(--ui-text);text-wrap:pretty; }
+.vinci-threshold { margin-top:16px;font-size:13px;color:var(--ui-text-quiet); }
+.vinci-source {position:fixed;right:26px;top:22px;min-width:100px;min-height:44px;border:1px solid color-mix(in srgb, var(--ui-text-quiet) 33%, transparent);background:color-mix(in srgb, var(--ui-ground-raised) 80%, transparent);color:var(--ui-text);font:10px var(--sans);letter-spacing:.15em;text-transform:uppercase;cursor:pointer; }
 .vinci-dot { position:fixed; width:44px;height:44px;transform:translate(-50%,-50%);background:none;border:0;cursor:pointer; }
-.vinci-dot::after {content:'';display:block;width:9px;height:9px;margin:auto;border-radius:50%;background:#d2a557;border:1px solid #f4dab2;box-shadow:0 0 0 5px #242c2877,0 1px 9px #0008; }
-.vinci-dock {position:fixed;left:28px;bottom:226px;width:330px;max-height:calc(100vh - 340px);overflow:auto;overscroll-behavior:contain;background:#101d27f2;border:1px solid #a9977355;padding:22px;color:#eae1d1;scrollbar-width:thin;user-select:text; }
+.vinci-dot::after {content:'';display:block;width:9px;height:9px;margin:auto;border-radius:50%;background:var(--ui-way);border:1px solid var(--ui-way);box-shadow:0 0 0 5px color-mix(in srgb, var(--ui-ground) 47%, transparent),0 1px 9px color-mix(in srgb, var(--ui-ground-deep) 53%, transparent); }
+.vinci-dock {position:fixed;left:28px;bottom:226px;width:330px;max-height:calc(100vh - 340px);overflow:auto;overscroll-behavior:contain;background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);border:1px solid var(--ui-line-strong);padding:22px;color:var(--ui-text);scrollbar-width:thin;user-select:text; }
 .vinci-dock[hidden] {display:none; }
 @media(min-aspect-ratio:9/10) {
   .vinci-dock[data-station='arrival'] {left:auto;right:28px;}
 }
-.vinci-certainty {color:#d2a557;font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase; }
-.vinci-certainty[data-certainty='unknown'] {color:#a8b3b7; }
+.vinci-certainty {color:var(--ui-sure-reconstructed);font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase; }
+.vinci-certainty[data-certainty='unknown'] {color:var(--ui-sure-unknown); }
 .vinci-dock h2 {font:400 24px/1.15 var(--serif);margin:10px 0 16px; }
 .vinci-statement {font:14px/1.55 var(--serif);margin:14px 0; }
 .vinci-certainty-word {display:block;margin-bottom:5px;font:9px/1.4 var(--sans);letter-spacing:.13em;text-transform:uppercase; }
-.vinci-statement[data-certainty='documented'] .vinci-certainty-word {color:#8cba8b; }
-.vinci-statement[data-certainty='reconstructed'] .vinci-certainty-word {color:#d2a557; }
-.vinci-statement[data-certainty='conjectural'] .vinci-certainty-word {color:#df9385; }
-.vinci-statement[data-certainty='unknown'] .vinci-certainty-word {color:#a8b3b7; }
-.vinci-statement[data-certainty='documented'] {border-left:2px solid #8cba8b;padding-left:10px; }
-.vinci-statement[data-certainty='conjectural'] {border-left:2px solid #df9385;padding-left:10px; }
-.vinci-citation {display:block;font:10px/1.5 var(--sans);color:#a8b3b7;overflow-wrap:anywhere;margin:10px 0; }
+.vinci-statement[data-certainty='documented'] .vinci-certainty-word {color:var(--ui-sure-documented); }
+.vinci-statement[data-certainty='reconstructed'] .vinci-certainty-word {color:var(--ui-sure-reconstructed); }
+.vinci-statement[data-certainty='conjectural'] .vinci-certainty-word {color:var(--ui-sure-conjectural); }
+.vinci-statement[data-certainty='unknown'] .vinci-certainty-word {color:var(--ui-sure-unknown); }
+.vinci-statement[data-certainty='documented'] {border-left:2px solid var(--ui-sure-documented);padding-left:10px; }
+.vinci-statement[data-certainty='conjectural'] {border-left:2px solid var(--ui-sure-conjectural);padding-left:10px; }
+.vinci-citation {display:block;font:10px/1.5 var(--sans);color:var(--ui-text-quiet);overflow-wrap:anywhere;margin:10px 0; }
 /* the hour the station names, on the frame and not only inside the card */
-.vinci-hour { margin:10px 0 0;font:10px/1.5 ui-monospace,monospace;letter-spacing:.02em;color:#e9cd94; }
-.vinci-arithmetic {white-space:pre-wrap;font:12px/1.6 ui-monospace,monospace;color:#edcc8c;border-block:1px solid #a9977333;padding:12px 0; }
+.vinci-hour { margin:10px 0 0;font:10px/1.5 ui-monospace,monospace;letter-spacing:.02em;color:var(--ui-text-quiet); }
+.vinci-arithmetic {white-space:pre-wrap;font:12px/1.6 ui-monospace,monospace;color:var(--ui-text-quiet);border-block:1px solid var(--ui-line);padding:12px 0; }
 .vinci-leader {position:fixed;inset:0;pointer-events:none; }
-.vinci-leader line {stroke:#d2a55799;stroke-width:1; }
-.vinci-dock:focus-visible,.vinci-source:focus-visible,.vinci-dot:focus-visible {outline:1px solid #edcc8c;outline-offset:3px; }
+.vinci-leader line {stroke:color-mix(in srgb, var(--ui-way) 60%, transparent);stroke-width:1; }
+.vinci-dock:focus-visible,.vinci-source:focus-visible,.vinci-dot:focus-visible {outline:1px solid var(--ui-way);outline-offset:3px; }
 @media(max-aspect-ratio:9/10) {
   #wing[data-wing='vinci'] { --wing-rail-bottom:190px; }
   .vinci-heading {left:22px;right:22px;top:84px;max-width:none; }
@@ -61,29 +61,29 @@
   .vinci-promise {font-size:14px; }
 }
 
-.vinci-statement[data-certainty='inferred'],.vinci-statement[data-certainty='reconstructed'] {border-left:2px solid #d2a557;padding-left:10px;}
-.vinci-statement[data-certainty='unknown'] {border-left:2px solid #a8b3b7;padding-left:10px;}
+.vinci-statement[data-certainty='inferred'],.vinci-statement[data-certainty='reconstructed'] {border-left:2px solid var(--ui-sure-reconstructed);padding-left:10px;}
+.vinci-statement[data-certainty='unknown'] {border-left:2px solid var(--ui-sure-unknown);padding-left:10px;}
 
-#wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 112px;min-width:112px;white-space:nowrap;min-height:44px;padding:8px;border:0;border-left:1px solid #a9977355;background:none;font-size:9px;letter-spacing:.10em; }
+#wing[data-wing='vinci'] .wing-rail-group .vinci-source {position:static;flex:0 0 112px;min-width:112px;white-space:nowrap;min-height:44px;padding:8px;border:0;border-left:1px solid var(--ui-line-strong);background:none;font-size:9px;letter-spacing:.10em; }
 
 /* The title's quiet field preserves contrast throughout the whole cone. */
-.vinci-heading:not(.vinci-construction) {padding:14px 18px 16px;margin-left:-18px;background:linear-gradient(105deg,rgba(15,24,30,.91),rgba(15,24,30,.72) 72%,transparent);border-left:1px solid #bea17366;}
+.vinci-heading:not(.vinci-construction) {padding:14px 18px 16px;margin-left:-18px;background:linear-gradient(105deg,color-mix(in srgb, var(--ui-ground-sheet) 91%, transparent),color-mix(in srgb, var(--ui-ground-sheet) 72%, transparent) 72%,transparent);border-left:1px solid color-mix(in srgb, var(--ui-way) 40%, transparent);}
 
-.vinci-insertion {font:10px/1.5 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:#d2a557;margin:12px 0 0;}
+.vinci-insertion {font:10px/1.5 var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--ui-way);margin:12px 0 0;}
 
-.vinci-record-toggle {min-height:44px;min-width:44px;width:100%;margin-top:18px;padding:10px 14px;text-align:left;background:transparent;color:#e6d6b8;border:1px solid #a9977366;font:12px var(--sans);cursor:pointer;}
-.vinci-record {border-top:1px solid #a9977344;margin-top:18px;padding-top:8px;}
+.vinci-record-toggle {min-height:44px;min-width:44px;width:100%;margin-top:18px;padding:10px 14px;text-align:left;background:transparent;color:var(--ui-text);border:1px solid var(--ui-line-strong);font:12px var(--sans);cursor:pointer;}
+.vinci-record {border-top:1px solid var(--ui-line);margin-top:18px;padding-top:8px;}
 .vinci-record[hidden] {display:none;}
 .vinci-record .vinci-statement {font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
 .vinci-record > .vinci-picture-source {display:block;padding:6px 0;}
-.vinci-record .picture-policy-label {min-width:0;margin:20px 0;padding-top:12px;border-top:1px solid #a9977344;font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
+.vinci-record .picture-policy-label {min-width:0;margin:20px 0;padding-top:12px;border-top:1px solid var(--ui-line);font:12px/1.6 var(--sans);overflow-wrap:anywhere;}
 .vinci-record .picture-policy-label p {margin:8px 0;white-space:pre-wrap;}
 .vinci-record .picture-label-language + .picture-label-language {margin-top:16px;}
-.vinci-record .picture-policy-label a {display:block;min-height:44px;padding:10px 0;box-sizing:border-box;color:#e6d6b8;overflow-wrap:anywhere;}
+.vinci-record .picture-policy-label a {display:block;min-height:44px;padding:10px 0;box-sizing:border-box;color:var(--ui-text);overflow-wrap:anywhere;}
 .vinci-hour {font:12px/1.5 var(--sans);letter-spacing:.03em;}
 
-.vinci-human-source {display:block;margin-top:7px;color:#b6bcae;font:12px/1.5 var(--sans);}
-.vinci-record h3 {font:16px/1.3 var(--serif);font-weight:400;color:#eadbc1;}
+.vinci-human-source {display:block;margin-top:7px;color:var(--ui-text-quiet);font:12px/1.5 var(--sans);}
+.vinci-record h3 {font:16px/1.3 var(--serif);font-weight:400;color:var(--ui-text);}
 .vinci-arithmetic {overflow-wrap:anywhere;}
 
 /* Compact the outdoor phone label while preserving the entire spoken hour. */
@@ -130,17 +130,17 @@
   .vinci-heading.vinci-standing[data-sheet='open'] {max-height:min(52dvh,calc(100dvh - 350px));overflow-y:auto;}
   .vinci-heading.vinci-standing .vinci-sheet-grab {display:flex;align-items:center;justify-content:center;width:100%;
     min-height:44px;margin:0;padding:0;background:none;border:0;cursor:pointer;}
-  .vinci-sheet-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:#c8bda6aa;}
-  .vinci-sheet-grab:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+  .vinci-sheet-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:color-mix(in srgb, var(--ui-text-quiet) 67%, transparent);}
+  .vinci-sheet-grab:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 }
 .vinci-sheet-grab {display:none;}
 
 /* The certainty shares the title line; its word remains in Sources. */
 .vinci-title {display:flex;align-items:baseline;gap:10px;}
-.vinci-title-dot {display:inline-block;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:#d2a557;align-self:baseline;}
-.vinci-title-dot[data-certainty='documented'] {background:#8cba8b;}
-.vinci-title-dot[data-certainty='conjectural'] {background:#df9385;}
-.vinci-title-dot[data-certainty='unknown'] {background:#a8b3b7;}
+.vinci-title-dot {display:inline-block;flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--ui-sure-reconstructed);align-self:baseline;}
+.vinci-title-dot[data-certainty='documented'] {background:var(--ui-sure-documented);}
+.vinci-title-dot[data-certainty='conjectural'] {background:var(--ui-sure-conjectural);}
+.vinci-title-dot[data-certainty='unknown'] {background:var(--ui-sure-unknown);}
 #wing[data-wing='vinci'] {--wing-rail-bottom:108px;}
 #wing[data-wing='vinci'] .wing-doorblock {display:flex;align-items:center;justify-content:center;gap:18px;bottom:14px;padding:10px 24px;}
 #wing[data-wing='vinci'] .wing-question {margin:0;max-width:620px;}
@@ -177,19 +177,20 @@
 
 /* Sources is one reading surface above the station bar at either viewport. */
 #wing[data-wing='vinci'] .vinci-dock {left:50%;right:auto;top:76px;bottom:calc(var(--wing-rail-bottom) + 46px);transform:translateX(-50%);margin:0;width:min(720px,calc(100vw - 56px));height:calc(100dvh - var(--wing-rail-bottom) - 122px);max-width:none;max-height:none;padding:0 24px 24px;box-sizing:border-box;overflow-x:hidden;overflow-y:auto;}
-.vinci-dock::backdrop {background:#081016b3;}
-.vinci-sources-toolbar {position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;background:#101d27;padding:12px 0;border-bottom:1px solid #a9977355;}
+.vinci-dock::backdrop {background:color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);}
+.vinci-sources-toolbar {position:sticky;top:0;z-index:1;display:flex;align-items:center;gap:12px;background:var(--ui-ground-sheet);padding:12px 0;border-bottom:1px solid var(--ui-line-strong);}
 .vinci-sources-tabs {display:flex;flex:1;min-width:0;gap:4px;}
-.vinci-sources-toolbar button {min-width:44px;min-height:44px;padding:8px 12px;border:1px solid transparent;background:none;color:#eae1d1;font:12px/1.25 var(--sans);cursor:pointer;}
-.vinci-sources-tabs button[aria-selected='true'] {border-bottom-color:#d2a557;color:#edcc8c;}
-.vinci-sources-toolbar button:focus-visible,.vinci-sources-panel:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.vinci-sources-toolbar button {min-width:44px;min-height:44px;padding:8px 12px;border:1px solid transparent;background:none;color:var(--ui-text);font:12px/1.25 var(--sans);cursor:pointer;}
+/* the chosen tab in the text colour: gold never stands as a marker beside a certainty mark */
+.vinci-sources-tabs button[aria-selected='true'] {border-bottom-color:var(--ui-text);color:var(--ui-text);}
+.vinci-sources-toolbar button:focus-visible,.vinci-sources-panel:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 .vinci-sources-panel {padding-top:8px;overflow-wrap:anywhere;}
 .vinci-sources-panel[hidden] {display:none;}
-.vinci-sources-panel a {display:inline-flex;align-items:center;min-height:44px;min-width:44px;color:#edcc8c;overflow-wrap:anywhere;}
-.vinci-certainty-legend {display:flex;flex-wrap:wrap;gap:12px 22px;list-style:none;padding:18px 0 0;margin:20px 0;border-top:1px solid #a9977344;font:12px/1.4 var(--sans);}
+.vinci-sources-panel a {display:inline-flex;align-items:center;min-height:44px;min-width:44px;color:var(--ui-text);text-decoration:underline;text-decoration-color:var(--ui-line-strong);text-underline-offset:4px;overflow-wrap:anywhere;}
+.vinci-certainty-legend {display:flex;flex-wrap:wrap;gap:12px 22px;list-style:none;padding:18px 0 0;margin:20px 0;border-top:1px solid var(--ui-line);font:12px/1.4 var(--sans);}
 .vinci-certainty-legend li {display:flex;align-items:center;gap:8px;}
-.vinci-room-source + .vinci-room-source {margin-top:24px;border-top:1px solid #a9977344;padding-top:16px;}
-.vinci-door-disclosure {font:13px/1.5 var(--sans);color:#b6bcae;margin-top:20px;}
+.vinci-room-source + .vinci-room-source {margin-top:24px;border-top:1px solid var(--ui-line);padding-top:16px;}
+.vinci-door-disclosure {font:13px/1.5 var(--sans);color:var(--ui-text-quiet);margin-top:20px;}
 @media(max-aspect-ratio:9/10) {
   /* THE WINDOW OWNS THE PHONE: the chrome under it stands down, so the
      reading runs to the foot of the screen instead of stopping above a bar
@@ -202,16 +203,16 @@
   /* ONE MARK DISMISSES THE WINDOW, at the corner: the word stays the control's
      own name for the screen reader and the glyph is what the thumb reads. */
   .vinci-sources-toolbar .vinci-sources-close {flex:0 0 44px;max-width:44px;font-size:0;letter-spacing:0;}
-  .vinci-sources-toolbar .vinci-sources-close::after {content:'\2715';font:15px/1 var(--sans);color:#e6d6b8;}
+  .vinci-sources-toolbar .vinci-sources-close::after {content:'\2715';font:15px/1 var(--sans);color:var(--ui-text);}
   .vinci-certainty-legend {display:grid;grid-template-columns:1fr 1fr;gap:12px;}
 }
 
 /* The room and wing tabs read as lists, not as prose: one exhibit or one
    absence per line, the name first and the sentence after it. */
-.vinci-room-list,.vinci-absence-list {list-style:none;padding:0;margin:12px 0;font:13px/1.55 var(--sans);color:#ddd6c6;}
-.vinci-room-list li,.vinci-absence-list li {padding:8px 0;border-top:1px solid #a9977333;overflow-wrap:anywhere;}
-.vinci-absence-work {display:block;color:#e6d6b8;}
-.vinci-sources-panel h3 {margin:24px 0 6px;font:400 16px/1.3 var(--serif);color:#eadbc1;}
+.vinci-room-list,.vinci-absence-list {list-style:none;padding:0;margin:12px 0;font:13px/1.55 var(--sans);color:var(--ui-text);}
+.vinci-room-list li,.vinci-absence-list li {padding:8px 0;border-top:1px solid var(--ui-line);overflow-wrap:anywhere;}
+.vinci-absence-work {display:block;color:var(--ui-text);}
+.vinci-sources-panel h3 {margin:24px 0 6px;font:400 16px/1.3 var(--serif);color:var(--ui-text);}
 
 /* THE ENTRANCE PANEL is the shared title plate; only what a leaf of it holds
    is the wing's own. The panel hangs in the label layer, which ignores the
@@ -222,18 +223,18 @@
 .vinci-welcome .vinci-certainty-word {font-size:.875rem;letter-spacing:.1em;}
 /* the sources of a group: the store's own holder and licence lines, one per
    line, complete, and long ones broken rather than cut */
-.vinci-welcome-sources {list-style:none;margin:2px 0 0;padding:0;font:.875rem/1.55 var(--sans);color:#e4ded0;}
-.vinci-welcome-sources li {padding:7px 0;border-top:1px solid #a9977326;overflow-wrap:anywhere;}
+.vinci-welcome-sources {list-style:none;margin:2px 0 0;padding:0;font:.875rem/1.55 var(--sans);color:var(--ui-text);}
+.vinci-welcome-sources li {padding:7px 0;border-top:1px solid var(--ui-line);overflow-wrap:anywhere;}
 @media(max-aspect-ratio:9/10) {
   .vinci-welcome .vinci-statement {font-size:.9375rem;line-height:1.5;}
 }
 .vinci-record-fold {margin:16px 0 0;}
-.vinci-record-fold > summary {display:flex;align-items:center;min-height:44px;padding:8px 0;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
-.vinci-record-fold > summary:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vinci-record-fold > summary {display:flex;align-items:center;min-height:44px;padding:8px 0;color:var(--ui-text);font:12px var(--sans);cursor:pointer;}
+.vinci-record-fold > summary:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 
 /* THE EXHIBIT MARKS. The same 44 px dot the station's own mark is, in the
    layer L cycles, each in its object's own certainty colour. */
-.vinci-exhibit-dot::after {background:var(--certainty,#d2a557);border-color:#f4dab2cc;}
+.vinci-exhibit-dot::after {background:var(--certainty,var(--ui-sure-reconstructed));border-color:color-mix(in srgb, var(--ui-way) 80%, transparent);}
 
 /* THE HANG STRIP. The whole wall as one row: every exhibit of the station a
    visitor stands in, in the order the wall hangs them, each a 44 px target
@@ -245,7 +246,7 @@
    is the hang itself, wide enough to recognise a face, with the scale under it
    saying where along thirty four metres the eye stands. */
 .vinci-strip {position:fixed;left:46px;display:flex;flex-direction:column;gap:5px;margin:0;padding:6px;box-sizing:border-box;
-  max-width:min(708px,calc(100vw - 92px));background:#101d27e6;border:1px solid #a9977344;pointer-events:auto;}
+  max-width:min(708px,calc(100vw - 92px));background:color-mix(in srgb, var(--ui-ground-sheet) 90%, transparent);border:1px solid var(--ui-line);pointer-events:auto;}
 /* A ROW WITH NOTHING IN IT DOES NOT STAND. The docked row sets its own
    display, which a bare [hidden] rule cannot beat, so the hidden state is
    matched on the dock as well. */
@@ -263,9 +264,9 @@
    leaves the line changes the row's width under the hand. */
 .vinci-strip-walk {display:flex;align-items:center;gap:6px;min-width:0;}
 .vinci-strip-end {flex:0 0 44px;width:44px;min-height:44px;padding:0;background:none;
-  border:1px solid #a9977344;color:#eae1d1;font:17px/1 var(--sans);cursor:pointer;}
+  border:1px solid var(--ui-line);color:var(--ui-text);font:17px/1 var(--sans);cursor:pointer;}
 .vinci-strip-end[data-off='true'] {visibility:hidden;pointer-events:none;}
-.vinci-strip-end:hover,.vinci-strip-end:focus-visible {border-color:#edcc8c;color:#edcc8c;outline:none;}
+.vinci-strip-end:hover,.vinci-strip-end:focus-visible {border-color:var(--ui-way);color:var(--ui-way);outline:none;}
 /* ONE ROW AT EVERY STATION, the picture room's wall included: cells small
    enough to leave the work whole and still a 44 px target, hugged at the foot
    left above the bar, standing up to the size a face is recognised at under a
@@ -299,8 +300,8 @@
    the visitor is at the second of twenty five. */
 .vinci-strip-scale {position:relative;height:7px;}
 .vinci-strip-scale[hidden] {display:none;}
-.vinci-strip-scale::before {content:'';position:absolute;left:0;right:0;top:3px;height:1px;background:#a9977355;}
-.vinci-strip-mark {position:absolute;left:var(--along,0%);top:0;width:2px;height:7px;background:#edcc8c;}
+.vinci-strip-scale::before {content:'';position:absolute;left:0;right:0;top:3px;height:1px;background:var(--ui-line-strong);}
+.vinci-strip-mark {position:absolute;left:var(--along,0%);top:0;width:2px;height:7px;background:var(--ui-way);}
 .vinci-strip-mark[hidden] {display:none;}
 /* THE WALL'S LENGTH COSTS NO HEIGHT: the hairline lies in the panel's own
    foot, under the cells, and never in a band of its own. */
@@ -314,18 +315,18 @@
   flex-direction:column;align-items:flex-end;justify-content:center;gap:4px;}
 .vinci-strip-foot {display:flex;align-items:center;justify-content:space-between;gap:12px;}
 .vinci-strip-foot[hidden] {display:none;}
-.vinci-strip-place {color:#cdbb9a;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;}
-.vinci-strip-whole {min-height:44px;padding:8px 12px;background:none;border:1px solid #a9977344;color:#eae1d1;
+.vinci-strip-place {color:var(--ui-text-quiet);font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;}
+.vinci-strip-whole {min-height:44px;padding:8px 12px;background:none;border:1px solid var(--ui-line);color:var(--ui-text);
   font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;cursor:pointer;}
 .vinci-strip-whole[hidden] {display:none;}
-.vinci-strip-whole:hover,.vinci-strip-whole:focus-visible {border-color:#edcc8c;color:#edcc8c;outline:none;}
+.vinci-strip-whole:hover,.vinci-strip-whole:focus-visible {border-color:var(--ui-way);color:var(--ui-way);outline:none;}
 /* Every cell is a pale mount, as the wall's own fields are: half these works
    are dark, and a dark reproduction on a dark cell reads as an empty one. */
 .vinci-strip-item {position:relative;display:flex;align-items:flex-end;justify-content:center;width:44px;height:44px;
-  padding:0;background:#b5ae9d;border:1px solid #a9977355;cursor:pointer;overflow:hidden;}
+  padding:0;background:var(--ui-text-quiet);border:1px solid var(--ui-line-strong);cursor:pointer;overflow:hidden;}
 .vinci-strip-item[disabled] {cursor:default;opacity:.5;}
-.vinci-strip-item[aria-current='true'] {border-color:#edcc8c;box-shadow:0 0 0 1px #edcc8c;}
-.vinci-strip-item:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vinci-strip-item[aria-current='true'] {border-color:var(--ui-way);box-shadow:0 0 0 1px var(--ui-way);}
+.vinci-strip-item:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 /* THE WHOLE WORK, NOT A CROP OF IT. A centre crop of a portrait on a black
    ground reads as an empty cell, and a row of works is a row of works. */
 .vinci-strip-thumb {position:absolute;inset:2px;width:calc(100% - 4px);height:calc(100% - 4px);object-fit:contain;}
@@ -333,9 +334,9 @@
    manifest could not be read no cell can carry its plate: the mount takes the
    mark an empty frame carries, so a row of blanks is not read as blank art. */
 :root[data-na-manifest='unread'] .vinci-strip-item:not(:has(img))
-  {background-image:linear-gradient(to bottom right,transparent calc(50% - 1px),#8b837199 50%,transparent calc(50% + 1px));}
+  {background-image:linear-gradient(to bottom right,transparent calc(50% - 1px),color-mix(in srgb, var(--ui-text-faint) 60%, transparent) 50%,transparent calc(50% + 1px));}
 .vinci-strip-dot {position:relative;width:7px;height:7px;margin-bottom:2px;border-radius:50%;
-  background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d1720cc;}
+  background:var(--certainty,var(--ui-sure-reconstructed));box-shadow:0 0 0 2px color-mix(in srgb, var(--ui-ground-sheet) 80%, transparent);}
 @media(max-aspect-ratio:9/10) {
   /* The bar's own offset is its foot, so the row clears its head as the
      card does, and the two never stand at once. */
@@ -372,18 +373,18 @@
   /* THE PULLED SHEET IS A READING SURFACE. Its own field is solid: the
      card's gradient lets the room through on the right, which is calm under
      a title and unreadable under a paragraph. */
-  .vinci-heading.vinci-standing[data-sheet='open'] {max-height:min(58dvh,calc(100dvh - 390px));background:#0e1a22f2;}
+  .vinci-heading.vinci-standing[data-sheet='open'] {max-height:min(58dvh,calc(100dvh - 390px));background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);}
   .vinci-heading.vinci-standing[data-sheet='open'] .vinci-promise {margin-top:9px;}
   /* THE FOOT STAYS UNDER THE THUMB while the paragraph above it scrolls. */
   .vinci-heading.vinci-standing .wing-sheet-foot {position:sticky;z-index:1;bottom:-13px;margin:11px -14px -13px;
-    padding:10px 14px 13px;background:#0e1a22;border-top:1px solid #a9977344;}
+    padding:10px 14px 13px;background:var(--ui-ground-sheet);border-top:1px solid var(--ui-line);}
   #wing[data-wing='vinci'] .wing-sheet-foot .wing-doorblock {position:static;inset:auto;display:flex;gap:10px;padding:0;background:none;}
   #wing[data-wing='vinci'] .wing-sheet-foot .wing-question {flex:1;min-width:0;margin:0;font-size:13px;line-height:1.35;text-align:left;}
   #wing[data-wing='vinci'] .wing-sheet-foot .wing-door {flex:none;max-width:108px;min-height:44px;margin:0;padding:8px 10px;font-size:9px;letter-spacing:.12em;text-indent:0;}
   #wing[data-wing='vinci'] .wing-sheet-foot .wing-note {margin-top:8px;}
-  #wing[data-wing='vinci'] .wing-sheet-foot .wing-bar-words {margin-top:10px;border-top:1px solid #a9977333;}
-  #wing[data-wing='vinci'] .wing-bar-words > * {color:#eae1d1;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
-  #wing[data-wing='vinci'] .wing-bar-words > *:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+  #wing[data-wing='vinci'] .wing-sheet-foot .wing-bar-words {margin-top:10px;border-top:1px solid var(--ui-line);}
+  #wing[data-wing='vinci'] .wing-bar-words > * {color:var(--ui-text);font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+  #wing[data-wing='vinci'] .wing-bar-words > *:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 }
 
 /* THE NAME UNDER THE PAINTING. Standing at a stop, the work says what it is
@@ -391,13 +392,13 @@
    certainty dot every reproduction in this museum carries. */
 .vinci-quiet {position:fixed;transform:translateX(-50%);margin:0;padding:6px 10px 7px;max-width:260px;
   display:grid;grid-template-columns:auto 1fr;gap:1px 8px;align-items:center;
-  background:#0d1720b3;border-bottom:1px solid #a9977344;text-align:left;pointer-events:none;}
+  background:color-mix(in srgb, var(--ui-ground-sheet) 70%, transparent);border-bottom:1px solid var(--ui-line);text-align:left;pointer-events:none;}
 .vinci-quiet[hidden] {display:none;}
 .vinci-quiet-dot {grid-row:1 / span 2;width:7px;height:7px;border-radius:50%;
-  background:var(--certainty,#d2a557);box-shadow:0 0 0 2px #0d172099;}
-.vinci-quiet-name {color:#f0e7d6;font:13px/1.25 var(--serif,var(--sans));letter-spacing:.01em;}
-.vinci-quiet-number {margin-right:.4em;color:#d2a557;font-family:var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;}
-.vinci-quiet-year {color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+  background:var(--certainty,var(--ui-sure-reconstructed));box-shadow:0 0 0 2px color-mix(in srgb, var(--ui-ground-sheet) 60%, transparent);}
+.vinci-quiet-name {color:var(--ui-text);font:13px/1.25 var(--serif,var(--sans));letter-spacing:.01em;}
+.vinci-quiet-number {margin-right:.4em;color:var(--ui-text-quiet);font-family:var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;}
+.vinci-quiet-year {color:var(--ui-text-quiet);font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
 @media(max-aspect-ratio:9/10) {
   .vinci-quiet {max-width:200px;padding:4px 8px 5px;}
   .vinci-quiet-name {font-size:11.5px;}
@@ -443,15 +444,15 @@
 
 /* THE PACE IN THE SHEET, where the bar's words stand on a narrow stage. */
 #wing[data-wing='vinci'] .wing-sheet-foot .wing-pace {display:flex;flex-wrap:wrap;align-items:center;gap:8px;
-  margin-top:10px;padding-top:9px;border-top:1px solid #a9977333;}
-#wing[data-wing='vinci'] .wing-pace-name {flex:none;color:#c3b596;font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
+  margin-top:10px;padding-top:9px;border-top:1px solid var(--ui-line);}
+#wing[data-wing='vinci'] .wing-pace-name {flex:none;color:var(--ui-text-quiet);font:9px var(--sans);letter-spacing:.14em;text-indent:.14em;text-transform:uppercase;}
 /* Each step is at least its own word wide; where the three and the name do
    not fit one line the name stands above them. */
 #wing[data-wing='vinci'] .wing-pace-step {flex:1 0 auto;min-width:44px;min-height:44px;padding:8px 10px;background:none;white-space:nowrap;
-  border:1px solid #a9977344;color:#eae1d1;font:9px var(--sans);letter-spacing:.12em;text-indent:.12em;text-transform:uppercase;cursor:pointer;}
+  border:1px solid var(--ui-line);color:var(--ui-text);font:9px var(--sans);letter-spacing:.12em;text-indent:.12em;text-transform:uppercase;cursor:pointer;}
 @media(max-width:340px) {#wing[data-wing='vinci'] .wing-sheet-foot .wing-pace-name {flex-basis:100%;}}
-#wing[data-wing='vinci'] .wing-pace-step[aria-pressed='true'] {border-color:#edcc8c;color:#edcc8c;}
-#wing[data-wing='vinci'] .wing-pace-step:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+#wing[data-wing='vinci'] .wing-pace-step[aria-pressed='true'] {border-color:var(--ui-way);color:var(--ui-way);}
+#wing[data-wing='vinci'] .wing-pace-step:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 
 /* THE CHAPTER CARD. The picture dips and the chapter's title stands on the
    dip: no plate, no rule, no picture behind the words. The title is the
@@ -459,10 +460,10 @@
    room's own words go with the picture, as they do on a leg; the bar stays,
    because it is the way out. */
 #wing[data-wing='vinci'] .vinci-cut {position:fixed;inset:0;display:grid;place-items:center;padding:32px;
-  background:#0b141b;opacity:0;transition:opacity .45s ease;pointer-events:none;}
+  background:var(--ui-ground);opacity:0;transition:opacity .45s ease;pointer-events:none;}
 #wing[data-wing='vinci'] .vinci-cut[data-on] {opacity:1;}
 #wing[data-wing='vinci'] .vinci-cut[hidden] {display:none;}
-.vinci-cut-title {margin:0;max-width:22ch;color:#fff5e3;text-align:center;text-wrap:balance;
+.vinci-cut-title {margin:0;max-width:22ch;color:var(--ui-text);text-align:center;text-wrap:balance;
   font:400 clamp(1.375rem,2.4vw,1.875rem)/1.3 var(--serif);}
 #wing[data-wing='vinci'][data-cut] .vinci-heading,
 #wing[data-wing='vinci'][data-cut] .vinci-strip,
@@ -505,13 +506,13 @@ body:has(#wing[data-wing='vinci'][data-farewell]) .brand {opacity:0;transition:o
 #wing[data-phone-form] .vinci-dock {
   left:0;right:0;top:44px;bottom:0;width:auto;height:auto;transform:none;margin:0;max-width:none;max-height:none;
   padding:0 16px calc(80px + env(safe-area-inset-bottom));
-  border:0;border-top:1px solid #a9977355;border-radius:14px 14px 0 0;background:#0d171f;
+  border:0;border-top:1px solid var(--ui-line-strong);border-radius:14px 14px 0 0;background:var(--ui-ground-sheet);
 }
-#wing[data-phone-form] .vinci-dock::backdrop {background:#081016a6;}
+#wing[data-phone-form] .vinci-dock::backdrop {background:color-mix(in srgb, var(--ui-ground-deep) 65%, transparent);}
 #wing[data-phone-form] .vinci-sources-toolbar .vinci-sources-close {
   position:fixed;left:16px;bottom:calc(16px + env(safe-area-inset-bottom));z-index:2;
   width:48px;height:48px;max-width:48px;min-width:48px;padding:0;border-radius:50%;
-  background:#07101ad9;box-shadow:inset 0 0 0 1px #ffffff40;
+  background:var(--ui-ground-raised);box-shadow:inset 0 0 0 1px var(--ui-line-strong);
 }
 html:has(#wing[data-phone-form]) #instruments {
   left:0;right:0;top:44px;bottom:0;width:auto;max-width:none;max-height:none;
@@ -532,7 +533,7 @@ html:has(#wing[data-phone-form]) #instruments .inst-close {
 /* the drawer is read, not stepped: the hang's steps come back with the one line */
 .film-box[data-drawer='true'] .vinci-phone-wall {display:none;}
 .vinci-phone-step {position:relative;flex:0 0 44px;width:44px;height:44px;padding:0;border:0;border-radius:50%;pointer-events:auto;
-  background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-ring);color:#ecdfc7;
+  background:var(--glass);box-shadow:inset 0 0 0 1px var(--glass-ring);color:var(--ui-text);
   display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .vinci-phone-step:disabled {visibility:hidden;}
 /* the door's question at the drawer's foot, over the door: the frozen form's one italic */

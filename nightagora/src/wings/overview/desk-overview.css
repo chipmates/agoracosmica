@@ -272,25 +272,25 @@
   padding: 20px 16px calc(88px + env(safe-area-inset-bottom));
   overflow-y: auto;
   overscroll-behavior: contain;
-  border-top: 1px solid #a9977355;
+  border-top: 1px solid var(--ui-line-strong);
   border-radius: 14px 14px 0 0;
-  background: #0d171f;
-  --desk-title: #fff5e3;
-  --desk-quiet: #c8bda6;
+  background: var(--ui-ground-sheet);
+  --desk-title: var(--ui-text);
+  --desk-quiet: var(--ui-text-quiet);
 }
 /* it stands in the wing's labels layer, which takes no press of its own */
 .desk-ov[data-sheet][open] { display: block; pointer-events: auto; }
-.desk-ov[data-sheet]::backdrop { background: #081016a6; }
+.desk-ov[data-sheet]::backdrop { background: color-mix(in srgb, var(--ui-ground-deep) 65%, transparent); }
 /* the foot under the close: the list fades into it as it scrolls by */
 .desk-ov[data-sheet]::after {
   content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 1; height: calc(80px + env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 28px); pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent), var(--ui-ground-sheet) 28px); pointer-events: none;
 }
 /* one close, and a press on a cell is the walk: the step back and the foot's selector stand down */
 .desk-ov[data-sheet] :is(.desk-ov-back, .desk-ov-foot) { display: none; }
 .desk-ov[data-sheet] .desk-ov-shut {
   position: fixed; left: 16px; right: auto; top: auto; bottom: calc(16px + env(safe-area-inset-bottom)); z-index: 2;
-  width: 48px; height: 48px; background: #07101ad9; box-shadow: inset 0 0 0 1px #ffffff40; color: #ecdfc7;
+  width: 48px; height: 48px; background: var(--ui-ground-raised); box-shadow: inset 0 0 0 1px var(--ui-line-strong); color: var(--ui-text);
 }
 .desk-ov[data-sheet] .desk-ov-title { margin: 0; padding-right: 8px; font: 400 1.375rem/1.75rem var(--serif); }
 .desk-ov[data-sheet] .desk-ov-sub { margin-top: 4px; font: 400 .875rem/1.25rem var(--sans); }

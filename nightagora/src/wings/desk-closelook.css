@@ -33,12 +33,12 @@
   column-gap: 24px;
   row-gap: var(--desk-clb-gap);
   align-items: start;
-  background: var(--na-abyss);
+  background: var(--ui-ground);
   /* the band is wall, not glass: a hand that lands on it never moves the eye */
   pointer-events: auto;
   /* the one ornament: on a dark work the picture's foot would vanish into
-     the band, and this edge is what keeps it legible */
-  box-shadow: inset 0 1px 0 color-mix(in srgb, var(--na-gold) 34%, transparent);
+     the band, and this lit edge is what keeps it legible */
+  box-shadow: inset 0 1px 0 var(--ui-line);
   color: var(--na-starlight);
 }
 
@@ -178,17 +178,15 @@
   right: 0;
   bottom: 10px;
   height: 1px;
-  background: color-mix(in srgb, var(--na-starlight) 44%, transparent);
+  background: var(--ui-line-strong);
 }
 #wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):hover::after,
 #wing[data-desk~='closelook'] .desk-clb :is(.desk-word-control, .vitrine-control):focus-visible::after {
   height: 1.5px;
   background: var(--na-starlight);
 }
-#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control { color: var(--desk-clock); }
-#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control::after {
-  background: color-mix(in srgb, var(--desk-clock) 50%, transparent);
-}
+/* anything you can press stands in the text colour, as the words beside it */
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control { color: var(--ui-text); }
 #wing[data-desk~='closelook'] .desk-clb .desk-word-control[aria-disabled='true'] { opacity: .55; cursor: default; }
 
 /* ---- the drawer: the band grown, never a second plate ---- */
@@ -349,7 +347,7 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
    there. The held frame stays undimmed until the plate is seated on it, and
    the ground comes up while the plate grows. */
 #wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate'] .vitrine-scrim { background: transparent; transition: background-color .4s ease-out; }
-#wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate']:has(.deep-plate[data-seated='true']) .vitrine-scrim { background: #0a0f13; }
+#wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate']:has(.deep-plate[data-seated='true']) .vitrine-scrim { background: var(--ui-ground-deep); }
 @media (prefers-reduced-motion: reduce) {
   #wing[data-desk~='closelook'] .vitrine[data-payload='deep-plate'] .vitrine-scrim { transition: none; }
 }
@@ -515,4 +513,5 @@ body:has(dialog[open]) #wing[data-desk~='closelook'] .desk-clb {
 #wing[data-desk~='closelook'] .reader-beside .vitrine-source-text s { text-decoration-thickness: 1px; opacity: .8; }
 /* the key that opens the whole text says when it stands */
 #wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control[aria-pressed='true'] { color: var(--desk-title); }
-#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control[aria-pressed='true']::after { height: 1.5px; background: var(--na-gold); }
+/* a chosen word is marked in the text colour: gold never stands as a marker beside a certainty mark */
+#wing[data-desk~='closelook'] .desk-clb-foot .vitrine-control[aria-pressed='true']::after { height: 1.5px; background: var(--ui-text); }

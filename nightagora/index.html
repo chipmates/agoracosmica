@@ -74,20 +74,40 @@
       --na-gold-deep: #b8863b;
       --na-starlight: #f3efe2;
       --na-mist: #8d93ad;
-      /* the film's slate, the ground its chrome stands on, and that ground lifted */
-      --na-slate: #08121c;
-      --na-slate-lift: #142333;
+
+      /* ---- THE INTERFACE: one grey-blue wall (hue 258) for the band, the
+         box, the sheets and the figure page; two steps of words; two lines;
+         one gold for the way on; the four certainty marks. Every text step
+         holds 4.5 to 1 on every ground, the strong line 3 to 1. ---- */
+      --ui-ground-deep: #090b0f;    /* behind a close look, scrims, ink on the gold: the most neutral dark */
+      --ui-ground: #18202b;         /* the wall: the band, the box, the caption */
+      --ui-ground-sheet: #1e2631;   /* a sheet over the wall */
+      --ui-ground-raised: #252e3b;  /* a field on the wall or a sheet: the way-on box, a seat */
+      --ui-text: #f3efe2;
+      --ui-text-quiet: #c2ccd8;     /* labels and facts; holds at 11 px */
+      --ui-text-faint: #949ca7;     /* never words: marks that are not words */
+      --ui-line: color-mix(in srgb, var(--ui-text-quiet) 24%, transparent);
+      --ui-line-strong: color-mix(in srgb, var(--ui-text-quiet) 52%, transparent);  /* control rings, underlines */
+      --ui-way: #e0b96a;            /* the way on, where you are, focus */
+      --ui-way-press: #b99547;
+      --ui-on-way: #090b0f;
+      --ui-passage: #7a4038;        /* reserved for the chapter card; no rule reads it */
+      --ui-sure-documented: #8cba8b;
+      --ui-sure-reconstructed: #d2a557;
+      --ui-sure-conjectural: #df9385;
+      --ui-sure-unknown: #a8b3b7;
+
       --serif: Georgia, 'Times New Roman', serif;
       --sans: system-ui, -apple-system, 'Segoe UI', sans-serif;
 
       /* ---- THE PRESS — the shell's one letterpress voice. Every surface of
          the night reads its ink, its rules and its plates out of this block.
-         Nothing below invents a hue: the nine colours above are the whole
-         palette. ---- */
+         Nothing below invents a hue: the seven na- colours are the lobby's
+         palette, the ui- tokens the interface's. ---- */
 
       /* type on the night: a hard close shadow so the letter has an edge,
          and a wide soft one so it sits IN the dark instead of on it */
-      --ink-night: 0 1px 2px rgba(4, 6, 13, 0.92), 0 2px 26px rgba(4, 6, 13, 0.72);
+      --ink-night: 0 1px 2px color-mix(in srgb, var(--ui-ground-deep) 92%, transparent), 0 2px 26px color-mix(in srgb, var(--ui-ground-deep) 72%, transparent);
       /* one hairline weight, two strengths: a rule you read, a rule you feel */
       --rule: color-mix(in srgb, var(--na-gold) 46%, transparent);
       --rule-faint: color-mix(in srgb, var(--na-gold) 20%, transparent);
@@ -95,11 +115,30 @@
       --plate-top: color-mix(in srgb, var(--na-lapis) 88%, transparent);
       --plate-foot: color-mix(in srgb, var(--na-abyss) 93%, transparent);
       --plate-edge: color-mix(in srgb, var(--na-gold) 32%, transparent);
-      --plate-lift: 0 22px 64px rgba(2, 3, 8, 0.5);
+      --plate-lift: 0 22px 64px color-mix(in srgb, var(--ui-ground-deep) 50%, transparent);
       /* the standard letterpress set, and the leading a wrapped caps line
          needs. German runs a third longer than English: every one of these
          lines wraps eventually, so leading is authored, never defaulted. */
       --press-lead: 1.85;
+    }
+    /* inside the wing the shell's older names read the interface's tokens;
+       the names computed at the root (press, rules, plates) are restated */
+    html:has(#wing) :is(#wing, #instruments) {
+      --na-abyss: var(--ui-ground);
+      --na-lapis: var(--ui-ground-sheet);
+      --na-horizon: var(--ui-ground-raised);
+      --na-mist: var(--ui-text-quiet);
+      --na-gold: var(--ui-way);
+      --na-gold-deep: var(--ui-way-press);
+      --na-starlight: var(--ui-text);
+      --press-white: var(--ui-text);
+      --press-muted: var(--ui-text-quiet);
+      --press-hairline: var(--ui-line-strong);
+      --rule: color-mix(in srgb, var(--ui-way) 46%, transparent);
+      --rule-faint: var(--ui-line);
+      --plate-top: color-mix(in srgb, var(--ui-ground-sheet) 88%, transparent);
+      --plate-foot: color-mix(in srgb, var(--ui-ground) 93%, transparent);
+      --plate-edge: var(--ui-line);
     }
     * { margin: 0; padding: 0; box-sizing: border-box; }
     html, body { height: 100%; overscroll-behavior: none; }
@@ -795,8 +834,8 @@ body.forge #door-measure .door-fill { transition: none !important; }
     body.forge .star-chip, body.forge #constellation-plate, body.forge #sky-invite,
     body.forge #chapter-marks { transition: none !important; }
 
-    /* a figure holds the whole frame while it is open, on the film's own
-       slate and opaque: a thinner scrim let the sky's letterpress read
+    /* a figure holds the whole frame while it is open, on the interface's
+       wall and opaque: a thinner scrim let the sky's letterpress read
        through the pane on a phone and collide with the names.
 
        IT IS ALSO A PLANE, AND NO PLANE IN THIS MUSEUM IS ONE COLOUR. Deep
@@ -809,12 +848,16 @@ body.forge #door-measure .door-fill { transition: none !important; }
     #figure-pane {
       position: fixed; inset: 0; z-index: 5;
       display: flex; align-items: center; justify-content: center;
-      background-color: var(--na-slate);
+      background-color: var(--ui-ground-deep);
+      /* the page's own light, in the wall's hue: a lit corner, a second
+         veil, the body of the wall and its fall to the foot */
       background-image:
-        url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.64 0 0 0 0 0.66 0 0 0 0 0.8 0.34 0.34 0.34 0 0'/%3E%3C/filter%3E%3Crect width='168' height='168' filter='url(%23t)' opacity='0.17'/%3E%3C/svg%3E"),
-        radial-gradient(ellipse 70% 80% at 28% 42%, var(--na-slate-lift) 0%, transparent 72%),
-        radial-gradient(ellipse 120% 90% at 80% 100%, color-mix(in srgb, var(--na-slate) 70%, var(--na-slate-lift)) 0%, transparent 60%);
-      background-size: 168px 168px, auto, auto;
+        url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='168' height='168'%3E%3Cfilter id='t'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.55' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.62 0 0 0 0 0.68 0 0 0 0 0.76 0.34 0.34 0.34 0 0'/%3E%3C/filter%3E%3Crect width='168' height='168' filter='url(%23t)' opacity='0.17'/%3E%3C/svg%3E"),
+        radial-gradient(ellipse 62% 72% at 14% 10%, rgba(63, 74, 90, 0.9) 0%, rgba(63, 74, 90, 0) 78%),
+        radial-gradient(ellipse 32% 36% at 76% 20%, rgba(45, 55, 70, 0.55) 0%, rgba(45, 55, 70, 0) 80%),
+        radial-gradient(ellipse 96% 74% at 30% 34%, rgba(27, 36, 50, 0.9) 0%, rgba(27, 36, 50, 0) 78%),
+        radial-gradient(ellipse 150% 88% at 84% 104%, rgba(20, 29, 43, 0.9) 0%, rgba(20, 29, 43, 0) 56%);
+      background-size: 168px 168px, auto, auto, auto, auto;
       opacity: 0; visibility: hidden; pointer-events: none;
       transition: opacity 0.8s ease, visibility 0s linear 0.8s;
     }
@@ -881,28 +924,28 @@ body.forge #door-measure .door-fill { transition: none !important; }
     }
     .pane-portrait[hidden] { display: none; }
     .pane-frame {
-      border: 1px solid color-mix(in srgb, var(--na-gold) 45%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ui-way) 45%, transparent);
       padding: 7px;
-      background: rgba(2, 3, 7, 0.4);
-      box-shadow: 0 0 60px rgba(224, 185, 106, 0.08);
+      background: color-mix(in srgb, var(--ui-ground-deep) 40%, transparent);
+      box-shadow: 0 0 60px color-mix(in srgb, var(--ui-way) 8%, transparent);
     }
     .pane-portrait img {
       display: block; width: 100%; height: auto;
-      border: 1px solid color-mix(in srgb, var(--na-gold) 22%, transparent);
+      border: 1px solid color-mix(in srgb, var(--ui-way) 22%, transparent);
     }
     .pane-credit {
       margin-top: 13px;
       font-family: var(--sans);
       font-size: 10.5px; line-height: 1.62;
       letter-spacing: 0.012em;
-      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      color: var(--ui-text-quiet);
       text-wrap: pretty;
     }
     .pane-credit-line, .pane-credit-note { display: block; }
     /* the honesty sentence stands apart from the credit it qualifies */
     .pane-credit-note {
       margin-top: 7px;
-      color: color-mix(in srgb, var(--na-mist) 66%, transparent);
+      color: var(--ui-text-quiet);
     }
     .pane-credit-note:empty { display: none; }
     /* on a wide stage the entry is a catalogue page: the plate, a hairline,
@@ -916,28 +959,28 @@ body.forge #door-measure .door-fill { transition: none !important; }
         width: 1px;
         background: linear-gradient(to bottom,
           transparent 0%,
-          color-mix(in srgb, var(--na-gold) 22%, transparent) 16%,
-          color-mix(in srgb, var(--na-gold) 22%, transparent) 84%,
+          color-mix(in srgb, var(--ui-way) 22%, transparent) 16%,
+          color-mix(in srgb, var(--ui-way) 22%, transparent) 84%,
           transparent 100%);
       }
     }
     .pane-kicker {
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.32em;
-      text-transform: uppercase; color: var(--na-gold);
+      text-transform: uppercase; color: var(--ui-way);
     }
     .pane-name {
       margin-top: 14px;
       font-family: var(--serif);
       font-size: clamp(26px, 3.4vw, 40px); line-height: 1.12;
       letter-spacing: 0.008em;
-      color: var(--na-starlight);
+      color: var(--ui-text);
     }
     .pane-years {
       margin-top: 12px;
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.26em;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
+      color: var(--ui-text-quiet);
     }
     .pane-body { margin-top: 22px; }
     /* who this was and what they made: the one or two sentences a visitor
@@ -946,7 +989,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       margin-top: 0;
       font-family: var(--serif);
       font-size: clamp(16px, 1.55vw, 19px); line-height: 1.56;
-      color: var(--na-starlight);
+      color: var(--ui-text);
       max-width: 40ch;
     }
     /* the pane of a figure with no public-domain likeness: the name stands
@@ -958,7 +1001,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       font-family: var(--sans);
       font-size: 10.5px; line-height: 1.62;
       letter-spacing: 0.012em;
-      color: color-mix(in srgb, var(--na-mist) 82%, transparent);
+      color: var(--ui-text-quiet);
       max-width: 42ch; text-wrap: pretty;
     }
     .pane-none::before {
@@ -971,7 +1014,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       font-family: var(--sans);
       font-size: 8px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-gold) 74%, transparent);
+      color: var(--ui-text-quiet);
     }
     .pane-enter,
 #enter-museum {
@@ -986,6 +1029,9 @@ body.forge #door-measure .door-fill { transition: none !important; }
     .pane-enter:hover, .pane-enter:focus-visible,
 #enter-museum:not([aria-disabled='true']):hover,
 #enter-museum:focus-visible { border-color: var(--na-gold); color: var(--na-starlight); outline: none; }
+    /* the way in, on the figure page's light: its ring holds 3 to 1 */
+    #figure-pane .pane-enter { border-color: color-mix(in srgb, var(--ui-way) 72%, transparent); }
+    #figure-pane .pane-enter:hover, #figure-pane .pane-enter:focus-visible { border-color: var(--ui-way); color: var(--ui-text); }
     .pane-enter[hidden] { display: none; }
     /* what the register says about this figure's wing tonight */
     .pane-state {
@@ -993,7 +1039,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.28em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 86%, transparent);
+      color: var(--ui-text-quiet);
     }
     /* the others of his constellation, set as a register and not as a stack
        of links: two columns, one name to a line, each one taking its rule
@@ -1010,7 +1056,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.26em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 92%, transparent);
+      color: var(--ui-text-quiet);
       transition: color 0.3s ease;
     }
     .pane-sibling::after {
@@ -1018,7 +1064,7 @@ body.forge #door-measure .door-fill { transition: none !important; }
       height: 1px; background: transparent;
       transition: background-color 0.35s ease;
     }
-    .pane-sibling:hover, .pane-sibling:focus-visible { color: var(--na-gold); outline: none; }
+    .pane-sibling:hover, .pane-sibling:focus-visible { color: var(--ui-way); outline: none; }
     .pane-sibling:hover::after, .pane-sibling:focus-visible::after { background: var(--rule); }
     .pane-close {
       position: absolute; top: max(22px, env(safe-area-inset-top)); right: max(22px, env(safe-area-inset-right));
@@ -1028,15 +1074,15 @@ body.forge #door-measure .door-fill { transition: none !important; }
       font-family: var(--sans);
       font-size: 9px; letter-spacing: 0.3em; text-indent: 0.3em;
       text-transform: uppercase;
-      color: color-mix(in srgb, var(--na-mist) 88%, transparent);
+      color: var(--ui-text-quiet);
       transition: color 0.3s ease;
     }
     .pane-close::after {
       content: ''; flex: none; width: 18px; height: 1px;
-      background: color-mix(in srgb, var(--na-mist) 40%, transparent);
+      background: var(--ui-line-strong);
       transition: background-color 0.3s ease;
     }
-    .pane-close:hover, .pane-close:focus-visible { color: var(--na-gold); outline: none; }
+    .pane-close:hover, .pane-close:focus-visible { color: var(--ui-way); outline: none; }
     .pane-close:hover::after, .pane-close:focus-visible::after { background: var(--rule); }
     @media (max-aspect-ratio: 9/10) {
       #constellation-plate { top: 11%; }

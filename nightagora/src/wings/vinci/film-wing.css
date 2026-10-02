@@ -12,16 +12,18 @@
 #wing[data-film='upright'] .wing-doorblock { display: none !important; }
 
 .film-box {
-  --plate: #08121cf0;
-  --veil: #08121c73;
-  --gold: var(--na-gold, #e0b96a);
-  --gold-ink: #12202c;
-  --gold-quiet: #d8bf8a;
-  --ink: #f3efe2;
-  --ink-bright: #fff5e3;
-  --glass: #07101ad9;
-  --glass-ring: #ffffff40;
-  --key: #ecdcbf;
+  /* the words stand on the wall, solid; the foot row keeps its veil */
+  --plate: var(--ui-ground);
+  --veil: color-mix(in srgb, var(--ui-ground) 45%, transparent);
+  --gold: var(--ui-way);
+  --gold-ink: var(--ui-on-way);
+  --gold-quiet: var(--ui-text-quiet);
+  --ink: var(--ui-text);
+  --ink-bright: var(--ui-text);
+  /* the round seats: a raised fill and a ring in the strong line, 3 to 1 over any frame */
+  --glass: color-mix(in srgb, var(--ui-ground-raised) 90%, transparent);
+  --glass-ring: var(--ui-line-strong);
+  --key: var(--ui-text);
   position: fixed;
   left: 0;
   right: 0;
@@ -54,10 +56,10 @@
 .film-box[data-name-rows='2'] > .film-drawer { padding-top: 0; }
 .film-name .desk-mark { width: 12px; height: 12px; flex: 0 0 12px; align-self: center; overflow: visible; }
 .film-name .desk-mark circle, .film-name .desk-mark path { stroke-width: 1.6; }
-.film-name .desk-mark[data-certainty='documented'] { color: #8cba8b; }
-.film-name .desk-mark[data-certainty='reconstructed'] { color: #d2a557; }
-.film-name .desk-mark[data-certainty='conjectural'] { color: #df9385; }
-.film-name .desk-mark[data-certainty='unknown'] { color: #a8b3b7; }
+.film-name .desk-mark[data-certainty='documented'] { color: var(--ui-sure-documented); }
+.film-name .desk-mark[data-certainty='reconstructed'] { color: var(--ui-sure-reconstructed); }
+.film-name .desk-mark[data-certainty='conjectural'] { color: var(--ui-sure-conjectural); }
+.film-name .desk-mark[data-certainty='unknown'] { color: var(--ui-sure-unknown); }
 .film-name .desk-mark-full, .film-name .desk-mark-half { fill: currentColor; stroke: none; }
 .film-name .desk-mark-ring, .film-name .desk-mark-open { fill: none; stroke: currentColor; }
 .film-name .desk-mark-broken { fill: none; stroke: currentColor; stroke-dasharray: 3 2.4; }
@@ -83,14 +85,14 @@
   margin-top: 8px;
   padding: 0;
   border: 0;
-  border-top: 1px solid #22303c;
+  border-top: 1px solid var(--ui-line);
   background: none;
   font: 400 .9375rem/1 var(--sans);
   color: var(--key);
   text-align: left;
   cursor: pointer;
 }
-.film-ask .film-ic-out { margin-left: auto; width: 14px; height: 14px; color: var(--gold); }
+.film-ask .film-ic-out { margin-left: auto; width: 14px; height: 14px; color: var(--key); }
 .film-keys {
   display: flex;
   flex-wrap: wrap;
@@ -113,7 +115,7 @@
   color: var(--key);
   white-space: nowrap;
   text-decoration: underline;
-  text-decoration-color: color-mix(in srgb, var(--gold) 40%, transparent);
+  text-decoration-color: var(--ui-line-strong);
   text-underline-offset: 5px;
   text-decoration-thickness: 1px;
   cursor: pointer;
@@ -123,7 +125,7 @@
 .film-key[hidden] { display: none; }
 /* on the narrowest phones the row keeps its longest count on one line ("17 Themen zu sehen" at 360) */
 @media (max-width: 370px) { .film-keys { column-gap: 8px; } }
-.film-key .film-ic { width: 14px; height: 14px; color: var(--gold); }
+.film-key .film-ic { width: 14px; height: 14px; color: var(--key); }
 .film-count { margin-left: auto; font: 400 .9375rem/32px var(--sans); font-variant-numeric: tabular-nums; color: var(--key); white-space: nowrap; }
 .film-foot {
   position: relative;
@@ -141,8 +143,9 @@
   border: 0;
   border-radius: 50%;
   background: var(--glass);
-  box-shadow: inset 0 0 0 1px var(--glass-ring);
-  color: #ecdfc7;
+  /* the seats stand over the film: a short halo of the wall keeps the ring 3 to 1 on a sunlit floor */
+  box-shadow: inset 0 0 0 1px var(--glass-ring), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
+  color: var(--ui-text);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -219,7 +222,7 @@
   width: 48px;
   padding: 0;
   justify-content: center;
-  background: #08121cdd;
+  background: color-mix(in srgb, var(--ui-ground) 87%, transparent);
   color: var(--gold);
   box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--gold) 33%, transparent);
 }
@@ -236,6 +239,26 @@
 
 /* the marks of the film stand where the live marks stand, and go with the walk */
 #wing[data-film][data-walking] .film-dot:not([data-state='walking']) { opacity: 0; pointer-events: none; }
+/* THE DESKTOP'S WAY ON is a raised field on the wall inside its gold ring;
+   the marks step's own tints for it (desk-marks.css) are restated on that field */
+#wing[data-desk~='marks'] .desk-on { background: var(--ui-ground-raised); }
+#wing[data-desk~='marks'] .desk-on:hover { background: color-mix(in srgb, var(--ui-way) 10%, var(--ui-ground-raised)); }
+#wing[data-desk~='marks'] .desk-on:active { background: color-mix(in srgb, var(--ui-way) 20%, var(--ui-ground-raised)); }
+/* NOTHING STANDS OVER THE FILM WITHOUT ITS OWN BACKING: each look mark's ring
+   stands on the wall's colour, so its gold holds on a sunlit table and on
+   pale stone alike (the ring's form is desk-marks.css's; this is its ground) */
+#wing[data-film] .film-dot.vinci-exhibit-dot[data-mark] .vinci-mark-ring {
+  background: color-mix(in srgb, var(--ui-ground) 80%, transparent);
+  box-shadow: inset 0 0 0 1.5px var(--ui-way), 0 0 0 5px color-mix(in srgb, var(--ui-ground) 30%, transparent);
+}
+#wing[data-film] .film-dot.vinci-exhibit-dot[data-mark]:hover .vinci-mark-ring,
+#wing[data-film] .film-dot.vinci-exhibit-dot[data-mark]:focus-visible .vinci-mark-ring {
+  background: color-mix(in srgb, var(--ui-way) 16%, color-mix(in srgb, var(--ui-ground) 80%, transparent));
+}
+#wing[data-film] .film-dot.vinci-exhibit-dot[data-mark]:active .vinci-mark-ring,
+#wing[data-film] .film-dot.vinci-exhibit-dot[data-mark][data-state='walking'] .vinci-mark-ring {
+  background: color-mix(in srgb, var(--ui-way) 26%, color-mix(in srgb, var(--ui-ground) 80%, transparent));
+}
 @media (prefers-reduced-motion: reduce) {
   .film-gold-ring circle { transition: none; }
 }
@@ -259,7 +282,8 @@
   border: 0;
   border-radius: 24px;
   background: var(--glass);
-  box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--gold) 60%, transparent);
+  /* the second way is an outline in the strong line, so the gold pill beside it leads */
+  box-shadow: inset 0 0 0 1px var(--ui-line-strong), 0 0 0 3px color-mix(in srgb, var(--ui-ground) 60%, transparent);
   color: var(--ink-bright);
   font: 400 .9375rem/18px var(--serif);
   text-align: left;
@@ -281,30 +305,31 @@
   left: 0; right: 0; top: 44px; bottom: 0; width: auto; height: auto; transform: none; margin: 0;
   max-width: none; max-height: none;
   padding: 0 16px calc(112px + env(safe-area-inset-bottom));
-  border: 0; border-top: 6px solid #0d171f; border-radius: 14px 14px 0 0;
-  box-shadow: 0 -1px 0 #a9977355;
-  background: #0d171f;
+  border: 0; border-top: 6px solid var(--ui-ground-sheet); border-radius: 14px 14px 0 0;
+  box-shadow: 0 -1px 0 var(--ui-line-strong);
+  background: var(--ui-ground-sheet);
 }
-#wing[data-film='upright'] .vinci-dock::backdrop { background: #081016a6; }
+#wing[data-film='upright'] .vinci-dock::backdrop { background: color-mix(in srgb, var(--ui-ground-deep) 65%, transparent); }
 /* the sheet's head: a band that stays as the reading scrolls, so a line
    passing under the top edge fades out instead of showing cut in half */
 #wing[data-film='upright'] :is(.vinci-dock, .desk-ov[data-sheet])::before {
   content: ''; display: block; position: sticky; top: 0; z-index: 3; height: 16px; margin: 0 -16px;
-  background: linear-gradient(to bottom, #0d171f 35%, color-mix(in srgb, #0d171f 0%, transparent)); pointer-events: none;
+  background: linear-gradient(to bottom, var(--ui-ground-sheet) 35%, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent)); pointer-events: none;
 }
 /* THE RECORD'S THREE TABS STAND AT ITS FOOT, beside its close and in the
    thumb's reach; the foot is solid, so the reading ends above it */
 #wing[data-film='upright'] .vinci-dock .vinci-sources-toolbar {
   position: fixed; left: 0; right: 0; top: auto; bottom: 0; z-index: 4; box-sizing: border-box;
   height: calc(88px + env(safe-area-inset-bottom)); padding: 0 12px env(safe-area-inset-bottom) 72px; gap: 0;
-  align-items: center; background: #0d171f; border-top: 1px solid #a9977333; border-bottom: 0;
+  align-items: center; background: var(--ui-ground-sheet); border-top: 1px solid var(--ui-line); border-bottom: 0;
 }
 #wing[data-film='upright'] .vinci-dock .vinci-sources-tabs { gap: 0; align-self: center; }
 #wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button {
   flex: 1 1 0; min-width: 0; min-height: 48px; padding: 6px 2px; font: 400 .875rem/1.2 var(--sans); white-space: normal;
-  border: 0; border-bottom: 2px solid transparent; color: #d8cdb6;
+  border: 0; border-bottom: 2px solid transparent; color: var(--ui-text-quiet);
 }
-#wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button[aria-selected='true'] { border-bottom-color: #d2a557; color: #edcc8c; }
+/* the chosen tab is marked in the text colour: gold never stands as a marker beside a certainty mark */
+#wing[data-film='upright'] .vinci-dock .vinci-sources-tabs button[aria-selected='true'] { border-bottom-color: var(--ui-text); color: var(--ui-text); }
 /* the record's small words at a size a phone reads: none under 13 px */
 #wing[data-film='upright'] .vinci-dock :is(.vinci-certainty, .vinci-certainty-word) { font-size: .875rem; letter-spacing: .08em; }
 #wing[data-film='upright'] .vinci-dock .vinci-certainty-word { margin-bottom: 4px; }
@@ -334,7 +359,7 @@ html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sou
   position: fixed; left: 16px; right: auto; top: auto; bottom: calc(22px + env(safe-area-inset-bottom)); z-index: 4;
   display: grid; place-items: center; box-sizing: border-box; flex: none;
   width: 44px; height: 44px; min-width: 44px; max-width: 44px; min-height: 44px; margin: 0; padding: 0;
-  border: 0; border-radius: 50%; background: #07101af2; box-shadow: inset 0 0 0 1px #ffffff40; color: #ecdfc7;
+  border: 0; border-radius: 50%; background: var(--ui-ground-raised); box-shadow: inset 0 0 0 1px var(--ui-line-strong); color: var(--ui-text);
   font-size: 0; letter-spacing: 0; line-height: 0; text-indent: 0;
 }
 html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
@@ -346,7 +371,7 @@ html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sou
 }
 html:has(#wing[data-film='upright']) #wing .vinci-sources-toolbar .vinci-sources-close::after { content: none; }
 html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sources-close, #wing .desk-ov[data-sheet] .desk-ov-shut,
-  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close):focus-visible { outline: 1px solid var(--na-gold, #e0b96a); outline-offset: 2px; }
+  #wing .wing-plan-shut, #wing .wing-life-shut, #instruments .inst-close):focus-visible { outline: 1px solid var(--na-gold, var(--ui-way)); outline-offset: 2px; }
 /* the close look's own mark at the top corner stands down: the foot row's
    first seat is the look's close while a look stands */
 #wing[data-film='upright'] .vitrine-shut { display: none !important; }
@@ -357,9 +382,9 @@ html:has(#wing[data-film='upright']) :is(#wing .vinci-sources-toolbar .vinci-sou
    never runs under the circle */
 html:has(#wing[data-film='upright']) :is(#instruments:not([hidden]), #wing .wing-life[open])::after {
   content: ''; position: fixed; left: 0; right: 0; bottom: 0; z-index: 3; height: calc(106px + env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px); pointer-events: none;
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent), var(--ui-ground-sheet) 26px); pointer-events: none;
 }
-html:has(#wing[data-film='upright']) #instruments:not([hidden])::after { background: linear-gradient(to bottom, color-mix(in srgb, var(--na-abyss, #0b1a2a) 0%, transparent), var(--na-abyss, #0b1a2a) 26px); }
+html:has(#wing[data-film='upright']) #instruments:not([hidden])::after { background: linear-gradient(to bottom, color-mix(in srgb, var(--ui-ground) 0%, transparent), var(--ui-ground) 26px); }
 #wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-reading { padding-bottom: calc(110px + env(safe-area-inset-bottom)); }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-foot { padding-left: 72px; min-height: calc(64px + env(safe-area-inset-bottom)); box-sizing: border-box; }
 
@@ -415,10 +440,10 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) { font-size: .875rem; }
 /* the card's own "more" reads as the record's fold does: one link, underlined, with the plus */
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more) {
-  color: #e6d6b8; text-decoration: underline; text-decoration-color: color-mix(in srgb, #edcc8c 45%, transparent);
+  color: var(--ui-text); text-decoration: underline; text-decoration-color: var(--ui-line-strong);
   text-underline-offset: 5px; text-decoration-thickness: 1px;
 }
-#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more)::after { content: '\00a0+'; color: #edcc8c; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more)::after { content: '\00a0+'; color: var(--ui-text); }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-more, .vitrine-words .picture-label-more)[aria-expanded='true']::after { content: '\00a0\2212'; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] :is(.vitrine-words .picture-holder, .vitrine-words .picture-source-reading,
   .vitrine-words .picture-column-note, .vitrine-meta, .vitrine-certainty, .deep-stand p, .deep-rule-label) { font-size: .8125rem; }
@@ -431,7 +456,7 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
    stop's words never show through the reading */
 #wing[data-film='upright'] :is(.wing-plan, .wing-life)[data-narrow='true'][open] {
   inset: 44px 0 0 0; width: auto; height: auto; max-width: none; max-height: none; margin: 0;
-  border: 0; border-top: 1px solid #a9977355; border-radius: 14px 14px 0 0; background: #0d171f;
+  border: 0; border-top: 1px solid var(--ui-line-strong); border-radius: 14px 14px 0 0; background: var(--ui-ground-sheet);
 }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] :is(.wing-plan-number, .wing-plan-entry-number) { font-size: .8125rem; }
 #wing[data-film='upright'] .wing-plan[data-narrow='true'] .wing-plan-work { font-size: .875rem; }
@@ -450,11 +475,11 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
    film wing carries no data-desk, so the marks' four colours are named here,
    for the sideways sheet too */
 #wing:is([data-film='upright'], [data-film='cinema']) .desk-ov[data-sheet] {
-  --desk-title: #fff5e3;
-  --desk-sure-documented: #8cba8b;
-  --desk-sure-reconstructed: #d2a557;
-  --desk-sure-conjectural: #df9385;
-  --desk-sure-unknown: #a8b3b7;
+  --desk-title: var(--ui-text);
+  --desk-sure-documented: var(--ui-sure-documented);
+  --desk-sure-reconstructed: var(--ui-sure-reconstructed);
+  --desk-sure-conjectural: var(--ui-sure-conjectural);
+  --desk-sure-unknown: var(--ui-sure-unknown);
 }
 #wing[data-film='upright'] .desk-ov[data-sheet] .desk-ov-cellname .desk-mark { width: 15px; height: 15px; vertical-align: -2px; }
 #wing[data-film='upright'] .desk-ov[data-sheet] .desk-mark :is(.desk-mark-ring, .desk-mark-open, .desk-mark-broken) { stroke-width: 2.6; }
@@ -464,11 +489,11 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
    scrolls clear of it; its head fades the scrolled cells (the band above) */
 #wing[data-film='upright'] .desk-ov[data-sheet] {
   padding-top: 0; padding-bottom: calc(124px + env(safe-area-inset-bottom));
-  border-top: 6px solid #0d171f; box-shadow: 0 -1px 0 #a9977355;
+  border-top: 6px solid var(--ui-ground-sheet); box-shadow: 0 -1px 0 var(--ui-line-strong);
 }
 #wing[data-film='upright'] .desk-ov[data-sheet]::after {
   height: calc(106px + env(safe-area-inset-bottom));
-  background: linear-gradient(to bottom, color-mix(in srgb, #0d171f 0%, transparent), #0d171f 26px);
+  background: linear-gradient(to bottom, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent), var(--ui-ground-sheet) 26px);
 }
 
 /* ---- THE RECORD ON BOTH PHONE FORMS ---- */
@@ -479,17 +504,17 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
 /* sideways the tabs stand at the top: a line scrolling under them fades out, not cut in half */
 #wing[data-film='cinema'] .vinci-dock .vinci-sources-toolbar::after {
   content: ''; position: absolute; left: 0; right: 0; top: calc(100% + 1px); height: 16px; pointer-events: none;
-  background: linear-gradient(to bottom, var(--na-abyss, #0d171f) 35%, color-mix(in srgb, var(--na-abyss, #0d171f) 0%, transparent));
+  background: linear-gradient(to bottom, var(--ui-ground-sheet) 35%, color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent));
 }
 /* the record's own disclosure reads as one: underlined, with the panel's plus */
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-record-fold > summary {
   display: flex; align-items: center; gap: 8px; min-height: 44px; list-style: none; cursor: pointer;
-  color: #e6d6b8; text-decoration: underline; text-decoration-color: color-mix(in srgb, #edcc8c 45%, transparent);
+  color: var(--ui-text); text-decoration: underline; text-decoration-color: var(--ui-line-strong);
   text-underline-offset: 5px; text-decoration-thickness: 1px;
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-record-fold > summary::-webkit-details-marker { display: none; }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-record-fold > summary::after {
-  content: '+'; margin-left: auto; padding-left: 12px; color: #edcc8c; font: 400 1.125rem/1 var(--sans);
+  content: '+'; margin-left: auto; padding-left: 12px; color: var(--ui-text); font: 400 1.125rem/1 var(--sans);
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-record-fold[open] > summary::after { content: '\2212'; }
 /* upright it reads as one link: its words and the plus on one line, under
@@ -498,33 +523,33 @@ html:has(#wing[data-film='upright']) #instruments :is(legend, small) { font-size
 #wing[data-film='upright'] .vinci-dock .vinci-record-fold > summary::after { content: '\00a0+'; margin-left: 0; padding-left: 0; font: inherit; }
 #wing[data-film='upright'] .vinci-dock .vinci-record-fold[open] > summary::after { content: '\00a0\2212'; }
 /* the tab the record opens on wears its underline only: the focused tab is
-   always the chosen one (arrows choose), so focus brightens and thickens
-   that underline instead of drawing a box round it */
+   always the chosen one (arrows choose), so focus thickens that underline
+   in the text colour instead of drawing a box round it (no gold beside a mark) */
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-sources-tabs button:focus { outline: none; }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .vinci-sources-tabs button:focus-visible {
-  outline: none; background: none; color: #fff5e3; box-shadow: inset 0 -2px 0 #edcc8c;
+  outline: none; background: none; color: var(--ui-text); box-shadow: inset 0 -2px 0 var(--ui-text);
 }
 
 /* a painting's record: the live record's paragraphs and rules, at the phone's
    reading size, so its lines no longer run together as one block */
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record .picture-policy-label {
-  margin: 0; font: 400 .875rem/1.55 var(--sans); color: #d8cdb6; overflow-wrap: anywhere;
+  margin: 0; font: 400 .875rem/1.55 var(--sans); color: var(--ui-text-quiet); overflow-wrap: anywhere;
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record p { margin: 0 0 10px; }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record :is(.picture-first, .picture-first-de) {
-  margin-bottom: 6px; font: 400 1.0625rem/1.4 var(--serif); color: #eadbc1;
+  margin-bottom: 6px; font: 400 1.0625rem/1.4 var(--serif); color: var(--ui-text);
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record :is(.picture-label-licences, .picture-label-evidence, .picture-machine-chain) {
-  margin-top: 16px; padding-top: 12px; border-top: 1px solid #a9977344;
+  margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--ui-line);
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record a {
-  display: block; min-height: 44px; padding: 10px 0; box-sizing: border-box; color: #e6d6b8;
+  display: block; min-height: 44px; padding: 10px 0; box-sizing: border-box; color: var(--ui-text);
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record .picture-source-hash {
-  color: #a8a397; font: 400 .8125rem/1.5 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere;
+  color: var(--ui-text-quiet); font: 400 .8125rem/1.5 var(--sans); white-space: pre-wrap; overflow-wrap: anywhere;
 }
 #wing:is([data-film='upright'], [data-film='cinema']) .vinci-dock .picture-full-record summary {
-  display: flex; align-items: center; min-height: 44px; cursor: pointer; color: #e6d6b8; font: 400 .875rem/1.4 var(--sans);
+  display: flex; align-items: center; min-height: 44px; cursor: pointer; color: var(--ui-text); font: 400 .875rem/1.4 var(--sans);
 }
 
 /* ---- THE PANEL, upright: a sheet whose every control is in the thumb's reach ----
@@ -553,12 +578,12 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 /* ---- THE PLAN'S PLATE AT A PHONE'S READING SIZE, both forms ---- */
 #wing .wing-plan[data-reading='true'] :is(.wing-plan-number, .wing-plan-north-letter) { font-size: 13px; }
 /* each word stands in a halo of the sheet's ground, so a line passing near it never reads through it */
-#wing .wing-plan[data-reading='true'] .wing-plan-number { text-shadow: 0 0 2px #0d171f, 0 0 2px #0d171f, 0 0 4px #0d171f; }
-#wing .wing-plan[data-reading='true'] .wing-plan-room-name { paint-order: stroke; stroke: #0d171f; stroke-width: 3px; stroke-linejoin: round; }
+#wing .wing-plan[data-reading='true'] .wing-plan-number { text-shadow: 0 0 2px var(--ui-ground-sheet), 0 0 2px var(--ui-ground-sheet), 0 0 4px var(--ui-ground-sheet); }
+#wing .wing-plan[data-reading='true'] .wing-plan-room-name { paint-order: stroke; stroke: var(--ui-ground-sheet); stroke-width: 3px; stroke-linejoin: round; }
 
 /* ---- THE LIFE'S DRAWING on a phone: a name over the ribbon reads in the sheet's ink, lit when its place is open ---- */
-#wing .wing-life .wing-life-place[data-over='true'] { fill: #d6ccb8; stroke: #0d171f; }
-#wing .wing-life .wing-life-segment[data-open='true'] .wing-life-place[data-over='true'] { fill: #edcc8c; stroke: #0d171f; }
+#wing .wing-life .wing-life-place[data-over='true'] { fill: var(--ui-text-quiet); stroke: var(--ui-ground-sheet); }
+#wing .wing-life .wing-life-segment[data-open='true'] .wing-life-place[data-over='true'] { fill: var(--ui-way); stroke: var(--ui-ground-sheet); }
 
 /* ---- THE LIFE'S PLACES, upright: every period in view at once ---- */
 #wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-spine { flex-wrap: wrap; overflow: visible; row-gap: 6px; }
@@ -578,7 +603,7 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
   display: flex; position: fixed; right: 18px; bottom: calc(var(--vitrine-peek, 190px) + 102px); z-index: 3; gap: 6px;
 }
 #wing[data-film='upright'] .vitrine[data-peek='true']:is(:not(:has(.reader[data-lined='true'])), :has(.reader[data-lined='true'][data-strip='false'])) .reader-row .reader-zoom .vitrine-control {
-  flex: 0 0 44px; width: 44px; height: 44px; background: #0d171fd9; box-shadow: inset 0 0 0 1px #a9977399;
+  flex: 0 0 44px; width: 44px; height: 44px; background: color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent); box-shadow: inset 0 0 0 1px var(--ui-line-strong);
 }
 /* the topics' two marks are drawn as the sheets' are: the fit is the double tap's, the words a reader of the screen's */
 #wing[data-film='upright'] .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom .vitrine-control {
@@ -602,14 +627,14 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-payload-controls { order: 2; margin-top: auto; }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab {
   order: 1; position: relative; justify-content: flex-start; gap: 6px; align-self: flex-start; width: auto; min-height: 44px;
-  margin: 0 0 -6px; padding: 0 8px 0 0; font: 400 .9375rem/1 var(--sans); color: #e6d6b8;
+  margin: 0 0 -6px; padding: 0 8px 0 0; font: 400 .9375rem/1 var(--sans); color: var(--ui-text);
 }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab::before {
-  content: attr(aria-label); text-decoration: underline; text-decoration-color: color-mix(in srgb, #edcc8c 40%, transparent);
+  content: attr(aria-label); text-decoration: underline; text-decoration-color: var(--ui-line-strong);
   text-underline-offset: 5px; text-decoration-thickness: 1px;
 }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab::after {
-  content: '\2191'; width: auto; height: auto; border-radius: 0; background: none; color: #d2a557; font: 400 .9375rem/1 var(--sans);
+  content: '\2191'; width: auto; height: auto; border-radius: 0; background: none; color: var(--ui-text); font: 400 .9375rem/1 var(--sans);
 }
 /* a place or a single picture has no controls of its own: its few words stand
    in the middle of the card's rest height, not over an empty foot */
@@ -637,11 +662,11 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls > .vitrine-views:has(> .vitrine-folio-glass:only-child) { order: 2; flex: 0 0 auto; width: auto; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-payload-controls:has(> .vitrine-views > .vitrine-folio-glass:only-child) > .vitrine-clock { order: 1; flex: 1 1 auto; min-width: 0; }
 /* the leaf reads as a way in: its picture in a gold ring, a gold arrow out at its corner */
-#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass { position: relative; inset: auto; overflow: visible; box-shadow: 0 0 0 1.5px #d2a557; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass { position: relative; inset: auto; overflow: visible; box-shadow: 0 0 0 1.5px var(--ui-way); }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-folio-glass .vitrine-folio-thumb { border-radius: 50%; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-views .vitrine-folio-glass::after {
   content: '\2197'; position: absolute; right: -5px; bottom: -5px; width: 18px; height: 18px; border-radius: 50%;
-  background: #0d171f; box-shadow: 0 0 0 1px #d2a557; color: #edcc8c; font: 400 11px/18px var(--sans); text-align: center;
+  background: var(--ui-ground-sheet); box-shadow: 0 0 0 1px var(--ui-way); color: var(--ui-way); font: 400 11px/18px var(--sans); text-align: center;
 }
 /* a machine's Mehr follows what the card already says and opens the rest under it */
 #wing[data-film='upright'] .vitrine[data-payload='machine']:not([data-peek='true']) .vitrine-body { display: flex; flex-direction: column; }

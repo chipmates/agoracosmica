@@ -22,23 +22,23 @@
   overscroll-behavior-x:contain;scrollbar-width:thin;touch-action:pan-x;pointer-events:auto;}
 .reader-cell {flex:0 0 auto;display:flex;}
 .reader-page {display:flex;align-items:center;justify-content:center;box-sizing:border-box;
-  min-width:44px;min-height:44px;width:58px;height:84px;padding:2px;background:#0a0f13a6;
-  border:1px solid #a9977344;color:#cfc6b4;font:11px/1.2 var(--sans);cursor:pointer;}
+  min-width:44px;min-height:44px;width:58px;height:84px;padding:2px;background:color-mix(in srgb, var(--ui-ground-deep) 65%, transparent);
+  border:1px solid var(--ui-line);color:var(--ui-text-quiet);font:11px/1.2 var(--sans);cursor:pointer;}
 .reader-page-thumb {display:block;width:100%;height:100%;object-fit:contain;}
-.reader-page[aria-current='true'] {border-color:#edcc8c;background:#edcc8c1f;}
-.reader-page:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.reader-page[aria-current='true'] {border-color:var(--ui-way);background:color-mix(in srgb, var(--ui-way) 12%, transparent);}
+.reader-page:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 /* ABSENCE SHOWN AS ABSENCE: what the source itself says is not there stands
    in the row as its own cell, and is not a page a hand can press. */
 .reader-absence {flex:0 0 auto;display:flex;align-items:center;box-sizing:border-box;width:150px;height:84px;
-  padding:6px 8px;border:1px dashed #a9977355;}
-.reader-absence p {margin:0;font:11px/1.35 var(--sans);color:#b6bcae;}
+  padding:6px 8px;border:1px dashed var(--ui-line-strong);}
+.reader-absence p {margin:0;font:11px/1.35 var(--sans);color:var(--ui-text-quiet);}
 /* WHERE A PART OF THE VOLUME BEGINS: a cell of words before its first side,
    so a book that binds two manuscripts shows where the second one starts. */
 .reader-part {flex:0 0 auto;display:flex;flex-direction:column;justify-content:center;box-sizing:border-box;
-  width:120px;height:84px;padding:4px 8px;border-left:2px solid #edcc8c;}
+  width:120px;height:84px;padding:4px 8px;border-left:2px solid var(--ui-way);}
 .reader-part p {margin:0;font:14px/18px var(--sans);}
-.reader-part-name {color:#f0e4cc;}
-.reader-part-sub {color:#b6bcae;}
+.reader-part-name {color:var(--ui-text);}
+.reader-part-sub {color:var(--ui-text-quiet);}
 
 /* THE STRIP BESIDE THE LEAF. A portrait page is fitted by its height, so
    the band under it is paid for in page, and the width beside it is not.
@@ -52,7 +52,7 @@
 .reader[data-dock='side'] .reader-page {width:100%;height:84px;}
 .reader[data-dock='side'] .reader-absence {width:100%;height:auto;min-height:60px;}
 .reader[data-dock='side'] .reader-part {width:100%;height:auto;min-height:60px;padding:6px 4px;
-  border-left:0;border-top:2px solid #edcc8c;}
+  border-left:0;border-top:2px solid var(--ui-way);}
 
 /* THE ROW A HAND MEETS: the two that step one side with the ways between,
    and the viewer's own steps beside them where there is a wheel. One line:
@@ -72,7 +72,7 @@
 /* THE CARD: where the side stands in the book, what is on it, who holds it,
    and the witnesses one deliberate press away. Its name is the window's. */
 .reader-place {margin:0 0 8px;}
-.reader-named {color:#f0e4cc;}
+.reader-named {color:var(--ui-text);}
 .reader-raise {width:100%;}
 
 @media(max-aspect-ratio:9/10) {

@@ -8,7 +8,7 @@
   overflow: hidden;
   pointer-events: none;
 }
-.na-cycle[data-ready='true'] { background: #1a2026; }
+.na-cycle[data-ready='true'] { background: var(--ui-ground-deep); }
 .na-cycle > img,
 .na-cycle > video {
   position: absolute;

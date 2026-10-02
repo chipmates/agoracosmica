@@ -3,13 +3,13 @@
    narrow one. The room stays under it, frozen and dimmed. */
 .vitrine {position:fixed;inset:0;pointer-events:none;}
 .vitrine[hidden] {display:none;}
-.vitrine-scrim {position:fixed;inset:0;background:#0a0f13a8;pointer-events:none;}
+.vitrine-scrim {position:fixed;inset:0;background:color-mix(in srgb, var(--ui-ground-deep) 66%, transparent);pointer-events:none;}
 /* The scrim with the work's own rectangle left clear. */
-.vitrine-hole {position:fixed;box-shadow:0 0 0 200vmax #0a0f13a8;pointer-events:none;}
+.vitrine-hole {position:fixed;box-shadow:0 0 0 200vmax color-mix(in srgb, var(--ui-ground-deep) 66%, transparent);pointer-events:none;}
 .vitrine-scrim[hidden],.vitrine-hole[hidden] {display:none;}
 /* THE CARD STANDS OVER THE WORK, never under it: on the narrow stage a
    raised card covers the viewport it was peeking over. */
-.vitrine-sheet {position:fixed;display:none;z-index:1;pointer-events:auto;background:#0d171ff5;border:1px solid #a9977344;}
+.vitrine-sheet {position:fixed;display:none;z-index:1;pointer-events:auto;background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);border:1px solid var(--ui-line);}
 .vitrine[data-narrow='true'] .vitrine-sheet {display:block;}
 .vitrine-view {position:fixed;z-index:0;pointer-events:none;}
 .vitrine-payload {position:absolute;inset:0;pointer-events:auto;touch-action:none;outline:none;}
@@ -20,22 +20,22 @@
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-payload {bottom:var(--vitrine-peek,0px);}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-caption {bottom:calc(var(--vitrine-peek,0px) + 4px);}
 .vitrine-payload:empty {pointer-events:none;}
-.vitrine-payload:focus-visible {outline:1px solid #edcc8c;outline-offset:-3px;}
+.vitrine-payload:focus-visible {outline:1px solid var(--ui-way);outline-offset:-3px;}
 .vitrine-caption {position:absolute;left:0;right:0;bottom:4px;margin:0 auto;max-width:640px;padding:8px 14px;
-  font:15px/1.45 var(--serif);color:#f2eadb;text-align:center;text-wrap:balance;text-shadow:0 1px 14px #0a0f13;pointer-events:none;}
+  font:15px/1.45 var(--serif);color:var(--ui-text);text-align:center;text-wrap:balance;text-shadow:0 1px 14px var(--ui-ground-deep);pointer-events:none;}
 .vitrine-caption:empty {display:none;}
 /* A MACHINE'S STEP IS READ OVER WHATEVER THE STEP LIGHTS: its line keeps a
    ground of its own in its place, as the page's line does, so lit linen
    never takes its contrast */
 .vitrine[data-payload='machine'] .vitrine-caption {width:fit-content;max-width:min(640px,calc(100% - 28px));box-sizing:border-box;
-  padding:6px 12px;background:#101d27e0;border:1px solid #a9977344;text-shadow:none;}
+  padding:6px 12px;background:color-mix(in srgb, var(--ui-ground-sheet) 88%, transparent);border:1px solid var(--ui-line);text-shadow:none;}
 
 /* THE CARD. The name first, then the line in its own type, then the module's
    own label sentences, the payload's text, and the controls where a hand
    left them. */
 .vitrine-card {position:fixed;z-index:2;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden;padding:20px;
-  background:#101d27f2;border:1px solid #a9977355;color:#eae1d1;pointer-events:auto;user-select:text;}
-.vitrine-card:focus-visible {outline:1px solid #edcc8c;outline-offset:3px;}
+  background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);pointer-events:auto;user-select:text;}
+.vitrine-card:focus-visible {outline:1px solid var(--ui-way);outline-offset:3px;}
 .vitrine-body {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
 /* ON THE PHONE THE DRAWER SCROLLS above the control row: its lower edge fades
    over the lowest line shown while more waits below (--fade from the host) */
@@ -45,18 +45,18 @@
 /* ONE NAME TYPE FOR EVERY KIND. A machine, a work, a sheet and a leaf are
    named in the same place and the same type, so a visitor reads the name
    before the sentence about it. */
-.vitrine-name {display:flex;align-items:baseline;gap:9px;margin:0 0 10px;font:400 19px/1.3 var(--serif);color:#f4ead6;text-wrap:pretty;}
+.vitrine-name {display:flex;align-items:baseline;gap:9px;margin:0 0 10px;font:400 19px/1.3 var(--serif);color:var(--ui-text);text-wrap:pretty;}
 .vitrine-name[hidden] {display:none;}
 .vitrine-name-text {min-width:0;}
-.vitrine-name-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);transform:translateY(-1px);}
+.vitrine-name-dot {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,var(--ui-sure-reconstructed));transform:translateY(-1px);}
 .vitrine-name-dot[hidden] {display:none;}
 /* the number cast on the work's frame, in the museum's own figures */
-.vitrine-name-number {flex:0 0 auto;font:400 1em/1 var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;color:#d2a557;}
+.vitrine-name-number {flex:0 0 auto;font:400 1em/1 var(--press-display,var(--serif));font-variant-numeric:oldstyle-nums proportional-nums;color:var(--ui-text-quiet);}
 .vitrine-name-number[hidden] {display:none;}
 /* the catalogue under the name: the date and where the original is */
-.vitrine-catalogue {margin:-6px 0 10px;font:400 14px/1.4 var(--sans);letter-spacing:.01em;color:#c8bda6;text-wrap:pretty;}
+.vitrine-catalogue {margin:-6px 0 10px;font:400 14px/1.4 var(--sans);letter-spacing:.01em;color:var(--ui-text-quiet);text-wrap:pretty;}
 .vitrine-catalogue[hidden] {display:none;}
-.vitrine-line {margin:0 0 14px;font:400 21px/1.3 var(--serif);color:#fff5e3;text-wrap:pretty;}
+.vitrine-line {margin:0 0 14px;font:400 21px/1.3 var(--serif);color:var(--ui-text);text-wrap:pretty;}
 .vitrine-line[hidden] {display:none;}
 /* THE SOURCE ROW: whose words the line is, small, under it */
 .vitrine-note {margin:-10px 0 14px;font:400 13px/1.4 var(--sans);color:color-mix(in srgb,var(--na-starlight) 64%,transparent);text-wrap:pretty;}
@@ -68,21 +68,21 @@
   text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--na-starlight) 40%,transparent);text-underline-offset:3px;}
 .vitrine-count:disabled {cursor:default;text-decoration:none;}
 .vitrine-count:focus-visible {outline:1px solid var(--na-gold);outline-offset:2px;}
-.vitrine-words p {margin:8px 0;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
+.vitrine-words p {margin:8px 0;font:14px/1.5 var(--serif);color:var(--ui-text);text-wrap:pretty;}
 .vitrine-words .picture-policy-label,.vitrine-words .picture-label-language {display:block;min-width:0;}
-.vitrine-words .picture-first,.vitrine-words .picture-first-de {display:flex;align-items:baseline;gap:9px;margin:0 0 8px;font:400 16px/1.3 var(--serif);color:#f4ead6;}
-.vitrine-words .picture-certainty {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
-.vitrine-words .picture-holder,.vitrine-words .picture-source-reading,.vitrine-words .picture-column-note,.vitrine-meta {font:12px/1.5 var(--sans);color:#b6bcae;overflow-wrap:anywhere;}
-.vitrine-words .picture-label-more,.vitrine-more {display:block;width:100%;min-height:44px;margin-top:6px;padding:10px 0;text-align:left;background:none;border:0;border-top:1px solid #a9977344;color:#e6d6b8;font:12px var(--sans);cursor:pointer;}
-.vitrine-certainty {display:flex;align-items:center;gap:9px;margin:10px 0 4px;font:11px/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:#d8cdb6;}
-.vitrine-certainty::before {content:'';flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,#d2a557);}
-.vitrine-controls {flex:0 0 auto;display:flex;flex-wrap:nowrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid #a9977344;}
+.vitrine-words .picture-first,.vitrine-words .picture-first-de {display:flex;align-items:baseline;gap:9px;margin:0 0 8px;font:400 16px/1.3 var(--serif);color:var(--ui-text);}
+.vitrine-words .picture-certainty {flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,var(--ui-sure-reconstructed));}
+.vitrine-words .picture-holder,.vitrine-words .picture-source-reading,.vitrine-words .picture-column-note,.vitrine-meta {font:12px/1.5 var(--sans);color:var(--ui-text-quiet);overflow-wrap:anywhere;}
+.vitrine-words .picture-label-more,.vitrine-more {display:block;width:100%;min-height:44px;margin-top:6px;padding:10px 0;text-align:left;background:none;border:0;border-top:1px solid var(--ui-line);color:var(--ui-text);font:12px var(--sans);cursor:pointer;}
+.vitrine-certainty {display:flex;align-items:center;gap:9px;margin:10px 0 4px;font:11px/1.4 var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--ui-text-quiet);}
+.vitrine-certainty::before {content:'';flex:0 0 8px;width:8px;height:8px;border-radius:50%;background:var(--certainty,var(--ui-sure-reconstructed));}
+.vitrine-controls {flex:0 0 auto;display:flex;flex-wrap:nowrap;gap:8px;margin-top:14px;padding-top:12px;border-top:1px solid var(--ui-line);}
 .vitrine[data-narrow='false'] .vitrine-caption {bottom:64px;}
 .vitrine-control {flex:1 1 0;display:inline-flex;align-items:center;justify-content:center;box-sizing:border-box;
-  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid #a9977366;color:#e6d6b8;
+  min-height:44px;min-width:44px;padding:10px 12px;background:transparent;border:1px solid var(--ui-line-strong);color:var(--ui-text);
   font:12px/1.2 var(--sans);text-align:center;text-decoration:none;cursor:pointer;}
-.vitrine-control:focus-visible,.vitrine-more:focus-visible,.vitrine-words .picture-label-more:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
-.vitrine-control[aria-pressed='true'] {border-color:#edcc8c;color:#fff5e3;}
+.vitrine-control:focus-visible,.vitrine-more:focus-visible,.vitrine-words .picture-label-more:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
+.vitrine-control[aria-pressed='true'] {border-color:var(--ui-way);color:var(--ui-text);}
 .vitrine-control[disabled] {opacity:.38;cursor:default;}
 /* The two controls that walk the wall carry a mark and not a word: the work
    each one opens is what names it. */
@@ -97,11 +97,11 @@
 .vitrine-payload-controls {position:fixed;z-index:3;box-sizing:border-box;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:8px;padding:0 8px;pointer-events:none;}
 .vitrine-payload-controls:empty {display:none;}
 .vitrine-payload-controls > * {pointer-events:auto;}
-.vitrine-payload-controls .vitrine-control {flex:0 0 auto;background:#101d27d9;}
+.vitrine-payload-controls .vitrine-control {flex:0 0 auto;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);}
 
 @media(max-aspect-ratio:9/10) {
   .vitrine-card {padding:10px 12px 12px;background:transparent;border:0;}
-  .vitrine-view {border:1px solid #a9977344;border-bottom:0;box-sizing:border-box;}
+  .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;box-sizing:border-box;}
   .vitrine-name {margin-bottom:6px;font-size:16px;}
   .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
   .vitrine-catalogue {margin:-3px 0 6px;font-size:13px;}
@@ -132,19 +132,19 @@
 /* ONE MARK DISMISSES THE WINDOW, at the corner of the work, where the card's
    own row has stood down behind a peek. */
 .vitrine-shut {position:fixed;z-index:4;display:none;align-items:center;justify-content:center;box-sizing:border-box;
-  min-width:44px;min-height:44px;background:#101d27d9;border:1px solid #a9977366;color:#e6d6b8;
+  min-width:44px;min-height:44px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);
   font:15px/1 var(--sans);cursor:pointer;pointer-events:auto;}
 .vitrine[data-narrow='true'] .vitrine-shut {display:flex;}
 .vitrine-shut[hidden] {display:none;}
-.vitrine-shut:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vitrine-shut:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 
 /* THE CARD IS A SHEET. Its grabber raises it over the work and puts it back,
    which is the gesture the station's own sheet already takes. */
 .vitrine-grab {display:none;}
 .vitrine[data-narrow='true'][data-fill='true'] .vitrine-grab {flex:0 0 auto;display:flex;align-items:center;
   justify-content:center;width:100%;min-height:44px;margin:0;padding:0;background:none;border:0;cursor:pointer;}
-.vitrine-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:#c8bda6aa;}
-.vitrine-grab:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+.vitrine-grab::after {content:'';width:38px;height:3px;border-radius:2px;background:color-mix(in srgb, var(--ui-text-quiet) 67%, transparent);}
+.vitrine-grab:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 /* AT THE PEEK THE CARD IS THE WORK'S OWN NAME AND NOTHING ELSE: the volume's
    line, the row and the walk come up with the card. */
 .vitrine[data-peek='true'] .vitrine-line,
@@ -197,13 +197,13 @@
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-place {display:none;}
 /* the grab raises the card, so the peek carries no second raise */
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .reader-raise {display:none;}
-.vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:#0d171ff5;}
+.vitrine[data-narrow='true'][data-fill='true'] .vitrine-card {background:color-mix(in srgb, var(--ui-ground-sheet) 96%, transparent);}
 
 /* THE ONE LINE UNDER A PAGE is read over paper as often as over dark: the
    reader gives it the same ground its page label has, and stands it above
    the strip of sides rather than across it. */
 .vitrine[data-payload='manuscript'] .vitrine-caption {width:fit-content;max-width:min(640px,calc(100% - 28px));
-  padding:7px 12px;background:#101d27e0;border:1px solid #a9977344;text-shadow:none;}
+  padding:7px 12px;background:color-mix(in srgb, var(--ui-ground-sheet) 88%, transparent);border:1px solid var(--ui-line);text-shadow:none;}
 .vitrine[data-payload='manuscript'][data-narrow='false'] .vitrine-caption {bottom:154px;}
 .vitrine[data-payload='manuscript'][data-narrow='false']:has(.reader[data-strip='false']) .vitrine-caption {bottom:70px;}
 .vitrine[data-payload='manuscript'][data-narrow='true'] .vitrine-caption {bottom:calc(var(--vitrine-peek,190px) + 88px);}
@@ -214,39 +214,39 @@
 .vitrine-plate img,.vitrine-plate canvas {position:absolute;display:block;max-width:none;}
 .vitrine-plate[hidden] {display:none;}
 /* A cut-out scan's shoulders outside its round top take the glass's own ground. */
-.vitrine-plate-ground {position:absolute;display:block;overflow:visible;fill:#0a0f13;}
+.vitrine-plate-ground {position:absolute;display:block;overflow:visible;fill:var(--ui-ground-deep);}
 
 /* THE MACHINE'S CLOCK, its viewpoints, its steps and its folio. */
 .vitrine-views {display:flex;gap:8px;}
 .vitrine-clock {display:flex;align-items:center;gap:10px;flex:1 1 320px;max-width:560px;}
 .vitrine-play {min-width:96px;}
 .vitrine-track {position:relative;flex:1 1 auto;display:flex;align-items:center;min-height:44px;}
-.vitrine-slider {width:100%;min-height:44px;margin:0;accent-color:#edcc8c;background:transparent;cursor:pointer;
+.vitrine-slider {width:100%;min-height:44px;margin:0;accent-color:var(--ui-way);background:transparent;cursor:pointer;
   -webkit-appearance:none;appearance:none;}
 .vitrine-slider::-webkit-slider-runnable-track {height:4px;border-radius:2px;
-  background:linear-gradient(to right,#edcc8c var(--fill,0%),#c8bda640 var(--fill,0%));}
-.vitrine-slider::-moz-range-track {height:4px;border-radius:2px;background:#c8bda640;}
-.vitrine-slider::-moz-range-progress {height:4px;border-radius:2px;background:#edcc8c;}
+  background:linear-gradient(to right,var(--ui-way) var(--fill,0%),color-mix(in srgb, var(--ui-text-quiet) 25%, transparent) var(--fill,0%));}
+.vitrine-slider::-moz-range-track {height:4px;border-radius:2px;background:color-mix(in srgb, var(--ui-text-quiet) 25%, transparent);}
+.vitrine-slider::-moz-range-progress {height:4px;border-radius:2px;background:var(--ui-way);}
 .vitrine-slider::-webkit-slider-thumb {-webkit-appearance:none;appearance:none;width:18px;height:18px;margin-top:-7px;border:0;border-radius:50%;
-  background:#edcc8c;box-shadow:0 0 0 3px #0d171f;}
-.vitrine-slider::-moz-range-thumb {width:18px;height:18px;border:0;border-radius:50%;background:#edcc8c;box-shadow:0 0 0 3px #0d171f;}
+  background:var(--ui-way);box-shadow:0 0 0 3px var(--ui-ground-sheet);}
+.vitrine-slider::-moz-range-thumb {width:18px;height:18px;border:0;border-radius:50%;background:var(--ui-way);box-shadow:0 0 0 3px var(--ui-ground-sheet);}
 .vitrine-slider:disabled {cursor:default;opacity:.5;}
-.vitrine-slider:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
-.vitrine-tick {position:absolute;top:8px;width:2px;height:8px;margin-left:-1px;background:#edcc8ccc;pointer-events:none;}
-.vitrine-steps {margin:14px 0 4px;padding:0;list-style:none;border-top:1px solid #a9977333;}
+.vitrine-slider:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
+.vitrine-tick {position:absolute;top:8px;width:2px;height:8px;margin-left:-1px;background:color-mix(in srgb, var(--ui-way) 80%, transparent);pointer-events:none;}
+.vitrine-steps {margin:14px 0 4px;padding:0;list-style:none;border-top:1px solid var(--ui-line);}
 .vitrine-step-item {display:flex;align-items:baseline;gap:10px;width:100%;min-height:44px;padding:9px 4px;text-align:left;
-  background:none;border:0;border-bottom:1px solid #a9977322;color:#cfc6b4;font:14px/1.45 var(--serif);cursor:pointer;}
-.vitrine-step-item .vinci-title-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:#d2a557;transform:translateY(-1px);}
-.vitrine-step-item[aria-current='step'] {color:#fff5e3;background:#edcc8c14;}
-.vitrine-step-item:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
+  background:none;border:0;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);font:14px/1.45 var(--serif);cursor:pointer;}
+.vitrine-step-item .vinci-title-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;background:var(--ui-sure-reconstructed);transform:translateY(-1px);}
+.vitrine-step-item[aria-current='step'] {color:var(--ui-text);background:color-mix(in srgb, var(--ui-way) 8%, transparent);}
+.vitrine-step-item:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
 .vitrine-folio {position:absolute;bottom:118px;right:0;display:flex;align-items:center;justify-content:center;min-width:44px;min-height:44px;
-  max-width:132px;padding:4px;background:#101d27d9;border:1px solid #a9977366;color:#e6d6b8;font:11px/1.3 var(--sans);cursor:pointer;pointer-events:auto;}
+  max-width:132px;padding:4px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);font:11px/1.3 var(--sans);cursor:pointer;pointer-events:auto;}
 .vitrine-folio-thumb {display:block;width:112px;height:auto;}
-.vitrine-folio:focus-visible {outline:1px solid #edcc8c;outline-offset:2px;}
+.vitrine-folio:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 .vitrine-leader {position:fixed;inset:0;width:100vw;height:100vh;overflow:visible;pointer-events:none;}
-.vitrine-leader line {stroke:#edcc8c;stroke-width:1;}
-.vitrine-part-name {position:fixed;max-width:260px;margin:0;padding:8px 12px;background:#101d27e6;border:1px solid #a9977366;
-  color:#fff5e3;font:14px/1.4 var(--serif);pointer-events:none;}
+.vitrine-leader line {stroke:var(--ui-way);stroke-width:1;}
+.vitrine-part-name {position:fixed;max-width:260px;margin:0;padding:8px 12px;background:color-mix(in srgb, var(--ui-ground-sheet) 90%, transparent);border:1px solid var(--ui-line-strong);
+  color:var(--ui-text);font:14px/1.4 var(--serif);pointer-events:none;}
 .vitrine-part-name[hidden] {display:none;}
 @media(max-aspect-ratio:9/10) {
   .vitrine-views {order:-1;width:100%;gap:6px;}
@@ -261,7 +261,7 @@
   .vitrine-views .vitrine-folio-glass {position:static;flex:0 0 44px;width:44px;height:44px;min-width:44px;max-width:44px;margin-left:auto;
     padding:0;overflow:hidden;border-radius:50%;}
   .vitrine-folio-glass .vitrine-folio-thumb {width:100%;height:100%;object-fit:cover;object-position:50% 30%;}
-  .vitrine-folio-leaf {width:20px;height:24px;fill:none;stroke:#edcc8c;stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;}
+  .vitrine-folio-leaf {width:20px;height:24px;fill:none;stroke:var(--ui-way);stroke-width:1.3;stroke-linejoin:round;stroke-linecap:round;}
   /* ONE TEXT AT A TIME: the run's caption is the step's one sentence, and the
      steps as rows stand in the drawer "More" opens, never under it as well */
   .vitrine[data-payload='machine'] .vitrine-card:has(.vitrine-more[aria-expanded='false']) .vitrine-steps {display:none;}
@@ -272,18 +272,18 @@
    book, its controls in one row, its words in the card. */
 .vitrine-leaf {position:absolute;inset:12px 12px 124px;display:flex;align-items:center;justify-content:center;gap:6px;pointer-events:none;}
 .vitrine-leaf[hidden] {display:none;}
-.vitrine-leaf-page {display:block;min-width:0;max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 2px 18px #0a0f13;}
+.vitrine-leaf-page {display:block;min-width:0;max-width:100%;max-height:100%;object-fit:contain;box-shadow:0 2px 18px var(--ui-ground-deep);}
 .vitrine-leaf-facing {max-width:49%;opacity:.92;}
 .vitrine-leaf-facing + .vitrine-leaf-page {max-width:49%;}
 .vitrine-leaf-mirrored {transform:scaleX(-1);}
 .vitrine-reader-row {display:flex;flex-wrap:wrap;justify-content:center;gap:8px;}
-.vitrine-folio-name {margin:4px 0 6px;font:400 18px/1.3 var(--serif);color:#f4ead6;}
+.vitrine-folio-name {margin:4px 0 6px;font:400 18px/1.3 var(--serif);color:var(--ui-text);}
 .vitrine-folio-words h4 {margin:12px 0 2px;font-weight:400;}
-.vitrine-source-text {white-space:pre-wrap;font:13px/1.5 var(--serif);color:#e6e0d2;}
+.vitrine-source-text {white-space:pre-wrap;font:13px/1.5 var(--serif);color:var(--ui-text);}
 .vitrine-reader-leaves {margin:6px 0;padding:0;list-style:none;}
 .vitrine-reader-shelf .vt-codex-list,.vitrine-reader-shelf .vt-absence-list {margin:6px 0;padding:0;list-style:none;}
-.vitrine-reader-shelf .vt-codex-button {display:flex;gap:10px;align-items:center;width:100%;min-height:44px;padding:6px 4px;text-align:left;background:none;border:0;border-bottom:1px solid #a9977322;color:#cfc6b4;cursor:pointer;}
-.vitrine-reader-shelf .vt-codex-row {display:flex;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid #a9977322;}
+.vitrine-reader-shelf .vt-codex-button {display:flex;gap:10px;align-items:center;width:100%;min-height:44px;padding:6px 4px;text-align:left;background:none;border:0;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);cursor:pointer;}
+.vitrine-reader-shelf .vt-codex-row {display:flex;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--ui-line);}
 .vitrine-reader-shelf .vt-codex-plate {width:44px;height:auto;flex:0 0 44px;}
 .vitrine-reader-shelf .vt-codex-body {display:flex;flex-direction:column;gap:2px;font:12px/1.4 var(--sans);}
 @media(max-aspect-ratio:9/10) {
@@ -295,18 +295,18 @@
 /* THE DATE READER: the date the list stands at in the viewport, the whole
    line as an ordered list in the card. */
 .vitrine-date {position:absolute;inset:0 0 118px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:12px;text-align:center;pointer-events:auto;}
-.vitrine-date-year {margin:0;font:400 44px/1.15 var(--serif);color:#fff5e3;text-wrap:balance;}
+.vitrine-date-year {margin:0;font:400 44px/1.15 var(--serif);color:var(--ui-text);text-wrap:balance;}
 .vitrine-date .vitrine-certainty {justify-content:center;}
 .vitrine-date-ask {font-size:15px;min-width:160px;}
-.vitrine-dates {margin:10px 0 0;padding:0;list-style:none;border-top:1px solid #a9977333;}
-.vitrine-dates-item {border-bottom:1px solid #a9977322;}
+.vitrine-dates {margin:10px 0 0;padding:0;list-style:none;border-top:1px solid var(--ui-line);}
+.vitrine-dates-item {border-bottom:1px solid var(--ui-line);}
 .vitrine-dates-heading {margin:0;font:inherit;}
-.vitrine-dates-link {display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 4px;color:#cfc6b4;font:14px/1.35 var(--serif);text-decoration:none;}
+.vitrine-dates-link {display:flex;align-items:center;gap:10px;min-height:44px;padding:6px 4px;color:var(--ui-text-quiet);font:14px/1.35 var(--serif);text-decoration:none;}
 .vitrine-dates-link .vinci-title-dot {flex:0 0 7px;width:7px;height:7px;border-radius:50%;}
-.vitrine-dates-link:focus-visible {outline:1px solid #edcc8c;outline-offset:-2px;}
-.vitrine-dates-item[aria-current='true'] {background:#edcc8c14;}
-.vitrine-dates-item[aria-current='true'] .vitrine-dates-link {color:#fff5e3;font-size:16px;}
-.vitrine-date-line {margin:0 4px 10px 21px;font:14px/1.5 var(--serif);color:#e6e0d2;text-wrap:pretty;}
+.vitrine-dates-link:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
+.vitrine-dates-item[aria-current='true'] {background:color-mix(in srgb, var(--ui-way) 8%, transparent);}
+.vitrine-dates-item[aria-current='true'] .vitrine-dates-link {color:var(--ui-text);font-size:16px;}
+.vitrine-date-line {margin:0 4px 10px 21px;font:14px/1.5 var(--serif);color:var(--ui-text);text-wrap:pretty;}
 .vitrine-date-line[hidden] {display:none;}
 @media(max-aspect-ratio:9/10) {
   .vitrine-date {inset:0 0 28px;gap:2px;}
