@@ -121,6 +121,13 @@ export async function openArnoCard(host: HTMLElement, options: ArnoCardOptions =
   drawing.sizes = SIZES
   drawing.srcset = admitted.files.map(file => `${address(file)} ${file.width}w`).join(', ')
   drawing.src = address(plate)
+  // a srcset size that fails never falls back by itself: the plate's own file stands in once
+  drawing.addEventListener('error', () => {
+    if (!drawing.srcset) return
+    drawing.removeAttribute('srcset')
+    drawing.removeAttribute('sizes')
+    drawing.src = address(plate)
+  })
   const shown = (): void => { sheet.dataset['loaded'] = 'true' }
   if (drawing.complete && drawing.naturalWidth) shown()
   else drawing.addEventListener('load', shown, { once: true })
