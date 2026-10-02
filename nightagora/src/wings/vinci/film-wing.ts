@@ -900,8 +900,14 @@ export function createWing(): WingModule {
     const ways = look?.id ? look.ways() : null
     if (ways?.next) { ways.step(1); return }
     const to = nextIndex()
-    if (to !== null) hosts?.navigate(to)
+    if (to !== null) onFromLook(to)
     else if (!endWith('lookup')) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+  }
+  /** the next stop from wherever the eye stands: an open look shuts without
+      the history's step back, whose pop would walk the eye back to this stop */
+  function onFromLook(to: number): void {
+    if (look?.id) { lookLeaving = true; try { look.close(false) } finally { lookLeaving = false } }
+    hosts?.navigate(to)
   }
 
   /* A SWIPE DOWN SHUTS A TALL SHEET ON THE PHONE, beside its one close: the
@@ -1259,7 +1265,7 @@ export function createWing(): WingModule {
       if (form !== 'desk' || !asked) return
       const to = nextIndex()
       asked.onward = to !== null
-        ? { kicker: text(CARDS.controls.date.next), title: text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name), go: () => hosts?.navigate(to) }
+        ? { kicker: text(CARDS.controls.date.next), title: text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name), go: () => onFromLook(to) }
         : { kicker: text(deskControl('walk', 'the_end')), title: text(deskControl('ending', 'lookup')), up: true,
           go: () => { if (!endWith('lookup')) wing.querySelector<HTMLElement>('.wing-lobby')?.click() } }
     }, { signal })
