@@ -121,6 +121,8 @@
 /* the key row's targets are 48 tall, the words 32 */
 .film-key::after { content: ''; position: absolute; left: -6px; right: -6px; top: -8px; bottom: -8px; }
 .film-key[hidden] { display: none; }
+/* on the narrowest phones the row keeps its longest count on one line ("17 Themen zu sehen" at 360) */
+@media (max-width: 370px) { .film-keys { column-gap: 8px; } }
 .film-key .film-ic { width: 14px; height: 14px; color: var(--gold); }
 .film-count { margin-left: auto; font: 400 .9375rem/32px var(--sans); font-variant-numeric: tabular-nums; color: var(--key); white-space: nowrap; }
 .film-foot {

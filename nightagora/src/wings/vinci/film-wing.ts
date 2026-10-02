@@ -80,8 +80,8 @@ const TRIANGLE_BACK = 'M11 3.5L4.5 8 11 12.5z'
 const STEP_BACK = 'M10 3L5 8l5 5'
 const RING = 2 * Math.PI * 20.5
 /** the most a mark is lifted to stand clear of the phone's box: sideways
-    takes 28, upright the Baptism's mark on Safari's short glass needs 37 */
-const MARK_LIFT = 40
+    takes 28; upright the Baptism's mark needs 37 at 390x664 and 41 at 375x667 */
+const MARK_LIFT = 44
 
 /** The release the address names: `?film=<name>` under the origin's `/film/`. */
 export function filmReleaseBase(): string {
