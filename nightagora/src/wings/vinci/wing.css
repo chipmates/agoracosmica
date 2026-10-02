@@ -28,6 +28,8 @@
   .vinci-dock[data-station='arrival'] {left:auto;right:28px;}
 }
 .vinci-certainty {color:var(--ui-sure-reconstructed);font:10px var(--sans);letter-spacing:.18em;text-transform:uppercase; }
+.vinci-certainty[data-certainty='documented'] {color:var(--ui-sure-documented); }
+.vinci-certainty[data-certainty='conjectural'] {color:var(--ui-sure-conjectural); }
 .vinci-certainty[data-certainty='unknown'] {color:var(--ui-sure-unknown); }
 .vinci-dock h2 {font:400 24px/1.15 var(--serif);margin:10px 0 16px; }
 .vinci-statement {font:14px/1.55 var(--serif);margin:14px 0; }
