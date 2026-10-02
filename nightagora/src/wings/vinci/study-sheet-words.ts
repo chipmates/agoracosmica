@@ -7,7 +7,7 @@ export const STUDY_SHEET_WORDS: {
 } = {
   title: { en: 'A deluge', de: 'Eine Sintflut' },
   shows: {
-    en: 'Dated about 1517 to 1518, the sheet is all storm: water and wind spiral, blocks tumble, the trees below are tiny. The museum put it here for the secretary’s note that he still drew.',
-    de: 'Das Blatt, auf etwa 1517 bis 1518 datiert, ist ein einziger Sturm: Wasser und Wind wirbeln, Blöcke stürzen, die Bäume unten sind winzig. Das Museum hat es hierher gelegt, weil der Sekretär festhielt, dass er noch zeichnete.',
+    en: 'Water and wind spiral, stone blocks tumble, the trees look tiny. It is dated about 1517 to 1518, drawn nobody knows where. The museum shows it here because the secretary wrote that Leonardo still drew.',
+    de: 'Wasser und Wind wirbeln, Steinblöcke stürzen, die Bäume wirken winzig. Das Blatt ist auf etwa 1517 bis 1518 datiert, und niemand weiß, wo es entstand. Das Museum zeigt es hier, weil der Sekretär festhielt, dass Leonardo noch zeichnete.',
   },
 }
