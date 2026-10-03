@@ -413,6 +413,17 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* the walk's seats and gold are the look's steps and its one close: the card's own stand down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more[hidden] { display: none; }
+/* an opened column's way back to the strip is its own close mark at its head, beside the name:
+   the foot row keeps the one key that reads on, so no two keys there point the same way */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] {
+  position: absolute; top: -8px; right: -14px; z-index: 1; justify-content: center;
+  width: 44px; min-width: 44px; height: 44px; text-decoration: none;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] .vitrine-look-more-word {
+  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+}
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] .vitrine-look-arrow { width: 16px; height: 16px; margin: 0; stroke-width: 1.4; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-name { padding-right: 32px; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-arrow {
   width: 13px; height: 13px; margin-left: 5px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
 }

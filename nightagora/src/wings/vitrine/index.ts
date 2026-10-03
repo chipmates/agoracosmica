@@ -228,7 +228,7 @@ export function createVitrine(options: {
   const lookArrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
   lookArrow.append(lookArrowPath)
   lookMore.append(lookMoreWord, lookArrow)
-  /** and its other key, wherever the column stands open or read on: back to the strip, or to the column's head */
+  /** and its other key: an opened column's own close mark at its head, back to the strip; a column at home, back to its head */
   const lookLess = make('button', 'vitrine-look-more vitrine-look-less')
   lookLess.type = 'button'
   const lookLessWord = make('span', 'vitrine-look-more-word')
@@ -540,8 +540,13 @@ export function createVitrine(options: {
   function clampWords(): void {
     cutAsked = false
     if (!cinemaFrame || root.dataset['lookForm'] !== 'beside') { cut = null; unmaskLines(body); return }
-    cut = wholeLines(body)
+    cut = wholeLines(body, { from: headBand(body.scrollTop > 0.5) })
     maskWholeLines(body, cut)
+  }
+  /** read on, an opened column's lines start under its close mark, which stands beside the name at its head */
+  function headBand(scrolled: boolean): number {
+    if (!scrolled || !lookLess.hasAttribute('data-head') || lookLess.hidden) return 0
+    return Math.max(0, lookLess.getBoundingClientRect().bottom - body.getBoundingClientRect().top - body.clientTop)
   }
   const askClamp = (): void => { if (cutAsked) return; cutAsked = true; requestAnimationFrame(() => { clampWords(); paintLookMore() }) }
   /** A FILM'S FOOT: its clock along the film's lower edge, its line centred
@@ -620,14 +625,18 @@ export function createVitrine(options: {
   }
   const toolWatch = new MutationObserver(() => gatherTools())
   /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
-  const UP = 'M8 13V3M4 7l4-4 4 4', DOWN = 'M8 3v10M4 9l4 4 4-4'
+  const UP = 'M8 13V3M4 7l4-4 4 4', DOWN = 'M8 3v10M4 9l4 4 4-4', CROSS = 'M4 4l8 8M12 4l-8 8'
   function paintLookMore(): void {
     const frame = cinemaFrame
     if (!frame) { lookMore.remove(); lookLess.remove(); return }
-    if (lookMore.parentElement !== controls) controls.prepend(lookMore)
-    if (lookLess.parentElement !== controls) lookMore.after(lookLess)
     const strip = root.dataset['lookForm'] === 'under'
     const opened = root.hasAttribute('data-look-open')
+    if (lookMore.parentElement !== controls) controls.prepend(lookMore)
+    /* one key reads on in the foot row; an opened column's way back is a
+       different act, so it is a different mark in a different place */
+    if (opened && lookLess.parentElement !== card) controls.after(lookLess)
+    if (!opened && lookLess.parentElement !== controls) lookMore.after(lookLess)
+    lookLess.toggleAttribute('data-head', opened)
     lookMoreWord.textContent = frame.more
     lookLessWord.textContent = frame.less
     // in the strip the key raises the words; in a column it reads on, while lines wait below
@@ -637,13 +646,13 @@ export function createVitrine(options: {
     lookMore.hidden = !strip && !readOn
     /* closing goes back down to the strip from an opened column; a column at
        home has one key, which turns back up to its head once its end is read */
-    lessArrowPath.setAttribute('d', opened ? DOWN : UP)
+    lessArrowPath.setAttribute('d', opened ? CROSS : UP)
     lookLess.hidden = strip || !(opened || (!readOn && Boolean(cut?.above)))
   }
   lookMore.addEventListener('click', () => {
     if (root.dataset['lookForm'] === 'under') { setRaised(true); return }
-    // the next page begins on the first line the column hid
-    const next = cut?.next ?? body.clientHeight - 44
+    // the next page begins on the first line the column hid, under an opened column's close mark
+    const next = (cut?.next ?? body.clientHeight - 44) - (root.hasAttribute('data-look-open') ? headBand(true) : 0)
     body.scrollBy({ top: Math.max(22, next), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
   })
   lookLess.addEventListener('click', () => {
