@@ -61,6 +61,10 @@ export interface VitrinePayloadHost {
   /** SIDEWAYS, the part of the glass a film may run to: the whole glass
    * under the strip, all but the label column beside it; null elsewhere. */
   field?(): VitrineRect | null
+  /** SIDEWAYS, where a film's line stands in the label column and not over
+   * its foot: the part of the zone its subject keeps clear of, which is the
+   * zone less the clock's band; null where the payload measures its own. */
+  clear?(): VitrineRect | null
 }
 
 /** THE PHONE HELD SIDEWAYS, as the host measures it: the glass inside its

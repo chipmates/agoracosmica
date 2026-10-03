@@ -330,6 +330,15 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   left: var(--words-left, 0px); width: var(--words-width, 100%); bottom: calc(var(--words-foot, 0px) + 44px); padding: 0;
 }
 #wing[data-film='cinema'] .vitrine[data-look-words='beside'] .vitrine-caption { text-align: left; text-wrap: pretty; }
+/* A MACHINE BESIDE ITS WORDS says its step in the label column, under a rule over the column's keys, at the height of
+   its longest step (cycle.ts), so the words above it never move as the steps go by; the film keeps only its clock */
+#wing[data-film='cinema'] .vitrine[data-look-aside] .vitrine-card > .vitrine-caption {
+  position: static; flex: 0 0 auto; z-index: auto; width: auto; max-width: none; margin: 0; box-sizing: border-box; padding: 9px 0 2px;
+  background: none; border: 0; border-top: 1px solid var(--ui-line); border-radius: 0; text-shadow: none;
+  font: 400 .9375rem/22px var(--serif); color: var(--ui-text); text-align: left; text-wrap: pretty; pointer-events: auto;
+}
+/* read on, the column lists the steps with the one under way marked: one text at a time, the line stands down */
+#wing[data-film='cinema'] .vitrine[data-look-aside] .vitrine-body[data-top='false'] + .vitrine-caption { display: none; }
 
 /* ---- BESIDE: the label column on the wall ---- */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-card {

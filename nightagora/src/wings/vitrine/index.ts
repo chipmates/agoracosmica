@@ -102,6 +102,8 @@ const CINEMA = {
   strip: 52,
   /** the clock's band along a film's foot, and its inset from the film's sides */
   clock: 44, clockInset: 16,
+  /** the air between a film's subject and its clock, where the film's line stands in the label column */
+  clockAir: 6,
 }
 
 export function createVitrine(options: {
@@ -472,8 +474,12 @@ export function createVitrine(options: {
     const under: VitrineRect = { left, top, width: right - left, height: frame.row.top - CINEMA.rowGap - top }
     const aspect = exhibit?.payload?.aspect?.() ?? null
     const area = (shape: number, box: VitrineRect): number => { const across = Math.min(box.width, box.height * shape); return across * across / shape }
+    /* A MACHINE RESTS BESIDE ITS WORDS: its film's frame is wide, but the
+       machine inside it stands taller in the field at the glass's height than
+       over the strip, and its step's line reads in the label column */
+    const machine = exhibit?.payload?.kind === 'machine'
     // a work that stands under steps aside when its words open: the words take the label column, the work the place beside it
-    const home = aspect && area(aspect, under) > area(aspect, beside) ? 'under' : 'beside'
+    const home = !machine && aspect && area(aspect, under) > area(aspect, beside) ? 'under' : 'beside'
     const form = home === 'under' && raised ? 'beside' : home
     root.dataset['form'] = 'cinema'
     root.dataset['lookForm'] = form
@@ -495,6 +501,11 @@ export function createVitrine(options: {
     nameIt(namingText.textContent ?? '', named.certainty ?? sureOf(exhibit?.certainty))
     rects.view = form === 'under' ? under : beside
     place(stage, rects.view)
+    // a filmed machine beside its words says its step in the label column, over the column's keys
+    const aside = machine && filmed && form === 'beside'
+    root.toggleAttribute('data-look-aside', aside)
+    if (aside && caption.parentElement !== card) { card.insertBefore(caption, controls); wordsResized.observe(caption) }
+    else if (!aside && caption.parentElement !== stage) { stage.append(caption); wordsResized.unobserve(caption) }
     if (form === 'beside') {
       /* THE LABEL COLUMN IS A BOX ON THE WALL in the walk's own ground, from
          the glass's top air to the foot row: it reaches into the gap to the
@@ -713,7 +724,8 @@ export function createVitrine(options: {
   })
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
-    for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm', 'lookWords']) delete root.dataset[key]
+    for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm', 'lookWords', 'lookAside']) delete root.dataset[key]
+    if (caption.parentElement !== stage) { stage.append(caption); wordsResized.unobserve(caption) }
     unmaskLines(body)
     cut = null
     stripName.textContent = ''
@@ -930,6 +942,8 @@ export function createVitrine(options: {
     banded: inBand(),
     cinema: () => cinemaFrame !== null,
     field: () => (cinemaFrame && rects.field ? { ...rects.field } : null),
+    clear: () => (cinemaFrame && root.hasAttribute('data-look-aside')
+      ? { ...rects.view, height: Math.max(80, rects.view.height - CINEMA.clock - CINEMA.clockAir) } : null),
     viewport: () => ({ ...rects.view }),
     work: () => (inBand() ? null : exhibit?.work?.() ?? null),
     surface: setSurface,
@@ -1060,6 +1074,7 @@ export function createVitrine(options: {
     payloadControls.textContent = ''
     aside.textContent = ''
     caption.textContent = ''
+    caption.style.removeProperty('min-height')
     setSurface('room')
   }
   function dismiss(): void {

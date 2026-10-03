@@ -283,12 +283,13 @@ export function createCyclePayload(options: {
       never moves when a step gives way to the next */
   let linesFor = '', linesBox = 0
   function linesHeight(h: VitrinePayloadHost): number {
-    const key = `${Math.round(h.viewport().width)}|${h.lang}|${steps.length}`
+    const key = `${Math.round(h.viewport().width)}|${Math.round(h.caption.getBoundingClientRect().width)}|${h.lang}|${steps.length}`
     if (key === linesFor) return linesBox
     const probe = h.caption.cloneNode(false) as HTMLElement
     probe.removeAttribute('aria-live')
     probe.setAttribute('aria-hidden', 'true')
     probe.style.visibility = 'hidden'
+    probe.style.removeProperty('min-height')
     h.caption.after(probe)
     let most = 0
     for (const step of steps) { probe.textContent = step.text; most = Math.max(most, probe.getBoundingClientRect().height) }
@@ -300,6 +301,10 @@ export function createCyclePayload(options: {
   /** SIDEWAYS THE MACHINE STANDS CLEAR OF EVERY WORD: the zone less its foot,
       where the clock runs and the step's line stands over it */
   function clearOf(h: VitrinePayloadHost): PictureBox {
+    // a line that stands in the label column keeps the longest step's rows there, so the column never moves as the steps go by
+    const given = h.clear?.() ?? null
+    if (given) { h.caption.style.minHeight = `${linesHeight(h)}px`; return given }
+    h.caption.style.removeProperty('min-height')
     const zone = h.viewport()
     const under = parseFloat(getComputedStyle(h.caption).bottom) || 0
     return { left: zone.left, top: zone.top, width: zone.width, height: Math.max(80, zone.height - under - linesHeight(h) - LINES_AIR) }
@@ -319,6 +324,7 @@ export function createCyclePayload(options: {
       groundedFor = size
       grounded = !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(getComputedStyle(options.host).backgroundColor)
     }
+    if (!sideways) host.caption.style.removeProperty('min-height')
     const cover = sideways ? host.field?.() ?? { left: 0, top: 0, width: innerWidth, height: innerHeight } : grounded ? null : coverOf(host)
     const next = cycleFit(f, sideways ? clearOf(host) : islandFit(host), cover)
     const key = [framing, next.left, next.top, next.width, next.height, cover?.left, cover?.top, cover?.width, cover?.height].join()
@@ -613,6 +619,7 @@ export function createCyclePayload(options: {
       if (video) { video.pause(); video.removeAttribute('src'); video.load() }
       root?.remove()
       ground?.remove()
+      host?.caption.style.removeProperty('min-height')
       root = undefined; video = undefined; poster = undefined; outline = undefined; ground = undefined; lines = undefined
       fitted = null; groundAt = null
       host = undefined
