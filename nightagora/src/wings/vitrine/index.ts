@@ -509,12 +509,16 @@ export function createVitrine(options: {
     if (form === 'beside') {
       /* THE LABEL COLUMN IS A BOX ON THE WALL in the walk's own ground, from
          the glass's top air to the foot row: it reaches into the gap to the
-         field's edge, and the cinema form's padding (half the gap at the
-         left, the head less the air at the top) keeps the words where the
-         column stands */
-      const top = safe.top + CINEMA.air, from = right - column - CINEMA.columnGap / 2
+         field's edge, or to the way on's edge under it where that is wider,
+         never to the work; its padding (the head less the air at the top,
+         at the left whatever it reached) keeps the words where the column
+         stands */
+      const top = safe.top + CINEMA.air
+      const from = Math.max(beside.left + beside.width + 2, Math.min(right - column - CINEMA.columnGap / 2, frame.row.gold))
       place(card, { left: from, top, width: right - from, height: frame.row.top - CINEMA.rowGap - top })
+      card.style.paddingLeft = `${Math.round(right - column - from)}px`
     } else {
+      card.style.removeProperty('padding-left')
       const stripTop = Math.round((frame.row.top + frame.row.bottom - CINEMA.strip) / 2)
       const from = Math.max(left, frame.row.seats + CINEMA.rowGap)
       const across = Math.max(120, frame.row.gold - 16 - from)
@@ -726,6 +730,7 @@ export function createVitrine(options: {
   function leaveCinema(): void {
     for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm', 'lookWords', 'lookAside']) delete root.dataset[key]
     if (caption.parentElement !== stage) { stage.append(caption); wordsResized.unobserve(caption) }
+    card.style.removeProperty('padding-left')
     unmaskLines(body)
     cut = null
     stripName.textContent = ''

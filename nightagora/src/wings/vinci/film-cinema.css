@@ -347,7 +347,7 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 }
 /* THE LABEL COLUMN IS A BOX in the walk's own ground, as its band, its box and its strip are, over a work's wall, a
    film's deep field and a place's dimmed room alike; it stands where the hairline between work and label stood. Its
-   padding is the window's geometry (index.ts): half the column gap at the left, the head less the air at the top */
+   top padding is the window's geometry (index.ts), the head less the air; the window sets the left one */
 #wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-card {
   padding: 8px 12px 0 14px; background: var(--ui-ground); border-radius: var(--ui-r-box-side);
 }
