@@ -40,6 +40,8 @@ const LANE = 24
     the glass fades over this share of the height, one at the glass's edge runs off it */
 const SIDE_FADE = 0.08
 const END_FADE = 0.1
+/** the film's frame stands this far inside the box's faded sides */
+const EDGE_IN = 2
 /** the line's column beside the film: its least and most width, and its gap to the film */
 const WORDS_LEAST = 200
 const WORDS_MOST = 340
@@ -179,7 +181,7 @@ export function createShowpiecePayload(options: {
   function plainFrame(): void {
     words = null
     frameWidth = 0
-    for (const el of [poster, video]) if (el) for (const name of ['inset', 'left', 'top', 'width', 'height']) el.style.removeProperty(name)
+    for (const el of [poster, video]) if (el) for (const name of ['inset', 'left', 'top', 'width', 'height', 'object-fit', 'object-position']) el.style.removeProperty(name)
     if (root) for (const name of ['mask-image', '-webkit-mask-image', 'mask-composite', '-webkit-mask-composite']) root.style.removeProperty(name)
   }
 
@@ -222,11 +224,12 @@ export function createShowpiecePayload(options: {
       words = { box: { left: 0, top: below, width: Math.round(box.width), height: Math.round(Math.max(said + CLOCK, box.height - below)) }, beside: false }
     }
     Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
-    // the whole frame, placed so the model's box is what the film shows
+    // the whole frame at its height, cut across by its own fit and kept two pixels inside the box's
+    // sides: one engine draws a video a device column wider than its box, past the mask
     const frameHeight = film.height / Math.max(0.01, y1 - y0)
     frameWidth = frameHeight * a
-    for (const el of [poster, video]) if (el) Object.assign(el.style, { inset: 'auto', left: `${(-x0 * frameWidth).toFixed(2)}px`, top: `${(-y0 * frameHeight).toFixed(2)}px`,
-      width: `${frameWidth.toFixed(2)}px`, height: `${frameHeight.toFixed(2)}px` })
+    for (const el of [poster, video]) if (el) Object.assign(el.style, { inset: 'auto', left: `${EDGE_IN}px`, top: `${(-y0 * frameHeight).toFixed(2)}px`,
+      width: `${film.width - 2 * EDGE_IN}px`, height: `${frameHeight.toFixed(2)}px`, objectFit: 'cover', objectPosition: `${(-x0 * frameWidth - EDGE_IN).toFixed(2)}px 0px` })
     // its sides fade into the wall over the air outside the model's box; its foot, and a top inside the glass, over a share of its height
     const end = END_FADE * film.height
     const atEdge = field !== null && box.top + film.top <= field.top + 0.5
