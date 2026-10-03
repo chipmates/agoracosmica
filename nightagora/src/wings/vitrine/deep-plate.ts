@@ -101,13 +101,16 @@ const AT_THE_CEILING = .999
  * whole file, which is the number a budget has to hear. */
 const tileMB = (pixels: number): number => pixels * 4 / 1e6
 
-/** The rule is a reading, so it is never a stub and never runs past the
- * plate: the numeral chosen is the largest one whose bar stands inside
- * these bounds of the viewport's own width. */
-const RULE_SHORTEST = 24
+/** The rule is a reading, so it is never a stub and never runs along the
+ * work: the numeral chosen is the largest one whose bar stands inside this
+ * share of the width the glass shows of the work. Shown whole on a phone,
+ * ten centimetres of a tall panel are under 20 px, which still reads beside
+ * its numeral. */
+const RULE_SHORTEST = 16
 const RULE_SHARE = .42
-/** What a rule stood beside the work keeps clear of the work's edge. */
-const RULE_CLEAR = 8
+/** THE RULE STANDS ON THE WORK, at a corner of what the glass shows of it,
+ * this far in from the work's edge. */
+const RULE_INSET = 10
 
 /** THE PAGE'S OWN NAME STANDS BESIDE THE PAGE, not on it, wherever the view
  * leaves a margin wide enough to read it in. Narrower than this and the name
@@ -226,29 +229,61 @@ export function createDeepPlatePayload(options: {
    * painting are this many pixels of the glass at the magnification
    * standing now, whatever size the glass is: the view never claims that
    * ten centimetres on the screen are ten centimetres of the panel, which
-   * would need a pixel pitch a browser does not know. */
+   * would need a pixel pitch a browser does not know. It stands on the work
+   * itself, from the moment the plate leaves the room's frame. */
   function measure(): void {
     if (!rule || !ruleBar || !ruleLabel || !root) return
     const perCm = options.pxPerCm, zoom = magnification()
-    if (!perCm || !(zoom > 0) || !options.words.rule.length) { rule.hidden = true; return }
-    const steps = [...options.words.rule].sort((a, b) => a.cm - b.cm)
-    let most = root.clientWidth * RULE_SHARE
-    // A RULE STOOD BESIDE THE WORK by its window never reaches into it: its
-    // length ends short of the work's left edge as the glass shows it
-    if (!root.contains(rule)) {
-      const item = viewer?.world.getItemAt(0), box = root.getBoundingClientRect()
-      const edge = item && library ? Math.max(box.left, box.left + item.imageToViewerElementCoordinates(new library.Point(0, 0)).x) : box.left
-      most = Math.min(most, edge - RULE_CLEAR - rule.getBoundingClientRect().left)
-    }
-    let chosen = steps[0]!
-    for (const step of steps) if (step.cm * perCm * zoom <= most) chosen = step
-    const width = chosen.cm * perCm * zoom
-    // A bar too short to read against is no measurement.
-    if (width < RULE_SHORTEST) { rule.hidden = true; return }
+    const seen = seated ? shownWork() : null
+    if (!perCm || !(zoom > 0) || !options.words.rule.length || !seen) { rule.hidden = true; return }
+    const across = seen.right - seen.left, down = seen.bottom - seen.top
+    const most = across * RULE_SHARE
+    // the longest numeral first: a bar longer than the share would run along
+    // the work rather than stand at its corner, and one too short to read
+    // against is no measurement
+    const steps = [...options.words.rule].sort((a, b) => b.cm - a.cm)
+      .filter(step => step.cm * perCm * zoom <= most && step.cm * perCm * zoom >= RULE_SHORTEST)
+    // THE CORNER BY FORM: on a phone the foot of the glass is the caption's
+    // and the walk's row's, so the rule takes the work's head; on the desk
+    // the band stands under the glass and the foot is free.
+    const head = Boolean(host?.narrow || host?.cinema?.())
     rule.hidden = false
-    ruleBar.style.width = `${Math.round(width)}px`
-    ruleLabel.textContent = chosen.label
-    root.dataset['rule'] = `${chosen.label} ${Math.round(width)}px`
+    for (const step of steps) {
+      const width = step.cm * perCm * zoom
+      ruleBar.style.width = `${Math.round(width)}px`
+      ruleLabel.textContent = step.label
+      // NEVER OVER THE WORK'S MIDDLE THIRD: a chip that reaches past the
+      // outer third across must stay inside the outer third down, or a
+      // shorter numeral stands instead.
+      const wide = rule.offsetWidth + RULE_INSET, tall = rule.offsetHeight + RULE_INSET
+      if (wide > across / 3 && tall > down / 3) continue
+      const top = head ? seen.top + RULE_INSET : seen.bottom - tall
+      rule.style.transform = `translate(${Math.round(seen.left + RULE_INSET)}px, ${Math.round(top)}px)`
+      root.dataset['rule'] = `${step.label} ${Math.round(width)}px`
+      root.dataset['ruleAt'] = head ? 'head' : 'foot'
+      root.dataset['ruleOn'] = [seen.left, seen.top, seen.right, seen.bottom].map(Math.round).join(' ')
+      return
+    }
+    rule.hidden = true
+  }
+
+  /** The work's rectangle as the glass shows it now, in the plate's own
+   * coordinates and clipped to the glass: the display window, which is what
+   * the centimetres measure, not the photograph's margins around it. */
+  function shownWork(): { left: number; top: number; right: number; bottom: number } | null {
+    if (!viewer || !library || !root || !stage) return null
+    const work = windowBounds(), view = viewer.viewport
+    const a = view.viewportToViewerElementCoordinates(new library.Point(work.x, work.y))
+    const b = view.viewportToViewerElementCoordinates(new library.Point(work.x + work.width, work.y + work.height))
+    const across = stage.clientWidth
+    let left = Math.min(a.x, b.x), right = Math.max(a.x, b.x)
+    // the viewer's flip mirrors what it draws about the middle of its box, not its coordinates
+    if (view.getFlip()) [left, right] = [across - right, across - left]
+    left = Math.max(0, left) + stage.offsetLeft
+    right = Math.min(across, right) + stage.offsetLeft
+    const top = Math.max(0, Math.min(a.y, b.y)) + stage.offsetTop
+    const bottom = Math.min(stage.clientHeight, Math.max(a.y, b.y)) + stage.offsetTop
+    return right - left > 0 && bottom - top > 0 ? { left, top, right, bottom } : null
   }
 
   /** THE NAME KEEPS OFF THE PAGE. The margin the view leaves at the left of
@@ -535,7 +570,6 @@ export function createDeepPlatePayload(options: {
       stage.className = 'deep-plate-stage'
       rule = document.createElement('div')
       rule.className = 'deep-rule'
-      rule.dataset['tool'] = 'rule'
       rule.hidden = true
       ruleBar = document.createElement('div')
       ruleBar.className = 'deep-rule-bar'

@@ -441,12 +441,6 @@ body:has(#wing[data-film][data-evening]) .brand { opacity: 0; transition: opacit
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .vitrine-control:not(.reader-zoom .vitrine-control) { font-size: .875rem; }
 /* the reader's row holds six seats at 390: its two worded ones at 13 px keep air inside their frames */
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .reader-row .vitrine-control:not(.reader-zoom .vitrine-control) { font-size: .8125rem; }
-/* THE WORK'S SCALE STANDS OVER THE WORK, never on it: upright the plate keeps a
-   strip at its head for the rule on one line, as the sideways plate keeps one at its foot */
-#wing[data-film='upright'] .vitrine[data-narrow='true'] .deep-plate:has(.deep-rule:not([hidden])) .deep-plate-stage { top: 30px; }
-#wing[data-film='upright'] .vitrine[data-narrow='true'] .deep-rule {
-  top: 7px; left: 10px; flex-direction: row; align-items: center; gap: 8px; padding: 0; background: none; border: 0;
-}
 /* a step's own arrow, at a size the eye finds: ‹ and › were drawn at 13 px */
 #wing:is([data-film='upright'], [data-film='cinema']) .vitrine[data-narrow='true'] :is(.reader-row, .vitrine-card) .vitrine-control.vitrine-step:not(.reader-zoom .vitrine-control) {
   font-size: 1.75rem; line-height: 1;

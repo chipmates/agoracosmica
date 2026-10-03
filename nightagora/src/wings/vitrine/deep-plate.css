@@ -17,10 +17,11 @@
 /* THE RULE MEASURES THE WORK, NOT THE SCREEN. Its length is the numeral's
    centimetres of the painting at the magnification standing now, so it
    assumes nothing about the size of the glass it is drawn on. It stands on
-   its own backing, the corner's chip, because a plate's white border or a
-   light passage swallows a thin numeral whatever its shadow. */
-.deep-rule {position:absolute;left:14px;bottom:14px;display:flex;flex-direction:column;gap:5px;pointer-events:none;
-  padding:7px 10px 6px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);}
+   the work at a corner of what the glass shows of it (placed by the payload),
+   on its own backing, because a light passage swallows a thin numeral
+   whatever its shadow. */
+.deep-rule {position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:4px;pointer-events:none;
+  padding:6px 8px 5px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);}
 .deep-rule[hidden] {display:none;}
 /* A MEASUREMENT IS READ OVER WHATEVER THE PLATE IS: deep in a light passage
    the ground under these marks is near white, so each one carries a tight
@@ -59,9 +60,6 @@
   {text-shadow:0 1px 14px var(--ui-ground-deep),0 0 3px var(--ui-ground-deep),0 0 1px var(--ui-ground-deep);}
 
 @media(max-aspect-ratio:9/10) {
-  /* The caption takes the foot of a phone's viewport, so the rule stands at
-     its head. */
-  .deep-rule {top:10px;bottom:auto;left:10px;}
   /* On the phone the peek card carries the page's own name, so nothing
      stands on the page itself. */
   .deep-stand {display:none;}
