@@ -50,7 +50,7 @@ export const WING_TEXT = {
     en: 'This wing is being researched and built. Its rooms open when the evidence does.',
     de: 'Dieser Flügel wird recherchiert und gebaut. Seine Räume öffnen, wenn die Belege es tun.',
   },
-  /** the door at every station */
+  /** the reading table's bench page door (the walk carries no station door) */
   door: {
     en: 'Ask the Echo about this',
     de: 'Frag das Echo danach',
@@ -60,14 +60,10 @@ export const WING_TEXT = {
     en: 'Opens the library in a new tab. 30 free messages a day. No signup needed.',
     de: 'Öffnet die Bibliothek in einem neuen Tab. 30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
   },
-  /* THE DOOR'S OWN PLATE. A first time visitor has never heard of the
-     library, so the door says what it leads to before it opens. The name in
-     the title is the wing's own, which is why it stands here as a mark. What
-     an Echo is comes from the disclosure canon and is never written twice. */
-  doorTitle: {
-    en: 'Talk with the Echo of {name}',
-    de: 'Sprich mit dem Echo von {name}',
-  },
+  /* THE PLATE IN FRONT OF THE LIBRARY. A first time visitor has never heard
+     of the library, so the plate says what it leads to before it opens; its
+     heading and its way in are the wing's own words. What an Echo is comes
+     from the disclosure canon and is never written twice. */
   /** one row on the desktop's band, German included */
   doorLead: {
     en: 'Behind this door is the Agora Cosmica library: learn from thirty lives, in chapters and conversations.',
@@ -76,11 +72,6 @@ export const WING_TEXT = {
   doorTerms: {
     en: 'Nonprofit and Open Source. Opens in a new tab. 30 free messages a day. No signup needed.',
     de: 'Non-Profit und Open Source. Öffnet sich in einem neuen Tab. 30 kostenlose Nachrichten pro Tag. Ohne Anmeldung.',
-  },
-  /** the plate's way in, which carries the station's own question */
-  doorAsk: {
-    en: 'Ask the Echo',
-    de: 'Frag das Echo',
   },
   doorStay: {
     en: 'Stay in the museum',

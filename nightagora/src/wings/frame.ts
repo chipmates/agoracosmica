@@ -1,22 +1,20 @@
 /* THE WING FRAME — the chrome every wing gets, so thirty wings are one
    museum and not thirty websites: the rail with its station index, the
-   layer a wing hangs its labels in, the door at EVERY station, and the
-   way back to the lobby.
+   layer a wing hangs its labels in, the plate in front of the library, and
+   the way back to the lobby.
 
    Two laws live here.
 
-   · THE DOOR IS AT EVERY STATION. Asking the person about what you are
-     looking at is the peak of the visit, so it cannot wait for the last
-     room. Each station reports its own question, the visitor reads it
-     beside the door, and the door opens the library with exactly that
-     question named.
+   · ONE WAY INTO THE LIBRARY, AT THE WALK'S END. No station carries a door
+     out of the museum: the wing offers the library once, at its last stop,
+     and it opens through this frame's plate (openWingModes).
    · THE LOBBY IS NOT REPLAYED. A wing is a place you come back to. The
      station index rides the URL hash, so a reload puts the visitor back
      where they stood, and the way home lands at the wheel, never at the
      overture. */
 
 import { PerspectiveCamera, Scene } from 'three/webgpu'
-import { WING_TEXT, lang, say } from './content'
+import { WING_TEXT, lang, say, type Bilingual } from './content'
 import { DISCLOSURES } from '../content/disclosures'
 import { LOBBY_TEXT } from '../content/lobby'
 import plateCss from './title-plate.css?inline'
@@ -91,15 +89,15 @@ export interface WingHosts {
       the stage and a click on the rail arrive at the same station */
   navigate: (index: number) => void
   /** WHERE THE BAR'S WORDS STAND ON A NARROW STAGE. A phone bar keeps one
-      line, so the words a wing appends to the bar, and the question and the
-      door under it, move into a foot the wing offers inside its own sheet.
+      line, so the words a wing appends to the bar move into a foot the wing
+      offers inside its own sheet.
       Null gives all of them back to the frame, which is where they stand on
       a wide stage and in a wing that offers no foot. */
   barFoot: (host: HTMLElement | null) => void
   /** NOTHING ON SCREEN MOVES WITH THE WALKER. While a leg is under way the
       frame carries one attribute and CSS alone takes the chrome that belongs
-      to a place a visitor has left: its card, its rows, its labels and the
-      question. The bar stays, at full strength, because it is the way out of
+      to a place a visitor has left: its card, its rows and its labels. The
+      bar stays, at full strength, because it is the way out of
       the room and out of the wing. */
   walking: (underWay: boolean) => void
 }
@@ -111,10 +109,9 @@ export interface WingStation {
   id: string
   /** the station's name, already in the page's language */
   name: string
-  /** the question its door carries, shown beside the door as text */
+  /** the station's question from the wing's data; no frame control shows it */
   question: string
-  /** the id the library knows that question by: the door asks
-      `w:<figure>:<door>`, and a station without one asks the figure's own */
+  /** the id the library knows that question by */
   door?: string
 }
 
@@ -122,8 +119,8 @@ export interface WingModule {
   stations: WingStation[]
   /** A walking wing distinguishes its standing station from its destination. */
   navigation?(): { completed?: string; target?: string; question?: string; door?: string }
-  /** Keep the library disclosure behind a door press: it stands on the first
-      one and on every later one until the visitor has gone through. */
+  /** Keep the library disclosure behind the end's press: it stands on the
+      first one and on every later one until the visitor has gone through. */
   doorDisclosure?: 'first-press'
   /** Old numeric deep links resolve through this fixed order; new links use ids. */
   legacyStationIds?: readonly string[]
@@ -176,9 +173,6 @@ export interface WingFrame {
   standsAt(at: number | string): boolean
   /** how many this wing has, which is what the motion eye walks */
   stations(): number
-  /** the door as it stands right now: where it goes and what it asks, so a
-      walk can record what a visitor's click would have opened */
-  doorHere(): { href: string; question: string }
   /** one frame of the wing's own time */
   update(dt: number): void
   /** True while the wing holds the canvas on its last frame: the loop skips
@@ -219,38 +213,34 @@ export function resolveWingStationIndex(at: number | string, stations: readonly 
   return Math.max(0, stations.findIndex(station => station.id === at))
 }
 
-/** a door id as the app's tag accepts it: lowercase, digits and hyphens */
-const DOOR_ID = /^[a-z0-9-]{1,40}$/
-
-/** The library's own door, at the app itself: the site's root is a static
-    page that keeps no question. The app's entry parser resolves NAMED ask
-    tags only, so a question travels as an identifier and free text never
-    rides the URL into the composer. A door that names its own question asks
-    `w:<figure>:<door>`; the app falls back to the figure's own question for
-    one it does not know. */
-function doorUrl(entry: WingEntry, doorId?: string): string {
-  const p = new URLSearchParams()
-  if (!entry.publicSlug || !entry.askTag) {
-    p.set('figure', entry.slug)
-    return `${APP_ORIGIN}/app?${p.toString()}`
-  }
-  p.set('figure', entry.publicSlug)
-  const own = entry.appFigure && doorId && DOOR_ID.test(doorId)
-  p.set('ask', own ? `w:${entry.appFigure}:${doorId}` : entry.askTag)
-  p.set('lang', lang())
-  return `${APP_ORIGIN}/app?${p.toString()}`
+/** The wing's words on the plate: the heading, the band's line and the way
+    in. The library line, the Echo's disclosure and the terms are the
+    frame's. */
+export interface WingModesWords {
+  title: Bilingual
+  line: Bilingual
+  go: Bilingual
 }
 
-/** the door of the frame standing on this page, for a choice a wing builds */
-let throughTheDoor: ((doorId: string, asked: string) => string) | null = null
+/** The figure's mode choice in the app: the figure alone, no question. The
+    fragment names the arrival's class for the app's counts and never travels
+    with the request. */
+function modesUrl(entry: WingEntry): string {
+  const p = new URLSearchParams()
+  p.set('figure', entry.publicSlug ?? entry.slug)
+  p.set('lang', lang())
+  return `${APP_ORIGIN}/app?${p.toString()}#src=museum`
+}
 
-/** THE SAME DOOR, ASKED FROM INSIDE A WING. A choice the wing builds itself
-    (the walk's farewell) goes through the frame's own door: the plate on a
-    first press, then the library in a new tab asking `w:<figure>:<door>`.
-    Call it from the control's click, so the new tab is the visitor's own.
-    Returns the address it opens, empty while no wing stands. */
-export function openWingDoor(doorId: string, question: string): string {
-  return throughTheDoor?.(doorId, question) ?? ''
+let toTheModes: ((words: WingModesWords) => string) | null = null
+
+/** THE LIBRARY, ASKED FROM INSIDE A WING (its walk's end): the plate on a
+    first press, carrying the wing's words, then the figure's mode choice in
+    the app in a new tab. Call it from the control's click, so the new tab is
+    the visitor's own. Returns the address it opens, empty while no wing
+    stands. */
+export function openWingModes(words: WingModesWords): string {
+  return toTheModes?.(words) ?? ''
 }
 
 function el<K extends keyof HTMLElementTagNameMap>(
@@ -328,13 +318,11 @@ export function createWingFrame(
      the bar, the group wraps them under the rail: the decision is the
      frame's, so a wing never has to know how wide its own words are. */
   const RAIL_SHARE = 1 / 3
-  /** what the bar keeps clear of the door block under it */
-  const BAR_CLEAR = 8
   /* THE PHONE KEEPS ONE BAR LINE. A 390 px bar that carries the way home,
      the rail and three words spends two lines on chrome and leaves the room
-     half the screen. So on a narrow stage the words a wing appended, and the
-     question and door block beneath them, stand in the foot the wing offers
-     inside its own sheet, and the bar is the way home and the rail. The
+     half the screen. So on a narrow stage the words a wing appended stand in
+     the foot the wing offers inside its own sheet, and the bar is the way
+     home and the rail. The
      decision is the frame's: a wing never places the frame's own chrome. */
   const words: HTMLElement[] = []
   const wordRow = el('div', 'wing-bar-words')
@@ -377,16 +365,12 @@ export function createWingFrame(
     const home = away ? wordRow : railGroup
     for (const word of words) if (word.parentElement !== home) home.append(word)
     if (away) {
-      if (doorBlock.parentElement !== footHost) footHost!.append(doorBlock)
       if (wordRow.parentElement !== footHost) footHost!.append(wordRow)
       // its own line under the words: as one of their even cells the three
       // paces had a quarter of the row and their labels ran over each other
       if (paceRow.previousElementSibling !== wordRow) wordRow.after(paceRow)
       paintPace()
     } else {
-      // back to its own place in the frame, which is under the bar and
-      // before the disclosure the door opens
-      if (doorBlock.parentElement !== host) railGroup.after(doorBlock)
       paceRow.remove()
       wordRow.remove()
     }
@@ -410,7 +394,6 @@ export function createWingFrame(
     const box = getComputedStyle(railGroup)
     const line = railGroup.clientWidth - parseFloat(box.paddingLeft || '0') - parseFloat(box.paddingRight || '0')
     if (line <= 0) return
-    const flat = railGroup.getBoundingClientRect().height
     let words = 0, lead = 0, beforeRail = true
     for (const child of railGroup.children) {
       if (child === rail) { beforeRail = false; continue }
@@ -428,39 +411,18 @@ export function createWingFrame(
       if (child === rail) { past = true; continue }
       if (past) (child as HTMLElement).style.flexGrow = '1'
     }
-    /* A SECOND LINE TAKES THE BAR'S OWN SLACK FIRST. Above the bar stands
-       whatever the wing put there, keyed to the bar's one line; below it
-       stands the door block, which is this frame's. So the group drops by as
-       much of its new height as the door block leaves it, and only what is
-       left over grows upward. */
-    const grew = railGroup.getBoundingClientRect().height - flat
-    const slack = doorBlock.getBoundingClientRect().top - railGroup.getBoundingClientRect().bottom
-    const drop = Math.max(0, Math.min(grew, Math.floor(slack - BAR_CLEAR)))
-    if (drop > 0) railGroup.style.bottom = `calc(${BAR_BOTTOM} - ${drop}px)`
   }
   new MutationObserver(() => { trackWords(); placeChrome(); fitTheBar() }).observe(railGroup, { childList: true })
   // the shell sizes the buffer to the window on a resize: the stage takes it
   // back on the next frame, whatever the band's height did in the same breath
   addEventListener('resize', () => { sized = ''; placeChrome(); fitTheBar(); doorStandsAlone() })
 
-  const question = el('p', 'wing-question')
-  const door = el('a', 'wing-door', say(WING_TEXT.door))
-  // the door is the frame's one persistent mark: it stands at every station
-  door.dataset['naPersistent'] = ''
-  door.target = '_blank'
-  door.rel = 'noopener'
-  // the no-key case, said once and plainly: the free tier is a daily
-  // quota, so a visitor with no key is not standing at a locked door
-  const note = el('p', 'wing-note', say(WING_TEXT.doorNote))
-  const doorBlock = el('div', 'wing-doorblock')
-  doorBlock.append(question, door, note)
-
-  /* THE DOOR SAYS WHAT IS BEHIND IT. A visitor who has never heard of the
+  /* THE WAY OUT SAYS WHAT IS BEHIND IT. A visitor who has never heard of the
      library is one press from leaving the museum for it, so the first press
      opens a plate: which library, in whose voice, on what terms. It is the
      museum's own plate grammar, and the part that owns that grammar mounts
      its stylesheet only where a wing builds a sheet, so the frame mounts it
-     under the same id and the door stands in a wing that builds none. */
+     under the same id for a wing that builds none. */
   const PLATE_STYLE = 'na-title-plate'
   if (!document.getElementById(PLATE_STYLE)) {
     const plateStyle = document.createElement('style')
@@ -475,8 +437,8 @@ export function createWingFrame(
   disclosure.setAttribute('aria-labelledby', doorTitle.id)
   const doorWall = el('div', 'na-plate-wall')
   /* ON A WIDE STAGE THE PLATE IS THE BAND GROWN. It opens in the place the
-     visitor was already reading, so it carries his own question, verbatim
-     from the wing's data, where the centred plate carries a heading. */
+     visitor was already reading, so it carries the wing's line where the
+     centred plate carries a heading. */
   const doorAsked = el('p', 'wing-door-asked')
   doorAsked.id = 'wing-door-asked'
   doorAsked.hidden = true
@@ -508,15 +470,15 @@ export function createWingFrame(
   function paintDoorPlate(): void {
     const band = disclosure.dataset['form'] === 'band'
     doorAsked.hidden = !band
-    doorAsked.textContent = band ? plateAsked ?? question.textContent ?? '' : ''
-    // the plate is named by what it carries: the question on a band, the
+    doorAsked.textContent = band && plateWords ? say(plateWords.line) : ''
+    // the plate is named by what it carries: the line on a band, the
     // heading in the centred plate
     disclosure.setAttribute('aria-labelledby', band ? doorAsked.id : doorTitle.id)
-    doorTitle.textContent = say(WING_TEXT.doorTitle).replace('{name}', entry?.name ?? '')
+    doorTitle.textContent = plateWords ? say(plateWords.title).replace('{name}', entry?.name ?? '') : ''
     doorLead.textContent = say(WING_TEXT.doorLead)
     doorEcho.textContent = say(DISCLOSURES.stone)
     doorTerms.textContent = say(WING_TEXT.doorTerms)
-    continueDoor.textContent = say(WING_TEXT.doorAsk)
+    continueDoor.textContent = plateWords ? say(plateWords.go) : ''
     closeDisclosure.textContent = say(WING_TEXT.doorStay)
   }
   /* ONE TEXT AT A TIME, the rule the entrance sheet follows: while the plate
@@ -526,18 +488,16 @@ export function createWingFrame(
     else delete document.documentElement.dataset['naPlate']
     windowOwnsTheScreen(document, disclosure.open && (narrowStage() || deskAny()), narrowStage() ? 'phone' : 'desk')
   }
-  /** True once the visitor has gone through the door: the plate says what is
+  /** True once the visitor has gone through the plate: it says what is
       behind it, so it stands on every press until it has been passed. */
   let doorPassed = false
-  /** the question a wing's own choice carried onto the plate, while it stands */
-  let plateAsked: string | null = null
+  /** the wing's own words while the plate stands */
+  let plateWords: WingModesWords | null = null
   /** where the hand goes back to when the plate closes */
-  let plateOpener: HTMLElement = door
-  door.setAttribute('aria-controls', doorWords.id)
-  door.setAttribute('aria-expanded', 'false')
-  function showPlate(href: string, asked: string | null, opener: HTMLElement): void {
+  let plateOpener: HTMLElement | null = null
+  function showPlate(href: string, opener: HTMLElement | null, words: WingModesWords): void {
     continueDoor.href = href
-    plateAsked = asked
+    plateWords = words
     plateOpener = opener
     /* THE PLATE GROWS FROM THE BAND where the band stands: no centred plate
        over a dimmed room, and the room above it stays the room. */
@@ -545,27 +505,19 @@ export function createWingFrame(
     else delete disclosure.dataset['form']
     paintDoorPlate()
     disclosure.showModal()
-    door.setAttribute('aria-expanded', 'true')
     doorStandsAlone()
     disclosure.scrollTop = 0
     continueDoor.focus({ preventScroll: true })
     // the ways belong to the surface that owns the foot of the screen
     dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: true } }))
   }
-  door.addEventListener('click', event => {
-    // the control that opens the plate also takes it away again
-    if (disclosure.open) { event.preventDefault(); disclosure.close(); return }
-    if (wing?.doorDisclosure !== 'first-press' || doorPassed) return
-    event.preventDefault()
-    showPlate(door.href, null, door)
-  })
-  throughTheDoor = (doorId, asked) => {
+  toTheModes = words => {
     if (!entry) return ''
-    const href = doorUrl(entry, doorId)
+    const href = modesUrl(entry)
     if (disclosure.open) disclosure.close()
     if (wing?.doorDisclosure === 'first-press' && !doorPassed) {
       const active = document.activeElement
-      showPlate(href, asked || null, active instanceof HTMLElement && active !== document.body ? active : door)
+      showPlate(href, active instanceof HTMLElement && active !== document.body ? active : null, words)
     } else {
       window.open(href, '_blank', 'noopener')
     }
@@ -574,13 +526,12 @@ export function createWingFrame(
   continueDoor.addEventListener('click', () => { doorPassed = true; disclosure.close() })
   closeDisclosure.addEventListener('click', () => disclosure.close())
   disclosure.addEventListener('close', () => {
-    door.setAttribute('aria-expanded', 'false')
     doorStandsAlone()
     dispatchEvent(new CustomEvent('na-wing-plate', { detail: { open: false } }))
-    const back = plateOpener.isConnected ? plateOpener : door
-    plateAsked = null
-    plateOpener = door
-    if (!host.hidden) back.focus({ preventScroll: true })
+    const back = plateOpener?.isConnected ? plateOpener : null
+    plateWords = null
+    plateOpener = null
+    if (!host.hidden) back?.focus({ preventScroll: true })
   })
 
   /* THE LOST CONTEXT. A phone under memory pressure takes the GPU back from
@@ -650,7 +601,7 @@ export function createWingFrame(
   }
   stack.onContextLost(() => showLost())
 
-  host.append(stage, labels, lostVeil, railGroup, doorBlock, disclosure)
+  host.append(stage, labels, lostVeil, railGroup, disclosure)
 
   let entry: WingEntry | null = null
   let wing: WingModule | null = null
@@ -664,8 +615,6 @@ export function createWingFrame(
   function paintWords(): void {
     lobby.textContent = say(WING_TEXT.lobby)
     rail.setAttribute('aria-label', say(WING_TEXT.rail))
-    door.textContent = say(WING_TEXT.door)
-    note.textContent = say(WING_TEXT.doorNote)
     paintDoorPlate()
     // the pace stands in the wing's own sheet, so its four words are the
     // frame's to repaint as well
@@ -677,9 +626,9 @@ export function createWingFrame(
     return wing?.stations[i]?.id ?? `station-${i + 1}`
   }
 
-  /** The rail's names, the question and the door's address, read again from
-      the wing's own stations. The buttons are not rebuilt: a rebuild would
-      drop the hand that is on one and scroll the track back. */
+  /** The rail's names, read again from the wing's own stations. The buttons
+      are not rebuilt: a rebuild would drop the hand that is on one and
+      scroll the track back. */
   function paintStationWords(): void {
     const stations = wing?.stations ?? []
     for (let i = 0; i < rail.children.length; i++) {
@@ -688,8 +637,6 @@ export function createWingFrame(
         `${say(WING_TEXT.station)} ${i + 1} · ${stations[i]?.name ?? ''}`
       )
     }
-    question.textContent = stations[index]?.question ?? ''
-    paintDoor(stations[index]?.door)
   }
 
   /* ONE MECHANISM FOR THE WHOLE FRAME. The language is announced once, by
@@ -729,23 +676,8 @@ export function createWingFrame(
     }
   }
 
-  /** The door's address, made again only when its question or the language
-      moves: the walk asks for it on every frame. */
-  let doorKey = ''
-  function paintDoor(doorId: string | undefined): void {
-    if (!entry) return
-    const key = `${entry.slug}|${doorId ?? ''}|${spoken}`
-    if (key === doorKey) return
-    doorKey = key
-    door.href = doorUrl(entry, doorId)
-  }
-
   function paintNavigation(): void {
     const navigation = wing?.navigation?.()
-    if (navigation?.question !== undefined && question.textContent !== navigation.question) question.textContent = navigation.question
-    // the door asks what the visitor reads beside it: a walk that names the
-    // question names its door too
-    if (navigation?.question !== undefined) paintDoor(navigation.door)
     for (let i = 0; i < rail.children.length; i++) {
       const button = rail.children[i] as HTMLElement
       const current = navigation ? button.dataset['station'] === navigation.completed : i === index
@@ -772,12 +704,7 @@ export function createWingFrame(
     if (!wing || !entry) return
     const count = wing.stations.length
     index = Math.min(Math.max(n, 0), Math.max(0, count - 1))
-    const station = wing.stations[index]
     wing.show(index, { labels, stage, world, navigate: goto, barFoot, walking })
-    question.textContent = station?.question ?? ''
-    // a station change reads the language afresh
-    doorKey = ''
-    paintDoor(station?.door)
     paintNavigation()
     const selected = rail.children[index] as HTMLElement | undefined
     if (selected && !wing.navigation) rail.scrollLeft = selected.offsetLeft - rail.clientWidth / 2 + 22
@@ -815,7 +742,6 @@ export function createWingFrame(
       // page's language now
       else wing!.stations = nextWing.stations
       paintWords()
-      note.hidden = wing?.doorDisclosure === 'first-press'
       index = 0
       host.hidden = false
       paintRail()
@@ -848,10 +774,6 @@ export function createWingFrame(
     pending: () => wing?.pending?.() ?? 0,
     errors: () => wing?.errors?.() ?? [],
     manifest: () => wing?.manifest?.() ?? [],
-    doorHere: () => ({
-      href: door.href,
-      question: question.textContent ?? '',
-    }),
     update(dt) {
       fitTheStage()
       wing?.update?.(dt)

@@ -24,8 +24,6 @@ export interface WingRecapOptions {
   resolve(id: string): RecapEntry | null
   /** the way to another life: the lobby's own wheel */
   onLobby(): void
-  /** the library door the frame already carries at every station */
-  door(): { word: string; press(): void }
   /** drop the night, on the device and on this surface */
   onForget(): void
 }
@@ -83,18 +81,13 @@ export function createWingRecap(options: WingRecapOptions): HTMLElement {
     root.append(list)
   }
 
-  /* THE TWO DOORS. One goes back to the wheel for another life, and the other
-     is the library door this frame already carries at every station, named
-     here as the way out rather than added a second time. */
+  /* THE WAY BACK to the wheel for another life. The library is the wing's own
+     choice at its end, never a second door here. */
   const doors = make('div', 'wing-recap-doors')
   const another = make('button', 'wing-recap-door', say(RECAP_WORDS.another))
   another.type = 'button'
   another.addEventListener('click', () => options.onLobby())
-  const library = options.door()
-  const ask = make('button', 'wing-recap-door', library.word)
-  ask.type = 'button'
-  ask.addEventListener('click', () => library.press())
-  doors.append(another, ask)
+  doors.append(another)
   root.append(doors)
 
   /* THE WAY OUT STANDS DIRECTLY UNDER WHAT WAS OPENED, and the sentence about

@@ -62,7 +62,7 @@ import { vinciWalk, vinciLifeOrderAsked, vinciWalkPose, vinciReadingSeconds, vin
 import { isVinciWalkPose, VINCI_HOUSE_DOOR, VINCI_VALVE, vinciRailPlace, vinciWalkPoseOf, type VinciWalkPoseId } from './walk-poses'
 import { VINCI_STAIR_HEAD } from './walk-places'
 import { awaitOpening } from './opening-seam'
-import { endWith, talkAtTheGrave } from './ending-talk'
+import { endWith, learnWord, talkAtTheGrave } from './ending-talk'
 import { collectRailSolids, createRailGeometryAuthority } from './rail-proof'
 import { bindRailPointer, createWheelStepper } from './input'
 import { dossier, world, type Quantity } from './site'
@@ -443,7 +443,7 @@ export function createWing():VinciWingModule {
       rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
       // the stop asked for stays the one the presses named, which may lie further on
       dipping=false;card=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
-      paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
+      paintHeader();paintHeaderVisibility();paintDock();standHere()
       cutPress=()=>moveOn()
       window.addEventListener('pointerdown',cutPress,true);window.addEventListener('keydown',cutPress,true)
       if(!CUT_CARD_WAITS_FOR_PRESS)cutTimers.push(setTimeout(moveOn,Math.round(vinciReadingSeconds(title.length)*1000)))
@@ -540,7 +540,7 @@ export function createWing():VinciWingModule {
       const stop=stopAt(to), s=stationOf(stop.station)
       rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
       card=to;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
-      paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
+      paintHeader();paintHeaderVisibility();paintDock();standHere()
     },outward?()=>walkOn(to,false):undefined)
   }
   /** THE WALK TO A STOP, as a press asks for it: along its wall where it
@@ -966,9 +966,7 @@ export function createWing():VinciWingModule {
       // room's, which is what the walk list already decided
       name:id=>WALK.stops.find(stop=>stop.id===id)?.name
         ??vinciContent.find(s=>s.id===id)?.name??{en:'',de:''},
-      door:()=>wing.querySelector<HTMLElement>('.wing-door'),
       sources:()=>source??null,
-      question:()=>text(hereContent().door),
       words:{next:LIFE_CARDS.controls.date.next,back:LIFE_CARDS.controls.date.previous,rail:WING_TEXT.rail},
       go:index=>h.navigate(index),
       // the way back goes up one level first: the phone's way back reads the same
@@ -1542,7 +1540,7 @@ export function createWing():VinciWingModule {
   /** the phone's two endings under the last stop's name, side by side as the desk's panel stands them */
   function endingsAtTheEnd():HTMLElement {
     const row=make('div','vinci-endings')
-    const talk=make('button','vinci-ending vinci-ending-talk',text(deskControl('ending','talk')))
+    const talk=make('button','vinci-ending vinci-ending-talk',text(learnWord()))
     const look=make('button','vinci-ending vinci-ending-look')
     const arrow=document.createElementNS('http://www.w3.org/2000/svg','svg'),line=document.createElementNS('http://www.w3.org/2000/svg','path')
     arrow.setAttribute('viewBox','0 0 16 16');arrow.setAttribute('aria-hidden','true');arrow.setAttribute('class','vinci-ending-arrow')
@@ -1567,9 +1565,6 @@ export function createWing():VinciWingModule {
         return title&&pick?{id,title:text(title),line:vinciLine(id),station:pick.station??''}:null
       },
       onLobby:()=>frame?.querySelector<HTMLElement>('.wing-lobby')?.click(),
-      // THE DOOR IS THE FRAME'S OWN, pressed from here: a second link would
-      // walk past the disclosure the frame puts in front of the first press.
-      door:()=>({word:text(WING_TEXT.door),press:()=>frame?.querySelector<HTMLElement>('.wing-door')?.click()}),
       // The card is composed again, so the hand keeps the control it pressed.
       onForget:()=>{visit?.forget();paintHeader();header.querySelector<HTMLElement>('.wing-recap-forget')?.focus({preventScroll:true})}})
   }
@@ -1850,7 +1845,7 @@ export function createWing():VinciWingModule {
     hosts.navigate(index)
     exhibits?.warm()
     rail.set(id,vinciWalkPose(stopAt(index),narrow()),true,narrow(),walkVertex(stopAt(index)))
-    station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintHeaderVisibility();paintDock();paintQuestion()
+    station=card=index;activeView='';aimPrint(id);exposureAt=id;paintHeader();paintHeaderVisibility();paintDock()
   }
   /** True once the rail's own geometry proof has resolved: before that the
    * rail cannot walk a certified route, so a station is placed instead. */
@@ -3119,12 +3114,6 @@ export function createWing():VinciWingModule {
       payload:null,controls,walk,...vinciLimits(id),...certainty,catalogue},from,how_)
     openMode='auto'
   }
-  /** The door asks about the place the visitor is standing in, so the
-   * question travels with the card and not with the rail mark. */
-  function paintQuestion() {
-    const q=hosts?.stage.parentElement?.querySelector('.wing-question')
-    if(q)q.textContent=text(hereContent().door)
-  }
   function paintHeader() {
     const index=card,s=hereContent()
     header.textContent=''
@@ -3416,7 +3405,6 @@ export function createWing():VinciWingModule {
     panel.append(make('h3','',text(vinciSourcesHeadings.counted)),make('p','vinci-statement',text(vinciWingCounts)))
     full.append(make('pre','vinci-arithmetic',text(vinciHourArithmetic)),...credits.map(node=>node.cloneNode(true)))
     foldRecord(panel,full);appendCertaintyLegend(panel)
-    panel.append(make('p','vinci-door-disclosure',text(WING_TEXT.doorNote)))
   }
   /** THE BAR'S THREE WORDS FOLLOW THE PAGE. They were painted with the dock
    * alone, which runs when a visitor arrives somewhere, so a language chosen
@@ -3540,7 +3528,6 @@ export function createWing():VinciWingModule {
     drawer.insertBefore(recordButton,drawer.children[2]??null);recordButton.after(record)
     if(exhibitSources){drawer.replaceChildren(title,make('h2','',text(exhibitSources.title)));exhibitSources.renderStation(drawer)}
     appendCertaintyLegend(drawer)
-    drawer.append(make('p','vinci-door-disclosure',text(WING_TEXT.doorNote)))
     paintRoomSources()
     paintWingSources(wingCredits)
     dock.scrollTop=scroll
@@ -3598,7 +3585,7 @@ export function createWing():VinciWingModule {
       const stop=stopAt(index), s=stationOf(stop.station)
       rail.set(railPlaceOf(stop),vinciWalkPose(stop,narrow()),true,narrow(),walkVertex(stop))
       card=station=index;dock.scrollTop=0;aimPrint(s.id);exposureAt=s.id
-      paintHeader();paintHeaderVisibility();paintDock();paintQuestion();standHere()
+      paintHeader();paintHeaderVisibility();paintDock();standHere()
     })
   }
   /** The stop the frame's current mark stays on while a walk is under way. */
@@ -3652,7 +3639,7 @@ export function createWing():VinciWingModule {
     language(){
       wingModule.stations=WALK.stops.map(walkStation)
       if(!hosts||!standing)return
-      paintBarWords();paintHeader();paintDock();paintQuestion();paintExhibitTitle();paintExhibitMarks();paintStrip()
+      paintBarWords();paintHeader();paintDock();paintExhibitTitle();paintExhibitMarks();paintStrip()
     },
     show(index,h){
       showing=true
@@ -3721,7 +3708,7 @@ export function createWing():VinciWingModule {
       // A CLOSE LOOK'S WALK ACROSS THE HALL'S TWO STATIONS takes the stop asked
       // for with the card, or the next press counts from the stop left and fades.
       const crossed=station===card&&pressedOn<0&&nav.wall===undefined&&!nav.running&&(nav.approaching??nav.exhibit)!==undefined
-      if(arrived>=0&&arrived!==card&&!activeView){if(stepped||crossed)station=arrived;card=arrived;dock.scrollTop=0;paintHeader();paintDock();paintQuestion();standHere()}
+      if(arrived>=0&&arrived!==card&&!activeView){if(stepped||crossed)station=arrived;card=arrived;dock.scrollTop=0;paintHeader();paintDock();standHere()}
       if(nav.completed&&nav.completed!==exposureAt)exposureAt=nav.completed
       const byRoom=activeView?null:roomPrint(nav,hosts.world.camera.position)
       const dusk=farewellShare===null?1:farewellExposure(farewellShare)*farewellDip()

@@ -10,6 +10,7 @@
 import { deskControl } from './desk-story'
 import { say, WING_TEXT } from './content'
 import type { VinciText } from './vinci/content'
+import { learnWord } from './vinci/ending-talk'
 
 /** one row of the wing's own five, as the shell paints it */
 export interface DeskPanelRow {
@@ -105,7 +106,7 @@ export function createDeskPanel(host: DeskPanelHost): void {
       set(host.title, 'textContent', look)
       if (host.title.hidden) host.title.hidden = false
       set(host.on, 'ariaLabel', `${host.kicker.textContent ?? ''} · ${look}`)
-      set(talkWords, 'textContent', text(deskControl('ending', 'talk')))
+      set(talkWords, 'textContent', text(learnWord()))
     }
     if (talk.hidden === end) talk.hidden = !end
     const d = end ? ARROW_UP : ARROW_ON

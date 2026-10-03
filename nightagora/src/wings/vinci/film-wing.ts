@@ -17,7 +17,7 @@ import { keepTogether, keepTogetherIn } from './keep-together'
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
-import { endWith, talkAtTheGrave } from './ending-talk'
+import { endWith, learnWord, talkAtTheGrave } from './ending-talk'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -645,7 +645,6 @@ export function createWing(): WingModule {
     setRegister(full, 'record')
     full.append(make('p', 'vinci-statement', text(s.record ?? s.promise)), make('small', 'vinci-citation', text(shownCitation(s.promiseSource))))
     panel.append(full)
-    panel.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
     paintRoomAndWing()
   }
   /** a spoken statement with its word of certainty, and its record folded behind it */
@@ -703,7 +702,6 @@ export function createWing(): WingModule {
     wing.append(make('h3', '', text(vinciSourcesHeadings.counted)), make('p', 'vinci-statement', text(vinciWingCounts)))
     full.append(make('pre', 'vinci-arithmetic', text(vinciHourArithmetic)))
     fold(wing, full)
-    wing.append(make('p', 'vinci-door-disclosure', text(WING_TEXT.doorNote)))
   }
 
   /* ---- the phone's graded box ---- */
@@ -732,7 +730,7 @@ export function createWing(): WingModule {
     const more = make('button', 'film-key film-more')
     more.type = 'button'
     more.setAttribute('aria-controls', drawer.id)
-    // the record's row at the drawer's foot, under the door's ask (paintPhone)
+    // the record's row at the drawer's foot (paintPhone)
     const from = make('button', 'film-ask film-from')
     from.type = 'button'
     // the count is the way into the story's index, as the panel's chapters row with the same count is
@@ -828,17 +826,6 @@ export function createWing(): WingModule {
     phone.drawer.textContent = ''
     if (drawerOpen && stop?.drawer) {
       for (const sentence of sentences(text(stop.drawer), lang())) phone.drawer.append(make('p', '', sentence))
-      const door = hosts.stage.parentElement!.querySelector<HTMLElement>('.wing-door')
-      if (door) {
-        // the question the door carries stands over it, as in the desktop's drawer and the live phone's
-        const asked = hosts.stage.parentElement!.querySelector('.wing-question')?.textContent?.trim()
-        if (asked) phone.drawer.append(make('p', 'vinci-phone-question', asked))
-        const ask = make('button', 'film-ask', door.textContent ?? '')
-        ask.type = 'button'
-        ask.append(icon('M5 11l6-6M6 5h5v5', 'film-ic film-ic-out'))
-        ask.addEventListener('click', () => door.click())
-        phone.drawer.append(ask)
-      }
     }
     phone.more.textContent = ''
     phone.more.append(document.createTextNode(text(drawerOpen ? LOBBY_TEXT.close : deskControl('shared', 'read_more'))), icon(drawerOpen ? ARROW_DOWN : ARROW_UP))
@@ -907,7 +894,7 @@ export function createWing(): WingModule {
       keepLast(phone.goldName, look, 2)
       phone.gold.setAttribute('aria-label', `${end} · ${look}`)
       const said = make('span', 'film-talk-name')
-      keepLast(said, text(deskControl('ending', 'talk')))
+      keepLast(said, text(learnWord()))
       phone.talk.replaceChildren(said)
     }
     const end = !walking && to === null && !ways?.next
@@ -993,9 +980,6 @@ export function createWing(): WingModule {
     paintPhone()
     paintSources()
     marksAt = ''
-    const s = stationOf(LIFE[card]!.station)
-    const q = hosts?.stage.parentElement?.querySelector('.wing-question')
-    if (q) q.textContent = text(s.door)
   }
   function ahead(): void {
     if (above) { picture?.ahead([stopNode(LIFE[0]!.id)]); return }
@@ -1213,9 +1197,7 @@ export function createWing(): WingModule {
       order: () => LIFE.map(s => s.id),
       stood: () => [...stood],
       name: id => LIFE.find(s => s.id === id)?.name ?? { en: '', de: '' },
-      door: () => wing.querySelector<HTMLElement>('.wing-door'),
       sources: () => sourceButton ?? null,
-      question: () => text(stationOf(LIFE[card]!.station).door),
       words: { next: CARDS.controls.date.next, back: CARDS.controls.date.previous, rail: WING_TEXT.rail },
       go: index => { if (carried(index)) h.navigate(index) },
       up, upward,

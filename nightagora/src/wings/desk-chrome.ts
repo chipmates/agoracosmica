@@ -52,14 +52,9 @@ export interface DeskChromeHost {
   stood: () => readonly string[]
   /** a stop the story layer does not carry falls back to the wing's name */
   name: (id: string) => VinciText
-  /** the frame's own way out of the museum, which the words' foot row takes
-      in while the bar stands down */
-  door: () => HTMLElement | null
   /** the wing's own way to what a station rests on, which the drawer's foot
       takes in until the one sheet replaces it */
   sources: () => HTMLElement | null
-  /** the question this station's door carries, as the frame wrote it */
-  question: () => string
   /** the words of the controls the frame and the wing already carry */
   words: {
     next: VinciText
@@ -352,17 +347,9 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   if (words) band.append(cap)
   else band.append(make('span', 'desk-nothing'))
   if (ways) band.append(waysRow)
-  /* The top dusk goes in first, so the bar and the door block stand on it. */
+  /* The top dusk goes in first, so the bar stands on it. */
   const top = make('div', 'desk-top')
   host.stage.append(top, thread, band)
-
-  /* THE WAY OUT OF THE MUSEUM STAYS ONE PRESS AWAY. The bar stands down with
-     this step, so the door it carried moves into the words' foot row until
-     the drawer's own foot takes it. It is the frame's node, kept whole with
-     its word, its address and its plate, and put back where it stood. */
-  const doorNode = ways && words ? host.door() : null
-  const doorNext = doorNode?.nextElementSibling ?? null
-  const doorNest = doorNode?.parentElement ?? null
 
   /* THE DRAWER: the same margin, the same foot line, one sentence a row, and
      the name row in its own place so the eye keeps the place it read. It is
@@ -383,7 +370,6 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
   plateWords.id = 'desk-drawer-words'
   setRegister(plateWords, 'drawer')
   const plateFoot = make('div', 'desk-drawer-foot')
-  const plateQuestion = make('p', 'desk-drawer-question')
   /* THE WAY BACK OUT IS A WORD in the drawer's own foot, beside the two side
      paths, and it says which key does the same thing. */
   const plateClose = make('button', 'desk-word-control desk-drawer-close')
@@ -460,9 +446,6 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
     for (const line of sentences(said, host.lang())) plateWords.append(make('p', '', line))
     plateFoot.textContent = ''
     if (sourcesNode) plateFoot.append(sourcesNode)
-    plateQuestion.textContent = host.question()
-    plateFoot.append(plateQuestion)
-    if (doorNode) plateFoot.append(doorNode)
     plateClose.textContent = ''
     plateClose.append(document.createTextNode(say(LOBBY_TEXT.close)), make('span', 'desk-key', 'Esc'))
     plateFoot.append(plateClose)
@@ -521,8 +504,6 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       tell.append(icon(PLAY), document.createTextNode(say(WORD.tell())))
       foot.append(more)
       if (DESK_TELL) foot.append(tell)
-      // the door stands in this row until the drawer's own foot takes it
-      if (doorNode && !drawer) foot.append(doorNode)
       paintDrawer()
     }
     if (ways) {
@@ -793,9 +774,7 @@ export function createDeskChrome(host: DeskChromeHost): DeskChrome {
       steadyWatch.abort()
       // the picture takes the whole window back with the band
       setDeskBand(0)
-      // the frame's door and the wing's own sources go home before the band
-      // that borrowed them is struck
-      if (doorNode && doorNest) doorNest.insertBefore(doorNode, doorNext)
+      // the wing's own sources go home before the band that borrowed them is struck
       if (sourcesNode && sourcesNest) sourcesNest.insertBefore(sourcesNode, sourcesNext)
       band.remove()
       top.remove()

@@ -1125,9 +1125,16 @@ function markTiers(): void {
   if (tierRow) tierRow.hidden = phase === 'wing' && Boolean(document.querySelector('#wing[data-film]:not([hidden])'))
 }
 
+/* THE WALK KEEPS ONE WAY INTO THE LIBRARY, at its end: while a wing stands,
+   the panel's own link to the library stands down. */
+const libraryLink = instrumentsEl.querySelector<HTMLElement>('.inst-library')
+function markLibrary(): void {
+  if (libraryLink) libraryLink.style.display = phase === 'wing' ? 'none' : ''
+}
+
 function setInstruments(open: boolean, focus = true): void {
   const sheet = panelIsSheet()
-  if (open) markTiers()
+  if (open) { markTiers(); markLibrary() }
   instrumentsEl.hidden = !open
   if (instPlan) instPlan.disabled = phase !== 'wing'
   railInstruments?.setAttribute('aria-expanded', String(open))
@@ -1377,8 +1384,6 @@ declare global {
             normalised rail, which repeats the last one */
         stationId: string
         stationIds: string[]
-        /** where the door at this station goes, and what it asks */
-        door: { href: string; question: string }
         /** library sets still in flight; a frame shot over zero is a frame
             drawn on a surface that is not dressed yet */
         texturesPending: number
@@ -1700,7 +1705,6 @@ window.__forge = {
       stations: stand ? stand.stations : wingFrame.stations(),
       stationId: stand ? stand.stationId : wingFrame.stationId(),
       stationIds: stand ? stand.stationIds : wingFrame.stationIds(),
-      door: wingFrame.doorHere(),
       texturesPending: stack.materials.pending() + (stand?.texturesPending ?? 0) + wingFrame.pending(),
       // a library set that failed has left the count above, so it is named here
       textureErrors: [...wingFrame.errors(), ...stack.materials.missing().map(({ name, reason }) => `library/${name}: ${reason}`)],

@@ -13,7 +13,7 @@ import { LOBBY_TEXT } from '../../content/lobby'
 import { deskMark } from '../desk-chrome'
 import { deskControl, deskStoryStop, storySentences } from '../desk-story'
 import type { DeskPanelRow } from '../desk-panel'
-import { endWith } from './ending-talk'
+import { endWith, learnWord } from './ending-talk'
 import { fitGoldName, watchGoldName } from './gold-fit'
 import type { VinciText } from './content'
 
@@ -95,7 +95,7 @@ export interface VinciPhoneHost {
   wall(): VinciPhoneWall | null
   /** the close look standing, whose foot row this box keeps */
   look(): VinciPhoneLook | null
-  /** THE ROOM'S LIST, its word at the drawer's foot under the door's ask: the
+  /** THE ROOM'S LIST, its word at the drawer's foot: the
       key row has no room for it at 390, and a row of its own at rest would
       take the picture under two thirds. Null where the room holds no set. */
   list?(): HTMLElement | null
@@ -246,7 +246,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
       keepLast(goldName, look, 2)
       gold.setAttribute('aria-label', `${end} · ${look}`)
       const said = make('span', 'film-talk-name')
-      keepLast(said, text(deskControl('ending', 'talk')))
+      keepLast(said, text(learnWord()))
       talk.replaceChildren(said)
     }
     const end = !walking && to === null && !look?.next
@@ -262,7 +262,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
   function paint(): void {
     const look = host.look(), at = host.wall()
     const said = [host.at(), lang(), open, Boolean(look), look?.previous, look?.next?.title, at?.at, at?.of, at?.previous, at?.next,
-      host.leg().walking, document.getElementById('rail-instruments')?.textContent, host.wing.querySelector('.wing-door')?.textContent, host.wing.querySelector('.wing-question')?.textContent].join('|')
+      host.leg().walking, document.getElementById('rail-instruments')?.textContent].join('|')
     if (said === painted) { publish(); return }
     painted = said
     root.dataset['look'] = String(Boolean(look))
@@ -278,19 +278,6 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     drawer.textContent = ''
     if (open && stop?.drawer) {
       for (const sentence of storySentences(text(stop.drawer), lang())) drawer.append(make('p', '', sentence))
-      // THE DOOR STANDS AT THE DRAWER'S FOOT: the frame's own door, pressed
-      // from here, so its disclosure still comes before the first press
-      const door = host.wing.querySelector<HTMLElement>('.wing-door')
-      if (door) {
-        // the question the door carries stands over it, the one italic on the sheet
-        const asked = host.wing.querySelector('.wing-question')?.textContent?.trim()
-        if (asked) drawer.append(make('p', 'vinci-phone-question', asked))
-        const ask = make('button', 'film-ask', door.textContent ?? '')
-        ask.type = 'button'
-        ask.append(icon('M5 11l6-6M6 5h5v5', 'film-ic film-ic-out'))
-        ask.addEventListener('click', () => door.click())
-        drawer.append(ask)
-      }
       const list = host.list?.()
       if (list) drawer.append(list)
     }

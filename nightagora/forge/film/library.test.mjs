@@ -124,10 +124,11 @@ test('each wire trips back to the global key when its proof no longer holds', as
   assert.equal(letters[CONTENT].placed, false, 'an importer of the words that reaches the letters')
   assert.match(letters[CONTENT].why, /welcome\.ts/)
   // an importer that reaches the letters through a module of its own
-  const via = `${WING_DIR}/ending-talk.ts`
-  const reach = wordsWith({ ...plant(via, "import { lang } from '../content'\n", "import { lang } from '../content'\nimport { mountCollectionExhibits } from './collection/exhibits'\nvoid mountCollectionExhibits\n") })
+  const via = `${WING_DIR}/walk.ts`
+  const own = "import { vinciContent, type VinciStationId, type VinciText } from './content'\n"
+  const reach = wordsWith({ ...plant(via, own, `${own}import { mountCollectionExhibits } from './collection/exhibits'\nvoid mountCollectionExhibits\n`) })
   assert.equal(reach[CONTENT].placed, false)
-  assert.match(reach[CONTENT].why, /ending-talk\.ts imports it and reaches a letter module/)
+  assert.match(reach[CONTENT].why, /walk\.ts imports it and reaches a letter module/)
   const canvas = wordsWith({ [`${WING_DIR}/study-sheet.ts`]: `${read(`${WING_DIR}/study-sheet.ts`)}\nexport const pen = (c: CanvasRenderingContext2D) => c.fillText('x', 0, 0)\n` })
   for (const f of WORDS_FILES) assert.equal(canvas[f].placed, false, `${f}: text drawn into a canvas`)
   const exhibits = `${WING_DIR}/collection/exhibits.ts`

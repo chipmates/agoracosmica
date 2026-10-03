@@ -1,12 +1,19 @@
-/** THE GRAVE'S SECOND ENDING: the talk choice opens the library's door with a
- * closing question, the door the museum keeps for the walk's end. Returns
+/** THE GRAVE'S SECOND ENDING: the learn choice opens the library's door to
+ * Leonardo's mode choice, with the plate's words the ending keeps. Returns
  * whether a door opened. */
-import { openWingDoor } from '../frame'
-import { lang } from '../content'
-import { vinciFarewellDoor } from './content'
+import { openWingModes } from '../frame'
+import { endingWord } from './ending-words'
+import type { VinciText } from './content'
+
+/** The choice's own word, beside the look up on every form. */
+export const learnWord = (): VinciText => endingWord('ending.learn.word')
 
 export function talkAtTheGrave(): boolean {
-  return openWingDoor(vinciFarewellDoor.station, vinciFarewellDoor[lang()]) !== ''
+  return openWingModes({
+    title: endingWord('ending.plate.title'),
+    line: endingWord('ending.plate.line'),
+    go: endingWord('ending.plate.go'),
+  }) !== ''
 }
 
 /** An ending asked of the wing (`na-wing-ending`), as the desk's panel asks
