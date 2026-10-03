@@ -10,7 +10,7 @@ import { samePlace } from '../../../forge/film/same-place.mjs'
 import filmCss from './film.css?inline'
 import type { FilmCycle } from './cycle'
 import {
-  PICTURE_ASPECT, lineIsLean, onBox, parsePrint, projectPrint,
+  PICTURE_ASPECT, lineIsLean, markCut, onBox, parsePrint, projectPrint,
   type CameraPrint, type PictureBox, type PictureEvent, type PictureFraming, type PictureMark,
   type PictureGo, type PictureNode, type PictureSource, type PictureState, type PictureWords,
 } from './seam'
@@ -1197,7 +1197,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       if (file) fetchHead(file.url, file.bytes)
     },
     state: () => state,
-    marks(node, lang) {
+    marks(node, lang, uncut = false) {
       const f = shownFraming
       const list = release.nodes[node]?.marks[f]?.[lang] ?? []
       const box = fit()
@@ -1205,7 +1205,7 @@ export function createFilmSource(options: FilmOptions): PictureSource & { readou
       for (const m of list) {
         const p = onBox(PICTURE_ASPECT[f], box, m.u, m.v)
         // a mark the crop of this glass leaves out is not offered
-        if (p.x < 22 || p.y < 22 || p.x > box.width - 22 || p.y > box.height - 22) continue
+        if (!uncut && markCut(p.x, p.y, box)) continue
         out.push({ id: m.id, x: p.x, y: p.y, walks: m.walks, label: m.label, word: m.word, colour: m.colour })
       }
       return out

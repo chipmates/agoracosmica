@@ -78,8 +78,10 @@ export interface PictureSource {
       reached by a dip, or not at all; a mark promises only what this says */
   reach(node: PictureNode): 'walk' | 'open' | 'dip' | 'none'
   state(): PictureState
-  /** the marks of a node, in picture-box pixels, in one language */
-  marks(node: PictureNode, lang: 'en' | 'de'): readonly PictureMark[]
+  /** the marks of a node, in picture-box pixels, in one language; `uncut`
+      keeps the marks the crop of this glass leaves out, for a chrome that
+      places those itself */
+  marks(node: PictureNode, lang: 'en' | 'de', uncut?: boolean): readonly PictureMark[]
   /** the works of a node a press on the picture reaches, in picture-box pixels */
   regions(node: PictureNode): readonly PictureRegion[]
   /** a point of the world on the picture as it stands now, or null behind the eye */
@@ -110,6 +112,11 @@ export function coverOf(aspect: number, box: PictureBox): { scale: number; width
 export function onBox(aspect: number, box: PictureBox, u: number, v: number): { x: number; y: number } {
   const c = coverOf(aspect, box)
   return { x: c.x + u * c.width, y: c.y + v * c.height }
+}
+
+/** A mark the crop of a glass leaves out: within 22 px of the box's edge, in box pixels. */
+export function markCut(x: number, y: number, box: PictureBox): boolean {
+  return x < 22 || y < 22 || x > box.width - 22 || y > box.height - 22
 }
 
 /** A CAMERA AS THE FILM PRINTS IT: eye, rotation (Euler XYZ, radians) and the

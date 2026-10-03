@@ -33,7 +33,7 @@ import type { FilmLook, FilmLookWays } from './film-look'
 import type { VitrineOnward } from '../vitrine'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
 import { createDeskOverview, type DeskOverview, type DeskOverviewCell } from '../overview'
-import type { PictureMark, PictureNode, PictureSource, PictureState } from '../picture/seam'
+import { markCut, type PictureMark, type PictureNode, type PictureSource, type PictureState } from '../picture/seam'
 import wingCss from './wing.css?inline'
 import deskCss from '../desk-chrome.css?inline'
 import deskTypeCss from '../desk-type.css?inline'
@@ -362,14 +362,27 @@ export function createWing(): WingModule {
     chip ??= Object.assign(make('span', 'vinci-mark-chip'), { hidden: true })
     chip.setAttribute('aria-hidden', 'true')
     if (!chip.isConnected) hosts.labels.append(chip)
-    const marks: PictureMark[] = [...picture.marks(node, lang())].sort((a, c) => a.x - c.x)
-    for (const mark of marks) {
+    const sideways = form === 'cinema'
+    const marks: PictureMark[] = [...picture.marks(node, lang(), sideways)].sort((a, c) => a.x - c.x)
+    // sideways the stop's own work is placed first, so it never gives way to a neighbour's mark
+    const own = sideways ? release?.nodes[node]?.exhibit : undefined
+    const ordered = own ? [...marks.filter(m => m.id === own), ...marks.filter(m => m.id !== own)] : marks
+    const outlines = sideways ? picture.regions(node) : []
+    /** sideways a work whose usual mark place is hidden keeps its mark on itself */
+    const onWork = (mark: PictureMark): void => {
+      const region = outlines.find(r => r.id === mark.id)
+      const at = region && cinema ? cinema.onWork(region.points.map(([px, py]) => [b.left + px, b.top + py] as const), MARK_TARGET / 2, dots) : null
+      if (at) placeMark(mark, at.x, at.y)
+    }
+    const hidden: PictureMark[] = []
+    for (const mark of ordered) {
       const x = b.left + mark.x
       let y = b.top + mark.y
       // no mark stands under the museum's own words; sideways it keeps clear of the row's controls, lifted where that is short
-      if (form === 'cinema') {
-        const clear = cinema ? cinema.clear(x, y, MARK_TARGET / 2) : y
-        if (clear === null) continue
+      if (sideways) {
+        const clear = markCut(mark.x, mark.y, b) ? null : cinema ? cinema.clear(x, y, MARK_TARGET / 2) : y
+        // the works whose marks stand where they are go first; the stop's own work does not wait
+        if (clear === null) { if (mark.id === own) onWork(mark); else hidden.push(mark); continue }
         y = clear
         if (crowded(x, y, dots)) continue
       } else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) {
@@ -378,39 +391,44 @@ export function createWing(): WingModule {
         if (y - lifted > MARK_LIFT || crowded(x, lifted, dots)) continue
         y = lifted
       }
-      const walks = routable(mark.id)
-      const dot = make('button', 'vinci-dot vinci-exhibit-dot film-dot')
-      dot.type = 'button'
-      dot.style.left = `${x}px`
-      dot.style.top = `${y}px`
-      // the press target runs past the drawn ring and its halo, in every form
-      dot.style.width = dot.style.height = `${MARK_TARGET}px`
-      // ONE SIGN FOR ONE ACT: every mark wears the live wing's own ring; the
-      // certainty colour is the close look's, and only the word says it walks
-      dot.dataset['mark'] = walks ? 'walk' : 'detail'
-      dot.dataset['exhibit'] = mark.id
-      dot.dataset['name'] = mark.label
-      const word = walks ? text(deskControl('walk', 'walk_there')) : ''
-      dot.dataset['word'] = word
-      dot.setAttribute('aria-label', word ? `${word} · ${mark.label}` : mark.label)
-      if (lookCard) dot.setAttribute('aria-controls', lookCard)
-      dot.setAttribute('aria-expanded', 'false')
-      dot.append(walkingRing(document))
-      dot.addEventListener('click', () => pressMark(dot, mark.id, walks))
-      dot.addEventListener('pointerenter', () => {
-        nameMark(dot)
-        // a hand resting on a gold mark fetches the start of its walk
-        if (walks && !narrow()) {
-          const timer = setTimeout(() => picture?.lean(viewNode(mark.id)), LEAN_MS)
-          dot.addEventListener('pointerleave', () => clearTimeout(timer), { once: true })
-        }
-      })
-      dot.addEventListener('pointerleave', () => { if (chip && answering?.dot !== dot) chip.hidden = true })
-      dot.addEventListener('focus', () => nameMark(dot))
-      dot.addEventListener('blur', () => { if (chip && answering?.dot !== dot) chip.hidden = true })
-      hosts.labels.append(dot)
-      dots.push(dot)
+      placeMark(mark, x, y)
     }
+    for (const mark of hidden) onWork(mark)
+  }
+  function placeMark(mark: PictureMark, x: number, y: number): void {
+    if (!hosts) return
+    const walks = routable(mark.id)
+    const dot = make('button', 'vinci-dot vinci-exhibit-dot film-dot')
+    dot.type = 'button'
+    dot.style.left = `${x}px`
+    dot.style.top = `${y}px`
+    // the press target runs past the drawn ring and its halo, in every form
+    dot.style.width = dot.style.height = `${MARK_TARGET}px`
+    // ONE SIGN FOR ONE ACT: every mark wears the live wing's own ring; the
+    // certainty colour is the close look's, and only the word says it walks
+    dot.dataset['mark'] = walks ? 'walk' : 'detail'
+    dot.dataset['exhibit'] = mark.id
+    dot.dataset['name'] = mark.label
+    const word = walks ? text(deskControl('walk', 'walk_there')) : ''
+    dot.dataset['word'] = word
+    dot.setAttribute('aria-label', word ? `${word} · ${mark.label}` : mark.label)
+    if (lookCard) dot.setAttribute('aria-controls', lookCard)
+    dot.setAttribute('aria-expanded', 'false')
+    dot.append(walkingRing(document))
+    dot.addEventListener('click', () => pressMark(dot, mark.id, walks))
+    dot.addEventListener('pointerenter', () => {
+      nameMark(dot)
+      // a hand resting on a gold mark fetches the start of its walk
+      if (walks && !narrow()) {
+        const timer = setTimeout(() => picture?.lean(viewNode(mark.id)), LEAN_MS)
+        dot.addEventListener('pointerleave', () => clearTimeout(timer), { once: true })
+      }
+    })
+    dot.addEventListener('pointerleave', () => { if (chip && answering?.dot !== dot) chip.hidden = true })
+    dot.addEventListener('focus', () => nameMark(dot))
+    dot.addEventListener('blur', () => { if (chip && answering?.dot !== dot) chip.hidden = true })
+    hosts.labels.append(dot)
+    dots.push(dot)
   }
   /* ---- a press on a work itself ---- */
   /** the work under a point of the picture at rest, in box pixels: the nearest whose outline holds it */

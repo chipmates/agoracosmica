@@ -75,6 +75,10 @@ export interface FilmCinema {
   /** where a mark at (x, y) stands clear of the foot row's controls: its own
       height, a short lift above them, or nowhere (null) */
   clear(x: number, y: number, half: number): number | null
+  /** where a mark whose usual place the row covers or the glass cuts off
+      stands on its own work instead (the outline in glass pixels), or
+      nowhere (null) */
+  onWork(outline: readonly (readonly [number, number])[], half: number, placed: readonly HTMLElement[]): { x: number; y: number } | null
   /** the glass and the foot row a close look lays itself out by, while the form stands */
   frame(): VitrineCinema | null
 }
@@ -386,6 +390,43 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     }
     return y - at <= LIFT_MOST ? at : null
   }
+  /** the drawn ring's radius: a mark moved onto its work keeps its whole ring on the work where it can */
+  const RING = 14
+  function inside(outline: readonly (readonly [number, number])[], x: number, y: number): boolean {
+    let hit = false
+    for (let i = 0, j = outline.length - 1; i < outline.length; j = i++) {
+      const [xi, yi] = outline[i]!, [xj, yj] = outline[j]!
+      if ((yi > y) !== (yj > y) && x < ((xj - xi) * (y - yi)) / (yj - yi) + xi) hit = !hit
+    }
+    return hit
+  }
+  /** A WORK IN VIEW KEEPS ITS MARK: on the middle of what shows of the
+      work, as low as the row and the marks already standing allow. An
+      outline is the work's hull, so the middle is read from what shows. */
+  function onWork(outline: readonly (readonly [number, number])[], half: number, placed: readonly HTMLElement[]): { x: number; y: number } | null {
+    if (!on || outline.length < 3) return null
+    const glass = probe.getBoundingClientRect()
+    const left = Math.max(22, glass.left), right = Math.min(innerWidth - 22, glass.right)
+    const top = Math.max(22, glass.top), bottom = Math.min(innerHeight - 22, glass.bottom)
+    const row = [...(box.querySelector<HTMLElement>(':scope > .film-foot')?.children ?? [])]
+      .filter((seat): seat is HTMLElement => seat instanceof HTMLElement && !seat.hidden && getComputedStyle(seat).visibility !== 'hidden')
+      .map(seat => seat.getBoundingClientRect()).filter(r => r.width && r.height)
+    const xs = outline.map(p => p[0]), ys = outline.map(p => p[1])
+    let sum = 0, count = 0
+    for (let y = Math.max(Math.min(...ys), top); y <= Math.min(Math.max(...ys), bottom); y += 4)
+      for (let x = Math.max(Math.min(...xs), left); x <= Math.min(Math.max(...xs), right); x += 4)
+        if (inside(outline, x, y) && !row.some(r => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom)) { sum += x; count++ }
+    if (!count) return null
+    const x = Math.round(sum / count)
+    for (const ring of [RING, 0])
+      for (let y = Math.floor(Math.min(Math.max(...ys) - ring, bottom)); y >= Math.max(Math.min(...ys) + ring, top); y -= 2) {
+        const held = [[x, y], [x, y + ring], [x, y - ring], [x - ring, y], [x + ring, y]] as const
+        if (!held.every(([px, py]) => inside(outline, px, py))) continue
+        if (clear(x, y, half) !== y || crowded(x, y, placed)) continue
+        return { x, y }
+      }
+    return null
+  }
 
   /* ---- the panel's rows: Lobby, the plan, the life, the chapters ---- */
   let rowsSaid = ''
@@ -410,5 +451,5 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     addEventListener('na-language', () => { rowsSaid = ''; publish() }, { signal })
   }
 
-  return { set, paint, clear, frame }
+  return { set, paint, clear, onWork, frame }
 }
