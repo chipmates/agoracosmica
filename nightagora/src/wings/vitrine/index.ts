@@ -496,8 +496,13 @@ export function createVitrine(options: {
     rects.view = form === 'under' ? under : beside
     place(stage, rects.view)
     if (form === 'beside') {
-      const head = safe.top + CINEMA.columnTop
-      place(card, { left: right - column, top: head, width: column, height: frame.row.top - CINEMA.rowGap - head })
+      /* THE LABEL COLUMN IS A BOX ON THE WALL in the walk's own ground, from
+         the glass's top air to the foot row: it reaches into the gap to the
+         field's edge, and the cinema form's padding (half the gap at the
+         left, the head less the air at the top) keeps the words where the
+         column stands */
+      const top = safe.top + CINEMA.air, from = right - column - CINEMA.columnGap / 2
+      place(card, { left: from, top, width: right - from, height: frame.row.top - CINEMA.rowGap - top })
     } else {
       const stripTop = Math.round((frame.row.top + frame.row.bottom - CINEMA.strip) / 2)
       const from = Math.max(left, frame.row.seats + CINEMA.rowGap)

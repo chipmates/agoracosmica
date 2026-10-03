@@ -228,11 +228,6 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-plate[data-seated='true'] { background: transparent; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-stand { display: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .reader :is(.reader-ground, .reader-stage) { bottom: 0; }
-/* the faint hairline between the work and its label, the figure page's */
-#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-view::after {
-  content: ''; position: absolute; top: 8px; bottom: 8px; right: -14px; width: 1px; pointer-events: none;
-  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--ui-way) 26%, transparent) 16%, color-mix(in srgb, var(--ui-way) 26%, transparent) 84%, transparent);
-}
 
 /* ---- THE INSTRUMENTS' COLUMN, over the walk's two seats and as wide as
    they are: the work's ways, its zoom, its whole, a film's pause and its
@@ -341,8 +336,12 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   display: flex; flex-direction: column; overflow: hidden; padding: 0;
   background: none; border: 0; border-radius: var(--ui-r-box-side); box-shadow: none;
 }
-/* a place's picture is the room's, so its label keeps a ground of its own over the dimmed room */
-#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-wall='false'] .vitrine-card { padding: 12px 14px 0; background: var(--ui-ground); }
+/* THE LABEL COLUMN IS A BOX in the walk's own ground, as its band, its box and its strip are, over a work's wall, a
+   film's deep field and a place's dimmed room alike; it stands where the hairline between work and label stood. Its
+   padding is the window's geometry (index.ts): half the column gap at the left, the head less the air at the top */
+#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-card {
+  padding: 8px 12px 0 14px; background: var(--ui-ground); border-radius: var(--ui-r-box-side);
+}
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body {
   flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none; padding: 0 0 4px;
 }
@@ -429,7 +428,7 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* an opened column's way back to the strip is its own close mark at its head, beside the name:
    the foot row keeps the one key that reads on, so no two keys there point the same way */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] {
-  position: absolute; top: -8px; right: -14px; z-index: 1; justify-content: center;
+  position: absolute; top: 0; right: -8px; z-index: 1; justify-content: center;
   width: 44px; min-width: 44px; height: 44px; text-decoration: none;
 }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] .vitrine-look-more-word {
