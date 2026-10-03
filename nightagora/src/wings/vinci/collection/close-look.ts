@@ -365,11 +365,13 @@ export function renderVinciMachineRecord(slug: MachineSlug, host: HTMLElement): 
 
 /** THE FOLIO BESIDE A MACHINE, as the island shows it: the store's own
  * thumbnail of the sheet it was read from, and the sheet's name. */
-export function vinciMachineSheet(slug: MachineSlug, open: () => void): { src: Promise<string | null> | null; label: string; open(): void } {
+export function vinciMachineSheet(slug: MachineSlug, open: () => void): { src: Promise<string | null> | null; label: string; name: string; open(): void } {
   const thumb = FOLIO_THUMB[slug]
   return {
     src: thumb ? loadManifest().then(index => { const entry = index.byId.get(thumb); return entry?.display ? assetAddress(entry) : null }) : null,
     label: folioName(slug),
+    // a machine no sheet of his survives for (the lion): the door opens its record, and says so
+    name: VINCI_VITRINE_WORDS.provenance[lang()],
     open,
   }
 }

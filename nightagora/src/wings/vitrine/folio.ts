@@ -3,7 +3,8 @@
    phone the door is a 44 px glass in the views' row, where no name fits whole,
    so a drawn leaf stands in the glass and the name stays the door's own. */
 
-export type FolioSheet = { src: Promise<string | null> | null; label: string; open(): void }
+/** `name`, where no sheet is named by `label`: what the door opens, its accessible name and nothing shown */
+export type FolioSheet = { src: Promise<string | null> | null; label: string; name?: string; open(): void }
 
 const SVG = 'http://www.w3.org/2000/svg'
 
@@ -22,7 +23,7 @@ export function folioDoor(doc: Document, sheet: FolioSheet, narrow: boolean, sig
   const door = doc.createElement('button')
   door.className = narrow ? 'vitrine-folio vitrine-folio-glass' : 'vitrine-folio'
   door.type = 'button'
-  door.setAttribute('aria-label', sheet.label)
+  door.setAttribute('aria-label', sheet.label || sheet.name || '')
   const named = (): void => { if (narrow) door.append(drawnLeaf(doc)); else door.textContent = sheet.label }
   if (sheet.src) {
     void sheet.src.then(src => {
