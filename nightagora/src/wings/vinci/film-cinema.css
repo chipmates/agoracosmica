@@ -331,9 +331,10 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 }
 #wing[data-film='cinema'] .vitrine[data-look-words='beside'] .vitrine-caption { text-align: left; text-wrap: pretty; }
 /* A MACHINE BESIDE ITS WORDS says its step in the label column, under a rule over the column's keys, at the height of
-   its longest step (cycle.ts), so the words above it never move as the steps go by; the film keeps only its clock */
+   its longest step (cycle.ts), so the words above it never move as the steps go by; the film keeps only its clock. The
+   rule's air above is a margin, so a column filled to its last line keeps it apart from that line */
 #wing[data-film='cinema'] .vitrine[data-look-aside] .vitrine-card > .vitrine-caption {
-  position: static; flex: 0 0 auto; z-index: auto; width: auto; max-width: none; margin: 0; box-sizing: border-box; padding: 9px 0 2px;
+  position: static; flex: 0 0 auto; z-index: auto; width: auto; max-width: none; margin: 5px 0 0; box-sizing: border-box; padding: 4px 0 2px;
   background: none; border: 0; border-top: 1px solid var(--ui-line); border-radius: 0; text-shadow: none;
   font: 400 .9375rem/22px var(--serif); color: var(--ui-text); text-align: left; text-wrap: pretty; pointer-events: auto;
 }
