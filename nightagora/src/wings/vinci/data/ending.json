@@ -4,20 +4,29 @@
     "scope": "the walk's end: the choice beside the look up and the plate it opens, words by key",
     "learn_word": "ending.learn.word is the owner's own wording for the choice, EN and DE, and is fixed.",
     "destination": "The choice opens Leonardo's mode choice in the library (`/app?figure=leonardo-da-vinci&lang=<lang>`), not a conversation: no question rides the address.",
-    "placeholders": "ending.plate.title, ending.plate.line and ending.plate.go still carry the plate's earlier words (the door's title, the farewell question, the door's way in). They describe a conversation the new destination no longer opens and wait for written words. Every other sentence of the plate (the library line, the Echo's disclosure, the terms) is the frame's own and stays as it is.",
-    "status": "placeholders"
+    "status": "written, read blind",
+    "words": "ending.plate.title, ending.plate.line and ending.plate.go were written for the new destination (four candidate sets) and read blind once; the reader's pick combines three of the written strings unchanged. Every other sentence of the plate (the library line, the Echo's disclosure, the terms) is the frame's own and stays as it is."
   },
   "ending": {
     "learn": {
-      "word": { "en": "Learn from Leonardo", "de": "Lerne von Leonardo" }
+      "word": {
+        "en": "Learn from Leonardo",
+        "de": "Lerne von Leonardo"
+      }
     },
     "plate": {
-      "title": { "en": "Talk with the Echo of Leonardo da Vinci", "de": "Sprich mit dem Echo von Leonardo da Vinci" },
-      "line": {
-        "en": "I have just walked through your whole life. What should I take with me?",
-        "de": "Ich bin gerade durch dein ganzes Leben gegangen. Was soll ich mitnehmen?"
+      "title": {
+        "en": "The next step with Leonardo",
+        "de": "Der nächste Schritt mit Leonardo"
       },
-      "go": { "en": "Ask the Echo", "de": "Frag das Echo" }
+      "line": {
+        "en": "You walked where he lived and saw what he made. Now you can learn from him.",
+        "de": "Du warst, wo er lebte, und hast gesehen, was er schuf. Jetzt kannst du von ihm lernen."
+      },
+      "go": {
+        "en": "To the library",
+        "de": "Zur Bibliothek"
+      }
     }
   }
 }
