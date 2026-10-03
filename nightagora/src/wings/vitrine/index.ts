@@ -560,8 +560,16 @@ export function createVitrine(options: {
   function clampWords(): void {
     cutAsked = false
     if (!cinemaFrame || root.dataset['lookForm'] !== 'beside') { cut = null; unmaskLines(body); return }
-    cut = wholeLines(body, { from: headBand(body.scrollTop > 0.5) })
+    cut = wholeLines(body, { from: headBand(body.scrollTop > 0.5), reach: restReach() })
     maskWholeLines(body, cut)
+  }
+  /** at rest a machine beside its words says its step in its own line, so its list of steps waits for the page read on */
+  function restReach(): number | undefined {
+    if (!root.hasAttribute('data-look-aside') || body.scrollTop > 0.5) return undefined
+    const list = body.querySelector<HTMLElement>('.vitrine-steps')
+    if (!list) return undefined
+    const at = list.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop
+    return at > 0 && at < body.clientHeight ? at : undefined
   }
   /** read on, an opened column's lines start under its close mark, which stands beside the name at its head */
   function headBand(scrolled: boolean): number {
