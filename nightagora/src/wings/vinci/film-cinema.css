@@ -456,8 +456,9 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls > :not(.vitrine-look-more) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-look-form='under']:not([data-look-open]) .vitrine-controls { padding: 0; }
-/* opened, a work that stood under has stepped aside into the label's form: its film's line stands down, the column holds its words */
-#wing[data-film='cinema'] .vitrine[data-look-open][data-look-film] .vitrine-caption { display: none; }
+/* opened, a work that stood under has stepped aside into the label's form: a film whose steps the column lists lets its line
+   stand down; a film without that list keeps its line along its foot, so its moment stays named */
+#wing[data-film='cinema'] .vitrine[data-look-open][data-look-film]:has(.vitrine-steps) .vitrine-caption { display: none; }
 
 /* ---- THE SHEETS OVER THE WHOLE GLASS, one close at the lower left ---- */
 /* the record */
