@@ -240,7 +240,7 @@ export function createVitrine(options: {
      in its place here while the form stands, and back where it was after */
   const tools = make('div', 'vitrine-tools')
   tools.hidden = true
-  const TOOL_ORDER = ['way', 'zoom', 'whole', 'play', 'source', 'rule'] as const
+  const TOOL_ORDER = ['way', 'zoom', 'whole', 'play', 'source'] as const
   const toolSlots = new Map<string, HTMLElement>(TOOL_ORDER.map(kind => {
     const slot = make('div', `vitrine-tools-slot vitrine-tools-${kind}`)
     tools.append(slot)
