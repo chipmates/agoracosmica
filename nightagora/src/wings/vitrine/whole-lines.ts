@@ -18,8 +18,9 @@ export interface LineCut {
   away: Element[]
 }
 
-/** what is read as one box, never split into lines: a control, a picture, a strip of leaves */
-const WHOLE = 'button, img, svg, input, select, textarea, canvas, video, ol'
+/** what is read as one box, never split into lines: a control, a picture, a strip of leaves; a machine's step
+ * is a row of words that happens to be pressable, so its lines are read like any other */
+const WHOLE = 'button:not(.vitrine-step-item), img, svg, input, select, textarea, canvas, video, ol'
 /** what holds a run of sentences */
 const BLOCK = 'p, li, h1, h2, h3, h4, h5, h6, blockquote, figcaption, dt, dd'
 /** how far a column's foot may rise to end on a sentence instead of inside one: two lines at most */
