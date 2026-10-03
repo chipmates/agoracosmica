@@ -586,9 +586,40 @@ export function createVitrine(options: {
     stage.style.setProperty('--fall-width', `${Math.round(fall.width)}px`)
     stage.style.setProperty('--fall-below', `${Math.round(fall.below)}px`)
   }
+  /** the form's own places a payload's tools are lent into */
+  const toolHomes = (): HTMLElement[] => [...new Set(toolSlots.values())]
+  /** A LENT TOOL'S PLACE IS ITS PAYLOAD'S, never the form's: a payload that
+   * set a node beside one of its lent tools set it in the form's place, so it
+   * goes beside that tool's home; a lent tool whose home its payload took
+   * down is gone with it. */
+  function settleTools(): void {
+    for (const [node, mark] of lent) {
+      if (mark.isConnected) continue
+      lent.delete(node)
+      node.remove()
+    }
+    for (const home of toolHomes()) {
+      for (const stray of [...home.children] as HTMLElement[]) {
+        if (stray === countButton || lent.has(stray)) continue
+        let after: Element | null = stray.nextElementSibling
+        while (after && !lent.has(after as HTMLElement)) after = after.nextElementSibling
+        let before: Element | null = stray.previousElementSibling
+        while (before && !lent.has(before as HTMLElement)) before = before.previousElementSibling
+        const beside = after ? lent.get(after as HTMLElement) : before ? lent.get(before as HTMLElement) : undefined
+        if (!beside) continue
+        if (after) beside.before(stray)
+        else beside.after(stray)
+      }
+    }
+  }
+  /** What is left in the form's places once every lent tool went home is a payload's that is gone. */
+  function sweepTools(): void {
+    for (const home of toolHomes()) for (const left of [...home.children]) if (left !== countButton) left.remove()
+  }
   /** The payload's tools into the form's own places; one the form has no place for stays where it is. */
   function gatherTools(): void {
     if (!cinemaFrame) return
+    settleTools()
     let clocked = false
     for (const node of root.querySelectorAll<HTMLElement>('[data-tool], .vitrine-payload-controls :is(.vitrine-play, .vitrine-track, .vitrine-viewpoint, .vitrine-folio-glass)')) {
       if (lent.has(node)) continue
@@ -1014,6 +1045,7 @@ export function createVitrine(options: {
   function unmountPayload(): void {
     // the tools go home first, so the payload takes down its own
     returnTools()
+    sweepTools()
     const payload = exhibit?.payload
     if (payload) {
       try { payload.unmount() } catch (error) { console.error(error) }
