@@ -62,7 +62,9 @@ function read(root: HTMLElement): { boxes: Box[]; stops: number[] } {
     const style = getComputedStyle(node as Element)
     if (style.display === 'none' || style.visibility === 'hidden') return
     const r = (node as Element).getBoundingClientRect()
-    if ((node as Element).matches(WHOLE)) {
+    // a painted mark with no words of its own (a certainty dot) is one box too, so a cut never leaves a sliver of it
+    const mark = !node.textContent?.trim() && (style.backgroundImage !== 'none' || !/^(transparent|rgba\(0, 0, 0, 0\))$/.test(style.backgroundColor))
+    if ((node as Element).matches(WHOLE) || mark) {
       if (r.height > 0 && r.width > 0) found.push({ top: r.top, bottom: r.bottom, block: node as Element, whole: true })
       return
     }
@@ -120,7 +122,13 @@ export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?:
   const shown = inside()
   if (shown.length) {
     const first = Math.min(...shown.map(b => b.top)), last = Math.max(...shown.map(b => b.bottom))
-    if (top > from + 0.5 && first > top) top = (top + first) / 2
+    // the last thing above the cut, or above a sheet's own head
+    const prior = Math.max(-Infinity, ...list.filter(b => b.bottom <= top + 0.5).map(b => b.bottom))
+    if (top > 0.5 && first > top && prior > -Infinity) top = Math.max(top, (prior + first) / 2)
+    // a rule hidden right above the head may snap a device row down into the cut: the cut keeps that row out
+    const px = 1 / (globalThis.devicePixelRatio || 1)
+    const rule = list.find(b => b.rule && Math.abs(b.bottom - prior) < 0.01)
+    if (top > 0.5 && rule && top - rule.bottom < px) top = rule.bottom + px
     if (foot < height - 0.5 && last < foot) foot = (foot + last) / 2
   }
   return {
@@ -145,7 +153,7 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
   const height = scroller.clientHeight
   setAway(scroller, cut.away)
   if (cut.top < 0.5 && cut.foot > height - 0.5) {
-    style.removeProperty('mask-image'); style.removeProperty('-webkit-mask-image')
+    style.removeProperty('mask-image'); style.removeProperty('-webkit-mask-image'); style.removeProperty('clip-path')
     return
   }
   // rounded inwards, so no pixel row of a hidden line's edge or a box's border is left at the cut
@@ -153,11 +161,14 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
   const mask = `linear-gradient(to bottom, transparent ${t}px, #000 ${t}px, #000 ${f}px, transparent ${f}px)`
   style.setProperty('mask-image', mask)
   style.setProperty('-webkit-mask-image', mask)
+  // the same cut as a clip: WebKit lets a device row of what crosses the scroller's own edge through a mask, never through a clip
+  style.setProperty('clip-path', `inset(${t}px 0 ${Math.max(0, height - f)}px 0)`)
 }
 
 /** Take the mask down again. */
 export function unmaskLines(scroller: HTMLElement): void {
   setAway(scroller, [])
+  scroller.style.removeProperty('clip-path')
   scroller.style.removeProperty('mask-image')
   scroller.style.removeProperty('-webkit-mask-image')
 }
