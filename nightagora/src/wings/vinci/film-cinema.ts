@@ -257,12 +257,12 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   const phoneLine = part('film-line')
   if (phoneLine) lineWatch.observe(phoneLine, { childList: true, characterData: true, subtree: true })
   /* the life opens at its drawing: its landing scrolls every box around the
-     period read, and only this form lets the life's body scroll */
+     period read, and only this form lets the life itself scroll */
   const lifeWatch = new MutationObserver(records => {
     if (!on) return
     for (const record of records) {
       const target = record.target as Element
-      if (target.matches('.wing-life[open]')) target.querySelector<HTMLElement>('.wing-life-body')?.scrollTo({ top: 0 })
+      if (target.matches('.wing-life[open]')) { target.scrollTo({ top: 0 }); target.querySelector<HTMLElement>('.wing-life-body')?.scrollTo({ top: 0 }) }
       if (target.matches('.vinci-dock')) askRecord()
       // the plan opens at the visitor's own row; its list then ends on a whole row
       if (target.matches('.wing-plan[open]')) {
