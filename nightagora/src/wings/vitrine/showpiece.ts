@@ -216,11 +216,10 @@ export function createShowpiecePayload(options: {
       height = Math.max(LEAST, box.height + over - said - LINE_AIR - CLOCK)
       width = Math.min(box.width, height * shape)
       height = width / shape
-      // a film the zone's width holds shorter stands with its words in the middle of the zone
-      const free = box.height + over - height - LINE_AIR - said - CLOCK
-      const top = free > 1 ? Math.max(0, (box.height - height - LINE_AIR - said - CLOCK) / 2) : -over
-      film = { left: Math.round((box.width - width) / 2), top: Math.round(top), width: Math.round(width), height: Math.round(height) }
-      words = { box: { left: 0, top: film.top + film.height + LINE_AIR, width: Math.round(box.width), height: said + CLOCK }, beside: false }
+      // a film the zone's width holds shorter still runs off the glass's top; the room it leaves stands over its line
+      film = { left: Math.round((box.width - width) / 2), top: -Math.round(over), width: Math.round(width), height: Math.round(height) }
+      const below = film.top + film.height + LINE_AIR
+      words = { box: { left: 0, top: below, width: Math.round(box.width), height: Math.round(Math.max(said + CLOCK, box.height - below)) }, beside: false }
     }
     Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
     // the whole frame, placed so the model's box is what the film shows
