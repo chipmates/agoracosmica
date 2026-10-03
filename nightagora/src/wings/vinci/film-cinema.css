@@ -275,11 +275,6 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass { width: 44px; padding: 0; overflow: hidden; }
 #wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass .vitrine-folio-thumb { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
 #wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-leaf { width: 20px; height: 24px; fill: none; stroke: var(--ui-way); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
-/* the work's measure on the wall beside it, never on it: its length bounded by the column */
-#wing[data-film='cinema'] .vitrine .vitrine-tools .deep-rule {
-  position: static; flex-direction: column; align-items: flex-start; gap: 7px; padding: 0 0 2px; background: none; border: 0;
-}
-#wing[data-film='cinema'] .vitrine .vitrine-tools .deep-rule-label { font: 400 .8125rem/1 var(--sans); letter-spacing: .02em; color: var(--ui-text-quiet); text-shadow: none; }
 /* what the tools left behind in the card stands down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-clock, .vitrine-views, .reader-zoom):not(:has(*)) { display: none; }
 
