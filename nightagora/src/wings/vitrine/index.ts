@@ -555,8 +555,20 @@ export function createVitrine(options: {
   function placeFilm(): void {
     const filmed = root.hasAttribute('data-look-film')
     clockFoot.hidden = !filmed || !clockFoot.firstElementChild
-    if (!filmed) return
+    if (!filmed) { delete root.dataset['lookWords']; return }
     const zone = rects.view
+    // a film that keeps its words clear of it names where they stand: the line over the clock, both on the wall
+    const said = exhibit?.payload?.filmWords?.() ?? null
+    if (said) {
+      const box = said.box, inset = said.beside ? 0 : CINEMA.clockInset
+      root.dataset['lookWords'] = said.beside ? 'beside' : 'under'
+      place(clockFoot, { left: box.left + inset, top: box.top + box.height - CINEMA.clock, width: Math.max(44, box.width - 2 * inset), height: CINEMA.clock })
+      stage.style.setProperty('--words-left', `${Math.round(box.left - zone.left)}px`)
+      stage.style.setProperty('--words-width', `${Math.round(box.width)}px`)
+      stage.style.setProperty('--words-foot', `${Math.round(zone.top + zone.height - box.top - box.height)}px`)
+      return
+    }
+    delete root.dataset['lookWords']
     const own = exhibit?.payload?.filmBox?.() ?? null
     const left = Math.max(zone.left, own?.left ?? zone.left)
     const right = Math.min(zone.left + zone.width, own ? own.left + own.width : zone.left + zone.width)
@@ -665,12 +677,12 @@ export function createVitrine(options: {
   })
   /** The look leaves the cinema form: the window's own phone or desk layout takes it back. */
   function leaveCinema(): void {
-    for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm']) delete root.dataset[key]
+    for (const key of ['form', 'lookForm', 'lookHome', 'lookOpen', 'lookWall', 'lookAspect', 'lookCrossover', 'lookFilm', 'lookWords']) delete root.dataset[key]
     unmaskLines(body)
     cut = null
     stripName.textContent = ''
     stripLine.textContent = ''
-    for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below']) stage.style.removeProperty(name)
+    for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below', '--words-left', '--words-width', '--words-foot']) stage.style.removeProperty(name)
     lookMore.remove()
     lookLess.remove()
     toolWatch.disconnect()

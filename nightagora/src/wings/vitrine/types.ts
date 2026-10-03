@@ -131,6 +131,10 @@ export interface VitrinePayload {
   /** Where a film stands inside the viewport, on the screen, where it does
    * not fill it: its clock is laid along this foot. */
   filmBox?(): VitrineRect | null
+  /** SIDEWAYS, where a film keeps its line and its clock clear of what it
+   * shows, on the screen: beside it, or under it; null where they stand over
+   * its foot. */
+  filmWords?(): { box: VitrineRect; beside: boolean } | null
   /** True when the payload took the key. */
   key?(event: KeyboardEvent): boolean
   /** Leave the stage as it was found. The window resumes the room after it. */

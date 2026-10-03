@@ -32,7 +32,7 @@ import limitsRaw from '../data/limits.json?raw'
 import partsRaw from '../data/parts.json?raw'
 import sizesRaw from '../data/sizes.json?raw'
 import filmsRaw from '../data/films.json?raw'
-import { createShowpiecePayload, type ShowpieceCut, type ShowpieceFile, type ShowpieceFraming, type ShowpiecePayload } from '../../vitrine/showpiece'
+import { createShowpiecePayload, type ShowpieceCut, type ShowpieceExtent, type ShowpieceFile, type ShowpieceFraming, type ShowpiecePayload } from '../../vitrine/showpiece'
 import type { FolioSheet } from '../../vitrine/folio'
 import type { ManifestEntry, ManifestIndex } from '../../../manifest'
 import { validateSheetRecord, type SheetManifestEntry } from '../pictures/sheet-record'
@@ -451,7 +451,8 @@ export function createVinciMachinePayload(options: {
 /* ---- a film of what a work describes ---------------------------------- */
 
 type FilmLine = Words & { from: number; source: string; certainty: string }
-const FILMS = (JSON.parse(filmsRaw) as { films: Record<string, { name: string; certainty: VinciShowpiece['certainty']; lines: FilmLine[] }> }).films
+const FILMS = (JSON.parse(filmsRaw) as { films: Record<string, { name: string; certainty: VinciShowpiece['certainty']; lines: FilmLine[]
+  extent?: VinciShowpiece['extent'] }> }).films
 type FilmRecord = ManifestEntry & { source?: string; framing?: string; width?: number; height?: number; seconds?: number }
 
 /** THE FILM A WORK'S CLOSE LOOK SHOWS: its cuts by framing from the store,
@@ -464,6 +465,8 @@ export interface VinciShowpiece {
   sources: string[]
   certainty: 'documented' | 'reconstructed' | 'conjectural'
   licence: string
+  /** where the model stands in each framing's frame over the run, as shares of the frame */
+  extent?: ShowpieceExtent
 }
 
 /** A work whose film the store does not carry, in a framing with its first
@@ -488,7 +491,7 @@ export function vinciShowpiece(id: string, index: ManifestIndex): VinciShowpiece
   const language = lang()
   return { id, cuts, seconds: seconds || Math.max(...film.lines.map(line => line.from)) + 1,
     lines: film.lines.map(line => ({ from: line.from, text: line[language] })), sources: film.lines.map(line => line.source),
-    certainty: film.certainty, licence: records[0]!.licence }
+    certainty: film.certainty, licence: records[0]!.licence, ...(film.extent ? { extent: film.extent } : {}) }
 }
 
 /** The sheet a film shows the model of, as the store records it: its page
@@ -514,7 +517,8 @@ export function createVinciShowpiecePayload(show: VinciShowpiece, options: {
 }): ShowpiecePayload {
   const language = lang()
   return createShowpiecePayload({ cuts: show.cuts, framing: options.framing, seconds: show.seconds, title: options.title, lines: show.lines,
-    words: { play: CONTROLS.machine.play[language], pause: CONTROLS.machine.pause[language], clock: options.title }, sheet: options.sheet })
+    words: { play: CONTROLS.machine.play[language], pause: CONTROLS.machine.pause[language], clock: options.title }, sheet: options.sheet,
+    ...(show.extent ? { extent: show.extent } : {}) })
 }
 
 /** THE FILM'S RECORD: what the sheet's reproduction is, the film's own line

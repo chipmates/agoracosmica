@@ -322,6 +322,16 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-tick {
   top: 18px; width: 1.5px; height: 8px; margin-left: -.75px; background: color-mix(in srgb, var(--ui-text) 72%, transparent);
 }
+/* A FILM SHOWN THROUGH ITS MODEL'S BOX (the heart's): no box of its own, its
+   sides fade into a dark wall, and its line and clock stand on the wall beside
+   it, or under it, never over it */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-payload='showpiece'] .showpiece { background: transparent; box-shadow: none; }
+#wing[data-film='cinema'] .vitrine[data-look-wall='true'][data-look-words] .vitrine-scrim { background-image: none; }
+#wing[data-film='cinema'] .vitrine[data-look-words] .vitrine-view::before { display: none; }
+#wing[data-film='cinema'] .vitrine[data-look-words] .vitrine-caption {
+  left: var(--words-left, 0px); width: var(--words-width, 100%); bottom: calc(var(--words-foot, 0px) + 44px); padding: 0;
+}
+#wing[data-film='cinema'] .vitrine[data-look-words='beside'] .vitrine-caption { text-align: left; text-wrap: pretty; }
 
 /* ---- BESIDE: the label column on the wall ---- */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-card {

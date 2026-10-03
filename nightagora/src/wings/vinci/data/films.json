@@ -4,12 +4,14 @@
     "scope": "A film the museum made of what a work describes, shown as that work's close look. Its lines run under the film, outside the picture: each from its own second of the film until the next line's. The work's own line in lines.json stays the work's.",
     "rule": "A line holds at most 120 characters and 20 words in either language, and no sentence over 14 words. Every line names its source, and the record prints it.",
     "files": "The film's bytes live in the asset store. A record there names this file's key as its `source`, its role (`showpiece-film` or `showpiece-poster`) and its framing; a work whose records the store does not carry opens as it did before.",
-    "prepared": "2026-09-25"
+    "prepared": "2026-09-25",
+    "extent": "Where the model stands in a framing's frame over the run, as shares of the frame [left, top, right, bottom]: the union of the glass's box in every frame where it stands whole (its edges, so a lit wall does not count), read from the film's own frames at two a second. Where the camera is inside it (the frame filled), the same box is shown. The phone held sideways shows the film through this box."
   },
   "films": {
     "sheet/rcin-919082": {
       "name": "glass-heart",
       "certainty": "reconstructed",
+      "extent": { "wide": [0.223, 0, 0.69, 1] },
       "lines": [
         {
           "from": 0,

@@ -6,9 +6,10 @@
    the caller's, already in the page's language. */
 
 import css from './showpiece.css?inline'
-import type { VitrinePayload, VitrinePayloadHost } from './types'
+import type { VitrinePayload, VitrinePayloadHost, VitrineRect } from './types'
 import { paintSlider } from './slider'
 import { folioDoor, type FolioSheet } from './folio'
+import { softMask } from '../picture/cycle'
 
 export type ShowpieceFraming = 'wide' | 'upright'
 export interface ShowpieceFile { src: string; width: number; height: number }
@@ -16,6 +17,8 @@ export interface ShowpieceFile { src: string; width: number; height: number }
 export interface ShowpieceCut { poster: ShowpieceFile; rungs: readonly ShowpieceFile[] }
 /** a line and the second of the film it stands from */
 export interface ShowpieceLine { from: number; text: string }
+/** where the model stands in a framing's frame over the whole run, as shares of the frame: [left, top, right, bottom] */
+export type ShowpieceExtent = Partial<Record<ShowpieceFraming, readonly [number, number, number, number]>>
 
 export interface ShowpiecePayload extends VitrinePayload {
   /** true once the first frame or a frame of the film stands */
@@ -31,6 +34,19 @@ const LEAST = 120
 const MEASURE = 860
 /** a wide stage keeps a lane beside the picture for the work's own door */
 const LANE = 24
+/** SIDEWAYS THE FILM IS SHOWN THROUGH ITS MODEL'S BOX: the box's sides
+    widened by this share of the frame's width, over which the film fades into
+    the wall, so the model itself is never faded; an end that stands inside
+    the glass fades over this share of the height, one at the glass's edge runs off it */
+const SIDE_FADE = 0.08
+const END_FADE = 0.1
+/** the line's column beside the film: its least and most width, and its gap to the film */
+const WORDS_LEAST = 200
+const WORDS_MOST = 340
+const WORDS_GAP = 28
+/** under the film: the air over its line, and the clock's band under the line */
+const LINE_AIR = 8
+const CLOCK = 44
 
 const make = <K extends keyof HTMLElementTagNameMap>(doc: Document, tag: K, cls: string, text?: string): HTMLElementTagNameMap[K] => {
   const node = doc.createElement(tag)
@@ -50,6 +66,8 @@ export function createShowpiecePayload(options: {
   words: { play: string; pause: string; clock: string }
   /** the work the film shows the model of, one press away */
   sheet?: FolioSheet
+  /** where its model stands in each framing's frame over the run; sideways the film is shown through it */
+  extent?: ShowpieceExtent
 }): ShowpiecePayload {
   const lines = [...options.lines].sort((a, b) => a.from - b.from)
   let host: VitrinePayloadHost | undefined
@@ -59,6 +77,10 @@ export function createShowpiecePayload(options: {
   let rung: string | null = null
   let shown = false, dragging = false, line = -1, lineBox = 0, measuredAt = ''
   let film: { left: number; top: number; width: number; height: number } | null = null
+  /** sideways, where the line and the clock stand clear of the film, in the viewport */
+  let words: { box: VitrineRect; beside: boolean } | null = null
+  /** the whole frame's width on the screen, which may run past the box the film is shown through */
+  let frameWidth = 0
   let listening = new AbortController()
   /** ON THE PHONE THE LINE IS THE CARD'S: it stands in the sheet under the
       work's name, as the phone form's line does, and never over the film */
@@ -117,6 +139,7 @@ export function createShowpiecePayload(options: {
     const box = host.element.getBoundingClientRect()
     if (box.width < 2 || box.height < 2) return
     if (host.cinema?.()) { fitWall(box); return }
+    plainFrame()
     if (host.narrow) { fitGlass(box); return }
     const lanes = !host.narrow && door ? 2 * (door.offsetWidth + LANE) : 0
     const room = { width: Math.max(LEAST, box.width - lanes), height: Math.max(LEAST, box.height - measureLines() - GAP) }
@@ -152,14 +175,88 @@ export function createShowpiecePayload(options: {
     Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
   }
 
-  /** SIDEWAYS THE FILM STANDS WHOLE ON THE WALL, as large as the zone holds
-      it: its line and its clock stand over its foot */
+  /** the film's frame fills the box it stands in, as it does everywhere but sideways */
+  function plainFrame(): void {
+    words = null
+    frameWidth = 0
+    for (const el of [poster, video]) if (el) for (const name of ['inset', 'left', 'top', 'width', 'height']) el.style.removeProperty(name)
+    if (root) for (const name of ['mask-image', '-webkit-mask-image', 'mask-composite', '-webkit-mask-composite']) root.style.removeProperty(name)
+  }
+
+  /** SIDEWAYS THE FILM STANDS ON THE WALL THROUGH ITS MODEL'S BOX, as tall as
+      the zone: its line and its clock stand beside it where the zone has the
+      room, else under it, and never over it. A framing with no box measured
+      stands whole, its line and clock over its foot. */
   function fitWall(box: DOMRect): void {
     if (!root) return
     const a = aspect()
-    const width = Math.min(box.width, box.height * a), height = width / a
-    film = { left: Math.round((box.width - width) / 2), top: Math.round((box.height - height) / 2), width: Math.round(width), height: Math.round(height) }
+    const ex = options.extent?.[framing]
+    if (!ex) {
+      plainFrame()
+      const width = Math.min(box.width, box.height * a), height = width / a
+      film = { left: Math.round((box.width - width) / 2), top: Math.round((box.height - height) / 2), width: Math.round(width), height: Math.round(height) }
+      Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
+      return
+    }
+    const x0 = Math.max(0, ex[0] - SIDE_FADE), x1 = Math.min(1, ex[2] + SIDE_FADE), y0 = ex[1], y1 = ex[3]
+    // the box's width over its height, in the frame's own pixels
+    const shape = ((x1 - x0) / Math.max(0.01, y1 - y0)) * a
+    // the film may run up past the zone's air to the field's top, the glass's own edge
+    const field = host?.field?.() ?? null
+    const over = field ? Math.max(0, box.top - field.top) : 0
+    let height = box.height + over, width = height * shape
+    const room = box.width - width - WORDS_GAP
+    if (room >= WORDS_LEAST) {
+      const column = Math.min(WORDS_MOST, room)
+      const left = Math.round((box.width - width - WORDS_GAP - column) / 2)
+      film = { left, top: -Math.round(over), width: Math.round(width), height: Math.round(height) }
+      words = { box: { left: film.left + film.width + WORDS_GAP, top: 0, width: Math.round(column), height: Math.round(box.height) }, beside: true }
+    } else {
+      const said = linesAt(box.width)
+      height = Math.max(LEAST, box.height + over - said - LINE_AIR - CLOCK)
+      width = Math.min(box.width, height * shape)
+      height = width / shape
+      // a film the zone's width holds shorter stands with its words in the middle of the zone
+      const free = box.height + over - height - LINE_AIR - said - CLOCK
+      const top = free > 1 ? Math.max(0, (box.height - height - LINE_AIR - said - CLOCK) / 2) : -over
+      film = { left: Math.round((box.width - width) / 2), top: Math.round(top), width: Math.round(width), height: Math.round(height) }
+      words = { box: { left: 0, top: film.top + film.height + LINE_AIR, width: Math.round(box.width), height: said + CLOCK }, beside: false }
+    }
     Object.assign(root.style, { left: `${film.left}px`, top: `${film.top}px`, width: `${film.width}px`, height: `${film.height}px` })
+    // the whole frame, placed so the model's box is what the film shows
+    const frameHeight = film.height / Math.max(0.01, y1 - y0)
+    frameWidth = frameHeight * a
+    for (const el of [poster, video]) if (el) Object.assign(el.style, { inset: 'auto', left: `${(-x0 * frameWidth).toFixed(2)}px`, top: `${(-y0 * frameHeight).toFixed(2)}px`,
+      width: `${frameWidth.toFixed(2)}px`, height: `${frameHeight.toFixed(2)}px` })
+    // its sides fade into the wall over the air outside the model's box; its foot, and a top inside the glass, over a share of its height
+    const end = END_FADE * film.height
+    const atEdge = field !== null && box.top + film.top <= field.top + 0.5
+    const mask = softMask({ left: Math.max(end / 2, (ex[0] - x0) * frameWidth), right: Math.max(end / 2, (x1 - ex[2]) * frameWidth),
+      top: atEdge ? 0 : end, bottom: end })
+    if (mask) {
+      for (const name of ['mask-image', '-webkit-mask-image']) root.style.setProperty(name, mask)
+      root.style.setProperty('mask-composite', 'intersect')
+      root.style.setProperty('-webkit-mask-composite', 'source-in')
+    }
+  }
+  /** THE LONGEST LINE'S HEIGHT at a width, in the caption's own type, measured
+      once per width and language, so the film never moves when a line gives way */
+  let linesFor = '', linesTall = 0
+  function linesAt(width: number): number {
+    if (!host) return 0
+    const key = `${Math.round(width)}|${host.lang}|${lines.length}`
+    if (key === linesFor) return linesTall
+    const probe = host.caption.cloneNode(false) as HTMLElement
+    probe.removeAttribute('aria-live')
+    probe.setAttribute('aria-hidden', 'true')
+    Object.assign(probe.style, { visibility: 'hidden', left: '0px', right: 'auto', top: '0px', bottom: 'auto', width: `${Math.round(width)}px`, padding: '0px' })
+    host.caption.after(probe)
+    let most = 0
+    for (const each of lines) { probe.textContent = each.text; most = Math.max(most, probe.getBoundingClientRect().height) }
+    probe.remove()
+    linesFor = key
+    linesTall = Math.ceil(most)
+    return linesTall
   }
 
   function load(f: ShowpieceFraming, at: number, playing: boolean): void {
@@ -170,7 +267,7 @@ export function createShowpiecePayload(options: {
     shown = false
     video.classList.remove('shown')
     poster.src = cut.poster.src
-    const width = film?.width ?? host.element.getBoundingClientRect().width
+    const width = frameWidth || (film?.width ?? host.element.getBoundingClientRect().width)
     const chosen = rungFor(cut, width)
     rung = `${chosen.width}x${chosen.height}`
     video.dataset['rung'] = rung
@@ -322,6 +419,7 @@ export function createShowpiecePayload(options: {
       line = -1
       wrote = undefined
       measuredAt = ''
+      linesFor = ''
       build(next)
       next.element.tabIndex = 0
       next.describe(options.title)
@@ -340,6 +438,7 @@ export function createShowpiecePayload(options: {
     layout() {
       if (!host || !video) return
       measuredAt = ''
+      linesFor = ''
       fit()
       paint()
       // a turned phone is the other framing's film, at the second it stood at
@@ -372,12 +471,19 @@ export function createShowpiecePayload(options: {
       root = undefined; poster = undefined; video = undefined; play = undefined; slider = undefined; door = undefined
       host = undefined
       film = null
+      words = null
+      frameWidth = 0
     },
     aspect,
     filmBox: () => {
       if (!host || !film) return null
       const box = host.element.getBoundingClientRect()
       return { left: box.left + film.left, top: box.top + film.top, width: film.width, height: film.height }
+    },
+    filmWords: () => {
+      if (!host || !words || !host.cinema?.()) return null
+      const box = host.element.getBoundingClientRect()
+      return { box: { left: box.left + words.box.left, top: box.top + words.box.top, width: words.box.width, height: words.box.height }, beside: words.beside }
     },
     standing: () => shown || root?.dataset['ready'] === 'true',
     readout: () => ({ framing, rung, time: now(), playing: Boolean(video && !video.paused && !video.ended), ended: Boolean(video?.ended),
