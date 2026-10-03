@@ -235,6 +235,128 @@
   }
 }
 
+/* ---- HELD SIDEWAYS: the wing's cinema form (arno-card.ts sets the form).
+   The drawing beside its words, as a close look stands beside its label:
+   the drawing as large as the glass allows left of the column, the words at
+   the column's head level with the drawing's top, the gold at its foot in
+   the walk's own corner. Every edge keeps clear of the notch and the home
+   indicator, read as the cinema form reads them. ---- */
+.arno-card[data-form='cinema'] {
+  --arno-st: calc(var(--na-safe-top, env(safe-area-inset-top, 0px)) + 10px);
+  --arno-sl: calc(var(--na-safe-left, env(safe-area-inset-left, 0px)) + 12px);
+  --arno-sr: calc(var(--na-safe-right, env(safe-area-inset-right, 0px)) + 12px);
+  --arno-sb: calc(var(--na-safe-bottom, env(safe-area-inset-bottom, 0px)) + 8px);
+  /* the close looks' label column and its gap to the work */
+  --arno-col: clamp(256px, 31vw, 300px);
+  --arno-gap: 28px;
+  /* the drawing's zone, and how far the drawing stands down in it */
+  --arno-zone-w: calc(100vw - var(--arno-sl) - var(--arno-sr) - var(--arno-col) - var(--arno-gap));
+  --arno-zone-h: calc(100dvh - var(--arno-st) - 10px);
+  --arno-sheet-top: max(0px, (var(--arno-zone-h) - min(var(--arno-zone-h), var(--arno-zone-w) / (var(--arno-ratio)))) / 2);
+  box-sizing: border-box;
+  padding: 0 var(--arno-sr) 0 var(--arno-sl);
+  background:
+    radial-gradient(64% 92% at calc(var(--arno-sl) + var(--arno-zone-w) / 2) 50%, var(--na-lapis) 0%, color-mix(in srgb, var(--na-lapis) 40%, var(--na-abyss)) 55%, var(--na-abyss) 100%);
+}
+/* opened, the label takes the room it reads in whole from the column's head,
+   wider on a shorter glass, and the drawing steps back as it does upright */
+.arno-card[data-form='cinema'][data-label='open'] { --arno-col: clamp(320px, 50vw, 460px); }
+.arno-card[data-form='cinema'][data-label='open'][data-room='wider'] { --arno-col: clamp(340px, 56vw, 520px); }
+.arno-card[data-form='cinema'][data-label='open'][data-room='widest'] { --arno-col: clamp(360px, 62vw, 580px); }
+/* the widest room gives up the air over the label and around the credit too */
+.arno-card[data-form='cinema'][data-label='open'][data-room='widest'] .arno-band { padding-top: var(--arno-st); }
+.arno-card[data-form='cinema'][data-label='open'][data-room='widest'] .arno-credit { margin-top: 0; }
+.arno-card[data-form='cinema'][data-label='open'][data-room='widest'] .arno-start { margin-top: 8px; }
+.arno-card[open][data-form='cinema'] {
+  grid-template-columns: minmax(0, 1fr) var(--arno-col);
+  grid-template-rows: minmax(0, 1fr);
+  column-gap: var(--arno-gap);
+}
+.arno-card[data-form='cinema'] .arno-stage { padding: var(--arno-st) 0 10px; }
+.arno-card[data-form='cinema'] .arno-band {
+  position: relative;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+  padding: max(var(--arno-st), calc(var(--arno-st) + var(--arno-sheet-top) - 6px)) 0 var(--arno-sb);
+  background: none;
+  box-shadow: none;
+}
+.arno-card[data-form='cinema'][data-step] .arno-band,
+.arno-card[data-form='cinema'][data-label='open'] .arno-band { padding-top: calc(var(--arno-st) + 8px); }
+/* the faint hairline between the drawing and its words, the close looks' */
+.arno-card[data-form='cinema'] .arno-band::before {
+  content: '';
+  position: absolute;
+  left: calc(var(--arno-gap) / -2);
+  top: calc(var(--arno-st) + var(--arno-sheet-top));
+  bottom: calc(10px + var(--arno-sheet-top));
+  width: 1px;
+  pointer-events: none;
+  background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--na-gold) 26%, transparent) 16%, color-mix(in srgb, var(--na-gold) 26%, transparent) 84%, transparent);
+}
+.arno-card[data-form='cinema'] .arno-words {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-width: none;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.arno-card[data-form='cinema'] .arno-line {
+  flex: none;
+  min-height: 0;
+  font: 400 1.25rem/27px var(--serif);
+}
+.arno-card[data-form='cinema'][data-step='snug'] .arno-line { font: 400 1.125rem/25px var(--serif); }
+.arno-card[data-form='cinema'][data-step='tight'] .arno-line { font: 400 1.0625rem/24px var(--serif); }
+.arno-card[data-form='cinema'] .arno-credit {
+  flex: none;
+  margin-top: 4px;
+  font: 500 .875rem/20px var(--sans);
+  /* balanced rows keep the mark beside the last word at the column's measure */
+  text-wrap: balance;
+}
+.arno-card[data-form='cinema'][data-step='tight'] .arno-credit { padding: 10px 0; font: 500 .8125rem/19px var(--sans); }
+/* the open label scrolls in the line's place and ends on a whole line (whole-lines.ts), no fade */
+.arno-card[data-form='cinema'] .arno-label {
+  flex: 0 1 auto;
+  min-height: 0;
+  max-height: none;
+  padding: 0 8px 0 0;
+  mask-image: none;
+}
+.arno-card[data-form='cinema'] .arno-label-part { margin: 0 0 6px; max-width: none; font: 400 .8125rem/19px var(--sans); }
+.arno-card[data-form='cinema'] .arno-label-part:last-child { margin-bottom: 0; }
+/* the gold of the upright glass, in the walk's own corner at the column's foot */
+.arno-card[data-form='cinema'] .arno-start {
+  flex: none;
+  align-self: flex-end;
+  margin: 12px 0 0;
+  min-width: 48px;
+  min-height: 48px;
+  height: 48px;
+  max-width: 100%;
+  padding: 0 6px 0 18px;
+  gap: 10px;
+  border-radius: var(--ui-r-way);
+  background: var(--na-gold);
+  box-shadow: 0 2px 14px color-mix(in srgb, var(--na-gold) 22%, transparent);
+  color: var(--na-abyss);
+}
+.arno-card[data-form='cinema'] .arno-start:hover { background: color-mix(in srgb, var(--na-gold) 88%, var(--na-starlight)); }
+.arno-card[data-form='cinema'] .arno-start-word { font: 400 0.9375rem/18px var(--serif); white-space: nowrap; }
+.arno-card[data-form='cinema'] .arno-start-arrow {
+  width: 36px;
+  height: 36px;
+  box-shadow: none;
+  background: color-mix(in srgb, var(--na-abyss) 12%, transparent);
+  color: var(--na-abyss);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .arno-card, .arno-drawing, .arno-start, .arno-credit-mark { transition: none; }
 }

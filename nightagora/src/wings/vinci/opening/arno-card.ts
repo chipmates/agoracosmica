@@ -8,11 +8,17 @@
      register's own label shows nothing and resolves at once, so the wing
      never waits on a card it cannot hang.
    · ONE TEXT AT A TIME. The card covers the whole glass in the museum's top
-     layer; nothing of the wing reads through it while it stands. */
+     layer; nothing of the wing reads through it while it stands.
+   · HELD SIDEWAYS (the wing's cinema form) the drawing stands beside its
+     words: the words in a column at the right, the gold at its foot. The
+     words step down a size until they stand whole above the gold, and the
+     opened label ends on a whole line. */
 
 import { lang, type Lang } from '../../content'
 import { loadManifest, type ManifestIndex } from '../../../manifest'
 import { assetAddress } from '../../../stack/materials'
+import { filmForm } from '../film-cinema'
+import { maskWholeLines, unmaskLines, wholeLines } from '../../vitrine/whole-lines'
 import { admitOpeningRecord, ARNO_1473, openingLabel, type OpeningFile } from '../pictures/opening-register'
 import wordsSource from '../data/opening.json?raw'
 import cardCss from './arno-card.css?inline'
@@ -60,8 +66,17 @@ const SVG = 'http://www.w3.org/2000/svg'
 const ARROW_ON = 'M3 8h10M9 4l4 4-4 4'
 const CHEVRON_UP = 'M4 10l4-4 4 4'
 /** the drawing's drawn width by form: the phone's glass less its gutters, the
-    desktop's stage less its margins and the band */
+    desktop's stage less its margins and the band. Held sideways the phone keeps
+    the phone's file, a little under the drawn size on the widest glasses, so the
+    first load stays light and a turn never swaps the file under the upright card. */
 const SIZES = '(max-aspect-ratio: 9/10) calc(100vw - 24px), min(calc(100vw - 128px), calc((100vh - 260px) * 1.46))'
+/** the sideways column's steps, largest first: the words held level with the
+    drawing's top, then at the column's head, then a size smaller twice */
+const SIDE_STEPS = ['', 'head', 'snug', 'tight'] as const
+/** the least air between the credit and the gold under it */
+const SIDE_AIR = 8
+/** the opened label's column, narrowest first: it widens until the label reads whole */
+const LABEL_ROOMS = ['', 'wider', 'widest'] as const
 
 function icon(path: string, cls: string): SVGSVGElement {
   const svg = document.createElementNS(SVG, 'svg')
@@ -108,12 +123,13 @@ export async function openArnoCard(host: HTMLElement, options: ArnoCardOptions =
   const card = make('dialog', 'arno-card')
   card.lang = language
   card.setAttribute('aria-labelledby', 'arno-card-line')
+  // the sideways column reads the sheet's shape too, to stand level with it
+  card.style.setProperty('--arno-ratio', `${plate.width} / ${plate.height}`)
   const style = make('style', '')
   style.textContent = cardCss
 
   const stage = make('div', 'arno-stage')
   const sheet = make('figure', 'arno-sheet')
-  sheet.style.setProperty('--arno-ratio', `${plate.width} / ${plate.height}`)
   const drawing = make('img', 'arno-drawing')
   drawing.alt = `${ARNO_1473.maker}, ${ARNO_1473.title[language]}, ${ARNO_1473.date_label[language]}`
   drawing.width = plate.width
@@ -166,18 +182,61 @@ export async function openArnoCard(host: HTMLElement, options: ArnoCardOptions =
   options.under?.(start)
   card.append(style, stage, band)
 
+  /** THE FORM FOLLOWS THE WING'S. Sideways, the words take the largest step
+      that stands whole above the gold; an open label is cut between lines. */
+  function fit(): void {
+    const form = filmForm()
+    card.dataset['form'] = form
+    if (form !== 'cinema') {
+      delete card.dataset['step']
+      delete card.dataset['room']
+      unmaskLines(label)
+      return
+    }
+    if (label.hidden) {
+      delete card.dataset['room']
+      for (const step of SIDE_STEPS) {
+        if (step) card.dataset['step'] = step
+        else delete card.dataset['step']
+        if (credit.getBoundingClientRect().bottom <= start.getBoundingClientRect().top - SIDE_AIR) break
+      }
+    } else {
+      for (const room of LABEL_ROOMS) {
+        if (room) card.dataset['room'] = room
+        else delete card.dataset['room']
+        if (label.scrollHeight <= label.clientHeight + 1) break
+      }
+    }
+    cut()
+  }
+  function cut(): void {
+    if (card.dataset['form'] === 'cinema' && !label.hidden) maskWholeLines(label, wholeLines(label))
+    else unmaskLines(label)
+  }
+  let pending = 0
+  const later = (then: () => void): void => {
+    cancelAnimationFrame(pending)
+    pending = requestAnimationFrame(then)
+  }
+  const watch = new AbortController()
+  addEventListener('resize', fit, { signal: watch.signal })
+  label.addEventListener('scroll', () => later(cut), { passive: true, signal: watch.signal })
+  void document_.fonts?.ready.then(() => { if (!watch.signal.aborted) fit() })
+
   function setLabel(open: boolean): void {
     label.hidden = !open
     line.hidden = open
     credit.setAttribute('aria-expanded', String(open))
     if (open) card.dataset['label'] = 'open'
     else delete card.dataset['label']
+    fit()
   }
   credit.addEventListener('click', () => setLabel(label.hidden))
 
   host.append(card)
   root.dataset['naOpening'] = ARNO_OPENING
   card.showModal()
+  fit()
   // one frame at the hidden state first, so the card fades in rather than cuts
   requestAnimationFrame(() => requestAnimationFrame(() => { card.dataset['shown'] = 'true' }))
 
@@ -186,6 +245,8 @@ export async function openArnoCard(host: HTMLElement, options: ArnoCardOptions =
     const leave = (end: ArnoCardEnd): void => {
       if (over) return
       over = true
+      watch.abort()
+      cancelAnimationFrame(pending)
       if (root.dataset['naOpening'] === ARNO_OPENING) delete root.dataset['naOpening']
       const still = end === 'aborted' || document_.body.classList.contains('forge')
         || matchMedia('(prefers-reduced-motion: reduce)').matches
