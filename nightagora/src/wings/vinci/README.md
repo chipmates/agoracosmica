@@ -1,7 +1,8 @@
 # The da Vinci wing
 
 A documentary reconstruction of the Chateau du Clos Luce at Amboise at 15:19
-local apparent time on 10 October 1517, walked on a rail of nineteen stations.
+local apparent time on 10 October 1517, walked on a rail of sixteen stations
+in seventeen stops.
 Everything here is modelled from the drawer's plans, photographs and surveys;
 a dimension the drawer does not give is a range with its basis on the label.
 
@@ -25,8 +26,8 @@ node src/wings/vinci/rail-certify.mjs --json     add every route's own reading
 ```
 
 It runs the real factories at hero, standard and calm, hashes them with the
-same `rail-fingerprint.ts` the browser runs, builds each of the forty directed
-routes from the station poses and `rail-waypoints.ts`, and proves them against
+same `rail-fingerprint.ts` the browser runs, builds each of the forty-one
+directed routes from the station poses and `rail-waypoints.ts`, and proves them against
 the real triangles:
 
 - every straight span of the finished path, end to end, by exact
