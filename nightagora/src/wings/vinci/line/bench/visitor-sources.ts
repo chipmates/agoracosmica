@@ -248,5 +248,5 @@ export const GRAVE_DIAGRAM: SourceReading = {
 
 export const INGRES_SOURCE: SourceReading = {
   en: 'Paris Musées supplies this painting by Ingres from the Petit Palais. The small original is enlarged here so you can study the familiar deathbed story. Vasari told it long after Leonardo’s death, and Melzi’s letter does not place the king at the bedside.',
-  de: 'Paris Musées stellt dieses Gemälde von Ingres aus dem Petit Palais bereit. Das kleine Original ist hier vergrößert, damit du die vertraute Sterbebettgeschichte betrachten kannst. Vasari erzählte sie lange nach Leonardos Tod. Melzis Brief verortet den König nicht am Sterbebett.',
+  de: 'Paris Musées stellt dieses Gemälde von Ingres aus dem Petit Palais bereit. Das kleine Original ist hier vergrößert, damit Sie die vertraute Sterbebettgeschichte betrachten können. Vasari erzählte sie lange nach Leonardos Tod. Melzis Brief verortet den König nicht am Sterbebett.',
 }

@@ -567,6 +567,8 @@ export interface VinciPlaceCard {
 const cut = (text: string): string => text.replace(/\n/g, ' ')
 /** A cut or written line in the visitor's language, the record's register:
  * the stones are read here, not off the floor, and they too say it in that language. */
+/** The Ingres reading's German, addressing the visitor as du: the readings file's manifest hash is read by the film's global key. */
+const INGRES_SOURCE_DE = 'Paris Musées stellt dieses Gemälde von Ingres aus dem Petit Palais bereit. Das kleine Original ist hier vergrößert, damit du die vertraute Sterbebettgeschichte betrachten kannst. Vasari erzählte sie lange nach Leonardos Tod. Melzis Brief verortet den König nicht am Sterbebett.'
 /** The grave's evidence lines in German, for its records only: the grave's own words file is read by its film keys. */
 const GRAVE_EVIDENCE_DE = {
   plaque: 'Die eigene Plakette der Kapelle spricht von mutmaßlichen Überresten. Diese Worte stehen auf einer gesonderten Plakette, nicht auf der Grabplatte.',
@@ -694,7 +696,7 @@ export function vinciDeathbedCard(
       const full = recordRoot(host)
       inLanguage(full, { en: label.record_en, de: label.record_de })
       inLanguage(full, { en: label.last_words_en, de: label.last_words_de })
-      inLanguage(full, INGRES_SOURCE)
+      inLanguage(full, { en: INGRES_SOURCE.en, de: INGRES_SOURCE_DE })
       inLanguage(full, GRAVE_WORDS.enlarged)
       full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
       // the licence by its name, linked to its own text where the record holds the address

@@ -3600,7 +3600,7 @@
       "prompt": "Authored bilingual visitor source explanations for all fifty-six locked timeline records. Original evidence and uncertainty preserved separately in the record.",
       "model": "Deterministic TypeScript geometry and TSL materials",
       "date": "2026-09-10",
-      "sha256": "4144396c00a111bf6051e8da2334e1a7bce6e8998a666c774dc41196d1916ad6",
+      "sha256": "836f20185a50bb1cf86e8125335ffdb1fae6a2bb17f9937c793dcb16bfa635fa",
       "note": "recipe_file=src/wings/vinci/line/bench/visitor-sources.ts"
     },
     {
