@@ -280,11 +280,19 @@
 .vitrine-folio-words h4 {margin:12px 0 2px;font-weight:400;}
 .vitrine-source-text {white-space:pre-wrap;font:13px/1.5 var(--serif);color:var(--ui-text);}
 .vitrine-reader-leaves {margin:6px 0;padding:0;list-style:none;}
-.vitrine-reader-shelf .vt-codex-list,.vitrine-reader-shelf .vt-absence-list {margin:6px 0;padding:0;list-style:none;}
-.vitrine-reader-shelf .vt-codex-button {display:flex;gap:10px;align-items:center;width:100%;min-height:44px;padding:6px 4px;text-align:left;background:none;border:0;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);cursor:pointer;}
-.vitrine-reader-shelf .vt-codex-row {display:flex;gap:10px;align-items:center;padding:6px 4px;border-bottom:1px solid var(--ui-line);}
-.vitrine-reader-shelf .vt-codex-plate {width:44px;height:auto;flex:0 0 44px;}
-.vitrine-reader-shelf .vt-codex-body {display:flex;flex-direction:column;gap:2px;font:12px/1.4 var(--sans);}
+/* the registers of the codices and of what is not shown stand in the record, as lists of its own */
+.vinci-record :is(.vt-codex-list,.vt-absence-list) {margin:0 0 6px;padding:0;list-style:none;}
+.vinci-record :is(.vt-codex-group,.vt-absence-status) {margin:12px 0 2px;font:12px/1.5 var(--sans);color:var(--ui-text-quiet);}
+.vinci-record :is(.vt-codex-button,.vt-codex-row) {display:flex;gap:10px;align-items:flex-start;width:100%;box-sizing:border-box;min-height:44px;padding:9px 4px;text-align:left;
+  background:none;border:0;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);font:14px/1.45 var(--serif);}
+.vinci-record .vt-codex-button {cursor:pointer;}
+.vinci-record .vt-codex-button[aria-current='true'] {background:color-mix(in srgb, var(--ui-way) 8%, transparent);}
+.vinci-record .vt-codex-button:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
+.vinci-record .vt-codex-plate {width:44px;height:auto;flex:0 0 44px;}
+.vinci-record .vt-codex-body {display:flex;flex-direction:column;gap:2px;min-width:0;overflow-wrap:anywhere;}
+.vinci-record :is(.vt-codex-name,.vt-absence-name) {color:var(--ui-text);}
+.vinci-record .vt-codex-state {flex:0 0 auto;font:12px/1.5 var(--sans);}
+.vinci-record .vt-absence-item {display:flex;flex-direction:column;gap:2px;padding:9px 4px;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);font:14px/1.45 var(--serif);overflow-wrap:anywhere;}
 @media(max-aspect-ratio:9/10) {
   .vitrine-leaf {inset:6px 6px 30px;}
   .vitrine-reader-row {gap:6px;width:100%;}
