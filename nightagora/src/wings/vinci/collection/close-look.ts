@@ -660,8 +660,19 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
 /** THE PAINTING AT THE GRAVE, under the card model of a picture: its label,
  * the words its wall label carries, the certainty of the story it shows, and
  * the record of what the letters and the acts of that week say. */
-export function vinciDeathbedCard(certainty: { word: string; colour: string }, licence: string | null): VinciPlaceCard {
+export function vinciDeathbedCard(
+  certainty: { word: string; colour: string }, licence: string | null,
+  addresses: { licence?: string | null | undefined; source?: string | null | undefined } = {},
+): VinciPlaceCard {
   const language = lang(), label = NEVER_SAID.deathbed_label
+  const web = (address: string | null | undefined): string | null => address && /^https?:\/\//.test(address) ? address : null
+  // a link on a line of its own, in the form the reading table's record gives one
+  const link = (words: string, address: string): HTMLElement => {
+    const line = make('p', 'vinci-statement'), a = make('a', 'vinci-picture-source', words)
+    a.href = address; a.target = '_blank'; a.rel = 'noopener noreferrer'
+    line.append(a)
+    return line
+  }
   return {
     title: language === 'de' ? label.title_de : label.title_en, certainty: 'conjectural',
     card: [drawer(language === 'de' ? label.label_de : label.label_en, language === 'de' ? label.last_words_de : label.last_words_en)],
@@ -674,7 +685,15 @@ export function vinciDeathbedCard(certainty: { word: string; colour: string }, l
       bothLanguages(full, INGRES_SOURCE)
       bothLanguages(full, GRAVE_WORDS.enlarged)
       full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
-      if (licence) full.append(make('p', 'vinci-statement', licence))
+      // the licence by its name, linked to its own text where the record holds the address
+      const deed = web(addresses.licence), source = web(addresses.source)
+      if (licence) full.append(deed ? link(licence, deed) : make('p', 'vinci-statement', licence))
+      // the source by its address's own name, as the reading table names one
+      if (source) {
+        let name = source
+        try { name = new URL(source).host } catch { /* the address as written */ }
+        full.append(link(name, source))
+      }
     },
   }
 }
