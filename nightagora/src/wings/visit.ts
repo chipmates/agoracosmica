@@ -1,8 +1,9 @@
-/** THE NIGHT ON THE DEVICE, and nothing more than that.
+/** THE VISIT IN ITS TAB, and nothing more than that.
  *
  * A museum without accounts can still offer a visitor what they opened, and
- * the only place that can live is the device in front of them. So this keeps
- * one record per wing under one key: EXHIBIT IDS AND STATION IDS. No titles,
+ * the only place that can live is the tab in front of them: the record ends
+ * when the tab closes. So this keeps one record per wing under one key in
+ * the tab's own store: EXHIBIT IDS AND STATION IDS. No titles,
  * no sentences, no timestamps, no route. Every title and every line the recap
  * shows is resolved again at render from the wing's own registers, which is
  * why nothing a sentence could be read out of is ever written down.
@@ -11,8 +12,8 @@
  *
  * · A REFUSED STORE FORGETS QUIETLY. A browser that will not keep anything
  *   still walks the whole wing and still gets its recap for the visit it is
- *   in; it simply has nothing to offer the next one. Never a warning, never
- *   a second ask.
+ *   in; a reload simply starts the list again. Never a warning, never a
+ *   second ask.
  * · ONE KEY CARRIES THE WING'S OWN SLUG, so a second wing never inherits the
  *   first one's night.
  * · THE ONE DOOR WRITES IT. The vitrine calls `noteOpened` where every close
@@ -55,7 +56,7 @@ function night(): string {
 
 function stored(key: string): string | null {
   try {
-    return localStorage.getItem(key)
+    return sessionStorage.getItem(key)
   } catch {
     return null
   }
@@ -63,7 +64,7 @@ function stored(key: string): string | null {
 
 function store(key: string, value: string): boolean {
   try {
-    localStorage.setItem(key, value)
+    sessionStorage.setItem(key, value)
     return true
   } catch {
     /* a store that refuses is not a reason to stop the walk */
@@ -73,7 +74,7 @@ function store(key: string, value: string): boolean {
 
 function drop(key: string): void {
   try {
-    localStorage.removeItem(key)
+    sessionStorage.removeItem(key)
   } catch {
     /* nothing was kept, so nothing has to be dropped */
   }
@@ -105,6 +106,8 @@ export function forgetVisit(wing: string): void {
 let current: Visit | null = null
 
 export function beginVisit(wing: string): Visit {
+  // a record an earlier build kept past its tab is dropped unread
+  try { localStorage.removeItem(KEY(wing)) } catch { /* nothing was kept */ }
   const held = readVisit(wing)
   let record: VisitRecord = held ?? { v: 1, wing, night: night(), opened: [], stood: [] }
   let kept = held !== null
