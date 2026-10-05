@@ -559,14 +559,13 @@ export interface VinciPlaceCard {
 }
 
 const cut = (text: string): string => text.replace(/\n/g, ' ')
-/** A cut or written line in both languages, one paragraph each, the record's
- * register: the stones are read here, not off the floor. */
-function bothLanguages(host: HTMLElement, words: Both): void {
-  for (const language of ['en', 'de'] as const) {
-    const paragraph = make('p', 'vinci-statement', cut(words[language]))
-    paragraph.lang = language
-    host.append(paragraph)
-  }
+/** A cut or written line in the visitor's language, the record's register:
+ * the stones are read here, not off the floor, and they too say it in that language. */
+function inLanguage(host: HTMLElement, words: Both): void {
+  const language = lang()
+  const paragraph = make('p', 'vinci-statement', cut(words[language]))
+  paragraph.lang = language
+  host.append(paragraph)
 }
 function recordRoot(host: HTMLElement): HTMLElement {
   const full = make('div', 'vinci-record')
@@ -615,10 +614,10 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
       after: [certaintyWord(certainty('documented')), quote, make('p', 'vitrine-meta', `${language === 'de' ? plate.where_de : plate.where_en} · ${plate.when}`)],
       record(host) {
         const full = recordRoot(host)
-        bothLanguages(full, { en: plate.title_en, de: plate.title_de })
+        inLanguage(full, { en: plate.title_en, de: plate.title_de })
         full.append(Object.assign(make('p', 'vinci-statement', plate.quote), { lang: 'en' }))
-        bothLanguages(full, { en: plate.line_en, de: plate.line_de })
-        bothLanguages(full, { en: plate.where_en, de: plate.where_de })
+        inLanguage(full, { en: plate.line_en, de: plate.line_de })
+        inLanguage(full, { en: plate.where_en, de: plate.where_de })
         full.append(make('p', 'vinci-statement', plate.when))
         full.append(Object.assign(make('p', 'vinci-statement', plate.language_note_de), { lang: 'de' }))
       },
@@ -631,11 +630,11 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
       after: [certaintyWord(certainty('reconstructed'))],
       record(host) {
         const full = recordRoot(host)
-        bothLanguages(full, GRAVE_WORDS.diagram)
-        bothLanguages(full, GRAVE_WORDS.diagramDate)
+        inLanguage(full, GRAVE_WORDS.diagram)
+        inLanguage(full, GRAVE_WORDS.diagramDate)
         full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE.frame))
         full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, null, 1)))
-        bothLanguages(full, GRAVE_DIAGRAM)
+        inLanguage(full, GRAVE_DIAGRAM)
       },
     }
   }
@@ -646,13 +645,13 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
     record(host) {
       const full = recordRoot(host)
       full.append(make('p', 'vinci-statement', GRAVE_WORDS.slab))
-      bothLanguages(full, GRAVE_WORDS.presumption)
+      inLanguage(full, GRAVE_WORDS.presumption)
       full.append(make('p', 'vinci-statement', GRAVE_WORDS.dig))
-      bothLanguages(full, GRAVE_WORDS.identification)
-      bothLanguages(full, GRAVE_WORDS.medallionRecord)
+      inLanguage(full, GRAVE_WORDS.identification)
+      inLanguage(full, GRAVE_WORDS.medallionRecord)
       for (const key of ['plaque', 'dig', 'transfer'] as const) full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE[key]))
-      bothLanguages(full, GRAVE_WORDS.disclosure)
-      bothLanguages(full, GRAVE_SOURCE)
+      inLanguage(full, GRAVE_WORDS.disclosure)
+      inLanguage(full, GRAVE_SOURCE)
     },
   }
 }
@@ -680,10 +679,10 @@ export function vinciDeathbedCard(
       make('p', 'vitrine-meta', GRAVE_WORDS.enlarged[language])],
     record(host) {
       const full = recordRoot(host)
-      bothLanguages(full, { en: label.record_en, de: label.record_de })
-      bothLanguages(full, { en: label.last_words_en, de: label.last_words_de })
-      bothLanguages(full, INGRES_SOURCE)
-      bothLanguages(full, GRAVE_WORDS.enlarged)
+      inLanguage(full, { en: label.record_en, de: label.record_de })
+      inLanguage(full, { en: label.last_words_en, de: label.last_words_de })
+      inLanguage(full, INGRES_SOURCE)
+      inLanguage(full, GRAVE_WORDS.enlarged)
       full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
       // the licence by its name, linked to its own text where the record holds the address
       const deed = web(addresses.licence)

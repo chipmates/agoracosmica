@@ -354,8 +354,8 @@ export function createFilmLook(h: FilmLookHost) {
       const record = place.record
       place.record = host => {
         record(host)
-        // the record closes on the card's own lines, one paragraph per language
-        for (const line of [...host.querySelectorAll<HTMLElement>('.vinci-record > p[lang]')].slice(-2)) {
+        // the record closes on the card's own line, in the visitor's language
+        for (const line of [...host.querySelectorAll<HTMLElement>('.vinci-record > p[lang]')].slice(-1)) {
           line.textContent = GRAVE_LIGHT[line.lang === 'de' ? 'de' : 'en']
         }
       }
