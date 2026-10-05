@@ -293,6 +293,14 @@
 .vinci-record :is(.vt-codex-name,.vt-absence-name) {color:var(--ui-text);}
 .vinci-record .vt-codex-state {flex:0 0 auto;font:12px/1.5 var(--sans);}
 .vinci-record .vt-absence-item {display:flex;flex-direction:column;gap:2px;padding:9px 4px;border-bottom:1px solid var(--ui-line);color:var(--ui-text-quiet);font:14px/1.45 var(--serif);overflow-wrap:anywhere;}
+/* the record's two leaf pickers, in the form of the window's controls */
+.vinci-record label.vinci-statement:has(> select) {display:flex;align-items:center;flex-wrap:wrap;gap:4px 2px;margin:10px 0;}
+/* the browser's own theme is taken off (it overrides height and corners in WebKit); the arrow is drawn from two gradients */
+.vinci-record label.vinci-statement > select {appearance:none;-webkit-appearance:none;box-sizing:border-box;min-width:0;max-width:100%;min-height:44px;padding:8px 30px 8px 10px;
+  background-color:var(--ui-ground-sheet);background-repeat:no-repeat;background-size:5px 5px;background-position:calc(100% - 15px) 50%,calc(100% - 10px) 50%;
+  background-image:linear-gradient(45deg, transparent 50%, var(--ui-text-quiet) 50%),linear-gradient(135deg, var(--ui-text-quiet) 50%, transparent 50%);
+  border:1px solid var(--ui-line-strong);border-radius:var(--ui-r-square);color:var(--ui-text);font:14px/1.2 var(--sans);text-overflow:ellipsis;cursor:pointer;}
+.vinci-record label.vinci-statement > select:focus-visible {outline:1px solid var(--ui-way);outline-offset:2px;}
 @media(max-aspect-ratio:9/10) {
   .vitrine-leaf {inset:6px 6px 30px;}
   .vitrine-reader-row {gap:6px;width:100%;}
