@@ -1,17 +1,18 @@
 /** THE MODEL OF THE CHOSEN LIGHT, as the museum object its record says it is:
- * a study for the light, not a likeness of Saint-Hubert. The bronze box holds
- * a pale ground plate seen in plan, north up, and on it stands one plain
- * small building with a gable roof, its gable turned to the measured
- * bearing. One light of its own reaches the box: the computed sun of the
- * chosen minute (2 May 1519, 18:50 UT), at its own azimuth on the plate and
- * its own altitude over it. A sun 3.7 degrees high lays a shadow 15.3 times
- * as long as the thing that throws it, and that one fact is what the model
- * shows: the building's shadow runs across the plate beside a row of marks
- * one building height apart and ends just past the fifteenth. The shadow is
- * the light's own, drawn into its map from the building alone; nothing of it
- * is painted. The court's sun and sky light everything else; only the box
- * takes this light (`lightsNode`). Its dimensions are authored exhibition
- * geometry; no elevation of 1519 is claimed.
+ * a study for the light, not a likeness of Saint-Hubert. At the back of the
+ * bronze case lies a pale stone ground seen in plan, north up, and on it
+ * stands one plain small building with a gable roof, its gable turned to the
+ * measured bearing. One light of its own reaches the case: the computed sun
+ * of the chosen minute (2 May 1519, 18:50 UT), at its own azimuth on the
+ * plate and its own altitude over it. A sun 3.7 degrees high lays a shadow
+ * 15.3 times as long as the thing that throws it, and that one fact is what
+ * the model shows: the building's shadow runs across the plate beside a row
+ * of cut marks one building height apart and ends just past the fifteenth.
+ * The shadow is the light's own, drawn into its map from the building alone,
+ * and it fades as the sun's own disc makes it fade; nothing of it is
+ * painted. The court's sun and sky light everything else; only the plate and
+ * the building take this light (`lightsNode`). Its dimensions are authored
+ * exhibition geometry; no elevation of 1519 is claimed.
  */
 import {
   BoxGeometry, BufferGeometry, Color, DirectionalLight, ExtrudeGeometry, Float32BufferAttribute, FrontSide, Group, Mesh,
@@ -22,12 +23,15 @@ import { lights as lightsOf } from 'three/tsl'
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js'
 import { anisotropicFootprint, resolved } from '../../../stack/detail'
 import { kelvinToColour } from '../../../stack/light'
+import { KEY_RIG } from '../print'
+// the numerals are set in the face the slab and its stones are lettered in
+import { textOutline } from '../words/outline'
 // the gable's measured bearing stands with the hour, in the grave's own module; it is read when a model is built
 import { GRAVE_HOUR } from './index'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, float, materialEnvIntensity, mx_noise_float, normalLocal, positionWorld, texture, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { attribute, float, materialEnvIntensity, mx_noise_float, normalLocal, positionWorld, select, texture, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 /** the layer the model's own light draws its map from; no other light reads
  * it and no camera renders it */
@@ -36,30 +40,44 @@ export const DIAGRAM_SHADOW_LAYER = 12
 /** THE LIGHT AS DATA. Its direction is the computed sun's and is not here.
  * Its level is an exhibition choice: a plate takes a sun this low at the
  * sine of 3.7 degrees, a fifteenth of what a wall facing it takes, so the
- * light stands high and the building is dark stone, and both stay inside the
- * print. `fill` is what the box's own sky gives back, as a level; a face of
- * the building turned up off the plate takes `skyward` more of it, so the
- * roof and the walls part in the shade as well. `level` and `fill` are both
- * laid over the host scene's environment level, as three lays every
- * environment: when the wing's evening takes the court's light the box goes
- * dark with it, and is no lit panel in the dusk. The map's taps lay the
- * shadow's edge a centimetre soft across it, and its texels stand the tip
- * within a centimetre along it. */
+ * light stands high and the building's stone is darker than the plate, and
+ * its sunlit faces are still the brightest thing in the case. `fill` is
+ * what the case's own sky gives back, as a level, in the plate's own hue, so
+ * a shadow is a deep tone of the stone it lies on; a face of the building
+ * turned up off the plate takes `skyward` more of it, so the roof's shaded
+ * slope stands lighter than the shadow it borders. `level` and `fill`
+ * are both laid over the host scene's environment level, as three lays
+ * every environment, and under the wing's day level once more: when the
+ * wing's evening takes the court's light the pale plate falls to the dusk
+ * wall's tone, and is no lit panel in the dusk. `disc` is the
+ * sun's own width in degrees: the map is read once for each of `taps` points
+ * of that disc, so the shadow's end fades over the third of a metre a disc
+ * that wide spreads it at this altitude, and its long edges part as they
+ * run. `soften` is the map's own filter across the shadow, in metres. */
 export const DIAGRAM_LIGHT = {
-  kelvin: 3600, level: 20.7, fill: [.066, .082, .108], skyward: 1.2,
-  map: { across: 256, up: 512, acrossM: .0012, upM: .0004, taps: 7, tapStep: 1.5 },
+  kelvin: 5400, level: 30, fill: [.18, .158, .14], skyward: 3,
+  disc: .53,
+  map: { across: 400, up: 640, acrossM: .0012, upM: .0004, taps: 32, soften: .024 },
 } as const
 
 /** THE MODEL AS DATA, in metres on the plate: east and north from the
  * plate's middle, heights off its face. */
 export const DIAGRAM_MODEL = {
-  ridge: .17, eaves: .09, width: .14, length: .3,
+  ridge: .17, eaves: .095, width: .22, length: .34,
   /** the middle of the building's footprint */
-  at: [-1.174, .6] as readonly [number, number],
-  /** the marks beside the shadow: one building height apart, every fifth longer */
-  mark: { count: 16, width: .028, short: .08, long: .13, clear: .03, lift: .003, numeral: .13 },
+  at: [-1.118, .66] as readonly [number, number],
+  /** the building's stone: its walls and its roof */
+  stone: { wall: '#a59d8f', roof: '#b6a58c' },
+  /** how far the plate lies behind the case's front */
+  recess: .19,
+  /** the marks beside the shadow: one building height apart, every fifth longer, cut `depth` through the plate's face
+   * onto an inked ground; `numbered` carry their count, the first so that one division is seen to be one height.
+   * The face is laid in squares `block` wide, halved `halvings` times where a cut's edge runs. */
+  mark: { count: 15, width: .028, short: .08, long: .13, clear: .05, depth: .012, numeral: .195, gap: .07, numbered: [1, 5, 10, 15], block: .24, halvings: 7 },
   /** the north mark's foot */
-  north: [1.22, .62] as readonly [number, number],
+  north: [1.22, .58] as readonly [number, number],
+  /** the sun's sign, on the line from the building's middle toward the sun */
+  sun: { disc: .05, gap: .01, ray: .03, rayWidth: .02, rays: 8, clear: .015 },
 } as const
 
 /** the computed sun and the gable's bearing, in degrees clockwise from north */
@@ -114,13 +132,13 @@ export function diagramPlan(sun: DiagramSun) {
 
 const linear = (hex: string): [number, number, number] => { const c = new Color(hex); return [c.r, c.g, c.b] }
 
-/** The building's stone: dark, so the wall that faces the sun stays inside
- * the print at the level the plate needs. Walls and roof carry their own
- * tone on a vertex attribute. */
+/** The building's stone: darker than the plate, so the faces the sun meets
+ * stay inside the print at the level the plate needs. Walls, roof and ridge
+ * carry their own colour on a vertex attribute. */
 function modelStone(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .82, metalness: 0 })
   const fine = mx_noise_float(positionWorld.mul(140)).mul(.04).mul(resolved(.007, anisotropicFootprint(positionWorld)))
-  m.colorNode = vec3(...linear('#6a6052')).mul(attribute('blockTone', 'float')).mul(float(1).add(fine))
+  m.colorNode = attribute('blockTone', 'vec3').mul(float(1).add(fine))
   m.name = 'vinci/grave/diagram-stone'
   return m
 }
@@ -130,10 +148,12 @@ type Role = { tint: string; rough: number }
 function groundSurface(): MeshStandardNodeMaterial {
   const m = new MeshStandardNodeMaterial({ roughness: .95, metalness: 0 })
   // no relief on the plate: at 3.7 degrees a degree of tilt is a quarter of
-  // its light, so its grain is tone alone, and only where a pixel holds it
-  const fine = mx_noise_float(positionWorld.mul(90)).mul(.03).mul(resolved(.011, anisotropicFootprint(positionWorld)))
-  const cast = mx_noise_float(positionWorld.mul(5)).mul(.035)
-  m.colorNode = attribute('tint', 'vec3').mul(float(1).add(fine).add(cast))
+  // its light, so its grain is tone alone, each scale only where a pixel holds it
+  const footprint = anisotropicFootprint(positionWorld)
+  const fine = mx_noise_float(positionWorld.mul(90)).mul(.08).mul(resolved(.011, footprint))
+  const mottle = mx_noise_float(positionWorld.mul(23)).mul(.10).mul(resolved(.043, footprint))
+  const cast = mx_noise_float(positionWorld.mul(5.3)).mul(.11).add(mx_noise_float(positionWorld.mul(1.3)).mul(.11))
+  m.colorNode = attribute('tint', 'vec3').mul(float(1).add(fine).add(mottle).add(cast))
   m.roughnessNode = attribute('rough', 'float')
   m.name = 'vinci/grave/diagram-ground'
   return m
@@ -163,45 +183,34 @@ function box(w: number, h: number, d: number, x: number, y: number, z: number): 
   return g
 }
 /** flat faces from triangles, each wound so it faces `out` */
-function faces(triangles: readonly (readonly [Vector3, Vector3, Vector3, Vector3])[], tones?: readonly number[]): BufferGeometry {
+function faces(triangles: readonly (readonly [Vector3, Vector3, Vector3, Vector3])[], tones?: readonly (readonly [number, number, number])[]): BufferGeometry {
   const position: number[] = [], tone: number[] = []
   const n = new Vector3(), e = new Vector3()
   triangles.forEach(([p, q, r, out], i) => {
     n.subVectors(q, p).cross(e.subVectors(r, p))
     for (const v of n.dot(out) >= 0 ? [p, q, r] : [p, r, q]) position.push(v.x, v.y, v.z)
-    if (tones) tone.push(tones[i]!, tones[i]!, tones[i]!)
+    if (tones) tone.push(...tones[i]!, ...tones[i]!, ...tones[i]!)
   })
   const g = new BufferGeometry()
   g.setAttribute('position', new Float32BufferAttribute(position, 3))
-  if (tones) g.setAttribute('blockTone', new Float32BufferAttribute(tone, 1))
+  if (tones) g.setAttribute('blockTone', new Float32BufferAttribute(tone, 3))
   g.computeVertexNormals()
   return g
 }
 
-/* THE NUMERALS AND THE NORTH MARK, as strokes on a unit cap: every stroke is
-   as wide as a mark, so none of them is thinner than a pixel of the stop on
-   either stage. */
-const ring = (cx: number, cy: number, rx: number, ry: number, from: number, to: number, steps: number): [number, number][] =>
-  Array.from({ length: steps + 1 }, (_, i) => { const t = (from + (to - from) * i / steps) * Math.PI / 180; return [cx + Math.cos(t) * rx, cy + Math.sin(t) * ry] })
-const GLYPHS: Record<string, { advance: number; strokes: [number, number][][] }> = {
-  '1': { advance: .42, strokes: [[[.2, 0], [.2, 1]], [[.2, 1], [.04, .78]]] },
-  '0': { advance: .74, strokes: [ring(.29, .5, .21, .42, 0, 360, 20)] },
-  '5': { advance: .72, strokes: [[[.52, .92], [.1, .92], [.1, .56]], [[.1, .56], ...ring(.27, .32, .25, .24, 110, -140, 14)]] },
-  N: { advance: .74, strokes: [[[.08, 0], [.08, 1]], [[.08, 1], [.5, 0]], [[.5, 0], [.5, 1]]] },
-}
-
 export function createDiagram(o: DiagramOptions): Diagram {
   const { x: X, y: Y, z: Z, width: W, height: H } = o
-  const M = DIAGRAM_MODEL, plan = diagramPlan(diagramSun(o.toSun))
+  const M = DIAGRAM_MODEL, sun = diagramSun(o.toSun), plan = diagramPlan(sun)
+  const altitude = sun.altitude * Math.PI / 180
   const stone = modelStone(), bronze = plain('#6b5537', .42, .8, 'bronze', .04), ground = groundSurface()
-  // everything in the box but its building and its bronze is one body: each
+  // everything in the case but its building and its bronze is one body: each
   // part carries its own colour and roughness on its vertices
-  const plaster: Role = { tint: '#e4e2dc', rough: .95 }, inlay: Role = { tint: '#8f7b5c', rough: .7 }
+  const plaster: Role = { tint: '#e0e0da', rough: .95 }, ink: Role = { tint: '#26231f', rough: .8 }
   const linen: Role = { tint: '#5d564b', rough: .95 }
   const parts = new Map<Material | Role, BufferGeometry[]>()
   const put = (m: Material | Role, g: BufferGeometry): void => { const list = parts.get(m) ?? []; list.push(g); parts.set(m, list) }
 
-  // THE BOX: its back, and mitred bronze strips 0.40 m deep round it
+  // THE CASE: its back, and mitred bronze strips 0.40 m deep round it
   put(linen, box(W, H, .13, X, Y, Z - .22))
   const ow = W / 2 + .045, oh = H / 2 + .045, iw = W / 2 - .045, ih = H / 2 - .045, gap = .002
   for (const corners of [
@@ -218,69 +227,111 @@ export function createDiagram(o: DiagramOptions): Diagram {
     put(bronze, strip)
   }
 
-  // THE PLATE fills the box to the strips' own face, a hair under it: a sun
-  // 3.7 degrees over a plate sunk a centimetre would leave it in the shadow
-  // of its own frame, fifteen centimetres deep along two sides.
-  const face = Z + .1855
-  put(plaster, box(2 * iw, 2 * ih, face - (Z - .155), X, Y, (face + Z - .155) / 2))
+  // THE PLATE lies at the back of the case, and the building stands inside
+  // it. The case's cheeks are no part of the ground the model shows: the map
+  // holds the building alone, so they throw nothing on the plate.
+  const face = Z + .1855 - M.recess
   /** a point of the plate, and a height off it, in the grave's frame */
   const at = (p: P2, h = 0): Vector3 => new Vector3(X + p[0], Y + p[1], face + h)
   const up = new Vector3(0, 0, 1)
-
   // THE BUILDING: four walls and a gable roof, nothing else
   {
-    const c = plan.corner, a = M.length / 2
+    const c = plan.corner, a = M.length / 2, b = M.width / 2
     const out = (p: P2, rise = 0): Vector3 => new Vector3(p[0], p[1], rise).normalize()
     const ridge = [add(M.at, plan.gable, a), add(M.at, plan.gable, -a)] as const
-    const tris: [Vector3, Vector3, Vector3, Vector3][] = [], tones: number[] = []
-    const quad = (p: Vector3, q: Vector3, r: Vector3, s: Vector3, n: Vector3, tone: number): void => { tris.push([p, q, r, n], [p, r, s, n]); tones.push(tone, tone) }
+    const wall = linear(M.stone.wall), roof = linear(M.stone.roof)
+    const tris: [Vector3, Vector3, Vector3, Vector3][] = [], tones: [number, number, number][] = []
+    const quad = (p: Vector3, q: Vector3, r: Vector3, s: Vector3, n: Vector3, tone: [number, number, number]): void => { tris.push([p, q, r, n], [p, r, s, n]); tones.push(tone, tone) }
     for (const j of [-1, 1]) {
-      const n: [number, number] = [plan.side[0] * j, plan.side[1] * j]
+      const n: [number, number] = [plan.side[0] * j, plan.side[1] * j], slope = out(n, b / (M.ridge - M.eaves))
       // a long wall, and the roof slope over it
-      quad(at(c(1, j)), at(c(-1, j)), at(c(-1, j), M.eaves), at(c(1, j), M.eaves), out(n), 1)
-      quad(at(c(1, j), M.eaves), at(c(-1, j), M.eaves), at(ridge[1], M.ridge), at(ridge[0], M.ridge), out(n, M.width / 2 / (M.ridge - M.eaves)), 1.5)
+      quad(at(c(1, j)), at(c(-1, j)), at(c(-1, j), M.eaves), at(c(1, j), M.eaves), out(n), wall)
+      quad(at(c(1, j), M.eaves), at(c(-1, j), M.eaves), at(ridge[1], M.ridge), at(ridge[0], M.ridge), slope, roof)
     }
     for (const [i, end] of [[1, ridge[0]], [-1, ridge[1]]] as const) {
       const n = out([plan.gable[0] * i, plan.gable[1] * i])
-      quad(at(c(i, -1)), at(c(i, 1)), at(c(i, 1), M.eaves), at(c(i, -1), M.eaves), n, 1)
-      tris.push([at(c(i, -1), M.eaves), at(c(i, 1), M.eaves), at(end, M.ridge), n]); tones.push(1)
+      quad(at(c(i, -1)), at(c(i, 1)), at(c(i, 1), M.eaves), at(c(i, -1), M.eaves), n, wall)
+      tris.push([at(c(i, -1), M.eaves), at(c(i, 1), M.eaves), at(end, M.ridge), n]); tones.push(wall)
     }
     put(stone, faces(tris, tones))
   }
 
-  // THE MARKS: flat inlays a hair off the plate, which throw nothing
-  const lift = M.mark.lift
-  const flat = (corners: readonly P2[]): void => {
-    const [p, q, r, s] = corners.map(v => at(v, lift)) as [Vector3, Vector3, Vector3, Vector3]
-    put(inlay, faces([[p, q, r, up], [p, r, s, up]]))
+  // THE MARKS are cut through the plate's face onto an inked ground a
+  // centimetre under it: closed outlines, joined by the nonzero rule.
+  const cuts: { shapes: P2[][]; box: readonly [number, number, number, number] }[] = []
+  const cut = (shapes: P2[][]): void => {
+    const xs = shapes.flat().map(p => p[0]), ys = shapes.flat().map(p => p[1])
+    const box = [Math.min(...xs), Math.min(...ys), Math.max(...xs), Math.max(...ys)] as const
+    if (box[0] < -iw + .02 || box[1] < -ih + .02 || box[2] > iw - .02 || box[3] > ih - .02) throw new Error('A mark leaves the plate')
+    cuts.push({ shapes, box })
   }
-  /** a bar from `from` to `to`, `width` across, its ends squared off half a width out */
-  const bar = (from: P2, to: P2, width = M.mark.width): void => {
-    const l = Math.hypot(to[0] - from[0], to[1] - from[1]), u: [number, number] = [(to[0] - from[0]) / l, (to[1] - from[1]) / l]
-    const v: [number, number] = [-u[1], u[0]], h = width / 2
-    flat([add(add(from, u, -h), v, -h), add(add(to, u, h), v, -h), add(add(to, u, h), v, h), add(add(from, u, -h), v, h)])
+  /** numerals upright on the plate, centred on `centre`, in the museum's own face */
+  const lettered = (text: string, centre: P2): void => {
+    const o = textOutline(text, { size: M.mark.numeral })
+    cut(o.contours.map(c => c.map(([x, y]) => [centre[0] + x - o.width / 2, centre[1] + y + o.height / 2] as [number, number])))
   }
-  /** numerals set along `along`, their heads toward `head`, centred on `centre` */
-  const set = (text: string, centre: P2, along: P2, head: P2, cap: number): void => {
-    const width = [...text].reduce((w, ch) => w + GLYPHS[ch]!.advance, 0) - .16
-    let pen = -width / 2
-    for (const ch of text) {
-      const place = (p: P2): [number, number] => add(add(centre, along, (pen + p[0]) * cap), head, (p[1] - .5) * cap)
-      for (const stroke of GLYPHS[ch]!.strokes) for (let i = 0; i + 1 < stroke.length; i++) bar(place(stroke[i]!), place(stroke[i + 1]!))
-      pen += GLYPHS[ch]!.advance
-    }
-  }
-  const head: [number, number] = [-plan.across[0], -plan.across[1]]
   for (let k = 0; k <= M.mark.count; k++) {
-    const foot = plan.mark(k), long = k % 5 === 0
-    bar(add(foot, plan.across, M.mark.width / 2), add(foot, plan.across, (long ? M.mark.long : M.mark.short) - M.mark.width / 2))
-    if (long && k > 0) set(String(k), add(foot, plan.across, M.mark.long + .05 + M.mark.numeral / 2), plan.away, head, M.mark.numeral)
+    const foot = plan.mark(k), end = add(foot, plan.across, k % 5 === 0 ? M.mark.long : M.mark.short), w = M.mark.width / 2
+    cut([[add(foot, plan.away, -w), add(foot, plan.away, w), add(end, plan.away, w), add(end, plan.away, -w)]])
+    if ((M.mark.numbered as readonly number[]).includes(k)) lettered(String(k), add(foot, plan.across, M.mark.long + M.mark.gap + M.mark.numeral / 2))
   }
   // north: a needle and its letter, upright on a plate whose north is up
   {
     const [e, n] = M.north
-    put(inlay, faces([[at([e - .04, n], lift), at([e + .04, n], lift), at([e, n + .26], lift), up]]))
-    set('N', [e, n + .40], [1, 0], [0, 1], M.mark.numeral)
+    cut([[[e - .045, n], [e + .045, n], [e, n + .26]]])
+    lettered('N', [e, n + .26 + M.mark.gap + M.mark.numeral / 2])
+  }
+  // the sun's sign: a disc and its rays, where the computed azimuth puts it
+  {
+    const S = M.sun, outer = S.disc / 2 + S.gap + S.ray
+    const clearOf = Math.max(...[-1, 1].flatMap(i => [-1, 1].map(j => dot(add(plan.corner(i, j), M.at, -1), plan.toSun))))
+    const centre = add(M.at, plan.toSun, clearOf + S.clear + outer), turn = Math.atan2(plan.away[1], plan.away[0])
+    const round = (t: number): [number, number] => [Math.cos(t), Math.sin(t)]
+    const disc = Array.from({ length: 16 }, (_, i) => add(centre, round(i / 16 * 2 * Math.PI), S.disc / 2))
+    const rays = Array.from({ length: S.rays }, (_, i) => {
+      const u = round(turn + i / S.rays * 2 * Math.PI), v: [number, number] = [-u[1], u[0]], foot = add(centre, u, S.disc / 2 + S.gap)
+      return [add(foot, v, -S.rayWidth / 2), add(centre, u, outer), add(foot, v, S.rayWidth / 2)]
+    })
+    cut([disc, ...rays])
+  }
+  // THE PLATE'S FACE is laid in squares, halved wherever a cut's edge runs
+  // down to cells two millimetres wide: every face of it is a square's
+  // half, so none is a sliver at any eye. Each square laps a hair over its
+  // neighbours, and no seam opens where a large one meets small ones.
+  {
+    const leaves = 1 << M.mark.halvings, nx = Math.round(2 * iw / M.mark.block) * leaves, ny = Math.round(2 * ih / M.mark.block) * leaves
+    const dx = 2 * iw / nx, dy = 2 * ih / ny, lap = .0002
+    // how many cells are cut, summed from the plate's corner
+    const sum = new Uint32Array((nx + 1) * (ny + 1))
+    const cutAt = new Uint8Array(nx * ny)
+    for (const { shapes, box } of cuts) {
+      const i0 = Math.max(0, Math.floor((box[0] + iw) / dx)), i1 = Math.min(nx - 1, Math.floor((box[2] + iw) / dx))
+      const j0 = Math.max(0, Math.floor((box[1] + ih) / dy)), j1 = Math.min(ny - 1, Math.floor((box[3] + ih) / dy))
+      for (let j = j0; j <= j1; j++) for (let i = i0; i <= i1; i++) {
+        const x = -iw + (i + .5) * dx, y = -ih + (j + .5) * dy
+        let wind = 0
+        for (const c of shapes) for (let k = 0; k < c.length; k++) {
+          const a = c[k]!, b = c[(k + 1) % c.length]!
+          if ((a[1] <= y) !== (b[1] <= y) && a[0] + (y - a[1]) / (b[1] - a[1]) * (b[0] - a[0]) > x) wind += b[1] > a[1] ? 1 : -1
+        }
+        if (wind !== 0) cutAt[j * nx + i] = 1
+      }
+    }
+    for (let j = 0; j < ny; j++) for (let i = 0; i < nx; i++) sum[(j + 1) * (nx + 1) + i + 1] = cutAt[j * nx + i]! + sum[j * (nx + 1) + i + 1]! + sum[(j + 1) * (nx + 1) + i]! - sum[j * (nx + 1) + i]!
+    const cutIn = (i: number, j: number, n: number): number => sum[(j + n) * (nx + 1) + i + n]! - sum[j * (nx + 1) + i + n]! - sum[(j + n) * (nx + 1) + i]! + sum[j * (nx + 1) + i]!
+    const squares: [Vector3, Vector3, Vector3, Vector3][] = []
+    const lay = (i: number, j: number, n: number): void => {
+      const within = cutIn(i, j, n)
+      if (within === n * n) return
+      if (within > 0) { const h = n / 2; lay(i, j, h); lay(i + h, j, h); lay(i, j + h, h); lay(i + h, j + h, h); return }
+      const x0 = -iw + i * dx - lap, y0 = -ih + j * dy - lap, x1 = -iw + (i + n) * dx + lap, y1 = -ih + (j + n) * dy + lap
+      const [a, b, c, d] = [at([x0, y0]), at([x1, y0]), at([x1, y1]), at([x0, y1])]
+      squares.push([a, b, c, up], [a, c, d, up])
+    }
+    for (let j = 0; j < ny; j += leaves) for (let i = 0; i < nx; i += leaves) lay(i, j, leaves)
+    put(plaster, faces(squares))
+    const under = [at([-iw, -ih], -M.mark.depth), at([iw, -ih], -M.mark.depth), at([iw, ih], -M.mark.depth), at([-iw, ih], -M.mark.depth)] as const
+    put(ink, faces([[under[0], under[1], under[2], up], [under[0], under[2], under[3], up]]))
   }
 
   // THE LIGHT OF THE CHOSEN MINUTE. In the box's frame the plate is the
@@ -289,8 +340,11 @@ export function createDiagram(o: DiagramOptions): Diagram {
   const colour = kelvinToColour(DIAGRAM_LIGHT.kelvin)
   const light = new DirectionalLight(colour, 1)
   light.name = 'vinci/grave/diagram-chosen-light'
-  // the level rides the scene's environment level; a light's own intensity cannot
-  Object.assign(light, { colorNode: vec3(colour.r, colour.g, colour.b).mul(DIAGRAM_LIGHT.level).mul(materialEnvIntensity) })
+  // the level rides the scene's environment level; a light's own intensity cannot.
+  // By day `dusk` is one exactly, in a scene lit higher than the wing too.
+  const day = KEY_RIG.environmentIntensity
+  const dusk = select(materialEnvIntensity.lessThan(day), materialEnvIntensity.div(day), float(1))
+  Object.assign(light, { colorNode: vec3(colour.r, colour.g, colour.b).mul(DIAGRAM_LIGHT.level).mul(materialEnvIntensity).mul(dusk) })
   const target = new Object3D()
   target.position.copy(at(M.at, M.ridge / 2))
   const distance = 2
@@ -317,9 +371,18 @@ export function createDiagram(o: DiagramOptions): Diagram {
       left = Math.min(left, v.dot(acrossLight)); right = Math.max(right, v.dot(acrossLight))
     }
     const halfAcross = map.across * map.acrossM / 2, halfUp = map.up * map.upM / 2
-    if (right - left > 2 * halfAcross - 6 * map.acrossM || hi - lo > 2 * halfUp - 6 * map.upM) throw new Error('The model outgrew its light map')
+    const bottom = (lo + hi) / 2 - halfUp, top = (lo + hi) / 2 + halfUp
+    // THE SUN IS A DISC. A point of it `q` of its radius higher lays every
+    // shadow shorter by tan(altitude + q) over tan(altitude), about the foot
+    // of what throws it; a point `p` to the side slides it sideways by that
+    // angle times its length. In the map the plate's own line under the
+    // building's middle is `ground`, and a point of the plate stands over it
+    // by its distance behind the building times the sine of the altitude.
+    const radius = DIAGRAM_LIGHT.disc / 2 * Math.PI / 180, ground = -(M.ridge / 2) * Math.cos(altitude)
+    const longest = Math.tan(altitude) / Math.tan(altitude - radius)
+    if (right - left > 2 * halfAcross - 6 * map.acrossM - map.soften || hi - lo > 2 * halfUp - 6 * map.upM || ground + (hi - ground) * longest > top - 3 * map.upM) throw new Error('The model outgrew its light map')
     Object.assign(camera, {
-      left: (left + right) / 2 - halfAcross, right: (left + right) / 2 + halfAcross, bottom: (lo + hi) / 2 - halfUp, top: (lo + hi) / 2 + halfUp,
+      left: (left + right) / 2 - halfAcross, right: (left + right) / 2 + halfAcross, bottom, top,
       // the phone bench stands the whole model at .84 of its size; the plate's far corner is within 3.3 m of the building
       near: (distance - .5) * .8, far: distance + 3.4,
     })
@@ -327,12 +390,22 @@ export function createDiagram(o: DiagramOptions): Diagram {
     light.shadow.mapSize.set(map.across, map.up)
     light.shadow.bias = -.0004
     light.shadow.normalBias = 0
-    // the edge's softness is laid across the shadow only: along the plate's
-    // normal a texel is already fifteen times its size on the plate
+    const line = 1 - (ground - bottom) / (2 * halfUp)
+    const disc = Array.from({ length: map.taps }, (_, i) => {
+      // a sunflower's seeds fill the disc evenly
+      const r = Math.sqrt((i + .5) / map.taps), t = i * 2.399963229728653
+      return {
+        shorter: Math.tan(altitude + r * Math.sin(t) * radius) / Math.tan(altitude),
+        slide: r * Math.cos(t) * radius * halfUp / (Math.sin(altitude) * halfAcross),
+        soft: (i * .6180339887498949 % 1 - .5) * map.soften / (2 * halfAcross),
+      }
+    })
     const filter = TSL.Fn(({ depthTexture, shadowCoord }: { depthTexture: N; shadowCoord: N }) => {
+      // the map's own v runs down: how far the receiver stands over the plate's line
+      const over: N = float(line).sub(shadowCoord.y)
       let lit: N = float(0)
-      for (let i = 0; i < map.taps; i++) {
-        lit = lit.add(texture(depthTexture, shadowCoord.xy.add(vec2((i - (map.taps - 1) / 2) * map.tapStep / map.across, 0))).compare(shadowCoord.z))
+      for (const point of disc) {
+        lit = lit.add(texture(depthTexture, vec2(shadowCoord.x.add(over.mul(point.slide)).add(point.soft), float(line).sub(over.mul(point.shorter)))).compare(shadowCoord.z))
       }
       return lit.div(map.taps)
     })
@@ -388,7 +461,7 @@ export function createDiagram(o: DiagramOptions): Diagram {
     group.add(mesh)
     // the box's own strips take the court's light like everything outside
     // the box; the plate and the building take the chosen light and its fill
-    if (material !== bronze) Object.assign(material, { lightsNode: rig, envNode: material === stone ? fill.mul(float(1).add(normalLocal.z.max(0).mul(DIAGRAM_LIGHT.skyward))) : fill })
+    if (material !== bronze) Object.assign(material, { lightsNode: rig, envNode: (material === stone ? fill.mul(float(1).add(normalLocal.z.max(0).mul(DIAGRAM_LIGHT.skyward))) : fill).mul(dusk) })
     if (material !== stone) continue
     const caster = new Mesh(merged, double)
     caster.name = `vinci/grave/diagram/${role}-caster`
