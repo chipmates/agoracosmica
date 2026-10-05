@@ -7,6 +7,8 @@ import type { VinciText } from './content'
 
 /** The choice's own word, beside the look up on every form. */
 export const learnWord = (): VinciText => endingWord('ending.learn.word')
+/** Where the look up leads, said over it on every form. */
+export const lobbyWord = (): VinciText => endingWord('ending.lobby.word')
 
 export function talkAtTheGrave(): boolean {
   return openWingModes({

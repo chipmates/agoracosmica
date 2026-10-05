@@ -198,6 +198,9 @@
 .film-gold-name[data-rows] { font-size: .8125rem; line-height: 15px; }
 .film-box:not([data-end='true']) .film-gold:has(> .film-gold-name[data-rows='4']) { top: 36px; translate: 0 -50%; height: auto; min-height: 48px; padding-block: 4px; }
 .film-keep { white-space: nowrap; }
+/* THE LAST STOP'S GOLD SAYS WHERE IT LEADS, over its call: two rows that never wrap */
+.film-gold-to { display: block; font: 600 .8125rem/15px var(--sans); white-space: nowrap; opacity: .8; }
+.film-gold-call { display: block; white-space: nowrap; }
 .film-gold-arrow {
   position: relative;
   flex: 0 0 36px;
@@ -306,6 +309,9 @@
   clip-path: inset(-3px round var(--ui-r-way));
 }
 .film-box[data-end='true'] .film-gold { justify-content: space-between; }
+/* upright, the two rows take the arrow's seat: the row keeps its height and the talk its one row */
+#wing[data-film='upright'] .film-box[data-end='true'] .film-gold:has(.film-gold-to) { padding-right: 12px; }
+#wing[data-film='upright'] .film-box[data-end='true'] .film-gold:has(.film-gold-to) .film-gold-arrow { display: none; }
 /* A CLOSE LOOK AT THE LAST STOP keeps every look's own row: the work before
    in the book's seat, gold looking up beside it; the talk stands again once
    the look closes. Without this the seat stood unreachable under the talk. */

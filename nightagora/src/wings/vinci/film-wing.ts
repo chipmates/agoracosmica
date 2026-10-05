@@ -17,7 +17,7 @@ import { keepTogether, keepTogetherIn } from './keep-together'
 import { vinciStory } from './story'
 import { VINCI_LISA_STOP, VINCI_OFF_THE_WALK, VINCI_VALVE } from './walk-places'
 import { awaitOpening } from './opening-seam'
-import { endWith, learnWord, talkAtTheGrave } from './ending-talk'
+import { endWith, learnWord, lobbyWord, talkAtTheGrave } from './ending-talk'
 import { deskControl, deskStoryStop } from '../desk-story'
 import { applyDeskSteps, deskOn } from '../desk-switches'
 import { deskStageHeight } from '../desk-stage'
@@ -892,10 +892,12 @@ export function createWing(): WingModule {
       phone.gold.setAttribute('aria-label', `${text(CARDS.controls.date.next)} · ${title}`)
     } else {
       /* THE WALK ENDS IN TWO WAYS, side by side as the desktop's panel stands
-         them: gold looks up, and the talk choice beside it opens the door */
-      const end = text(deskControl('walk', 'the_end')), look = text(deskControl('ending', 'lookup'))
-      keepLast(phone.goldName, look, 2)
-      phone.gold.setAttribute('aria-label', `${end} · ${look}`)
+         them: gold looks up and says where that leads, and the talk choice
+         beside it opens the door */
+      const lobby = text(lobbyWord()), look = text(deskControl('ending', 'lookup'))
+      if (phone.goldName.querySelector('.film-gold-to')?.textContent !== lobby || phone.goldName.querySelector('.film-gold-call')?.textContent !== look)
+        phone.goldName.replaceChildren(make('span', 'film-gold-to', lobby), make('span', 'film-gold-call', look))
+      phone.gold.setAttribute('aria-label', `${lobby} · ${look}`)
       const said = make('span', 'film-talk-name')
       keepLast(said, text(learnWord()))
       phone.talk.replaceChildren(said)
@@ -1282,7 +1284,7 @@ export function createWing(): WingModule {
       const to = nextIndex()
       asked.onward = to !== null
         ? { kicker: text(CARDS.controls.date.next), title: text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name), go: () => onFromLook(to) }
-        : { kicker: text(deskControl('walk', 'the_end')), title: text(deskControl('ending', 'lookup')), up: true,
+        : { kicker: text(lobbyWord()), title: text(deskControl('ending', 'lookup')), up: true,
           go: () => { if (!endWith('lookup')) wing.querySelector<HTMLElement>('.wing-lobby')?.click() } }
     }, { signal })
     // the grave's talk choice opens the library's door, as in the live wing

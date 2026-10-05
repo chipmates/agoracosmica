@@ -17,6 +17,7 @@ import { deskControl, deskCutBetween, deskStoryStop } from './desk-story'
 import { setRegister } from './frame'
 import { LOBBY_TEXT } from '../content/lobby'
 import type { VinciCertainty, VinciText } from './vinci/content'
+import { lobbyWord } from './vinci/ending-talk'
 
 import { createDeskPanel } from './desk-panel'
 
@@ -113,12 +114,13 @@ export interface DeskChrome {
   dispose(): void
 }
 
-/* EVERY DISPLAYED WORD OF THIS CHROME IS THE CARD DATA'S, by key. Nothing
-   here is written, and a word that changes changes in one file. */
+/* EVERY DISPLAYED WORD OF THIS CHROME IS THE CARD DATA'S, by key, but the
+   last stop's: the ending's own file says where the way on leads there.
+   Nothing here is written, and a word that changes changes in one file. */
 const WORD = {
   more: () => deskControl('shared', 'read_more'),
   tell: () => deskControl('visit', 'tell_the_story'),
-  end: () => deskControl('walk', 'the_end'),
+  end: () => lobbyWord(),
   walking: () => deskControl('walk', 'walking'),
   faster: () => deskControl('walk', 'walk_faster'),
 }
