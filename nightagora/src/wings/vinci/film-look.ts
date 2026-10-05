@@ -446,7 +446,7 @@ export function createFilmLook(h: FilmLookHost) {
         mirror: page.hand === 'his' && page.mirror === 'own'
           ? (page.direction === 'ordinary' ? bestOfKey('mirror_ordinary', language) : null) ?? MIRROR_EXPLANATION[language].documented : null,
         credit,
-        record: [page.name ? `${name} · ${page.seat[language]}` : name, page.credit, found.record.licence] }
+        record: [page.name ? `${name} · ${page.seat[language]}` : name, (language === 'de' ? found.record.honesty_de : found.record.honesty_en) ?? page.credit, found.record.licence] }
     }
     const scan = bestOfRecord(assets, SHEET_SCAN[slug] ?? '')
     if (scan?.role === 'codex-page' && scan.width && scan.height) {

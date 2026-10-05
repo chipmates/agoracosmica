@@ -345,9 +345,10 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       if (said) full.append(node('p', cls, said))
     }
     add(page.name ? `${page.name[language]} · ${page.seat[language]}` : page.seat[language])
-    // the holder's own line, verbatim: the Institut's in French, with its licence
-    add(page.credit)
     const scan = index ? bestOfSource(page, index)?.record as (ScanRecord & { rights_notice?: string; licence_url?: string }) | undefined : undefined
+    // the record's own line in the visitor's language, as the shelf's books read it (the Institut's is the
+    // holder's, in French in both); the set's line where the record holds none
+    add((language === 'de' ? scan?.honesty_de : scan?.honesty_en) ?? page.credit)
     // the notice the picture's file carries, word for word from its record: the file's words are the credit
     add(scan?.rights_notice)
     const link = (label: string, url: string): void => {
