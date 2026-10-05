@@ -45,12 +45,17 @@
  * and from the texts files: a German page's doubts only from `doubts_de`.
  * Re-run order when the scans are staged anew: --stage, then the plate
  * finder's stage (it appends the plates to the same patch), then a plain run.
+ *
+ * A staged scan's own rights statement (the notice a holder's file carries in
+ * its metadata) is read from the file into its records as `rights_notice`,
+ * word for word, and its thumbnail keeps the statement (forge/best-of-rights.mjs).
  */
 import { createHash } from 'node:crypto'
 import { copyFileSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs'
 import { dirname, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { STORE } from './vite-na-assets.mjs'
+import { CARRIED, carryRights, embeddedRights, profileName } from './best-of-rights.mjs'
 import { CODEX_ROLE, expectedTileFiles, filesUnder, jpegSize, scaleFactorsFor, tileRecipe, treeHash } from './tiles-check.mjs'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
@@ -783,10 +788,15 @@ async function cutTiles(dir, file, source) {
     rmSync(join(dirname(out), 'vips-properties.xml'), { force: true })
     files = filesUnder(out)
   }
+  // sharp converts a tagged file to sRGB and writes no profile; an untagged file's values stand
+  const profile = profileName(readFileSync(scan))
   const recipe = tileRecipe(sharp.versions.sharp, sharp.versions.vips, TILE_SIZE)
+    + (profile ? `; colour converted from the file's embedded profile (${profile}) to sRGB, no profile embedded in a tile` : '')
   return {
     id: `vinci/${CODEX_ROLE}/${folder}__p${number}`, path, class: source.class, licence: source.licence,
     holder: source.holder, source_url: source.source_url,
+    // the tiles carry no metadata: the source's notice stands on their record
+    ...(source.rights_notice ? { rights_notice: source.rights_notice } : {}),
     bytes: files.reduce((sum, name) => sum + statSync(join(out, name)).size, 0), pixels: size.width * size.height,
     wing: 'wing-vinci', display: true, role: CODEX_ROLE, tier: source.tier, codex: source.codex, page: source.page,
     width: size.width, height: size.height, tile_size: TILE_SIZE, scale_factors: factors, levels: factors.length,
@@ -819,8 +829,20 @@ async function stage(dir) {
     const thumbTarget = join(dir, page.thumb)
     mkdirSync(dirname(thumbTarget), { recursive: true })
     // the thumbnail is a resize only, in the source's own colour space
-    const thumbBytes = await sharp(bytes).resize({ width: THUMB_EDGE, height: THUMB_EDGE, fit: 'inside', withoutEnlargement: true, kernel: 'lanczos3' })
+    const resized = await sharp(bytes).resize({ width: THUMB_EDGE, height: THUMB_EDGE, fit: 'inside', withoutEnlargement: true, kernel: 'lanczos3' })
       .keepIccProfile().jpeg({ quality: 86, chromaSubsampling: '4:4:4' }).toBuffer()
+    // THE FILE'S OWN RIGHTS STATEMENT stays with its thumbnail and goes on its
+    // records word for word; a field the file does not carry is never supplied
+    const stated = embeddedRights(bytes)
+    for (const what of stated.unread) warn(`${row.id}: ${what} in ${page.file} was not read for a rights notice`)
+    const thumbBytes = carryRights(resized, bytes)
+    const carried = Object.fromEntries(Object.entries(stated.fields).filter(([name]) => CARRIED(name)))
+    if (JSON.stringify(embeddedRights(thumbBytes).fields) !== JSON.stringify(carried)) throw new Error(`${row.id}: the thumbnail does not read back its source's rights fields`)
+    const kept = Object.keys(carried)
+    const keptNote = kept.length ? `; the source's own rights statement kept (${[kept.some(name => !name.startsWith('iptc:')) ? 'its XMP packet whole, byte for byte' : null,
+      kept.some(name => name.startsWith('iptc:')) ? 'its IIM rights datasets' : null].filter(Boolean).join(' and ')}: ${kept.join(', ')})` : ''
+    const dropped = Object.keys(stated.fields).filter(name => !CARRIED(name))
+    if (dropped.length) warn(`${row.id}: the thumbnail does not carry ${dropped.join(', ')} of ${page.file}`)
     writeFileSync(thumbTarget, thumbBytes)
     const thumbMeta = await sharp(thumbBytes).metadata()
     const rights = rightsOf(row, pool)
@@ -829,6 +851,7 @@ async function stage(dir) {
       ...(rights.url ? { licence_url: rights.url } : {}),
       // the credit is the holder's own line, verbatim in both languages
       honesty_en: row.credit_line, honesty_de: row.credit_line,
+      ...(stated.notice ? { rights_notice: stated.notice } : {}),
       holder: rights.holder, source_url: pool.permalink || sourcePage(row) || encodeURI(row.image_id),
       original_url: deep ? `${encodeURI(pool.iiif_image_id)}/full/${deepSize(pool)}/0/default.jpg` : encodeURI(pool.iiif_image_id || row.image_id),
       wing: 'wing-vinci', display: true,
@@ -838,7 +861,8 @@ async function stage(dir) {
       id: idOf('codex-page', page.file), path: page.file, ...common,
       sha256: sha(bytes), bytes: bytes.length, pixels: meta.width * meta.height, width: meta.width, height: meta.height,
       role: 'codex-page', codex: codexKey(row.codex), page: page.file,
-      edition_index: Number(pool.canvas) || 0, page_kind: 'facsimile',
+      // what the picture is, by the set's own word: a photograph of the leaf is no facsimile
+      edition_index: Number(pool.canvas) || 0, ...(page.picture ? { page_kind: page.picture } : {}),
       folio: `${row.codex} f. ${row.folio}${row.side === 'recto' ? 'r' : row.side === 'verso' ? 'v' : ''}`,
       note: `The best-of set's page ${row.id} (${row.topic}, ${row.order}), stored as fetched: ${pool.width && pool.height ? `the source is ${pool.width}x${pool.height} and ` : ''}the held file is ${meta.width}x${meta.height}${deep ? `, served at that size by the holder's own IIIF server (${deepSize(pool)})` : ''}, not re-encoded, its colour profile ${meta.icc ? 'embedded as delivered' : 'absent (sRGB assumed)'}. Rights line of the set: ${row.rights_line}${rights.rule ? ` ${rights.rule}` : ''}`,
     }
@@ -846,7 +870,7 @@ async function stage(dir) {
       id: idOf('codex-thumb', page.thumb), path: page.thumb, ...common,
       sha256: sha(thumbBytes), bytes: thumbBytes.length, pixels: thumbMeta.width * thumbMeta.height, width: thumbMeta.width, height: thumbMeta.height,
       role: 'codex-thumb', codex: codexKey(row.codex), of_page: pageRecord.id,
-      note: `Strip and shelf thumbnail of ${page.file}, which carries the page's record. Preparation: ${meta.width}x${meta.height} to ${thumbMeta.width}x${thumbMeta.height}; resize only, no crop, no grade; LANCZOS; JPEG quality 86, 4:4:4; ${meta.icc ? 'the source\'s colour profile kept, no conversion' : 'untagged source: sRGB assumed'}.`,
+      note: `Strip and shelf thumbnail of ${page.file}, which carries the page's record. Preparation: ${meta.width}x${meta.height} to ${thumbMeta.width}x${thumbMeta.height}; resize only, no crop, no grade; LANCZOS; JPEG quality 86, 4:4:4; ${meta.icc ? 'the source\'s colour profile kept, no conversion' : 'untagged source: sRGB assumed'}${keptNote}.`,
     }
     patch.push({ set_id: row.id, source: row.file, source_sha256: sha(bytes), staged: page.file, target: `${WING}/${page.file}`,
       ...(rights.confirm ? { confirm: rights.confirm } : {}), record: pageRecord })
