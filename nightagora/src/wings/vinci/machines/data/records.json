@@ -100,7 +100,7 @@
           "commission_reference": "83v",
           "correction": null,
           "date": {
-            "range": "1487 to 1489",
+            "range": "about 1487 to 1489",
             "certainty": "A",
             "source": "s-holder"
           },
@@ -937,7 +937,7 @@
           "date": {
             "range": "about 1493 to 1495, or about 1506",
             "certainty": "B",
-            "note": "Two datings. The standard catalogue gives c. 1493 to 1495 and the holder's site 1493; a watermark study of 2022 places the paper before 1500 and agrees. The Milan museum favours about 1506."
+            "note": "Two datings. The standard catalogue gives c. 1493 to 1495 and the holder's site 1493. A watermark study of 2022 places the paper before 1500 and agrees. The Milan museum favours about 1506."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/2547/sheet_20190204175615409630.jpg",
           "image_licence_quote": null,
@@ -1054,7 +1054,7 @@
           "verification": "verified",
           "commission_reference": "157r",
           "correction": null,
-          "date": "About 1480 to 1482 (Pedretti 1978, Marani 2009); about 1480 to 1487 (Landrus 2010); the holder's site gives 1480. Exact year unresolved.",
+          "date": "About 1480 to 1482 (Pedretti 1978, Marani 2009). About 1480 to 1487 (Landrus 2010). The holder's site gives 1480. Exact year unresolved.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1549/sheet_20190204173535135230.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -1410,7 +1410,7 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": "1487 to 1489",
+            "range": "about 1487 to 1489",
             "certainty": "B",
             "source": "EL-CRANE",
             "note": "The holder dates the notebook: Carnet B, about 1487 to 1489 (Bibliothèque de l’Institut de France, Ms 2173). Approximate manuscript dating, not a dated completion record."
@@ -2510,7 +2510,7 @@
           "date": {
             "range": "about 1485 to 1487",
             "certainty": "B",
-            "note": "Standard catalogue: c. 1485 to 1487 (Pedretti 1979), c. 1485 (Marani 2004); the holder's site gives 1485. The older dating of about 1500 (Solmi 1924) is rejected by Pedretti."
+            "note": "Standard catalogue: c. 1485 to 1487 (Pedretti 1979), c. 1485 (Marani 2004). The holder's site gives 1485. The older dating of about 1500 (Solmi 1924) is rejected by Pedretti."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/3545/sheet_20190320184632116060.jpg",
           "image_licence_quote": null,
@@ -2748,10 +2748,10 @@
           "commission_reference": "Ms E75v",
           "correction": null,
           "date": {
-            "range": "About1513 to1514",
+            "range": "about 1513 to 1514",
             "certainty": "A",
             "source": "holder",
-            "note": "Milan museum broadens date to1513 to1515."
+            "note": "The holder's exhibition page gives about 1513 to 1514 and its digital library about 1513 to 1515. The Milan museum gives 1513 to 1515."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/26/4275/sheet_20190416121019582484.JPG",
           "image_licence_quote": null,
@@ -2990,7 +2990,7 @@
           "verification": "verified",
           "commission_reference": "149r",
           "correction": null,
-          "date": "About 1485 (Pedretti 1978; the holder's site gives 1485); about 1485 to 1492 (Landrus 2010). The 1488 to 1489 of the reconstruction literature has no source here.",
+          "date": "About 1485 (Pedretti 1978, and the holder's site). About 1485 to 1492 (Landrus 2010).",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1533/sheet_20190204173515429547.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
