@@ -662,7 +662,7 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
  * the record of what the letters and the acts of that week say. */
 export function vinciDeathbedCard(
   certainty: { word: string; colour: string }, licence: string | null,
-  addresses: { licence?: string | null | undefined; source?: string | null | undefined } = {},
+  addresses: { licence?: string | null | undefined; holder?: string | null | undefined; source?: string | null | undefined } = {},
 ): VinciPlaceCard {
   const language = lang(), label = NEVER_SAID.deathbed_label
   const web = (address: string | null | undefined): string | null => address && /^https?:\/\//.test(address) ? address : null
@@ -686,13 +686,14 @@ export function vinciDeathbedCard(
       bothLanguages(full, GRAVE_WORDS.enlarged)
       full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
       // the licence by its name, linked to its own text where the record holds the address
-      const deed = web(addresses.licence), source = web(addresses.source)
+      const deed = web(addresses.licence)
       if (licence) full.append(deed ? link(licence, deed) : make('p', 'vinci-statement', licence))
-      // the source by its address's own name, as the reading table names one
-      if (source) {
-        let name = source
-        try { name = new URL(source).host } catch { /* the address as written */ }
-        full.append(link(name, source))
+      // the holder's own page, then the source: each by its address's own name, as the reading table names one
+      for (const address of [web(addresses.holder), web(addresses.source)]) {
+        if (!address) continue
+        let name = address
+        try { name = new URL(address).host } catch { /* the address as written */ }
+        full.append(link(name, address))
       }
     },
   }

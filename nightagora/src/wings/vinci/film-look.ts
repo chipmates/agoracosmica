@@ -346,7 +346,8 @@ export function createFilmLook(h: FilmLookHost) {
     const painting = id === DEATHBED
     const plate = painting ? assets?.byId.get(FILM_DEATHBED_PLATE) : undefined
     const place = painting ? vinciDeathbedCard(placeCertainty('conjectural'), plate?.licence ?? null,
-      { licence: (plate as { licence_url?: string } | undefined)?.licence_url, source: plate?.source_url }) : vinciPlaceCard(id as VinciPlaceId, placeCertainty)
+      { licence: (plate as { licence_url?: string } | undefined)?.licence_url,
+        holder: (plate as { holder_url?: string } | undefined)?.holder_url, source: plate?.source_url }) : vinciPlaceCard(id as VinciPlaceId, placeCertainty)
     // the light model's card and record read its own words, which the bench's file cannot carry
     if (id === 'grave-diagram') {
       for (const line of place.card[0]?.querySelectorAll('p') ?? []) line.textContent = GRAVE_LIGHT[lang()]
