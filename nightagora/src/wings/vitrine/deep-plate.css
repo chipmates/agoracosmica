@@ -16,10 +16,10 @@
 
 /* THE RULE MEASURES THE WORK, NOT THE SCREEN. Its length is the numeral's
    centimetres of the painting at the magnification standing now, so it
-   assumes nothing about the size of the glass it is drawn on. It stands on
-   the work at a corner of what the glass shows of it (placed by the payload),
-   on its own backing, because a light passage swallows a thin numeral
-   whatever its shadow. */
+   assumes nothing about the size of the glass it is drawn on. It stands at
+   one place on the glass, the work's corner at Home (placed by the payload),
+   and the work moves under it; on its own backing, because a light passage
+   swallows a thin numeral whatever its shadow. */
 .deep-rule {position:absolute;left:0;top:0;display:flex;flex-direction:column;gap:4px;pointer-events:none;
   padding:6px 8px 5px;background:color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent);border:1px solid var(--ui-line);border-radius:var(--ui-r-square);}
 .deep-rule[hidden] {display:none;}

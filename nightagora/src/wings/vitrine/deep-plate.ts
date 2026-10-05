@@ -108,9 +108,14 @@ const tileMB = (pixels: number): number => pixels * 4 / 1e6
  * its numeral. */
 const RULE_SHORTEST = 16
 const RULE_SHARE = .42
-/** THE RULE STANDS ON THE WORK, at a corner of what the glass shows of it,
- * this far in from the work's edge. */
+/** THE RULE STANDS STILL AND THE WORK MOVES UNDER IT. Its place is the corner
+ * the work takes at Home on the glass standing now, this far in from the
+ * work's edge. */
 const RULE_INSET = 10
+/** What the rule keeps clear of the caption's words where both stand at the
+ * foot of the glass, and the shortest bar it gives way to them with. */
+const RULE_CLEAR = 12
+const RULE_BESIDE_WORDS = 48
 
 /** THE PAGE'S OWN NAME STANDS BESIDE THE PAGE, not on it, wherever the view
  * leaves a margin wide enough to read it in. Narrower than this and the name
@@ -170,6 +175,9 @@ export function createDeepPlatePayload(options: {
   let framed: DeepPlateDetail | null = null
   let grown = false, drawn = false, waiting = 0, homeZoom = 0, settled = 0, arrived = false
   let seat: VitrineRect | null = null
+  /** Where the caption's words last stood on the screen, and the magnification
+   * they stood at: a pan that drops the words leaves the rule as it was. */
+  let spoke: { zoom: number; left: number; top: number; right: number; bottom: number } | null = null
   /** The source standing in the viewer now. A reading replaces it; a plate
    * never does. */
   let shown: DeepPlateShow = { source: options.source, window: options.window, title: options.title,
@@ -220,23 +228,31 @@ export function createDeepPlatePayload(options: {
     root.dataset['tiles'] = String(tiles)
     root.dataset['cacheMb'] = (tiles * tileMB(tilePixels)).toFixed(1)
     root.dataset['zoom'] = magnification().toFixed(3)
+    speak()
     measure()
     stand()
-    speak()
   }
 
   /** THE RULE MEASURES THE WORK, NOT THE SCREEN. Ten centimetres of the
    * painting are this many pixels of the glass at the magnification
    * standing now, whatever size the glass is: the view never claims that
    * ten centimetres on the screen are ten centimetres of the panel, which
-   * would need a pixel pitch a browser does not know. It stands on the work
-   * itself, from the moment the plate leaves the room's frame. */
+   * would need a pixel pitch a browser does not know.
+   *
+   * IT IS A FIXED PLACE ON THE GLASS, the work's corner at Home, read from
+   * the glass and never from the view: a zoom changes its length and a pan
+   * changes nothing, so whatever it covers is uncovered by moving the work,
+   * and it stays a scale beside a work moved off it. */
   function measure(): void {
-    if (!rule || !ruleBar || !ruleLabel || !root) return
+    if (!rule || !ruleBar || !ruleLabel || !root || !stage || !host) return
+    const bar = ruleBar, label = ruleLabel, chip = rule
+    host.caption.style.translate = ''
     const perCm = options.pxPerCm, zoom = magnification()
-    const seen = seated ? shownWork() : null
-    if (!perCm || !(zoom > 0) || !options.words.rule.length || !seen) { rule.hidden = true; return }
-    const across = seen.right - seen.left, down = seen.bottom - seen.top
+    const home = seated ? workAtHome() : null, now = seated ? workNow() : null
+    if (!perCm || !(zoom > 0) || !options.words.rule.length || !home || !now) { chip.hidden = true; return }
+    // what the glass can hold of the work at this magnification, across and
+    // down: a pan changes neither, so the bar and its numeral hold still
+    const across = Math.min(now.right - now.left, stage.clientWidth), down = Math.min(now.bottom - now.top, stage.clientHeight)
     const most = across * RULE_SHARE
     // the longest numeral first: a bar longer than the share would run along
     // the work rather than stand at its corner, and one too short to read
@@ -245,33 +261,68 @@ export function createDeepPlatePayload(options: {
       .filter(step => step.cm * perCm * zoom <= most && step.cm * perCm * zoom >= RULE_SHORTEST)
     // THE CORNER BY FORM: on a phone the foot of the glass is the caption's
     // and the walk's row's, so the rule takes the work's head; on the desk
-    // the band stands under the glass and the foot is free.
-    const head = Boolean(host?.narrow || host?.cinema?.())
-    rule.hidden = false
-    for (const step of steps) {
-      const width = step.cm * perCm * zoom
-      ruleBar.style.width = `${Math.round(width)}px`
-      ruleLabel.textContent = step.label
-      // NEVER OVER THE WORK'S MIDDLE THIRD: a chip that reaches past the
-      // outer third across must stay inside the outer third down, or a
-      // shorter numeral stands instead.
-      const wide = rule.offsetWidth + RULE_INSET, tall = rule.offsetHeight + RULE_INSET
-      if (wide > across / 3 && tall > down / 3) continue
-      const top = head ? seen.top + RULE_INSET : seen.bottom - tall
-      rule.style.transform = `translate(${Math.round(seen.left + RULE_INSET)}px, ${Math.round(top)}px)`
-      root.dataset['rule'] = `${step.label} ${Math.round(width)}px`
-      root.dataset['ruleAt'] = head ? 'head' : 'foot'
-      root.dataset['ruleOn'] = [seen.left, seen.top, seen.right, seen.bottom].map(Math.round).join(' ')
-      return
+    // the band stands under the glass and the foot holds only the caption.
+    const head = Boolean(host.narrow || host.cinema?.())
+    const left = Math.round(home.left + RULE_INSET)
+    const top = (): number => Math.round(head ? home.top + RULE_INSET : home.bottom - chip.offsetHeight - RULE_INSET)
+    chip.hidden = false
+    // NEVER LARGER THAN A THIRD OF THE WORK BOTH WAYS: a chip that reaches
+    // past a third across must stay inside a third down, or a shorter
+    // numeral stands instead.
+    const fits = (step: { label: string; cm: number }): boolean => {
+      bar.style.width = `${Math.round(step.cm * perCm * zoom)}px`
+      label.textContent = step.label
+      return !(chip.offsetWidth + RULE_INSET > across / 3 && chip.offsetHeight + RULE_INSET > down / 3)
     }
-    rule.hidden = true
+    // AT THE FOOT THE CAPTION'S WORDS STAND IN THE SAME BAND. The rule takes
+    // the longest numeral that ends before them; where that would be a stub,
+    // the words stand over the rule's band instead.
+    const words = head ? null : captionWords(zoom)
+    const origin = root.getBoundingClientRect()
+    const meets = (): boolean => {
+      if (!words) return false
+      const x = origin.left + left, y = origin.top + top()
+      return x + chip.offsetWidth + RULE_CLEAR > words.left && x - RULE_CLEAR < words.right && y + chip.offsetHeight > words.top && y < words.bottom
+    }
+    let step = steps.find(fits)
+    if (!step) { chip.hidden = true; return }
+    if (meets()) {
+      const longest = step
+      step = steps.find(step => fits(step) && !meets() && step.cm * perCm * zoom >= RULE_BESIDE_WORDS)
+      if (!step) {
+        step = longest
+        fits(step)
+        if (said && words) host.caption.style.translate = `0 ${Math.round(origin.top + top() - words.bottom - RULE_CLEAR / 2)}px`
+      }
+    }
+    chip.style.transform = `translate(${left}px, ${top()}px)`
+    root.dataset['rule'] = `${step.label} ${bar.style.width}`
+    root.dataset['ruleAt'] = head ? 'head' : 'foot'
+    root.dataset['ruleOn'] = [home.left, home.top, home.right, home.bottom].map(Math.round).join(' ')
+    // the chip's rectangle in shares of the work as it stands now, for a rig: outside 0 to 1 it lies beside the work
+    const share = (at: number, from: number, to: number): string => ((at - from) / (to - from)).toFixed(3)
+    root.dataset['ruleUnder'] = [share(left, now.left, now.right), share(top(), now.top, now.bottom),
+      share(left + chip.offsetWidth, now.left, now.right), share(top() + chip.offsetHeight, now.top, now.bottom)].join(' ')
   }
 
-  /** The work's rectangle as the glass shows it now, in the plate's own
-   * coordinates and clipped to the glass: the display window, which is what
-   * the centimetres measure, not the photograph's margins around it. */
-  function shownWork(): { left: number; top: number; right: number; bottom: number } | null {
-    if (!viewer || !library || !root || !stage) return null
+  /** Where the caption's words stand on the screen, and where they last
+   * stood while the magnification has not changed since; null otherwise. */
+  function captionWords(zoom: number): { left: number; top: number; right: number; bottom: number } | null {
+    if (!host) return null
+    if (said) {
+      const range = host.caption.ownerDocument.createRange()
+      range.selectNodeContents(host.caption)
+      const box = range.getBoundingClientRect()
+      spoke = box.width > 0 ? { zoom, left: box.left, top: box.top, right: box.right, bottom: box.bottom } : null
+    } else if (spoke && Math.abs(zoom - spoke.zoom) > spoke.zoom * 1e-4) spoke = null
+    return spoke
+  }
+
+  /** The work's rectangle as the view shows it now, in the plate's own
+   * coordinates and not clipped to the glass: the display window, which is
+   * what the centimetres measure, not the photograph's margins around it. */
+  function workNow(): { left: number; top: number; right: number; bottom: number } | null {
+    if (!viewer || !library || !stage) return null
     const work = windowBounds(), view = viewer.viewport
     const a = view.viewportToViewerElementCoordinates(new library.Point(work.x, work.y))
     const b = view.viewportToViewerElementCoordinates(new library.Point(work.x + work.width, work.y + work.height))
@@ -279,11 +330,20 @@ export function createDeepPlatePayload(options: {
     let left = Math.min(a.x, b.x), right = Math.max(a.x, b.x)
     // the viewer's flip mirrors what it draws about the middle of its box, not its coordinates
     if (view.getFlip()) [left, right] = [across - right, across - left]
-    left = Math.max(0, left) + stage.offsetLeft
-    right = Math.min(across, right) + stage.offsetLeft
-    const top = Math.max(0, Math.min(a.y, b.y)) + stage.offsetTop
-    const bottom = Math.min(stage.clientHeight, Math.max(a.y, b.y)) + stage.offsetTop
-    return right - left > 0 && bottom - top > 0 ? { left, top, right, bottom } : null
+    return { left: left + stage.offsetLeft, top: Math.min(a.y, b.y) + stage.offsetTop,
+      right: right + stage.offsetLeft, bottom: Math.max(a.y, b.y) + stage.offsetTop }
+  }
+
+  /** Where the work stands at Home on the glass standing now, by the viewer's
+   * own fit: the tighter way fills the glass and the work is centred in the
+   * other. It never reads the view, so no zoom and no pan moves it. */
+  function workAtHome(): { left: number; top: number; right: number; bottom: number } | null {
+    if (!library || !stage) return null
+    const across = stage.clientWidth, down = stage.clientHeight, work = windowBounds()
+    if (!(across > 0 && down > 0 && work.width > 0 && work.height > 0)) return null
+    const scale = Math.min(across / work.width, down / work.height)
+    const left = (across - work.width * scale) / 2 + stage.offsetLeft, top = (down - work.height * scale) / 2 + stage.offsetTop
+    return { left, top, right: left + work.width * scale, bottom: top + work.height * scale }
   }
 
   /** THE NAME KEEPS OFF THE PAGE. The margin the view leaves at the left of
@@ -356,6 +416,7 @@ export function createDeepPlatePayload(options: {
     }
     said = ''
     speak()
+    measure()
   }
 
   /** CSS pixels per pixel of the source: 1 is the source's own pixels. */
@@ -643,6 +704,7 @@ export function createDeepPlatePayload(options: {
       // The stage moved under the viewer. Its own resize watch takes the
       // new container; the view the visitor made is left where it is.
       if (!seated) seat = options.from()
+      spoke = null
       measure()
     },
     key(event) {
@@ -676,6 +738,8 @@ export function createDeepPlatePayload(options: {
       // the payload's own root.
       viewer?.destroy()
       viewer = undefined
+      host?.caption.style.removeProperty('translate')
+      spoke = null
       root?.remove()
       root = undefined; stage = undefined; host = undefined; library = undefined; ground = undefined
       rule = undefined; ruleBar = undefined; ruleLabel = undefined; corner = undefined
