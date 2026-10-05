@@ -421,8 +421,8 @@
     },
     "machine/miter-lock-gates": {
       "limit": {
-        "en": "The catalogue dates the sheet about 1493 to 1495, a museum in Milan about 1506, and whether he improved the small doors or drew them after they were built is uncertain.",
-        "de": "Der Katalog datiert das Blatt auf etwa 1493 bis 1495, ein Mailänder Museum auf etwa 1506, und ob er die kleinen Türen verbesserte oder nach ihrem Bau zeichnete, ist ungewiss.",
+        "en": "The catalogue dates the sheet about 1493 to 1495, a museum in Milan about 1506, and whether he improved the gates or drew them after they were built is uncertain.",
+        "de": "Der Katalog datiert das Blatt auf etwa 1493 bis 1495, ein Mailänder Museum auf etwa 1506, und ob er die Tore verbesserte oder nach ihrem Bau zeichnete, ist ungewiss.",
         "source": "machines/data/records.json, miter-lock-gates, the folio and build sections"
       },
       "visual_note": {
