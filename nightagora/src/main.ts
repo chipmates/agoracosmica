@@ -21,7 +21,7 @@ import { readLabels, type ForgeLabel } from './core/labels'
 import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { lang, say, wingCount } from './wings/content'
-import { LOBBY_TEXT } from './content/lobby'
+import { LOBBY_LINKS, LOBBY_TEXT } from './content/lobby'
 import { gaitPace, setGaitPace } from './wings/vinci/gait'
 import { benchOptions, benchPath, createBench, type BenchOptions } from './bench'
 
@@ -33,6 +33,8 @@ function syncLobbyCopy(): void {
     const text = say(LOBBY_TEXT[key])
     if (el instanceof HTMLMetaElement) el.content = text
     else el.textContent = text
+    if (el instanceof HTMLAnchorElement && key in LOBBY_LINKS)
+      el.href = say(LOBBY_LINKS[key as keyof typeof LOBBY_LINKS])
   }
   const count = wingCount(wingsOpen(), wingsPreparing())
   for (const el of document.querySelectorAll<HTMLElement>('#lobby-plate, [data-lobby-count]'))
@@ -1260,6 +1262,7 @@ function setLobbyLanguage(language: 'en' | 'de'): void {
   history.replaceState({}, '', address)
   document.documentElement.lang = language
   syncLobbyCopy()
+  syncTitle()
   syncReadWeights()
   const sky = HUB_SPOTS[0]
   if (sky) sky.label = say(LOBBY_TEXT.sky)
@@ -1447,6 +1450,16 @@ function wingPath(): { slug: string; station: number | string } | null {
   return m?.[1] === undefined ? null : { slug: m[1], station: stationFromHash() }
 }
 
+/* THE TAB NAMES THE PLACE. One document serves the lobby and every wing, and
+   inside a wing the masthead is away, so the title is where the museum's name
+   stands there: the wing's own name first, the museum's after it. */
+function syncTitle(): void {
+  const wing = wingBySlug(wingSlug)
+  const title = wing ? `${wing.name} | ${say(LOBBY_TEXT.titleInside)}` : say(LOBBY_TEXT.pageTitle)
+  document.title = title
+  document.querySelector('meta[property="og:title"]')?.setAttribute('content', title)
+}
+
 /** Stand in a wing. The overture is never replayed to get here. */
 async function openWing(slug: string, at: number | string, view?: string): Promise<void> {
   const entry = wingBySlug(slug)
@@ -1455,6 +1468,7 @@ async function openWing(slug: string, at: number | string, view?: string): Promi
     return
   }
   wingSlug = slug
+  syncTitle()
   // the room is claimed before its module arrives, and only once: claiming
   // it again between two stations strikes the wing that is standing
   if (phase !== 'wing') setPhase('wing')
@@ -1814,6 +1828,7 @@ function setPhase(next: Phase): void {
     wingSlug = ''
     wingFrame.close()
   }
+  syncTitle()
   // the page's lines change with the phase: measure them at the change
   syncPageReserve(true)
   hotspots.set(next === 'agora' ? HUB_SPOTS : [])

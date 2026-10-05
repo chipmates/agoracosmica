@@ -1,19 +1,34 @@
 import type { Bilingual } from '../wings/content'
 
+/* THE MUSEUM'S NAME AND ITS LINE. Decided words: the name is the same in both
+   languages, and a title or a sentence that opens with it names it a digital
+   museum. */
+const NAME = 'Museum of Ages'
+const LINE: Bilingual = {
+  en: 'We rebuild what was. You walk through it.',
+  de: 'Wir bauen nach, was war. Du gehst hinein.',
+}
+/** the name with its descriptor inside a title or a sentence of its own */
+const NAME_IN_TITLE: Bilingual = {
+  en: `${NAME}, a digital museum`,
+  de: `${NAME}, ein digitales Museum`,
+}
+
 /** The front door's words, with the museum's German beside its English. */
 export const LOBBY_TEXT = {
+  name: { en: NAME, de: NAME },
   pageTitle: {
-    en: 'Night Agora · The digital museum of thirty lives',
-    de: 'Night Agora · Das digitale Museum für dreißig Leben',
+    en: `${NAME}: a digital museum of historical figures`,
+    de: `${NAME}: digitales Museum für historische Persönlichkeiten`,
   },
+  /** what follows a wing's own name in the tab while that wing stands */
+  titleInside: NAME_IN_TITLE,
   searchDescription: {
-    en: 'A 3D museum of thirty historical figures, each in the place they lived.',
-    de: 'Ein 3D-Museum über dreißig historische Persönlichkeiten, jeweils an dem Ort, an dem sie lebten.',
+    en: `${NAME_IN_TITLE.en}. ${LINE.en}`,
+    de: `${NAME_IN_TITLE.de}. ${LINE.de}`,
   },
-  tagline: {
-    en: 'The digital museum of thirty lives. Walk where they lived, see what they made.',
-    de: 'Das digitale Museum für dreißig Leben. Geh, wo sie lebten, sieh, was sie schufen.',
-  },
+  tagline: LINE,
+  shareLocale: { en: 'en_GB', de: 'de_DE' },
   descentTitle: { en: 'The museum', de: 'Das Museum' },
   descentMuseum: {
     en: 'A digital museum of thirty lives. Each in the place they lived, at a real hour of a real day.',
@@ -77,7 +92,8 @@ export const LOBBY_TEXT = {
     de: 'Die Beschriftung nennt, was du siehst. Die Schublade erklärt die Belege. Im Nachweis stehen alle Quellen, Maße und Lizenzen. Die Wörter dokumentiert, rekonstruiert, vermutet und nicht bekannt zeigen, wie sicher eine Aussage ist. Das Museum kennzeichnet die Reproduktion, nicht das Gemälde.',
   },
   library: { en: 'Agora Cosmica, the library', de: 'Agora Cosmica, die Bibliothek' },
-  terms: { en: 'Terms', de: 'Nutzungsbedingungen' },
+  aboutMuseum: { en: 'What this museum is', de: 'Was dieses Museum ist' },
+  legalNotice: { en: 'Legal notice', de: 'Impressum' },
   privacy: { en: 'Privacy', de: 'Datenschutz' },
   close: { en: 'Close', de: 'Schließen' },
   paneEnter: { en: 'Enter the museum', de: 'Das Museum betreten' },
@@ -99,3 +115,12 @@ export const LOBBY_TEXT = {
     de: 'Ein Gang durch alle Räume, damit dein Rundgang ruhig läuft',
   },
 } satisfies Record<string, Bilingual>
+
+/* THE MUSEUM'S OWN PAGES. They stand on the same site as the lobby, one path
+   per language, so the legal notice and the privacy page are one press from
+   the panel in the visitor's language. */
+export const LOBBY_LINKS = {
+  aboutMuseum: { en: '/what-this-museum-is/', de: '/de/was-dieses-museum-ist/' },
+  legalNotice: { en: '/imprint/', de: '/de/impressum/' },
+  privacy: { en: '/privacy/', de: '/de/datenschutz/' },
+} satisfies Partial<Record<keyof typeof LOBBY_TEXT, Bilingual>>
