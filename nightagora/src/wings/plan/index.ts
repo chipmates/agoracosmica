@@ -40,6 +40,12 @@ export const PLAN_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, gap: 22, 
  * so the sheet is bounded by the viewport and not by the bar. */
 export const PLAN_NARROW = { top: 10, side: 8, bottom: 10, padding: 12, gap: 10, plateShare: .58, plateLeast: 190, plateMost: 400 } as const
 
+/** A PHONE HELD SIDEWAYS: the form's own stylesheet says so with
+ * `--plan-form: side`, sets the sheet's padding and gap, and stands the foot
+ * under the reading alone. The plate takes the sheet's whole height, as wide
+ * as leaves the reading this much. */
+export const PLAN_SIDE = { readingMin: 300 } as const
+
 export interface WingPlanOptions {
   host: HTMLElement
   lang(): 'en' | 'de'
@@ -197,16 +203,24 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
 
     const box = sheet.getBoundingClientRect()
     const numbers = narrow ? PLAN_NARROW : PLAN_WIDE
+    const side = !narrow && view.getComputedStyle(dialog).getPropertyValue('--plan-form').trim() === 'side'
+    const frame = view.getComputedStyle(sheet)
+    const edge = (...values: string[]): number => values.reduce((sum, value) => sum + (parseFloat(value) || 0), 0)
     const area = narrow
       ? {
         // the column the one mark at the corner stands in
         width: Math.max(80, box.width - numbers.padding * 2 - 52),
         height: Math.max(80, Math.min(PLAN_NARROW.plateMost, Math.max(PLAN_NARROW.plateLeast, (box.height - numbers.padding * 2) * numbers.plateShare))),
       }
-      : {
-        width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
-        height: Math.max(80, box.height - numbers.padding * 2),
-      }
+      : side
+        ? {
+          width: Math.max(80, box.width - edge(frame.paddingLeft, frame.paddingRight, frame.columnGap) - PLAN_SIDE.readingMin),
+          height: Math.max(80, box.height - edge(frame.paddingTop, frame.paddingBottom)),
+        }
+        : {
+          width: Math.max(80, (box.width - numbers.padding * 2 - numbers.gap) * numbers.plateShare),
+          height: Math.max(80, box.height - numbers.padding * 2),
+        }
     // The plate attaches its own drawing, because it measures a name on the
     // page before it decides where the name may stand.
     plate = drawPlanPlate(site, area, {
@@ -220,6 +234,8 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     drawing.style.width = `${plate.width.toFixed(2)}px`
     drawing.style.height = `${plate.height.toFixed(2)}px`
     drawing.append(marksHost)
+    // for a form that stands something beside the plate and not under it
+    dialog.style.setProperty('--plan-plate', `${plate.width.toFixed(2)}px`)
 
     /* THE MARKS ARE THE MAP, THE LIST IS THE CONTROL. On the wide stage a
        mark is a 44 px target of its own. On a 390 px stage the wing's own

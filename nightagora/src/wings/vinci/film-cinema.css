@@ -700,13 +700,29 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
      12 px the first screen keeps clear over the foot (LIFE_SIDE.air) */
   background: var(--ui-ground-sheet); box-shadow: 0 -12px 10px -6px var(--ui-ground-sheet);
 }
-/* the plan's sheet keeps its inset box over the glass */
+/* THE PLAN KEEPS ITS INSET BOX OVER THE GLASS, 6 px inside the safe areas on every side. Its drawing takes the
+   box's whole height (plan/index.ts reads --plan-form and the sheet's padding and gap), so the foot with its two
+   ways stands under the list alone, from the list's left edge to the box's right */
 #wing[data-film='cinema'] .wing-plan[open] {
-  left: var(--cinema-l) !important;
-  width: calc(100vw - var(--cinema-l) - var(--cinema-r)) !important;
-  top: calc(var(--cinema-t) + 8px) !important;
-  height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 8px) !important;
+  --plan-form: side;
+  --plan-pad: 12px;
+  --plan-gap: 16px;
+  /* the foot: its rule, its padding and a way's 44 px */
+  --plan-foot: 57px;
+  /* the list and the foot under it take the box's width beside the drawing, up to this */
+  --plan-list: 520px;
+  left: calc(var(--cinema-l) - 6px) !important;
+  width: calc(100vw - var(--cinema-l) - var(--cinema-r) + 12px) !important;
+  top: calc(var(--cinema-t) + 6px) !important;
+  height: calc(100dvh - var(--cinema-t) - var(--cinema-b) - 4px) !important;
 }
+#wing[data-film='cinema'] .wing-plan .wing-plan-sheet { gap: var(--plan-gap); padding: 10px var(--plan-pad); }
+#wing[data-film='cinema'] .wing-plan .wing-plan-foot {
+  position: absolute; left: calc(var(--plan-pad) + var(--plan-plate, 0px) + var(--plan-gap)); bottom: 0;
+  width: min(var(--plan-list), calc(100% - var(--plan-pad) * 2 - var(--plan-plate, 0px) - var(--plan-gap)));
+  box-sizing: border-box; height: var(--plan-foot); padding: 6px 0;
+}
+#wing[data-film='cinema'] .wing-plan .wing-plan-reading { max-width: var(--plan-list); }
 #wing[data-film='cinema'] .wing-plan :is(.wing-plan-number, .wing-plan-entry-number) { font-size: .8125rem; }
 #wing[data-film='cinema'] .wing-plan svg text { font-size: 13px; }
 #wing[data-film='cinema'] .wing-plan :is(.wing-plan-close, .wing-life-door) { font-size: .875rem; }
@@ -714,5 +730,5 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
 #wing[data-film='cinema'] .wing-plan[open] { background: var(--ui-ground-sheet); }
 /* the chosen row's ring stands clear of its number */
 #wing[data-film='cinema'] .wing-plan .wing-plan-entry { padding-left: 10px; }
-/* the list ends on a whole row at rest: film-cinema.ts shortens it by --cinema-cut */
-#wing[data-film='cinema'] .wing-plan .wing-plan-reading { margin-bottom: var(--cinema-cut, 0px); }
+/* the list ends over the foot, on a whole row at rest: film-cinema.ts shortens it by --cinema-cut */
+#wing[data-film='cinema'] .wing-plan .wing-plan-reading { margin-bottom: calc(var(--plan-foot) - 10px + var(--cinema-cut, 0px)); }
