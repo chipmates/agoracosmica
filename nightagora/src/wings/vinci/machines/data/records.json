@@ -128,8 +128,8 @@
         "de": "Windmesser mit Klappplatte"
       },
       "label": {
-        "en": "The sheet wants the force of the wind read off a scale instead of guessed.",
-        "de": "Das Blatt will die Windkraft an einer Skala ablesen statt sie zu schätzen."
+        "en": "The sheet wants to measure how far you go in an hour with the wind.",
+        "de": "Das Blatt will messen, wie weit man in einer Stunde mit dem Wind kommt."
       },
       "arithmetic": {
         "en": "Assume a 0.12 kg plate of 0.06 m². Balance normal wind torque against gravity. With air density 1.225 kg/m³ and assumed Cd 1.2, 30 degrees corresponds to 4.2 m/s. The angle is not proportional to wind speed. [5]",
@@ -267,7 +267,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "The balls run between two plates, and small rollers keep each ball from touching its neighbour. Their shapes are how the museum reads the sheet, not how a workshop made them."
+            "body": "The balls run between two plates, and small wheels on pivots keep each ball from touching its neighbour. Their shapes are how the museum reads the sheet, not how a workshop made them."
           },
           {
             "title": "What it was for",
@@ -301,7 +301,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Die Kugeln laufen zwischen zwei Platten, kleine Rollen halten jede von der nächsten fern. Ihre Form ist die Lesart des Museums, nicht die einer Werkstatt."
+            "body": "Die Kugeln laufen zwischen zwei Platten, kleine gelagerte Rädchen halten jede von der nächsten fern. Ihre Form ist die Lesart des Museums, nicht die einer Werkstatt."
           },
           {
             "title": "Wofür es gedacht war",
@@ -505,7 +505,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "Weights on the spokes carry the store, and a person at the shaft keeps the wheel turning. Four equal weights on rigid spokes are the museum’s pick from the several the sheet asks about."
+            "body": "Weights on the spokes carry the store, and a person at the shaft keeps the wheel turning. Four equal weights on rigid spokes are the museum’s choice, the sheet compares other arrangements."
           },
           {
             "title": "What it was for",
@@ -539,7 +539,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Gewichte an den Speichen tragen den Vorrat, ein Mensch an der Welle hält das Rad in Gang. Vier gleiche Gewichte an starren Speichen sind unsere Wahl aus den mehreren des Blattes."
+            "body": "Gewichte an den Speichen tragen den Vorrat, ein Mensch an der Welle hält das Rad in Gang. Vier gleiche Gewichte an starren Speichen sind unsere Wahl, das Blatt vergleicht andere Anordnungen."
           },
           {
             "title": "Wofür es gedacht war",
@@ -744,7 +744,7 @@
           },
           {
             "title": "The mechanism",
-            "body": "The rope is wound round the spindle, so the foot stroke turns it one way and the bow turns it back. The bow, the guided foot bar and the spool are the museum’s, and the drill is not fed in."
+            "body": "The rope is wound round the spindle, so the foot stroke turns it one way and the bow turns it back. The sheet shows the bow. The foot bar, the spool and the sizes are ours, and the drill is not fed in."
           },
           {
             "title": "What it was for",
@@ -778,7 +778,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Das Seil ist um die Welle gewickelt: Der Tritt dreht sie in die eine Richtung, der Bogen zurück. Bogen, Fußstange und Spule sind unsere, und der Bohrer wird nicht vorgeschoben."
+            "body": "Das Seil ist um die Welle gewickelt: Der Tritt dreht sie hin, der Bogen zurück. Den Bogen zeigt das Blatt. Fußstange, Spule und alle Maße sind unsere, und der Bohrer wird nicht vorgeschoben."
           },
           {
             "title": "Wofür es gedacht war",
@@ -1607,7 +1607,7 @@
           },
           {
             "title": "Der Mechanismus",
-            "body": "Jede Drehung der Welle hebt das Wasser im Rohr nach oben, und Kurbel, Lager und Größe sind unsere."
+            "body": "Jede Drehung der Welle hebt das Wasser im Rohr nach oben, und Kurbel, Stützen und Größe sind unsere."
           },
           {
             "title": "Wozu es dienen sollte",

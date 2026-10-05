@@ -96,8 +96,8 @@ export const vinciStory: readonly VinciStoryStop[] = [
     quiet: false,
     chapter: { en: "He wanted to fly", de: "Er wollte fliegen" },
     age: { en: "about 30", de: "mit etwa 30 Jahren" },
-    line: { en: "There he drew machines like these. He wanted to fly. Nobody wrote down that he ever did.", de: "Dort zeichnete er solche Maschinen. Fliegen wollte er. Dass er je geflogen ist, hat niemand aufgeschrieben." },
-    drawer: { en: "The letter offering Milan’s duke his service survives as a copy. Nobody knows if it was sent. He drew this screw in a notebook. The sheet gives one size: four and a half metres, rim to middle. It does not say what turns it. We estimate it needs about nineteen kilowatts to lift itself. Four top cyclists together make two.", de: "Sein Angebot an den Herzog von Mailand ist nur als Abschrift erhalten. Ob es je abgeschickt wurde, weiß niemand. Diese Schraube zeichnete er in ein Notizbuch. Das Blatt nennt nur ein Maß: viereinhalb Meter vom Rand zur Mitte. Wie sie angetrieben wird, steht nicht da. Wir schätzen, zum Abheben bräuchte sie etwa neunzehn Kilowatt. Vier Spitzenradfahrer schaffen zusammen etwa zwei." },
+    line: { en: "In Milan he drew machines like these. He wanted to fly. Nobody wrote down that he ever did.", de: "In Mailand zeichnete er solche Maschinen. Fliegen wollte er. Dass er je geflogen ist, hat niemand aufgeschrieben." },
+    drawer: { en: "His offer to Milan’s ruler, Ludovico Sforza, survives as a draft. Nobody knows if it was sent. He drew this screw later, about 1487 to 1489. The drawing gives one size: eight braccia, about 4.7 metres, rim to middle. To lift four people it needs at least nineteen kilowatts, we estimate. Four top cyclists make about two for an hour.", de: "Sein Angebot an Mailands Herrscher Ludovico Sforza ist als Entwurf erhalten. Ob es abgeschickt wurde, weiß niemand. Diese Schraube zeichnete er später, etwa 1487 bis 1489. Die Zeichnung nennt ein Maß: acht Braccia, etwa 4,7 Meter, vom Rand zur Mitte. Um vier Menschen zu heben, braucht sie mindestens neunzehn Kilowatt, schätzen wir. Vier Spitzenradfahrer schaffen eine Stunde lang etwa zwei." },
     certainty: "inferred",
     sees: "The aerial screw at the middle of the hall",
     pointers: ["C05", "C07"],
@@ -111,7 +111,7 @@ export const vinciStory: readonly VinciStoryStop[] = [
     chapter: { en: "The French take Milan", de: "Die Franzosen nehmen Mailand ein" },
     age: { en: "47", de: "mit 47 Jahren" },
     line: { en: "He drew machines for water too, and stayed for about seventeen years. Then the French took Milan, and he left.", de: "Er zeichnete auch Wassermaschinen und blieb etwa siebzehn Jahre. Dann nahmen die Franzosen Mailand ein, und er ging." },
-    drawer: { en: "Not everything here was his idea. Lock gates and the water screw were in use before he was born. He also worked on a huge horse in clay, meant for bronze. The bronze for it went to cannon instead. A man who remembered it wrote, decades later, that soldiers shot at the horse.", de: "Nicht alles hier war seine Idee. Schleusentore und die Wasserschraube waren schon in Gebrauch, als er geboren wurde. Er arbeitete auch an einem riesigen Tonpferd, das in Bronze gegossen werden sollte. Die Bronze dafür wurde zu Kanonen gegossen. Einer, der sich daran erinnerte, schrieb Jahrzehnte später, Soldaten hätten auf das Pferd geschossen." },
+    drawer: { en: "Not everything here was his idea. Canal locks and the water screw existed before him. His part in these gates is not settled. He also worked on a huge horse in clay, meant for bronze. The bronze for it went to cannon instead. A man who remembered it wrote, decades later, that soldiers shot at the horse.", de: "Nicht alles hier war seine Idee. Kanalschleusen und die Wasserschraube gab es schon vor ihm. Sein Anteil an diesen Toren ist nicht geklärt. Er arbeitete auch an einem riesigen Tonpferd, das in Bronze gegossen werden sollte. Die Bronze dafür wurde zu Kanonen gegossen. Einer, der sich daran erinnerte, schrieb Jahrzehnte später, Soldaten hätten auf das Pferd geschossen." },
     certainty: "documented",
     sees: "The hall's other end",
     pointers: ["C06"],
@@ -358,7 +358,7 @@ export const vinciStoryTitleWall: VinciStoryTitleWall = {
 export const vinciStoryExit: VinciStoryExit = {
   things: [
     { en: "He looked at everything himself: faces, water, birds, the inside of the body.", de: "Er sah sich alles selbst an: Gesichter, Wasser, Vögel, das Innere des Körpers." },
-    { en: "He left about seven thousand pages of notes, and many works unfinished.", de: "Er hinterließ rund siebentausend Seiten Notizen und viele unvollendete Werke." },
+    { en: "He left thousands of pages of notes, and many works unfinished.", de: "Er hinterließ Tausende Seiten Notizen und viele unvollendete Werke." },
     { en: "He died in France at 67. Nobody is sure where he rests.", de: "Er starb mit 67 in Frankreich. Wo er liegt, weiß niemand sicher." },
   ],
   doors: [

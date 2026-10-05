@@ -552,8 +552,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen in Windsor. Neunundzwanzig davon hängen an dieser Wand, jedes aus einer öffentlichen Reproduktion, die das Recht uns zeigen lässt. Die Quellen nennen jedes Blatt, seine Nummer in der königlichen Sammlung und was seine Lizenz von uns verlangt.',
   },
   works: {
-    en: 'This end of the hall holds what worked on land and in water. The lock gates and the lifting screw existed before him, and his sheets record them rather than invent them. Each machine names the page it was rebuilt from and what that page does not say.',
-    de: 'Dieses Ende der Halle zeigt, was auf dem Land und im Wasser arbeitete. Schleusentore und Wasserschraube gab es vor ihm, seine Blätter halten sie fest, statt sie zu erfinden. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
+    en: 'This end of the hall holds what worked on land and in water. Canal locks and the lifting screw existed before him, and his sheet records the screw. Whether he improved these gates or drew them after they were built is not settled. Each machine names the page it was rebuilt from and what that page does not say.',
+    de: 'Dieses Ende der Halle zeigt, was auf dem Land und im Wasser arbeitete. Kanalschleusen und die Wasserschraube gab es vor ihm, und sein Blatt hält die Schraube fest. Ob er diese Tore verbesserte oder nach ihrem Bau zeichnete, ist nicht geklärt. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
   },
   flight: {
     en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fifteen of his machines are rebuilt in this museum. Nine stand here in this hall and three in the house. Three stand out in the court. The parachute is one of them, because it is taller than this roof. Twenty-seven others give too little to build and stay records in the sources. No flight of his own is documented.',
@@ -615,8 +615,8 @@ const seeds: readonly StationSeed[] = [
     { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
     [], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('flight', { en: 'The mechanism hall, one: flight', de: 'Die Maschinenhalle, eins: Flug' },
-    { en: 'Fifteen of Leonardo da Vinci’s machines are rebuilt here from what the sources actually give, fourteen from his sheets and the lion from old accounts. Twenty-seven cannot be, and they are here as sheets.',
-      de: 'Fünfzehn von Leonardo da Vincis Maschinen sind hier nach dem rekonstruiert, was die Quellen tatsächlich hergeben, vierzehn nach seinen Blättern und der Löwe nach alten Berichten. Siebenundzwanzig nicht, und sie sind hier als Blätter zu sehen.' },
+    { en: 'Fifteen of Leonardo da Vinci’s machines are rebuilt here from what the sources actually give, fourteen from his sheets and the lion from old accounts. The other twenty-seven studies give too little to rebuild and are kept as records.',
+      de: 'Fünfzehn von Leonardo da Vincis Maschinen sind hier nach dem rekonstruiert, was die Quellen tatsächlich hergeben, vierzehn nach seinen Blättern und der Löwe nach alten Berichten. Die übrigen siebenundzwanzig Studien geben zu wenig her und bleiben Aufzeichnungen.' },
     [vinciNoBodies], 'brief/CONCEPT-OPUS.md §3 S15'),
   seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
@@ -1154,8 +1154,8 @@ export const vinciLifePeople: readonly {
   {
     id: 'ludovico', name: { en: 'Ludovico Sforza', de: 'Ludovico Sforza' },
     role: {
-      en: 'The duke in Milan he offered his services to, and who granted him a vineyard.',
-      de: 'Der Herzog in Mailand, dem er seine Dienste anbot und der ihm einen Weinberg schenkte.',
+      en: 'The man who ruled Milan, duke from 1494. He offered him his services and later got a vineyard from him.',
+      de: 'Der Mann, der Mailand regierte, ab 1494 Herzog. Ihm bot er seine Dienste an, und von ihm bekam er später einen Weinberg.',
     },
     events: ['life-13', 'life-19', 'life-23'],
   },

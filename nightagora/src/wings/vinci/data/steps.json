@@ -55,8 +55,8 @@
       {
         "at": 1,
         "part": "vane",
-        "en": "The wind drops and the plate falls back. What it reads is force, not speed.",
-        "de": "Der Wind lässt nach und die Platte fällt zurück. Was sie anzeigt, ist Kraft, nicht Geschwindigkeit.",
+        "en": "The wind drops and the plate falls back. It shows how hard the wind pushes. The sheet aimed at speed.",
+        "de": "Der Wind lässt nach und die Platte fällt zurück. Sie zeigt, wie stark der Wind drückt. Dem Blatt ging es um Geschwindigkeit.",
         "certainty": "reconstructed"
       }
     ],

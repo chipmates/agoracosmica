@@ -491,7 +491,7 @@
     },
     "machine/revolving-crane": {
       "en": "A load no one could carry had to go up. A hand crank winds the rope over two pulleys.",
-      "de": "Eine Last, die niemand tragen kann, musste nach oben. Eine Handkurbel zieht das Seil.",
+      "de": "Was keiner tragen konnte, musste hoch. Eine Handkurbel zieht das Seil über zwei Rollen.",
       "source": "machines/data/revolving-crane.json, folio Manuscript B 49r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
@@ -521,7 +521,7 @@
     },
     "machine/camera-obscura": {
       "en": "He was studying how the eye sees. One small hole puts the picture on paper, upside down.",
-      "de": "Er untersuchte, wie das Auge sieht. Ein Loch wirft das Bild verkehrt herum aufs Papier.",
+      "de": "Er untersuchte, wie das Auge sieht. Ein kleines Loch wirft das Bild kopfüber aufs Papier.",
       "source": "machines/data/camera-obscura.json, folio Paris Manuscript D 8r; machines/data/records.json, the purpose and mechanism sections",
       "certainty": "reconstructed"
     },
