@@ -189,7 +189,7 @@ const DatenschutzPage: FC = () => {
             <strong>Löschung Ihrer Daten:</strong> Da alle Chat-Daten ausschließlich lokal auf Ihrem Gerät gespeichert werden (verschlüsselt in IndexedDB), können Sie diese jederzeit durch Löschen Ihrer Browserdaten vollständig entfernen. Eine serverseitige Löschung ist nicht erforderlich, da wir keine Chat-Inhalte serverseitig speichern.
           </p>
           <p>
-            <strong>Zuständige Aufsichtsbehörde:</strong> Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg, Lautenschlagerstraße 20, 70173 Stuttgart, <a href="https://www.baden-wuerttemberg.datenschutz.de">www.baden-wuerttemberg.datenschutz.de</a>.
+            <strong>Zuständige Aufsichtsbehörde:</strong> Der Landesbeauftragte für den Datenschutz und die Informationsfreiheit Baden-Württemberg, Heilbronner Straße 35, 70191 Stuttgart, <a href="https://www.baden-wuerttemberg.datenschutz.de">www.baden-wuerttemberg.datenschutz.de</a>.
           </p>
         </section>
 
