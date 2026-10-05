@@ -143,10 +143,12 @@ export function lifeCounts(events: readonly LifeEvent[], works: readonly LifeWor
   for (const event of events) by[event.certainty] = (by[event.certainty] ?? 0) + 1
   const gaps = lifeGaps(events, span.from, span.to)
   const years = reached(events, span.from, span.to)
-  const dated = works.filter(work => workYears(work, span)).length
+  // the works sentence says "here": it counts the works with a place in the wing, not the register
+  const here = works.filter(work => work.exhibit !== null)
+  const dated = here.filter(work => workYears(work, span)).length
   return {
     events: { total: events.length, by },
-    works: { total: works.length, dated, undated: works.length - dated },
+    works: { total: here.length, dated, undated: here.length - dated },
     emptyYears: span.to - span.from + 1 - years.size,
     longestGapYears: gaps.reduce((most, gap) => Math.max(most, gap.years), 0),
   }
