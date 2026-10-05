@@ -38,8 +38,8 @@ export const GRAVE_WORDS = {
   diagram: { en: 'CHOSEN LIGHT · A MODEL', de: 'GEWÄHLTES LICHT · EIN MODELL' },
   diagramDate: { en: '2 MAY 1519 · JULIAN CALENDAR', de: '2. MAI 1519 · JULIANISCH' },
   disclosure: {
-    en: 'The slab and the gable model are made for this exhibition. The slab is pale limestone with the name cut on two lines. Their sizes and lettering are interpretive, not a measured copy of the tomb or the chapel. The portrait medallion is not reproduced.',
-    de: 'Grabplatte und Giebelmodell sind für diese Ausstellung gemacht. Die Platte ist heller Kalkstein, der Name ist auf zwei Zeilen eingeschnitten. Maße und Schrift beruhen auf einer Interpretation und sind keine vermessene Nachbildung von Grab oder Kapelle. Das Porträtmedaillon wird nicht wiedergegeben.',
+    en: 'The slab and the model of the light are made for this exhibition. The slab is pale limestone. Its size and lettering are our choice, not measured from the tomb. The model does not show the chapel. The tomb\'s portrait medallion is left out.',
+    de: 'Grabplatte und Lichtmodell sind für diese Ausstellung gemacht. Die Grabplatte ist heller Kalkstein. Maße und Schrift sind frei gewählt und nicht am Grab gemessen. Das Modell zeigt nicht die Kapelle. Das Porträtmedaillon des Grabes ist nicht nachgebildet.',
   },
   painter: 'INGRES · 1818',
   holder: 'Paris Musées',
