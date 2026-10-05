@@ -217,14 +217,14 @@ const ALLOWED = [
   // windows' glass and the open entrance door
   { mesh: 'house-hall', why: 'known, 2026-09-24: the furniture with the stools\' joinery and the leaf ironwork, 1097 faces, thinnest 0.019 px at 20 m' },
   // THE GRAVE COURT: its copings and its made things at their real size (the
-  // beds' steel edges, the bench's feet, the walk's nosing), and the diagram's
-  // relief, a model whose joints, slates and glass are millimetres, read from
-  // the far route eyes across the court's walls
+  // beds' steel edges, the bench's feet, the walk's nosing), and the light
+  // model's box: its strips' bevels and the marks on its plate, read from the
+  // far route eyes across the court's walls
   { mesh: 'vinci-grave-court-walls-made-surface', why: 'known, 2026-09-24: the copings\' drips and the band\'s bricks, 30 faces, thinnest 0.22 px at 61 m' },
   { mesh: 'vinci-grave-court-floor-made-surface', why: 'known, 2026-09-24: the beds\' steel edges, the bench\'s feet and the walk\'s nosing, 360 faces, thinnest 0.045 px at 52 m' },
-  { mesh: 'vinci/grave/diagram/stone', why: 'known, 2026-09-24: the relief\'s blocks, surround and copings, 364 faces, thinnest 0.003 px at 78 m' },
-  { mesh: 'vinci/grave/diagram/ground', why: 'known, 2026-09-24: the relief\'s slates, glass and shelf, 562 faces, thinnest 0.003 px at 78 m' },
-  { mesh: 'vinci/grave/diagram/bronze', why: 'known, 2026-09-24: the box\'s bevelled strips (were in the grave\'s own body), 80 faces, thinnest 0.023 px at 32 m' },
+  { mesh: 'vinci/grave/diagram/stone', why: 'known, 2026-10-05: the model\'s building, 14 faces, none under a pixel at a certified eye' },
+  { mesh: 'vinci/grave/diagram/ground', why: 'known, 2026-10-05: the plate\'s marks and numerals, 28 mm strokes, none under a pixel from the grave\'s own eyes on either stage; 19 faces, thinnest 0.33 px at 25 m, from the works\' approach' },
+  { mesh: 'vinci/grave/diagram/bronze', why: 'known, 2026-09-24: the box\'s bevelled strips (were in the grave\'s own body), 64 faces, thinnest 0.023 px at 34 m' },
 ]
 const allowed = row => ALLOWED.find(rule => rule.mesh === row.mesh || rule.mesh === row.body)
 
