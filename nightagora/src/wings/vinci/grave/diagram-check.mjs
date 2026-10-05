@@ -127,6 +127,7 @@ for (const stage of ['desktop', 'phone']) {
   assert.equal(caster.geometry, stone.geometry, 'the map is drawn from another body than the building')
   assert.equal(light.shadow.camera.layers.mask, 1 << DIAGRAM_SHADOW_LAYER, 'the map\'s camera reads another layer')
   assert.equal(light.visible, false, 'the model\'s light reaches the wing')
+  assert.ok(light.colorNode, 'the model\'s light no longer rides the scene\'s environment level: it would stand lit in the wing\'s dusk')
   assert.ok(ground.receiveShadow && !ground.castShadow && !stone.castShadow && !bronze.castShadow)
   light.shadow.updateMatrices(light)
   const seen = light.shadow.camera

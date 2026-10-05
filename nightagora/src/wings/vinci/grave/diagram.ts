@@ -27,7 +27,7 @@ import { GRAVE_HOUR } from './index'
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type N = any
-const { attribute, float, mx_noise_float, normalLocal, positionWorld, texture, vec2, vec3 } = TSL as unknown as Record<string, N>
+const { attribute, float, materialEnvIntensity, mx_noise_float, normalLocal, positionWorld, texture, vec2, vec3 } = TSL as unknown as Record<string, N>
 
 /** the layer the model's own light draws its map from; no other light reads
  * it and no camera renders it */
@@ -39,11 +39,14 @@ export const DIAGRAM_SHADOW_LAYER = 12
  * light stands high and the building is dark stone, and both stay inside the
  * print. `fill` is what the box's own sky gives back, as a level; a face of
  * the building turned up off the plate takes `skyward` more of it, so the
- * roof and the walls part in the shade as well. The map's taps lay the
+ * roof and the walls part in the shade as well. `level` and `fill` are both
+ * laid over the host scene's environment level, as three lays every
+ * environment: when the wing's evening takes the court's light the box goes
+ * dark with it, and is no lit panel in the dusk. The map's taps lay the
  * shadow's edge a centimetre soft across it, and its texels stand the tip
  * within a centimetre along it. */
 export const DIAGRAM_LIGHT = {
-  kelvin: 3600, intensity: 5.8, fill: [.066, .082, .108], skyward: 1.2,
+  kelvin: 3600, level: 20.7, fill: [.066, .082, .108], skyward: 1.2,
   map: { across: 256, up: 512, acrossM: .0012, upM: .0004, taps: 7, tapStep: 1.5 },
 } as const
 
@@ -283,8 +286,11 @@ export function createDiagram(o: DiagramOptions): Diagram {
   // THE LIGHT OF THE CHOSEN MINUTE. In the box's frame the plate is the
   // ground, so the computed altitude is the light's angle over the plate.
   const toSun = new Vector3(...plan.direction)
-  const light = new DirectionalLight(kelvinToColour(DIAGRAM_LIGHT.kelvin), DIAGRAM_LIGHT.intensity)
+  const colour = kelvinToColour(DIAGRAM_LIGHT.kelvin)
+  const light = new DirectionalLight(colour, 1)
   light.name = 'vinci/grave/diagram-chosen-light'
+  // the level rides the scene's environment level; a light's own intensity cannot
+  Object.assign(light, { colorNode: vec3(colour.r, colour.g, colour.b).mul(DIAGRAM_LIGHT.level).mul(materialEnvIntensity) })
   const target = new Object3D()
   target.position.copy(at(M.at, M.ridge / 2))
   const distance = 2
