@@ -360,8 +360,12 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     }
     // the licence by its name, linked to its own text where the record holds the address
     const licenceUrl = scan?.licence_url
+    // a licence written as a sentence the English credit quotes word for word is already in the credit,
+    // whose German carries it in German: a line of its own would repeat it, in English under the German
+    const licence = scan?.licence?.trim() ?? ''
+    const quoted = /[.!?]$/.test(licence) && Boolean(scan?.honesty_en?.includes(licence)) && Boolean(scan?.honesty_de)
     if (scan?.licence && licenceUrl && /^https?:\/\//.test(licenceUrl)) link(scan.licence, licenceUrl)
-    else add(scan?.licence)
+    else if (!quoted) add(scan?.licence)
     if (scan?.source_url) {
       let host_ = scan.source_url
       try { host_ = new URL(scan.source_url).host } catch { /* the address as written */ }
