@@ -301,8 +301,8 @@
     },
     "machine/aerial-screw": {
       "limit": {
-        "en": "The sheet gives a drive only for a small paper model, says nothing on keeping a flying machine from turning with the screw, and no build in his lifetime is documented.",
-        "de": "Das Blatt nennt einen Antrieb nur für ein kleines Papiermodell und nicht, wie sich ein Fluggerät am Mitdrehen hindern ließe, und ein Bau zu Lebzeiten ist nicht belegt.",
+        "en": "The sheet gives a drive only for a small paper model and says nothing about keeping a flying machine from turning with the screw, and no build in his lifetime is documented.",
+        "de": "Das Blatt nennt einen Antrieb nur für ein kleines Papiermodell und sagt nicht, wie sich ein Fluggerät am Mitdrehen hindern ließe, und ein Bau zu Lebzeiten ist nicht belegt.",
         "source": "machines/data/aerial-screw.json, gaps and research claims; machines/data/records.json, aerial-screw, the myth section"
       },
       "visual_note": {
@@ -422,7 +422,7 @@
     "machine/miter-lock-gates": {
       "limit": {
         "en": "The catalogue dates the sheet about 1493 to 1495, a museum in Milan about 1506, and whether he improved the small doors or drew them after they were built is uncertain.",
-        "de": "Der Katalog datiert das Blatt etwa 1493 bis 1495, ein Mailänder Museum etwa 1506, und ob er die kleinen Türen verbesserte oder nach ihrem Bau zeichnete, ist ungewiss.",
+        "de": "Der Katalog datiert das Blatt auf etwa 1493 bis 1495, ein Mailänder Museum auf etwa 1506, und ob er die kleinen Türen verbesserte oder nach ihrem Bau zeichnete, ist ungewiss.",
         "source": "machines/data/records.json, miter-lock-gates, the folio and build sections"
       },
       "visual_note": {
@@ -470,7 +470,7 @@
     "machine/mechanical-lion": {
       "limit": {
         "en": "No drawing, part or measurement of the lion survives, and the old accounts differ on where it was shown and what it did.",
-        "de": "Keine Zeichnung, kein Teil und kein Maß des Löwen ist erhalten, und die alten Berichte widersprechen sich, wo er gezeigt wurde und was er tat.",
+        "de": "Keine Zeichnung, kein Teil und kein Maß des Löwen ist erhalten, und die alten Berichte gehen darin auseinander, wo er gezeigt wurde und was er tat.",
         "source": "machines/data/mechanical-lion.json, gaps; machines/data/records.json, mechanical-lion, the folio and Was it built sections"
       },
       "visual_note": {

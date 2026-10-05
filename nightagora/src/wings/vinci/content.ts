@@ -532,8 +532,8 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Die Gartenfront nimmt die tiefe Westsonne, dahinter fällt das Tal ab. Der Hang folgt der Vermessung des Geländes, die Bepflanzung stammt von uns, denn keine Quelle hält fest, was hier zu seiner Zeit wuchs. Du verlässt das Jahr 1517. Es folgt ein Museum dessen, was erhalten ist, erbaut in unserem Jahrhundert.',
   },
   'picture-room': {
-    en: 'Twenty-five paintings hang here close to the sizes recorded for them, roughly in the order he made them, so this wall gives you the real scale. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says. The wall is thirty-four metres long from here, and the last painting hangs at the far end.',
-    de: 'Fünfundzwanzig Gemälde hängen hier annähernd in den Maßen, die für sie verzeichnet sind, ungefähr in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz. Die Wand ist von hier aus vierunddreißig Meter lang, und das letzte Gemälde hängt am anderen Ende.',
+    en: 'Twenty-five pictures hang here close to the sizes recorded for them, roughly in the order they were made, so this wall gives you the real scale. That makes twenty-four works, because one panel is shown from both sides. Every position carries a picture, and each names the reproduction it comes from. The sources name every work, where it is today and what its licence says. The wall is thirty-four metres long from here, and the last painting hangs at the far end.',
+    de: 'Fünfundzwanzig Bilder hängen hier annähernd in den Maßen, die für sie verzeichnet sind, ungefähr in der Reihenfolge ihrer Entstehung, diese Wand gibt dir also den wirklichen Maßstab. Es sind vierundzwanzig Werke, denn eine Tafel wird von beiden Seiten gezeigt. Jeder Platz trägt ein Bild, und jedes nennt die Reproduktion, aus der es stammt. Die Quellen nennen jedes Werk, seinen heutigen Ort und seine Lizenz. Die Wand ist von hier aus vierunddreißig Meter lang, und das letzte Gemälde hängt am anderen Ende.',
   },
   'picture-room-west': {
     en: 'This end is the latest. From here the wall runs back to the first of them, and the door beside you opens on the machines.',
@@ -552,12 +552,12 @@ const stationCards: Record<VinciStationId, VinciText> = {
     de: 'Er öffnete Körper und zeichnete, was er fand, und etwa sechshundert dieser Blätter liegen in Windsor. Neunundzwanzig davon hängen an dieser Wand, jedes aus einer öffentlichen Reproduktion, die das Recht uns zeigen lässt. Die Quellen nennen jedes Blatt, seine Nummer in der königlichen Sammlung und was seine Lizenz von uns verlangt.',
   },
   works: {
-    en: 'This end of the hall holds what worked on land and in water. Canal locks and the lifting screw existed before him, and his sheet records the screw. Whether he improved these gates or drew them after they were built is not settled. Each machine names the page it was rebuilt from and what that page does not say.',
-    de: 'Dieses Ende der Halle zeigt, was auf dem Land und im Wasser arbeitete. Kanalschleusen und die Wasserschraube gab es vor ihm, und sein Blatt hält die Schraube fest. Ob er diese Tore verbesserte oder nach ihrem Bau zeichnete, ist nicht geklärt. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
+    en: 'This end of the hall holds what worked on land and in water. Canal locks and the water screw existed before him, and his sheet records the screw. Whether he improved this lock’s small doors or drew them after they were built is not settled. Each machine names the sheet it was rebuilt from and what that sheet does not say.',
+    de: 'Dieses Ende der Halle zeigt, was an Land und im Wasser arbeitete. Kanalschleusen und die Wasserschraube gab es vor ihm, und sein Blatt hält die Schraube fest. Ob er die kleinen Türen dieser Schleuse verbesserte oder nach ihrem Bau zeichnete, ist nicht geklärt. Jede Maschine nennt das Blatt, nach dem sie rekonstruiert ist, und was dieses Blatt nicht sagt.',
   },
   flight: {
-    en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fifteen of his machines are rebuilt in this museum. Nine stand here in this hall and three in the house. Three stand out in the court. The parachute is one of them, because it is taller than this roof. Twenty-seven others give too little to build and stay records in the sources. No flight of his own is documented.',
-    de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Fünfzehn seiner Maschinen sind in diesem Museum gebaut. Neun stehen hier in dieser Halle und drei im Haus. Drei stehen draußen im Hof. Der Fallschirm ist einer von ihnen, weil er höher ist als dieses Dach. Siebenundzwanzig weitere geben zu wenig her, sie bleiben Aufzeichnungen in den Quellen. Kein eigener Flug von ihm ist belegt.',
+    en: 'The aerial screw stands at the middle of this hall, rebuilt from one page of Manuscript B. Fifteen of his machines are rebuilt in this museum. Nine stand here in this hall and three in the house. Three stand out in the court. The parachute is one of them, because it is taller than this roof. Twenty-seven others give too little to build and stay records. No flight of his own is documented.',
+    de: 'In der Mitte dieser Halle steht die Luftschraube, rekonstruiert nach einer Seite aus Manuskript B. Fünfzehn seiner Maschinen sind in diesem Museum gebaut. Neun stehen hier in dieser Halle und drei im Haus. Drei stehen draußen im Hof. Der Fallschirm ist einer von ihnen, weil er höher ist als dieses Dach. Siebenundzwanzig weitere geben zu wenig her und bleiben Aufzeichnungen. Kein eigener Flug von ihm ist belegt.',
   },
   'supper-wall': {
     en: 'The Last Supper measures 460 by 880 cm, and this field in the court is its size. The painting itself is a refectory wall in Milan and cannot travel, because he painted it dry on the plaster instead of into it. Inside the outline hangs a reproduction with its own source and licence.',
@@ -615,8 +615,8 @@ const seeds: readonly StationSeed[] = [
     { en: 'The latest painting on the wall, and the door to the machines.', de: 'Das späteste Gemälde der Wand und die Tür zu den Maschinen.' },
     [], 'brief/CONCEPT-OPUS.md §3 S11'),
   seed('flight', { en: 'The mechanism hall, one: flight', de: 'Die Maschinenhalle, eins: Flug' },
-    { en: 'Fifteen of Leonardo da Vinci’s machines are rebuilt here from what the sources actually give, fourteen from his sheets and the lion from old accounts. The other twenty-seven studies give too little to rebuild and are kept as records.',
-      de: 'Fünfzehn von Leonardo da Vincis Maschinen sind hier nach dem rekonstruiert, was die Quellen tatsächlich hergeben, vierzehn nach seinen Blättern und der Löwe nach alten Berichten. Die übrigen siebenundzwanzig Studien geben zu wenig her und bleiben Aufzeichnungen.' },
+    { en: 'Fifteen machines are rebuilt in this museum from what the sources actually give, fourteen from Leonardo da Vinci’s sheets and the lion from old accounts. The other twenty-seven studies give too little to build and stay records.',
+      de: 'Fünfzehn Maschinen sind in diesem Museum nach dem rekonstruiert, was die Quellen tatsächlich hergeben, vierzehn nach Leonardo da Vincis Blättern und der Löwe nach alten Berichten. Die übrigen siebenundzwanzig Studien geben zu wenig her und bleiben Aufzeichnungen.' },
     [vinciNoBodies], 'brief/CONCEPT-OPUS.md §3 S15'),
   seed('works', { en: 'The mechanism hall, two: land, water, measure', de: 'Die Maschinenhalle, zwei: Land, Wasser, Maß' },
     { en: 'The two that were real, and how they differ.', de: 'Die beiden, die es wirklich gab, und ihr Unterschied.' },
@@ -894,16 +894,16 @@ export const vinciAbsences: Partial<Record<VinciStationId, readonly VinciAbsence
       work: { en: 'Nine Paris manuscripts, C, E, F, G, H, I, K, L and M', de: 'Neun Pariser Manuskripte, C, E, F, G, H, I, K, L und M' },
       holder: { en: 'Bibliothèque de l’Institut de France, Paris', de: 'Bibliothèque de l’Institut de France, Paris' },
       reason: {
-        en: 'The old library editions carry no public domain mark, and no other reproduction reaches the size this display needs.',
-        de: 'Die alten Bibliotheksausgaben tragen keinen Public-Domain-Vermerk, und keine andere Reproduktion erreicht die Größe, die diese Ausstellung braucht.',
+        en: 'Pages of all nine are in the topics, from photographs published by the library of the Institut de France. The museum chose single pages for its topics, not the whole notebooks.',
+        de: 'Seiten aller neun stehen in den Themen, nach Fotografien, die die Bibliothek des Institut de France veröffentlicht hat. Das Museum hat für seine Themen einzelne Seiten gewählt, nicht die ganzen Notizbücher.',
       },
     },
     {
       work: { en: 'Ashburnham A', de: 'Ashburnham A' },
       holder: { en: 'Bibliothèque de l’Institut de France, Paris', de: 'Bibliothèque de l’Institut de France, Paris' },
       reason: {
-        en: 'No marked facsimile and no large enough leaf could be verified for the fragment taken out of manuscript A.',
-        de: 'Für das aus Manuskript A entnommene Fragment ließ sich kein gekennzeichnetes Faksimile und kein ausreichend großes Blatt bestätigen.',
+        en: 'Some of its pages are in the topics, from photographs published by the library of the Institut de France. The museum chose single pages for its topics, not the whole fragment.',
+        de: 'Einige seiner Seiten stehen in den Themen, nach Fotografien, die die Bibliothek des Institut de France veröffentlicht hat. Das Museum hat für seine Themen einzelne Seiten gewählt, nicht das ganze Fragment.',
       },
     },
     {
@@ -971,8 +971,8 @@ export const vinciRightsPolicy: VinciText = {
 
 /** What this wing holds, counted. The sentences above carry what it does not. */
 export const vinciWingCounts: VinciText = {
-  en: 'This wing stands on two grounds. The picture room holds 25 positions close to the sizes recorded for the works, and every one of them carries a picture, the wall of the body 29 sheets from Windsor, the mechanism hall 9 machines rebuilt from the sheets, with 3 more in the court and 3 in the house, and the reading table one open page. The rights review of this museum read 538 catalogued Windsor sheet groups and admitted 389 of them, and of 25 named codex units it admitted 11. What it could not admit is named in the room it belongs to, with its holder and its reason.',
-  de: 'Dieser Flügel steht auf zwei Gründen. Der Bildersaal trägt 25 Plätze, annähernd in den Maßen, die für die Werke verzeichnet sind, und jeder davon trägt ein Bild, die Wand des Körpers 29 Blätter aus Windsor, die Maschinenhalle 9 nach den Blättern gebaute Maschinen, dazu 3 im Hof und 3 im Haus, und der Lesetisch eine offene Seite. Die Rechteprüfung dieses Museums las 538 verzeichnete Windsor-Blattgruppen und ließ 389 von ihnen zu, und von 25 benannten Codex-Einheiten ließ sie 11 zu. Was sie nicht zulassen konnte, steht in dem Raum, zu dem es gehört, mit Sammlung und Grund.',
+  en: 'This wing stands on two grounds. The picture room has 25 positions, and every one carries a picture, hung close to the size recorded for the work. That makes 24 works, because one panel is shown from both sides. The wall of the body holds 29 of his sheets from Windsor. In the mechanism hall, the court and the house stand 15 rebuilt machines, 14 from his sheets and the lion from old accounts. The reading table opens 17 topics with 207 pages. Its shelf holds 8 books. What we were not allowed to show is named in the room it belongs to, with its holder and its reason.',
+  de: 'Dieser Flügel steht auf zwei Gründen. Der Bildersaal hat 25 Plätze, und jeder trägt ein Bild, annähernd in den Maßen, die für das Werk verzeichnet sind. Es sind 24 Werke, denn eine Tafel wird von beiden Seiten gezeigt. Die Wand des Körpers trägt 29 seiner Blätter aus Windsor. In der Maschinenhalle, im Hof und im Haus stehen 15 rekonstruierte Maschinen, 14 nach seinen Blättern und der Löwe nach alten Berichten. Der Lesetisch öffnet 17 Themen mit 207 Seiten. In seinem Regal stehen 8 Bücher. Was wir nicht zeigen durften, steht in dem Raum, zu dem es gehört, mit der Sammlung, die es hat, und dem Grund, warum es fehlt.',
 }
 
 /** THE WING'S ONE SENTENCE, the same in the welcome, the recap at the exit
@@ -1154,8 +1154,8 @@ export const vinciLifePeople: readonly {
   {
     id: 'ludovico', name: { en: 'Ludovico Sforza', de: 'Ludovico Sforza' },
     role: {
-      en: 'The man who ruled Milan, duke from 1494. He offered him his services and later got a vineyard from him.',
-      de: 'Der Mann, der Mailand regierte, ab 1494 Herzog. Ihm bot er seine Dienste an, und von ihm bekam er später einen Weinberg.',
+      en: 'The man who ruled Milan, duke from 1494. Leonardo wrote him an offer of his services and later got a vineyard from him.',
+      de: 'Der Mann, der Mailand regierte, ab 1494 Herzog. Ihm schrieb Leonardo einen Brief, in dem er seine Dienste anbot, und von ihm bekam er später einen Weinberg.',
     },
     events: ['life-13', 'life-19', 'life-23'],
   },

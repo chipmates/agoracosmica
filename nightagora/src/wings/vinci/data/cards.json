@@ -174,7 +174,7 @@
       "zoom_in": { "en": "Zoom in", "de": "Näher" },
       "zoom_out": { "en": "Zoom out", "de": "Weiter weg" },
       "whole_wall": { "en": "The whole wall", "de": "Die ganze Wand" },
-      "hang_row": { "en": "The hang, twenty-five paintings", "de": "Die Hängung, fünfundzwanzig Gemälde" },
+      "hang_row": { "en": "The hang, twenty-five pictures", "de": "Die Hängung, fünfundzwanzig Bilder" },
       "place": { "en": "{n} of {total}", "de": "{n} von {total}" },
       "reproduction": { "en": "Reproduction", "de": "Reproduktion" }
     },
