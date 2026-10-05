@@ -1,10 +1,11 @@
 // THE LIBRARY, PLACED: a revision keys with its own library; a words record
 // moves the global key only by what is not a display text; the flat reader's
 // records move nothing, nor, from the third definition, the reading table's
-// page and bench save the panel's shelf state; everything else a frame can
-// draw still moves it; each wire trips back to the global key when its proof
-// no longer holds; and the older definitions key as their own code did.
-// Every change is planted over the tree (an overlay, a copied library).
+// page and bench save the panel's shelf state, nor, from the fourth, a
+// statement's record sentences and a station's built flag; everything else a
+// frame can draw still moves it; each wire trips back to the global key when
+// its proof no longer holds; and the older definitions key as their own code
+// did. Every change is planted over the tree (an overlay, a copied library).
 //
 //   node --test forge/film/library.test.mjs
 import { before, test } from 'node:test'
@@ -15,8 +16,10 @@ import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import path from 'node:path'
 import { pathToFileURL } from 'node:url'
-import { GLOBAL_DEFINITION, carriedElsewhere, drawable, globalKey, placeLibrary, recipeFilesOf } from './keys.mjs'
-import { READER_ROLES, TABLE_BENCH_FILES, TABLE_DOM_FILES, WORDS_FILES, benchPlacement, blankDisplay, importGraph, libraryAt, panelStyleScoped, readerPlacement, sourcesAt, tablePlacement, wordsPlacement } from './library.mjs'
+import ts from 'typescript'
+import { GLOBAL_DEFINITION, GLOBAL_DEFINITIONS, addedParts, carriedElsewhere, drawable, globalKey, placeLibrary, recipeFilesOf } from './keys.mjs'
+import { BUILT_FLAGS, BUILT_READS, READER_ROLES, STATEMENT_HELPERS, STATEMENT_RECORD_READERS, TABLE_BENCH_FILES, TABLE_DOM_FILES, WORDS_FILES, benchPlacement, blankDisplay, builtPlacement, importGraph, libraryAt,
+  panelStyleScoped, propertyReads, readerPlacement, sourcesAt, statementOf, statementShape, statementsPlacement, tablePlacement, wordsPlacement } from './library.mjs'
 import { APP_ROOT, WING_DIR, createLoader } from './load.mjs'
 import { libraryOf, mountWorld } from './scene.mjs'
 import { mergeManifests } from '../vite-na-assets.mjs'
@@ -33,16 +36,17 @@ const rerecord = (library, overlay) => library.map((e) => {
   return files.length === 1 && files[0] in overlay ? { ...e, sha256: sha256(overlay[files[0]]) } : e
 })
 const store = libraryAt()
-const V2 = 'library-placed-v2'
+const V2 = 'library-placed-v2', V3 = 'library-placed-v3'
 const CONTENT = `${WING_DIR}/content.ts`, STORY = `${WING_DIR}/story.ts`, TABLE = `${WING_DIR}/table/content.ts`
 let worldFiles, world
 before(async () => { world = await mountWorld({ library: store }); worldFiles = world.files.map(([f]) => f) })
 
-/** both global keys of a planted tree, with its placement */
+/** the global keys of a planted tree under each definition, with its placement */
 async function keysAt(overlay = {}, library = store) {
   const loader = await createLoader({ overlay })
   const placement = placeLibrary({ overlay, loader, worldFiles })
-  return { now: globalKey(loader, { library, placement }), v2: globalKey(loader, { library, placement, definition: V2 }), before: globalKey(loader, { library, definition: 'v1' }), placement }
+  return { now: globalKey(loader, { library, placement }), v3: globalKey(loader, { library, placement, definition: V3 }), v2: globalKey(loader, { library, placement, definition: V2 }),
+    before: globalKey(loader, { library, definition: 'v1' }), placement }
 }
 const movedParts = (a, b) => [...new Set([...Object.keys(a.parts), ...Object.keys(b.parts)])].filter((k) => a.parts[k] !== b.parts[k]).sort()
 
@@ -282,6 +286,250 @@ async function codeAt(rev) {
   try { return await import(pathToFileURL(path.join(dir, 'keys.mjs')).href) } finally { rmSync(dir, { recursive: true, force: true }) }
 }
 
+/* ---- the fourth definition: a statement's record sentences and a station's built flag ---- */
+const INDEX = `${WING_DIR}/index.ts`
+const WORDS_PART = 'words records, their display texts left out'
+/** the words file with one argument of its statement call for an id written again */
+function statementEdit(id, index, rewrite, text = read(CONTENT)) {
+  const source = ts.createSourceFile(CONTENT, text, ts.ScriptTarget.ES2022, true)
+  let call = null
+  const visit = (n) => {
+    if (!call && ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === 'statement' && n.arguments[0] && ts.isStringLiteral(n.arguments[0]) && n.arguments[0].text === id) call = n
+    if (!call) ts.forEachChild(n, visit)
+  }
+  visit(source)
+  assert.ok(call?.arguments[index], `the words file states ${id} with an argument ${index}`)
+  const arg = call.arguments[index], was = arg.getText(source), now = rewrite(was)
+  assert.notEqual(now, was)
+  return { [CONTENT]: text.slice(0, arg.getStart(source)) + now + text.slice(arg.getEnd()) }
+}
+/** the words file with the built flag of its seeding helper told otherwise */
+function builtEdit(rewrite, text = read(CONTENT)) {
+  const flag = text.match(/^ {2}built: (.+),$/m)
+  assert.ok(flag, 'the seeding helper sets the built flag on a line of its own')
+  assert.notEqual(rewrite(flag[1]), flag[1])
+  return plant(CONTENT, flag[0], `  built: ${rewrite(flag[1])},`, text)
+}
+/** a station's list one id shorter: what taking a room out of the unbuilt ones is */
+const oneRoomBuilt = (init) => init.replace(/\['[a-z-]+', /, '[')
+const wiresWith = (overlay) => { const sources = sourcesAt({ overlay }); return { statements: statementsPlacement({ sources }), built: builtPlacement({ sources }) } }
+
+test("a statement's sentences are blanked under the fourth definition, and nothing else of the call is", () => {
+  const helper = STATEMENT_HELPERS[CONTENT]
+  assert.deepEqual(helper.sentences.map((p) => helper.parameters.indexOf(p)), [1, 2], 'the sentences are the second and third arguments')
+  const src = [
+    "const statement = (id: string, en: string, de: string, certainty: C, target: T, source: string, germanProvenance: P = 'museum translation'): S => museumStatement({ id, en, de, certainty, target, source, germanProvenance })",
+    "const a = statement('picture-absence',\n  'All twenty-five positions.',\n  `Alle ${n} Plätze.`,\n  'documented', 'document', 'The room hang', 'supplied')",
+    "const b = { ...statement('hall-arrangement', 'One', \"Eins\", 'reconstructed', 'carrier', 'S3'), carrier: 'vinci/house-hall' }",
+    "const c = other.statement('x', 'kept one', 'kept two')",
+    "const d = statement(...parts, 'kept three')",
+  ].join('\n')
+  const v3 = (t) => blankDisplay(t, CONTENT), v4 = (t) => blankDisplay(t, CONTENT, { statement: helper })
+  for (const word of ['All twenty-five', 'Alle ', ' Plätze.', "'One'", '"Eins"']) { assert.ok(v3(src).includes(word), `${word}: the third definition reads it`); assert.ok(!v4(src).includes(word), `${word}: the fourth blanks it`) }
+  for (const kept of ["'picture-absence'", "'documented', 'document', 'The room hang', 'supplied'", "'reconstructed', 'carrier', 'S3'", "'vinci/house-hall'", '"·"n"·"', "'kept one', 'kept two'", "'kept three'", "'museum translation'"])
+    assert.ok(v4(src).includes(kept), `${kept} is kept`)
+  for (const [from, to] of [['All twenty-five positions.', 'Every position.'], ['Alle ', 'Jeder der '], ["'One'", "'One and a half'"], ['"Eins"', "'Anderthalb'"]]) {
+    assert.equal(v4(src.replace(from, to)), v4(src), `${from}: a sentence edit leaves the fourth definition's text`)
+    assert.notEqual(v3(src.replace(from, to)), v3(src), `${from}: and moves the third's`)
+  }
+  for (const [from, to] of [["'picture-absence'", "'picture-absent'"], ["'documented', 'document'", "'conjectural', 'document'"], ["'documented', 'document'", "'documented', 'absence'"], ["'The room hang'", "'The register'"],
+    ["'supplied'", "'museum translation'"], ["'S3'", "'S4'"], ["'vinci/house-hall'", "'vinci/house'"], ['${n}', '${m}'], ["'kept one'", "'moved'"], ["'kept three'", "'moved'"]]) {
+    assert.notEqual(v4(src.replace(from, to)), v4(src), `${from}: moves the fourth definition's text`)
+    assert.notEqual(v3(src.replace(from, to)), v3(src), `${from}: and the third's`)
+  }
+})
+
+test("a station's built flag is left out under the fourth definition, where the seeding helper sets it and nowhere else", () => {
+  const flag = BUILT_FLAGS[CONTENT]
+  const src = [
+    "const seed = (id: Id, name: T, labels: readonly S[]): Seed => ({\n  id, name, labels,\n  outdoor: id === 'arrival' || id === 'garden',\n  built: !['hall', 'oratory'].includes(id),\n  group: 'house',\n})",
+    "const stop = { id: 'body-valve', built: false, order: 3 }",
+  ].join('\n')
+  const v3 = (t) => blankDisplay(t, CONTENT), v4 = (t) => blankDisplay(t, CONTENT, { built: flag })
+  assert.ok(v3(src).includes("!['hall', 'oratory'].includes(id)") && !v4(src).includes('includes(id)'))
+  assert.ok(v4(src).includes('built: "·",') && v4(src).includes('built: false'), 'the flag keeps its place; a flag set elsewhere is read')
+  for (const to of ["!['oratory'].includes(id)", 'true', "id !== 'hall'"]) {
+    const edit = src.replace("!['hall', 'oratory'].includes(id)", to)
+    assert.equal(v4(edit), v4(src), `${to}: the flag told otherwise leaves the fourth definition's text`)
+    assert.notEqual(v3(edit), v3(src), `${to}: and moves the third's`)
+  }
+  for (const [from, to] of [["id === 'arrival' || id === 'garden'", "id === 'arrival'"], ['built: false', 'built: true'], ["group: 'house'", "group: 'line'"], ['built: !', 'open: !']]) {
+    assert.notEqual(v4(src.replace(from, to)), v4(src), `${from}: moves the fourth definition's text`)
+    assert.notEqual(v3(src.replace(from, to)), v3(src), `${from}: and the third's`)
+  }
+})
+
+test("on the tree as it stands both wires hold, and the audits are the tree's own", async () => {
+  const sources = sourcesAt()
+  assert.deepEqual(statementsPlacement({ sources }), { placed: true })
+  assert.deepEqual(builtPlacement({ sources }), { placed: true })
+  // the helper as audited, and the calls it blanks: every one hands two plain sentences
+  const helper = STATEMENT_HELPERS[CONTENT], text = read(CONTENT), source = ts.createSourceFile(CONTENT, text, ts.ScriptTarget.ES2022, true)
+  assert.deepEqual(helper.parameters, ['id', 'en', 'de', 'certainty', 'target', 'source', 'germanProvenance'])
+  const calls = []
+  const visit = (n) => { if (ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === helper.name) calls.push(n); ts.forEachChild(n, visit) }
+  visit(source)
+  assert.ok(calls.length >= 18, `${calls.length} statements are made by the helper`)
+  for (const c of calls) for (const i of [1, 2]) assert.ok(ts.isStringLiteralLike(c.arguments[i]), `${c.arguments[0].getText(source)}: argument ${i} is one plain string`)
+  // every statement that reads a built flag is an audited one, and every audited one still stands
+  const found = {}
+  for (const [file, shape] of propertyReads(sources, 'built')) (found[file] ??= []).push(shape)
+  const byFile = (table) => Object.fromEntries(Object.entries(table).map(([f, l]) => [f, [...l].sort()]).sort())
+  assert.deepEqual(byFile(found), byFile(Object.fromEntries(Object.entries(BUILT_READS).map(([f, l]) => [f, l.map(([shape]) => shape)]))))
+  const { placement } = await keysAt()
+  for (const f of WORDS_FILES) assert.equal(placement.words[f].placed, true)
+  assert.deepEqual([placement.statements, placement.built], [{ placed: true }, { placed: true }])
+  // the fourth definition reads the words file with both left out, the other two words files as the third does
+  assert.notEqual(placement.words[CONTENT].blanked4, placement.words[CONTENT].blanked)
+  for (const f of [STORY, TABLE]) assert.equal(placement.words[f].blanked4, placement.words[f].blanked, `${f} has neither`)
+})
+
+test("by the compiler's types: a station's built flag and a statement's record are read where audited, and nowhere else", () => {
+  const config = ts.parseJsonConfigFileContent(ts.readConfigFile(path.join(APP_ROOT, 'tsconfig.json'), ts.sys.readFile).config, ts.sys, APP_ROOT)
+  const program = ts.createProgram(config.fileNames, config.options), checker = program.getTypeChecker()
+  const typeOf = (n) => checker.typeToString(checker.getNonNullableType(checker.getTypeAtLocation(n)))
+  const functionOf = (n) => {
+    for (let at = n.parent; at; at = at.parent) {
+      if (!ts.isFunctionLike(at)) continue
+      if (at.name) return at.name.getText()
+      if (ts.isVariableDeclaration(at.parent)) return at.parent.name.getText()
+    }
+    return ''
+  }
+  const built = {}, records = {}
+  for (const source of program.getSourceFiles()) {
+    const file = path.relative(APP_ROOT, source.fileName).split(path.sep).join('/')
+    if (source.isDeclarationFile || !file.startsWith('src/')) continue
+    const visit = (n) => {
+      if (ts.isPropertyAccessExpression(n) && n.name.text === 'built') (built[file] ??= []).push([statementShape(statementOf(n), source), typeOf(n.expression)])
+      if (ts.isPropertyAccessExpression(n) && n.name.text === 'record' && ['VinciStatement', 'VinciStationContent', 'StationSeed'].includes(typeOf(n.expression))) (records[file] ??= new Set()).add(functionOf(n))
+      ts.forEachChild(n, visit)
+    }
+    visit(source)
+  }
+  const sorted = (table) => Object.fromEntries(Object.entries(table).map(([f, l]) => [f, [...l].map(String).sort()]).sort())
+  assert.deepEqual(sorted(built), sorted(Object.fromEntries(Object.entries(BUILT_READS).map(([f, l]) => [f, l.map(([shape, type]) => [shape, type])]))), 'every read of a built flag, with the type the compiler gives its owner')
+  assert.equal(Object.values(BUILT_READS).flat().filter(([, type]) => type === 'VinciStationContent').length, 9, "nine statements read a station's flag")
+  assert.deepEqual(sorted(records), sorted(Object.fromEntries(Object.entries(STATEMENT_RECORD_READERS).map(([f, readers]) => [f, Object.keys(readers)]))), "every function that reads a statement's or a station's record")
+})
+
+test("a statement's sentence and a station's built flag move the third definition and leave the fourth; what is not display moves both", async () => {
+  const base = await keysAt()
+  const held = async (overlay, what) => {
+    const k = await keysAt(overlay, rerecord(store, overlay))
+    assert.equal(k.now.key, base.now.key, `${what}: the fourth definition's key stands`)
+    assert.deepEqual(movedParts(base.v3, k.v3), [WORDS_PART], `${what}: the third definition re-rendered the film for it`)
+    assert.notEqual(k.before.key, base.before.key)
+  }
+  const en = statementEdit('picture-absence', 1, () => "'Every position of the hang carries a reproduction of a work in the public domain.'")
+  await held(en, "the picture room's record sentence")
+  await held(statementEdit('picture-absence', 2, () => "'Jeder Platz der Hängung trägt die Reproduktion eines gemeinfreien Werks.'"), 'its German')
+  await held(statementEdit('hall-arrangement', 1, (was) => was.replace(/^'/, "'Again. ")), 'a sentence of a statement spread into an object')
+  await held(builtEdit(oneRoomBuilt), 'a room taken out of the unbuilt ones')
+  // the two together, as they are held to land
+  await held(builtEdit(oneRoomBuilt, en[CONTENT]), 'both at once')
+  const storyText = read(STORY), storyFlag = '    built: false,\n', at = storyText.indexOf(storyFlag)
+  assert.ok(at > 0, 'the story holds a stop that is not built')
+  // what is not display moves both
+  const moved = [
+    ['the id', statementEdit('picture-absence', 0, () => "'picture-absent'")],
+    ['the certainty', statementEdit('picture-absence', 3, () => "'reconstructed'")],
+    ['the target', statementEdit('picture-absence', 4, () => "'absence'")],
+    ['the source', statementEdit('picture-absence', 5, (was) => was.replace(/'$/, ", checked'"))],
+    ['the German provenance', statementEdit('picture-absence', 6, () => "'supplied'")],
+    ['the outdoor flag', plant(CONTENT, "outdoor: id === 'arrival' || id === 'courtyard' || id === 'garden',", "outdoor: id === 'arrival' || id === 'courtyard',")],
+    ["a story stop's built flag, which no seeding helper sets", { [STORY]: `${storyText.slice(0, at)}    built: true,\n${storyText.slice(at + storyFlag.length)}` }],
+  ]
+  for (const [what, overlay] of moved) {
+    const k = await keysAt(overlay, rerecord(store, overlay))
+    assert.deepEqual(movedParts(base.now, k.now), [WORDS_PART], `${what}: moves the fourth definition's key, by the words part alone`)
+    assert.deepEqual(movedParts(base.v3, k.v3), [WORDS_PART], `${what}: and the third's`)
+  }
+})
+
+test("the statements' wire trips when the helper is not the audited one, and the sentences are read again", async () => {
+  const head = 'const statement = (\n  id: string, en: string, de: string, certainty: VinciCertainty,'
+  const trips = [
+    ['a parameter before the sentences', plant(CONTENT, head, 'const statement = (\n  id: string, note: string, en: string, de: string, certainty: VinciCertainty,'), /takes \(id, note, en, de, certainty, target, source, germanProvenance\), audited \(id, en, de,/],
+    ['a parameter after them', plant(CONTENT, "  target: VinciStatement['target'], source: string,\n", "  target: VinciStatement['target'], source: string, carrier: string,\n"), /takes \(id, en, de, certainty, target, source, carrier, germanProvenance\)/],
+    ['the sentences the other way round', plant(CONTENT, head, 'const statement = (\n  id: string, de: string, en: string, certainty: VinciCertainty,'), /takes \(id, de, en,/],
+    ['a parameter renamed', plant(CONTENT, head, 'const statement = (\n  id: string, en: string, german: string, certainty: VinciCertainty,'), /takes \(id, en, german,/],
+    ['the rest gathered', plant(CONTENT, "  germanProvenance: VinciStatement['germanProvenance'] = 'museum translation',\n): VinciStatement =>", '  ...germanProvenance: string[]\n): VinciStatement =>'), /\.\.\.germanProvenance\)/],
+    ['a second thing of the name', { [CONTENT]: `${read(CONTENT)}\nexport const told = (statement: VinciStatement): string => statement.id\n` }, /statement is declared 2 times/],
+    ['the helper gone', plant(CONTENT, 'const statement = (', 'const statementOf = ('), /statement is declared 0 times/],
+    ['the helper inside another function', { [CONTENT]: read(CONTENT).replace('const statement = (', 'function make() {\nconst statement = (').replace('): VinciStatement => museumStatement({ id, en, de, certainty, target, source, germanProvenance });', '): VinciStatement => museumStatement({ id, en, de, certainty, target, source, germanProvenance });\nreturn statement }') }, /not a function of the file's top level/],
+  ]
+  for (const [what, overlay, why] of trips) {
+    const got = wiresWith(overlay).statements
+    assert.equal(got.placed, false, what)
+    assert.match(got.why, why, what)
+  }
+  // tripped, a sentence moves the fourth definition's key as it moves the third's; the built flag's wire is its own
+  const [, tripped] = trips[0]
+  const off = await keysAt(tripped, rerecord(store, tripped))
+  assert.equal(off.placement.statements.placed, false)
+  assert.equal(off.placement.built.placed, true)
+  const sentence = statementEdit('picture-absence', 1, () => "'Every position.'", tripped[CONTENT])
+  assert.deepEqual(movedParts(off.now, (await keysAt(sentence, rerecord(store, sentence))).now), [WORDS_PART])
+  const flag = builtEdit(oneRoomBuilt, tripped[CONTENT])
+  assert.equal((await keysAt(flag, rerecord(store, flag))).now.key, off.now.key, 'the flag is still left out')
+})
+
+test("the built flag's wire trips for a reader that is not audited, and the flag is read again", async () => {
+  const hidden = 'header.hidden=mode===2||Boolean(closeLook?.id)||(away&&!hereContent().built)'
+  const trips = [
+    ['a new reader in the index', plant(INDEX, 'function standHere():void { visit?.stand(hereContent().id) }', 'function standHere():void { visit?.stand(hereContent().id);sky.visible=hereContent().built }'), /index\.ts reads a built flag in a statement that is not audited: sky\.visible=hereContent\(\)\.built/],
+    ['a reader in a module that draws', { [`${WING_DIR}/study-sheet.ts`]: `${read(`${WING_DIR}/study-sheet.ts`)}\nexport const shown = (s: { built: boolean }): boolean => s.built\n` }, /study-sheet\.ts reads a built flag/],
+    ['the flag taken apart', { [`${WING_DIR}/walk.ts`]: `${read(`${WING_DIR}/walk.ts`)}\nexport const open = vinciContent.map(({ built }) => built)\n` }, /walk\.ts reads a built flag/],
+    ['the flag read by a string key', { [`${WING_DIR}/walk.ts`]: `${read(`${WING_DIR}/walk.ts`)}\nexport const open = vinciContent.map(station => station['built'])\n` }, /walk\.ts reads a built flag/],
+    ['an audited statement that does more', plant(INDEX, hidden, hidden.replace('header.hidden=', 'header.hidden=sky.visible=')), /index\.ts reads a built flag in a statement that is not audited: header\.hidden=sky\.visible=/],
+    ['an audited read a second time', plant(INDEX, hidden, `${hidden};${hidden}`), /index\.ts reads a built flag/],
+    ['the flag told from more than the id', builtEdit((init) => `${init} && labels.length > 0`), /tells built from labels/],
+    ['the flag set twice', builtEdit((init) => `${init},\n  ...{ built: true }`), /sets built 2 times/],
+    ['the seeding helper gone', plant(CONTENT, 'const seed = (', 'const seedOf = ('), /seed is declared 0 times/],
+  ]
+  for (const [what, overlay, why] of trips) {
+    const got = wiresWith(overlay).built
+    assert.equal(got.placed, false, what)
+    assert.match(got.why, why, what)
+  }
+  // a word changed inside an audited statement, or an audited read taken away, trips nothing
+  assert.equal(wiresWith(plant(INDEX, "'Modern museum insertion · Rooms in construction'", "'A museum insertion of today · Rooms in construction'")).built.placed, true)
+  assert.equal(wiresWith(plant(INDEX, "if(!s.built)header.append(make('p','vinci-status',text(vinciConstructionStatus)))", '')).built.placed, true)
+  // tripped, the flag moves the fourth definition's key as it moves the third's; the statements' wire is its own
+  const [, tripped] = trips[0]
+  const off = await keysAt(tripped)
+  assert.equal(off.placement.built.placed, false)
+  assert.equal(off.placement.statements.placed, true)
+  const flag = { ...tripped, ...builtEdit(oneRoomBuilt) }
+  assert.deepEqual(movedParts(off.now, (await keysAt(flag, rerecord(store, flag))).now), [WORDS_PART])
+  const sentence = { ...tripped, ...statementEdit('picture-absence', 1, () => "'Every position.'") }
+  assert.equal((await keysAt(sentence, rerecord(store, sentence))).now.key, off.now.key, 'a sentence is still left out')
+})
+
+test('the fourth definition reads less of a words file than the third and the same of everything else: nothing is added', async () => {
+  assert.equal(GLOBAL_DEFINITION, 'library-placed-v4')
+  assert.deepEqual(GLOBAL_DEFINITIONS, ['v1', V2, V3, GLOBAL_DEFINITION])
+  const loader = await createLoader()
+  assert.deepEqual(addedParts(loader, V3, GLOBAL_DEFINITION), {}, 'nothing is added since the third')
+  assert.deepEqual(addedParts(loader, V2, GLOBAL_DEFINITION), {}, 'nor since the second')
+  assert.deepEqual(addedParts(loader, 'v1', GLOBAL_DEFINITION), addedParts(loader, 'v1', V3), 'since the first, what the third added')
+  // on the same tree the two keys differ by the words part and the name alone
+  const base = await keysAt()
+  assert.deepEqual(movedParts(base.v3, base.now), ['definition', WORDS_PART])
+  assert.deepEqual(Object.keys(base.now.parts).sort(), Object.keys(base.v3.parts).sort(), 'the same parts by name')
+  // what the fourth reads of a words file is told by what the third reads of it: it can stand where the third moves, never move where the third stands
+  for (const file of WORDS_FILES) {
+    const text = read(file), out = { statement: STATEMENT_HELPERS[file] ?? null, built: BUILT_FLAGS[file] ?? null }
+    assert.equal(blankDisplay(blankDisplay(text, file), file, out), blankDisplay(text, file, out), `${file}: the fourth definition's text is made from the third's`)
+  }
+  // with both wires tripped the fourth reads a words file exactly as the third does
+  const sources = sourcesAt()
+  const off = { ...base.placement, words: wordsPlacement({ sources, graph: importGraph(sources), worldFiles: new Set(worldFiles), statements: { placed: false, why: 'test' }, built: { placed: false, why: 'test' } }) }
+  assert.equal(off.words[CONTENT].blanked4, off.words[CONTENT].blanked)
+  assert.equal(globalKey(loader, { library: store, placement: off }).parts[WORDS_PART], base.v3.parts[WORDS_PART])
+})
+
 test('the older definitions key byte for byte as the code of 7a18ca94 keyed them', async () => {
   const then = await codeAt('7a18ca94')
   assert.equal(then.GLOBAL_DEFINITION, V2)
@@ -297,4 +545,25 @@ test('the older definitions key byte for byte as the code of 7a18ca94 keyed them
     console.log(`# ${definition}: ${is.key}`)
   }
   console.log(`# ${GLOBAL_DEFINITION}: ${globalKey(loader, { ...args, placement: placedNow }).key}`)
+})
+
+test('the third definition, and the two before it, key byte for byte as the code of 852b38bc keyed them', async () => {
+  const then = await codeAt('852b38bc')
+  assert.equal(then.GLOBAL_DEFINITION, V3)
+  const loader = await createLoader()
+  const args = { library: world.library, claimed: world.claimed }
+  const placedNow = placeLibrary({ loader, worldFiles })
+  // the wires of that code read the tree as today's do
+  const placedThen = then.placeLibrary({ loader, worldFiles })
+  for (const wire of ['reader', 'table', 'bench']) assert.deepEqual(placedNow[wire], placedThen[wire], `${wire}: the same wire`)
+  for (const f of WORDS_FILES) assert.deepEqual({ placed: placedNow.words[f].placed, blanked: placedNow.words[f].blanked }, placedThen.words[f], `${f}: read as that code read it`)
+  for (const definition of ['v1', V2, V3]) {
+    for (const placement of [placedNow, placedThen]) {
+      const was = then.globalKey(loader, { ...args, definition, placement })
+      const is = globalKey(loader, { ...args, definition, placement })
+      assert.deepEqual(is.parts, was.parts, `${definition}: every part`)
+      assert.equal(is.key, was.key, `${definition}: the key`)
+    }
+    console.log(`# ${definition}: ${globalKey(loader, { ...args, definition, placement: placedNow }).key}`)
+  }
 })

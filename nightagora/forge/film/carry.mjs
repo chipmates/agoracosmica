@@ -6,8 +6,8 @@
 // global key alone, so the motion, the picture and the delivery a record is
 // carried with are the ones it was rendered with. What the definition now reads
 // and the old one did not (`addedParts`: from v1, the day dome's evening terms;
-// from v2, nothing) must also be as it was in the tree the record was rendered
-// from (its head).
+// from v2 or v3, nothing) must also be as it was in the tree the record was
+// rendered from (its head).
 //
 //   node forge/film/carry.mjs --job=<dir>                 carry, then write the record the gate reads
 //   node forge/film/carry.mjs --job=<dir> --dry           count only

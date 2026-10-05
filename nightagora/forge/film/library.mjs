@@ -27,11 +27,21 @@
 //            table back only from a visitor's event.
 //   BENCH    (from library-placed-v3) the reading table's bench: only the
 //            bench page imports it, by import(), when it opens it.
+//   RECORD   (from library-placed-v4) a statement's record sentences: the two
+//            text arguments of a words file's own helper `statement(id, en,
+//            de, …)`. They leave the file only as a statement's and a
+//            station's `record`, which the sources window writes into the
+//            page; the helper's parameter list is held as audited.
+//   BUILT    (from library-placed-v4) a station's `built` flag, told from its
+//            id alone: every read of it writes the page (the station card,
+//            the phone's box, the sources window's word of certainty), and
+//            every read of a property of that name in the app is audited.
 //
 // Everything else a record's text or bytes can reach stays in the global key.
 // What no wire can see: a page module that throws while the table is built
 // leaves the table unbuilt (the exhibits swallow the error) with the key where
-// it was; only a check that builds the table in a browser sees that.
+// it was; only a check that builds the table in a browser sees that. Nor a
+// station read whole (its keys walked, or written out) instead of by name.
 import { execFileSync } from 'node:child_process'
 import { createHash } from 'node:crypto'
 import { existsSync, readFileSync, readdirSync } from 'node:fs'
@@ -236,10 +246,19 @@ export const LETTER_CALL_PARAMETERS = {
   [`${WING_DIR}/picture-words.ts`]: ['createPictureWords', 'place: (layer: SVGSVGElement) => void'],
 }
 
-/** A source with every display string replaced by its position: what the file says to anything but a reader. */
-export function blankDisplay(text, file = 'words.ts') {
+/**
+ * A source with every display string replaced by its position: what the file
+ * says to anything but a reader.
+ *   statement   the file's audited statement helper (STATEMENT_HELPERS): the
+ *               strings of its sentence arguments are blanked too
+ *   built       the file's audited built flag (BUILT_FLAGS): its initializer
+ *               in the seeding helper is left out
+ */
+export function blankDisplay(text, file = 'words.ts', { statement = null, built = null } = {}) {
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.ES2022, true)
   const cuts = []
+  const sentences = statement ? statement.sentences.map((p) => statement.parameters.indexOf(p)) : []
+  const seeding = built ? helperOf(source, built.helper).node : null
   const nameOf = (n) => (ts.isIdentifier(n) || ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n) ? n.text : null)
   const strings = (n) => {
     if (ts.isStringLiteral(n) || ts.isNoSubstitutionTemplateLiteral(n)) cuts.push([n.getStart(source), n.getEnd()])
@@ -250,9 +269,17 @@ export function blankDisplay(text, file = 'words.ts') {
     }
     ts.forEachChild(n, strings)
   }
+  const within = (n, outer) => { for (let at = n; at; at = at.parent) if (at === outer) return true; return false }
   const visit = (n) => {
     if (ts.isPropertyAssignment(n) && DISPLAY_WHOLE_KEY.test(nameOf(n.name) ?? '')) { cuts.push([n.initializer.getStart(source), n.initializer.getEnd()]); return }
     if (ts.isPropertyAssignment(n) && DISPLAY_KEY.test(nameOf(n.name) ?? '')) { strings(n.initializer); return }
+    if (seeding && ts.isPropertyAssignment(n) && nameOf(n.name) === built.property && within(n, seeding)) { cuts.push([n.initializer.getStart(source), n.initializer.getEnd()]); return }
+    // a call of the helper by its bare name: an argument spread before the last sentence hides which is which
+    if (statement && ts.isCallExpression(n) && ts.isIdentifier(n.expression) && n.expression.text === statement.name &&
+      !n.arguments.slice(0, Math.max(...sentences) + 1).some(ts.isSpreadElement)) {
+      n.arguments.forEach((a, i) => (sentences.includes(i) ? strings(a) : visit(a)))
+      return
+    }
     ts.forEachChild(n, visit)
   }
   visit(source)
@@ -274,14 +301,183 @@ function parametersOf(text, name) {
   return found
 }
 
+/* ---- THE STATEMENT'S RECORD SENTENCES (from library-placed-v4) ---- */
+/**
+ * THE STATEMENT HELPER OF A WORDS FILE, as audited (2026-10-05): its name, its
+ * parameters in order, and which of them are the record sentences. The helper
+ * hands them to `museumStatement`, which keeps them as the statement's
+ * `record`; a station's `record` is its statement's, or two of them joined.
+ * Both are read in STATEMENT_RECORD_READERS and nowhere else, and the way
+ * there is the file's own code, which stays keyed. A changed parameter list
+ * trips the wire, so no new argument slips into the blanked range unseen.
+ */
+export const STATEMENT_HELPERS = {
+  [`${WING_DIR}/content.ts`]: { name: 'statement', parameters: ['id', 'en', 'de', 'certainty', 'target', 'source', 'germanProvenance'], sentences: ['en', 'de'] },
+}
+/** Every read of a statement's or a station's `record` (audited 2026-10-05, by the compiler's types), by the function it stands in: each writes the sentence into a paragraph of the sources window. */
+export const STATEMENT_RECORD_READERS = {
+  [`${WING_DIR}/index.ts`]: {
+    appendLabel: 'label.record??label, handed to appendStatement and on to appendRecord: a text node of the full record',
+    appendSourceStatement: 'label.record??label: a paragraph of the folded record',
+    paintRoomSources: 'station.record??station.promise: a paragraph of the room tab',
+    paintDock: 's.record??s.promise, handed to appendRecord: a text node of the full record',
+  },
+  [`${WING_DIR}/film-wing.ts`]: {
+    paintSources: 's.record ?? s.promise: a paragraph of the station tab',
+    statement: 'label.record ?? label: a paragraph of the folded record',
+    paintRoomAndWing: 'station.record ?? station.promise: a paragraph of the room tab',
+  },
+}
+
+/** A name's one declaration in a source when it is a function of the file's own top level: { node, parameters }, or { why }. */
+function helperOf(source, name) {
+  const bound = []
+  const visit = (n) => {
+    if (ts.isIdentifier(n) && n.text === name && n.parent.name === n && (ts.isVariableDeclaration(n.parent) || ts.isFunctionDeclaration(n.parent) || ts.isFunctionExpression(n.parent) ||
+      ts.isParameter(n.parent) || ts.isBindingElement(n.parent) || ts.isImportSpecifier(n.parent) || ts.isImportClause(n.parent) || ts.isNamespaceImport(n.parent) || ts.isClassDeclaration(n.parent))) bound.push(n.parent)
+    ts.forEachChild(n, visit)
+  }
+  visit(source)
+  if (bound.length !== 1) return { why: `${name} is declared ${bound.length} times` }
+  const [d] = bound
+  const top = ts.isFunctionDeclaration(d) ? d.parent === source : ts.isVariableDeclaration(d) && d.parent.parent.parent === source
+  const node = ts.isFunctionDeclaration(d) ? d : ts.isVariableDeclaration(d) && d.initializer && (ts.isArrowFunction(d.initializer) || ts.isFunctionExpression(d.initializer)) ? d.initializer : null
+  if (!top || !node) return { why: `${name} is not a function of the file's top level` }
+  return { node, parameters: node.parameters.map((p) => `${p.dotDotDotToken ? '...' : ''}${p.name.getText(source)}`) }
+}
+
+/** THE STATEMENTS' WIRE: whether the record sentences leave the global key, and the first reason they do not. */
+export function statementsPlacement({ sources }) {
+  const why = (() => {
+    for (const [file, audited] of Object.entries(STATEMENT_HELPERS)) {
+      if (!sources.has(file)) return `${file} is not in the tree`
+      const found = helperOf(parse(file, sources.get(file)), audited.name)
+      if (found.why) return `${file}: ${found.why}`
+      if (found.parameters.join(', ') !== audited.parameters.join(', ')) return `${file}#${audited.name} takes (${found.parameters.join(', ')}), audited (${audited.parameters.join(', ')})`
+    }
+    return null
+  })()
+  return why ? { placed: false, why } : { placed: true }
+}
+
+/* ---- THE STATION'S BUILT FLAG (from library-placed-v4) ---- */
+/** THE BUILT FLAG OF A WORDS FILE, as audited (2026-10-05): the helper that seeds a station, the property, and the only names its initializer may hold (a station's id, tested against a list). */
+export const BUILT_FLAGS = { [`${WING_DIR}/content.ts`]: { helper: 'seed', property: 'built', names: ['id', 'includes'] } }
+/**
+ * EVERY STATEMENT OF THE APP THAT READS A PROPERTY NAMED `built` (audited
+ * 2026-10-05, by the compiler's types): the statement with its strings
+ * blanked, the type whose flag it reads, and what it does with it. A
+ * station's flag only writes the page; the other three flags of that name are
+ * not a station's. A read that is not here trips the wire, and so does a
+ * statement changed around one.
+ */
+export const BUILT_READS = {
+  [`${WING_DIR}/index.ts`]: [
+    ['if(id.startsWith("·")&&!s.built&&!vinciStandsInRoom(s.id))header.append(make("·","·",lang()==="·"?"·":"·"))', 'VinciStationContent', 'showView: a line of the station card'],
+    ['dot.dataset["·"]=s.built?s.carrierCertainty:"·"', 'VinciStationContent', "paintHeader: the colour of the card's dot"],
+    ['dot.setAttribute("·",text(vinciCertaintyWords[s.built?s.carrierCertainty:"·"]))', 'VinciStationContent', "paintHeader: the dot's spoken name"],
+    ['header.classList.toggle("·",!standing&&!s.built)', 'VinciStationContent', "paintHeader: the card's centred form"],
+    ['if(!s.built)header.append(make("·","·",text(vinciConstructionStatus)))', 'VinciStationContent', "paintHeader: the card's status line"],
+    ['header.hidden=mode===2||Boolean(closeLook?.id)||(away&&!hereContent().built)', 'VinciStationContent', "paintHeaderVisibility: the card's hidden flag, read back by the hand's landing place, the marks' boxes and the sheet's foot (all the page)"],
+    ['phone.show(Boolean(closeLook?.id)||!(away&&!hereContent().built))', 'VinciStationContent', "paintHeaderVisibility: the phone box's hidden flag, read back by the same three"],
+    ['const certainty=exhibitSources?.certainty??(s.built?s.carrierCertainty:"·")', 'VinciStationContent', "paintDock: the sources window's word of certainty"],
+  ],
+  [`${WING_DIR}/film-wing.ts`]: [
+    ['const certainty = exhibit?.certainty ?? (s.built ? s.carrierCertainty : "·")', 'VinciStationContent', "paintSources: the sources window's word of certainty"],
+  ],
+  'src/wings/plan/plate.ts': [
+    ['rect.dataset["·"] = String(room.built)', 'PlanRoom', "drawPlanPlate: the plan's own room, into the plate's data attribute"],
+    ['line.dataset["·"] = String(shape.built)', 'PlanShape', "drawPlanPlate: the plan's own shape, into the plate's data attribute"],
+  ],
+  [`${WING_DIR}/leaf-litter.ts`]: [
+    ['const lee = c.built && plan.walked(foot[0], foot[1]) && nearCourt(foot) ? 2.6 : 1', 'Run', "layLitter: the litter's own run, flagged where the runs are made"],
+  ],
+}
+/** The innermost statement that holds a node. */
+export function statementOf(n) {
+  let at = n
+  while (at.parent && !ts.isStatement(at)) at = at.parent
+  return at
+}
+/** A statement with its strings blanked and its spaces run together: what it does, whatever it says. */
+export function statementShape(statement, source) {
+  const from = statement.getStart(source), cuts = []
+  const strings = (x) => { if (ts.isStringLiteralLike(x)) cuts.push([x.getStart(source) - from, x.getEnd() - from]); else ts.forEachChild(x, strings) }
+  strings(statement)
+  const text = statement.getText(source)
+  let out = '', pos = 0
+  for (const [a, b] of cuts) { out += `${text.slice(pos, a)}"·"`; pos = b }
+  return (out + text.slice(pos)).replace(/\s+/g, ' ').replace(/;$/, '').trim()
+}
+/** Every statement of the app's sources that reads a property named `name` (by name, by a string key, or by taking it apart): [file, shape] in the order they stand. */
+export function propertyReads(sources, name) {
+  const out = []
+  const word = new RegExp(`\\b${name}\\b`)
+  for (const [file, text] of sources) {
+    if (!file.endsWith('.ts') || !word.test(text)) continue
+    const source = parse(file, text), held = new Set()
+    const visit = (n) => {
+      const read = (ts.isPropertyAccessExpression(n) && n.name.text === name) ||
+        (ts.isElementAccessExpression(n) && ts.isStringLiteralLike(n.argumentExpression) && n.argumentExpression.text === name) ||
+        (ts.isBindingElement(n) && ts.isObjectBindingPattern(n.parent) && (n.propertyName ?? n.name).getText(source) === name)
+      const statement = read ? statementOf(n) : null
+      if (statement && !held.has(statement)) { held.add(statement); out.push([file, statementShape(statement, source)]) }
+      ts.forEachChild(n, visit)
+    }
+    visit(source)
+  }
+  return out
+}
+
+/** THE BUILT FLAG'S WIRE: whether a station's `built` leaves the global key, and the first reason it does not. */
+export function builtPlacement({ sources }) {
+  const why = (() => {
+    for (const [file, audited] of Object.entries(BUILT_FLAGS)) {
+      if (!sources.has(file)) return `${file} is not in the tree`
+      const source = parse(file, sources.get(file))
+      const seeding = helperOf(source, audited.helper)
+      if (seeding.why) return `${file}: ${seeding.why}`
+      const flags = []
+      const find = (n) => { if (ts.isPropertyAssignment(n) && (ts.isIdentifier(n.name) || ts.isStringLiteral(n.name)) && n.name.text === audited.property) flags.push(n); ts.forEachChild(n, find) }
+      find(seeding.node)
+      if (flags.length !== 1) return `${file}#${audited.helper} sets ${audited.property} ${flags.length} times`
+      // told from the station's id alone: nothing else is named in it
+      const names = []
+      const named = (n) => { if (ts.isIdentifier(n)) names.push(n.text); ts.forEachChild(n, named) }
+      named(flags[0].initializer)
+      const other = names.find((n) => !audited.names.includes(n))
+      if (other) return `${file}#${audited.helper} tells ${audited.property} from ${other}`
+    }
+    // every read of a property of that name is an audited one, in its audited statement
+    const left = Object.fromEntries(Object.entries(BUILT_READS).map(([file, list]) => [file, list.map(([shape]) => shape)]))
+    for (const [file, shape] of propertyReads(sources, 'built')) {
+      const at = (left[file] ?? []).indexOf(shape)
+      if (at < 0) return `${file} reads a built flag in a statement that is not audited: ${shape.slice(0, 120)}`
+      left[file].splice(at, 1)
+    }
+    return null
+  })()
+  return why ? { placed: false, why } : { placed: true }
+}
+
+/* ---- THE WORDS WIRE ---- */
+/** What the fourth definition leaves out of a words file besides its display texts, while each wire holds. */
+function leftOut(file, statements, built) {
+  return { statement: statements.placed ? STATEMENT_HELPERS[file] ?? null : null, built: built.placed ? BUILT_FLAGS[file] ?? null : null }
+}
+
 /**
  * THE WORDS WIRE for each words file: placed (its display texts leave the
- * global key) or not, and the first reason it is not.
+ * global key) or not, and the first reason it is not. `blanked` is the file as
+ * the second and third definitions read it; `blanked4` as the fourth does,
+ * without the record sentences and the built flag while their wires hold.
  *   sources      sourcesAt() of the tree
  *   graph        importGraph(sources)
  *   worldFiles   the files the world's parts read (`mountWorld().files`)
+ *   statements   statementsPlacement() of the tree
+ *   built        builtPlacement() of the tree
  */
-export function wordsPlacement({ sources, graph, worldFiles = new Set() }) {
+export function wordsPlacement({ sources, graph, worldFiles = new Set(), statements = statementsPlacement({ sources }), built = builtPlacement({ sources }) }) {
   const letters = new Set([...sources.keys()].filter((f) => f.endsWith('.ts') &&
     (LETTER_MODULES.includes(f) || (graph.edges.get(f) ?? []).some((e) => LETTER_MODULES.includes(e.to)) || CANVAS_TEXT.test(sources.get(f)))))
   const canvasText = [...sources].filter(([f, t]) => f.endsWith('.ts') && CANVAS_TEXT.test(t)).map(([f]) => f)
@@ -322,7 +518,7 @@ export function wordsPlacement({ sources, graph, worldFiles = new Set() }) {
       }
       return null
     })()
-    out[file] = why ? { placed: false, why } : { placed: true, blanked: sha256(blankDisplay(sources.get(file), file)) }
+    out[file] = why ? { placed: false, why } : { placed: true, blanked: sha256(blankDisplay(sources.get(file), file)), blanked4: sha256(blankDisplay(sources.get(file), file, leftOut(file, statements, built))) }
   }
   return out
 }

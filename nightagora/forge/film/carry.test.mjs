@@ -86,8 +86,8 @@ test("the day dome's evening terms: a record rendered where they stood otherwise
   assert.deepEqual(plan.stale.map((x) => [x.id, x.moved]).sort(), [[clip.id, ['added parts']], [moved.id, ['added parts']], [still.id, ['added parts']]].sort())
 })
 
-/* ---- from the second definition to the third ---- */
-const V2 = 'library-placed-v2', G3 = 'c'.repeat(32)
+/* ---- from an older placed definition to the one now ---- */
+const V2 = 'library-placed-v2', V3 = 'library-placed-v3', G3 = 'c'.repeat(32)
 const job3 = { ...job, keys: { ...job.keys, global: G3, before: { definition: V2, global: G2 } } }
 const tree3 = { ...tree, global: G3, globals: { v1: G1, [V2]: G2, [GLOBAL_DEFINITION]: G3 }, added: {}, addedAt: new Map() }
 /** a line as this afternoon's carry from v1 to v2 wrote it */
@@ -96,9 +96,9 @@ const afternoon = (e) => {
   return { ...r, rung: { file: 'stills/wide/1920x1080/x.png', bytes: 1, sha256: 'e' }, keys: { ...r.keys, global: G2 }, carried: { from: r.keys, fromDefinition: 'v1', definition: V2, globalBefore: G1, job: 'afternoon', at: 'noon', by: 'forge/film/carry.mjs' } }
 }
 
-test('the third definition is the one now, and every older one stays named', () => {
-  assert.equal(GLOBAL_DEFINITION, 'library-placed-v3')
-  assert.deepEqual(GLOBAL_DEFINITIONS, ['v1', V2, GLOBAL_DEFINITION])
+test('the fourth definition is the one now, and every older one stays named', () => {
+  assert.equal(GLOBAL_DEFINITION, 'library-placed-v4')
+  assert.deepEqual(GLOBAL_DEFINITIONS, ['v1', V2, V3, GLOBAL_DEFINITION])
 })
 
 test('a plan names the definition it replaced, and keeps it over a plan under the same one', () => {
@@ -161,4 +161,53 @@ test('a carry names an older definition the tree was keyed under, or is refused'
   assert.throws(() => carryPlan(job3, new Map(), tree3, { from: 'v0' }), /no carry from/)
   assert.throws(() => carryPlan(job3, new Map(), { ...tree3, globals: { v1: G1, [GLOBAL_DEFINITION]: G3 } }), /was not taken/)
   assert.equal(carryPlan(job3, new Map(), tree3, { from: 'v1' }).from, 'v1')
+})
+
+/* ---- from the third definition to the fourth: a job rendered under v3, part of it carried there from v2 and v1 ---- */
+const G4 = 'e'.repeat(32)
+const job4 = { ...job, keys: { ...job.keys, global: G4, before: { definition: V3, global: G3 } } }
+const tree4 = { ...tree, global: G4, globals: { v1: G1, [V2]: G2, [V3]: G3, [GLOBAL_DEFINITION]: G4 }, added: {}, addedAt: new Map() }
+/** a line as the carry from v2 to v3 wrote it, for a record rendered under v2 */
+const evening = (e) => {
+  const r = old(e, { global: G2 })
+  return { ...r, rung: { file: 'stills/wide/1920x1080/x.png', bytes: 1, sha256: 'e' }, keys: { ...r.keys, global: G3 }, carried: { from: r.keys, fromDefinition: V2, definition: V3, globalBefore: G2, job: 'evening', at: 'dusk', by: 'forge/film/carry.mjs' } }
+}
+
+test('from v3: a record rendered under v3 and one carried there both carry, with no head asked; a moved one and an older key stay', () => {
+  const rendered = old(clip, { global: G3 }, 'unreadable')
+  const records = new Map([[clip.id, rendered], [still.id, evening(still)], [moved.id, old(moved, { global: G3, picture: 'p-old' })], [cycle.id, old(cycle, { global: G2 })]])
+  const plan = carryPlan(job4, records, tree4)
+  assert.equal(plan.from, V3, 'the job names the definition its last plan replaced')
+  assert.deepEqual(plan.carried.map((c) => c.e.id).sort(), [clip.id, still.id].sort(), 'nothing is added since v3: no head is asked')
+  assert.deepEqual(plan.stale.map((x) => [x.id, x.moved]).sort(), [[cycle.id, ['global']], [moved.id, ['picture']]].sort(), 'a v2 key is not a v3 key')
+  const byId = new Map(plan.carried.map((c) => [c.e.id, carriedRecord(c, { job: job4, at: 'night' })]))
+  const c = byId.get(clip.id), s2 = byId.get(still.id)
+  assert.deepEqual(c.keys, { motion: 'm1', picture: 'p1', global: G4, delivery: D }, 'the global key alone is new')
+  assert.deepEqual(c.carried.from, rendered.keys)
+  assert.deepEqual([c.carried.fromDefinition, c.carried.definition, c.carried.globalBefore], [V3, GLOBAL_DEFINITION, G3])
+  assert.equal(c.carried.rendered, undefined, 'rendered under v3: its files are the keys it carries from')
+  assert.deepEqual(s2.carried.rendered, { keys: old(still, { global: G2 }).keys, definition: V2 }, 'carried before: the keys of the render ride along')
+  assert.ok(stillCurrent(s2, still, job4) && stillCurrent(c, clip, job4))
+  // carried, a second carry finds nothing to do, and the gate holds each sidecar against the keys of its render
+  const dir = mkdtempSync(join(tmpdir(), 'w7-carry4-'))
+  try {
+    for (const r of [rendered, evening(still), c, s2]) appendLedger(dir, r)
+    const after = readLedger(dir)
+    const again = carryPlan({ ...job4, entries: [clip, still] }, after, tree4)
+    assert.deepEqual([again.carried.length, again.current.sort()], [0, [clip.id, still.id].sort()])
+    writeRecord(dir, { ...job4, head: 'h', entries: [clip, still], recipe: {} }, after)
+    const release = JSON.parse(readFileSync(join(dir, 'release.json'), 'utf8'))
+    assert.equal(release.definition, GLOBAL_DEFINITION)
+    const [rc] = release.clips, [rs] = release.stills
+    assert.deepEqual(rc.carried, { keys: rendered.keys, fromDefinition: V3, definition: GLOBAL_DEFINITION })
+    assert.deepEqual(rs.carried, { keys: old(still, { global: G2 }).keys, fromDefinition: V2, definition: GLOBAL_DEFINITION })
+    assert.ok(carriedHolds({ keys: rendered.keys }, rc) && carriedHolds({ keys: old(still, { global: G2 }).keys }, rs))
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('a plan under the fourth definition over a job of the third names the third, and a carry from it is allowed', () => {
+  assert.deepEqual(beforeOf({ definition: V3, global: G3, before: { definition: V2, global: G2 } }, GLOBAL_DEFINITION), { before: { definition: V3, global: G3 } })
+  assert.equal(carryFrom(job4), V3)
+  assert.equal(carryPlan(job4, new Map(), tree4, { from: V2 }).from, V2, 'an older one may still be named')
+  assert.throws(() => carryPlan(job4, new Map(), { ...tree4, globals: { v1: G1, [GLOBAL_DEFINITION]: G4 } }), /under library-placed-v3 was not taken/)
 })

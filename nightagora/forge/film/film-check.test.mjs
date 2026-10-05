@@ -466,11 +466,13 @@ test("a release is held under its own definition: one planned before the library
   assert.ok(asV1(clean.globalBefore.key, 'some-later-definition').lines.find((l) => l.name === 'keys').red.some((r) => r.at === 'release'), 'a definition this gate cannot read')
 })
 
-test('a release under the third definition reads the tree under it; one under the second still reads the tree under the second', () => {
-  const V2 = 'library-placed-v2'
-  assert.equal(clean.global.definition, 'library-placed-v3')
+test('a release under the definition now reads the tree under it; one under an older placed definition still reads the tree under its own', () => {
+  const V2 = 'library-placed-v2', V3 = 'library-placed-v3'
+  assert.equal(clean.global.definition, 'library-placed-v4')
   assert.equal(clean.globals[clean.global.definition], clean.global)
   assert.notEqual(clean.globals[V2].key, clean.global.key)
+  assert.notEqual(clean.globals[V3].key, clean.global.key)
+  assert.notEqual(clean.globals[V3].key, clean.globals[V2].key)
   const under = (definition, global) => {
     const store = release.fork()
     const rel = JSON.parse(store.read('release.json'))
@@ -488,10 +490,13 @@ test('a release under the third definition reads the tree under it; one under th
   const now = under(clean.global.definition, clean.global.key)
   assert.deepEqual(now.red, [])
   assert.ok(!now.notes.some((n) => n.startsWith('the global key is read under')), 'the definition now needs no note')
-  const v2 = under(V2, clean.globals[V2].key)
-  assert.deepEqual(v2.red, [], 'a v2 release is held against the tree under v2')
-  assert.ok(v2.notes.some((n) => n.startsWith(`the global key is read under ${V2}`)))
-  assert.ok(under(V2, clean.global.key).red.length > 0, 'v2 named, the key now: every entry red')
+  for (const older of [V2, V3]) {
+    const held = under(older, clean.globals[older].key)
+    assert.deepEqual(held.red, [], `a release under ${older} is held against the tree under it`)
+    assert.ok(held.notes.some((n) => n.startsWith(`the global key is read under ${older}`)))
+    assert.ok(under(older, clean.global.key).red.length > 0, `${older} named, the key now: every entry red`)
+  }
+  assert.ok(under(V2, clean.globals[V3].key).red.length > 0, 'v2 named, the v3 key: every entry red')
 })
 
 test('an entry carried twice holds: the release names the keys of its render, two definitions back', () => {

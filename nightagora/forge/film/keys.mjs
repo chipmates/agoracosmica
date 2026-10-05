@@ -8,8 +8,9 @@
 //   GLOBAL    the stack, the print, the light, the sky, the recipe, and the
 //             library sets no plate claims that a frame can draw, save what
 //             no frame can show (`library.mjs`): the display texts of the
-//             words records, the flat reader's records, and the reading
-//             table's page and bench (the panel's shelf state stays)
+//             words records, the flat reader's records, the reading table's
+//             page and bench (the panel's shelf state stays), a statement's
+//             record sentences and a station's built flag
 //   DELIVERY  the job image, the encoder and the rungs; a clip exempt from
 //             its byte line says so
 //
@@ -22,18 +23,20 @@ import { FILM_PACE, FPS, FRAMINGS, buildGraph } from './graph.mjs'
 import { WING_DIR, createLoader } from './load.mjs'
 import { canonicalPrint, openReplay, replayEdge, trackKey } from './replay.mjs'
 import { mountWorld } from './scene.mjs'
-import { READER_ROLES, TABLE_BENCH_FILES, TABLE_DOM_FILES, benchPlacement, fileAt, importGraph, libraryAt, readerPlacement, sourcesAt, tablePlacement, wordsPlacement } from './library.mjs'
+import { READER_ROLES, TABLE_BENCH_FILES, TABLE_DOM_FILES, benchPlacement, builtPlacement, fileAt, importGraph, libraryAt, readerPlacement, sourcesAt, statementsPlacement, tablePlacement, wordsPlacement } from './library.mjs'
 import { buildIndex, seenSet } from './seen.mjs'
 import { eveningTrack } from './evening.mjs'
 
 export const KEYS_FORMAT = 'vinci-film-keys-v1'
 /** THE GLOBAL KEY'S DEFINITION. `v1` kept every library record no plate
-    claims; `library-placed-v2` leaves out what no frame can show; this one
-    leaves out the reading table's page and bench as well. A job and a release
-    name the definition their global key was taken under (`carry.mjs`); every
+    claims; `library-placed-v2` leaves out what no frame can show;
+    `library-placed-v3` the reading table's page and bench as well; this one
+    reads two more things of a words file as display: a statement's record
+    sentences and a station's built flag. A job and a release name the
+    definition their global key was taken under (`carry.mjs`); every
     definition here stays computable, oldest first. */
-export const GLOBAL_DEFINITION = 'library-placed-v3'
-export const GLOBAL_DEFINITIONS = ['v1', 'library-placed-v2', GLOBAL_DEFINITION]
+export const GLOBAL_DEFINITION = 'library-placed-v4'
+export const GLOBAL_DEFINITIONS = ['v1', 'library-placed-v2', 'library-placed-v3', GLOBAL_DEFINITION]
 const sha256 = (text) => createHash('sha256').update(text).digest('hex')
 const short = (text) => sha256(text).slice(0, 32)
 
@@ -99,7 +102,9 @@ export function foreignParts(loader, definition = GLOBAL_DEFINITION) {
 }
 /** The parts a definition reads that an older one did not: a carry holds them
     equal between a record's render tree and the tree now. The table's shelf
-    state is no such part: the older definitions read the whole panel. */
+    state is no such part: the older definitions read the whole panel. Nor is
+    anything of the fourth: it reads less of a words file than the third, and
+    the same of everything else. */
 export function addedParts(loader, from = 'v1', to = GLOBAL_DEFINITION) {
   const before = foreignParts(loader, from)
   return Object.fromEntries(Object.entries(foreignParts(loader, to)).filter(([k]) => !(k in before)).sort())
@@ -321,17 +326,19 @@ export function globalKey(loader, { library = [], claimed = new Set(), definitio
   }
   /* A WORDS RECORD keys its recipe file with the display texts blanked; the
      flat reader's records are keyed nowhere, while their wires hold; so,
-     under v3, are the table's page and bench records */
+     from v3, are the table's page and bench records; under v4 a words file
+     is read without its record sentences and its built flag as well */
   const words = new Map(Object.entries(placement?.words ?? {}).filter(([, w]) => w.placed))
   const reader = placement?.reader?.placed ? new Set(READER_ROLES) : new Set()
-  const v3 = definition === 'library-placed-v3'
+  const v4 = definition === 'library-placed-v4', v3 = v4 || definition === 'library-placed-v3'
+  const blankedOf = (w) => (v4 ? w.blanked4 ?? w.blanked : w.blanked)
   const page = new Set([...(v3 && placement?.table?.placed ? TABLE_DOM_FILES : []), ...(v3 && placement?.bench?.placed ? TABLE_BENCH_FILES : [])])
   const kept = [], told = []
   for (const e of unclaimed) {
     if (reader.has(e.role)) continue
     const files = recipeFilesOf(e)
     if (String(e.path ?? '').startsWith('procedural/') && files.length && files.every((f) => page.has(f))) continue
-    if (String(e.path ?? '').startsWith('procedural/') && files.length === 1 && words.has(files[0])) told.push(`${e.id}|${e.path}|${words.get(files[0]).blanked}`)
+    if (String(e.path ?? '').startsWith('procedural/') && files.length === 1 && words.has(files[0])) told.push(`${e.id}|${e.path}|${blankedOf(words.get(files[0]))}`)
     else kept.push(identity(e))
   }
   parts['library sets no plate claims'] = short(kept.sort().join('\n'))
@@ -342,15 +349,18 @@ export function globalKey(loader, { library = [], claimed = new Set(), definitio
 }
 
 /** WHERE THE LIBRARY ACTS, read off the tree (`library.mjs`): the words wire of
-    each words file, the reader's wire, the table's page wire and its bench's. */
+    each words file, the reader's wire, the table's page wire and its bench's,
+    the statements' wire and the built flag's. */
 export function placeLibrary({ rev = '', overlay = {}, loader, worldFiles = [] }) {
   const sources = sourcesAt({ rev, overlay })
   const graph = importGraph(sources)
   const text = declaringText(loader)
   const shaping = [...declarations(text, GLOBAL_DECLARATIONS).values(), ...declarations(text, ['STATION_EXPOSURE', 'STATION_TOE']).values(),
     ...declarations(text, (n) => EVENING_DECLARATIONS.includes(n) || EVENING_NAME.test(n)).values()].map((node) => node.getText())
+  const statements = statementsPlacement({ sources }), built = builtPlacement({ sources })
   return {
-    words: wordsPlacement({ sources, graph, worldFiles: new Set(worldFiles) }),
+    words: wordsPlacement({ sources, graph, worldFiles: new Set(worldFiles), statements, built }),
+    statements, built,
     reader: readerPlacement({ sources, graph, frameShaping: shaping }),
     table: tablePlacement({ sources, graph, worldFiles: new Set(worldFiles), frameShaping: shaping, css: fileAt({ rev, overlay }, `${WING_DIR}/table/panel.css`) }),
     bench: benchPlacement({ sources, graph, worldFiles: new Set(worldFiles) }),
