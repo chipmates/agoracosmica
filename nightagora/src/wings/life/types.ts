@@ -131,6 +131,10 @@ export interface LifeWingWords {
    * the museum's others. */
   worksRow: Bi
   worksCount: Bi
+  /** The same sentence where one work alone has no year, and the row's count of one: one is never a
+   * numeral and German inflects it with the noun, so the wing writes both. */
+  worksCountOneUndated?: Bi
+  worksRowOne?: Bi
   /** what that row says for a period it holds nothing in */
   worksEmpty: Bi
   /** The age beside a year, in the wing's own words, so the reader that

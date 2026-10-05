@@ -27,6 +27,12 @@ const SURE_RANK: Record<string, number> = { documented: 2, inferred: 1, traditio
 const sureRank = (key: string): number => SURE_RANK[key] ?? -1
 /** a day and a year apart, the widest span an age may be said about */
 const YEAR_MS = 366 * 864e5
+/** The pictures' count where one alone has no year: one is said as a word and German inflects it. Kept out of
+ * the wing's words file, whose shape the film's global key reads. */
+const WORKS_COUNT_ONE_UNDATED: VinciText = {
+  en: '{total} pictures here. {dated} with a year in the record, one without a year.',
+  de: '{total} Bilder hier. {dated} mit einer Jahreszahl im Verzeichnis, eines ohne Jahreszahl.',
+}
 
 export const vinciLifeStud = (id: string): Stud | undefined => LINE_STUDS.find(stud => stud.id === id)
 
@@ -114,7 +120,7 @@ export function vinciLifeRecord(hangs: (exhibit: string) => boolean): LifeRecord
     here: LINE_STUDS.find(stud => stud.date === vinciHourValues.julianDate)?.id,
     words: { throughLine: vinciThroughLine, secondLine: { en: fill(vinciLifeSecondLine.en, span), de: fill(vinciLifeSecondLine.de, span) },
       honesty: { en: counted('en'), de: counted('de') }, cut: vinciLifeCut,
-      worksRow: vinciLifeWorksRow, worksCount: vinciLifeWorksCount, worksEmpty: vinciLifeWorksEmpty, age: AGE_WORDS, back: CARDS.controls.shared.back,
+      worksRow: vinciLifeWorksRow, worksCount: vinciLifeWorksCount, worksCountOneUndated: WORKS_COUNT_ONE_UNDATED, worksEmpty: vinciLifeWorksEmpty, age: AGE_WORDS, back: CARDS.controls.shared.back,
       provenance: CARDS.controls.machine.provenance, hour: vinciLifeHourMark },
     span }
 }

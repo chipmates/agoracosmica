@@ -278,7 +278,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     )
     /* A FAMILY THE RECORD HOLDS NONE OF IS NOT COUNTED. A life with no work
        in its register says nothing about works rather than counting none. */
-    if (tally.works.total) counts.insertBefore(make('p', 'wing-life-count', capitalise(fill(record.words.worksCount[language], {
+    const worksCount = tally.works.undated === 1 ? record.words.worksCountOneUndated ?? record.words.worksCount : record.words.worksCount
+    if (tally.works.total) counts.insertBefore(make('p', 'wing-life-count', capitalise(fill(worksCount[language], {
       total: spokenCount(tally.works.total, language),
       dated: spokenCount(tally.works.dated, language),
       undated: spokenCount(tally.works.undated, language),
