@@ -356,7 +356,20 @@ export function createVitrine(options: {
   function layout(): void {
     if (!open || laying) return
     laying = true
-    try { layOut() } finally { laying = false }
+    try { layOut(); keptAsShown() } finally { laying = false }
+  }
+  /** WORDS KEPT BEHIND A CARD'S SECOND DOOR come up with the window in the forms that show them there: shown,
+   * they carry no hidden attribute, or a reader of the screen skips what the eye reads; folded, the door's state returns. */
+  const keptHidden = new Set<HTMLElement>()
+  function keptAsShown(): void {
+    for (const kept of keptHidden) kept.hidden = true
+    keptHidden.clear()
+    if (!raised) return
+    for (const kept of card.querySelectorAll<HTMLElement>('.vitrine-words > .vitrine-description[hidden]')) {
+      if (view.getComputedStyle(kept).display === 'none') continue
+      keptHidden.add(kept)
+      kept.hidden = false
+    }
   }
   function layOut(): void {
     const width = view.innerWidth, height = view.innerHeight
