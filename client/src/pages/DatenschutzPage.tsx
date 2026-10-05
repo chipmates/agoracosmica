@@ -278,7 +278,7 @@ const DatenschutzPage: FC = () => {
         <section className="legal-section">
           <h2>Minderjährige / Nutzer unter 16 Jahren</h2>
           <p>
-            Gemäß Art. 8 DSGVO i.V.m. § 8 BDSG benötigen Personen unter 16 Jahren die Zustimmung eines Erziehungsberechtigten zur Nutzung des Chat-Dienstes, soweit personenbezogene Daten verarbeitet werden.
+            Gemäß Art. 8 DSGVO benötigen Personen unter 16 Jahren die Zustimmung eines Erziehungsberechtigten zur Nutzung des Chat-Dienstes, soweit personenbezogene Daten verarbeitet werden.
           </p>
           <p>Wir haben folgende Schutzmaßnahmen implementiert:</p>
           <ul>
