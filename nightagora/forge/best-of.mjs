@@ -837,7 +837,9 @@ async function stage(dir) {
     for (const what of stated.unread) warn(`${row.id}: ${what} in ${page.file} was not read for a rights notice`)
     const thumbBytes = carryRights(resized, bytes)
     const carried = Object.fromEntries(Object.entries(stated.fields).filter(([name]) => CARRIED(name)))
-    if (JSON.stringify(embeddedRights(thumbBytes).fields) !== JSON.stringify(carried)) throw new Error(`${row.id}: the thumbnail does not read back its source's rights fields`)
+    // read back from the thumbnail itself: a notice it would lose stops the run
+    const back = embeddedRights(thumbBytes)
+    if (JSON.stringify(back.fields) !== JSON.stringify(carried) || back.notice !== stated.notice) throw new Error(`${row.id}: the thumbnail does not read back its source's rights statement`)
     const kept = Object.keys(carried)
     const keptNote = kept.length ? `; the source's own rights statement kept (${[kept.some(name => !name.startsWith('iptc:')) ? 'its XMP packet whole, byte for byte' : null,
       kept.some(name => name.startsWith('iptc:')) ? 'its IIM rights datasets' : null].filter(Boolean).join(' and ')}: ${kept.join(', ')})` : ''
