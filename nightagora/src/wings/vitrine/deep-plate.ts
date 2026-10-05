@@ -529,14 +529,15 @@ export function createDeepPlatePayload(options: {
     // it opens at Home in a window that already stands.
     made.addHandler('open', () => { placeGround(); if (seated) fitHome(true); else seatNow() })
     made.addHandler('viewport-change', () => readout())
-    // HOME FOLLOWS THE BAND. A window built before the close look's band was
-    // measured fits in the old box, and the viewer carries a zoom across a
-    // resize by the diagonal: a plate still at its fit is fitted again to the
-    // box it now has, after the viewer's own resize. A view the visitor made
-    // stays, and a window with no band keeps the viewer's own rule. Sideways
-    // the work steps aside when its words open, and stands whole there too.
+    // HOME FOLLOWS THE GLASS. A window built before the close look's band was
+    // measured fits in the old box, a turned phone gives the plate another
+    // one, and the viewer carries a zoom across a resize by the diagonal: a
+    // plate still at its fit is fitted again to the box it now has, after the
+    // viewer's own resize, so the rule's corner stays the work's corner. A
+    // view the visitor made stays. Sideways the work steps aside when its
+    // words open, and stands whole there too.
     made.addHandler('resize', () => {
-      if (!(host?.banded || host?.cinema?.()) || !seated || framed || !homeZoom) return
+      if (!seated || framed || !homeZoom) return
       if (Math.abs(made.viewport.getZoom(false) - homeZoom) > homeZoom * .02) return
       queueMicrotask(() => fitHome(true))
     })
