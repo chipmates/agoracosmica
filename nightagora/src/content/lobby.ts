@@ -30,8 +30,8 @@ export const LOBBY_TEXT = {
   lineFirst: LINE_FIRST,
   lineSecond: LINE_SECOND,
   pageTitle: {
-    en: `${NAME}: a digital museum of historical figures`,
-    de: `${NAME}: digitales Museum für historische Persönlichkeiten`,
+    en: `${NAME}: a digital museum of the past, rebuilt in 3D`,
+    de: `${NAME}: digitales Museum, Geschichte in 3D nachgebaut`,
   },
   /** what follows a wing's own name in the tab while that wing stands */
   titleInside: NAME_IN_TITLE,
