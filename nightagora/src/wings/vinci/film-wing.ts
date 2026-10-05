@@ -366,37 +366,98 @@ export function createWing(): WingModule {
     chip.setAttribute('aria-hidden', 'true')
     if (!chip.isConnected) hosts.labels.append(chip)
     const sideways = form === 'cinema'
-    const marks: PictureMark[] = [...picture.marks(node, lang(), sideways)].sort((a, c) => a.x - c.x)
+    /* A WORK WITH A CLOSE LOOK KEEPS A WAY INTO IT ON A PHONE'S GLASS: every
+       mark the picture carries is placed, at its own place, lifted clear of
+       the museum's words, on its work, or at the nearest free place beside it */
+    const onPhone = form !== 'desk'
+    const marks: PictureMark[] = [...picture.marks(node, lang(), onPhone)].sort((a, c) => a.x - c.x)
     // sideways the stop's own work is placed first, so it never gives way to a neighbour's mark
     const own = sideways ? release?.nodes[node]?.exhibit : undefined
     const ordered = own ? [...marks.filter(m => m.id === own), ...marks.filter(m => m.id !== own)] : marks
     const outlines = sideways ? picture.regions(node) : []
-    /** sideways a work whose usual mark place is hidden keeps its mark on itself */
-    const onWork = (mark: PictureMark): void => {
+    /** sideways a work whose usual mark place is hidden keeps its mark on itself;
+        `apart` asks for a place whose whole target is the mark's own */
+    const onWork = (mark: PictureMark, apart = false): boolean => {
       const region = outlines.find(r => r.id === mark.id)
       const at = region && cinema ? cinema.onWork(region.points.map(([px, py]) => [b.left + px, b.top + py] as const), MARK_TARGET / 2, dots) : null
-      if (at) placeMark(mark, at.x, at.y)
+      if (!at || (apart && beside(at.x, at.y))) return false
+      placeMark(mark, at.x, at.y)
+      return true
     }
-    const hidden: PictureMark[] = []
+    // the field a phone's mark may stand on: the picture, inside the glass
+    const glass = onPhone ? markGlass() : null
+    const field = glass && { left: Math.max(glass.left, b.left + 22), top: Math.max(glass.top, b.top + 22), right: Math.min(glass.right, b.left + b.width - 22), bottom: Math.min(glass.bottom, b.top + b.height - 22) }
+    const cut = (x: number, y: number): boolean => field ? x < field.left || x > field.right || y < field.top || y > field.bottom : markCut(x - b.left, y - b.top, b)
+    const late: PictureMark[] = []
     for (const mark of ordered) {
       const x = b.left + mark.x
       let y = b.top + mark.y
       // no mark stands under the museum's own words; sideways it keeps clear of the row's controls, lifted where that is short
       if (sideways) {
-        const clear = markCut(mark.x, mark.y, b) ? null : cinema ? cinema.clear(x, y, MARK_TARGET / 2) : y
+        const clear = cut(x, y) ? null : cinema ? cinema.clear(x, y, MARK_TARGET / 2) : y
         // the works whose marks stand where they are go first; the stop's own work does not wait
-        if (clear === null) { if (mark.id === own) onWork(mark); else hidden.push(mark); continue }
+        if (clear === null) { if (mark.id !== own || !onWork(mark)) late.push(mark); continue }
         y = clear
-        if (crowded(x, y, dots)) continue
-      } else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) {
-        // upright a mark the box would swallow stands just above it, and gives way past the lift or beside another mark
+        if (crowded(x, y, dots)) { late.push(mark); continue }
+      } else if (onPhone && cut(x, y)) { late.push(mark); continue }
+      else if (avoid && x + 22 > avoid.left && x - 22 < avoid.right && y + 22 > avoid.top && y - 22 < avoid.bottom) {
+        // a mark the box would swallow stands just above it; past the lift or beside another mark the desktop's gives way
         const lifted = avoid.top - 4 - 22
-        if (y - lifted > MARK_LIFT || crowded(x, lifted, dots)) continue
+        if (y - lifted > MARK_LIFT || crowded(x, lifted, dots)) { if (onPhone) late.push(mark); continue }
         y = lifted
       }
       placeMark(mark, x, y)
     }
-    for (const mark of hidden) onWork(mark)
+    if (!late.length || !field) return
+    const blocks = markBlocks(sideways, avoid)
+    for (const mark of late) {
+      if (own !== mark.id && onWork(mark, true)) continue
+      const at = nearestFree(b.left + mark.x, b.top + mark.y, field, blocks)
+      if (at) placeMark(mark, at.x, at.y)
+    }
+  }
+  /** the glass a mark's centre may stand on: inside the notch and the home indicator, its target whole */
+  let marksGlass: HTMLDivElement | undefined
+  function markGlass(): { left: number; top: number; right: number; bottom: number } {
+    marksGlass ??= make('div', 'film-marks-glass')
+    if (!marksGlass.isConnected) hosts?.labels.append(marksGlass)
+    const g = marksGlass.getBoundingClientRect()
+    return { left: g.left + 22, top: g.top + 22, right: g.right - 22, bottom: g.bottom - 22 }
+  }
+  /** where a mark's centre may not stand on a phone: the museum's own words
+      and controls, each grown by the half target and the air the lifts keep */
+  function markBlocks(sideways: boolean, box: ReturnType<typeof chrome>): { left: number; top: number; right: number; bottom: number }[] {
+    if (!sideways) return box ? [{ left: box.left - 22, top: box.top - 26, right: box.right + 22, bottom: box.bottom + 22 }] : []
+    const grow = MARK_TARGET / 2 + 4
+    return [...(phone?.root.querySelectorAll<HTMLElement>(':scope > .film-foot > *') ?? [])]
+      .filter(seat => !seat.hidden && getComputedStyle(seat).visibility !== 'hidden')
+      .map(seat => seat.getBoundingClientRect()).filter(r => r.width && r.height)
+      .map(r => ({ left: r.left - grow, top: r.top - grow, right: r.right + grow, bottom: r.bottom + grow }))
+  }
+  /** a place whose press target would lie over a standing mark's */
+  function beside(x: number, y: number): boolean {
+    return dots.some(d => Math.abs((parseFloat(d.style.left) || 0) - x) < MARK_TARGET && Math.abs((parseFloat(d.style.top) || 0) - y) < MARK_TARGET)
+  }
+  /** THE NEAREST FREE PLACE ON THE PICTURE to a mark's own: inside the field,
+      off every block, its whole target clear of each mark standing. A step down counts
+      double, so a mark rises as the lifts do before it drops toward the
+      controls. The search steps from the mark's own column and row. Null only
+      where the field holds no such place. */
+  function nearestFree(x0: number, y0: number, field: { left: number; top: number; right: number; bottom: number },
+    blocks: readonly { left: number; top: number; right: number; bottom: number }[]): { x: number; y: number } | null {
+    const STEP = 2
+    const ax = Math.min(field.right, Math.max(field.left, x0)), ay = Math.min(field.bottom, Math.max(field.top, y0))
+    let best: { x: number; y: number } | null = null, least = Infinity
+    for (let y = ay - Math.floor((ay - field.top) / STEP) * STEP; y <= field.bottom; y += STEP) {
+      const dy = y > y0 ? 2 * (y - y0) : y0 - y
+      for (let x = ax - Math.floor((ax - field.left) / STEP) * STEP; x <= field.right; x += STEP) {
+        const far = (x - x0) ** 2 + dy ** 2
+        if (far >= least || blocks.some(r => x > r.left && x < r.right && y > r.top && y < r.bottom) || beside(x, y)) continue
+        best = { x, y }
+        least = far
+      }
+    }
+    return best
   }
   function placeMark(mark: PictureMark, x: number, y: number): void {
     if (!hosts) return
@@ -1412,7 +1473,7 @@ export function createWing(): WingModule {
       sources?.dispose(); sources = undefined
       sourceButton?.remove(); sourceButton = undefined
       picture?.dispose(); picture = undefined
-      clearMarks(); chip?.remove(); answering?.dot.remove(); answering = null
+      clearMarks(); chip?.remove(); marksGlass?.remove(); answering?.dot.remove(); answering = null
       words?.dispose(); words = undefined; wordsAt = ''
       cutCard?.remove()
       evening = undefined; eveningOn = eveningFull = eveningAsked = false

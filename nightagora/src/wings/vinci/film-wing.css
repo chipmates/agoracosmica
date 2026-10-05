@@ -249,6 +249,9 @@
 #wing[data-film='upright'][data-cut] .film-book { visibility: hidden; }
 
 /* the marks of the film stand where the live marks stand, and go with the walk */
+/* the glass a phone's marks keep to: inside the notch and the home indicator */
+.film-marks-glass { position: fixed; inset: var(--na-safe-top, env(safe-area-inset-top, 0px)) var(--na-safe-right, env(safe-area-inset-right, 0px))
+  var(--na-safe-bottom, env(safe-area-inset-bottom, 0px)) var(--na-safe-left, env(safe-area-inset-left, 0px)); visibility: hidden; pointer-events: none; }
 #wing[data-film][data-walking] .film-dot:not([data-state='walking']) { opacity: 0; pointer-events: none; }
 /* THE DESKTOP'S WAY ON is a raised field on the wall inside its gold ring;
    the marks step's own tints for it (desk-marks.css) are restated on that field */
