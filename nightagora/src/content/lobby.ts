@@ -17,6 +17,11 @@ const NAME_IN_TITLE: Bilingual = {
   en: `${NAME}, a digital museum`,
   de: `${NAME}, ein digitales Museum`,
 }
+/** what a search result reads after the name and the line: true of every wing, so it counts nothing */
+const WING_IN_SEARCH: Bilingual = {
+  en: 'Each wing is one life, in the places where it was lived, with works and sources.',
+  de: 'Jeder Flügel ist ein Leben, dort, wo es gelebt wurde, mit Werken und Quellen.',
+}
 
 /** The front door's words, with the museum's German beside its English. */
 export const LOBBY_TEXT = {
@@ -31,8 +36,8 @@ export const LOBBY_TEXT = {
   /** what follows a wing's own name in the tab while that wing stands */
   titleInside: NAME_IN_TITLE,
   searchDescription: {
-    en: `${NAME_IN_TITLE.en}. ${LINE.en}`,
-    de: `${NAME_IN_TITLE.de}. ${LINE.de}`,
+    en: `${NAME_IN_TITLE.en}. ${LINE.en} ${WING_IN_SEARCH.en}`,
+    de: `${NAME_IN_TITLE.de}. ${LINE.de} ${WING_IN_SEARCH.de}`,
   },
   tagline: LINE,
   shareLocale: { en: 'en_GB', de: 'de_DE' },
