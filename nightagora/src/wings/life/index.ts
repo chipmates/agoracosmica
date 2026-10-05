@@ -185,7 +185,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     /* THE RIBBON, and the presses laid over it. A segment is a 44 px target
        on a wide stage; on a phone the narrowest of them is seventeen pixels,
        so there the drawing is inert and the spine takes every press. */
-    const area = Math.max(240, body.getBoundingClientRect().width - (narrow ? LIFE_NARROW.padding : LIFE_WIDE.padding) * 2)
+    /* The drawing is as wide as the column the body's own padding leaves: a
+       form that pads the body by a phone's safe areas gets a narrower one. */
+    const column = view.getComputedStyle(body)
+    const area = Math.max(240, body.getBoundingClientRect().width - (parseFloat(column.paddingLeft) || 0) - (parseFloat(column.paddingRight) || 0))
     const drawn = record.events.some(event => dateYears(event.date))
     plate = drawn
       ? drawLifePlate({ record, scale, area: { width: area }, language, narrow, open: band, at,
