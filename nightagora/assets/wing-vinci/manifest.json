@@ -75,7 +75,7 @@
       "prompt": "Spoken bilingual museum labels with unchanged station names and canonical door questions. Plain source explanations and a separately opened complete record retain the original source chain, dimensional ranges, uncertainty and identical computed-hour arithmetic.",
       "model": "Deterministic TypeScript and TSL procedural geometry",
       "date": "2026-09-09",
-      "sha256": "6ce5e9eaf3bfe525779cd9dbc90032c838d32965a2a55b88841eaa2d0d192459",
+      "sha256": "30e648127f1ebb09280568ead9a4f81c73ea805cea5291fbae5f5d3e3bf0903f",
       "note": "brief/CONCEPT-OPUS.md; brief/CONCEPT-GPT6.md; src/wings/vinci/data/doors.json; recipe_file=src/wings/vinci/content.ts; visitor_evidence_recipe=src/wings/vinci/evidence-copy.ts; visitor_evidence_sha256=1154b783a9a2b7bddd75d4d1294475ae82dbe74006e4b6ff5c0eb2df9247ed00"
     },
     {

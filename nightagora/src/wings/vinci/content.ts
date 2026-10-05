@@ -440,8 +440,8 @@ const chamberPlacement = statement('chamber-placement',
   'Das Museum verortet sein Zimmer an diesem Ende, mit Blick auf das Schloss des Königs.',
   'conjectural', 'document', 'brief/CONCEPT-OPUS.md §3 S6');
 const emptyPicture = statement('picture-absence',
-  'All twenty-five positions of the hang carry a reproduction, seven admitted at the first tier, twelve at the second and six from the earlier allowlist. No position is withheld, and every work names its own source and terms.',
-  'Alle fünfundzwanzig Plätze der Hängung tragen eine Reproduktion, sieben in der ersten Stufe zugelassen, zwölf in der zweiten und sechs aus der früheren Freigabeliste. Kein Platz bleibt ausgespart, und jedes Werk nennt seine eigene Quelle und ihre Bedingungen.',
+  'All twenty-five positions of the hang carry a reproduction of a work in the public domain, and none is left empty. That makes twenty-four works, because one panel is shown from both sides. Every work names its own source and terms.',
+  'Alle fünfundzwanzig Plätze der Hängung tragen die Reproduktion eines gemeinfreien Werks, und keiner bleibt leer. Es sind vierundzwanzig Werke, denn eine Tafel wird von beiden Seiten gezeigt. Jedes Werk nennt seine eigene Quelle und ihre Bedingungen.',
   'documented', 'document', 'The room hang and the picture register', 'museum translation');
 const supper = statement('supper-record',
   'The Last Supper, 460 by 880 cm, on the north wall of the refectory of Santa Maria delle Grazie in Milan. Dry wall-painting over gesso, pitch and mastic, not fresco.',
@@ -453,7 +453,7 @@ const supperAbsence = statement('supper-absence',
   'reconstructed', 'absence', 'The picture register and the displayed reproduction source record', 'museum translation');
 const readingTable = statement('facsimile-record',
   'Manuscript B, folio 83 verso, in an 1883 photolithographic facsimile.',
-  'Manuskript B, Blatt 83 verso, in einem photolithografischen Faksimile von 1883.',
+  'Manuskript B, Blatt 83 verso, in einem fotolithografischen Faksimile von 1883.',
   'documented', 'document', 'brief/CONCEPT-GPT6.md Station 10; brief/collection/msb-pages.json');
 const readingRoom: VinciStatement = {
   ...statement('reading-room',
@@ -580,7 +580,7 @@ const seed = (
   labels, promiseSource: source,
   germanProvenance: 'museum translation',
   outdoor: id === 'arrival' || id === 'courtyard' || id === 'garden',
-  built: !['hall', 'oratory', 'study', 'chamber'].includes(id),
+  built: !['oratory', 'study', 'chamber'].includes(id),
   group: id.startsWith('line-') ? 'line' : ['arrival', 'courtyard', 'hall', 'oratory', 'study', 'chamber', 'garden'].includes(id) ? 'house' : 'collection',
 });
 
