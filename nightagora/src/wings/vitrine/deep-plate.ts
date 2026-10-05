@@ -131,6 +131,9 @@ const ZOOM_STEP = 1.4
 /** A double tap's one step in from the whole, a reading size for a line of
  * a page shown whole on a phone; the ceiling caps it. */
 const READING_STEP = 3
+/** The share of the glass the work keeps from two steps in. It may leave by
+ * the rest, so its far sides come under the rule. */
+const PAN_KEEP = .5
 /** Frames the room draws at the standing eye before it is held, so the
  * frame the viewer seats on is the arrival and not the last stride. */
 const SETTLE_FRAMES = 2
@@ -173,6 +176,7 @@ export function createDeepPlatePayload(options: {
   let library: typeof import('openseadragon') | undefined
   let live = false, seated = false, tileSize = 256, tilePixels = 256 * 256, said = ''
   let framed: DeepPlateDetail | null = null
+  let strict = false
   let grown = false, drawn = false, waiting = 0, homeZoom = 0, settled = 0, arrived = false
   let seat: VitrineRect | null = null
   /** Where the caption's words last stood on the screen, and the magnification
@@ -405,6 +409,7 @@ export function createDeepPlatePayload(options: {
     const foot = host.caption.getBoundingClientRect().height
       + (host.narrow || host.banded ? 0 : host.controls.getBoundingClientRect().height + 16)
     framed = detail
+    keep(true)
     viewer.viewport.fitBoundsWithConstraints(box, host.reducedMotion)
     // The detail is lifted by half the band the words take, in the units the
     // fit just chose; where the plate ends there, the constraint wins.
@@ -414,6 +419,7 @@ export function createDeepPlatePayload(options: {
       viewer.viewport.panBy(new library.Point(0, band / 2), host.reducedMotion)
       viewer.viewport.applyConstraints(host.reducedMotion)
     }
+    keep()
     said = ''
     speak()
     measure()
@@ -423,6 +429,21 @@ export function createDeepPlatePayload(options: {
   function magnification(): number {
     const item = viewer?.world.getItemAt(0)
     return item && viewer ? item.viewportToImageZoom(viewer.viewport.getZoom(true)) : 0
+  }
+
+  /** HELD WHOLE, LOOSER WITH EVERY STEP IN. At the whole view the work keeps
+   * the glass; what it must keep falls evenly with the magnification to
+   * PAN_KEEP two steps in, so nothing lets go at once on the way in or comes
+   * home at once on the way out. A detail is framed inside the work. */
+  function keep(inside = false): void {
+    if (!viewer || !library) return
+    strict = inside
+    // the viewport holds the option and reads it at every constraint; the library's types do not list it
+    const view = viewer.viewport as import('openseadragon').Viewport & { visibilityRatio: number }
+    const work = windowBounds()
+    const over = view.getZoom() * Math.max(work.width, work.height * view.getAspectRatio())
+    const eased = 1 - (1 - PAN_KEEP) * (over - 1) / (ZOOM_STEP * ZOOM_STEP - 1)
+    view.visibilityRatio = strict ? 1 : Math.min(1, Math.max(PAN_KEEP, eased))
   }
 
   /** THE FIRST FRAME IS THE FRAME THE VISITOR HAD. The viewer is stood on
@@ -529,6 +550,7 @@ export function createDeepPlatePayload(options: {
     // it opens at Home in a window that already stands.
     made.addHandler('open', () => { placeGround(); if (seated) fitHome(true); else seatNow() })
     made.addHandler('viewport-change', () => readout())
+    made.addHandler('zoom', () => keep(strict))
     // HOME FOLLOWS THE GLASS. A window built before the close look's band was
     // measured fits in the old box, a turned phone gives the plate another
     // one, and the viewer carries a zoom across a resize by the diagonal: a
