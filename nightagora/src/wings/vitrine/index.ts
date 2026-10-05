@@ -658,7 +658,8 @@ export function createVitrine(options: {
     cutAsked = false
     if (!cinemaFrame || root.dataset['lookForm'] !== 'beside') { cut = null; unmaskLines(body); return }
     const head = headBand()
-    cut = wholeLines(body, { from: head, reach: restReach() })
+    // at rest a row cut inside its sentence ends on a mark of more; the opened window scrolls on instead
+    cut = wholeLines(body, { from: head, reach: restReach(), mark: !raised })
     maskWholeLines(body, cut, head)
   }
   /** at rest a machine beside its words says its step in its own line, so its list of steps waits for the page read on */

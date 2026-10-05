@@ -37,6 +37,9 @@
   background:color-mix(in srgb, var(--ui-ground-sheet) 95%, transparent);border:1px solid var(--ui-line-strong);color:var(--ui-text);pointer-events:auto;user-select:text;}
 .vitrine-card:focus-visible {outline:1px solid var(--ui-way);outline-offset:3px;}
 .vitrine-body {flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;}
+/* a row cut inside its sentence ends on an ellipsis drawn out of the flow (whole-lines.ts): it moves no line */
+.vitrine-body .line-runs-on {position:relative;}
+.vitrine-body .line-runs-on::after {content:'\2026';position:absolute;left:0.25em;bottom:auto;white-space:nowrap;pointer-events:none;}
 /* ON THE PHONE THE DRAWER SCROLLS above the control row: its lower edge fades
    over the lowest line shown while more waits below (--fade from the host) */
 .vitrine[data-narrow='true'] .vitrine-body {scroll-padding-bottom:16px;}

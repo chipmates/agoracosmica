@@ -16,6 +16,63 @@ export interface LineCut {
   next: number | null
   /** the controls and pictures that lie wholly outside the cut */
   away: Element[]
+  /** where the last row shown stops inside a sentence that goes on below: the mark of more stands after it */
+  runsOn: { node: Text; at: number } | null
+}
+
+/** A row cut inside its sentence ends on this mark: an empty inline anchor whose drawn ellipsis is out of the flow,
+ * so it takes no room on the row and moves no line. */
+const RUNS_ON = 'line-runs-on'
+const SENTENCE_CLOSED = /[.!?…]["'“”„»«)\]]*\s*$/
+let measure: CanvasRenderingContext2D | null | undefined
+function ellipsisWidth(block: Element): number {
+  const style = getComputedStyle(block)
+  const size = parseFloat(style.fontSize) || 16
+  if (measure === undefined) measure = document.createElement('canvas').getContext('2d')
+  if (!measure) return size * 1.2
+  measure.font = `${style.fontStyle} ${style.fontWeight} ${style.fontSize} ${style.fontFamily}`
+  // the mark's own gap before it, as its rule sets it
+  return measure.measureText('…').width + size * 0.25
+}
+/** The last character of `block` above `foot` (viewport pixels), the row it stands on and its right edge. */
+function lastShown(block: Element, foot: number): { node: Text; at: number; right: number; top: number } | null {
+  const range = block.ownerDocument.createRange()
+  const walker = block.ownerDocument.createTreeWalker(block, NodeFilter.SHOW_TEXT)
+  let found: { node: Text; at: number; right: number; top: number } | null = null
+  for (let node = walker.nextNode() as Text | null; node; node = walker.nextNode() as Text | null) {
+    const text = node.data
+    for (let i = 0; i < text.length; i++) {
+      if (/\s/.test(text[i] ?? ' ')) continue
+      range.setStart(node, i)
+      range.setEnd(node, i + 1)
+      const r = [...range.getClientRects()].find(q => q.height > 0)
+      if (!r) continue
+      // a block's words run down the page in order: the first below the foot ends the search
+      if (r.bottom > foot + 0.5) return found
+      found = { node, at: i + 1, right: r.right, top: r.top }
+    }
+  }
+  return found
+}
+/** Take a mark of more out again, joining the words it stood between. */
+export function clearRunsOn(scroller: HTMLElement): void {
+  for (const mark of scroller.querySelectorAll<HTMLElement>(`.${RUNS_ON}`)) {
+    const before = mark.previousSibling, after = mark.nextSibling
+    const split = mark.dataset['split'] === 'true'
+    mark.remove()
+    if (split && before instanceof Text && after instanceof Text) { before.appendData(after.data); after.remove() }
+  }
+}
+function setRunsOn(at: { node: Text; at: number } | null): void {
+  if (!at || !at.node.isConnected) return
+  const mark = at.node.ownerDocument.createElement('span')
+  mark.className = RUNS_ON
+  mark.setAttribute('aria-hidden', 'true')
+  if (at.at < at.node.length) {
+    at.node.splitText(at.at)
+    mark.dataset['split'] = 'true'
+  }
+  at.node.after(mark)
 }
 
 /** what is read as one box, never split into lines: a control, a picture, a strip of leaves; a machine's step
@@ -80,7 +137,9 @@ function read(root: HTMLElement): { boxes: Box[]; stops: number[] } {
 
 /** The window of whole lines a scroller shows now: its whole height, or the band from `from` to `reach`
  * where a sheet's own head and foot stand over its words. */
-export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?: number } = {}): LineCut {
+export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?: number; mark?: boolean } = {}): LineCut {
+  // a mark of more from the last cut is read as no line: it goes before the words are measured
+  clearRunsOn(scroller)
   const frame = scroller.getBoundingClientRect()
   const edge = frame.top + scroller.clientTop
   const from = band.from ?? 0
@@ -102,6 +161,19 @@ export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?:
   if (last && (ends.get(last.block) ?? 0) > foot + 0.5 && !stops.some(s => Math.abs(s - last.bottom) < 2)) {
     const closed = stops.filter(s => s > top + 0.5 && s <= foot + 0.5 && s >= foot - SENTENCE_REACH && !straddles(s))
     if (closed.length) foot = Math.max(...closed)
+  }
+  // a row cut inside its sentence says the words go on; a row with no room left for the mark waits below with the rest
+  let runsOn: LineCut['runsOn'] = null
+  if (band.mark) {
+    const right = frame.left + scroller.clientLeft + scroller.clientWidth - (parseFloat(getComputedStyle(scroller).paddingRight) || 0)
+    for (let tries = 0; tries < 3; tries++) {
+      const low = inside().filter(b => !b.rule).reduce<Box | null>((a, b) => (a && a.bottom >= b.bottom ? a : b), null)
+      if (!low || low.whole || (ends.get(low.block) ?? 0) <= foot + 0.5) break
+      const shown = lastShown(low.block, foot + edge)
+      if (!shown || SENTENCE_CLOSED.test(shown.node.data.slice(0, shown.at))) break
+      if (right - shown.right >= ellipsisWidth(low.block)) { runsOn = { node: shown.node, at: shown.at }; break }
+      foot = low.top
+    }
   }
   // a rule left last above the foot, or first under the head, goes with the words it divides
   for (let shown = inside(); shown.length; shown = inside()) {
@@ -139,6 +211,7 @@ export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?:
     next: below ? Math.min(...hidden.map(b => b.top)) : null,
     // what stands in a sheet's own head stays: only what the cut hides is away
     away: list.filter(b => b.whole && !(from > 0 && b.top >= -0.5 && b.bottom <= from + 0.5) && (b.bottom <= top + 0.5 || b.top >= foot - 0.5)).map(b => b.block),
+    runsOn,
   }
 }
 
@@ -155,6 +228,8 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut, head = 0): v
   const style = scroller.style
   const height = scroller.clientHeight
   setAway(scroller, cut.away)
+  clearRunsOn(scroller)
+  setRunsOn(cut.runsOn)
   if (cut.top < 0.5 && cut.foot > height - 0.5) {
     style.removeProperty('mask-image'); style.removeProperty('-webkit-mask-image'); style.removeProperty('clip-path')
     return
@@ -174,6 +249,7 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut, head = 0): v
 /** Take the mask down again. */
 export function unmaskLines(scroller: HTMLElement): void {
   setAway(scroller, [])
+  clearRunsOn(scroller)
   scroller.style.removeProperty('clip-path')
   scroller.style.removeProperty('mask-image')
   scroller.style.removeProperty('-webkit-mask-image')
