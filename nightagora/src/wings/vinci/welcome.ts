@@ -43,7 +43,8 @@ export function vinciWelcomeSeen(): boolean {
   }
 }
 
-function markSeen(): void {
+/** The visit has met its opening: the door, or the card and the walk down. */
+export function markVinciWelcomeSeen(): void {
   try {
     sessionStorage.setItem(FLAG, '1')
   } catch {
@@ -190,7 +191,7 @@ export function createVinciWelcome(
       }]),
     ],
     onClose() {
-      markSeen()
+      markVinciWelcomeSeen()
       onEnter(route)
     },
   })

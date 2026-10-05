@@ -28,7 +28,7 @@ import { mountFilmWays } from './film-ways'
 import cardsSource from './data/cards.json?raw'
 import { createFilmSource, FILM_FORMAT, loadFilmRelease, LEAN_MS, type FilmEvening, type FilmRelease } from '../picture/film'
 import { walkedClip } from '../../../forge/film/walks.mjs'
-import { createVinciWelcome, vinciWelcomeSeen, type VinciWelcome } from './welcome'
+import { createVinciWelcome, markVinciWelcomeSeen, vinciWelcomeSeen, type VinciWelcome } from './welcome'
 import type { FilmLook, FilmLookWays } from './film-look'
 import type { VitrineOnward } from '../vitrine'
 import { createPictureWords, type PictureWordsLayer } from './picture-words'
@@ -158,8 +158,11 @@ export function createWing(): WingModule {
   /** An entry that names a stop stands there; any other begins at the walk's
       start where the release carries one, and walks down into the first stop
       once the opening and the door are done. Read before the frame writes
-      the address. */
-  const namedEntry = /(?:^|[#&])s=/.test(location.hash)
+      the address. The first stop's own address is what every visit writes as
+      it opens, so a reloaded or restored tab carries it: it names the stop
+      only for a visit that has met its opening, and begins like any other
+      before that. */
+  const namedEntry = /(?:^|[#&])s=/.test(location.hash) && (vinciWelcomeSeen() || !/^#s=0?$/.test(location.hash))
   let above = false
   let doorDone: (() => void) | null = null
   let hosts: WingHosts | undefined
@@ -1048,6 +1051,8 @@ export function createWing(): WingModule {
   async function descend(): Promise<void> {
     if (!above || !hosts) return
     await awaitOpening(hosts.labels, { under: way => turnLine.under(way) })
+    // the opening is met: a reload of this visit stands at its stop and opens nothing again
+    markVinciWelcomeSeen()
     if (doorStanding) await new Promise<void>(resolve => { doorDone = resolve })
     const s = picture?.state()
     if (!above || !picture || s?.kind !== 'rest' || s.node !== release?.start) return
