@@ -34,14 +34,15 @@ import type { TurntablePayload } from '../vitrine/turntable'
 import { vinciLeafSource } from './collection/deep-plate'
 import { createPlatePayload } from '../vitrine/picture'
 import { createDeepPlatePayload } from '../vitrine/deep-plate'
-import { createReaderPayload as createLeafReader } from '../vitrine/reader'
-import { FAMOUS_FOLIOS, type PageRecord } from './table/content'
+import { createReaderPayload as createLeafReader, type ReaderWay } from '../vitrine/reader'
+import type { DeepPlateSource, DeepPlateWindow } from '../vitrine/deep-plate'
+import { MIRROR_EXPLANATION, type PageRecord } from './table/content'
 import studyPageMap from './table/data/msb-pages.json?raw'
 import { assetAddress } from '../../stack/materials'
 import { loadManifest, type ManifestEntry, type ManifestIndex } from '../../manifest'
 import type { DeskOverviewCell } from '../overview'
 import { deskControl } from '../desk-story'
-import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfSource, topicExhibit, topicPages, topicPagesWord } from './table/best-of'
+import { BEST_OF_OPENING, BEST_OF_TOPICS, bestOfKey, bestOfPage, bestOfRecord, bestOfSource, topicExhibit, topicPages, topicPagesWord } from './table/best-of'
 import { createBestOfLook } from './table/best-of-look'
 import { EDITION_EXHIBIT, SHELF_BOOKS, shelfBook, shelfPlate } from './table/codex-shelf'
 import { shownAbsences } from './table/absences'
@@ -116,11 +117,41 @@ const pictureCertainty = (colour: string): VinciCertainty => {
 }
 const placeCertainty = (key: VinciPlaceCertainty): { word: string; colour: string } => ({ word: text(vinciCertaintyWords[key]), colour: certaintyColour(key) })
 
-/** THE ONE LEAF A MACHINE'S FOLIO OPENS here: manuscript B, folio 83 verso,
-    the sheet the aerial screw was read from. */
-function screwLeaf(): PageRecord | undefined {
-  const pages = (JSON.parse(studyPageMap) as { pages: PageRecord[] }).pages
-  return pages.find(page => page.page_kind === 'facsimile' && page.codex === 'B' && page.folio === 83 && page.side === 'verso')
+/** the edition of 1883's page map, read once */
+let editionPages: PageRecord[] | undefined
+const edition = (): PageRecord[] => editionPages ??= (JSON.parse(studyPageMap) as { pages: PageRecord[] }).pages
+/** THE PLATE OF THE 1883 EDITION A MACHINE WAS READ FROM: the facsimile side
+    the edition's own map names as that machine's primary folio. */
+function machinePlate(slug: MachineSlug): PageRecord | undefined {
+  return edition().find(page => page.page_kind === 'facsimile'
+    && page.machine_sources.some(source => source.slug === slug && source.relation === 'primary_folio'))
+}
+/** manuscript B, folio 83 verso, the sheet the aerial screw was read from */
+const screwLeaf = (): PageRecord | undefined => machinePlate('aerial-screw')
+
+/** THE SHEETS HELD OUTSIDE THAT EDITION, each read off its own picture against
+    the machine's record (codex, folio and side): a page of the reading
+    table's set by its id there, or a side of a whole book on the shelf by its
+    scan. A machine in neither list and not in the edition has no sheet here. */
+const SHEET_PAGE: Partial<Record<MachineSlug, string>> = {
+  'ball-bearing': 'M1.53', 'multi-barrel-gun': 'ATL.0313.1', 'parachute': 'CA.9', 'water-lifting-screw': 'ATL.0011.1',
+}
+const SHEET_SCAN: Partial<Record<MachineSlug, string>> = { 'flywheel': 'codices/madrid-i/p0224.jpg' }
+
+/** one held sheet, as the leaf reader shows it and as its record says it */
+interface MachineSheet {
+  title: string
+  /** the same name in both languages, for the record's head */
+  name: VinciText
+  shows: string
+  source: DeepPlateSource
+  window: DeepPlateWindow | null
+  thumb: string | null
+  /** the mirror's line, only where the sheet's own record turns the scan itself */
+  mirror: string | null
+  /** the reproduction's own credit, under the sheet; absent, the reader's line for a printed page */
+  credit: string | null
+  record: string[]
 }
 
 /** THE STORE'S TWO RECORDS OF THE SHEET ON THE STUDY'S SUPPORT, admitted for
@@ -267,7 +298,8 @@ export function createFilmLook(h: FilmLookHost) {
       const title = machineCatalog[slug].title[lang()]
       const words = vinciMachineCard(slug, h.narrow(), { word: text(vinciCertaintyWords.reconstructed), colour: PICTURE_CERTAINTY_KEY[2]!.colour })
       const record = (): void => h.openRecord(id, machineCatalog[slug].title, 'reconstructed', host => host.append(make('p', 'vinci-statement', text(machineCatalog[slug].label))))
-      const openFolio = slug === 'aerial-screw' ? () => openLeaf(id) : undefined
+      // the door beside the model opens the sheet itself wherever the wing holds its picture
+      const openFolio = machineSheet(slug) ? () => openLeaf(id) : undefined
       const choice = islandChoice(h.stack)
       const filmed = h.cycle(id)
       /* THE ISLAND'S BUILDERS AND THE WING'S PRINT arrive only where the island
@@ -290,7 +322,7 @@ export function createFilmLook(h: FilmLookHost) {
       const makeFilmed = filmed ? (step: number) => {
         cycle = createCyclePayload({ cycle: filmed.cycle, base: filmed.base, framing: h.framing, host: h.cycleLayer(), box: h.box,
           title, steps: vinciMachineSteps(slug), words: vinciMachineClockWords(),
-          sheet: vinciMachineSheet(slug, openFolio ?? record), land: step > 0 ? step : null })
+          sheet: sheetDoor(slug, openFolio, record), land: step > 0 ? step : null })
         return cycle
       } : null
       const payload = Object.assign(createIslandPayload({ choice: live ? choice : { mode: 'filmed', why: choice.why }, live: makeLive, filmed: makeFilmed,
@@ -384,10 +416,84 @@ export function createFilmLook(h: FilmLookHost) {
     readout,
   }
 
-  /** THE SHEET: the leaf the screw was read from, opened in the reader where
-      the visitor stands */
+  /** THE SHEET A MACHINE WAS READ FROM, where the wing holds a picture of it:
+      the plate of the 1883 edition, a page of the reading table's set, or a
+      side of a whole book on the shelf. Each stands whole, from the store's
+      own record of it, under that record's own credit. Null where none is held. */
+  function machineSheet(slug: MachineSlug): MachineSheet | null {
+    if (!assets) return null
+    const language = lang()
+    const title = machineCatalog[slug].title[language]
+    const plate = machinePlate(slug)
+    if (plate) {
+      const stem = plate.file.replace(/^.*\//, '').replace(/\.[a-z]+$/, '')
+      const near = assets.byId.get(`vinci/ms-page-near/${stem}`) ?? assets.byId.get(`vinci/ms-page/${stem}`)
+      if (!near) return null
+      const scan = near as typeof near & { width?: number; height?: number; licence?: string }
+      const thumb = assets.byId.get(`vinci/ms-thumb/${stem}`)
+      const shows = language === 'de' ? plate.what_it_shows_de : plate.what_it_shows_en
+      return { title, name: machineCatalog[slug].title, shows, window: null, thumb: thumb ? assetAddress(thumb) : null, mirror: null, credit: null,
+        source: vinciLeafSource(assets, plate.file, { file: assetAddress(near), width: scan.width ?? 0, height: scan.height ?? 0 }),
+        record: [shows, scan.licence ?? ''] }
+    }
+    const page = bestOfPage(SHEET_PAGE[slug] ?? '')
+    const found = page ? bestOfSource(page, assets) : null
+    if (page && found) {
+      const credit = (language === 'de' ? found.record.honesty_de : found.record.honesty_en) ?? found.record.licence
+      const name = page.name?.[language] ?? page.seat[language]
+      return { title: name, name: page.name ?? page.seat, shows: page.caption?.[language] ?? '', source: found.source, window: page.leaf, thumb: found.thumb,
+        // a copy in another hand has no mirror, and a scan its holder lets nobody alter is never turned
+        mirror: page.hand === 'his' && page.mirror === 'own'
+          ? (page.direction === 'ordinary' ? bestOfKey('mirror_ordinary', language) : null) ?? MIRROR_EXPLANATION[language].documented : null,
+        credit,
+        record: [page.name ? `${name} · ${page.seat[language]}` : name, page.credit, found.record.licence] }
+    }
+    const scan = bestOfRecord(assets, SHEET_SCAN[slug] ?? '')
+    if (scan?.role === 'codex-page' && scan.width && scan.height) {
+      const credit = (language === 'de' ? scan.honesty_de : scan.honesty_en) ?? scan.licence
+      return { title, name: machineCatalog[slug].title, shows: '', source: { pyramid: null, file: assetAddress(scan), width: scan.width, height: scan.height }, window: null, thumb: null,
+        mirror: MIRROR_EXPLANATION[language].documented, credit,
+        record: [...machineCatalog[slug].folio.map(folio => `${folio.codex} ${folio.folio} · ${folio.holder} · ${folio.catalogue_reference}`), credit] }
+    }
+    return null
+  }
+  /** THE DOOR BESIDE A FILMED MACHINE: the sheet where one is held. Where
+      none is, a phone's glass would promise a page and open words, so it has
+      no door and the record's own control names the sheet; a wide stage
+      keeps the sheet's name in words, which open that record. */
+  function sheetDoor(slug: MachineSlug, openFolio: (() => void) | undefined, record: () => void): ReturnType<typeof vinciMachineSheet> | undefined {
+    if (openFolio) return vinciMachineSheet(slug, openFolio)
+    return h.narrow() ? undefined : vinciMachineSheet(slug, record)
+  }
+  /** THE SHEET, opened in the reader where the visitor stands. The way back
+      to the machine is the look's own way back, as a film's sheet has it: the
+      band's arrow on the desktop, the foot row's seat on the phone, and the
+      word on the card. */
   function openLeaf(machine: string): void {
-    readLeaf(`${machine}/leaf`, () => void open(machine, null), null, 'advance')
+    const slug = machine.slice('machine/'.length) as MachineSlug
+    const sheet = machineSheet(slug)
+    if (!sheet) return
+    const door = `${machine}/leaf`
+    const words = vinciManuscriptWords()
+    const back = (): void => void open(machine, null)
+    const own = { ceiling: words.ceiling }
+    const ways: ReaderWay[] = sheet.mirror
+      ? [{ id: 'hand', label: bestOfKey('way_hand', lang()) ?? words.hand, ...own }, { id: 'mirror', label: words.mirror, mirrored: true, line: sheet.mirror, ...own }] : []
+    const step = make('button', 'vitrine-control vitrine-step', '\u2039')
+    step.type = 'button'
+    step.dataset['role'] = 'back'
+    step.setAttribute('aria-label', text(VINCI_VITRINE_WORDS.back))
+    step.addEventListener('click', back)
+    const reader = createLeafReader({
+      book: Promise.resolve({ sides: [{ id: slug, label: sheet.title, shows: sheet.shows, source: sheet.source, window: sheet.window, thumb: sheet.thumb, ways,
+        colour: certaintyColour('documented'), head: null, holder: '', ...(sheet.credit ? { honesty: sheet.credit } : {}) }],
+      stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
+      start: slug, words, tier: () => 'standard' })
+    openLook({ id: door, title: sheet.title, line: null, card: [], payload: reader,
+      controls: [control(VINCI_VITRINE_WORDS.provenance, () => h.openRecord(door, sheet.name, 'documented',
+        host => { for (const line of sheet.record) if (line) host.append(make('p', 'vinci-statement', line)) }), 'record'),
+      control(VINCI_VITRINE_WORDS.back, back, 'back'), shut()],
+      walk: [step], set: null, certainty: 'documented' }, null, 'advance')
   }
   /** THE SHEET ON THE STUDY'S SUPPORT, opened where the visitor stands, as the
       live wing opens it: one side, the sheet's own scan with its zoom; its
@@ -412,29 +518,6 @@ export function createFilmLook(h: FilmLookHost) {
     openLook({ id: door, title, line: shows || null, card: [], payload: reader,
       controls: [control(VINCI_VITRINE_WORDS.provenance, record, 'record'), shut()],
       set: stand(VINCI_STUDY_LEAF).set, certainty: 'documented' }, from, how)
-  }
-  function readLeaf(door: string, back: (() => void) | null, from: HTMLElement | null, how: 'enter' | 'advance'): void {
-    const leaf = screwLeaf()
-    if (!leaf || !assets) return
-    const stem = leaf.file.replace(/^.*\//, '').replace(/\.[a-z]+$/, '')
-    const near = assets.byId.get(`vinci/ms-page-near/${stem}`) ?? assets.byId.get(`vinci/ms-page/${stem}`)
-    const thumb = assets.byId.get(`vinci/ms-thumb/${stem}`)
-    if (!near) return
-    const scan = near as typeof near & { width?: number; height?: number; licence?: string }
-    const named = FAMOUS_FOLIOS.find(folio => folio.folio === '83v')
-    const title = lang() === 'de' ? named?.de ?? '' : named?.en ?? ''
-    const shows = lang() === 'de' ? leaf.what_it_shows_de : leaf.what_it_shows_en
-    const source = vinciLeafSource(assets, leaf.file, { file: assetAddress(near), width: scan.width ?? 0, height: scan.height ?? 0 })
-    const reader = createLeafReader({
-      book: Promise.resolve({ sides: [{ id: 'screw-leaf', label: title, shows, source, thumb: thumb ? assetAddress(thumb) : null, ways: [],
-        colour: certaintyColour('documented'), head: null, holder: '' }],
-      stripLabel: h.room, holder: '', honesty: text(VINCI_PAGE_HONESTY) }),
-      start: 'screw-leaf', words: vinciManuscriptWords(), tier: () => 'standard' })
-    openLook({ id: door, title, line: null, card: [], payload: reader,
-      controls: [control(VINCI_VITRINE_WORDS.provenance, () => h.openRecord(door, { en: named?.en ?? '', de: named?.de ?? '' }, 'documented',
-        host => { for (const line of [shows, scan.licence ?? '']) if (line) host.append(make('p', 'vinci-statement', line)) }), 'record'),
-      ...(back ? [control(VINCI_VITRINE_WORDS.back, back, 'back')] : []), shut()],
-      set: null, certainty: 'documented' }, from, how)
   }
 
   /** THE FILM OF WHAT A SHEET DESCRIBES, as the sheet's close look: the film
