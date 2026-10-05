@@ -284,8 +284,10 @@ export function createReaderPayload(options: {
       payload.open(sideOf(key))
     },
     renderRecord(record) {
-      const here = payload.current()
-      const page = (here ? pages.find(entry => folioKey(entry) === here.id) : undefined) ?? pages[at]!
+      // a side shows its facsimile; the leaf's facing print shares its key and stands before it in the edition
+      const shown = (id: string | undefined): PageRecord | undefined => id === undefined ? undefined
+        : pages.find(entry => entry.page_kind === 'facsimile' && folioKey(entry) === id) ?? pages.find(entry => folioKey(entry) === id)
+      const page = shown(payload.current()?.id) ?? pages[at]!
       at = page.edition_index
       const full = document.createElement('div')
       full.className = 'vinci-record'
@@ -339,6 +341,21 @@ export function createReaderPayload(options: {
       full.append(leaves, buildShownAbsences(language))
       // THE PAGE-RECORD SELECTORS: every record of the edition and every
       // represented leaf stays reachable by name.
+      const selects: { select: HTMLSelectElement; value: (page: PageRecord) => string }[] = []
+      // both name the page the window shows, after a choice in either
+      const follow = (): void => {
+        const now = shown(payload.current()?.id)
+        if (!now) return
+        for (const { select, value } of selects) {
+          const index = [...select.options].findIndex(option => option.value === value(now))
+          if (index >= 0) select.selectedIndex = index
+        }
+      }
+      // a printed page opens the leaf it belongs to; a page of no leaf opens the nearest one
+      const leafOf = (key: string): string => {
+        const chosen = key.startsWith('edition:') ? pages[Number(key.slice('edition:'.length))] : undefined
+        return chosen && chosen.codex && chosen.folio !== null && chosen.side ? folioKey(chosen) : sideOf(key)
+      }
       const selector = (label: string, records: readonly PageRecord[], value: (page: PageRecord) => string,
         text: (page: PageRecord) => string): void => {
         const wrap = document.createElement('label')
@@ -358,7 +375,8 @@ export function createReaderPayload(options: {
         }
         const current = [...select.options].findIndex(option => option.value === here)
         if (current >= 0) select.selectedIndex = current
-        select.addEventListener('change', () => payload.open(select.value))
+        select.addEventListener('change', () => { payload.open(leafOf(select.value)); follow() })
+        selects.push({ select, value })
         wrap.append(select)
         full.append(wrap)
       }
