@@ -31,7 +31,7 @@
         { "id": "certainty", "from": "machines/data/<slug>.json, the dossier's status and scope", "register": "label" },
         { "id": "absence", "from": "machines/bench/registers.ts BENCH_ABSENCE, where one exists", "register": "label" }
       ],
-      "record": "the folio, the arithmetic and what the sheet does not say, from machines/data/records.json; the twenty eight partial records read as sheets with their gaps, never as completed machines"
+      "record": "the folio, the arithmetic and what the sheet does not say, from machines/data/records.json; the twenty seven partial records read as sheets with their gaps, never as completed machines"
     },
     "manuscript": {
       "fields": [
@@ -87,8 +87,10 @@
     { "en": "1 mm", "de": "1 mm" },
     { "en": "5 mm", "de": "5 mm" },
     { "en": "1 cm", "de": "1 cm" },
+    { "en": "2 cm", "de": "2 cm" },
     { "en": "5 cm", "de": "5 cm" },
     { "en": "10 cm", "de": "10 cm" },
+    { "en": "20 cm", "de": "20 cm" },
     { "en": "50 cm", "de": "50 cm" }
   ],
   "floor_honesty": {

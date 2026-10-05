@@ -340,10 +340,10 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": "1492 to1497",
+            "range": "the 1490s",
             "certainty": "B",
             "source": "BNE-DATE",
-            "note": "Approximate manuscript dating, not a dated completion record."
+            "note": "The codex carries two written dates, 1 January 1493 on folio 1 verso and 28 September 1497 on the leaf before it. The holder gives only a span from 1400 to 1599, with a question mark. Approximate manuscript dating, not a dated completion record."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/22/2718/sheet_20190205095335500504.jpg",
           "image_licence_quote": null,
@@ -578,10 +578,10 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": "1492 to1497",
+            "range": "the 1490s",
             "certainty": "B",
             "source": "BNE-DATE",
-            "note": "Approximate manuscript dating, not a dated completion record."
+            "note": "The codex carries two written dates, 1 January 1493 on folio 1 verso and 28 September 1497 on the leaf before it. The holder gives only a span from 1400 to 1599, with a question mark. Approximate manuscript dating, not a dated completion record."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/22/2889/sheet_20190205095542344302.jpg",
           "image_licence_quote": null,
@@ -696,10 +696,10 @@
           "commission_reference": "inclinometer, unspecified folio",
           "correction": null,
           "date": {
-            "range": "about1480 to1490",
-            "certainty": "U",
+            "range": "about 1485",
+            "certainty": "B",
             "source": "s-folio",
-            "note": "No dated inscription verified for this instrument."
+            "note": "Standard catalogue (Pedretti 1979, Marani 2004): c. 1485; the holder's site gives 1485. It is the recto of the parachute's sheet. No dated inscription verified for this instrument."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1313/sheet_20190204173102299793.jpg",
           "image_licence_quote": null,
@@ -817,10 +817,10 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": null,
-            "certainty": "U",
+            "range": "about 1495 to 1497",
+            "certainty": "B",
             "source": "EL-LATHE",
-            "note": "Approximate manuscript dating, not a dated completion record."
+            "note": "Standard catalogue (Pedretti 1978, Marani 2015): c. 1495 to 1497; the holder's site gives 1495. Approximate manuscript dating, not a dated completion record."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1451/sheet_20190204173349592621.jpg",
           "image_licence_quote": null,
@@ -927,17 +927,17 @@
       "folio": [
         {
           "codex": "Codex Atlanticus",
-          "folio": "656r, detail a",
+          "folio": "656a recto",
           "holder": "Veneranda Biblioteca Ambrosiana",
-          "catalogue_reference": "Codex Atlanticus f. 656r, detail a",
+          "catalogue_reference": "Codex Atlanticus f. 656a recto, old 240 recto-c, Leonardo//thek@ ATL.1311.1",
           "catalogue_url": "https://www.leonardodigitale.com/sfoglia/codice-atlantico/0656-r/",
           "verification": "verified",
           "commission_reference": "Miter lock gate, Naviglio",
           "correction": null,
           "date": {
-            "range": "about 1499 to 1506",
+            "range": "about 1493 to 1495, or about 1506",
             "certainty": "B",
-            "note": "Watermark study dates about 1499. Milan museum favours about 1506."
+            "note": "Two datings. The standard catalogue gives c. 1493 to 1495 and the holder's site 1493; a watermark study of 2022 places the paper before 1500 and agrees. The Milan museum favours about 1506."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/2547/sheet_20190204175615409630.jpg",
           "image_licence_quote": null,
@@ -1054,7 +1054,7 @@
           "verification": "verified",
           "commission_reference": "157r",
           "correction": null,
-          "date": "Circa1480 to1490, B broad reconstruction dating, exact year unresolved.",
+          "date": "About 1480 to 1482 (Pedretti 1978, Marani 2009); about 1480 to 1487 (Landrus 2010); the holder's site gives 1480. Exact year unresolved.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1549/sheet_20190204173535135230.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -1410,10 +1410,10 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": "1487 to1490",
+            "range": "1487 to 1489",
             "certainty": "B",
             "source": "EL-CRANE",
-            "note": "Approximate manuscript dating, not a dated completion record."
+            "note": "The holder dates the notebook: Carnet B, about 1487 to 1489 (Bibliothèque de l’Institut de France, Ms 2173). Approximate manuscript dating, not a dated completion record."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/12/820/sheet_20190415182951946413.JPG",
           "image_licence_quote": null,
@@ -2250,10 +2250,10 @@
           "commission_reference": null,
           "correction": null,
           "date": {
-            "range": "1492 to1497",
+            "range": "the 1490s",
             "certainty": "B",
             "source": "BNE-DATE",
-            "note": "Approximate manuscript dating, not a dated completion record."
+            "note": "The codex carries two written dates, 1 January 1493 on folio 1 verso and 28 September 1497 on the leaf before it. The holder gives only a span from 1400 to 1599, with a question mark. Approximate manuscript dating, not a dated completion record."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/22/2697/sheet_20190205095319864610.jpg",
           "image_licence_quote": null,
@@ -2508,8 +2508,9 @@
           "commission_reference": "CA909v",
           "correction": null,
           "date": {
-            "range": "About1500, provisional contextual dating",
-            "certainty": "U"
+            "range": "about 1485 to 1487",
+            "certainty": "B",
+            "note": "Standard catalogue: c. 1485 to 1487 (Pedretti 1979), c. 1485 (Marani 2004); the holder's site gives 1485. The older dating of about 1500 (Solmi 1924) is rejected by Pedretti."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/21/3545/sheet_20190320184632116060.jpg",
           "image_licence_quote": null,
@@ -2989,7 +2990,7 @@
           "verification": "verified",
           "commission_reference": "149r",
           "correction": null,
-          "date": "Usually circa1488 to1489 in reconstruction literature, B. Holder page confirms sheet, not this narrow date.",
+          "date": "About 1485 (Pedretti 1978; the holder's site gives 1485); about 1485 to 1492 (Landrus 2010). The 1488 to 1489 of the reconstruction literature has no source here.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1533/sheet_20190204173515429547.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -3227,10 +3228,10 @@
           "commission_reference": "MadridI glider,unspecified folio",
           "correction": "Lower gliding device on64r. The20braccia dimension belongs to the upper wind-driven rotating device, not securely to the lower glider.",
           "date": {
-            "range": "about1490to1499",
+            "range": "the 1490s",
             "certainty": "B",
             "source": "s-record",
-            "note": "Broad notebook dating. No exact date for64r verified."
+            "note": "Broad notebook dating: the codex carries the dates 1 January 1493 and 28 September 1497. No exact date for 64r verified."
           },
           "image_url": "https://backend.leonardodigitale.com/images/books/22/2789/sheet_20190205095425982918.jpg",
           "image_licence_quote": null,
@@ -3466,7 +3467,7 @@
           "verification": "partially_verified",
           "commission_reference": "579r",
           "correction": "Folio exists and transcript inspected. Identification as a unified knight is a modern reconstruction claim, not a holder classification.",
-          "date": "Circa1495 often proposed for knight reconstruction, B. Dates of separate fragments need separate confirmation.",
+          "date": "About 1497 (Pedretti 1979); the holder's site gives 1497. About 1495 is often proposed for the knight, a modern reconstruction from these separate fragments.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/2393/sheet_20190204175241097026.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -3480,7 +3481,7 @@
           "verification": "partially_verified",
           "commission_reference": "1077r",
           "correction": "Folio exists and transcript inspected. Identification as a unified knight is a modern reconstruction claim, not a holder classification.",
-          "date": "Circa1495 often proposed for knight reconstruction, B. Dates of separate fragments need separate confirmation.",
+          "date": "About 1495 to 1497 (Pedretti 1979); the holder's site gives 1495. About 1495 is often proposed for the knight, a modern reconstruction from these separate fragments.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1351/sheet_20190204173148497941.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -3494,7 +3495,7 @@
           "verification": "partially_verified",
           "commission_reference": "1021r",
           "correction": "Folio exists and transcript inspected. Identification as a unified knight is a modern reconstruction claim, not a holder classification.",
-          "date": "Circa1495 often proposed for knight reconstruction, B. Dates of separate fragments need separate confirmation.",
+          "date": "About 1495 to 1497 (Pedretti 1979); the holder's site gives no year. About 1495 is often proposed for the knight, a modern reconstruction from these separate fragments.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1239/sheet_20190204172941804531.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
@@ -3508,7 +3509,7 @@
           "verification": "partially_verified",
           "commission_reference": "1021v",
           "correction": "Folio exists and transcript inspected. Identification as a unified knight is a modern reconstruction claim, not a holder classification.",
-          "date": "Circa1495 often proposed for knight reconstruction, B. Dates of separate fragments need separate confirmation.",
+          "date": "About 1495 to 1497 (Pedretti 1979); the holder's site gives no year. About 1495 is often proposed for the knight, a modern reconstruction from these separate fragments.",
           "image_url": "https://backend.leonardodigitale.com/images/books/21/1240/sheet_20190204172943639301.jpg",
           "image_licence_quote": "Ogni utilizzo a scopo di studio o di natura editoriale deve essere richiesto a Mondadori Portfolio",
           "licence_source": "https://www.ambrosiana.it/scopri/capolavori/richiesta-immagini/"
