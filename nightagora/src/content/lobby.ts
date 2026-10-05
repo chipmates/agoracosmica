@@ -1,12 +1,16 @@
 import type { Bilingual } from '../wings/content'
 
-/* THE MUSEUM'S NAME AND ITS LINE. Decided words: the name is the same in both
-   languages, and a title or a sentence that opens with it names it a digital
-   museum. */
+/* THE MUSEUM'S NAME, ITS DESCRIPTOR AND ITS LINE. Decided words: the name is
+   the same in both languages, the descriptor stands beside it wherever the
+   name first appears, and the line is two sentences that break between them. */
 const NAME = 'Museum of Ages'
+/** inside a running sentence the name keeps to one line (no-break spaces) */
+const NAME_SET = NAME.replaceAll(' ', '\u00a0')
+const LINE_FIRST: Bilingual = { en: 'We rebuild what was.', de: 'Wir bauen nach, was war.' }
+const LINE_SECOND: Bilingual = { en: 'You walk through it.', de: 'Du gehst hinein.' }
 const LINE: Bilingual = {
-  en: 'We rebuild what was. You walk through it.',
-  de: 'Wir bauen nach, was war. Du gehst hinein.',
+  en: `${LINE_FIRST.en} ${LINE_SECOND.en}`,
+  de: `${LINE_FIRST.de} ${LINE_SECOND.de}`,
 }
 /** the name with its descriptor inside a title or a sentence of its own */
 const NAME_IN_TITLE: Bilingual = {
@@ -17,6 +21,9 @@ const NAME_IN_TITLE: Bilingual = {
 /** The front door's words, with the museum's German beside its English. */
 export const LOBBY_TEXT = {
   name: { en: NAME, de: NAME },
+  descriptor: { en: 'Digital museum', de: 'Digitales Museum' },
+  lineFirst: LINE_FIRST,
+  lineSecond: LINE_SECOND,
   pageTitle: {
     en: `${NAME}: a digital museum of historical figures`,
     de: `${NAME}: digitales Museum für historische Persönlichkeiten`,
@@ -35,15 +42,15 @@ export const LOBBY_TEXT = {
     de: 'Dreißig Leben in einem digitalen Museum. Dort, wo sie lebten, zu einer bestimmten Stunde an einem wirklichen Tag.',
   },
   descentWalk: {
-    en: 'Welcome to Night Agora. Walk where they lived and look closer at what they made.',
-    de: 'Willkommen in der Night Agora. Geh, wo sie lebten, und schau genauer hin, was sie schufen.',
+    en: `Welcome to ${NAME_SET}. Walk where they lived and look closer at what they made.`,
+    de: `Willkommen im ${NAME_SET}. Geh, wo sie lebten, und schau genauer hin, was sie schufen.`,
   },
   tonight: { en: 'Tonight', de: 'Heute Nacht' },
   firstLight: { en: 'First light', de: 'Das erste Licht' },
   /** the front door's one way on, and the museum's own word for it */
   enterMuseum: { en: 'Enter the museum', de: 'Museum betreten' },
   descend: { en: 'Scroll to descend', de: 'Scrolle, um hinabzugehen' },
-  fireStatus: { en: 'Night Agora · scroll to look up', de: 'Night Agora · scrolle, um nach oben zu schauen' },
+  fireStatus: { en: `${NAME_SET} · scroll to look up`, de: `${NAME_SET} · scrolle, um nach oben zu schauen` },
   /* THE ONE SENTENCE AT THE FIRE. It is the museum's whole instruction to a
      visitor who has just arrived: one string per language, changed here. */
   fireLine: {

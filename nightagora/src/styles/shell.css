@@ -25,6 +25,19 @@
   gap: 18px;
 }
 .brand::before, .brand::after { width: 16px; background: var(--press-hairline); }
+/* THE NAME'S DESCRIPTOR rides in the masthead's own line, a step quieter. Its
+   measures are in em: a rule that takes the masthead's type to nothing (a
+   sheet on a phone inside a wing) takes these words with it. */
+.brand { align-items: baseline; }
+.brand::before, .brand::after { align-self: center; }
+.brand-desc {
+  font-family: var(--press-ui);
+  font-size: .74em;
+  font-variant-caps: normal;
+  letter-spacing: .2em;
+  text-indent: 0;
+  color: color-mix(in srgb, currentColor 72%, transparent);
+}
 #veil { padding-bottom: calc(45px + env(safe-area-inset-bottom)); }
 #veil h1 {
   font-family: var(--press-display);
@@ -37,6 +50,8 @@
   max-width: 860px;
   margin-inline: auto;
 }
+/* the line is two sentences and breaks only between them */
+#veil h1 span { display: block; }
 .descent-beat:first-of-type { top: 19%; }
 .descent-ask { max-width: 28em; font-size: clamp(23px, 2.5vw, 34px); }
 .tagline {
@@ -56,6 +71,15 @@
   color: var(--press-muted);
 }
 body.door .status { animation: none; }
+/* the status names the museum, so the longer language wraps: in two even lines */
+.status { text-wrap: balance; }
+/* A SHORT STAGE (a phone held sideways) sets the line as one line and brings
+   it down to the way on, so it stands under the eclipse and not across it. */
+@media (max-height: 480px) and (min-aspect-ratio: 9/10) {
+  #veil h1 span { display: inline-block; }
+  .status { margin-top: 8px; }
+  body #enter-museum { margin-top: 16px; }
+}
 #overture-skip {
   margin-top: 10px;
   padding: 10px 18px;
@@ -213,6 +237,13 @@ body.door .status { animation: none; }
 @media (max-width: 620px) {
   .brand { top: calc(23px + env(safe-area-inset-top)); font-size: 13px; letter-spacing: .18em; text-indent: .18em; gap: 14px; }
   .brand::before, .brand::after { width: 12px; }
+  /* a narrow stage has no room for both in one line: the descriptor steps
+     under the name, and the lobby's plate steps down with it */
+  .brand { flex-wrap: wrap; row-gap: 0; }
+  .brand-desc { order: 1; flex-basis: 100%; font-size: .8em; text-align: center; text-indent: .2em; line-height: 1.5; }
+  #lobby-plate { top: calc(72px + env(safe-area-inset-top)); }
+  /* the sky's own plate begins under the lobby's, on a short phone too */
+  #constellation-plate { top: max(11%, calc(100px + env(safe-area-inset-top))); }
   #veil { padding: 0 24px calc(32px + env(safe-area-inset-bottom)); }
   #veil h1 { font-size: clamp(25px, 6.8vw, 34px); line-height: 1.2; letter-spacing: -.015em; }
   .tagline { max-width: 290px; margin: 20px auto 0; font-size: 10px; letter-spacing: .14em; text-indent: .14em; line-height: 1.8; }
