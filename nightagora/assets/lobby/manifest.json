@@ -1832,6 +1832,19 @@
       "source_sha1": "7d54532cb41dd67764948ae8dc3f59e1307bc8f9",
       "honesty_en": "Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the photograph. Non-profit cultural use.",
       "honesty_de": "Gemeinfreies Werk. Reproduktion von Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Fotografie. Nichtkommerzielle kulturelle Nutzung."
+    },
+    {
+      "id": "lobby/museum-sign",
+      "path": "static/sign/",
+      "wing": "lobby",
+      "class": "GENERATED",
+      "licence": "The museum's own sign, drawn for it; © ChipMates gemeinnützige GmbH.",
+      "display": true,
+      "prompt": "The museum's sign: the first stones of a built arch and one chalk line that completes the opening, drawn by hand in SVG code; a 32 px tab cut and a 180 px home-screen cut.",
+      "model": "Claude Opus 5.5 design seat, SVG written by hand in code; the PNG cuts drawn from the SVG with Pillow",
+      "date": "2026-10-05",
+      "source_url": "/static/sign/*.png",
+      "note": "Served from public/static/sign/ beside the app, byte-equal to the site's own copies: tab-32.png 3b00a0763dad2951, tab.svg 3786880aa48892fa, home-180.png b516ae20e11de541 (sha256, first 16)."
     }
   ]
 }
