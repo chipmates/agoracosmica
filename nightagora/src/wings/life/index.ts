@@ -197,7 +197,7 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const drawn = record.events.some(event => dateYears(event.date))
     /* SIDEWAYS THE STRIP TAKES THE HEIGHT THE GLASS SPARES: what is left of
        the first screen under the head and over the foot is the drawing's. */
-    const side = !narrow && view.getComputedStyle(dialog).getPropertyValue('--life-form').trim() === 'side'
+    const side = sideways()
     const frame = view.getComputedStyle(drawing)
     const room = dialog.clientHeight - foot.offsetHeight - LIFE_SIDE.air - head.offsetHeight
       - (parseFloat(frame.paddingTop) || 0) - (parseFloat(frame.paddingBottom) || 0)
@@ -294,6 +294,10 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       longest: spokenCount(tally.longestGapYears, language),
     }))), counts.lastElementChild)
     restAtTheFoot(side)
+  }
+
+  function sideways(): boolean {
+    return !options.narrow() && view.getComputedStyle(dialog).getPropertyValue('--life-form').trim() === 'side'
   }
 
   /** A PRESS IS 44 PX WIDE, also over a block that is narrower. Where every
@@ -696,6 +700,18 @@ export function createWingLife(options: WingLifeOptions): WingLife {
        stands whole again. Only the chip row moves sideways. */
     showTheChip(id)
     if (options.narrow()) { reading.scrollTop = 0; foldTheHead() }
+    /* SIDEWAYS THE READING STANDS UNDER THE FIRST SCREEN: a period pressed on
+       the strip brings it up, so the press shows what it opened, with the
+       period's own item in view in the list beside it. */
+    else if (from === 'ribbon' && sideways()) {
+      const item = spine.querySelector<HTMLElement>(`.wing-life-item[data-band="${id}"]`)
+      if (item) {
+        const box = item.getBoundingClientRect(), pane = spine.getBoundingClientRect()
+        if (box.top < pane.top) spine.scrollTop -= pane.top - box.top
+        else if (box.bottom > pane.bottom) spine.scrollTop += box.bottom - pane.bottom
+      }
+      dialog.scrollTo({ top: dialog.scrollHeight, behavior: noMotion.matches ? 'auto' : 'smooth' })
+    }
   }
 
   /** ONE DATE IS UNFOLDED WHERE IT STANDS. The body is built into the element
