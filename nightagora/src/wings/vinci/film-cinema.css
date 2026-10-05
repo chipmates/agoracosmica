@@ -426,14 +426,16 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* the walk's seats and gold are the look's steps and its one close: the card's own stand down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more[hidden] { display: none; }
-/* the name gives the close mark its corner of the column's head */
-#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-name { padding-right: 44px; }
+/* the name gives the close mark its corner of the column's head, and the words keep 12 px clear of the mark:
+   a name too long for its row breaks, and the first line under the mark starts that far below it */
+#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-name { margin-bottom: 12px; padding-right: 44px; }
+#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-name-text { -webkit-hyphens: auto; hyphens: auto; }
 /* AT REST THE LABEL IS WHAT IT SHOWS: its words stand still, and the key opens the reading window for the rest */
 #wing[data-film='cinema'] .vitrine[data-look-form='beside']:not([data-look-open]) .vitrine-body { overflow: hidden; }
 /* THE READING WINDOW, sideways: the column takes most of the glass and the work, still whole, what is left; the
    name stays at the head while the words pass under it, and a swipe down on it folds the window as its key does */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-name {
-  position: sticky; top: 0; z-index: 1; margin-bottom: 0; padding-bottom: 6px; background: var(--ui-ground); touch-action: none;
+  position: sticky; top: 0; z-index: 1; margin-bottom: 0; padding-bottom: 12px; background: var(--ui-ground); touch-action: none;
 }
 /* while it is read, what belongs to the work stands down (a book keeps its pager), and the window holds a machine's
    words whole: what its second door kept comes up with it. That door stands down at rest too: the column has one
