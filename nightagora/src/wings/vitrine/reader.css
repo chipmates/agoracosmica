@@ -59,6 +59,8 @@
    a second line would stand on the strip. */
 .reader-row {display:flex;flex-wrap:nowrap;align-items:stretch;gap:6px;}
 .reader-row[hidden],.reader-row .vitrine-step[hidden] {display:none;}
+/* a row whose every seat stands down stands down with them */
+.reader-row:not(:has(> :not([hidden]))) {display:none;}
 .reader-row .vitrine-step {flex:0 0 44px;}
 .reader-way {flex:1 1 0;min-width:0;}
 .reader-way[hidden] {display:none;}
@@ -108,6 +110,8 @@
   .reader-row .reader-zoom [data-zoom='nearer']::before {content:'+';font:400 20px/1 var(--sans);}
   .reader-row .reader-zoom [data-zoom='further']::before {content:'\2212';font:400 20px/1 var(--sans);}
 }
+/* on a phone the plate's steps have left the row (the fingers zoom): their empty seat takes no room */
+.vitrine[data-narrow='true'] .reader-row .reader-zoom:not(:has(*)) {display:none;}
 
 /* THE WHOLE TEXT ON THE RAISED CARD: the passages one under another, the lead
    marked, the bare labels small */

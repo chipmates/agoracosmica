@@ -162,6 +162,11 @@ export interface ReaderRoom {
   leave(): void
 }
 
+/** What a reader of the screen hears on a phone's one turn between two
+ * ways, before the name of the way standing now ("Now showing: His hand").
+ * Never drawn. */
+const TURN_SAYS = { en: 'Now showing', de: 'Jetzt zu sehen' } as const
+
 /** Frames the room draws before it may be held, after the last change. */
 const SETTLE_FRAMES = 2
 /** A swipe on the glass turns the side: this far across, and no further
@@ -204,7 +209,12 @@ export function createReaderPayload(options: {
   /** Which side of the book each cell of the strip stands for. */
   const cellOf: number[] = []
   const ways: HTMLButtonElement[] = []
+  /** ON A PHONE ONE TURN STANDS FOR TWO WAYS: it names the way it leads to,
+      and says the way standing now to a reader of the screen */
+  let turn: HTMLButtonElement | undefined, turnSaid: HTMLElement | undefined
   const steps: { previous?: HTMLButtonElement; next?: HTMLButtonElement } = {}
+  /** the row the steps and the ways are made in; a phone's window may stand a step elsewhere */
+  let stepRow: HTMLElement | undefined
   /** SIDEWAYS THE PAGER'S MIDDLE: where the side stands in its book, which
       opens the strip of its leaves; it stands only while the form does */
   let count: HTMLButtonElement | undefined
@@ -459,17 +469,24 @@ export function createReaderPayload(options: {
   /** The ways as one segmented control, and the two that step one side. */
   function paintControls(): void {
     const shown = waysOf(side())
+    const turned = Boolean(host?.narrow) && shown.length === 2
     for (const [index, button] of ways.entries()) {
       const label = shown[index]
       if (!label || !button) continue
       button.textContent = label.label
       button.setAttribute('aria-pressed', String(index === way))
-      button.hidden = false
+      button.hidden = turned
     }
     for (let index = shown.length; index < ways.length; index++) ways[index]!.hidden = true
+    if (turn && turnSaid) {
+      const to = shown[way === 0 ? 1 : 0], now = shown[way]
+      turn.hidden = !turned
+      turn.textContent = turned && to ? to.label : ''
+      turnSaid.textContent = turned && now && host ? `${TURN_SAYS[host.lang]}: ${now.label}` : ''
+    }
     // A PAGE WITH ONE WAY HAS NO SEGMENTS, and the two that step the book
     // take the row rather than standing in a corner of it.
-    steps.previous?.parentElement?.setAttribute('data-ways', String(shown.length))
+    stepRow?.setAttribute('data-ways', String(turned ? 0 : shown.length))
     if (steps.previous) steps.previous.disabled = at <= 0
     if (steps.next) steps.next.disabled = !book || at >= book.sides.length - 1
     /* A BOOK OF ONE SIDE HAS NOTHING TO STEP: its two steps stand down, and a
@@ -477,8 +494,7 @@ export function createReaderPayload(options: {
     const single = !book || book.sides.length < 2
     if (steps.previous) steps.previous.hidden = single
     if (steps.next) steps.next.hidden = single
-    const row = steps.previous?.parentElement
-    if (row) row.hidden = single && shown.length === 0
+    if (stepRow) stepRow.hidden = single && shown.length === 0
     // A STEP THAT CROSSES INTO ANOTHER VOLUME OR PART NAMES WHERE IT LANDS, so
     // the way on says the book changes before the next side stands.
     for (const [step, to] of [[steps.previous, at - 1], [steps.next, at + 1]] as const) {
@@ -662,11 +678,18 @@ export function createReaderPayload(options: {
    * a hand turning a leaf and never a pan that went nowhere. */
   function watchSwipe(element: HTMLElement): void {
     let from: { x: number; y: number; id: number } | null = null
+    // TWO FINGERS ARE A PINCH, never a turn: the second one down ends the swipe the first began
+    const down = new Set<number>()
     element.addEventListener('pointerdown', event => {
-      if (!event.isPrimary || from) return
+      // a first finger is first whatever an earlier touch left behind
+      if (event.isPrimary) { down.clear(); from = null }
+      down.add(event.pointerId)
+      if (down.size > 1) { from = null; return }
+      if (!event.isPrimary) return
       from = { x: event.clientX, y: event.clientY, id: event.pointerId }
     }, { signal: listening.signal, capture: true })
     const end = (event: PointerEvent): void => {
+      down.delete(event.pointerId)
       if (!from || event.pointerId !== from.id) return
       const dx = event.clientX - from.x, dy = event.clientY - from.y
       from = null
@@ -675,7 +698,7 @@ export function createReaderPayload(options: {
       go(at + (dx < 0 ? 1 : -1))
     }
     element.addEventListener('pointerup', end, { signal: listening.signal, capture: true })
-    element.addEventListener('pointercancel', () => { from = null }, { signal: listening.signal, capture: true })
+    element.addEventListener('pointercancel', event => { down.delete(event.pointerId); from = null }, { signal: listening.signal, capture: true })
   }
 
   return {
@@ -750,6 +773,7 @@ export function createReaderPayload(options: {
       // The row a hand meets: the two that step one side with the ways
       // between them, all at the row's own size.
       const row = make('div', 'reader-row')
+      stepRow = row
       steps.previous = control('vitrine-step', '‹', () => go(at - 1), options.words.previous)
       steps.next = control('vitrine-step', '›', () => go(at + 1), options.words.next)
       // sideways the two that step the book stand in the label's pager, round the count
@@ -772,7 +796,15 @@ export function createReaderPayload(options: {
         ways.push(button)
         row.append(button)
       }
-      row.append(steps.next)
+      turn = control('reader-turn', '', () => chooseWay(way === 0 ? 1 : 0))
+      turn.dataset['tool'] = 'turn'
+      turn.hidden = true
+      turnSaid = make('span', 'reader-turn-said')
+      turnSaid.id = `${next.element.id || 'vitrine'}-turn-said`
+      turnSaid.setAttribute('role', 'status')
+      turn.setAttribute('aria-describedby', turnSaid.id)
+      root.append(turnSaid)
+      row.append(turn, steps.next)
       next.controls.append(row)
       if (next.narrow && options.strip !== false) next.controls.append(shelf)
       // THE STRIP TAKES ONE TAB STOP. Inside it the arrows walk, and its two
@@ -851,6 +883,9 @@ export function createReaderPayload(options: {
       shelf?.remove()
       count?.remove()
       count = undefined
+      turn?.remove()
+      turn = undefined; turnSaid = undefined
+      stepRow = undefined
       root = undefined; stage = undefined; ground = undefined; shelf = undefined; beside = undefined; zoomRow = undefined
       cells.length = 0
       ways.length = 0
