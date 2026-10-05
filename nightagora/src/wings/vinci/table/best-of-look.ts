@@ -347,8 +347,9 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
     add(page.name ? `${page.name[language]} · ${page.seat[language]}` : page.seat[language])
     // the holder's own line, verbatim: the Institut's in French, with its licence
     add(page.credit)
-    const scan = index ? bestOfSource(page, index)?.record : undefined
-    add(scan?.licence)
+    const scan = index ? bestOfSource(page, index)?.record as (ScanRecord & { rights_notice?: string; licence_url?: string }) | undefined : undefined
+    // the notice the picture's file carries, word for word from its record: the file's words are the credit
+    add(scan?.rights_notice)
     const link = (label: string, url: string): void => {
       const line = node('p', 'vinci-statement')
       const a = node('a', 'vinci-picture-source', label)
@@ -356,6 +357,10 @@ export function createBestOfLook(options: BestOfLookOptions): BestOfLook {
       line.append(a)
       full.append(line)
     }
+    // the licence by its name, linked to its own text where the record holds the address
+    const licenceUrl = scan?.licence_url
+    if (scan?.licence && licenceUrl && /^https?:\/\//.test(licenceUrl)) link(scan.licence, licenceUrl)
+    else add(scan?.licence)
     if (scan?.source_url) {
       let host_ = scan.source_url
       try { host_ = new URL(scan.source_url).host } catch { /* the address as written */ }
