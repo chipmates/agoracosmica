@@ -567,6 +567,13 @@ export interface VinciPlaceCard {
 const cut = (text: string): string => text.replace(/\n/g, ' ')
 /** A cut or written line in the visitor's language, the record's register:
  * the stones are read here, not off the floor, and they too say it in that language. */
+/** The grave's evidence lines in German, for its records only: the grave's own words file is read by its film keys. */
+const GRAVE_EVIDENCE_DE = {
+  plaque: 'Die eigene Plakette der Kapelle spricht von mutmaßlichen Überresten. Diese Worte stehen auf einer gesonderten Plakette, nicht auf der Grabplatte.',
+  dig: 'Arsène Houssaye grub 1863 die ehemalige Kirche Saint-Florentin aus und berichtete von einem fast vollständigen Skelett. Die Identifizierung bleibt unbewiesen.',
+  transfer: 'Das Schloss beschreibt eine Überführung nach Saint-Hubert im neunzehnten Jahrhundert. Das genaue Datum 1874 und der Bericht von den Bruchstücken mit Buchstaben brauchen den historischen Beleg für Grabung und Überführung.',
+  frame: 'Berechnetes Licht · 2. Mai 1519 · 18:50 UT. Eine gewählte Minute, kein bezeugter Augenblick.',
+} as const
 function inLanguage(host: HTMLElement, words: Both): void {
   const language = lang()
   const paragraph = make('p', 'vinci-statement', cut(words[language]))
@@ -638,7 +645,7 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
         const full = recordRoot(host)
         inLanguage(full, GRAVE_WORDS.diagram)
         inLanguage(full, GRAVE_WORDS.diagramDate)
-        full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE.frame))
+        inLanguage(full, { en: GRAVE_EVIDENCE.frame, de: GRAVE_EVIDENCE_DE.frame })
         full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, null, 1)))
         inLanguage(full, GRAVE_DIAGRAM)
       },
@@ -655,7 +662,7 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
       full.append(make('p', 'vinci-statement', GRAVE_WORDS.dig))
       inLanguage(full, GRAVE_WORDS.identification)
       inLanguage(full, GRAVE_WORDS.medallionRecord)
-      for (const key of ['plaque', 'dig', 'transfer'] as const) full.append(make('p', 'vinci-statement', GRAVE_EVIDENCE[key]))
+      for (const key of ['plaque', 'dig', 'transfer'] as const) inLanguage(full, { en: GRAVE_EVIDENCE[key], de: GRAVE_EVIDENCE_DE[key] })
       inLanguage(full, GRAVE_WORDS.disclosure)
       inLanguage(full, GRAVE_SOURCE)
     },
