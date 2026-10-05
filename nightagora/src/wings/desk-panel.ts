@@ -9,6 +9,7 @@
 
 import { deskControl } from './desk-story'
 import { say, WING_TEXT } from './content'
+import { leaveWingFinished } from './frame'
 import type { VinciText } from './vinci/content'
 import { learnWord } from './vinci/ending-talk'
 
@@ -128,7 +129,7 @@ export function createDeskPanel(host: DeskPanelHost): void {
     return asked.defaultPrevented
   }
   host.on.addEventListener('click', () => {
-    if (host.next() === null && !endWith('lookup')) leave()
+    if (host.next() === null && !endWith('lookup')) leaveWingFinished()
   }, { signal })
   talk.addEventListener('click', () => { endWith('talk') }, { signal })
 

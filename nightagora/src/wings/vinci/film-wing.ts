@@ -5,7 +5,7 @@
    from the wing's own data by key; the phone's rest, walk, wait and dip stand
    in the frozen form's one graded box. */
 
-import { setRegister, type WingHosts, type WingModule, type WingStation } from '../frame'
+import { leaveWingFinished, setRegister, type WingHosts, type WingModule, type WingStation } from '../frame'
 import { lang, WING_TEXT } from '../content'
 import { LOBBY_TEXT } from '../../content/lobby'
 import { vinciAbsences, vinciCertaintyWords, vinciCollectionThreshold, vinciContent, vinciEveningSky, vinciGrounds, vinciHourArithmetic, vinciHourIntegrity, vinciHourLabel,
@@ -977,7 +977,7 @@ export function createWing(): WingModule {
     if (ways?.next) { ways.step(1); return }
     const to = nextIndex()
     if (to !== null) onFromLook(to)
-    else if (!endWith('lookup')) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+    else if (!endWith('lookup')) leaveWingFinished()
   }
   /** the next stop from wherever the eye stands: an open look shuts without
       the history's step back, whose pop would walk the eye back to this stop */
@@ -1079,7 +1079,7 @@ export function createWing(): WingModule {
       eveningAsked = false
       // a press elsewhere during the walk back took the visitor on: nothing more
       if (picture?.state().kind !== 'rest' || here() !== from) return
-      if (!nightfall()) hosts?.stage.parentElement?.querySelector<HTMLElement>('.wing-lobby')?.click()
+      if (!nightfall()) leaveWingFinished()
     })
     return true
   }
@@ -1098,7 +1098,7 @@ export function createWing(): WingModule {
       if (gone) return
       gone = true
       evening?.stop()
-      wing.querySelector<HTMLElement>('.wing-lobby')?.click()
+      leaveWingFinished()
     }
     // a press anywhere, Escape, Enter or Space goes on at once; every other key is held, so nothing moves behind the evening
     addEventListener('pointerdown', e => { e.preventDefault(); e.stopPropagation(); home() }, { capture: true, signal })
@@ -1346,7 +1346,7 @@ export function createWing(): WingModule {
       asked.onward = to !== null
         ? { kicker: text(CARDS.controls.date.next), title: text(deskStoryStop(LIFE[to]!.id)?.chapter ?? LIFE[to]!.name), go: () => onFromLook(to) }
         : { kicker: text(lobbyWord()), title: text(deskControl('ending', 'lookup')), up: true,
-          go: () => { if (!endWith('lookup')) wing.querySelector<HTMLElement>('.wing-lobby')?.click() } }
+          go: () => { if (!endWith('lookup')) leaveWingFinished() } }
     }, { signal })
     // the grave's talk choice opens the library's door, as in the live wing
     addEventListener('na-wing-ending', e => {

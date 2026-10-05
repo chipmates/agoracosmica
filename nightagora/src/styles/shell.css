@@ -275,3 +275,9 @@ body.door .status { animation: none; }
 #rail button::before,
 #rail button::after { transition: none; animation: none; }
 }
+
+/* THE PAGE IS LEAVING for a page of the site: the ground alone stands until
+   that page paints, with nothing on it to press. */
+html[data-na-leaving] { background: var(--na-abyss); }
+html[data-na-leaving] body,
+html[data-na-leaving] body * { visibility: hidden !important; }

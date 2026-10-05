@@ -7,7 +7,7 @@
    the two phones cannot drift apart in look; the film's own copy of this
    logic stays in film-wing.ts until the two are folded into one. */
 
-import { setRegister } from '../frame'
+import { leaveWingFinished, setRegister } from '../frame'
 import { lang, say, WING_TEXT } from '../content'
 import { LOBBY_TEXT } from '../../content/lobby'
 import { deskMark } from '../desk-chrome'
@@ -329,7 +329,7 @@ export function createVinciPhoneForm(host: VinciPhoneHost): VinciPhoneForm {
     if (look?.next) { look.step(1); return }
     const to = next()
     if (to !== null) { host.go(to); return }
-    if (!endWith('lookup')) lobby()?.click()
+    if (!endWith('lookup')) leaveWingFinished()
   }
 
   more.addEventListener('click', () => setDrawer(!open), { signal })

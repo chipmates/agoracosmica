@@ -21,6 +21,7 @@ import { readLabels, type ForgeLabel } from './core/labels'
 import { DISCLOSURES } from './content/disclosures'
 import { WINGS, wingBySlug, wingsOpen, wingsPreparing } from './wings/registry'
 import { lang, say, wingCount } from './wings/content'
+import { sitePage, wayOut, type Settings } from './wings/way-out'
 import { LOBBY_LINKS, LOBBY_TEXT } from './content/lobby'
 import { gaitPace, setGaitPace } from './wings/vinci/gait'
 import { benchOptions, benchPath, createBench, type BenchOptions } from './bench'
@@ -1440,9 +1441,11 @@ declare global {
   }
 }
 // ---- THE MUSEUM'S ROUTE: / is the lobby, /w/<slug> is a wing ----
-const wingFrame = createWingFrame(wingEl, () => toLobby(), stack, () => performance.now() / 1000)
+const wingFrame = createWingFrame(wingEl, (finished) => toLobby(finished), stack, () => performance.now() / 1000)
 let wingSlug = ''
 const bench = createBench(stack, () => toLobby())
+/** what the build names: a wing's own page on the site, the site's front page */
+const SETTINGS: Settings = import.meta.env
 
 /** A wing's own address, with the station the visitor stood at. */
 function wingPath(): { slug: string; station: number | string } | null {
@@ -1462,9 +1465,12 @@ function syncTitle(): void {
 
 /** Stand in a wing. The overture is never replayed to get here. */
 async function openWing(slug: string, at: number | string, view?: string): Promise<void> {
+  if (leaving) return
   const entry = wingBySlug(slug)
   if (!entry) {
-    toLobby()
+    const front = sitePage(SETTINGS, lang())
+    if (front) leaveTo(front, true)
+    else toLobby()
     return
   }
   wingSlug = slug
@@ -1473,7 +1479,7 @@ async function openWing(slug: string, at: number | string, view?: string): Promi
   // it again between two stations strikes the wing that is standing
   if (phase !== 'wing') setPhase('wing')
   const mod = await entry.load()
-  if (wingSlug !== slug) return // the visitor left while it loaded
+  if (wingSlug !== slug || leaving) return // the visitor left while it loaded
   wingFrame.open(entry, mod.createWing(), at, view)
   /* THE ENTRY IS OVER WHEN THE WALK IS PAID FOR. A wing compiles the
      pipelines of a room the first time a frame draws it, so without this the
@@ -1496,10 +1502,38 @@ function enterWing(slug: string): void {
   })
 }
 
+/* THE WAY OUT IS A PAGE OF THE SITE WHERE THE BUILD NAMES ONE. The page is
+   loaded, never mounted: the wing is struck and the stage dark before it
+   goes, so no frame follows the press and no second press is taken. */
+let leaving = false
+function leaveTo(address: string, replace: boolean): void {
+  if (leaving) return
+  leaving = true
+  document.documentElement.dataset['naLeaving'] = ''
+  wingFrame.close()
+  bench.close()
+  // a replaced entry is one the browser's back never lands on again
+  if (replace) location.replace(address)
+  else location.assign(address)
+}
+// a page the browser kept whole comes back as it left, struck and dark: it
+// is loaded again, and stands at the stop its address names
+addEventListener('pageshow', (event) => {
+  if (event.persisted && leaving) location.reload()
+})
+
 /** The way home lands at the wheel, where the choosing happens, never at
     the eclipse: a museum whose every entry replays the overture is a
-    museum you see once. */
-function toLobby(): void {
+    museum you see once. Where the build names the wing's own page on the
+    site, the way home is that page: with its fragment for a visitor who
+    has `finished` the walk, and in place of the entry a `popped` history
+    step landed on. Outside a wing it is the site's front page. */
+function toLobby(finished = false, popped = false): void {
+  const out = wingSlug ? wayOut(SETTINGS, wingSlug, lang(), finished) : sitePage(SETTINGS, lang())
+  if (out) {
+    leaveTo(out, popped)
+    return
+  }
   wingFrame.close()
   wingSlug = ''
   if (location.pathname !== '/') history.pushState({}, '', `/${location.search}`)
@@ -1524,7 +1558,7 @@ addEventListener('popstate', () => {
   // that pop strikes the card the wing just raised and cuts its walk short.
   if (here && phase === 'wing' && wingSlug === here.slug && wingFrame.standsAt(here.station)) return
   if (here) void openWing(here.slug, here.station)
-  else if (phase === 'wing' || phase === 'bench') toLobby()
+  else if (phase === 'wing' || phase === 'bench') toLobby(false, true)
 })
 
 window.__forge = {
@@ -2311,8 +2345,14 @@ function bootRoute(): boolean {
   const here = wingPath()
   if (!here) return false
   if (!wingBySlug(here.slug)) {
-    // an address for a wing that does not exist: the night begins where a
-    // night begins, and the bar stops claiming a room that is not there
+    // an address for a wing that does not exist: the site's front page
+    // where the build names one. Otherwise the night begins where a night
+    // begins, and the bar stops claiming a room that is not there
+    const front = sitePage(SETTINGS, lang())
+    if (front) {
+      leaveTo(front, true)
+      return true
+    }
     history.replaceState({}, '', `/${location.search}`)
     return false
   }

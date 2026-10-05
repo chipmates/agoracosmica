@@ -243,6 +243,15 @@ export function openWingModes(words: WingModesWords): string {
   return toTheModes?.(words) ?? ''
 }
 
+let pressHome: ((finished: boolean) => void) | null = null
+
+/** THE WALK'S END LEAVES AS FINISHED: after its stars, or where they cannot
+    play. It presses the frame's own way home, as every other way out does,
+    and says so to whoever answers the press. */
+export function leaveWingFinished(): void {
+  pressHome?.(true)
+}
+
 function el<K extends keyof HTMLElementTagNameMap>(
   tag: K,
   cls: string,
@@ -256,7 +265,7 @@ function el<K extends keyof HTMLElementTagNameMap>(
 
 export function createWingFrame(
   host: HTMLElement,
-  onLobby: () => void,
+  onLobby: (finished: boolean) => void,
   stack: Stack,
   clock: () => number
 ): WingFrame {
@@ -295,7 +304,12 @@ export function createWingFrame(
   const lobby = el('button', 'wing-lobby', say(WING_TEXT.lobby))
   lobby.type = 'button'
   lobby.style.cssText = 'position:static;flex:0 0 auto'
-  lobby.addEventListener('click', () => onLobby())
+  let finished = false
+  lobby.addEventListener('click', () => onLobby(finished))
+  pressHome = (walked) => {
+    finished = walked
+    try { lobby.click() } finally { finished = false }
+  }
 
   /* THE RAIL IS ONE MARK, not two. The way home and the stations stand in
      one group, and only the inner track scrolls, so a wing with nineteen
