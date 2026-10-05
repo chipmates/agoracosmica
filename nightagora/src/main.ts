@@ -1800,9 +1800,10 @@ function sendLobbyAhead(): void {
 /* THE LOBBY'S OWN LAYERS STAND DOWN INSIDE A WING. They stay in the document
    there, painted out, so a reader was still told of them and a key still
    stopped on one. Inert takes both at once, and nothing else of an element.
-   The masthead and the heading are the museum's own and stay. */
+   The masthead, its heading and the page's static mirror stand under the
+   wing unseen, so a reader there is not told of them either. */
 const LOBBY_LAYERS = document.querySelectorAll<HTMLElement>(
-  '#status, #lobby-plate, #enter-museum, #door-measure, #descent, #verse, #voice, #constellation-plate, ' +
+  '#veil, .static-soul, #status, #lobby-plate, #enter-museum, #door-measure, #descent, #verse, #voice, #constellation-plate, ' +
     '#sky-invite, #chapter-marks, #sky-return, #star-chips, #figure-pane, #hotspots'
 )
 
