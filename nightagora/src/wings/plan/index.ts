@@ -97,15 +97,18 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
     return element
   }
   const say = <T extends { en: string; de: string }>(value: T): string => value[options.lang()]
-  const chevron = (): SVGSVGElement => {
+  const drawn = (box: string, d: string): SVGSVGElement => {
     const svg = document_.createElementNS('http://www.w3.org/2000/svg', 'svg')
-    svg.setAttribute('viewBox', '0 0 12 12')
+    svg.setAttribute('viewBox', box)
     svg.setAttribute('aria-hidden', 'true')
     const line = document_.createElementNS('http://www.w3.org/2000/svg', 'path')
-    line.setAttribute('d', 'M2.5 4.5 6 8l3.5-3.5')
+    line.setAttribute('d', d)
     svg.append(line)
     return svg
   }
+  const chevron = (): SVGSVGElement => drawn('0 0 12 12', 'M2.5 4.5 6 8l3.5-3.5')
+  /** the arrow of the walk's own control */
+  const arrow = (): SVGSVGElement => drawn('0 0 16 16', 'M3 8h10M9 4l4 4-4 4')
 
   const dialog = document_.createElement('dialog')
   dialog.className = 'wing-plan'
@@ -270,8 +273,8 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
         list.append(item)
         continue
       }
-      /* A STATION THAT HOLDS WORKS OPENS UNDER ITS ROW: the first line walks to
-         the stop itself, the lines under it to each work it holds. */
+      /* A STATION THAT HOLDS WORKS OPENS UNDER ITS ROW: the walk's own control
+         first, which goes to the stop itself, then a line for each work it holds. */
       const inner = make('ul', 'wing-plan-works')
       inner.id = `wing-plan-works-${station.number}`
       entry.setAttribute('aria-controls', inner.id)
@@ -295,8 +298,11 @@ export function createWingPlan(options: WingPlanOptions): WingPlan {
       })
       if (station.id !== standing) {
         const there = make('li', '')
-        const walk = make('button', 'wing-plan-work wing-plan-there', say(deskControl('walk', 'walk_there')))
+        const word = say(deskControl('walk', 'walk_there'))
+        const walk = make('button', 'wing-plan-there')
         walk.type = 'button'
+        walk.setAttribute('aria-label', `${word} · ${station.name[language]}`)
+        walk.append(make('span', 'wing-plan-there-word', word), arrow())
         walk.addEventListener('click', () => press(() => options.station(station.id)))
         there.append(walk)
         inner.append(there)

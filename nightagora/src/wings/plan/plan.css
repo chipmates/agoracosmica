@@ -82,11 +82,18 @@
 .wing-plan-fold svg {width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:1.4;transition:transform .2s ease;}
 .wing-plan-entry[aria-expanded='true'] .wing-plan-fold {color:var(--ui-text);}
 .wing-plan-entry[aria-expanded='true'] .wing-plan-fold svg {transform:rotate(180deg);}
-/* the line that walks to the stop itself, first in what it holds */
-.wing-plan-there {color:var(--ui-text);}
+/* THE WALK TO THE STOP ITSELF IS A CONTROL, NOT A LINE: it wears the way on's
+   own gold, kicker and arrow, so it never reads as one of the works under it. */
+.wing-plan-there {display:inline-flex;align-items:center;gap:12px;min-height:44px;margin:2px 0 8px;padding:0 14px 0 16px;
+  background:color-mix(in srgb, var(--ui-way) 7%, transparent);border:0;border-radius:var(--ui-r-square);box-shadow:inset 0 0 0 1px var(--ui-way);
+  color:var(--ui-way);font:600 .875rem/1.125rem var(--sans);letter-spacing:.14em;text-transform:uppercase;text-align:left;cursor:pointer;}
+.wing-plan-there svg {flex:none;width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;}
+.wing-plan-there:hover {background:color-mix(in srgb, var(--ui-way) 14%, transparent);}
+.wing-plan-there:active {background:color-mix(in srgb, var(--ui-way) 22%, transparent);}
 .wing-plan-works[hidden] {display:none;}
 .wing-plan-entry[aria-current='true'] .wing-plan-entry-number {color:var(--ui-way);}
 .wing-plan-entry:focus-visible,.wing-plan-work:focus-visible,.wing-plan-close:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
+.wing-plan-there:focus-visible {outline:1px solid var(--ui-text);outline-offset:2px;}
 .wing-plan-works {margin:0 0 6px 38px;padding:0;list-style:none;}
 .wing-plan-work {display:block;width:100%;min-height:44px;padding:4px 6px 4px 0;text-align:left;background:none;border:0;border-radius:var(--ui-r-square);
   color:var(--ui-text-quiet);font:13px/1.4 var(--sans);cursor:pointer;}
