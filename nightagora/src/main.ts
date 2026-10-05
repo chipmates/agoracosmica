@@ -1797,6 +1797,15 @@ function sendLobbyAhead(): void {
   if (spare) agora.fetchSets()
 }
 
+/* THE LOBBY'S OWN LAYERS STAND DOWN INSIDE A WING. They stay in the document
+   there, painted out, so a reader was still told of them and a key still
+   stopped on one. Inert takes both at once, and nothing else of an element.
+   The masthead and the heading are the museum's own and stay. */
+const LOBBY_LAYERS = document.querySelectorAll<HTMLElement>(
+  '#status, #lobby-plate, #enter-museum, #door-measure, #descent, #verse, #voice, #constellation-plate, ' +
+    '#sky-invite, #chapter-marks, #sky-return, #star-chips, #figure-pane, #hotspots'
+)
+
 function setPhase(next: Phase): void {
   // the phase arrives from the rig as well as from the night's own verbs, so
   // a name nobody wrote is reachable: refuse it and keep the stage standing
@@ -1805,7 +1814,9 @@ function setPhase(next: Phase): void {
     return
   }
   if (next !== 'bench') bench.close()
+  // the panel gives every layer its own state back first
   setInstruments(false, false)
+  for (const layer of LOBBY_LAYERS) layer.inert = next === 'wing'
   phase = next
   document.body.dataset['phase'] = next
   if (LOBBY_PHASES.has(next)) agora.fetchSets()
