@@ -673,6 +673,8 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
    list, whose two columns then fill the glass over the foot and keep their own
    scroll; the foot with its close stays at the glass's foot */
 #wing[data-film='cinema'] .wing-life[open] {
+  /* the drawing reads this (life/index.ts): its strip takes the first screen's spare height, its names stand over it */
+  --life-form: side;
   --life-side-l: calc(var(--cinema-l) + 8px);
   --life-side-r: calc(var(--cinema-r) + 8px);
   /* the foot: its padding, the close's 44 px and its rule */
@@ -682,8 +684,10 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
   overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
 }
 #wing[data-film='cinema'] .wing-life[open]::-webkit-scrollbar { display: none; }
-#wing[data-film='cinema'] .wing-life-head { flex: 0 0 auto; padding: calc(var(--cinema-t) + 16px) var(--life-side-r) 4px var(--life-side-l); }
+#wing[data-film='cinema'] .wing-life-head { flex: 0 0 auto; padding: calc(var(--cinema-t) + 10px) var(--life-side-r) 4px var(--life-side-l); }
 #wing[data-film='cinema'] .wing-life-body { flex: 0 0 auto; padding: 0 var(--life-side-r) 0 var(--life-side-l); }
+/* no padding: the presses over the blocks are placed from the drawing's own corner */
+#wing[data-film='cinema'] .wing-life-drawing { padding: 0; }
 #wing[data-film='cinema'] .wing-life-reading { flex: 0 0 auto; height: calc(100dvh - var(--life-foot) - var(--cinema-t) - 8px); }
 /* each column's lowest line fades out at its foot, and its end scrolls clear of the fade */
 #wing[data-film='cinema'] .wing-life-reading > :is(.wing-life-spine, .wing-life-period-body) {
@@ -692,8 +696,9 @@ html:has(#wing[data-film='cinema']) :is(#inst-sound, #inst-plan) { display: none
 }
 #wing[data-film='cinema'] .wing-life-foot {
   position: sticky; bottom: 0; z-index: 2; padding: 6px var(--life-side-r) max(6px, calc(var(--cinema-b) - 2px)) var(--life-side-l);
-  /* a line passing under the foot fades into it, it never breaks off at its edge */
-  background: var(--ui-ground-sheet); box-shadow: 0 -18px 14px -6px var(--ui-ground-sheet);
+  /* a line passing under the foot fades into it, it never breaks off at its edge; the fade stays inside the
+     12 px the first screen keeps clear over the foot (LIFE_SIDE.air) */
+  background: var(--ui-ground-sheet); box-shadow: 0 -12px 10px -6px var(--ui-ground-sheet);
 }
 /* the plan's sheet keeps its inset box over the glass */
 #wing[data-film='cinema'] .wing-plan[open] {

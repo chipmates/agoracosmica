@@ -35,6 +35,25 @@ export const PLATE = {
   name: { wide: 15, narrow: 14, floor: 14, margin: 6 },
   /** the tracking the ribbon's names carry, which the ruler adds back */
   tracking: .02,
+  /** A PHONE HELD SIDEWAYS: the strip is the sheet's main thing. Its blocks
+   * take the height the glass spares, and every name stands over its own
+   * block on a leader, because at this width no block holds its name. */
+  side: {
+    /** the strip starts where the sheet's words start */
+    pad: { x: 1, top: 8, bottom: 4 },
+    /** the lowest and the tallest a block is drawn: the tallest is a press's own height */
+    strip: { least: 26, most: 44 },
+    /** one row of names, the rows they take first, and the rows a crowded life may take */
+    row: 19, rows: 2, most: 3,
+    /** a name's size, the air between two in a row, how far one may stand off its block's middle,
+     * and how far inside its own ends its leader starts */
+    name: { base: 15, floor: 13, gap: 12, nudge: 12, inset: 5 },
+    /** the band between the names and the strip, which the ring stands in */
+    ring: 12,
+    /** the air a leader keeps to a name it passes and to the ring, and the air it is given where there is a choice */
+    clear: 5, pin: 8, roomy: 16,
+    after: { gap: 26, height: 10 },
+  },
 } as const
 
 export interface LifePlateBand {
@@ -75,6 +94,112 @@ function nameSize(words: string, room: number, base: number, floor: number): num
   return null
 }
 
+interface Run { left: number; right: number }
+interface OverName { left: number; right: number; row: number; lead: number }
+
+/** Where a leader may touch its block: on a painted piece, under its own
+ * name, clear of everything it must pass. The name's own middle where that
+ * is free, else the middle of the free stretch nearest to it. */
+function leadAt(pieces: readonly Run[], name: Run, barred: readonly Run[]): number | null {
+  const inset = PLATE.side.name.inset
+  let free: Run[] = pieces
+    .map(piece => piece.right - piece.left >= 6 ? { left: piece.left + 2, right: piece.right - 2 } : { left: (piece.left + piece.right) / 2, right: (piece.left + piece.right) / 2 })
+    .map(piece => ({ left: Math.max(piece.left, name.left + inset), right: Math.min(piece.right, name.right - inset) }))
+    .filter(piece => piece.right >= piece.left)
+  for (const bar of barred) free = free.flatMap(run => {
+    if (bar.right <= run.left || bar.left >= run.right) return [run]
+    return [{ left: run.left, right: bar.left }, { left: bar.right, right: run.right }].filter(part => part.right >= part.left)
+  })
+  if (!free.length) return null
+  const middle = (name.left + name.right) / 2
+  const near = (run: Run): number => middle < run.left ? run.left - middle : middle > run.right ? middle - run.right : 0
+  const best = free.reduce((held, run) => near(run) < near(held) ? run : held)
+  return near(best) === 0 ? middle : (best.left + best.right) / 2
+}
+
+/** One row of names, each as near its own place as the others and the
+ * drawing's two ends allow: names that would meet move as one group, by the
+ * least that parts them. Null where the row is wider than the drawing. */
+function settleRow(names: readonly { ideal: number; width: number }[], bounds: Run, gap: number): number[] | null {
+  interface Group { first: number; width: number; sum: number; count: number }
+  const at = (group: Group): number => Math.min(Math.max(group.sum / group.count, bounds.left), bounds.right - group.width)
+  const groups: Group[] = []
+  for (const [index, name] of names.entries()) {
+    let group: Group = { first: index, width: name.width, sum: name.ideal, count: 1 }
+    for (let before = groups[groups.length - 1]; before && at(before) + before.width + gap > at(group); before = groups[groups.length - 1]) {
+      const offset = before.width + gap
+      group = { first: before.first, width: offset + group.width, sum: before.sum + group.sum - group.count * offset, count: before.count + group.count }
+      groups.pop()
+    }
+    if (group.width > bounds.right - bounds.left + .5) return null
+    groups.push(group)
+  }
+  const lefts: number[] = []
+  for (const group of groups) {
+    let left = at(group)
+    for (let index = group.first; index < group.first + group.count; index++) { lefts.push(left); left += names[index]!.width + gap }
+  }
+  return lefts
+}
+
+/** EVERY NAME OVER ITS OWN BLOCK, at the largest size and in the fewest rows
+ * that hold them all. Every way of sharing the names between the rows is
+ * tried, and the one kept has no name far off its block's middle, no two
+ * meeting and no leader through a name or the ring; of those, the fewest
+ * rows, then the least moved, then the leaders with the most air. No name is
+ * left off. */
+function namesOver(
+  blocks: readonly { words: string; from: number; to: number; pieces: readonly Run[] }[],
+  bounds: Run, pin: number | null,
+): { size: number; rows: number; names: OverName[] } | null {
+  const side = PLATE.side
+  // every sharing is tried, so a life of many periods keeps the wide form's names
+  if (!blocks.length || blocks.length > 8) return null
+  for (const rows of [side.rows, side.most]) for (let size: number = side.name.base; size >= side.name.floor; size -= .5) {
+    const widths = blocks.map(block => nameWidth(block.words, size))
+    const ideals = blocks.map((block, index) => Math.min(Math.max((block.from + block.to) / 2 - widths[index]! / 2, bounds.left), bounds.right - widths[index]!))
+    let best: { cost: number; names: OverName[] } | null = null
+    for (let code = 0; code < rows ** blocks.length; code++) {
+      const row = blocks.map((_, index) => Math.floor(code / rows ** index) % rows)
+      const names: OverName[] = blocks.map((_, index) => ({ left: 0, right: 0, row: row[index]!, lead: 0 }))
+      let moved = 0, fits = true
+      for (let r = 0; r < rows && fits; r++) {
+        const own = blocks.map((_, index) => index).filter(index => row[index] === r)
+        const lefts = settleRow(own.map(index => ({ ideal: ideals[index]!, width: widths[index]! })), bounds, side.name.gap)
+        if (!lefts) { fits = false; break }
+        for (const [n, index] of own.entries()) {
+          const shift = Math.abs(lefts[n]! - ideals[index]!)
+          if (shift > side.name.nudge) fits = false
+          moved += shift
+          names[index]!.left = lefts[n]!
+          names[index]!.right = lefts[n]! + widths[index]!
+        }
+      }
+      if (!fits) continue
+      for (const [index, name] of names.entries()) {
+        const barred = names.filter(other => other.row < name.row).map(other => ({ left: other.left - side.clear, right: other.right + side.clear }))
+        if (pin !== null) barred.push({ left: pin - side.pin, right: pin + side.pin })
+        const lead = leadAt(blocks[index]!.pieces, name, barred)
+        if (lead === null) { fits = false; break }
+        name.lead = lead
+      }
+      if (!fits) continue
+      // a leader squeezed between two names reads as a rule between them
+      let tight = 0
+      for (const name of names) for (const other of names) {
+        if (other.row >= name.row) continue
+        const air = name.lead < other.left ? other.left - name.lead : name.lead > other.right ? name.lead - other.right : 0
+        tight += Math.max(0, side.roomy - air)
+      }
+      const used = Math.max(...row) + 1
+      const cost = used * 1e6 + Math.round(moved) * 1000 + Math.round(tight) * 10 + row.reduce((sum, r) => sum + r, 0)
+      if (!best || cost < best.cost) best = { cost, names }
+    }
+    if (best) return { size, rows: Math.max(...best.names.map(name => name.row)) + 1, names: best.names }
+  }
+  return null
+}
+
 /** The afterlife has its own linear scale: five centuries cannot share an
  * axis with sixty seven years and leave either of them readable. */
 function afterScale(years: readonly number[]): { at(year: number): number; from: number; to: number } {
@@ -112,15 +237,17 @@ export function drawLifePlate(options: {
   /** the museum's word for the strip under the blank */
   /** the museum's words for the strip under the blank, with {from} and {to} */
   afterWords: string
+  /** a phone held sideways, with the height the sheet has for the drawing */
+  side?: { room: number }
 }): LifePlate {
   const { record, scale, language, narrow, open } = options
   const width = Math.max(240, Math.round(options.area.width))
-  const stripHeight = narrow ? PLATE.strip.narrow : PLATE.strip.wide
   const after = record.bands.find(band => band.afterlife)
   const afterEvents = after ? record.events.filter(event => event.band === after.id) : []
   const afterYears = afterEvents.map(event => dateYears(event.date)?.from).filter((year): year is number => year !== undefined)
   const hasAfter = Boolean(after && afterYears.length)
-  const pad = narrow ? PLATE.pad.narrow : PLATE.pad.wide
+  const sideways = Boolean(options.side) && !narrow
+  const pad = sideways ? PLATE.side.pad.x : narrow ? PLATE.pad.narrow : PLATE.pad.wide
   /* ON A PHONE A NAME NO PIECE HOLDS STANDS OVER THE RIBBON, at its own
      segment's middle: written across the pieces it would hide their edges.
      The row is only there when a name needs it. */
@@ -145,12 +272,27 @@ export function drawLifePlate(options: {
     return { from, to, words, held, run, size, over: narrow && !held && size !== null }
   }
   const overRow = living.some((band, index) => naming(index, band).over) ? overSize + 8 : 0
-  const top = pad + overRow + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
+  /* SIDEWAYS, THE NAMES ARE PLACED FIRST: the rows they take and what is left
+     of the sheet's room decide how tall a block is drawn. The ring's place is
+     read early, so no leader runs through it. */
+  const here = record.here ? record.events.find(event => event.id === record.here) : undefined
+  const hereYears = here && !record.bands.find(band => band.id === here.band)?.afterlife ? dateYears(here.date) : null
+  const flown = sideways
+    ? namesOver(living.map((band, index) => { const { from, to, words } = naming(index, band); return { words, from, to, pieces: pieces(from, to, gapRuns) } }),
+      { left, right: left + span }, hereYears ? x(hereYears.from) : null)
+    : null
+  const side = flown ? PLATE.side : null
+  const afterGap = side ? side.after.gap : PLATE.after.gap, afterHeight = side ? side.after.height : PLATE.after.height
+  const top = side ? side.pad.top + flown!.rows * side.row + side.ring : pad + overRow + (narrow ? PLATE.ring.narrow : PLATE.ring.wide)
+  const under = 3 + PLATE.ticks.floor + PLATE.years + (hasAfter ? afterGap + afterHeight : 4) + (side ? side.pad.bottom : pad)
+  const stripHeight = side
+    ? Math.round(Math.min(side.strip.most, Math.max(side.strip.least, options.side!.room - top - under)))
+    : narrow ? PLATE.strip.narrow : PLATE.strip.wide
   const ticksTop = top + stripHeight + 3
   // the life's own two years stand under its ticks, one row of type
   const lifeYears = ticksTop + PLATE.ticks.floor + PLATE.years
-  const afterTop = lifeYears + PLATE.after.gap
-  const height = (hasAfter ? afterTop + PLATE.after.height : lifeYears + 4) + pad
+  const afterTop = lifeYears + afterGap
+  const height = top + stripHeight + under
 
   const svg = document.createElementNS(NS, 'svg')
   svg.setAttribute('class', 'wing-life-plate')
@@ -200,7 +342,15 @@ export function drawLifePlate(options: {
        crosses a break it carries a halo in its own segment's ink, so the
        dashes under it never run through the letters; on a phone it stands
        over the ribbon instead. */
-    if (over) {
+    const high = flown?.names[index]
+    if (high && side) {
+      /* SIDEWAYS: over its own block, on a leader that touches a painted
+         piece of it, so a name wider than its block is still that block's. */
+      const base = side.pad.top + (flown!.rows - 1 - high.row) * side.row + side.name.base * .93
+      add('line', { class: 'wing-life-lead', x1: high.lead.toFixed(1), y1: base + 4, x2: high.lead.toFixed(1), y2: top - 1 }, group)
+      const text = add('text', { class: 'wing-life-place', 'data-over': 'true', x: ((high.left + high.right) / 2).toFixed(1), y: base, 'font-size': flown!.size }, group)
+      text.textContent = words
+    } else if (over) {
       const w = nameWidth(words, overSize)
       const middle = Math.min(Math.max((from + to) / 2, left + w / 2), left + span - w / 2)
       const room = { l: middle - w / 2 - 6, r: middle + w / 2 + 6 }
@@ -272,10 +422,10 @@ export function drawLifePlate(options: {
     const clock = afterScale(afterYears)
     const label = add('text', { class: 'wing-life-after-word', x: left, y: afterTop - 7 })
     label.textContent = fill(options.afterWords, { from: clock.from, to: clock.to })
-    add('rect', { class: 'wing-life-after', x: left, y: afterTop, width: span, height: PLATE.after.height, rx: 1 })
+    add('rect', { class: 'wing-life-after', x: left, y: afterTop, width: span, height: afterHeight, rx: 1 })
     for (const year of afterYears) {
       const place = left + clock.at(year) * span
-      add('line', { class: 'wing-life-tick wing-life-tick-after', x1: place, y1: afterTop, x2: place, y2: afterTop + PLATE.after.height })
+      add('line', { class: 'wing-life-tick wing-life-tick-after', x1: place, y1: afterTop, x2: place, y2: afterTop + afterHeight })
     }
   }
 

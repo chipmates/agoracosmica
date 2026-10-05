@@ -40,6 +40,11 @@ export const LIFE_WIDE = { top: 76, side: 28, bottom: 18, padding: 20, widest: 1
  * so the sheet is bounded by the viewport and not by the bar. */
 export const LIFE_NARROW = { top: 10, side: 8, bottom: 10, padding: 12 } as const
 
+/** A PHONE HELD SIDEWAYS: the sheet scrolls as one column over a foot that
+ * stays, and the form's own stylesheet says so with `--life-form: side`.
+ * `air` is what stays clear over the foot at rest. */
+export const LIFE_SIDE = { air: 12 } as const
+
 export interface WingLifeOptions {
   host: HTMLElement
   lang(): 'en' | 'de'
@@ -190,9 +195,15 @@ export function createWingLife(options: WingLifeOptions): WingLife {
     const column = view.getComputedStyle(body)
     const area = Math.max(240, body.getBoundingClientRect().width - (parseFloat(column.paddingLeft) || 0) - (parseFloat(column.paddingRight) || 0))
     const drawn = record.events.some(event => dateYears(event.date))
+    /* SIDEWAYS THE STRIP TAKES THE HEIGHT THE GLASS SPARES: what is left of
+       the first screen under the head and over the foot is the drawing's. */
+    const side = !narrow && view.getComputedStyle(dialog).getPropertyValue('--life-form').trim() === 'side'
+    const frame = view.getComputedStyle(drawing)
+    const room = dialog.clientHeight - foot.offsetHeight - LIFE_SIDE.air - head.offsetHeight
+      - (parseFloat(frame.paddingTop) || 0) - (parseFloat(frame.paddingBottom) || 0)
     plate = drawn
       ? drawLifePlate({ record, scale, area: { width: area }, language, narrow, open: band, at,
-        afterWords: LIFE_WORDS.afterSpan[language] })
+        afterWords: LIFE_WORDS.afterSpan[language], ...(side ? { side: { room } } : {}) })
       : undefined
     presses.replaceChildren()
     drawing.replaceChildren(...(plate ? [plate.element] : []), presses)
@@ -217,7 +228,8 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       kept && Number.isFinite(last) ? fill(LIFE_COUNTS.calendar[language], { last, calendar: LIFE_CALENDARS[kept]?.[language] ?? kept }) : '']
     caption.textContent = notes.filter(Boolean).join(' ')
     caption.hidden = !caption.textContent
-    if (plate && !narrow) for (const segment of plate.bands) {
+    const runs = plate && !narrow ? pressRuns(plate.bands, plate.width) : []
+    if (plate && !narrow) for (const [index, segment] of plate.bands.entries()) {
       const press = make('button', 'wing-life-press')
       press.type = 'button'
       press.dataset['band'] = segment.id
@@ -225,10 +237,13 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       press.setAttribute('aria-controls', periodBody.id)
       press.setAttribute('aria-expanded', String(segment.id === band))
       press.tabIndex = segment.id === band ? 0 : -1
+      const run = runs[index] ?? segment
       Object.assign(press.style, {
-        left: `${segment.left}px`, width: `${Math.max(12, segment.right - segment.left)}px`,
+        left: `${run.left}px`, width: `${Math.max(12, run.right - run.left)}px`,
         top: `${segment.top + segment.height / 2 - 22}px`,
       })
+      // a block drawn taller than the press is pressed over its whole height
+      if (segment.height > 44) Object.assign(press.style, { top: `${segment.top}px`, height: `${segment.height}px` })
       press.addEventListener('click', () => select(segment.id, 'ribbon'))
       press.addEventListener('keydown', event => step(event, record))
       presses.append(press)
@@ -278,6 +293,51 @@ export function createWingLife(options: WingLifeOptions): WingLife {
       from: record.span.from, to: record.span.to,
       longest: spokenCount(tally.longestGapYears, language),
     }))), counts.lastElementChild)
+    restAtTheFoot(side)
+  }
+
+  /** A PRESS IS 44 PX WIDE, also over a block that is narrower. Where every
+   * block is that wide each press is its own block, as drawn. Where one is
+   * not, the presses share the strip from end to end, and a narrow one takes
+   * what it lacks from the neighbours that can spare it. */
+  function pressRuns(bands: readonly { left: number; right: number }[], width: number): { left: number; right: number }[] {
+    const least = 44, count = bands.length
+    const drawn = bands.map(band => ({ left: band.left, right: band.right }))
+    if (!count || bands.every(band => band.right - band.left >= least) || count * least > width) return drawn
+    const cuts = [0, ...bands.slice(1).map((band, index) => (bands[index]!.right + band.left) / 2), width]
+    const wide = (at: number): number => cuts[at + 1]! - cuts[at]!
+    const spare = (at: number): number => at < 0 || at >= count ? 0 : Math.max(0, wide(at) - least)
+    for (let index = 0; index < count; index++) {
+      const lack = least - wide(index), before = spare(index - 1), after = spare(index + 1)
+      if (lack <= 0 || before + after <= 0) continue
+      const take = Math.min(lack, before + after)
+      cuts[index] = cuts[index]! - take * before / (before + after)
+      cuts[index + 1] = cuts[index + 1]! + take * after / (before + after)
+    }
+    // narrow ones side by side take it from further along the strip
+    for (let index = 0; index < count - 1; index++) if (wide(index) < least) cuts[index + 1] = cuts[index]! + least
+    for (let index = count - 1; index > 0; index--) if (wide(index) < least) cuts[index] = cuts[index + 1]! - least
+    return bands.map((_, index) => ({ left: cuts[index]!, right: cuts[index + 1]! }))
+  }
+
+  /** NOTHING STANDS HALF UNDER THE FOOT AT REST. Sideways the sheet scrolls
+   * under a foot that stays, so the first of the parts under the drawing
+   * that the foot's edge would run through waits under it whole, and the
+   * first screen ends on the last part it holds. */
+  function restAtTheFoot(side: boolean): void {
+    const parts = [second, caption, reading]
+    for (const part of parts) part.style.marginTop = ''
+    if (!side) return
+    const sheet = dialog.getBoundingClientRect()
+    const edge = sheet.top + dialog.clientTop + dialog.clientHeight - foot.offsetHeight + dialog.scrollTop
+    for (const part of parts) {
+      if (part.hidden) continue
+      const box = part.getBoundingClientRect()
+      const top = box.top + dialog.scrollTop, bottom = box.bottom + dialog.scrollTop
+      if (bottom <= edge - LIFE_SIDE.air) continue
+      if (top < edge) part.style.marginTop = `${(parseFloat(view.getComputedStyle(part).marginTop) || 0) + edge - top}px`
+      break
+    }
   }
 
   /** THE COUNTS READ AT THE END OF THE READING, on both stages: a pinned

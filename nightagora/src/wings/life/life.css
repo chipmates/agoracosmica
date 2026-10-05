@@ -50,6 +50,9 @@
   stroke:var(--ui-ground-sheet);stroke-width:3;stroke-linejoin:round;paint-order:stroke fill;
   transition:fill 240ms cubic-bezier(.25,.1,.25,1);}
 .wing-life-segment[data-open='true'] .wing-life-place {fill:var(--ui-on-way);stroke:var(--ui-way);}
+/* A name over the strip is joined to its own block by a leader. */
+.wing-life-lead {stroke:var(--ui-line-strong);stroke-width:1;transition:stroke 240ms cubic-bezier(.25,.1,.25,1);}
+.wing-life-segment[data-open='true'] .wing-life-lead {stroke:var(--ui-way);}
 /* An empty stretch interrupts the bar: the years are there and the record is
    not, so the bar stops and a rule bridges the break. */
 .wing-life-break {stroke:var(--ui-line-strong);stroke-opacity:.5;stroke-width:1;stroke-dasharray:2 3;}
@@ -267,7 +270,7 @@
 /* THE QUIET CEREMONY IS OPTIONAL. Where the visitor asked for no motion the
    same states are cuts, and the marker jumps to the date it names. */
 @media (prefers-reduced-motion: reduce) {
-  .wing-life-date-body,.wing-life-date-inner,.wing-life-marker,.wing-life-period,.wing-life-place,.wing-life-item-name,
+  .wing-life-date-body,.wing-life-date-inner,.wing-life-marker,.wing-life-period,.wing-life-place,.wing-life-lead,.wing-life-item-name,
   .wing-life-head,.wing-life-second,.wing-life-caption,.wing-life-drawing
     {transition:none;}
 }
