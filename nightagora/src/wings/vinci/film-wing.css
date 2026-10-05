@@ -657,6 +657,17 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 }
 #wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-line { margin-bottom: 10px; font: 400 1.0625rem/24px var(--serif); }
 #wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-name { font-size: 1.125rem; }
+/* opened, the grab says what it does where the folded one said Mehr, its arrow down; the name keeps clear of it */
+#wing[data-film='upright'] .vitrine[data-narrow='true'][data-read='true'] .vitrine-grab::before { content: none; }
+#wing[data-film='upright'] .vitrine[data-narrow='true'][data-read='true'] .vitrine-grab-says {
+  display: block; position: absolute; right: 20px; top: 24px; font: 400 .9375rem/1 var(--sans); color: var(--ui-text);
+  white-space: nowrap; text-decoration: underline; text-decoration-color: var(--ui-line-strong);
+  text-underline-offset: 5px; text-decoration-thickness: 1px;
+}
+#wing[data-film='upright'] .vitrine[data-narrow='true'][data-read='true'] .vitrine-grab-says::after {
+  content: '\2193'; display: inline-block; margin-left: 6px; text-decoration: none;
+}
+#wing[data-film='upright'] .vitrine[data-narrow='true'][data-read='true'] .vitrine-name { padding-right: 104px; }
 /* the window holds the label whole: its second door, for a card that folds, stands down */
 #wing[data-film='upright'] .vitrine[data-read='true'] .picture-label-rest { display: block; }
 #wing[data-film='upright'] .vitrine[data-read='true'] .picture-label-more { display: none; }

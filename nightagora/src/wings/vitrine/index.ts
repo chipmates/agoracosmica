@@ -213,6 +213,10 @@ export function createVitrine(options: {
   const grab = make('button', 'vitrine-grab')
   grab.type = 'button'
   grab.setAttribute('aria-controls', options.id)
+  // the word the opened window's grab says, where a form draws it
+  const grabSays = make('span', 'vitrine-grab-says')
+  grabSays.setAttribute('aria-hidden', 'true')
+  grab.append(grabSays)
   card.append(grab, body, controls, foot)
   /** ONE MARK DISMISSES THE WINDOW where the card's own row has stood down. */
   const shutMark = make('button', 'vitrine-shut')
@@ -1059,7 +1063,10 @@ export function createVitrine(options: {
    * it has them. */
   function nameTheGrabber(): void {
     const words = exhibit?.payload?.raiseWords
-    grab.setAttribute('aria-label', words ? (raised ? words.down : words.up) : options.raiseLabel?.() ?? '')
+    // opened, the grab folds the window and says so, as the sideways key does
+    const fold = FOLD_SAYS[options.lang()]
+    grab.setAttribute('aria-label', words ? (raised ? words.down : words.up) : raised ? fold : options.raiseLabel?.() ?? '')
+    grabSays.textContent = raised ? fold : ''
     // drawn beside the name, the key says the host's one short word on every kind: a payload's longer name would run into the name
     grab.dataset['says'] = options.raiseLabel?.() ?? words?.up ?? ''
   }
