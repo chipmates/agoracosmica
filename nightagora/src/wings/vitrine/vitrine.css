@@ -102,6 +102,8 @@
 @media(max-aspect-ratio:9/10) {
   .vitrine-card {padding:10px 12px 12px;background:transparent;border:0;}
   .vitrine-view {border:1px solid var(--ui-line);border-bottom:0;border-radius:var(--ui-r-square);overflow:hidden;box-sizing:border-box;}
+  /* the hairline edges a dark plate; a look whose picture is the room's own film has no pane to edge */
+  .vitrine:is([data-payload='machine'],[data-payload='showpiece'],[data-payload='place']) .vitrine-view {border-color:transparent;}
   .vitrine-name {margin-bottom:6px;font-size:16px;}
   .vitrine-line {margin-bottom:6px;font-size:15px;line-height:1.32;}
   .vitrine-catalogue {margin:-3px 0 6px;font-size:13px;}
