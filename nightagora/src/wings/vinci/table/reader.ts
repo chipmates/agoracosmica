@@ -349,11 +349,15 @@ export function createReaderPayload(options: {
         // A control a hand has to hit, in a window a thumb reaches.
         select.style.minHeight = '44px'
         select.style.marginLeft = '8px'
+        // the entry stands on what the page read is, by the selector's own key: a leaf and its facing print share one leaf
+        const here = value(page)
         for (const entry of records) {
           const option = document.createElement('option')
-          option.value = value(entry); option.textContent = text(entry); option.selected = entry.file === page.file
+          option.value = value(entry); option.textContent = text(entry)
           select.append(option)
         }
+        const current = [...select.options].findIndex(option => option.value === here)
+        if (current >= 0) select.selectedIndex = current
         select.addEventListener('change', () => payload.open(select.value))
         wrap.append(select)
         full.append(wrap)
