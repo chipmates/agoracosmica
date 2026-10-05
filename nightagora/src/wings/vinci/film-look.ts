@@ -460,10 +460,13 @@ export function createFilmLook(h: FilmLookHost) {
   /** THE DOOR BESIDE A FILMED MACHINE: the sheet where one is held. Where
       none is, a phone's glass would promise a page and open words, so it has
       no door and the record's own control names the sheet; a wide stage
-      keeps the sheet's name in words, which open that record. */
+      keeps the sheet's name in words, which open that record. A machine no
+      sheet survives for has no name to print, so no door on any stage. */
   function sheetDoor(slug: MachineSlug, openFolio: (() => void) | undefined, record: () => void): ReturnType<typeof vinciMachineSheet> | undefined {
     if (openFolio) return vinciMachineSheet(slug, openFolio)
-    return h.narrow() ? undefined : vinciMachineSheet(slug, record)
+    if (h.narrow()) return undefined
+    const door = vinciMachineSheet(slug, record)
+    return door.label ? door : undefined
   }
   /** THE SHEET, opened in the reader where the visitor stands. The way back
       to the machine is the look's own way back, as a film's sheet has it: the
