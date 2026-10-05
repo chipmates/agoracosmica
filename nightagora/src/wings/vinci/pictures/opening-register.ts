@@ -60,13 +60,13 @@ export interface OpeningDrawing {
 /** RIGHTS-POLICY.md, Tier 2, worded for a drawing as the wing's sheets are. */
 export const TIER2_DRAWING_HONESTY: OpeningBilingual = Object.freeze({
   en: 'Public domain work. Reproduction from Wikimedia Commons. The museum labels the reproduction, not the drawing. Non-profit cultural use.',
-  de: 'Gemeinfreies Werk. Reproduktion aus Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Zeichnung. Nichtkommerzielle kulturelle Nutzung.',
+  de: 'Gemeinfreies Werk. Reproduktion aus Wikimedia Commons. Das Museum kennzeichnet die Reproduktion, nicht die Zeichnung. Kulturelle Nutzung ohne Gewinnabsicht.',
 })
 
 /** An Italian state-held work names the code and the exemption it rests on. */
 export const ITALIAN_CODE_LINE: OpeningBilingual = Object.freeze({
-  en: 'Italian Codice dei beni culturali, art. 108, paragraph 3-bis: exemption for non-profit study, research and cultural promotion.',
-  de: 'Italienischer Codice dei beni culturali, Art. 108 Abs. 3-bis: Ausnahme für nicht gewinnorientiertes Studium, Forschung und Kulturvermittlung.',
+  en: 'Italian Codice dei beni culturali, art. 108 comma 3-bis: exemption for non-profit study, research and promotion of knowledge of the cultural heritage.',
+  de: 'Italienischer Codice dei beni culturali, Art. 108 comma 3-bis: Ausnahme für Studium, Forschung und Förderung der Kenntnis des Kulturerbes, jeweils ohne Gewinnabsicht.',
 })
 
 interface OpeningDrawingsFile { readonly drawings: readonly OpeningDrawing[] }
