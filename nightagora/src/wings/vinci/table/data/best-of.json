@@ -4,12 +4,12 @@
  "inputs": {
   "curator-250/SET.csv": "9edb048064cc91a1fccea997e925b823eaf0db4ae9f3661d335482482de2a792",
   "curator-250/TOPICS.csv": "60cc864f750bcf14ee8b60b2329ad75b81c510c1db9549aff0344653c72c61aa",
-  "words/captions.jsonl": "7c78897051d5c102c42698383fe266f2ae4dea9cf25426052713ca250f86c9e9",
+  "words/captions.jsonl": "056f16aa0b114ff716de6cafae8ba47909c0856f9c651f9c7de6de0b4a25dca5",
   "words/topics.json": "acc5230e6bb0d1363835eb6095f108629fee67a43ba6a10243ea077817562451",
   "words/notices.json": "0ce595d11d018e8596c538cf1dd40f9f041323d1994b502104a3c2f410198d42",
   "words/leads.jsonl": "25754a4dd652ac9fcbc544233ca1fe969ebf7a861c0dca4f75ee49021910cf45",
-  "words/keys.json": "2b3b3b5a204e87d5f93bc4bd8ed0f17cf8799c4ecfb03814b6b525c6e8b99a4e",
-  "words/phone-lines.jsonl": "d2363f639ba63730244a36d593f67389e4270bab12c77327843bc23ee07973f3",
+  "words/keys.json": "467ee9082dac2c8a38e40bc7adbc1d47269882500ed480231b5c78ab0c76a086",
+  "words/phone-lines.jsonl": "18eabec362c3eb7b68a41b9b8f45778cb30cf6d16c17894ce563c3e7ff71cd80",
   "texts-final/it-b.jsonl": "4baec9ed8ac99ef71e2feb1d647b0124fbf9f3a83d19ffd56fe1ed139b957e03",
   "texts-final/it.jsonl": "00e6af9c3a0a3545a368c19b0cd58ce1f37d78a2c12f093243206605106b7a74",
   "texts-final/rh-b.jsonl": "3754cf721940edda3f53547f159beccb6e2af5b2f3ded0986b3c4cbba93b2fe4",
@@ -95,12 +95,12 @@
    "de": "{topic}, {n} von {total}"
   },
   "absence_paris_rest": {
-   "en": "Pages from them appear in the topics, from the Institut's own photographs. The museum chose single pages for its topics, not the whole books.",
-   "de": "Seiten daraus stehen in den Themen, aus den Fotografien des Institut de France. Das Museum hat für seine Themen einzelne Seiten gewählt, nicht die ganzen Bände."
+   "en": "Pages from them appear in the topics, from photographs published by the library of the Institut de France. The museum chose single pages for its topics, not the whole books.",
+   "de": "Seiten daraus stehen in den Themen, aus Fotografien, die die Bibliothek des Institut de France veröffentlicht hat. Das Museum hat für seine Themen einzelne Seiten gewählt, nicht die ganzen Bände."
   },
   "absence_ashburnham": {
-   "en": "Some of them appear in the topics, from the Institut's own photographs. They were cut from manuscripts A and B, so they are not shown as a book.",
-   "de": "Einige davon stehen in den Themen, aus den Fotografien des Institut de France. Sie wurden aus den Manuskripten A und B herausgeschnitten und werden nicht als Buch gezeigt."
+   "en": "Some of them appear in the topics, from photographs published by the library of the Institut de France. They were cut from manuscripts A and B, so they are not shown as a book.",
+   "de": "Einige davon stehen in den Themen, aus Fotografien, die die Bibliothek des Institut de France veröffentlicht hat. Sie wurden aus den Manuskripten A und B herausgeschnitten und werden nicht als Buch gezeigt."
   },
   "absence_arundel_middle": {
    "en": "Pages from this part appear in the topics, from the British Library's own photographs. The printed copy of this part was never published, so this part is not on the shelf as a book.",
@@ -2598,8 +2598,8 @@
    "picture": "leaf",
    "credit": "Leonardo da Vinci, Codex Madrid I, f. 20v. Biblioteca Nacional de Espana digitisation via Wikimedia Commons; Creative Commons Attribution 4.0 International or equivalent licence.; https://commons.wikimedia.org/wiki/File:Leonardo_da_Vinci_-_Codex_Madrid_I.pdf",
    "caption": {
-    "en": "A caged ring of balls, rollers under a plate, a toothed ring.",
-    "de": "Ein Kranz von Kugeln im Käfig, Walzen unter einer Platte, ein Zahnkranz."
+    "en": "A ring of balls in a cage with small wheels between them, and a toothed wheel turning four pinions.",
+    "de": "Ein Kranz von Kugeln im Käfig mit kleinen Rädchen dazwischen, und ein Zahnrad, das vier Ritzel dreht."
    },
    "writing": true,
    "drawing_only": false,
@@ -2612,11 +2612,7 @@
    "lead_none": true,
    "lead_placeholder": false,
    "long": false,
-   "phone": {
-    "from": "caption",
-    "en": "A caged ring of balls, rollers under a plate, a toothed ring.",
-    "de": "Ein Kranz von Kugeln im Käfig, Walzen unter einer Platte, ein Zahnkranz."
-   },
+   "phone": null,
    "leaf": null,
    "plate": null,
    "mirror": "own"
