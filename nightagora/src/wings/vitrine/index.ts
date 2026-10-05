@@ -74,8 +74,10 @@ const RESIZE_FRAMES = 3
  * work's own name, the one control that raises the rest of the words, and
  * the payload's own row, each at the row's own size. */
 const PEEK = 190
-/** The share of the sheet a raised card takes over the work. */
-const RAISED_SHARE = .62
+/** THE READING WINDOW: the share of the sheet a raised card takes over the
+ * work at most. The rest stays the work's, so a reader sees what the words
+ * are about and where the window goes back to. */
+const READ_SHARE = .86
 /** However much its own peek asks for, a card never takes more of the sheet
  * than this: the work is what the window is for. */
 const PEEK_MOST = .42
@@ -83,19 +85,26 @@ const PEEK_MOST = .42
  * and keeps the work this share of the screen above the sheet. */
 const PEEK_LINE_ROWS = 2
 const WORK_AT_REST = 2 / 3
+/** The air a plate keeps in a stage it cannot fill, above and below together, before its line may take the rest. */
+const REST_AIR = 24
 /** A drag on the grabber this far decides; a shorter one is a press. */
 const GRAB_PX = 24
 const GRAB_SLOP = 8
 /** THE WORK OWNS THE STAGE: it fills this share of the stage's limiting side,
  * and the rest is the air every hung thing needs around it. */
 const WORK_SHARE = .92
-/** THE PHONE HELD SIDEWAYS: the instruments' column at the left, over the
- * walk's two seats and as wide as they are, the work's zone beside it, and a
- * label column at the right where a work stands beside its words. */
+/** THE PHONE HELD SIDEWAYS: the work's zone from the glass's left edge, and a
+ * label column at the right where a work stands beside its words; the close
+ * mark at the column's head, the look's ways in the foot row under it. */
 const CINEMA = {
-  tools: 104, toolsGap: 16,
   /** the label column: a share of the glass between two bounds, its gap to the work, its head */
   columnLeast: 256, columnMost: 300, columnShare: .31, columnGap: 28, columnTop: 18,
+  /** where a work leaves width it cannot use at the glass's height, the column takes it, up to this */
+  columnRest: 380,
+  /** the reading window: a share of the glass inside its safe areas, up to a measure a line reads well in */
+  readShare: .6, readMost: 460,
+  /** the close mark, the air it keeps, a seat of the foot row, and the most air between two seats that stand together */
+  shut: 44, shutGap: 8, seat: 44, together: 24,
   /** the air at the glass's top and foot, and over the foot row */
   air: 10, rowGap: 12,
   /** the strip in the foot row */
@@ -218,8 +227,8 @@ export function createVitrine(options: {
   for (const [name, value] of [['d', 'M4 4l8 8M12 4l-8 8'], ['fill', 'none'], ['stroke', 'currentColor'], ['stroke-width', '1.4'], ['stroke-linecap', 'round']] as const) stroke.setAttribute(name, value)
   cross.append(stroke)
   shutMark.append(cross)
-  /* SIDEWAYS, THE LOOK'S ONE KEY TO ITS WORDS: in the label column it reads
-     on down the column, in the foot row's strip it raises the strip's column */
+  /* SIDEWAYS, THE LOOK'S ONE KEY TO ITS WORDS: it opens the reading window,
+     from the label column and from the foot row's strip alike */
   const lookMore = make('button', 'vitrine-look-more')
   lookMore.type = 'button'
   const lookMoreWord = make('span', 'vitrine-look-more-word')
@@ -230,37 +239,47 @@ export function createVitrine(options: {
   const lookArrowPath = document.createElementNS('http://www.w3.org/2000/svg', 'path')
   lookArrow.append(lookArrowPath)
   lookMore.append(lookMoreWord, lookArrow)
-  /** and its other key: an opened column's own close mark at its head, back to the strip; a column at home, back to its head */
+  /** and its other key, in the same seat while the reading window stands: back to the label at rest */
   const lookLess = make('button', 'vitrine-look-more vitrine-look-less')
   lookLess.type = 'button'
   const lookLessWord = make('span', 'vitrine-look-more-word')
   const lessArrow = lookArrow.cloneNode(true) as SVGSVGElement
   const lessArrowPath = lessArrow.firstElementChild as SVGPathElement
   lookLess.append(lookLessWord, lessArrow)
-  /* SIDEWAYS THE WORK'S OWN TOOLS STAND BY THE LEFT HAND, over the walk's
-     seats: a payload marks each with `data-tool`, and the window stands it
-     in its place here while the form stands, and back where it was after */
+  /* ON A PHONE THE WORK'S OWN TOOLS LEAVE THE CARD: a payload marks each with
+     `data-tool`, and the window stands it in its place here while the form
+     stands, and back where it was after. THE FINGERS ZOOM, so the plate's
+     steps are not drawn there: they keep their names and their place in the
+     reading order here, and show while a keyboard holds one of them */
   const tools = make('div', 'vitrine-tools')
   tools.hidden = true
-  const TOOL_ORDER = ['way', 'zoom', 'whole', 'play', 'source'] as const
-  const toolSlots = new Map<string, HTMLElement>(TOOL_ORDER.map(kind => {
-    const slot = make('div', `vitrine-tools-slot vitrine-tools-${kind}`)
-    tools.append(slot)
-    return [kind, slot]
-  }))
-  /** a film's clock runs along the film's own foot, over it */
+  const toolSlots = new Map<string, HTMLElement>([['zoom', tools], ['whole', tools]])
+  /** a film's pause, its clock and its sheet run along the film's own foot, over it */
   const clockFoot = make('div', 'vitrine-clockfoot')
   clockFoot.hidden = true
-  toolSlots.set('clock', clockFoot)
+  for (const kind of ['play', 'clock', 'source']) toolSlots.set(kind, clockFoot)
+  /** the tools an upright phone lends: the rest keep the card's own row there */
+  const UPRIGHT_LENDS = new Set(['zoom', 'whole', 'turn'])
   /** A BOOK'S PAGER under its seat in the label column: the step back, the
    * count, the step on, and the strip of its leaves behind the count */
   const pager = make('div', 'vitrine-pager')
   pager.hidden = true
   for (const kind of ['page', 'count', 'leaves']) toolSlots.set(kind, pager)
+  /** UPRIGHT, A BOOK WITHOUT A STRIP steps from the card's head, beside the
+   * page's name: the row the two steps kept alone goes to the page */
+  const headSteps = make('div', 'vitrine-headsteps')
+  headSteps.hidden = true
   /** where each tool stood before the form took it, so it goes back to the same place */
   const lent = new Map<HTMLElement, Comment>()
   /** a payload that marks no tools of its own (the live island) is read by its controls' own classes */
-  const UNMARKED: readonly (readonly [string, string])[] = [['vitrine-play', 'play'], ['vitrine-track', 'clock'], ['vitrine-viewpoint', 'way'], ['vitrine-folio-glass', 'source']]
+  const UNMARKED: readonly (readonly [string, string])[] = [['vitrine-play', 'play'], ['vitrine-track', 'clock'], ['vitrine-folio-glass', 'source']]
+  /** THE HOST'S WAY ON, where it keeps its foot row under the window: a work's
+   * own turn (a page's other way) stands left of it, in that row */
+  const wayOn = (): HTMLElement | null => (host.dataset['keepsFoot'] !== undefined ? host.querySelector<HTMLElement>('.film-foot > .film-gold') : null)
+  grab.after(headSteps)
+  /** true where a book's steps stand at the card's head: upright, at rest, a lined book with no strip of its own */
+  const stepsAtHead = (): boolean => !cinemaFrame && !raised && Boolean(exhibit?.payload?.lined)
+    && host.dataset['keepsFoot'] !== undefined && root.querySelector('.reader[data-strip="false"]') !== null
   const toolOf = (node: HTMLElement): string | undefined => node.dataset['tool']
     ?? (payloadControls.contains(node) ? UNMARKED.find(([cls]) => node.classList.contains(cls))?.[1] : undefined)
   // THE HAND MEETS THE WORDS FIRST: the card takes the focus on opening, and
@@ -287,6 +306,8 @@ export function createVitrine(options: {
   /** the cinema form's measure while it stands, else null */
   let cinemaFrame: VitrineCinema | null = null
   let raised = false
+  /** what the folded card kept clear of the work at rest: the reading window rises over the work and never resizes it */
+  let restPeek: number | null = null
   /** THE LINE THE CARD SAYS, whole, and its source row; the peek may say its own. */
   let spoken: { head: string | null; note: string | null; short: string | null; restNote: string | null; restSource: string | null
     own: VitrinePeek['own'] } = { head: null, note: null, short: null, restNote: null, restSource: null, own: null }
@@ -340,13 +361,24 @@ export function createVitrine(options: {
     const frame = narrow ? options.cinema?.() ?? null : null
     root.dataset['narrow'] = String(narrow)
     const as = frame ? 'cinema' : narrow ? 'narrow' : 'desk'
+    /* WHILE THE PHONE'S WINDOW IS READ the work's own row and the card's row
+       ride the words, after their last line; everywhere else they stand under them */
+    const reading = as === 'narrow' && raised && Boolean(exhibit?.payload?.fill)
+    if (!reading && controls.parentElement !== card) card.insertBefore(controls, foot)
     if (laidAs !== as) {
       if (as !== 'cinema') leaveCinema()
+      // every lent tool goes home, and the new form lends what it has a place for
+      returnTools()
+      if (as === 'desk') toolWatch.disconnect()
       laidAs = as
       if (frame) { body.insertBefore(payloadControls, words); seat.after(pager) }
-      else if (narrow) card.insertBefore(payloadControls, controls)
-      else if (!inBand()) root.append(payloadControls)
+      else if (!narrow && !inBand()) root.append(payloadControls)
     }
+    if (as === 'narrow') {
+      if (reading) body.append(payloadControls, controls)
+      else if (payloadControls.parentElement !== card) card.insertBefore(payloadControls, controls)
+    }
+    if (as !== 'narrow') { delete root.dataset['read']; delete root.dataset['restLine'] }
     cinemaFrame = frame
     if (frame) layCinema(frame)
     else if (narrow) {
@@ -362,32 +394,51 @@ export function createVitrine(options: {
       place(stage, rects.view)
       root.dataset['fill'] = String(fill)
       root.dataset['peek'] = String(fill && !raised)
+      root.dataset['read'] = String(reading)
+      grab.hidden = !fill
+      // the plate's steps leave the card before it is measured: the fingers zoom
+      if (!stepsAtHead()) giveBack(headSteps)
+      gatherTools()
+      toolWatch.observe(root, { childList: true, subtree: true })
       // THE PEEK IS WHAT IT HAS TO SHOW. A work whose name takes two lines
       // gets the two lines: the card is placed once to be measured in its
       // own width, and then at the height its own peek needs.
-      let peek = Math.min(PEEK, Math.round(tall * .34))
+      let peek = raised && restPeek !== null ? restPeek : Math.min(PEEK, Math.round(tall * .34))
       const place2 = (height: number): void => {
         const at = bottom - height
         place(sheet, { left, top: at, width: right - left, height })
         place(card, { left, top: at, width: right - left, height })
       }
       const lined = Boolean(exhibit?.payload?.lined)
+      delete root.dataset['restLine']
       if (fill && !raised && lined) {
         // ONE REST HEIGHT FOR EVERY PAGE of a lined book, never over a third
         // of the screen: a page with less to say leaves its room empty
-        peek = Math.max(0, Math.min(restHeight(place2), bottom - Math.ceil(height * WORK_AT_REST)))
+        peek = Math.max(0, restHeight(place2, bottom - Math.ceil(height * WORK_AT_REST)))
         place2(peek)
         paintLine(() => body.scrollHeight <= body.clientHeight + 1)
       } else if (fill && !raised) {
         place2(peek)
         paintLine(peekRoom)
-        peek = Math.min(Math.max(peek, peekAsked()), Math.round(tall * PEEK_MOST))
+        // where the host keeps its foot row the card at rest is what it has to show, and the work takes the rest
+        const snug = host.dataset['keepsFoot'] !== undefined
+        peek = Math.min(snug ? restAsked() : Math.max(peek, peekAsked()), Math.round(tall * PEEK_MOST))
+        /* A PLATE THAT CANNOT USE THE STAGE'S HEIGHT leaves it to its line: fitted
+           by its width, it stands as large with the line under its name as without */
+        const shape = snug && exhibit?.payload?.kind === 'deep-plate' && spoken.head ? exhibit.payload.aspect?.() ?? null : null
+        if (shape && tall - peek - Math.ceil((right - left) / shape) - REST_AIR > 0) {
+          root.dataset['restLine'] = 'true'
+          const said = Math.min(restAsked(), Math.round(tall * PEEK_MOST))
+          if (tall - said - Math.ceil((right - left) / shape) - REST_AIR >= 0) peek = said
+          else delete root.dataset['restLine']
+        }
       } else paintLine(null)
       // The sheet is the card's ground; the viewport above it stays open to
       // the stage, so the work is seen and not a shade through a panel.
       // a raised card takes the height its words need, never more than its share
-      if (fill && raised) place2(Math.round(tall * RAISED_SHARE))
-      place2(fill ? (raised ? Math.max(peek, Math.min(Math.round(tall * RAISED_SHARE), raisedAsked())) : peek) : bottom - top - viewHeight)
+      if (fill && raised) place2(Math.round(tall * READ_SHARE))
+      place2(fill ? (raised ? Math.max(peek, Math.min(Math.round(tall * READ_SHARE), raisedAsked())) : peek) : bottom - top - viewHeight)
+      if (fill && !raised) restPeek = peek
       payloadControls.style.cssText = ''
       // a lined book's page runs to the stage's top corner, where its folio
       // stands: the mark waits above the stage there
@@ -395,8 +446,10 @@ export function createVitrine(options: {
       // The peek is what the payload keeps clear of the card, raised or not:
       // a card that rises stands OVER the work rather than resizing it.
       root.style.setProperty('--vitrine-peek', `${fill ? peek : 0}px`)
-      grab.hidden = !fill
       shutMark.hidden = false
+      // the unseen steps' place while a keyboard holds one: the work's lower left, over the card
+      const low = fill ? bottom - peek : top + viewHeight
+      Object.assign(tools.style, { left: `${left + 8}px`, top: `${Math.round(low - 52)}px` })
     } else if (inBand()) {
       paintLine(null)
       // THE WORK OWNS THE STAGE. The picture's box is the window less the
@@ -461,40 +514,58 @@ export function createVitrine(options: {
   const onWall = (): boolean => cinemaFrame !== null && typeof exhibit?.payload?.aspect === 'function' && surface !== 'own'
 
   /** THE LOOK SIDEWAYS. A work whose shape gives it more area beside a label
-   * column stands BESIDE it at the stage's full height; a wider work, a film
-   * and a machine's cycle stand UNDER, over the foot row, whose strip carries
-   * the words. The walk's seats and gold keep their places in that row. */
+   * column stands BESIDE it at the stage's full height; a wider work stands
+   * UNDER, over the foot row, whose strip carries the words. Nothing of the
+   * museum stands left of the work: the close mark is at the glass's upper
+   * right, the column's head, and the look's ways stand in the foot row
+   * under the column. */
   function layCinema(frame: VitrineCinema): void {
     const width = view.innerWidth, height = view.innerHeight
     const safe = frame.safe, right = safe.left + safe.width
-    const left = safe.left + CINEMA.tools + CINEMA.toolsGap, top = safe.top + CINEMA.air
-    const column = Math.round(Math.min(CINEMA.columnMost, Math.max(CINEMA.columnLeast, width * CINEMA.columnShare)))
+    const left = safe.left, top = safe.top + CINEMA.air
+    const across = right - left, down = height - CINEMA.air - top
     const filmed = Boolean(root.querySelector('[data-tool="clock"], .vitrine-clockfoot .vitrine-track, .vitrine-payload-controls .vitrine-track'))
-    const beside: VitrineRect = { left, top, width: right - column - CINEMA.columnGap - left, height: height - CINEMA.air - top }
-    const under: VitrineRect = { left, top, width: right - left, height: frame.row.top - CINEMA.rowGap - top }
     const aspect = exhibit?.payload?.aspect?.() ?? null
-    const area = (shape: number, box: VitrineRect): number => { const across = Math.min(box.width, box.height * shape); return across * across / shape }
     /* A MACHINE RESTS BESIDE ITS WORDS: its film's frame is wide, but the
        machine inside it stands taller in the field at the glass's height than
        over the strip, and its step's line reads in the label column */
     const machine = exhibit?.payload?.kind === 'machine'
-    // a work that stands under steps aside when its words open: the words take the label column, the work the place beside it
-    const home = !machine && aspect && area(aspect, under) > area(aspect, beside) ? 'under' : 'beside'
+    /* THE LOOK'S WAYS (the work before, a page's other way, gold) stand
+       together at the foot row's right: the column over them is as wide as
+       they are, so a work at the glass's full height never runs under them */
+    // a work that cannot use the zone's whole width at the glass's height leaves the rest to its words
+    const spare = aspect && !machine ? across - CINEMA.columnGap - Math.ceil(down * aspect) : 0
+    const ways = waysWide(frame, right, spare)
+    const least = Math.max(Math.round(Math.min(CINEMA.columnMost, Math.max(CINEMA.columnLeast, width * CINEMA.columnShare))),
+      Math.min(Math.ceil(ways), Math.round(across * CINEMA.readShare)))
+    const rest = Math.max(least, Math.min(CINEMA.columnRest, spare))
+    // THE READING WINDOW: the words take most of the glass, and the work, still whole, what is left
+    const column = raised ? Math.max(rest, Math.round(Math.min(CINEMA.readMost, across * CINEMA.readShare))) : rest
+    const besideOf = (words: number): VitrineRect => ({ left, top, width: right - words - CINEMA.columnGap - left, height: down })
+    const beside = besideOf(column)
+    const under: VitrineRect = { left, top, width: across, height: frame.row.top - CINEMA.rowGap - top }
+    const area = (shape: number, box: VitrineRect): number => { const wide = Math.min(box.width, box.height * shape); return wide * wide / shape }
+    // a work that stands under steps aside when its words open: the words take the column, the work the place beside it
+    const home = !machine && aspect && area(aspect, under) > area(aspect, besideOf(rest)) ? 'under' : 'beside'
     const form = home === 'under' && raised ? 'beside' : home
+    // under the close mark a work steps aside, where that costs it nothing
+    if (form === 'under' && aspect) {
+      const wide = Math.min(under.width, under.height * aspect), reach = CINEMA.shut + CINEMA.shutGap
+      if ((under.width - wide) / 2 < reach && under.width - reach >= wide) under.width -= reach
+    }
     root.dataset['form'] = 'cinema'
     root.dataset['lookForm'] = form
     root.dataset['lookHome'] = home
-    root.toggleAttribute('data-look-open', home === 'under' && raised)
+    root.toggleAttribute('data-look-open', raised)
     root.toggleAttribute('data-look-film', filmed)
     root.dataset['lookWall'] = String(onWall())
     root.dataset['lookAspect'] = aspect ? aspect.toFixed(3) : ''
     // the shape where both forms give a work the same area: wider than this, it stands under
-    root.dataset['lookCrossover'] = (beside.width / under.height).toFixed(2)
+    root.dataset['lookCrossover'] = (besideOf(rest).width / under.height).toFixed(2)
     delete root.dataset['fill']
     delete root.dataset['peek']
     root.style.setProperty('--vitrine-peek', '0px')
     grab.hidden = true
-    shutMark.hidden = true
     sheet.style.cssText = ''
     payloadControls.style.cssText = ''
     paintLine(null)
@@ -508,29 +579,55 @@ export function createVitrine(options: {
     else if (!aside && caption.parentElement !== stage) { stage.append(caption); wordsResized.unobserve(caption) }
     if (form === 'beside') {
       /* THE LABEL COLUMN IS A BOX ON THE WALL in the walk's own ground, from
-         the glass's top air to the foot row: it reaches into the gap to the
-         field's edge, or to the way on's edge under it where that is wider,
-         never to the work; its padding (the head less the air at the top,
-         at the left whatever it reached) keeps the words where the column
-         stands */
-      const top = safe.top + CINEMA.air
-      const from = Math.max(beside.left + beside.width + 2, Math.min(right - column - CINEMA.columnGap / 2, frame.row.gold))
+         the glass's top air to the foot row; its left padding keeps the words
+         where the column stands */
+      const from = right - column - CINEMA.columnGap / 2
       place(card, { left: from, top, width: right - from, height: frame.row.top - CINEMA.rowGap - top })
-      card.style.paddingLeft = `${Math.round(right - column - from)}px`
+      card.style.paddingLeft = `${Math.round(CINEMA.columnGap / 2)}px`
     } else {
+      // the strip runs from the glass's left edge to the look's ways
       card.style.removeProperty('padding-left')
       const stripTop = Math.round((frame.row.top + frame.row.bottom - CINEMA.strip) / 2)
-      const from = Math.max(left, frame.row.seats + CINEMA.rowGap)
-      const across = Math.max(120, frame.row.gold - 16 - from)
-      place(card, { left: from, top: stripTop, width: across, height: CINEMA.strip })
+      place(card, { left, top: stripTop, width: Math.max(120, right - ways - 16 - left), height: CINEMA.strip })
     }
     // the part of the glass a film may run to: all of it under the strip, all but the label column beside it
     rects.field = form === 'under' ? { left: 0, top: 0, width, height } : { left: 0, top: 0, width: right - column - CINEMA.columnGap / 2, height }
+    // ONE CLOSE, where the column's head is: it keeps its place whatever the card does
+    shutMark.hidden = false
+    place(shutMark, { left: right - CINEMA.shut, top, width: CINEMA.shut, height: CINEMA.shut })
     gatherTools()
     toolWatch.observe(root, { childList: true, subtree: true })
-    if (!tools.hidden) place(tools, { left: safe.left, top, width: CINEMA.tools - 8, height: frame.row.top - CINEMA.rowGap - top })
+    // the unseen steps' place while a keyboard holds one: the work's lower left, over the glass's own foot bar
+    Object.assign(tools.style, { left: `${Math.round(rects.view.left + 8)}px`, top: `${Math.round(Math.min(rects.view.top + rects.view.height, safeFoot()) - 52)}px` })
     fitStrip()
     paintLookMore()
+  }
+  /** Where the look's ways begin at the foot row's right: the left edge of the seats that stand together from gold leftward. */
+  function waysFrom(frame: VitrineCinema, right: number): number {
+    const row = wayOn()?.parentElement
+    if (!row) return frame.row.gold
+    const seats = ([...row.children] as HTMLElement[]).filter(seat => !seat.hidden).map(seat => seat.getBoundingClientRect())
+      .filter(box => box.width > 0 && box.height > 0).sort((a, b) => b.right - a.right)
+    let from = Math.min(right, frame.row.gold)
+    for (const box of seats) {
+      if (box.left >= from) continue
+      if (from - box.right > CINEMA.together) break
+      from = box.left
+    }
+    return from
+  }
+  /** How wide the look's ways stand. Where they are wider than the room a work
+   * leaves beside itself, a page's turn sets its word on two rows first: read
+   * from the turn at its full width each time, so the answer never reads itself. */
+  function waysWide(frame: VitrineCinema, right: number, room: number): number {
+    const wide = (): number => Math.max(0, right - waysFrom(frame, right))
+    const turn = [...lent.keys()].find(node => node.dataset['tool'] === 'turn' && !node.hidden)
+    if (!turn) return wide()
+    delete turn.dataset['tight']
+    const loose = wide()
+    if (room <= 0 || loose <= room) return loose
+    turn.dataset['tight'] = 'true'
+    return wide()
   }
   /** The strip's two rows, each cut at a word's end where it does not fit whole. */
   function fitStrip(): void {
@@ -560,21 +657,22 @@ export function createVitrine(options: {
   function clampWords(): void {
     cutAsked = false
     if (!cinemaFrame || root.dataset['lookForm'] !== 'beside') { cut = null; unmaskLines(body); return }
-    cut = wholeLines(body, { from: headBand(body.scrollTop > 0.5), reach: restReach() })
-    maskWholeLines(body, cut)
+    const head = headBand()
+    cut = wholeLines(body, { from: head, reach: restReach() })
+    maskWholeLines(body, cut, head)
   }
   /** at rest a machine beside its words says its step in its own line, so its list of steps waits for the page read on */
   function restReach(): number | undefined {
-    if (!root.hasAttribute('data-look-aside') || body.scrollTop > 0.5) return undefined
+    if (raised || !root.hasAttribute('data-look-aside') || body.scrollTop > 0.5) return undefined
     const list = body.querySelector<HTMLElement>('.vitrine-steps')
     if (!list) return undefined
     const at = list.getBoundingClientRect().top - body.getBoundingClientRect().top - body.clientTop
     return at > 0 && at < body.clientHeight ? at : undefined
   }
-  /** read on, an opened column's lines start under its close mark, which stands beside the name at its head */
-  function headBand(scrolled: boolean): number {
-    if (!scrolled || !lookLess.hasAttribute('data-head') || lookLess.hidden) return 0
-    return Math.max(0, lookLess.getBoundingClientRect().bottom - body.getBoundingClientRect().top - body.clientTop)
+  /** read on, the window's lines pass under its name, which stays at its head */
+  function headBand(): number {
+    if (!raised || body.scrollTop <= 0.5 || naming.hidden) return 0
+    return Math.max(0, naming.getBoundingClientRect().bottom - body.getBoundingClientRect().top - body.clientTop)
   }
   const askClamp = (): void => { if (cutAsked) return; cutAsked = true; requestAnimationFrame(() => { clampWords(); paintLookMore() }) }
   /** A FILM'S FOOT: its clock along the film's lower edge, its line centred
@@ -585,22 +683,26 @@ export function createVitrine(options: {
     clockFoot.hidden = !filmed || !clockFoot.firstElementChild
     if (!filmed) { delete root.dataset['lookWords']; return }
     const zone = rects.view
+    // a film's keys stand over the glass's own foot bar, never under it
+    const floor = safeFoot()
     // a film that keeps its words clear of it names where they stand: the line over the clock, both on the wall
     const said = exhibit?.payload?.filmWords?.() ?? null
     if (said) {
       const box = said.box, inset = said.beside ? 0 : CINEMA.clockInset
+      // the line stands over the clock wherever the clock stands
+      const foot = Math.min(box.top + box.height, floor)
       root.dataset['lookWords'] = said.beside ? 'beside' : 'under'
-      place(clockFoot, { left: box.left + inset, top: box.top + box.height - CINEMA.clock, width: Math.max(44, box.width - 2 * inset), height: CINEMA.clock })
+      place(clockFoot, { left: box.left + inset, top: foot - CINEMA.clock, width: Math.max(44, box.width - 2 * inset), height: CINEMA.clock })
       stage.style.setProperty('--words-left', `${Math.round(box.left - zone.left)}px`)
       stage.style.setProperty('--words-width', `${Math.round(box.width)}px`)
-      stage.style.setProperty('--words-foot', `${Math.round(zone.top + zone.height - box.top - box.height)}px`)
+      stage.style.setProperty('--words-foot', `${Math.round(zone.top + zone.height - foot)}px`)
       return
     }
     delete root.dataset['lookWords']
     const own = exhibit?.payload?.filmBox?.() ?? null
     const left = Math.max(zone.left, own?.left ?? zone.left)
     const right = Math.min(zone.left + zone.width, own ? own.left + own.width : zone.left + zone.width)
-    const foot = Math.min(zone.top + zone.height, own ? own.top + own.height : zone.top + zone.height)
+    const foot = Math.min(zone.top + zone.height, own ? own.top + own.height : zone.top + zone.height, floor)
     place(clockFoot, { left: left + CINEMA.clockInset, top: foot - CINEMA.clock, width: Math.max(44, right - left - 2 * CINEMA.clockInset), height: CINEMA.clock })
     const zoneFoot = zone.top + zone.height
     stage.style.setProperty('--film-left', `${Math.round(left - zone.left)}px`)
@@ -614,8 +716,10 @@ export function createVitrine(options: {
     stage.style.setProperty('--fall-width', `${Math.round(fall.width)}px`)
     stage.style.setProperty('--fall-below', `${Math.round(fall.below)}px`)
   }
+  /** the lower edge of the glass inside its safe areas, sideways */
+  const safeFoot = (): number => (cinemaFrame ? cinemaFrame.safe.top + cinemaFrame.safe.height : view.innerHeight)
   /** the form's own places a payload's tools are lent into */
-  const toolHomes = (): HTMLElement[] => [...new Set(toolSlots.values())]
+  const toolHomes = (): HTMLElement[] => [...new Set(toolSlots.values()), headSteps]
   /** A LENT TOOL'S PLACE IS ITS PAYLOAD'S, never the form's: a payload that
    * set a node beside one of its lent tools set it in the form's place, so it
    * goes beside that tool's home; a lent tool whose home its payload took
@@ -646,28 +750,30 @@ export function createVitrine(options: {
   }
   /** The payload's tools into the form's own places; one the form has no place for stays where it is. */
   function gatherTools(): void {
-    if (!cinemaFrame) return
+    if (!options.narrow()) return
     settleTools()
     let clocked = false
-    for (const node of root.querySelectorAll<HTMLElement>('[data-tool], .vitrine-payload-controls :is(.vitrine-play, .vitrine-track, .vitrine-viewpoint, .vitrine-folio-glass)')) {
+    for (const node of root.querySelectorAll<HTMLElement>('[data-tool], .vitrine-payload-controls :is(.vitrine-play, .vitrine-track, .vitrine-folio-glass)')) {
       if (lent.has(node)) continue
       const kind = toolOf(node)
-      const slot = toolSlots.get(kind ?? '')
-      if (!slot) continue
+      const atHead = kind === 'page' && stepsAtHead()
+      if (!kind || !(cinemaFrame || atHead || UPRIGHT_LENDS.has(kind))) continue
+      // a page's other way stands left of the host's way on, in the host's own row
+      const on = kind === 'turn' ? wayOn() : null
+      const slot = atHead ? headSteps : toolSlots.get(kind)
+      if (!slot && !on) continue
       const mark = document.createComment('')
       node.before(mark)
       lent.set(node, mark)
-      slot.append(node)
+      if (on) { on.before(node); turnWatch.observe(node) }
+      else slot!.append(node)
       if (kind === 'clock') clocked = true
-      // a step drawn as a glyph keeps its word as its name and its hint
-      if (kind === 'zoom') {
-        const word = node.textContent?.trim() ?? ''
-        if (!node.hasAttribute('aria-label')) { node.setAttribute('aria-label', word); node.dataset['toolNamed'] = '' }
-        if (!node.title) { node.title = node.getAttribute('aria-label') ?? word; node.dataset['toolHint'] = '' }
-      }
+      // a step that is not drawn keeps its word as its name
+      if (kind === 'zoom' && !node.hasAttribute('aria-label')) { node.setAttribute('aria-label', node.textContent?.trim() ?? ''); node.dataset['toolNamed'] = '' }
     }
-    tools.hidden = !tools.querySelector('.vitrine-tools-slot > *')
-    arrangePager()
+    tools.hidden = !tools.firstElementChild
+    headSteps.hidden = !headSteps.firstElementChild
+    if (cinemaFrame) arrangePager()
     // a clock that arrives after the look was laid out lays the film's foot again
     if (clocked && !root.hasAttribute('data-look-film')) queueMicrotask(() => layout())
   }
@@ -680,56 +786,59 @@ export function createVitrine(options: {
     else if (!borrow && countButton.parentElement !== seat) seat.append(countButton)
     pager.hidden = pages.length === 0
   }
+  /** The tools one of the form's places holds, back where their payload put them. */
+  function giveBack(home: HTMLElement): void {
+    for (const [node, mark] of lent) {
+      if (node.parentElement !== home) continue
+      if (mark.isConnected) mark.replaceWith(node)
+      else { mark.remove(); node.remove() }
+      lent.delete(node)
+    }
+    home.hidden = true
+  }
   /** Every tool back where its payload put it. */
   function returnTools(): void {
     for (const [node, mark] of lent) {
       if (node.dataset['toolNamed'] !== undefined) { node.removeAttribute('aria-label'); delete node.dataset['toolNamed'] }
-      if (node.dataset['toolHint'] !== undefined) { node.removeAttribute('title'); delete node.dataset['toolHint'] }
+      delete node.dataset['tight']
       if (mark.isConnected) mark.replaceWith(node)
       else { mark.remove(); node.remove() }
     }
     lent.clear()
+    turnWatch.disconnect()
     tools.hidden = true
+    headSteps.hidden = true
     clockFoot.hidden = true
     if (countButton.parentElement !== seat) seat.append(countButton)
     pager.hidden = true
   }
   const toolWatch = new MutationObserver(() => gatherTools())
-  /** The look's key says where it goes: on down the column, up into the strip's column, or back down. */
-  const UP = 'M8 13V3M4 7l4-4 4 4', DOWN = 'M8 3v10M4 9l4 4 4-4', CROSS = 'M4 4l8 8M12 4l-8 8'
+  /** sideways a page's turn stands among the look's ways: as it comes, goes or changes its word, the column over them is measured again */
+  const turnWatch = new ResizeObserver(() => { if (open && cinemaFrame) layout() })
+  /** The look's key says where it goes: up into the reading window, or back down to the label at rest. */
+  const UP = 'M8 13V3M4 7l4-4 4 4', DOWN = 'M8 3v10M4 9l4 4 4-4'
+  /** the key that folds the window says its own word: the look's close mark stands in the same column and closes the look */
+  const FOLD_SAYS = { en: 'Less', de: 'Weniger' } as const
   function paintLookMore(): void {
     const frame = cinemaFrame
     if (!frame) { lookMore.remove(); lookLess.remove(); return }
     const strip = root.dataset['lookForm'] === 'under'
-    const opened = root.hasAttribute('data-look-open')
+    // one seat, at the head of the column's foot row: the key that opens the window, and while it stands the key that folds it
     if (lookMore.parentElement !== controls) controls.prepend(lookMore)
-    /* one key reads on in the foot row; an opened column's way back is a
-       different act, so it is a different mark in a different place */
-    if (opened && lookLess.parentElement !== card) controls.after(lookLess)
-    if (!opened && lookLess.parentElement !== controls) lookMore.after(lookLess)
-    lookLess.toggleAttribute('data-head', opened)
+    if (lookLess.parentElement !== controls || lookLess.previousElementSibling !== lookMore) lookMore.after(lookLess)
     lookMoreWord.textContent = frame.more
-    lookLessWord.textContent = frame.less
-    // in the strip the key raises the words; in a column it reads on, while lines wait below
-    lookArrowPath.setAttribute('d', strip ? UP : DOWN)
-    lookMore.setAttribute('aria-expanded', String(opened))
-    const readOn = Boolean(cut?.below)
-    lookMore.hidden = !strip && !readOn
-    /* closing goes back down to the strip from an opened column; a column at
-       home has one key, which turns back up to its head once its end is read */
-    lessArrowPath.setAttribute('d', opened ? CROSS : UP)
-    lookLess.hidden = strip || !(opened || (!readOn && Boolean(cut?.above)))
+    lookLessWord.textContent = FOLD_SAYS[options.lang()]
+    lookArrowPath.setAttribute('d', UP)
+    lessArrowPath.setAttribute('d', DOWN)
+    lookMore.setAttribute('aria-expanded', 'false')
+    lookLess.setAttribute('aria-expanded', 'true')
+    // a label that says all it has at rest has no window to open; words kept behind a card's second door wait in it
+    const kept = words.querySelector(':scope > .vitrine-more') !== null
+    lookMore.hidden = raised || (!strip && !cut?.below && !kept)
+    lookLess.hidden = !raised
   }
-  lookMore.addEventListener('click', () => {
-    if (root.dataset['lookForm'] === 'under') { setRaised(true); return }
-    // the next page begins on the first line the column hid, under an opened column's close mark
-    const next = (cut?.next ?? body.clientHeight - 44) - (root.hasAttribute('data-look-open') ? headBand(true) : 0)
-    body.scrollBy({ top: Math.max(22, next), behavior: reducedMotion.matches ? 'auto' : 'smooth' })
-  })
-  lookLess.addEventListener('click', () => {
-    if (root.hasAttribute('data-look-open')) { setRaised(false); return }
-    body.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'auto' : 'smooth' })
-  })
+  lookMore.addEventListener('click', () => setRaised(true))
+  lookLess.addEventListener('click', () => setRaised(false))
   // a detail pressed in an opened column folds it, so the work it moves to stands in its own place
   payloadControls.addEventListener('click', event => {
     if (cinemaFrame && root.hasAttribute('data-look-open') && (event.target as Element | null)?.closest('button')) setRaised(false)
@@ -746,7 +855,6 @@ export function createVitrine(options: {
     for (const name of ['--film-left', '--film-width', '--film-foot', '--fall-left', '--fall-width', '--fall-below', '--words-left', '--words-width', '--words-foot']) stage.style.removeProperty(name)
     lookMore.remove()
     lookLess.remove()
-    toolWatch.disconnect()
     returnTools()
     pager.remove()
     cinemaFrame = null
@@ -844,14 +952,23 @@ export function createVitrine(options: {
     const reach = grab.hidden ? 0 : grab.getBoundingClientRect().height + Math.min(0, parseFloat(view.getComputedStyle(grab).marginBottom) || 0)
     return Math.ceil(reach + body.scrollHeight + payloadControls.getBoundingClientRect().height + slack)
   }
+  /** The folded card's own height: its rows at their own heights, nothing between them. */
+  function restAsked(): number {
+    const held = card.style.height
+    card.style.height = 'auto'
+    const asked = Math.ceil(card.getBoundingClientRect().height)
+    card.style.height = held
+    return asked
+  }
   /** The height the raised card's words and rows ask for: every row at its
    * own height, the words whole. */
   function raisedAsked(): number {
     const own = view.getComputedStyle(card)
     let asked = parseFloat(own.paddingTop) + parseFloat(own.paddingBottom) + parseFloat(own.borderTopWidth) + parseFloat(own.borderBottomWidth)
     for (const part of [...card.children] as HTMLElement[]) {
-      if (part.hidden || view.getComputedStyle(part).display === 'none') continue
       const style = view.getComputedStyle(part)
+      // the window's head stands over its words and asks for no row of its own
+      if (part.hidden || style.display === 'none' || style.position === 'absolute') continue
       asked += (part === body ? bodyAsked() : part.getBoundingClientRect().height) + parseFloat(style.marginTop) + parseFloat(style.marginBottom)
     }
     return Math.ceil(asked) + 2
@@ -873,11 +990,16 @@ export function createVitrine(options: {
   /** THE REST HEIGHT OF A LINED BOOK: what a one-row name, a one-row place,
    * a two-row line and a one-row source row ask for in the card's own
    * type, measured once per screen with stand-in words. */
-  let restKey = '', restIdeal = 0
-  function restHeight(placeAt: (height: number) => void): number {
+  let restKey = '', restIdeal = 0, restShort = 0, restLeast = 0
+  /** Where the screen has no room for that, every page rests at the richest
+   * of two shorter rests that fits (the line over one source row; the name,
+   * the place and one source row) and the page takes the room that leaves:
+   * `most` is what the work's share of the screen leaves the card. */
+  function restHeight(placeAt: (height: number) => void, most: number): number {
+    const pick = (): number => (restIdeal <= most ? restIdeal : restShort <= most ? restShort : Math.min(most, restLeast))
     const key = [view.innerWidth, view.innerHeight, view.getComputedStyle(document.documentElement).fontSize,
       Math.round(payloadControls.getBoundingClientRect().height)].join('/')
-    if (key === restKey) return restIdeal
+    if (key === restKey) return pick()
     const kept = { name: namingText.textContent, seat: seat.hidden, words: seatWords.textContent, wordsHidden: seatWords.hidden,
       count: countButton.textContent, countHidden: countButton.hidden }
     namingText.textContent = 'M'
@@ -887,13 +1009,18 @@ export function createVitrine(options: {
     // the card at no height, so the body's scroll height is its words' own
     placeAt(1)
     const own = view.getComputedStyle(card)
-    restIdeal = Math.ceil(body.getBoundingClientRect().top - card.getBoundingClientRect().top + body.scrollHeight
+    const asked = (): number => Math.ceil(body.getBoundingClientRect().top - card.getBoundingClientRect().top + body.scrollHeight
       + payloadControls.getBoundingClientRect().height + parseFloat(own.paddingBottom) + 2)
+    restIdeal = asked()
+    note.replaceChildren('M')
+    restShort = asked()
+    line.hidden = true
+    restLeast = asked()
     namingText.textContent = kept.name
     seat.hidden = kept.seat; seatWords.textContent = kept.words; seatWords.hidden = kept.wordsHidden
     countButton.textContent = kept.count; countButton.hidden = kept.countHidden
     restKey = key
-    return restIdeal
+    return pick()
   }
 
   /** Rows the line takes at its own width, by the font it is set in. */
@@ -932,17 +1059,30 @@ export function createVitrine(options: {
   function nameTheGrabber(): void {
     const words = exhibit?.payload?.raiseWords
     grab.setAttribute('aria-label', words ? (raised ? words.down : words.up) : options.raiseLabel?.() ?? '')
+    // drawn beside the name, the key says the host's one short word on every kind: a payload's longer name would run into the name
+    grab.dataset['says'] = options.raiseLabel?.() ?? words?.up ?? ''
   }
 
-  /** The card over the work, or back to its peek. */
+  /** THE READING WINDOW over the work, or the card back at rest: one step
+   * each way, the same on every kind of look. */
   function setRaised(open: boolean): void {
     if (raised === open) return
+    const hand = document.activeElement
     raised = open
     grab.setAttribute('aria-expanded', String(raised))
     nameTheGrabber()
-    if (!raised) body.scrollTop = 0
+    body.scrollTop = 0
     layout()
+    // the hand stays on the key that moved the window, which is the key that moves it back:
+    // where the key it was on left the page with the step, the key in its seat takes it
+    if (!(hand instanceof HTMLElement) || hand === card || !root.contains(hand) && hand.isConnected) return
+    if (hand.isConnected && !hand.hidden && hand.getClientRects().length) return
+    const key = cinemaFrame ? (raised ? lookLess : lookMore) : grab
+    if (key.isConnected && !key.hidden && key.getClientRects().length) key.focus({ preventScroll: true })
+    else card.focus({ preventScroll: true })
   }
+  /** True where the card at rest has a window to open. */
+  const canRaise = (): boolean => (cinemaFrame ? lookMore.isConnected && !lookMore.hidden : !grab.hidden)
 
   const payloadHost = (): VitrinePayloadHost => ({
     element: payloadEl,
@@ -956,7 +1096,7 @@ export function createVitrine(options: {
     cinema: () => cinemaFrame !== null,
     field: () => (cinemaFrame && rects.field ? { ...rects.field } : null),
     clear: () => (cinemaFrame && root.hasAttribute('data-look-aside')
-      ? { ...rects.view, height: Math.max(80, rects.view.height - CINEMA.clock - CINEMA.clockAir) } : null),
+      ? { ...rects.view, height: Math.max(80, Math.min(rects.view.top + rects.view.height, safeFoot()) - rects.view.top - CINEMA.clock - CINEMA.clockAir) } : null),
     viewport: () => ({ ...rects.view }),
     work: () => (inBand() ? null : exhibit?.work?.() ?? null),
     surface: setSurface,
@@ -1130,6 +1270,26 @@ export function createVitrine(options: {
     setRaised(dy <= -GRAB_PX ? true : dy >= GRAB_PX ? false : raised)
   })
   grab.addEventListener('pointercancel', () => { grabHeld = false })
+  /* A SWIPE MOVES THE WINDOW AS ITS KEY DOES: up on the card at rest opens it,
+     down on its head folds it. Read from touches, which a scroll does not
+     cancel; the words' own scroll is never a fold. */
+  let swipe: { x: number; y: number; head: boolean } | null = null
+  card.addEventListener('touchstart', event => {
+    swipe = null
+    const target = event.target instanceof Element ? event.target : null
+    const touch = event.touches[0]
+    if (!options.narrow() || event.touches.length !== 1 || !touch || target?.closest('input, [role="slider"]')) return
+    swipe = { x: touch.clientX, y: touch.clientY, head: Boolean(target?.closest('.vitrine-grab, .vitrine-name')) }
+  }, { passive: true })
+  card.addEventListener('touchend', event => {
+    const was = swipe, touch = event.changedTouches[0]
+    swipe = null
+    if (!was || !touch) return
+    const dy = touch.clientY - was.y, dx = touch.clientX - was.x
+    if (Math.abs(dy) < GRAB_PX || Math.abs(dy) < Math.abs(dx) * 1.5) return
+    if (dy < 0 && !raised && canRaise()) setRaised(true)
+    else if (dy > 0 && raised && was.head) setRaised(false)
+  }, { passive: true })
   view.addEventListener('popstate', () => {
     if (popping) { popping = false; return }
     if (!open) return
@@ -1177,6 +1337,7 @@ export function createVitrine(options: {
       open = next.id
       exhibit = next
       raised = false
+      restPeek = null
       grab.setAttribute('aria-expanded', 'false')
       shutMark.setAttribute('aria-label', options.closeLabel?.() ?? '')
       root.dataset['payload'] = next.payload?.kind ?? ''
@@ -1264,6 +1425,7 @@ export function createVitrine(options: {
       band = null
       wordsResized.disconnect()
       toolWatch.disconnect()
+      turnWatch.disconnect()
       leaving.abort()
       delete document.documentElement.dataset['naWindow']
       root.remove()

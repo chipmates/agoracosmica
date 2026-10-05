@@ -197,18 +197,32 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 
 /* ---- THE CLOSE LOOK SIDEWAYS (vitrine/index.ts, its cinema branch). The
    window lays out its boxes from the glass and the walk's foot row, which
-   the look keeps: the instruments' column at the left over the seats, the
-   work on the museum's wall, its words BESIDE it in a label column at the
-   right, or UNDER it in the foot row's strip, where the walk's caption
-   stands. These lines are its type and its grounds. ---- */
+   the look keeps: the work on the museum's wall from the glass's left edge,
+   its words BESIDE it in a label column at the right, or UNDER it in the
+   foot row's strip, where the walk's caption stands. Nothing of the museum
+   stands left of the work. These lines are its type and its grounds. ---- */
 .cinema-probe { position: fixed; left: var(--cinema-l); right: var(--cinema-r); top: var(--cinema-t); bottom: var(--cinema-b);
   visibility: hidden; pointer-events: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-sheet,
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-grab { display: none; }
-/* one close for a look, the foot row's first seat drawn as the cross, as on the upright phone */
-#wing[data-film='cinema'] .vitrine-shut { display: none !important; }
-#wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-ic-fill { display: none; }
-#wing[data-film='cinema'] .film-box[data-look='true'] .film-back .film-cross { display: block; width: 10px; height: 10px; background: var(--film-cross); }
+/* ONE CLOSE FOR A LOOK, the mark at the glass's upper right, where the label column's head is: the seat the foot
+   row's close has, on its own ground wherever it stands (index.ts places it; it never moves with the card).
+   The row's first seat, which closed a look from the lower left, stands down */
+#wing[data-film='cinema'] .vitrine-shut {
+  display: flex; min-width: 44px; min-height: 44px; border: 0; border-radius: var(--ui-r-seat-phone);
+  background: color-mix(in srgb, var(--ui-ground-raised) 90%, transparent); box-shadow: inset 0 0 0 1px var(--ui-line-strong);
+}
+#wing[data-film='cinema'] .vitrine-shut[hidden] { display: none; }
+#wing[data-film='cinema'] .vitrine-shut svg { width: 14px; height: 14px; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-foot > .film-back { display: none; }
+/* THE LOOK'S WAYS STAND TOGETHER at the row's right, under the column: the work before, a page's other way, gold */
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-foot > .vinci-phone-earlier { margin-left: auto; margin-right: 2px; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-foot > .film-gold { margin-left: 0; }
+#wing[data-film='cinema'] .film-foot > .reader-turn { flex: 0 0 auto; height: 48px; padding: 0 12px; white-space: nowrap; }
+/* where the look's ways would take room a page could use, the turn's word stands on two rows (the window says when) */
+#wing[data-film='cinema'] .film-foot > .reader-turn[data-tight='true'] { width: min-content; min-width: 58px; margin: 0 -4px; padding: 0 3px; white-space: normal; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-foot:has(> .reader-turn[data-tight='true']) > .vinci-phone-earlier { margin-right: 0; }
+#wing[data-film='cinema'] .film-box[data-look='true'] .film-foot:has(> .reader-turn[data-tight='true']) > .film-gold::after { left: -2px; }
 
 /* THE MUSEUM'S WALL behind a work of its own: the figure page's grey-blue
    light opening behind the work, a darker fall to the foot */
@@ -229,54 +243,36 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .deep-stand { display: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .reader :is(.reader-ground, .reader-stage) { bottom: 0; }
 
-/* ---- THE INSTRUMENTS' COLUMN, over the walk's two seats and as wide as
-   they are: the work's ways, its zoom, its whole, a film's pause and its
-   sheet, the work's measure lowest. Each control 44 px; + and − and pause
-   are drawn, their words stay their names ---- */
-#wing[data-film='cinema'] .vitrine .vitrine-tools { position: fixed; z-index: 3; display: flex; flex-direction: column; justify-content: flex-end;
-  align-items: stretch; gap: 10px; pointer-events: none; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools[hidden],
-#wing[data-film='cinema'] .vitrine .vitrine-tools-slot:not(:has(> :not([hidden]))) { display: none; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools-slot { display: flex; flex-direction: column; gap: 6px; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools-zoom { flex-direction: row; gap: 8px; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools-slot > * { pointer-events: auto; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass) {
-  position: relative; inset: auto; flex: 0 0 auto; box-sizing: border-box; min-width: 44px; max-width: none; width: 100%; height: 44px; min-height: 44px; margin: 0; padding: 0 6px;
-  border: 0; border-radius: var(--ui-r-control); background: color-mix(in srgb, var(--ui-ground-deep) 62%, transparent);
-  /* the outer dark ring keeps the edge where a lit film runs behind the column */
-  box-shadow: inset 0 0 0 1px var(--ui-line-strong), 0 0 0 1px color-mix(in srgb, var(--ui-ground-deep) 72%, transparent); color: var(--ui-text);
-  font: 400 .875rem/1.15 var(--sans); letter-spacing: 0; text-align: center; white-space: normal; cursor: pointer;
-}
-/* over a lit film the face is firmer and the ring brighter, so the edge holds 3 to 1 on either side of it */
-#wing[data-film='cinema'] .vitrine[data-look-film] .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass) {
-  background: color-mix(in srgb, var(--ui-ground-deep) 84%, transparent);
+/* ---- A FILM'S OWN TOOLS run along its foot with its clock: pause at the
+   clock's left, the film's sheet at its right, each 44 px on a ground of its
+   own; pause and play are drawn, their words stay their names ---- */
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is(.vitrine-control, .vitrine-folio-glass) {
+  position: relative; inset: auto; flex: 0 0 44px; box-sizing: border-box; width: 44px; min-width: 44px; max-width: none; height: 44px; min-height: 44px; margin: 0; padding: 0;
+  border: 0; border-radius: var(--ui-r-control); background: color-mix(in srgb, var(--ui-ground-deep) 84%, transparent);
+  /* the outer dark ring keeps the edge where a lit film runs behind it */
   box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--ui-text-quiet) 76%, transparent), 0 0 0 1px color-mix(in srgb, var(--ui-ground-deep) 72%, transparent);
+  color: var(--ui-text); font-size: 0; cursor: pointer; pointer-events: auto;
 }
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is(.vitrine-control, .vitrine-folio-glass):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 2px; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way { font-size: .8125rem; color: var(--ui-text-quiet); }
-#wing[data-film='cinema'] .vitrine .vitrine-tools .reader-way[hidden] { display: none; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is(.reader-way, .vitrine-viewpoint)[aria-pressed='true'] {
-  color: var(--ui-text); background: color-mix(in srgb, var(--ui-text) 12%, var(--ui-ground-deep)); box-shadow: inset 0 0 0 1px var(--ui-text-quiet);
-}
-/* + and −, and pause or play, drawn */
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is([data-tool='zoom'], [data-tool='play'], .vitrine-play[aria-pressed]) { width: 44px; flex: 0 0 44px; font-size: 0; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools [data-tool='zoom']::before,
-#wing[data-film='cinema'] .vitrine .vitrine-tools [data-zoom='nearer']::after {
-  content: ''; position: absolute; left: 50%; top: 50%; width: 15px; height: 1.5px; background: var(--ui-text); translate: -50% -50%;
-}
-#wing[data-film='cinema'] .vitrine .vitrine-tools [data-zoom='nearer']::after { rotate: 90deg; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is([data-tool='play'], .vitrine-play[aria-pressed])::before {
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is(.vitrine-control, .vitrine-folio-glass):focus-visible { outline: 1px solid var(--ui-way); outline-offset: 2px; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is([data-tool='play'], .vitrine-play) { order: 0; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-track { order: 1; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is([data-tool='source'], .vitrine-folio-glass) { order: 2; overflow: hidden; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is([data-tool='play'], .vitrine-play)::before {
   content: ''; position: absolute; left: 50%; top: 50%; width: 11px; height: 14px; translate: -50% -50%;
   background: linear-gradient(var(--ui-text), var(--ui-text)) 0 0 / 3.5px 100% no-repeat, linear-gradient(var(--ui-text), var(--ui-text)) 100% 0 / 3.5px 100% no-repeat;
 }
-#wing[data-film='cinema'] .vitrine .vitrine-tools :is([data-tool='play'], .vitrine-play)[aria-pressed='false']::before {
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot :is([data-tool='play'], .vitrine-play)[aria-pressed='false']::before {
   width: 12px; translate: -40% -50%; background: var(--ui-text); clip-path: polygon(0 0, 100% 50%, 0 100%);
 }
-#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass { width: 44px; padding: 0; overflow: hidden; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-glass .vitrine-folio-thumb { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
-#wing[data-film='cinema'] .vitrine .vitrine-tools .vitrine-folio-leaf { width: 20px; height: 24px; fill: none; stroke: var(--ui-way); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-folio-glass .vitrine-folio-thumb { width: 100%; height: 100%; object-fit: cover; object-position: 50% 30%; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-folio-leaf { width: 20px; height: 24px; fill: none; stroke: var(--ui-way); stroke-width: 1.3; stroke-linejoin: round; stroke-linecap: round; }
 /* what the tools left behind in the card stands down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] :is(.vitrine-clock, .vitrine-views, .reader-zoom):not(:has(*)) { display: none; }
+/* a machine's views stay with its words: one row of quiet framed words as a work's details are, a long name on two lines */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-views { flex-wrap: nowrap; gap: 6px; width: 100%; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-body > .vitrine-payload-controls .vitrine-views .vitrine-control {
+  flex: 1 1 0; min-width: 0; padding: 0 6px; white-space: normal; font: 400 .8125rem/1.15 var(--sans);
+}
 
 /* ---- A FILM SIDEWAYS, a machine's cycle or the heart's film, under: its
    step's line is its subtitle and its clock runs along its foot, both on the
@@ -297,7 +293,7 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
   font: 400 1rem/22px var(--serif); color: var(--ui-text); text-align: center; text-wrap: balance;
   text-shadow: 0 1px 2px color-mix(in srgb, var(--ui-ground-deep) 90%, transparent), 0 0 14px color-mix(in srgb, var(--ui-ground-deep) 70%, transparent);
 }
-#wing[data-film='cinema'] .vitrine .vitrine-clockfoot { position: fixed; z-index: 3; display: flex; align-items: center; }
+#wing[data-film='cinema'] .vitrine .vitrine-clockfoot { position: fixed; z-index: 3; display: flex; align-items: center; gap: 8px; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot[hidden] { display: none; }
 #wing[data-film='cinema'] .vitrine .vitrine-clockfoot .vitrine-track { flex: 1 1 auto; min-height: 44px; }
 /* the track a quiet line, the steps and the knob in the text's colour: gold is the way on, amber a certainty, neither is a knob */
@@ -430,17 +426,24 @@ html:has(#wing[data-film='upright']) #rail { display: none !important; }
 /* the walk's seats and gold are the look's steps and its one close: the card's own stand down */
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) { display: none; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-more[hidden] { display: none; }
-/* an opened column's way back to the strip is its own close mark at its head, beside the name:
-   the foot row keeps the one key that reads on, so no two keys there point the same way */
-#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] {
-  position: absolute; top: 0; right: -8px; z-index: 1; justify-content: center;
-  width: 44px; min-width: 44px; height: 44px; text-decoration: none;
+/* the name gives the close mark its corner of the column's head */
+#wing[data-film='cinema'] .vitrine[data-look-form='beside'] .vitrine-name { padding-right: 44px; }
+/* AT REST THE LABEL IS WHAT IT SHOWS: its words stand still, and the key opens the reading window for the rest */
+#wing[data-film='cinema'] .vitrine[data-look-form='beside']:not([data-look-open]) .vitrine-body { overflow: hidden; }
+/* THE READING WINDOW, sideways: the column takes most of the glass and the work, still whole, what is left; the
+   name stays at the head while the words pass under it, and a swipe down on it folds the window as its key does */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-name {
+  position: sticky; top: 0; z-index: 1; margin-bottom: 0; padding-bottom: 6px; background: var(--ui-ground); touch-action: none;
 }
-#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] .vitrine-look-more-word {
-  position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;
+/* while it is read, what belongs to the work stands down (a book keeps its pager), and the window holds a machine's
+   words whole: what its second door kept comes up with it. That door stands down at rest too: the column has one
+   key to more words, and it opens the window (index.ts shows the key wherever the door kept words) */
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-body > .vitrine-payload-controls { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-words > .vitrine-more { display: none; }
+#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-words > .vitrine-description[hidden] { display: block; }
+@media (prefers-reduced-motion: no-preference) {
+  #wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-body { animation: vitrine-window-in .18s ease-out; }
 }
-#wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-less[data-head] .vitrine-look-arrow { width: 16px; height: 16px; margin: 0; stroke-width: 1.4; }
-#wing[data-film='cinema'] .vitrine[data-form='cinema'][data-look-open] .vitrine-name { padding-right: 32px; }
 #wing[data-film='cinema'] .vitrine[data-form='cinema'] .vitrine-look-arrow {
   width: 13px; height: 13px; margin-left: 5px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round;
 }

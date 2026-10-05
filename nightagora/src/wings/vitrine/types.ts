@@ -75,8 +75,9 @@ export interface VitrineCinema {
   /** the foot row: its top and foot, the right edge of the seats at its
    * left, and gold's left edge */
   row: { top: number; bottom: number; seats: number; gold: number }
-  /** the look's one key to its words, in the page's language: more, and back */
+  /** the look's one key to its words, in the page's language */
   more: string
+  /** not read: the window says its own word on the key that folds it */
   less: string
 }
 

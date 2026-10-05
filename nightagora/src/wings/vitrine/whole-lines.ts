@@ -137,7 +137,8 @@ export function wholeLines(scroller: HTMLElement, band: { from?: number; reach?:
     above: scroller.scrollTop > 0.5,
     below,
     next: below ? Math.min(...hidden.map(b => b.top)) : null,
-    away: list.filter(b => b.whole && (b.bottom <= top + 0.5 || b.top >= foot - 0.5)).map(b => b.block),
+    // what stands in a sheet's own head stays: only what the cut hides is away
+    away: list.filter(b => b.whole && !(from > 0 && b.top >= -0.5 && b.bottom <= from + 0.5) && (b.bottom <= top + 0.5 || b.top >= foot - 0.5)).map(b => b.block),
   }
 }
 
@@ -148,8 +149,9 @@ function setAway(scroller: HTMLElement, away: Element[]): void {
   for (const el of away) el.setAttribute('data-line-cut', '')
 }
 
-/** Show only the whole lines: the mask cuts between lines, or stands down where nothing is cut. */
-export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
+/** Show only the whole lines: the mask cuts between lines, or stands down where nothing is cut.
+ * `head` is a band at the scroller's top that stays shown whole: a name that stays while the lines pass under it. */
+export function maskWholeLines(scroller: HTMLElement, cut: LineCut, head = 0): void {
   const style = scroller.style
   const height = scroller.clientHeight
   setAway(scroller, cut.away)
@@ -159,11 +161,14 @@ export function maskWholeLines(scroller: HTMLElement, cut: LineCut): void {
   }
   // rounded inwards, so no pixel row of a hidden line's edge or a box's border is left at the cut
   const t = Math.max(0, Math.ceil(cut.top)), f = Math.max(t, Math.floor(cut.foot))
-  const mask = `linear-gradient(to bottom, transparent ${t}px, #000 ${t}px, #000 ${f}px, transparent ${f}px)`
+  const h = Math.min(t, Math.max(0, Math.floor(head)))
+  const mask = h > 0
+    ? `linear-gradient(to bottom, #000 ${h}px, transparent ${h}px, transparent ${t}px, #000 ${t}px, #000 ${f}px, transparent ${f}px)`
+    : `linear-gradient(to bottom, transparent ${t}px, #000 ${t}px, #000 ${f}px, transparent ${f}px)`
   style.setProperty('mask-image', mask)
   style.setProperty('-webkit-mask-image', mask)
   // the same cut as a clip: WebKit lets a device row of what crosses the scroller's own edge through a mask, never through a clip
-  style.setProperty('clip-path', `inset(${t}px 0 ${Math.max(0, height - f)}px 0)`)
+  style.setProperty('clip-path', `inset(${h > 0 ? 0 : t}px 0 ${Math.max(0, height - f)}px 0)`)
 }
 
 /** Take the mask down again. */

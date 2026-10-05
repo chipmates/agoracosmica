@@ -115,11 +115,9 @@
   .vitrine-caption {font-size:13px;padding:6px 10px;}
   .vitrine-payload-controls {position:static;flex:0 0 auto;padding:8px 0 0;justify-content:stretch;}
   .vitrine-payload-controls .vitrine-control {flex:1 1 0;background:transparent;}
-  /* A DETAIL IS NAMED IN A SENTENCE, not in a word. Sharing the row with the
-     three that fit the plate, a German name stacks to three lines in an 82 px
-     column; on its own line it is one. The plate's own controls come first,
-     so what follows them is a name that points. */
-  .vitrine[data-payload='deep-plate'] .vitrine-payload-controls > .vitrine-control:nth-child(n+4)
+  /* A DETAIL IS NAMED IN A SENTENCE, not in a word: on a line of its own a
+     German name is one line, where a column would stack it to three. */
+  .vitrine[data-payload='deep-plate'] .vitrine-payload-controls > .vitrine-control[data-zoom='detail']
     {flex:1 0 100%;}
 }
 
@@ -166,9 +164,10 @@
    steps at its ends. No word under 14 px, raised or at rest. */
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-card {padding-top:0;padding-bottom:4px;}
 /* the grab's 44 px reach over the name, which raises the card as the grab does */
-.vitrine[data-narrow='true'][data-fill='true']:has(.reader[data-lined='true']) .vitrine-grab {position:relative;z-index:1;
+.vitrine[data-narrow='true'][data-fill='true']:not([data-read='true']):has(.reader[data-lined='true']) .vitrine-grab {position:relative;z-index:1;
   align-items:flex-start;padding-top:10px;margin-bottom:-22px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {margin:0;font-size:17px;line-height:22px;}
+.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-name {font-size:17px;line-height:22px;}
+.vitrine[data-narrow='true']:not([data-read='true']):has(.reader[data-lined='true']) .vitrine-name {margin:0;}
 /* the seat row's own margin is the count's reach, so the line starts under it */
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat {margin:0 0 20px;font:400 14px/20px var(--sans);column-gap:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-seat:has(.vitrine-count:not([hidden])) .vitrine-seat-words:not([hidden])::after {
@@ -182,8 +181,6 @@
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0 0 14px;font-size:14px;line-height:18px;}
 .vitrine[data-peek='true']:has(.reader[data-lined='true']) .vitrine-note {margin:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-control {font-size:14px;}
-/* the pinch's two steps stay marks, their words kept for a reader of the screen */
-.vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .reader-zoom .vitrine-control {font-size:0;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) :is(.vitrine-words, .vitrine-aside) :is(p, li) {font-size:14px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .vitrine-payload-controls {position:relative;padding-top:2px;row-gap:8px;}
 .vitrine[data-narrow='true']:has(.reader[data-lined='true']) .reader-row .vitrine-step {position:absolute;bottom:0;width:44px;height:44px;}
@@ -315,22 +312,61 @@
   .vitrine-date-year {font-size:30px;}
 }
 /* A LINED BOOK WITHOUT ITS STRIP (the best-of: its topics are chosen from the
-   room's list): at rest one row, the page's two steps either side of the
-   ways, so the line keeps its two rows over a foot row the phone keeps; the
-   viewer's three zoom words come up with the card, as the painting's look
-   stands them, and the pinch and the double tap zoom at rest */
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row {flex-wrap:wrap;row-gap:8px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .vitrine-step {position:static;flex:0 0 44px;font-size:20px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom {display:flex;order:1;flex:1 0 100%;gap:4px;}
-.vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom {display:none;}
+   room's list): its two steps keep no row of their own. Where the host keeps
+   its foot row they stand at the card's head, beside the page's name, in the
+   band the grab already has; in the reading window they follow the words */
+.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .vitrine-step {position:static;width:auto;height:auto;min-height:44px;}
+.vitrine-headsteps {position:absolute;z-index:2;top:0;right:6px;display:flex;gap:2px;}
+.vitrine-headsteps[hidden] {display:none;}
+.vitrine-headsteps .vitrine-step {flex:0 0 44px;width:44px;min-width:44px;height:44px;margin:0;padding:8px 0 0;border:0;background:none;color:var(--ui-text);cursor:pointer;}
+.vitrine-headsteps .vitrine-step[hidden] {display:none;}
+.vitrine-headsteps .vitrine-step:disabled {color:var(--ui-text-quiet);opacity:.45;cursor:default;}
+.vitrine-headsteps .vitrine-step:focus-visible {outline:1px solid var(--ui-way);outline-offset:-2px;}
+/* the name gives the two steps their corner of the head, and the grab's reach ends where they begin: its bar keeps the card's middle */
+.vitrine[data-narrow='true']:has(.vitrine-headsteps:not([hidden])) .vitrine-name {padding-right:92px;}
+.vitrine[data-narrow='true'][data-fill='true']:not([data-read='true']):has(.vitrine-headsteps:not([hidden])) .vitrine-grab {box-sizing:border-box;align-self:flex-start;width:calc(100% - 96px);padding-left:96px;}
 /* the count's reach keeps 14 px of air over the line, so the line's two rows stand at rest over the kept foot row */
 .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .vitrine-seat {margin-bottom:14px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom .vitrine-control {
-  flex:1 1 0;min-width:0;padding:10px 6px;font-size:14px;line-height:18px;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom] {display:block;}
-.vitrine[data-narrow='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom]::before {content:none;}
 /* A HOST THAT KEEPS ITS FOOT ROW UNDER THE WINDOW (the phone form) walks the
    set from that row: the work before in the book's seat, gold the work after,
    and the one close is the mark over the work. The card's own steps and its
    second close stand down, so every way stands in one place. */
 [data-keeps-foot] > .vitrine[data-narrow='true'] .vitrine-controls > :is(.vitrine-step, [data-role='close']) {display:none;}
+
+/* ON A PHONE THE FINGERS ZOOM. The plate's steps (nearer, further, the whole)
+   are not drawn and take no finger: they keep their names and their place in
+   the reading order, and stand on the work while a keyboard holds one */
+.vitrine-tools {position:fixed;z-index:5;display:flex;gap:8px;pointer-events:none;}
+.vitrine-tools[hidden] {display:none;}
+.vitrine-tools:not(:has(:focus-visible)) {width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+.vitrine-tools .vitrine-control {flex:0 0 auto;min-width:44px;height:44px;padding:0 12px;pointer-events:auto;
+  background:color-mix(in srgb, var(--ui-ground-sheet) 92%, transparent);font:400 .875rem/1 var(--sans);}
+/* what a reader of the screen hears of a page's turn; never drawn */
+.reader-turn-said {position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;}
+.reader-turn[hidden] {display:none;}
+
+/* the reading window's words come up in one soft step where motion is welcome; a cut where it is not (the hosts' rules) */
+@keyframes vitrine-window-in {from {opacity:0;}}
+
+/* THE READING WINDOW on the phone held upright. One step raises the card over
+   the work to most of the glass: its name stays at its head with the key
+   that folds it, its words scroll under the name, and the work's own
+   controls leave until it is folded again. */
+.vitrine[data-narrow='true'] .vitrine-card {touch-action:manipulation;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-card {padding-top:0;}
+/* the head: the grab's bar, and at its right the mark that folds the window; the whole head takes the press and the swipe */
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-grab {position:absolute;z-index:3;left:0;right:0;top:0;width:auto;height:58px;min-height:0;
+  margin:0;align-items:flex-start;padding-top:8px;touch-action:none;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-grab::before {content:'';position:absolute;right:20px;top:27px;width:9px;height:9px;
+  border:solid var(--ui-text);border-width:0 1.6px 1.6px 0;rotate:45deg;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-body {padding-bottom:12px;scroll-padding-top:60px;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-name {position:sticky;top:0;z-index:2;margin:0 -12px 6px;padding:22px 56px 8px 12px;
+  background:var(--ui-ground-sheet);touch-action:none;}
+/* a line passing under the head fades into it, it never breaks off at its edge */
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-name::after {content:'';position:absolute;left:0;right:0;top:100%;height:10px;pointer-events:none;
+  background:linear-gradient(to bottom,var(--ui-ground-sheet),color-mix(in srgb, var(--ui-ground-sheet) 0%, transparent));}
+/* while it is read, what belongs to the work stands down; a book keeps the two that turn its page, after the words */
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-payload-controls > :not(.reader-row) {display:none;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-payload-controls .reader-row > :not(.vitrine-step) {display:none;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-payload-controls {padding-top:12px;}
+.vitrine[data-narrow='true'][data-read='true'] .vitrine-payload-controls:not(:has(> .reader-row:not([hidden]) > .vitrine-step:not([hidden]))) {display:none;}

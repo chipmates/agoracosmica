@@ -606,71 +606,108 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='upright'] .wing-life[data-narrow='true'] .wing-life-spine { flex-wrap: wrap; overflow: visible; row-gap: 6px; }
 
 /* ---- THE CLOSE LOOK AT REST, upright: the work keeps two thirds of the glass ----
-   At rest the card is the work's name, one worded key that raises it, and the
-   work's own controls; the label, the line, the record and the strip come up
-   with the card. The key is the card's grab, named as it is, set as the box's
-   own keys are. A lined book keeps its own measured rest. */
+   At rest the card is one row, the work's name and at its right the worded key
+   that raises it, and under it the work's own controls; the label, the line,
+   the record and the strip come up with the card. The key is the card's grab,
+   named as it is, set as the box's own keys are. The window measures the card
+   at this height (vitrine/index.ts), so the work takes whatever a row left.
+   A lined book keeps its own measured rest. */
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) :is(.vitrine-words, .reader-raise, .reader-shelf) { display: none; }
-/* AT REST A SHEET'S PINCH KEEPS ITS TWO MARKS beside it: + and − stand at the
-   work's lower right, over the work and just above the card (the card's foot
-   is the foot row's 80 px and the vitrine's 10 px above the glass's edge);
-   the reading table's topics, whose zoom words leave the drawn-up card, keep
-   the same two marks */
-#wing[data-film='upright'] .vitrine[data-peek='true']:is(:not(:has(.reader[data-lined='true'])), :has(.reader[data-lined='true'][data-strip='false'])) .reader-row .reader-zoom {
-  display: flex; position: fixed; right: 18px; bottom: calc(var(--vitrine-peek, 190px) + 102px); z-index: 3; gap: 6px;
-}
-#wing[data-film='upright'] .vitrine[data-peek='true']:is(:not(:has(.reader[data-lined='true'])), :has(.reader[data-lined='true'][data-strip='false'])) .reader-row .reader-zoom .vitrine-control {
-  flex: 0 0 44px; width: 44px; height: 44px; background: color-mix(in srgb, var(--ui-ground-sheet) 85%, transparent); box-shadow: inset 0 0 0 1px var(--ui-line-strong);
-}
-/* the topics' two marks are drawn as the sheets' are: the fit is the double tap's, the words a reader of the screen's */
-#wing[data-film='upright'] .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom .vitrine-control {
-  display: inline-flex; align-items: center; justify-content: center; min-width: 44px; padding: 0; font-size: 0;
-}
-#wing[data-film='upright'] .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom='whole'] { display: none; }
-#wing[data-film='upright'] .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom='nearer']::before { content: '+'; font: 400 20px/1 var(--sans); }
-#wing[data-film='upright'] .vitrine[data-peek='true']:has(.reader[data-lined='true'][data-strip='false']) .reader-row .reader-zoom [data-zoom='further']::before { content: '\2212'; font: 400 20px/1 var(--sans); }
-/* READING, upright: the card drawn up gives its words the room the picture's
-   own controls took (the zoom, the pointing lines, the strip of small pages);
-   the steps, the ways and the record stay. Nothing leaves the DOM, so the card
-   drawn down has them back and the viewer keeps its zoom. */
-#wing[data-film='upright'] .vitrine[data-narrow='true'][data-fill='true'][data-peek='false'] :is(.vitrine-control[data-zoom], .reader-zoom, .reader-shelf) { display: none; }
 /* the reader's own raise is the peek's: it leaves with the peek, before the
    drawn-up card measures its words, or that card keeps its height as a gap */
 #wing[data-film='upright'] .vitrine[data-narrow='true'][data-fill='true'][data-peek='false'] .reader-raise { display: none; }
-#wing[data-film='upright'] .vitrine[data-narrow='true'][data-fill='true'][data-peek='false'] .vitrine-payload-controls:not(:has(> :not(.vitrine-control[data-zoom], .reader-shelf, [hidden]))) { padding-top: 0; }
-#wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-name { margin-bottom: 0; }
+/* the name's row is the key's height, and the key stands at its right end, out of the flow: what follows the name
+   (a place's line, a plate's) runs the card's full width under both */
+#wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-name { margin: 0; padding: 11px 84px 11px 0; }
 /* the words keep their own height at rest (a body grown to the card would be measured as words and raise the peek) */
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-body { order: 0; flex: 0 0 auto; }
-#wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-payload-controls { order: 2; margin-top: auto; }
+#wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-payload-controls { order: 2; }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab {
-  order: 1; position: relative; justify-content: flex-start; gap: 6px; align-self: flex-start; width: auto; min-height: 44px;
-  margin: 0 0 -6px; padding: 0 8px 0 0; font: 400 .9375rem/1 var(--sans); color: var(--ui-text);
+  order: 1; position: absolute; right: 12px; top: 10px; justify-content: flex-start; gap: 6px; width: auto; min-height: 44px;
+  margin: 0; padding: 0 0 0 8px; font: 400 .9375rem/1 var(--sans); color: var(--ui-text);
 }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab::before {
-  content: attr(aria-label); text-decoration: underline; text-decoration-color: var(--ui-line-strong);
+  content: attr(data-says); text-decoration: underline; text-decoration-color: var(--ui-line-strong);
   text-underline-offset: 5px; text-decoration-thickness: 1px;
 }
 #wing[data-film='upright'] .vitrine[data-peek='true']:not(:has(.reader[data-lined='true'])) .vitrine-grab::after {
   content: '\2191'; width: auto; height: auto; border-radius: 0; background: none; color: var(--ui-text); font: 400 .9375rem/1 var(--sans);
 }
-/* a place or a single picture has no controls of its own: its few words stand
-   in the middle of the card's rest height, not over an empty foot */
-#wing[data-film='upright'] .vitrine[data-peek='true']:is([data-payload='place'], [data-payload='picture']) .vitrine-card { justify-content: center; }
+/* a plate fitted by its width leaves the stage's height unused: its line, the one text, stands at rest under its name
+   (the window says where, vitrine/index.ts), and the plate is as large with it as without */
+#wing[data-film='upright'] .vitrine[data-peek='true'][data-rest-line='true'] .vitrine-line { display: block; margin: -5px 0 2px; font: 400 .9375rem/21px var(--serif); }
+#wing[data-film='upright'] .vitrine[data-peek='true'][data-rest-line='true'] .vitrine-line[hidden] { display: none; }
 /* the film's caption under a showpiece keeps two rows at rest */
 #wing[data-film='upright'] .vitrine[data-peek='true'] .showpiece-line {
   display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin-bottom: 0;
 }
 /* a place has no controls of its own: its line stands at rest under its name */
 #wing[data-film='upright'] .vitrine[data-peek='true'][data-payload='place'] .vitrine-line {
-  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: 4px 0 0;
+  display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; overflow: hidden; margin: -5px 0 2px;
 }
 /* a place is its own stones in the held frame, read whole and undimmed */
 #wing:is([data-film='upright'], [data-film='cinema']) .vitrine[data-payload='place'] :is(.vitrine-scrim, .vitrine-hole) { display: none; }
 /* the card is focused on opening for the reader of the screen; it wears no ring for that */
 #wing:is([data-film='upright'], [data-film='cinema']) .vitrine-card:focus-visible { outline: none; }
 
-/* ---- THE CLOSE LOOK RAISED, upright ---- */
-/* a sheet's reader row: its steps and its ways, the zoom having left with the reading (above) */
+/* ---- THE READING WINDOW, upright (vitrine.css raises it): its words at the
+   walk's own reading size, its label whole, its record as the last line ---- */
+#wing[data-film='upright'] .vitrine[data-read='true'] :is(.vitrine-words, .vitrine-aside) :is(p, li):not(.vitrine-meta, .picture-holder, .picture-source-reading, .picture-column-note, .vitrine-certainty) {
+  margin: 0 0 8px; font: 400 .9375rem/22px var(--serif);
+}
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-line { margin-bottom: 10px; font: 400 1.0625rem/24px var(--serif); }
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-name { font-size: 1.125rem; }
+/* the window holds the label whole: its second door, for a card that folds, stands down */
+#wing[data-film='upright'] .vitrine[data-read='true'] .picture-label-rest { display: block; }
+#wing[data-film='upright'] .vitrine[data-read='true'] .picture-label-more { display: none; }
+/* and a machine's words whole: what its second door kept comes up with the window, in the order they are read
+   (what it is, how it runs, how sure the model is), the keys after the last of them */
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-words > .vitrine-more { display: none; }
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-words > .vitrine-description[hidden] { display: block; }
+#wing[data-film='upright'] .vitrine[data-read='true'][data-payload='machine'] .vitrine-card .vitrine-steps { display: block; }
+#wing[data-film='upright'] .vitrine[data-read='true'][data-payload='machine'] .vitrine-card .vitrine-body > :is(.vitrine-after, .vitrine-words) { order: 0; }
+@media (prefers-reduced-motion: no-preference) {
+  #wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-body { animation: vitrine-window-in .18s ease-out; }
+}
+/* the record is where the words come from: a quiet key after their last line */
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-controls { margin-top: 10px; padding-top: 4px; gap: 20px; }
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-controls .vitrine-control {
+  flex: 0 0 auto; min-height: 44px; padding: 0; border: 0; border-radius: 0; background: none;
+  font: 400 .9375rem/20px var(--sans); color: var(--ui-text);
+  text-decoration: underline; text-decoration-color: var(--ui-line-strong); text-underline-offset: 5px; text-decoration-thickness: 1px;
+}
+#wing[data-film='upright'] .vitrine[data-read='true'] .vitrine-controls .vitrine-control[aria-pressed='true'] { text-decoration-color: var(--ui-way); }
+
+/* ---- A PAGE'S OTHER WAY, in the foot row left of gold, on the phone held either way: one key named for the way it
+   leads to (reader.ts makes it, the window stands it here). Upright the row is laid as the last stop's is, the two
+   seats and gold where they always stand; beside a long way on the key gives way first and sets its word on two
+   rows, and gold never shrinks under its own longest word ---- */
+.film-foot > .reader-turn {
+  flex: 0 1 auto; box-sizing: border-box; min-width: 64px; height: 44px; min-height: 44px; margin: 0; padding: 0 6px;
+  border: 0; border-radius: var(--ui-r-way); background: var(--glass); box-shadow: inset 0 0 0 1px var(--glass-ring);
+  color: var(--ui-text); font: 400 .875rem/1.1 var(--sans); text-align: center; white-space: normal; text-wrap: balance;
+  -webkit-hyphens: auto; hyphens: auto; cursor: pointer;
+}
+.film-foot > .reader-turn[hidden] { display: none; }
+.film-foot > .reader-turn:focus-visible { outline: 1px solid var(--na-gold, var(--ui-way)); outline-offset: 2px; }
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) {
+  display: flex; align-items: flex-start; gap: 8px; height: 68px; padding: 12px 12px env(safe-area-inset-bottom) 16px;
+}
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) > :is(.film-back, .vinci-phone-earlier) {
+  position: relative; top: 2px; left: auto; flex: 0 0 44px;
+}
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) > .reader-turn { flex-shrink: 1000; margin: 2px 0 0 auto; }
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) > .film-gold {
+  position: relative; top: auto; right: auto; translate: none; flex: 0 1 auto; min-width: min-content; max-width: none;
+}
+/* beside the key the longest way on sets every word on a row of its own, and on the narrowest phone its longest word breaks */
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) .film-gold-name { -webkit-hyphens: auto; hyphens: auto; }
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) .film-keep { white-space: normal; }
+/* gold's reach to its left ends short of the key beside it */
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) > .film-gold::after { left: -3px; }
+#wing[data-film='upright'] .film-box[data-look='true'] .film-foot:has(> .reader-turn:not([hidden])) > .film-gold:has(> .film-gold-name[data-rows='4']) { margin-top: -8px; padding-block: 2px; }
+
+/* ---- THE CLOSE LOOK'S OWN ROWS, upright ---- */
 #wing[data-film='upright'] .vitrine[data-narrow='true']:has(.reader:not([data-lined='true'])) .reader-row { flex-wrap: wrap; row-gap: 8px; }
 #wing[data-film='upright'] .vitrine[data-narrow='true'] .reader-row .reader-way { padding-left: 4px; padding-right: 4px; }
 /* a machine's leaf stands in its clock's row, as a showpiece's door does: one
@@ -697,8 +734,6 @@ html:has(#wing[data-film='upright']) #instruments .inst-pace small { position: a
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row { flex-wrap: wrap; gap: 6px 4px; width: 100%; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .vitrine-step { flex: 0 0 44px; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-way { flex: 1 1 0; min-width: 0; padding-left: 4px; padding-right: 4px; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom { display: flex; order: 1; flex: 1 0 100%; gap: 4px; }
-#wing[data-film='cinema'] .vitrine[data-narrow='true'] .reader-row .reader-zoom .vitrine-control { flex: 1 1 0; }
 #wing[data-film='cinema'] .vitrine[data-narrow='true'] .vitrine-payload-controls .reader-shelf {
   position: static; flex: 1 0 100%; height: 44px; margin: 0; padding: 0; gap: 4px;
 }
