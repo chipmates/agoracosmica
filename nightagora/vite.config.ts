@@ -2,10 +2,20 @@ import { defineConfig } from 'vite'
 import { resolve } from 'node:path'
 import { forgeWhoami } from './forge/vite-forge-whoami.mjs'
 import { naAssets } from './forge/vite-na-assets.mjs'
+import { naWingPages } from './forge/vite-na-wing-pages.mjs'
+import { LOBBY_TEXT } from './src/content/lobby'
+import { readSettings } from './src/wings/way-out'
 
 export default defineConfig({
   server: { port: 5199 },
-  plugins: [forgeWhoami(), naAssets()],
+  plugins: [
+    forgeWhoami(),
+    naAssets(),
+    naWingPages({
+      read: readSettings,
+      words: { name: LOBBY_TEXT.name.en, line: LOBBY_TEXT.tagline, inside: LOBBY_TEXT.titleInside },
+    }),
+  ],
   build: {
     target: 'esnext',
     /* THE THREE BENCHES ARE NOT PART OF THE MUSEUM. All are dev and preview
