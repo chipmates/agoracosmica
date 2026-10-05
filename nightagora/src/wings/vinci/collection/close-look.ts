@@ -648,7 +648,8 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
         inLanguage(full, GRAVE_WORDS.diagram)
         inLanguage(full, GRAVE_WORDS.diagramDate)
         inLanguage(full, { en: GRAVE_EVIDENCE.frame, de: GRAVE_EVIDENCE_DE.frame })
-        full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, null, 1)))
+        // the figures without `source`, which names the computing script's paths in the repository
+        full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, (key, value: unknown) => (key === 'source' ? undefined : value), 1)))
         inLanguage(full, GRAVE_DIAGRAM)
       },
     }
