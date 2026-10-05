@@ -1783,6 +1783,8 @@ const OPENING_HOLD = 2.5
 let lobbyAhead = false
 function sendLobbyAhead(): void {
   if (lobbyAhead) return
+  // where the way home is a page of the site, no lobby follows the wing
+  if (wayOut(SETTINGS, wingSlug, lang(), false)) return
   const count = wingFrame.stations()
   if (!count || wingFrame.station() !== count - 1) return
   lobbyAhead = true
