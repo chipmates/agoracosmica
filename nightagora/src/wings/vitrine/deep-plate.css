@@ -11,8 +11,9 @@
 .deep-ground svg {display:block;width:100%;height:100%;overflow:visible;fill:var(--deep-ground);}
 .deep-plate[data-drawn='true'] .deep-ground {visibility:visible;}
 .deep-plate-stage {position:absolute;inset:0;}
-.deep-plate-stage .openseadragon-canvas {outline:none;}
-.deep-plate-stage .openseadragon-canvas:focus-visible {outline:1px solid var(--ui-way);outline-offset:-3px;}
+/* the viewer's canvas is out of the tab order and takes the focus only from a press (its own click handler),
+   which Chromium marks focus-visible: it wears no ring; the keyboard's ring is the payload's (vitrine.css) */
+.deep-plate-stage .openseadragon-canvas, .deep-plate-stage .openseadragon-canvas:focus-visible {outline:none;}
 
 /* THE RULE MEASURES THE WORK, NOT THE SCREEN. Its length is the numeral's
    centimetres of the painting at the magnification standing now, so it
