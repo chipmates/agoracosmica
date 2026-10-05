@@ -268,6 +268,12 @@ const uncited = (text: string): string => text.replace(/\s*\[\d+(?:\s*,\s*\d+)*\
 function folioName(slug: MachineSlug): string {
   return machineCatalog[slug].folio.map(f => `${f.codex} ${lang() === 'de' ? 'Blatt' : 'f.'} ${f.folio}`).join(', ')
 }
+/** A sheet's name as the German view says the codices elsewhere: the dossiers name them in English. */
+export function vinciFolioLabel(label: string): string {
+  return lang() === 'de'
+    ? label.split(', ').map(name => name.replace(/^Paris Manuscript /, 'Pariser Manuskript ').replace(/^Manuscript /, 'Manuskript ')).join(', ')
+    : label
+}
 
 /** The machine's card, in the card model's order after its line: the
  * description, then the steps the payload lays in, then the certainty, the

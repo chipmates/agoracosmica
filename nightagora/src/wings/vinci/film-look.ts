@@ -14,7 +14,7 @@ import { validatePaintingRecord } from './pictures/policy'
 import { machineCatalog, type MachineSlug } from './machines/catalog'
 import { createVinciCloseLook, createVinciMachinePayload, createVinciShowpiecePayload, fillVinciLimitSlots, renderVinciShowpieceRecord, vinciDeathbedCard,
   vinciLine, vinciLimits, vinciMachineCard, vinciMachineClockWords, vinciMachineSheet, vinciMachineSteps, vinciManuscriptWords, vinciPlaceCard,
-  vinciPlaceTitle, vinciRoomName, vinciSheetRecords, vinciSheetSides, vinciShowpiece, vinciWorkTitle,
+  vinciFolioLabel, vinciPlaceTitle, vinciRoomName, vinciSheetRecords, vinciSheetSides, vinciShowpiece, vinciWorkTitle,
   VINCI_EXHIBIT_CARD, VINCI_PAGE_HONESTY, VINCI_VITRINE_WORDS, type VinciPlaceCertainty, type VinciPlaceId, type VinciShowpiece } from './collection/close-look'
 import { createVinciPaintingView, vinciPlateWords } from './collection/deep-plate'
 import { hangCatalogue } from './collection/catalogue'
@@ -25,6 +25,7 @@ import { GRAVE_DEATHBED } from './grave/placement'
 import { GRAVE_LIGHT } from './grave/light-words'
 import { keepTogetherIn } from './keep-together'
 import { createPlacePayload } from '../vitrine/place'
+import { sayFolioLabels } from '../vitrine/folio'
 import type { VitrineCinema, VitrineExhibit, VitrinePlace } from '../vitrine/types'
 import type { ShowpiecePayload } from '../vitrine/showpiece'
 import { createCyclePayload, type FilmCycle } from '../picture/cycle'
@@ -50,6 +51,9 @@ import { createCodexReaderPayload } from './table/codex-reader'
 import { createReaderPayload as createEditionReader } from './table/reader'
 import type { ReadingTable } from './table'
 import { SHELF_UI, TABLE_UI } from './table/content'
+
+// a sheet's door says its codex as the German view does elsewhere
+sayFolioLabels(vinciFolioLabel)
 
 /** the card every mark names with aria-controls */
 export const FILM_LOOK_CARD = VINCI_EXHIBIT_CARD

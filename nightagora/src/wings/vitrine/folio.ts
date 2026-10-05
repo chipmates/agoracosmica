@@ -19,12 +19,18 @@ function drawnLeaf(doc: Document): SVGSVGElement {
   return svg
 }
 
+/** A wing says a sheet's name in its visitor's words: the name reaches the door through the machine's
+ * own payload, which the film's keys read, so the wing's words are set here instead. */
+let sayLabel = (label: string): string => label
+export function sayFolioLabels(say: (label: string) => string): void { sayLabel = say }
+
 export function folioDoor(doc: Document, sheet: FolioSheet, narrow: boolean, signal: AbortSignal, live: () => boolean): HTMLButtonElement {
   const door = doc.createElement('button')
   door.className = narrow ? 'vitrine-folio vitrine-folio-glass' : 'vitrine-folio'
   door.type = 'button'
-  door.setAttribute('aria-label', sheet.label || sheet.name || '')
-  const named = (): void => { if (narrow) door.append(drawnLeaf(doc)); else door.textContent = sheet.label }
+  const label = sheet.label ? sayLabel(sheet.label) : ''
+  door.setAttribute('aria-label', label || sheet.name || '')
+  const named = (): void => { if (narrow) door.append(drawnLeaf(doc)); else door.textContent = label }
   if (sheet.src) {
     void sheet.src.then(src => {
       if (!live()) return
