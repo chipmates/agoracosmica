@@ -207,7 +207,8 @@
   .arno-words { max-width: none; }
   .arno-line { min-height: 0; font: 400 1.375rem/29px var(--serif); }
   .arno-credit { margin-top: 4px; }
-  .arno-label { max-height: 46vh; }
+  /* the share of the screen's height lands between two pixels: a label that fits by less than one must not scroll */
+  .arno-label { max-height: calc(46vh + 1px); }
   .arno-start {
     position: absolute;
     right: 12px;
