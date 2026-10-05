@@ -97,7 +97,7 @@ export function createDeskPanel(host: DeskPanelHost): void {
     const end = host.next() === null
     if (out.hidden === first) out.hidden = !first
     if (first) {
-      set(out, 'textContent', text(WING_TEXT.lobby))
+      set(out, 'textContent', text(WING_TEXT.firstWayOut))
       if (host.back.disabled) host.back.disabled = false
       set(host.back, 'ariaLabel', text(WING_TEXT.lobby))
     }

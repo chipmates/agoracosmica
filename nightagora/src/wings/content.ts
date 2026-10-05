@@ -77,10 +77,15 @@ export const WING_TEXT = {
     en: 'Stay in the museum',
     de: 'Im Museum bleiben',
   },
-  /** the way back to the lobby, which never replays the overture */
+  /** the wing's way out on the way; the key keeps the name of where it first led */
   lobby: {
-    en: 'Lobby',
-    de: 'Lobby',
+    en: 'Exit to the website',
+    de: 'Ausgang zur Webseite',
+  },
+  /** the same way out at the desktop's first stop: one short word before the way back, room for five letters in capitals */
+  firstWayOut: {
+    en: 'Exit',
+    de: 'Ausgang',
   },
   /** the rail's own label, read by assistive technology */
   rail: {

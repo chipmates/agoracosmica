@@ -2,8 +2,8 @@
   "schema_version": 1,
   "provenance": {
     "scope": "the walk's end: the choice beside the look up and the plate it opens, words by key",
-    "learn_word": "ending.learn.word is the owner's own wording for the choice, EN and DE, and is fixed.",
-    "lobby_word": "ending.lobby.word says where the look up leads, over its own words on every form. The owner's wording.",
+    "learn_word": "ending.learn.word names the choice beside the look up by the place its plate leads to, EN and DE.",
+    "lobby_word": "ending.lobby.word stands over the look up on every form and says what the press does: the walk ends and the visitor leaves the wing. The key keeps its older name.",
     "destination": "The choice opens Leonardo's mode choice in the library (`/app?figure=leonardo-da-vinci&lang=<lang>`), not a conversation: no question rides the address.",
     "status": "written, read blind",
     "words": "ending.plate.title, ending.plate.line and ending.plate.go were written for the new destination (four candidate sets) and read blind once; the reader's pick combines three of the written strings unchanged. Every other sentence of the plate (the library line, the Echo's disclosure, the terms) is the frame's own and stays as it is."
@@ -11,14 +11,14 @@
   "ending": {
     "learn": {
       "word": {
-        "en": "Learn from Leonardo",
-        "de": "Lerne von Leonardo"
+        "en": "The library",
+        "de": "Die Bibliothek"
       }
     },
     "lobby": {
       "word": {
-        "en": "Back to the lobby",
-        "de": "Zurück zur Lobby"
+        "en": "End and exit",
+        "de": "Ende und Ausgang"
       }
     },
     "plate": {
@@ -27,8 +27,8 @@
         "de": "Der nächste Schritt mit Leonardo"
       },
       "line": {
-        "en": "You walked where he lived and saw what he made. Now you can learn from him.",
-        "de": "Du warst, wo er lebte, und hast gesehen, was er schuf. Jetzt kannst du von ihm lernen."
+        "en": "You walked where he lived and saw what he made. Now you can read on and ask.",
+        "de": "Du warst, wo er lebte, und hast gesehen, was er schuf. Jetzt kannst du weiterlesen und fragen."
       },
       "go": {
         "en": "To the library",
