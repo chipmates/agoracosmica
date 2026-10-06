@@ -47,6 +47,7 @@ import { setWalkingLeg, walkingRing } from './labels'
 import { createFilmCinema, crowded, filmForm, whenFraming, FILM_CINEMA_CSS, MARK_TARGET, type FilmCinema, type FilmForm } from './film-cinema'
 import { createTurnLine, TURN_LINE_CSS } from './turn-line'
 import { countArrival, countStop } from '../../core/museum-count'
+import { FILM_RELEASE } from '../film-release'
 
 const text = (value: VinciText): string => value[lang()]
 const make = <K extends keyof HTMLElementTagNameMap>(tag: K, cls: string, value?: string): HTMLElementTagNameMap[K] => {
@@ -85,9 +86,9 @@ const RING = 2 * Math.PI * 20.5
     takes 28; upright the Baptism's mark needs 37 at 390x664 and 41 at 375x667 */
 const MARK_LIFT = 44
 
-/** The release the address names: `?film=<name>` under the origin's `/film/`. */
+/** The release the address names (`?film=<name>`), else the build's own, under the origin's `/film/`. */
 export function filmReleaseBase(): string {
-  const name = new URLSearchParams(location.search).get('film') || 'w5'
+  const name = new URLSearchParams(location.search).get('film') || FILM_RELEASE || 'w5'
   return new URL(`/film/${encodeURIComponent(name)}/`, location.origin).href
 }
 

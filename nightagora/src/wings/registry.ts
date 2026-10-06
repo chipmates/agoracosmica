@@ -7,6 +7,7 @@
    `/w/<slug>` a working deep link before the wing is finished. */
 
 import type { WingModule } from './frame'
+import { FILM_RELEASE } from './film-release'
 
 export type WingStatus = 'open' | 'preparing'
 
@@ -26,8 +27,9 @@ export interface WingEntry {
   load: () => Promise<{ createWing: () => WingModule }>
 }
 
-/** `?film=<release>`: the wing as its film, read once per visit. */
+/** `?film=<release>`, or a build that names one: the wing as its film, read once per visit. */
 function filmAsked(): boolean {
+  if (FILM_RELEASE) return true
   try { return new URLSearchParams(location.search).has('film') } catch { return false }
 }
 
