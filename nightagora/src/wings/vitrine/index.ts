@@ -93,6 +93,10 @@ const GRAB_SLOP = 8
 /** THE WORK OWNS THE STAGE: it fills this share of the stage's limiting side,
  * and the rest is the air every hung thing needs around it. */
 const WORK_SHARE = .92
+/** German compounds the browser's own hyphenation splits away from their
+ * joint: a soft hyphen at the joint, so a narrow name breaks where the word does. */
+const JOINTS: Readonly<Record<string, string>> = { Pyramidenfallschirm: 'Pyramiden\u00ADfallschirm' }
+const jointed = (words: string): string => words.replace(/\p{L}+/gu, word => JOINTS[word] ?? word)
 /** THE PHONE HELD SIDEWAYS: the work's zone from the glass's left edge, and a
  * label column at the right where a work stands beside its words; the close
  * mark at the column's head, the look's ways in the foot row under it. */
@@ -929,7 +933,7 @@ export function createVitrine(options: {
    * before it carries the exhibit's certainty where the payload has one. */
   function nameIt(title: string, certainty?: string | null): void {
     const said = title.trim()
-    namingText.textContent = said
+    namingText.textContent = jointed(said)
     naming.hidden = !said
     naming.lang = options.lang()
     namingDot.hidden = !certainty
