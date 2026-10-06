@@ -166,6 +166,6 @@ Helping: the [good first issues](https://github.com/chipmates/agoracosmica/label
 
 ## Who runs it
 
-ChipMates gemeinnützige GmbH, a registered German nonprofit: a limited company bound to a charitable purpose under German tax law, with one project, this one. When we oversimplify a figure or misread a source, write to [agoracosmica@chipmates.ai](mailto:agoracosmica@chipmates.ai).
+ChipMates gemeinnützige GmbH, a registered German nonprofit: a limited company bound to a charitable purpose under German tax law, with two projects: this one and [Museum of Ages](https://museumofages.org), a digital museum. When we oversimplify a figure or misread a source, write to [agoracosmica@chipmates.ai](mailto:agoracosmica@chipmates.ai).
 
 Code is [AGPL-3.0](LICENSE). Copyleft applies to network deployments. Content (stories, prism dialogues, council debates, factchecks, voice profiles, instruction prompts, images, audio) is copyright ChipMates gemeinnützige GmbH at launch and moves to CC-BY 4.0 within 6 to 12 months of the May 2026 launch. [CONTENT-LICENSE.md](CONTENT-LICENSE.md) has the terms and the attribution format.
