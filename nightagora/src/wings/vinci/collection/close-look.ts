@@ -21,8 +21,7 @@ import { playbackSchedule } from '../machines/bench/playback'
 import { BENCH_ABSENCE } from '../machines/bench/registers'
 import { setRegister } from '../../frame'
 import { deskOn } from '../../desk-switches'
-import { GRAVE_EVIDENCE, GRAVE_HOUR, GRAVE_WORDS } from '../grave'
-import { GRAVE_DEATHBED } from '../grave/placement'
+import { GRAVE_EVIDENCE, GRAVE_WORDS } from '../grave'
 import { GRAVE_DIAGRAM, GRAVE_SOURCE, INGRES_SOURCE } from '../line/bench/visitor-sources'
 import neverSaidRaw from '../line/data/never-said.json?raw'
 import linesRaw from '../data/lines.json?raw'
@@ -573,8 +572,12 @@ const INGRES_SOURCE_DE = 'Paris Musées stellt dieses Gemälde von Ingres aus de
 const GRAVE_EVIDENCE_DE = {
   plaque: 'Die eigene Plakette der Kapelle spricht von mutmaßlichen Überresten. Diese Worte stehen auf einer gesonderten Plakette, nicht auf der Grabplatte.',
   dig: 'Arsène Houssaye grub 1863 die ehemalige Kirche Saint-Florentin aus und berichtete von einem fast vollständigen Skelett. Die Identifizierung bleibt unbewiesen.',
-  transfer: 'Das Schloss beschreibt eine Überführung nach Saint-Hubert im neunzehnten Jahrhundert. Das genaue Datum 1874 und der Bericht von den Bruchstücken mit Buchstaben brauchen den historischen Beleg für Grabung und Überführung.',
   frame: 'Berechnetes Licht · 2. Mai 1519 · 18:50 UT. Eine gewählte Minute, kein bezeugter Augenblick.',
+} as const
+/** The slab's transfer line in both languages, for its record only, for the same reason. */
+const GRAVE_TRANSFER = {
+  en: 'The château says the remains were moved to Saint-Hubert in the nineteenth century. The museum has not checked two other details against the original records of the dig and the move: the year 1874 for the move, and the pieces of stone with letters on them.',
+  de: 'Das Schloss berichtet, die Überreste seien im neunzehnten Jahrhundert nach Saint-Hubert gebracht worden. Zwei weitere Angaben hat das Museum bisher nicht anhand der ursprünglichen Unterlagen zu Grabung und Überführung geprüft: das Jahr 1874 für die Überführung und die Steinstücke mit Buchstaben darauf.',
 } as const
 function inLanguage(host: HTMLElement, words: Both): void {
   const language = lang()
@@ -648,8 +651,6 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
         inLanguage(full, GRAVE_WORDS.diagram)
         inLanguage(full, GRAVE_WORDS.diagramDate)
         inLanguage(full, { en: GRAVE_EVIDENCE.frame, de: GRAVE_EVIDENCE_DE.frame })
-        // the figures without `source`, which names the computing script's paths in the repository
-        full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_HOUR, (key, value: unknown) => (key === 'source' ? undefined : value), 1)))
         inLanguage(full, GRAVE_DIAGRAM)
       },
     }
@@ -665,7 +666,8 @@ export function vinciPlaceCard(id: VinciPlaceId, certainty: (key: VinciPlaceCert
       full.append(make('p', 'vinci-statement', GRAVE_WORDS.dig))
       inLanguage(full, GRAVE_WORDS.identification)
       inLanguage(full, GRAVE_WORDS.medallionRecord)
-      for (const key of ['plaque', 'dig', 'transfer'] as const) inLanguage(full, { en: GRAVE_EVIDENCE[key], de: GRAVE_EVIDENCE_DE[key] })
+      for (const key of ['plaque', 'dig'] as const) inLanguage(full, { en: GRAVE_EVIDENCE[key], de: GRAVE_EVIDENCE_DE[key] })
+      inLanguage(full, GRAVE_TRANSFER)
       inLanguage(full, GRAVE_WORDS.disclosure)
       inLanguage(full, GRAVE_SOURCE)
     },
@@ -699,7 +701,6 @@ export function vinciDeathbedCard(
       inLanguage(full, { en: label.last_words_en, de: label.last_words_de })
       inLanguage(full, { en: INGRES_SOURCE.en, de: INGRES_SOURCE_DE })
       inLanguage(full, GRAVE_WORDS.enlarged)
-      full.append(make('pre', 'vinci-arithmetic', JSON.stringify(GRAVE_DEATHBED, null, 1)))
       // the licence by its name, linked to its own text where the record holds the address
       const deed = web(addresses.licence)
       if (licence) full.append(deed ? link(licence, deed) : make('p', 'vinci-statement', licence))
