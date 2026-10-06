@@ -139,6 +139,9 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     more.click()
   }, { signal })
 
+  /* the panel shows the stop's line beside an open drawer, so it never keeps
+     the upright form's hidden mark there, which a screen reader obeys */
+  const lineShown = (): void => { const line = part('film-line'); if (line?.hidden) line.hidden = false }
   let on = false
   function set(want: boolean): void {
     if (want === on) return
@@ -146,12 +149,16 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
     if (on) {
       const kept = ['film-name', 'film-line', 'film-drawer', 'film-keys'].map(part).filter((n): n is HTMLElement => Boolean(n))
       panel.append(...kept)
+      lineShown()
       box.insertBefore(panel, foot)
       if (foot && gold) foot.insertBefore(caption, gold)
       paint()
     } else {
       for (const node of [...panel.children]) box.insertBefore(node, panel)
       panel.remove()
+      // upright, an open drawer stands in the line's place again
+      const line = part('film-line')
+      if (line) line.hidden = part('film-drawer')?.hidden === false
       caption.remove()
       for (const scroller of cut) scroller.style.removeProperty('--cinema-cut')
       cut.clear()
@@ -163,6 +170,7 @@ export function createFilmCinema(host: FilmCinemaHost): FilmCinema {
   let said = ''
   function paint(): void {
     if (!on) return
+    lineShown()
     const id = host.stop()
     const stop = deskStoryStop(id)
     const line = stop ? say(stop.line) : ''
