@@ -933,7 +933,13 @@ export function createVitrine(options: {
    * before it carries the exhibit's certainty where the payload has one. */
   function nameIt(title: string, certainty?: string | null): void {
     const said = title.trim()
-    namingText.textContent = jointed(said)
+    const shown = jointed(said)
+    namingText.textContent = shown
+    // a named joint is the only break: Safari's own hyphenation would pick another
+    for (const property of ['hyphens', '-webkit-hyphens']) {
+      if (shown.includes('\u00AD')) namingText.style.setProperty(property, 'manual')
+      else namingText.style.removeProperty(property)
+    }
     naming.hidden = !said
     naming.lang = options.lang()
     namingDot.hidden = !certainty
