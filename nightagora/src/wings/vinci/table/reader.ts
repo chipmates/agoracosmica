@@ -341,16 +341,6 @@ export function createReaderPayload(options: {
       full.append(leaves, buildShownAbsences(language))
       // THE PAGE-RECORD SELECTORS: every record of the edition and every
       // represented leaf stays reachable by name.
-      const selects: { select: HTMLSelectElement; value: (page: PageRecord) => string }[] = []
-      // both name the page the window shows, after a choice in either
-      const follow = (): void => {
-        const now = shown(payload.current()?.id)
-        if (!now) return
-        for (const { select, value } of selects) {
-          const index = [...select.options].findIndex(option => option.value === value(now))
-          if (index >= 0) select.selectedIndex = index
-        }
-      }
       // a printed page opens the leaf it belongs to; a page of no leaf opens the nearest one
       const leafOf = (key: string): string => {
         const chosen = key.startsWith('edition:') ? pages[Number(key.slice('edition:'.length))] : undefined
@@ -375,8 +365,13 @@ export function createReaderPayload(options: {
         }
         const current = [...select.options].findIndex(option => option.value === here)
         if (current >= 0) select.selectedIndex = current
-        select.addEventListener('change', () => { payload.open(leafOf(select.value)); follow() })
-        selects.push({ select, value })
+        select.addEventListener('change', () => {
+          payload.open(leafOf(select.value))
+          // the text, links and licence above name the page the window now shows
+          full.remove()
+          this.renderRecord(record)
+          record.querySelector<HTMLSelectElement>(`select[aria-label="${CSS.escape(label)}"]`)?.focus()
+        })
         wrap.append(select)
         full.append(wrap)
       }
