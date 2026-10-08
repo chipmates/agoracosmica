@@ -4,6 +4,7 @@
 
 import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
 import { DASHBOARD_HTML } from './dashboard';
+import { handleMuseum } from './museum';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
@@ -39,6 +40,12 @@ export default {
     // Live server stats (proxied from GEX130 servers)
     if (url.pathname === '/api/server-stats' && request.method === 'GET') {
       return handleServerStats(env);
+    }
+
+    // Museum of Ages: Cloudflare's own totals for the museum's zone. Fixed
+    // queries on the server, nothing passed through from the page.
+    if ((url.pathname === '/api/museum' || url.pathname === '/api/museum/hours') && request.method === 'GET') {
+      return handleMuseum(request, env);
     }
 
     // Serve dashboard HTML — inject LAUNCH_EPOCH_SECONDS at render time so the

@@ -20,6 +20,21 @@ export interface Env {
    * feature was added.
    */
   LAUNCH_EPOCH_SECONDS?: string;
+  /**
+   * Museum of Ages panel. A read-only token for the museum's zone (Zone,
+   * Analytics, Read, that one zone) and the zone's tag, both secrets. With
+   * either one missing the panel says it is not set up and asks nothing.
+   */
+  MUSEUM_CF_API_TOKEN?: string;
+  MUSEUM_ZONE_TAG?: string;
+  /** The museum's host name. Defaults to museumofages.org. */
+  MUSEUM_HOST?: string;
+  /** The day the museum opened (YYYY-MM-DD, UTC). Totals start there. */
+  MUSEUM_OPEN_DATE?: string;
+  /** Language codes, comma separated, the root language first. */
+  MUSEUM_LANGS?: string;
+  /** The walk's stops in their order, comma separated, as the film's files name them. */
+  MUSEUM_WALK_STOPS?: string;
 }
 
 export interface BatchQueryRequest {

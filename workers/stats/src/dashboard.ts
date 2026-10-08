@@ -684,6 +684,72 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   .funnel-parallel-label { text-align: left; }
 }
 
+/* === MUSEUM OF AGES TAB === */
+/* The tab has its own three frames, so the period control stands down. */
+body[data-tab="museum"] .sidebar-section,
+body[data-tab="museum"] .mobile-range { display: none; }
+.mus-note {
+  font-size: 0.75rem; color: var(--dim); line-height: 1.5;
+  margin: -6px 0 14px; max-width: 78ch;
+}
+#alerts-museum:not(:empty) { margin-bottom: 16px; }
+.mus-block { margin-bottom: 14px; }
+.mus-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; flex-wrap: wrap;
+}
+.mus-controls { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.mus-btn, .mus-date {
+  min-height: 44px; min-width: 44px; padding: 0 12px;
+  font-family: inherit; font-size: 0.8125rem; font-weight: 500;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  border-radius: var(--radius-sm); background: var(--bg-primary);
+  color: var(--tx2); cursor: pointer;
+  transition: border-color 0.15s, color 0.15s, background 0.15s;
+}
+.mus-date { color-scheme: dark; }
+.mus-btn:hover, .mus-date:hover { border-color: var(--gold-deep); color: var(--gold); }
+.mus-btn:focus-visible, .mus-date:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.mus-btn:disabled { opacity: 0.35; cursor: default; }
+.mus-btn.active {
+  background: color-mix(in srgb, var(--gold) 12%, transparent);
+  border-color: var(--gold-deep); color: var(--gold);
+}
+.mus-line { font-size: 0.8125rem; color: var(--tx2); margin-top: 10px; }
+.mus-line b { color: var(--gold); font-weight: 600; }
+.mus-cap { font-size: 0.75rem; color: var(--dim); line-height: 1.5; margin-top: 10px; }
+.mus-wide .bar-label { min-width: 132px; text-align: left; }
+.mus-scroll { max-height: 300px; overflow-y: auto; }
+.mus-num { text-align: right; font-variant-numeric: tabular-nums; }
+.mus-na { color: var(--dim); }
+td.mus-strong { color: var(--tx); font-weight: 600; }
+/* Upright bars as boxes: the names under them keep their size at any width. */
+.mus-bars { display: flex; align-items: stretch; gap: 3px; height: 190px; margin-top: 12px; padding-top: 18px; }
+.mus-bar-col { flex: 1; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.mus-bar-plot {
+  flex: 1; width: 100%; display: flex; align-items: flex-end;
+  border-bottom: 1px solid var(--bg-highlight);
+}
+.mus-bar { position: relative; width: 100%; min-height: 1px; border-radius: 3px 3px 0 0; opacity: 0.85; }
+.mus-bar-n {
+  position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%);
+  padding-bottom: 3px; font-size: 0.6875rem; color: var(--tx2); white-space: nowrap;
+}
+.mus-bar-x { font-size: 0.6875rem; color: var(--dim); margin-top: 5px; white-space: nowrap; }
+@media (max-width: 640px) {
+  body[data-tab="museum"] #tab-museum { padding-top: 12px; }
+  .mus-wide .bar-label { min-width: 112px; }
+  .mus-controls { width: 100%; }
+  .mus-date { flex: 1; }
+  /* A table fits the screen: tighter cells, names and headings may wrap. */
+  .mus-table { font-size: 0.75rem; }
+  .mus-table th, .mus-table td { padding: 6px 5px; }
+  .mus-table th, .mus-table td.mus-strong { white-space: normal; }
+  .mus-wide-only { display: none; }
+  .mus-bars { height: 150px; gap: 2px; }
+  .mus-bars.tight .mus-bar-col:not(:nth-child(3n+1)) .mus-bar-x { visibility: hidden; }
+}
+
 /* === PRINT === */
 @media print {
   #sidebar, #mobile-tabs, #status-bar, .mobile-range, .sidebar-section { display: none !important; }
@@ -739,6 +805,10 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
     <button class="nav-item" data-tab="servers">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
       <span class="nav-label">Servers</span>
+    </button>
+    <button class="nav-item" data-tab="museum">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18"/><path d="M4 10h16"/><path d="M12 3l8 7H4z"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8"/></svg>
+      <span class="nav-label">Museum</span>
     </button>
   </div>
   <div class="sidebar-section">
@@ -814,6 +884,24 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   <div id="grid-adgrants"></div>
 </section>
 
+<!-- Tab: Museum of Ages (Cloudflare's own totals for the museum's zone) -->
+<section class="tab-section" id="tab-museum" aria-labelledby="title-museum">
+  <div class="tab-header">
+    <h2 class="tab-title" id="title-museum">Museum of Ages</h2>
+    <span class="tab-updated" id="updated-museum"></span>
+  </div>
+  <div id="alerts-museum"></div>
+  <div id="top-museum">
+    <div class="grid">
+      <div class="card card-hero"><div class="skel-label skeleton"></div><div class="skel-value skeleton"></div><div class="skel-sub skeleton"></div></div>
+      <div class="card card-hero"><div class="skel-label skeleton"></div><div class="skel-value skeleton"></div><div class="skel-sub skeleton"></div></div>
+      <div class="card"><div class="skel-label skeleton"></div><div class="skel-value skeleton"></div><div class="skel-sub skeleton"></div></div>
+    </div>
+  </div>
+  <div id="hours-museum"></div>
+  <div id="grid-museum"></div>
+</section>
+
 </main>
 </div>
 
@@ -839,6 +927,10 @@ html { scrollbar-color: var(--bg-highlight) transparent; scrollbar-width: thin; 
   <button class="mob-tab" data-tab="servers">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="2" y="2" width="20" height="8" rx="2"/><rect x="2" y="14" width="20" height="8" rx="2"/><circle cx="6" cy="6" r="1" fill="currentColor"/><circle cx="6" cy="18" r="1" fill="currentColor"/></svg>
     Servers
+  </button>
+  <button class="mob-tab" data-tab="museum">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M3 21h18"/><path d="M4 10h16"/><path d="M12 3l8 7H4z"/><path d="M6 10v8M10 10v8M14 10v8M18 10v8"/></svg>
+    Museum
   </button>
 </div>
 </nav>
@@ -3485,8 +3577,356 @@ function consentTable(dimLabel, shownRows, acceptRows, key, labelFn, cls) {
     tableHtml([dimLabel, 'Seen', 'Accepted', 'Accepts / seen'], body) + caption, cls);
 }
 
+// --- Tab: Museum of Ages ---
+// Cloudflare's own totals for the museum's zone, read by the worker. The site
+// counts nothing itself, so this tab shows totals and never a visitor.
+
+var MUS = { day: '', metric: 'arrivals', answer: null, hours: null, shell: false };
+var MUS_LANGS = { en: 'English', de: 'German', fr: 'French', it: 'Italian', es: 'Spanish', 'pt-BR': 'Portuguese (BR)', bg: 'Bulgarian' };
+var MUS_KINDS = { front: 'Front page', wing: 'Wing page', topic: 'Topic page', about: 'About the museum', walk: 'The walk', privacy: 'Privacy', legal: 'Legal notice', other: 'Other' };
+var MUS_METRICS = [
+  { key: 'arrivals', label: 'Arrivals' },
+  { key: 'pages', label: 'Pages opened' },
+  { key: 'started', label: 'Walks started' },
+  { key: 'req', label: 'Requests' },
+];
+// What Cloudflare did not give, in the worker's own short names.
+var MUS_GAPS = {
+  token: 'Cloudflare refused the token. MUSEUM_CF_API_TOKEN needs Zone, Analytics, Read for the museum zone.',
+  zone: 'The token does not see the zone. Check MUSEUM_ZONE_TAG and which zone the token is for.',
+  daily: 'Cloudflare did not give the daily totals. The next refresh asks again.',
+  countries: 'Cloudflare did not give the countries or the server errors with the daily totals.',
+  visitors: 'Cloudflare gives different visitors per day only, not for a longer stretch.',
+  pages: 'Cloudflare did not give page-level totals, so language, page kind and the walk are missing.',
+  arrivals: 'Cloudflare did not give its visits figure, so arrivals are missing.',
+  film: 'Cloudflare did not give the totals for the film files, so walks started and stops are missing.',
+};
+
+function musPad(n) { return n < 10 ? '0' + n : String(n); }
+function musShiftDay(day, by) { return new Date(Date.parse(day + 'T12:00:00Z') + by * 86400000).toISOString().slice(0, 10); }
+// Cloudflare cuts its days at midnight UTC. This is that moment on the reader's clock.
+function musDayTurn(day) { return musPad(new Date(day + 'T00:00:00Z').getHours()) + ':00'; }
+function musUtcDay(day) {
+  var d = new Date(day + 'T12:00:00Z');
+  return isNaN(d.getTime()) ? esc(day) : d.toLocaleDateString([], { month: 'short', day: 'numeric', timeZone: 'UTC' });
+}
+function musFull(n) { return Number(n || 0).toLocaleString(); }
+function musCell(v) { return v == null ? '<span class="mus-na">n/a</span>' : musFull(v); }
+function musBytes(n) {
+  n = Number(n || 0);
+  if (n >= 1e9) return (n / 1e9).toFixed(1) + ' GB';
+  if (n >= 1e6) return (n / 1e6).toFixed(1) + ' MB';
+  if (n >= 1e3) return Math.round(n / 1e3) + ' KB';
+  return n + ' B';
+}
+function musCountry(code) {
+  try {
+    var name = new Intl.DisplayNames(['en'], { type: 'region' }).of(code);
+    return name && name !== code ? name : code;
+  } catch (e) { return code; }
+}
+function musStop(id, i) {
+  var words = String(id).split('-').join(' ');
+  return (i + 1) + '. ' + cap(words);
+}
+function musTable(headers, rows, wideOnly) {
+  // First column is a name, the rest are figures. wideOnly lists the columns
+  // a phone leaves out so the table fits without scrolling sideways.
+  if (!rows.length) return '<div class="empty-state">No data yet</div>';
+  var cls = function(i) {
+    return (i > 0 ? 'mus-num' : 'mus-strong') + (wideOnly && wideOnly.indexOf(i) >= 0 ? ' mus-wide-only' : '');
+  };
+  var html = '<div class="tbl-wrap"><table class="mus-table"><tr>';
+  headers.forEach(function(h, i) { html += '<th class="' + cls(i) + '">' + h + '</th>'; });
+  html += '</tr>';
+  rows.forEach(function(r) {
+    html += '<tr>';
+    r.forEach(function(cell, i) { html += '<td class="' + cls(i) + '">' + cell + '</td>'; });
+    html += '</tr>';
+  });
+  return html + '</table></div>';
+}
+// Upright bars as plain boxes, so the names under them keep their size on a
+// phone. every: name each n-th bar. tight: only the tallest bar says its figure.
+function musBars(items, color, aria, every, tight) {
+  if (!items.length) return '<div class="empty-state">No data yet</div>';
+  var max = 0;
+  items.forEach(function(d) { if (d.c > max) max = d.c; });
+  var html = '<div class="mus-bars' + (tight ? ' tight' : '') + '" role="img" aria-label="' + esc(aria) + '">';
+  items.forEach(function(d, i) {
+    var h = max > 0 ? (d.c / max * 100) : 0;
+    var says = (!tight && d.c > 0) || (d.c === max && max > 0);
+    html += '<div class="mus-bar-col" title="' + esc(d.label) + ': ' + musFull(d.c) + '"><div class="mus-bar-plot">' +
+      '<div class="mus-bar" style="height:' + h.toFixed(1) + '%;background:' + color + '">' +
+      (says ? '<span class="mus-bar-n">' + fmt(d.c) + '</span>' : '') + '</div></div>' +
+      '<span class="mus-bar-x">' + (i % (every || 1) === 0 ? esc(d.label) : '&nbsp;') + '</span></div>';
+  });
+  return html + '</div>';
+}
+
+async function loadMuseum() {
+  var top = document.getElementById('top-museum');
+  var a = null;
+  try {
+    var res = await fetch('/api/museum');
+    a = await res.json();
+  } catch (e) { a = null; }
+  if (!a || a.error) {
+    if (!MUS.answer) top.innerHTML = '<div class="empty-state">Cloudflare did not answer. The next refresh asks again.</div>';
+    return;
+  }
+  if (!a.configured) {
+    document.getElementById('hours-museum').innerHTML = '';
+    document.getElementById('grid-museum').innerHTML = '';
+    top.innerHTML = '<div class="placeholder"><h3>Not set up yet</h3><p>This panel reads the totals Cloudflare holds for the museum. It needs two secrets on this worker: MUSEUM_CF_API_TOKEN and MUSEUM_ZONE_TAG. Until both are set, nothing is asked.</p></div>';
+    return;
+  }
+  MUS.answer = a;
+  renderMuseum(a);
+  document.getElementById('updated-museum').textContent = 'Updated ' + now();
+  if (!MUS.day) MUS.day = a.today;
+  if (!MUS.shell) renderMuseumHoursShell(a);
+  loadMuseumHours();
+}
+
+function renderMuseum(a) {
+  var f = a.frames;
+  var openName = a.open ? musUtcDay(a.open) : '';
+  var sinceLabel = 'Since ' + (a.open && a.reach.daily === a.open ? openName : musUtcDay(a.reach.daily));
+
+  // What Cloudflare left out, said once at the top
+  var alerts = '';
+  var gaps = a.gaps || [];
+  // A wrong token or zone explains every other gap, so it is the only line.
+  if (gaps[0] === 'token' || gaps[0] === 'zone') gaps = [gaps[0]];
+  gaps.forEach(function(g) {
+    if (MUS_GAPS[g]) alerts += '<div class="alert-card a-warn">' + MUS_GAPS[g] + '</div>';
+  });
+  document.getElementById('alerts-museum').innerHTML = alerts;
+
+  // The second stop's picture stands in for a real use: a visit that did
+  // more than arrive. Null where Cloudflare gave no film totals.
+  var second = a.stops && a.stops.length > 1 ? a.stops[1] : null;
+  var use = {
+    today: second ? second.today : null,
+    week: second ? second.week : null,
+    open: second ? second.open : null,
+  };
+
+  // --- The headline and the three frames ---
+  var top = '<div class="mus-note">Cloudflare&rsquo;s totals for ' + esc(a.host) + '. The site counts nothing itself. Bots and crawlers are in every number, because Cloudflare&rsquo;s own bot filter is not applied. A day is Cloudflare&rsquo;s day: it turns at ' + musDayTurn(a.today) + ' your time.</div>';
+  top += '<div class="grid mus-block">';
+  if (f.today.arrivals == null && (a.gaps || []).indexOf('daily') < 0) {
+    // Without Cloudflare's visits figure the nearest thing is pages opened.
+    top += kpi('Pages opened today', f.today.pv, { hero: true, sub: 'Last 7 days ' + fmt(f.week.pv) + ' &middot; arrivals were not given' });
+  } else {
+    top += kpi('Arrivals today', f.today.arrivals == null ? 'n/a' : f.today.arrivals, {
+      hero: true,
+      sub: 'Last 7 days ' + (f.week.arrivals == null ? 'n/a' : fmt(f.week.arrivals)) + ' &middot; pages reached from outside the site',
+    });
+  }
+  top += kpi('Walks started today', f.today.started == null ? 'n/a' : f.today.started, {
+    hero: true,
+    sub: 'Last 7 days ' + (f.week.started == null ? 'n/a' : fmt(f.week.started)) + ' &middot; the film began in a browser',
+  });
+  top += kpi('Second stop reached today', use.today == null ? 'n/a' : use.today, {
+    hero: true,
+    sub: 'Last 7 days ' + (use.week == null ? 'n/a' : fmt(use.week)) + ' &middot; stands in for real uses',
+  });
+  top += '</div>';
+
+  var frameRows = [
+    ['Arrivals', musCell(f.today.arrivals), musCell(f.week.arrivals), musCell(f.open.arrivals)],
+    ['Pages opened', musCell(f.today.pv), musCell(f.week.pv), musCell(f.open.pv)],
+    ['The walk opened', musCell(f.today.walks), musCell(f.week.walks), musCell(f.open.walks)],
+    ['Walks started', musCell(f.today.started), musCell(f.week.started), musCell(f.open.started)],
+    ['Second stop reached', musCell(use.today), musCell(use.week), musCell(use.open)],
+    ['Different visitors', musCell(f.today.uniq), musCell(f.week.uniq), musCell(f.open.uniq)],
+    ['Requests', musCell(f.today.req), musCell(f.week.req), musCell(f.open.req)],
+    ['Data moved', musBytes(f.today.bytes), musBytes(f.week.bytes), musBytes(f.open.bytes)],
+    ['Stopped by Cloudflare', musCell(f.today.stopped), musCell(f.week.stopped), musCell(f.open.stopped)],
+    ['Server errors', musCell(f.today.err5), musCell(f.week.err5), musCell(f.open.err5)],
+  ];
+  var reachNote = a.reach.pagesSinceOpen ? '' : ' Cloudflare keeps arrivals and the walk for about a month, so the last column has no figure for them.';
+  top += '<div class="mus-block">' + chartCard('Today, the last 7 days, since opening',
+    musTable(['', 'Today', '7 days', sinceLabel], frameRows) +
+    '<div class="mus-cap">Arrivals are what Cloudflare calls visits: a page opened from outside the site or straight from the address bar. ' +
+    'Walks started counts how often the film&rsquo;s index was read, which only a browser running the walk does. ' +
+    'Second stop reached counts how often the second stop&rsquo;s picture was asked for. It stands in for real uses, a visit that did more than arrive, and is not a count of people.' + reachNote + '</div>',
+    'card-full') + '</div>';
+  document.getElementById('top-museum').innerHTML = top;
+
+  // --- By day ---
+  var html = '<div class="section-divider">By day</div><div class="grid">';
+  var dayItems = a.days.map(function(d) { return { label: musUtcDay(d.d), c: d.pv }; });
+  html += chartCard('Pages opened per day', musBars(dayItems, 'var(--s-prism)', 'Pages opened per day', Math.ceil(dayItems.length / 8), dayItems.length > 16), 'card-wide');
+  var dayRows = a.days.slice(-14).reverse().map(function(d) {
+    return [musUtcDay(d.d), musCell(d.arrivals), musCell(d.pv), musCell(d.uniq), musCell(d.started)];
+  });
+  html += chartCard('Day by day', '<div class="mus-scroll">' + musTable(['Day', 'Arrivals', 'Pages', 'Visitors', 'Walks started'], dayRows) + '</div>', '');
+  html += '</div>';
+
+  // --- By language ---
+  html += '<div class="section-divider">By language of the page</div><div class="grid">';
+  if (a.byLang) {
+    var langRows = a.byLang.map(function(l) {
+      return [esc(MUS_LANGS[l.key] || l.key), musCell(l.today[0]), musCell(l.today[1]), musCell(l.week[0]), musCell(l.week[1])];
+    });
+    html += chartCard('Pages and arrivals by language',
+      musTable(['Language', 'Pages today', 'Arrivals today', 'Pages 7 days', 'Arrivals 7 days'], langRows) +
+      '<div class="mus-cap">The language of the page that was asked for, never the language of a browser.</div>',
+      'card-wide');
+    var langItems = a.byLang.map(function(l) { return { label: MUS_LANGS[l.key] || l.key, c: l.week[0] }; });
+    html += chartCard('Pages, last 7 days', '<div class="mus-wide">' + barsHtml(langItems, 'var(--s-story)') + '</div>', '');
+  } else {
+    html += chartCard('Pages and arrivals by language', '<div class="empty-state">Cloudflare did not give page-level totals.</div>', 'card-full');
+  }
+  html += '</div>';
+
+  // --- By kind of page, and countries ---
+  html += '<div class="section-divider">By kind of page &middot; countries</div><div class="grid">';
+  if (a.byKind) {
+    var kindRows = a.byKind.map(function(k) {
+      return [esc(MUS_KINDS[k.key] || k.key), musCell(k.today[0]), musCell(k.today[1]), musCell(k.week[0]), musCell(k.week[1])];
+    });
+    html += chartCard('Pages and arrivals by kind of page',
+      musTable(['Kind', 'Pages today', 'Arrivals today', 'Pages 7 days', 'Arrivals 7 days'], kindRows), 'card-wide');
+  } else {
+    html += chartCard('Pages and arrivals by kind of page', '<div class="empty-state">Cloudflare did not give page-level totals.</div>', 'card-wide');
+  }
+  var longer = a.reach.daily < a.reach.week;
+  var lands = (longer ? a.countries.open : a.countries.week).slice(0, 10).map(function(c) { return { label: musCountry(c[0]), c: c[1] }; });
+  html += chartCard('Top countries, ' + (longer ? 'since opening' : 'last 7 days'),
+    '<div class="mus-wide">' + barsHtml(lands, 'var(--s-prism)') + '</div><div class="mus-cap">Requests by country, not people.</div>', '');
+  html += '</div>';
+
+  // --- The walk ---
+  html += '<div class="section-divider">The walk</div><div class="grid">';
+  var walkRows = [
+    ['Opened', musCell(f.today.walks), musCell(f.week.walks)],
+    ['Started', musCell(f.today.started), musCell(f.week.started)],
+    ['Second stop reached', musCell(use.today), musCell(use.week)],
+  ];
+  html += chartCard('Opened, started, second stop', musTable(['', 'Today', '7 days'], walkRows) +
+    '<div class="mus-cap">Started can stand above opened: the film&rsquo;s index is asked for at every start, also by a browser that still holds the page, and by our own checks of the site. ' +
+    'In which language a walk was opened is not shown here. The address carries it after the question mark, and Cloudflare does not give that part on this plan.</div>', '');
+  if (a.stops && a.stops.length) {
+    var stopItems = a.stops.map(function(s, i) { return { label: musStop(s.id, i), c: s.week }; });
+    html += chartCard('How far walks went, last 7 days',
+      '<div class="mus-wide">' + barsHtml(stopItems, 'var(--s-wisdom)') + '</div>' +
+      '<div class="mus-cap">How often each stop&rsquo;s picture was asked for. It stands in for stops reached: the player may fetch a picture a step ahead, and a browser that already holds a picture does not ask again.</div>',
+      'card-wide');
+  } else {
+    html += chartCard('How far walks went', '<div class="empty-state">Cloudflare did not give the totals for the film files.</div>', 'card-wide');
+  }
+  html += '</div>';
+
+  document.getElementById('grid-museum').innerHTML = html;
+}
+
+// --- One chosen day, hour by hour ---
+
+function renderMuseumHoursShell(a) {
+  var el = document.getElementById('hours-museum');
+  el.innerHTML = '<div class="card card-full mus-block">' +
+    '<div class="mus-head"><div class="kpi-label">Hour by hour</div>' +
+    '<div class="mus-controls">' +
+    '<button class="mus-btn" data-mus-step="-1" aria-label="The day before">&lsaquo;</button>' +
+    '<input class="mus-date" id="mus-day" type="date" aria-label="Day">' +
+    '<button class="mus-btn" data-mus-step="1" aria-label="The day after">&rsaquo;</button>' +
+    '<button class="mus-btn" data-mus-step="0">Today</button>' +
+    '</div></div>' +
+    '<div id="mus-hours-body"><div class="empty-state">Loading the hours...</div></div></div>';
+  var input = document.getElementById('mus-day');
+  if (a.open) input.min = a.open;
+  input.addEventListener('change', function() { if (input.value) musSetDay(input.value); });
+  el.addEventListener('click', function(ev) {
+    var t = ev.target && ev.target.closest ? ev.target.closest('[data-mus-step], [data-mus-metric]') : null;
+    if (!t) return;
+    if (t.dataset.musMetric) { MUS.metric = t.dataset.musMetric; renderMuseumHours(); return; }
+    var step = Number(t.dataset.musStep);
+    musSetDay(step === 0 ? MUS.answer.today : musShiftDay(MUS.day, step));
+  });
+  MUS.shell = true;
+}
+
+function musSetDay(day) {
+  var today = MUS.answer.today;
+  if (day > today) day = today;
+  if (MUS.answer.open && day < MUS.answer.open) day = MUS.answer.open;
+  MUS.day = day;
+  loadMuseumHours();
+}
+
+async function loadMuseumHours() {
+  var day = MUS.day;
+  var today = MUS.answer.today;
+  var input = document.getElementById('mus-day');
+  if (input) { input.value = day; input.max = today; }
+  var next = document.querySelector('[data-mus-step="1"]');
+  if (next) next.disabled = day >= today;
+  var prev = document.querySelector('[data-mus-step="-1"]');
+  if (prev) prev.disabled = !!(MUS.answer.open && day <= MUS.answer.open);
+  var h = null;
+  try {
+    var res = await fetch('/api/museum/hours?day=' + day);
+    h = await res.json();
+  } catch (e) { h = null; }
+  if (day !== MUS.day) return;
+  MUS.hours = h && h.hours ? h : null;
+  renderMuseumHours();
+}
+
+function renderMuseumHours() {
+  var body = document.getElementById('mus-hours-body');
+  if (!body) return;
+  var h = MUS.hours;
+  if (!h) { body.innerHTML = '<div class="empty-state">Cloudflare did not answer for this day.</div>'; return; }
+  var metric = MUS.metric;
+  var has = function(key) { return h.hours.some(function(r) { return r[key] != null; }); };
+  if (!has(metric)) {
+    var firstWith = MUS_METRICS.filter(function(m) { return has(m.key); })[0];
+    if (firstWith) metric = firstWith.key;
+  }
+  if (!has(metric)) {
+    body.innerHTML = '<div class="empty-state">Cloudflare no longer holds the hours of this day. Requests and visitors per hour reach back three days, page-level totals about a month.</div>';
+    return;
+  }
+  var pills = '<div class="mus-controls" style="margin-top:10px" role="group" aria-label="What the bars show">';
+  MUS_METRICS.forEach(function(m) {
+    pills += '<button class="mus-btn' + (m.key === metric ? ' active' : '') + '" data-mus-metric="' + m.key + '"' + (has(m.key) ? '' : ' disabled') + '>' + m.label + '</button>';
+  });
+  pills += '</div>';
+
+  var label = '';
+  MUS_METRICS.forEach(function(m) { if (m.key === metric) label = m.label; });
+  var total = 0, peak = -1, peakAt = '';
+  var items = h.hours.map(function(r) {
+    var hour = musPad(new Date(r.t).getHours());
+    var c = r[metric] == null ? 0 : Number(r[metric]);
+    total += c;
+    if (c > peak) { peak = c; peakAt = hour; }
+    return { label: hour, c: c };
+  });
+  var line = '<div class="mus-line"><b>' + musFull(total) + '</b> ' + label.toLowerCase() + ' on this day' +
+    (peak > 0 ? ' &middot; busiest hour <b>' + peakAt + ':00</b> with ' + musFull(peak) : '') +
+    ' &middot; hours on your clock, the day runs from ' + musDayTurn(MUS.day) + ' to ' + musDayTurn(MUS.day) + '</div>';
+  var chart = musBars(items, 'var(--gold-subtle)', label + ' per hour', 1, true);
+
+  var rowsHtml = h.hours.filter(function(r) {
+    return r.req != null || r.pages != null;
+  }).reverse().map(function(r) {
+    return [musPad(new Date(r.t).getHours()) + ':00', musCell(r.arrivals), musCell(r.pages), musCell(r.walks), musCell(r.started), musCell(r.uniq), musCell(r.req)];
+  });
+  var gapNote = '';
+  if ((h.gaps || []).indexOf('hourly-reach') >= 0) gapNote = '<div class="mus-cap">Cloudflare keeps visitors and requests per hour for three days only, so those two columns are empty for this day.</div>';
+  body.innerHTML = pills + line + chart +
+    '<div class="mus-scroll">' + musTable(['Hour', 'Arrivals', 'Pages', 'Walk opened', 'Walks started', 'Visitors', 'Requests'], rowsHtml, [3, 6]) + '</div>' + gapNote;
+}
+
 function switchTab(tab) {
   S.tab = tab;
+  document.body.dataset.tab = tab;
   location.hash = tab;
 
   // Update sidebar
@@ -3517,6 +3957,7 @@ function loadTab(tab) {
   else if (tab === 'product') loadProduct();
   else if (tab === 'audio') loadAudio();
   else if (tab === 'adgrants') loadAdGrants();
+  else if (tab === 'museum') loadMuseum();
 }
 
 function setRange(days) {
@@ -3563,10 +4004,11 @@ function init() {
 
   // Read hash
   var hash = location.hash.replace('#', '');
-  if (['overview', 'servers', 'product', 'audio', 'adgrants'].indexOf(hash) >= 0) {
+  if (['overview', 'servers', 'product', 'audio', 'adgrants', 'museum'].indexOf(hash) >= 0) {
     S.tab = hash;
   }
 
+  document.body.dataset.tab = S.tab;
   renderRangePills();
 
   // Activate correct tab
@@ -3589,7 +4031,7 @@ function init() {
   // Hash change
   window.addEventListener('hashchange', function() {
     var h = location.hash.replace('#', '');
-    if (h && h !== S.tab && ['overview', 'servers', 'product', 'audio', 'adgrants'].indexOf(h) >= 0) {
+    if (h && h !== S.tab && ['overview', 'servers', 'product', 'audio', 'adgrants', 'museum'].indexOf(h) >= 0) {
       switchTab(h);
     }
   });

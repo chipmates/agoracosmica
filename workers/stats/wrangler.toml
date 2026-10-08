@@ -17,8 +17,19 @@ SERVER_NBG1_URL = "https://nbg1.agoracosmica.org"
 # Leave at "0" to disable (shows full AE history, no label).
 # Set 2026-05-06 05:18:40 UTC — public launch.
 LAUNCH_EPOCH_SECONDS = "1778044720"
+# Museum of Ages panel: Cloudflare's own totals for the museum's zone.
+# The day it opened (UTC), its languages (the root language first), and the
+# walk's stops in their order, as the film's files name them.
+MUSEUM_HOST = "museumofages.org"
+MUSEUM_OPEN_DATE = "2026-10-06"
+MUSEUM_LANGS = "en,de,fr,it,es,pt-BR,bg"
+MUSEUM_WALK_STOPS = "picture-room,picture-room-lisa,picture-room-west,flight,works,reading-table,body,body-valve,line-early,supper-wall,arrival,courtyard,hall,oratory,study,chamber,grave"
 
 # Secrets (set via wrangler secret put):
+# - MUSEUM_CF_API_TOKEN (read-only token for the museum's zone: Zone,
+#                        Analytics, Read, that one zone and nothing else)
+# - MUSEUM_ZONE_TAG     (the museum zone's ID; without both the panel says
+#                        it is not set up and asks Cloudflare nothing)
 # - CF_API_TOKEN       (API token with Analytics Engine read permission)
 # - CF_ACCOUNT_ID      (Cloudflare account ID for Analytics Engine queries)
 # - AUDIO_API_KEY      (Bearer token for GEX130 servers — same as audio worker)
