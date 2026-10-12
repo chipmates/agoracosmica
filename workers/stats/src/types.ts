@@ -35,6 +35,21 @@ export interface Env {
   MUSEUM_LANGS?: string;
   /** The walk's stops in their order, comma separated, as the film's files name them. */
   MUSEUM_WALK_STOPS?: string;
+  /**
+   * Marks and aims for the museum's trend charts, a secret holding JSON:
+   * {"events":[{"day":"YYYY-MM-DD","label":"..."}],"aims":[{"metric":"real","per":"week","value":15,"label":"..."}]}.
+   * Never in the repository. Without it the charts carry no marks.
+   */
+  MUSEUM_TREND_NOTES?: string;
+  /** The Analytics Engine dataset the museum's own count writes to. */
+  MUSEUM_COUNT_DATASET?: string;
+  /**
+   * Account and read token for that dataset, both secrets, needed only when
+   * the museum's Pages project sits in another account than CF_ACCOUNT_ID.
+   * Without them the count is read with CF_ACCOUNT_ID and CF_API_TOKEN.
+   */
+  MUSEUM_COUNT_ACCOUNT_ID?: string;
+  MUSEUM_COUNT_API_TOKEN?: string;
 }
 
 export interface BatchQueryRequest {

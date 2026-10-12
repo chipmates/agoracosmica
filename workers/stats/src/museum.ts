@@ -714,7 +714,268 @@ async function buildHours(cfg: Config, fetcher: Fetcher, now: number, from: numb
   return { configured: true, at: iso(now), from: iso(from), hours: [...hours.values()], gaps };
 }
 
-// --- The two routes ---
+// --- Trends: the same totals, day by day over the weeks ---
+
+// Marks for the time axis and aim lines, from one private setting. Labels are
+// plain text and are escaped again where they are shown.
+export interface TrendNotes {
+  events: Array<{ day: string; label: string }>;
+  aims: Array<{ metric: string; per: 'day' | 'week'; value: number; label: string }>;
+}
+
+export const AIM_METRICS = ['arrivals', 'opened', 'started', 'second', 'pages', 'visitors', 'real', 'use', 'walks', 'reads'];
+
+const cleanLabel = (v: unknown): string =>
+  String(v == null ? '' : v).replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 80);
+
+export function readNotes(raw: string | undefined): TrendNotes | null | 'bad' {
+  if (!raw || !raw.trim()) return null;
+  let parsed: unknown;
+  try { parsed = JSON.parse(raw); } catch { return 'bad'; }
+  const o = obj(parsed);
+  const events: TrendNotes['events'] = [];
+  for (const e of arr(o.events).slice(0, 60)) {
+    const day = String(e.day || '');
+    const label = cleanLabel(e.label);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(day) && !isNaN(dayStart(day)) && label) events.push({ day, label });
+  }
+  events.sort((a, b) => (a.day < b.day ? -1 : a.day > b.day ? 1 : 0));
+  const aims: TrendNotes['aims'] = [];
+  for (const a of arr(o.aims).slice(0, 20)) {
+    const metric = String(a.metric || '');
+    const value = Number(a.value);
+    const per = a.per === 'week' ? 'week' : 'day';
+    if (AIM_METRICS.indexOf(metric) >= 0 && isFinite(value) && value > 0) aims.push({ metric, per, value, label: cleanLabel(a.label) });
+  }
+  return { events, aims };
+}
+
+const TREND_COUNTRIES = 8;
+
+interface TrendDay {
+  d: string;
+  req: number | null;
+  pv: number | null;
+  uniq: number | null;
+  bytes: number | null;
+  stopped: number | null;
+  err5: number | null;
+  arrivals: number | null;
+  pages: number | null;
+  walks: number | null;
+  started: number | null;
+  second: number | null;
+}
+
+type Column = Array<number | null>;
+
+export interface TrendsAnswer {
+  configured: true;
+  at: string;
+  host: string;
+  open: string;
+  today: string;
+  // First day of each kind of series, and how many days Cloudflare keeps it.
+  reach: { daily: string; pages: string | null; dailyKeep: number; pagesKeep: number };
+  days: TrendDay[];
+  byLang: Array<{ key: string; pages: Column; arrivals: Column }> | null;
+  byKind: Array<{ key: string; pages: Column; arrivals: Column }> | null;
+  countries: Array<{ key: string; req: Column }> | null;
+  // Each stop's picture asked for, per day, in the walk's order.
+  stops: { ids: string[]; days: Array<number[] | null> } | null;
+  // Different visitors over the last 7 full days and the 7 before: not a sum of days.
+  visitors: { last: number | null; prev: number | null };
+  notes: TrendNotes | null;
+  gaps: string[];
+}
+
+async function buildTrends(cfg: Config, fetcher: Fetcher, now: number, notes: TrendNotes | null | 'bad'): Promise<TrendsAnswer> {
+  const limits = await limitsOf(cfg, fetcher);
+  const today = dateOf(now);
+  const todayStart = dayStart(today);
+  const gaps: string[] = [];
+  if (notes === 'bad') gaps.push('notes');
+
+  const dailyFloor = dateOf(floorOf(now, limits.daily) + DAY_MS);
+  const from = cfg.open ? (cfg.open > dailyFloor ? cfg.open : dailyFloor) : dateOf(todayStart - 89 * DAY_MS);
+  const range = (a: string, b: string) => 'filter: {date_geq: "' + a + '", date_leq: "' + b + '"}';
+  const dayFields = 'dimensions { date } sum { requests pageViews bytes threats';
+
+  // The same daily question as the present view: whole-zone totals, a year back.
+  const daily = await askFirst(cfg, fetcher, [
+    'days: httpRequests1dGroups(limit: 400, ' + range(from, today) + ', orderBy: [date_ASC]) { ' + dayFields +
+      ' countryMap { clientCountryName requests } responseStatusMap { edgeResponseStatus requests } } uniq { uniques } }',
+    'days: httpRequests1dGroups(limit: 400, ' + range(from, today) + ', orderBy: [date_ASC]) { ' + dayFields + ' } uniq { uniques } }',
+  ]);
+  if (!daily) gaps.push('daily');
+  else if (daily.form > 0) gaps.push('countries');
+
+  const rows = new Map<string, TrendDay>();
+  const blank = (d: string): TrendDay => ({ d, req: null, pv: null, uniq: null, bytes: null, stopped: null, err5: null, arrivals: null, pages: null, walks: null, started: null, second: null });
+  for (let t = dayStart(from); t <= todayStart; t += DAY_MS) rows.set(dateOf(t), blank(dateOf(t)));
+  const lands = new Map<string, Map<string, number>>();
+  for (const row of daily ? arr(daily.zone.days) : []) {
+    const d = String(obj(row.dimensions).date || '');
+    const r = rows.get(d);
+    if (!r) continue;
+    const sum = obj(row.sum);
+    let err5 = 0;
+    for (const s of arr(sum.responseStatusMap)) if (num(s.edgeResponseStatus) >= 500) err5 += num(s.requests);
+    r.req = num(sum.requests); r.pv = num(sum.pageViews); r.bytes = num(sum.bytes);
+    r.stopped = num(sum.threats); r.err5 = daily && daily.form === 0 ? err5 : null;
+    r.uniq = num(obj(row.uniq).uniques);
+    const byLand = new Map<string, number>();
+    for (const c of arr(sum.countryMap)) {
+      const code = String(c.clientCountryName || 'XX');
+      if (/^[A-Z0-9]{2}$/.test(code)) byLand.set(code, (byLand.get(code) || 0) + num(c.requests));
+    }
+    lands.set(d, byLand);
+  }
+
+  // Different visitors cannot be added across days, so the two weeks ask for their own figure.
+  const lastTo = dateOf(todayStart - DAY_MS);
+  const lastFrom = dateOf(todayStart - 7 * DAY_MS);
+  const prevTo = dateOf(todayStart - 8 * DAY_MS);
+  const prevFrom = dateOf(todayStart - 14 * DAY_MS);
+  const visitors: TrendsAnswer['visitors'] = { last: null, prev: null };
+  if (daily && lastTo >= from) {
+    const clip = (d: string) => (d < from ? from : d);
+    const parts = 'w0: httpRequests1dGroups(limit: 1, ' + range(clip(lastFrom), lastTo) + ') { uniq { uniques } }' +
+      (prevTo >= from ? ' w1: httpRequests1dGroups(limit: 1, ' + range(clip(prevFrom), prevTo) + ') { uniq { uniques } }' : '');
+    const spans = await askFirst(cfg, fetcher, [parts]);
+    const one = (v: unknown): number | null => { const row = arr(v)[0]; return row ? num(obj(row.uniq).uniques) : null; };
+    if (spans) { visitors.last = one(spans.zone.w0); visitors.prev = prevTo >= from ? one(spans.zone.w1) : null; }
+    else gaps.push('visitors');
+  }
+
+  // Page-level totals: as far back as one question may span, from a whole day.
+  const reach = now - Math.min(limits.adaptive.notOlderThan * 1000 - 10 * 60 * 1000, limits.adaptive.maxDuration * 1000);
+  const openStart = dayStart(from);
+  const pagesFrom = openStart >= reach ? openStart : Math.ceil(reach / DAY_MS) * DAY_MS;
+  const pagesWith = (visits: boolean) =>
+    'pages: httpRequestsAdaptiveGroups(limit: 10000, filter: {' + pageSpan(cfg, pagesFrom, now) + '}, orderBy: [count_DESC]) { count ' +
+    (visits ? 'sum { visits } ' : '') + 'dimensions { date clientRequestPath } }';
+  const index = ' index: httpRequestsAdaptiveGroups(limit: 100, filter: {' + span(cfg, pagesFrom, now) +
+    ', clientRequestPath_like: "/film/%/film.json"}, orderBy: [date_ASC]) { count dimensions { date } }';
+  const stills = ' stills: httpRequestsAdaptiveGroups(limit: 10000, filter: {' + span(cfg, pagesFrom, now) +
+    ', clientRequestPath_like: "/film/%/stills/%"}, orderBy: [count_DESC]) { count dimensions { date clientRequestPath } }';
+  const page = pagesFrom < now ? await askFirst(cfg, fetcher, [
+    pagesWith(true) + index + stills,
+    pagesWith(true) + index,
+    pagesWith(false) + index + stills,
+    pagesWith(false) + index,
+  ]) : null;
+
+  const langKeys = cfg.langs.slice();
+  const kindKeys = KIND_ORDER.slice();
+  const dayPages = new Map<string, DayPages>();
+  let stops: TrendsAnswer['stops'] = null;
+  if (!page) gaps.push('pages');
+  else {
+    const visits = page.form === 0 || page.form === 1;
+    const withStills = page.form === 0 || page.form === 2;
+    if (!visits) gaps.push('arrivals');
+    if (!withStills) gaps.push('stops');
+    for (let t = pagesFrom; t < now; t += DAY_MS) {
+      const day = emptyDay(dateOf(t), visits);
+      day.started = 0;
+      dayPages.set(day.d, day);
+    }
+    for (const row of arr(page.zone.pages)) {
+      const dim = obj(row.dimensions);
+      const day = dayPages.get(String(dim.date || ''));
+      if (day) addPage(day, cfg, String(dim.clientRequestPath || ''), num(row.count), visits ? num(obj(row.sum).visits) : null);
+    }
+    for (const row of arr(page.zone.index)) {
+      const day = dayPages.get(String(obj(row.dimensions).date || ''));
+      if (day) day.started = (day.started || 0) + num(row.count);
+    }
+    if (withStills) {
+      const list = arr(page.zone.stills);
+      if (list.length >= 10000) gaps.push('stops-cut');
+      const perDay = new Map<string, Counts>();
+      for (const row of list) {
+        const dim = obj(row.dimensions);
+        const d = String(dim.date || '');
+        const stop = stopOf(String(dim.clientRequestPath || ''));
+        if (!stop || !dayPages.has(d)) continue;
+        const c = perDay.get(d) || {};
+        c[stop] = (c[stop] || 0) + num(row.count);
+        perDay.set(d, c);
+      }
+      const ids = cfg.stops.slice();
+      for (const c of perDay.values()) for (const id of Object.keys(c)) if (ids.indexOf(id) < 0) ids.push(id);
+      stops = {
+        ids,
+        days: [...rows.keys()].map((d) => (dayPages.has(d) ? ids.map((id) => (perDay.get(d) || {})[id] || 0) : null)),
+      };
+    }
+    for (const day of dayPages.values()) {
+      for (const k of Object.keys(day.pages ? day.pages.byKind : {})) if (kindKeys.indexOf(k) < 0) kindKeys.push(k);
+    }
+  }
+
+  const dates = [...rows.keys()];
+  const secondAt = stops && cfg.stops[1] ? stops.ids.indexOf(cfg.stops[1]) : -1;
+  dates.forEach((d, i) => {
+    const r = rows.get(d) as TrendDay;
+    const p = dayPages.get(d);
+    if (!p || !p.pages) return;
+    r.arrivals = p.pages.arrivals; r.pages = p.pages.total; r.walks = p.pages.walks; r.started = p.started;
+    const v = stops ? stops.days[i] : null;
+    r.second = v && secondAt >= 0 ? v[secondAt] : null;
+  });
+
+  const columnsOf = (keys: string[], pick: (p: NonNullable<DayPages['pages']>) => Record<string, Pair>) => {
+    if (!page) return null;
+    return keys.map((key) => ({
+      key,
+      pages: dates.map((d) => { const p = dayPages.get(d); return p && p.pages ? (pick(p.pages)[key] || [0, 0])[0] : null; }),
+      arrivals: dates.map((d) => {
+        const p = dayPages.get(d);
+        if (!p || !p.pages || p.pages.arrivals === null) return null;
+        const v = pick(p.pages)[key];
+        return v ? v[1] : 0;
+      }),
+    }));
+  };
+  const byKind = columnsOf(kindKeys, (p) => p.byKind);
+
+  let countries: TrendsAnswer['countries'] = null;
+  if (daily && daily.form === 0) {
+    const total = new Map<string, number>();
+    for (const m of lands.values()) for (const [k, v] of m) total.set(k, (total.get(k) || 0) + v);
+    const top = [...total.entries()].filter((e) => e[1] > 0).sort((a, b) => b[1] - a[1]).slice(0, TREND_COUNTRIES).map((e) => e[0]);
+    countries = top.map((key) => ({ key, req: dates.map((d) => { const m = lands.get(d); return m ? m.get(key) || 0 : null; }) }));
+  }
+
+  if (cfg.refusals.has('token')) gaps.unshift('token');
+  else if (cfg.refusals.has('zone')) gaps.unshift('zone');
+
+  return {
+    configured: true,
+    at: iso(now),
+    host: cfg.host,
+    open: cfg.open,
+    today,
+    reach: {
+      daily: from,
+      pages: page ? dateOf(pagesFrom) : null,
+      dailyKeep: Math.floor(limits.daily.notOlderThan / DAY_S),
+      pagesKeep: Math.floor(limits.adaptive.notOlderThan / DAY_S),
+    },
+    days: [...rows.values()],
+    byLang: columnsOf(langKeys, (p) => p.byLang),
+    byKind: byKind ? byKind.filter((k) => k.key !== 'other' || k.pages.some((v) => !!v)) : null,
+    countries,
+    stops,
+    visitors,
+    notes: notes === 'bad' ? null : notes,
+    gaps,
+  };
+}
+
+// --- The routes ---
 
 function json(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
@@ -724,11 +985,16 @@ function json(body: unknown, status = 200): Response {
 }
 
 export async function handleMuseum(request: Request, env: Env, fetcher: Fetcher = (u, i) => fetch(u, i)): Promise<Response> {
-  const cfg = readConfig(env);
-  if (!cfg) return json({ configured: false });
   const url = new URL(request.url);
+  const cfg = readConfig(env);
+  const notes = url.pathname === '/api/museum/trends' ? readNotes(env.MUSEUM_TREND_NOTES) : null;
+  if (!cfg) return json(notes && notes !== 'bad' ? { configured: false, notes } : { configured: false });
   const now = Date.now();
   try {
+    if (url.pathname === '/api/museum/trends') {
+      // Finished days no longer move, so the long view is asked again every few minutes only.
+      return json(await cached('trends', (v) => (v.gaps.length ? 60 : 300), () => buildTrends(cfg, fetcher, now, notes)));
+    }
     if (url.pathname === '/api/museum/hours') {
       // The day is Cloudflare's own, cut at midnight UTC, so the hours add
       // up to the figures of that day elsewhere on the panel.

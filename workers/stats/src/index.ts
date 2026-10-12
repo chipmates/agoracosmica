@@ -5,6 +5,7 @@
 import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
 import { DASHBOARD_HTML } from './dashboard';
 import { handleMuseum } from './museum';
+import { handleMuseumCount, countDatasetOf } from './museum-count';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
@@ -44,8 +45,13 @@ export default {
 
     // Museum of Ages: Cloudflare's own totals for the museum's zone. Fixed
     // queries on the server, nothing passed through from the page.
-    if ((url.pathname === '/api/museum' || url.pathname === '/api/museum/hours') && request.method === 'GET') {
+    if ((url.pathname === '/api/museum' || url.pathname === '/api/museum/hours' || url.pathname === '/api/museum/trends') && request.method === 'GET') {
       return handleMuseum(request, env);
+    }
+
+    // The museum's own count: fixed, guarded questions only (museum-count.ts).
+    if (url.pathname === '/api/museum/count' && request.method === 'GET') {
+      return handleMuseumCount(env);
     }
 
     // Serve dashboard HTML — inject LAUNCH_EPOCH_SECONDS at render time so the
@@ -89,11 +95,20 @@ function applyLaunchFloor(sql: string, env: Env): string {
   return sql.replace(/\bWHERE\s+/i, `WHERE timestamp > toDateTime(${epoch}) AND `);
 }
 
+// The museum's count is read only through its own guarded route, so no page
+// can ask it a question that groups finer or reads single rows.
+function namesCount(sql: string, env: Env): boolean {
+  return new RegExp('\\b' + countDatasetOf(env) + '\\b', 'i').test(sql);
+}
+
 async function handleQuery(request: Request, env: Env): Promise<Response> {
   try {
     const { query } = (await request.json()) as { query: string; dataset?: string };
     if (!query || !query.trim().toUpperCase().startsWith('SELECT')) {
       return Response.json({ error: 'Only SELECT queries allowed' }, { status: 400 });
+    }
+    if (namesCount(query, env)) {
+      return Response.json({ error: 'Not through this route' }, { status: 400 });
     }
 
     const response = await queryAnalyticsEngine(applyLaunchFloor(query, env), env);
@@ -124,6 +139,9 @@ async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
     for (const q of queries) {
       if (typeof q.sql !== 'string' || !q.sql.trim().toUpperCase().startsWith('SELECT')) {
         return Response.json({ error: 'Only SELECT queries allowed' }, { status: 400 });
+      }
+      if (namesCount(q.sql, env) || namesCount(String(q.dataset || ''), env)) {
+        return Response.json({ error: 'Not through this route' }, { status: 400 });
       }
     }
 

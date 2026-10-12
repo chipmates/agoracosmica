@@ -32,6 +32,13 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
   --tx: #D2D2D2;
   --tx2: #CACACA;
   --dim: #8A8A8A;
+  --src-direct: var(--tx2);
+  --src-search: var(--s-prism);
+  --src-ads: var(--gold);
+  --src-forum: var(--err);
+  --src-social: var(--s-wisdom);
+  --src-other: var(--ok);
+  --src-inside: color-mix(in srgb, var(--dim) 45%, transparent);
   --radius: 16px;
   --radius-sm: 8px;
   --sidebar-w: 160px;
@@ -750,6 +757,135 @@ td.mus-strong { color: var(--tx); font-weight: 600; }
   .mus-bars.tight .mus-bar-col:not(:nth-child(3n+1)) .mus-bar-x { visibility: hidden; }
 }
 
+/* === MUSEUM: NOW AND TRENDS === */
+.mus-switch {
+  display: inline-flex; margin: -4px 0 14px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent);
+  border-radius: var(--radius-sm); overflow: hidden; background: var(--bg-primary);
+}
+.mus-view {
+  min-height: 44px; min-width: 104px; padding: 0 18px;
+  font-family: inherit; font-size: 0.8125rem; font-weight: 500;
+  color: var(--dim); background: none; border: none; cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.15s, background 0.15s, border-color 0.15s;
+}
+.mus-view + .mus-view { border-left: 1px solid color-mix(in srgb, var(--gold-deep) 22%, transparent); }
+.mus-view:hover { color: var(--tx2); }
+.mus-view.active { color: var(--gold); background: color-mix(in srgb, var(--gold) 10%, transparent); border-bottom-color: var(--gold); }
+.mus-view:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+#trends-museum { display: none; }
+#tab-museum[data-view="trends"] #trends-museum { display: block; }
+#tab-museum[data-view="trends"] #alerts-museum,
+#tab-museum[data-view="trends"] #top-museum,
+#tab-museum[data-view="trends"] #hours-museum,
+#tab-museum[data-view="trends"] #grid-museum { display: none; }
+.tr-head { display: flex; align-items: center; gap: 10px 18px; flex-wrap: wrap; margin-bottom: 10px; }
+.tr-reach { font-size: 0.75rem; color: var(--dim); line-height: 1.5; flex: 1 1 320px; }
+.tr-marks { display: flex; flex-wrap: wrap; gap: 6px 18px; font-size: 0.75rem; color: var(--tx2); margin: 4px 0 6px; }
+.tr-mark-key { display: inline-flex; align-items: center; gap: 6px; }
+.tr-num {
+  width: 18px; height: 18px; border-radius: 50%; flex-shrink: 0;
+  border: 1px solid var(--s-prism); color: var(--s-prism);
+  font-size: 0.625rem; font-weight: 600;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.tr-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; margin-bottom: 14px; }
+.tr-card .kpi-label { margin-bottom: 6px; }
+.tr-chart { position: relative; width: 100%; margin-top: 6px; }
+.tr-svg { display: block; overflow: visible; touch-action: pan-y; }
+.tr-svg text { font-family: 'Space Grotesk', system-ui, sans-serif; font-size: 11px; fill: var(--dim); }
+.tr-gridline { stroke: var(--bg-highlight); stroke-width: 1; }
+.tr-gridline.dash { stroke-dasharray: 2 4; }
+.tr-hatch { stroke: color-mix(in srgb, var(--bg-highlight) 80%, transparent); stroke-width: 2; }
+.tr-none { opacity: 0.35; }
+.tr-svg text.tr-gone-lbl { font-size: 10.5px; fill: var(--tx2); }
+.tr-bar { fill: color-mix(in srgb, var(--gold-subtle) 34%, transparent); }
+.tr-bar.today { fill: color-mix(in srgb, var(--gold-subtle) 10%, transparent); stroke: color-mix(in srgb, var(--gold-subtle) 70%, transparent); stroke-dasharray: 2 2; }
+.tr-avg { fill: none; stroke: var(--gold); stroke-width: 2.25; stroke-linejoin: round; stroke-linecap: round; }
+.tr-avg.thin { stroke-width: 1.5; stroke-dasharray: 3 3; opacity: 0.8; }
+.tr-pt { fill: var(--gold); }
+.tr-pt.low { fill: var(--bg-card); stroke: var(--dim); stroke-width: 1.25; }
+.tr-pt.today { opacity: 0.55; }
+.tr-rate { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; }
+.tr-mark { stroke: var(--s-prism); stroke-width: 1; stroke-dasharray: 3 3; opacity: 0.75; }
+.tr-mark-dot { fill: var(--bg-card); stroke: var(--s-prism); }
+.tr-svg text.tr-mark-n { fill: var(--s-prism); font-size: 9.5px; font-weight: 600; }
+.tr-aim { stroke: var(--ok); stroke-width: 1.25; stroke-dasharray: 6 4; }
+.tr-svg text.tr-aim-lbl { fill: var(--ok); font-size: 10.5px; }
+.tr-step { fill: none; stroke: var(--gold); stroke-width: 2; stroke-linejoin: round; }
+.tr-step-ghost { fill: color-mix(in srgb, var(--gold-deep) 22%, transparent); }
+.tr-svg text.tr-stack-n { fill: var(--tx2); font-size: 10.5px; }
+.tr-guide { stroke: var(--tx2); stroke-width: 1; opacity: 0; pointer-events: none; }
+.tr-guide.on { opacity: 0.45; }
+.tr-hit { fill: transparent; cursor: crosshair; }
+.tr-src-direct { fill: var(--src-direct); } .tr-src-search { fill: var(--src-search); } .tr-src-ads { fill: var(--src-ads); }
+.tr-src-forum { fill: var(--src-forum); } .tr-src-social { fill: var(--src-social); } .tr-src-other { fill: var(--src-other); }
+.tr-src-inside { fill: var(--src-inside); }
+.tr-svg rect.part { opacity: 0.45; }
+.tr-sw { display: inline-block; width: 10px; height: 10px; border-radius: 2px; margin-right: 5px; vertical-align: -1px; }
+.tr-sw-direct { background: var(--src-direct); } .tr-sw-search { background: var(--src-search); } .tr-sw-ads { background: var(--src-ads); }
+.tr-sw-forum { background: var(--src-forum); } .tr-sw-social { background: var(--src-social); } .tr-sw-other { background: var(--src-other); }
+.tr-sw-inside { background: var(--src-inside); }
+.tr-legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 0.75rem; color: var(--tx2); margin-top: 10px; }
+.graph-tooltip.tr-tip { position: fixed; white-space: normal; max-width: 260px; line-height: 1.45; font-size: 0.75rem; padding: 6px 9px; z-index: 200; }
+.tr-tip b { color: var(--gold); font-weight: 600; }
+.tr-tip-mark { color: var(--s-prism); }
+.tr-wow { font-size: 0.8125rem; color: var(--tx2); margin-top: 8px; line-height: 1.5; }
+.tr-wow b { color: var(--gold); font-weight: 600; }
+.tr-wow .kpi-delta { font-size: 0.75rem; }
+.tr-multi { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px 18px; margin-top: 12px; }
+.tr-panel { min-width: 0; }
+.tr-panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6px; font-size: 0.75rem; }
+.tr-panel-name { color: var(--tx); font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tr-panel-fig { color: var(--dim); white-space: nowrap; }
+.tr-panel-fig .kpi-delta { font-size: 0.6875rem; }
+.tr-rates { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.tr-lists { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 28px; margin-top: 16px; align-items: start; }
+.tr-card.card-full { margin-bottom: 14px; }
+.tr-svg text.tr-aim-lbl, .tr-svg text.tr-gone-lbl, .tr-svg text.tr-stack-n { paint-order: stroke; stroke: var(--bg-card); stroke-width: 3px; stroke-linejoin: round; }
+.tr-mark-lead { stroke: var(--s-prism); stroke-width: 1; opacity: 0.75; }
+.tr-clip { fill: none; stroke: var(--tx); stroke-width: 1.5; }
+.tr-index { display: flex; flex-direction: column; }
+.tr-row {
+  display: grid; grid-template-columns: minmax(0, 1.7fr) 1fr 1fr 1fr; align-items: center; gap: 8px;
+  min-height: 44px; padding: 0 10px; width: 100%;
+  font-family: inherit; font-size: 0.8125rem; color: var(--tx2); text-align: left;
+  background: none; border: none; border-left: 3px solid transparent;
+  border-bottom: 1px solid color-mix(in srgb, var(--bg-highlight) 40%, transparent);
+  cursor: pointer;
+}
+.tr-row:hover { background: var(--bg-highlight); }
+.tr-row.active { border-left-color: var(--gold); background: color-mix(in srgb, var(--gold) 8%, transparent); color: var(--gold); }
+.tr-row:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.tr-row-head { cursor: default; min-height: 32px; font-size: 0.6875rem; color: var(--dim); border-bottom-color: var(--bg-highlight); }
+.tr-row-head:hover { background: none; }
+.tr-row-head span:not(:first-child) { text-align: right; }
+.tr-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+.tr-row-name small { display: block; font-size: 0.625rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tr-ghost .fbar-labelwrap { min-width: 120px; }
+@media (max-width: 1024px) {
+  .tr-multi { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .tr-rates { grid-template-columns: 1fr; }
+  .tr-lists { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  /* The switch stays in reach while the tab scrolls, as the phone's tab bar does. */
+  .mus-switch {
+    display: flex; position: sticky; top: 0; z-index: 10;
+    margin: 0 -12px 12px; border: none; border-radius: 0;
+    border-bottom: 1px solid color-mix(in srgb, var(--gold-deep) 15%, transparent);
+    background: var(--bg-primary);
+  }
+  .mus-view { flex: 1; min-width: 0; }
+  .tr-grid2 { grid-template-columns: 1fr; }
+  .tr-multi { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 12px; }
+  .tr-panel-head { flex-direction: column; align-items: flex-start; gap: 0; }
+  .tr-row { grid-template-columns: minmax(0, 1.6fr) 1fr 1fr; padding: 0 6px; font-size: 0.75rem; }
+  .tr-wide { display: none; }
+  .tr-ghost .fbar-labelwrap { min-width: 92px; }
+}
+
 /* === PRINT === */
 @media print {
   #sidebar, #mobile-tabs, #status-bar, .mobile-range, .sidebar-section { display: none !important; }
@@ -890,6 +1026,10 @@ td.mus-strong { color: var(--tx); font-weight: 600; }
     <h2 class="tab-title" id="title-museum">Museum of Ages</h2>
     <span class="tab-updated" id="updated-museum"></span>
   </div>
+  <div class="mus-switch" role="tablist" aria-label="Museum view">
+    <button class="mus-view active" role="tab" data-mus-view="now" aria-selected="true">Now</button>
+    <button class="mus-view" role="tab" data-mus-view="trends" aria-selected="false">Trends</button>
+  </div>
   <div id="alerts-museum"></div>
   <div id="top-museum">
     <div class="grid">
@@ -900,6 +1040,7 @@ td.mus-strong { color: var(--tx); font-weight: 600; }
   </div>
   <div id="hours-museum"></div>
   <div id="grid-museum"></div>
+  <div id="trends-museum"></div>
 </section>
 
 </main>
@@ -3581,7 +3722,7 @@ function consentTable(dimLabel, shownRows, acceptRows, key, labelFn, cls) {
 // Cloudflare's own totals for the museum's zone, read by the worker. The site
 // counts nothing itself, so this tab shows totals and never a visitor.
 
-var MUS = { day: '', metric: 'arrivals', answer: null, hours: null, shell: false };
+var MUS = { day: '', metric: 'arrivals', answer: null, hours: null, shell: false, view: 'now' };
 var MUS_LANGS = { en: 'English', de: 'German', fr: 'French', it: 'Italian', es: 'Spanish', 'pt-BR': 'Portuguese (BR)', bg: 'Bulgarian' };
 var MUS_KINDS = { front: 'Front page', wing: 'Wing page', topic: 'Topic page', about: 'About the museum', walk: 'The walk', privacy: 'Privacy', legal: 'Legal notice',
   'placed-g': 'Placed: grant ads', 'placed-p': 'Placed: paid search', 'placed-f': 'Placed: forum placement', 'placed-o': 'Placed: own posts', other: 'Other' };
@@ -3928,10 +4069,1014 @@ function renderMuseumHours() {
     '<div class="mus-scroll">' + musTable(['Hour', 'Arrivals', 'Pages', 'Walk opened', 'Walks started', 'Visitors', 'Requests'], rowsHtml, [3, 6]) + '</div>' + gapNote;
 }
 
+// --- Museum: trends ---
+// How the museum's numbers move over the weeks, from two sources: Cloudflare's
+// totals (bots included, a day is UTC) and the museum's own count (from its
+// first day with rows). Charts are drawn at the width they are given, so their
+// labels keep their size on a phone.
+
+var TR = { cf: null, count: null, at: 0, range: 28, metric: 'started', split: 'lang', of: 'arrivals', src: 'walks', charts: {}, seq: 0, painted: false, marks: [] };
+// A rate over fewer than this many is greyed and its line left out.
+var TR_FLOOR = 20;
+var TR_RANGES = [{ days: 28, label: '4 weeks' }, { days: 91, label: '13 weeks' }, { days: 0, label: 'Since opening' }];
+var TR_METRICS = [
+  { key: 'arrivals', label: 'Arrivals', cf: 'arrivals', keep: 'pages', cap: 'Pages opened from outside the site or straight from the address bar, as Cloudflare counts its visits. Bots and our own checks are in it.' },
+  { key: 'opened', label: 'The walk opened', cf: 'walks', keep: 'pages', cap: 'The walk&rsquo;s page opened, as Cloudflare counts it. Bots are in it.' },
+  { key: 'started', label: 'Walks started', cf: 'started', keep: 'pages', cap: 'The film&rsquo;s index read, which only a browser running the walk does. Our own checks of the site read it too.' },
+  { key: 'second', label: 'Second stop reached', tag: 'stand-in', cf: 'second', keep: 'pages', cap: 'The second stop&rsquo;s picture asked for. It stands in for real uses: a browser that already holds the picture does not ask again.' },
+  { key: 'pages', label: 'Pages opened', cf: 'pv', keep: 'daily', cap: 'Page views as Cloudflare counts them, bots included.' },
+  { key: 'visitors', label: 'Different visitors', cf: 'uniq', keep: 'daily', cap: 'Cloudflare&rsquo;s estimate per day. A week&rsquo;s figure is its own estimate, not the sum of its days.' },
+  { key: 'bytes', label: 'Data moved', cf: 'bytes', keep: 'daily', bytes: true, cap: 'What the site sent, the film included.' },
+  { key: 'real', label: 'Real uses', tag: 'counted', count: function(c) { return c.stops && c.stops['3']; }, cap: 'Walks that reached the third stop, counted by the museum.' },
+  { key: 'use', label: 'Uses', tag: 'counted', count: function(c) { return c.steps && c.steps.museum_use; }, cap: 'The count&rsquo;s use: the second stop or the first close look, once per walk.' },
+  { key: 'walks', label: 'Walks opened', tag: 'counted', count: function(c) { return c.steps && c.steps.museum_arrival; }, cap: 'The walk opened in a browser, once per page load, counted by the museum.' },
+  { key: 'site', label: 'Page arrivals', tag: 'counted', count: function(c) { return c.steps && c.steps.page_arrival; }, cap: 'A site page opened in a browser, once per page load.' },
+  { key: 'reads', label: 'Page reads', tag: 'counted', count: function(c) { return c.steps && c.steps.page_read; }, cap: 'The middle of a page&rsquo;s text came into view.' },
+  { key: 'doors', label: 'Door presses', tag: 'counted', count: function(c) { return c.steps && c.steps.door_press; }, cap: 'A link into the walk pressed, once per page load.' },
+];
+var TR_M = {};
+TR_METRICS.forEach(function(m) { TR_M[m.key] = m; });
+var TR_FAMILIES = [
+  { key: 'direct', label: 'Direct', words: ['direct'] },
+  { key: 'search', label: 'Search', words: ['search'] },
+  { key: 'ads', label: 'Ads', words: ['ad_grant', 'ad_paid', 'ad_forum'] },
+  { key: 'forum', label: 'Forums', words: ['forum'] },
+  { key: 'social', label: 'Social and mail', words: ['social', 'mail'] },
+  { key: 'other', label: 'Other links', words: ['code', 'edu', 'wiki', 'news', 'award', 'assistant', 'referral'] },
+  { key: 'inside', label: 'From the site', words: [''] },
+];
+var TR_WORDS = { direct: 'Direct', search: 'Search', ad_grant: 'Ad, grant', ad_paid: 'Ad, paid', ad_forum: 'Ad in a forum', forum: 'Forum post', code: 'Code sites', edu: 'Schools', wiki: 'Wikis', news: 'News', mail: 'Mail', award: 'Awards, galleries', assistant: 'AI assistants', social: 'Social', referral: 'Other sites', '': 'From the site' };
+var TR_COUNT_KINDS = { home: 'Front page', leonardo: 'Leonardo', inventions: 'Inventions', statement: 'About the museum', privacy: 'Privacy', imprint: 'Legal notice' };
+var TR_HOLDS = { upright: 'Upright', sideways: 'Sideways', wide: 'Wide' };
+var TR_DEVICES = { phone: 'Phone', tablet: 'Tablet', desktop: 'Desktop' };
+var TR_GAPS = {
+  stops: 'Cloudflare did not give the stops per day, so the second stop and how far walks go are missing here.',
+  'stops-cut': 'Cloudflare cut the list of film pictures at its limit, so the stops may read low.',
+  notes: 'MUSEUM_TREND_NOTES is not valid JSON, so the charts carry no marks.',
+};
+
+function trNul() { return null; }
+function trDayMs(d) { return Date.parse(d + 'T00:00:00Z'); }
+function trShift(d, by) { return new Date(trDayMs(d) + by * 86400000).toISOString().slice(0, 10); }
+function trDates(from, to) {
+  var out = [];
+  for (var t = trDayMs(from); t <= trDayMs(to); t += 86400000) out.push(new Date(t).toISOString().slice(0, 10));
+  return out;
+}
+function trSum(list) {
+  var s = 0, any = false;
+  list.forEach(function(v) { if (v != null) { s += v; any = true; } });
+  return any ? s : null;
+}
+function trCfOk() { return !!(TR.cf && TR.cf.configured && TR.cf.days); }
+function trCountOk() { return !!(TR.count && TR.count.state === 'ok' && TR.count.days); }
+function trToday() {
+  if (TR.cf && TR.cf.today) return TR.cf.today;
+  if (TR.count && TR.count.today) return TR.count.today;
+  return new Date().toISOString().slice(0, 10);
+}
+function trIndex(list) { var o = {}; list.forEach(function(d, i) { o[d] = i; }); return o; }
+// A column of the count (aligned with its days) read on other dates: zero on
+// a counted day without rows, nothing before the count began.
+function trAlign(dates, col) {
+  if (!trCountOk()) return dates.map(trNul);
+  var idx = TR.cIdx;
+  return dates.map(function(d) { var i = idx[d]; return i == null ? null : (col ? col[i] || 0 : 0); });
+}
+function trCfCol(dates, col) {
+  if (!trCfOk()) return dates.map(trNul);
+  var idx = TR.cfIdx;
+  return dates.map(function(d) { var i = idx[d]; return i == null || col[i] == null ? null : col[i]; });
+}
+function trHas(m) {
+  if (m.cf) return trCfOk();
+  return trCountOk();
+}
+function trValues(key, dates) {
+  var m = TR_M[key];
+  if (m.cf) return trCfCol(dates, TR.cf ? TR.cf.days.map(function(r) { return r[m.cf]; }) : []);
+  return trAlign(dates, trCountOk() ? m.count(TR.count) : null);
+}
+// Why a day has no figure, said in the chart and in its tooltip.
+function trWhy(key, d) {
+  var m = TR_M[key] || {};
+  if (m.count || key === 'count') {
+    return trCountOk() && d < TR.count.first ? 'not counted yet' : '';
+  }
+  if (!trCfOk()) return '';
+  if (d < TR.cf.reach.daily) return TR.cf.open && d < TR.cf.open ? 'before the opening' : 'not kept';
+  if (m.keep === 'pages' && (!TR.cf.reach.pages || d < TR.cf.reach.pages)) return 'not kept';
+  return '';
+}
+function trDomain() {
+  var today = trToday();
+  var first = today;
+  if (trCfOk() && TR.cf.days.length) first = TR.cf.days[0].d;
+  if (trCountOk() && TR.count.first < first) first = TR.count.first;
+  var from = TR.range ? trShift(today, -(TR.range - 1)) : first;
+  if (from < first) from = first;
+  return trDates(from, today);
+}
+
+// The last 7 full days against the 7 before. Today is never in it: half a day
+// would read as a fall.
+function trWeeks(get) {
+  var today = trToday();
+  var dates = trDates(trShift(today, -14), trShift(today, -1));
+  var v = get(dates);
+  var part = function(a) {
+    var have = a.filter(function(x) { return x != null; });
+    return { sum: have.length ? trSum(have) : null, days: have.length };
+  };
+  var prev = part(v.slice(0, 7)), last = part(v.slice(7));
+  var t = get([today])[0];
+  return { last: last.sum, lastDays: last.days, prev: prev.sum, prevDays: prev.days, today: t, from: dates[7], to: dates[13] };
+}
+function trWow(key) {
+  var w = trWeeks(function(dates) { return trValues(key, dates); });
+  // Different visitors over a week are Cloudflare's own figure, never a sum.
+  if (key === 'visitors' && trCfOk()) {
+    w.last = w.lastDays ? TR.cf.visitors.last : null;
+    w.prev = w.prevDays ? TR.cf.visitors.prev : null;
+  }
+  return w;
+}
+function trDaysWord(n) { return n ? n + (n > 1 ? ' days' : ' day') : 'none'; }
+function trFig(m, v) {
+  if (v == null) return '<span class="mus-na">n/a</span>';
+  return m && m.bytes ? musBytes(v) : musFull(Math.round(v));
+}
+function trDelta(cur, prev, bytes) {
+  if (!bytes) return deltaHtml(cur, prev);
+  var diff = cur - prev;
+  if (!prev || !diff) return '<span class="kpi-delta flat">~0</span>';
+  return '<span class="kpi-delta ' + (diff > 0 ? 'up' : 'down') + '">' + (diff > 0 ? '&#9650; +' : '&#9660; -') + musBytes(Math.abs(diff)) + ' (' + (diff > 0 ? '+' : '') + Math.round(diff / prev * 100) + '%)</span>';
+}
+function trChange(w, bytes) {
+  if (w.lastDays === 7 && w.prevDays === 7 && w.prev != null) return trDelta(w.last, w.prev, bytes);
+  return '<span class="kpi-delta flat">-</span>';
+}
+function trWowLine(key) {
+  var m = TR_M[key];
+  var w = trWow(key);
+  if (!w.lastDays) {
+    return '<div class="tr-wow">' + (w.today != null ? 'No full day yet &middot; today so far <b>' + trFig(m, w.today) + '</b>' : 'No full day yet') + '</div>';
+  }
+  var head = w.lastDays === 7 ? 'Last 7 full days' : 'The ' + w.lastDays + ' full day' + (w.lastDays > 1 ? 's' : '') + ' so far';
+  var out = head + ' <b>' + trFig(m, w.last) + '</b>';
+  if (w.lastDays === 7 && w.prevDays === 7) out += ' &middot; the 7 before ' + trFig(m, w.prev) + ' ' + trDelta(w.last, w.prev, m.bytes);
+  else if (w.lastDays === 7 && w.prevDays > 0) out += ' &middot; only ' + w.prevDays + ' day' + (w.prevDays > 1 ? 's' : '') + ' before them (' + trFig(m, w.prev) + ')';
+  else if (w.lastDays === 7) out += ' &middot; no week before them yet';
+  return '<div class="tr-wow">' + out + '</div>';
+}
+
+// --- Drawing ---
+
+function trNice(max) {
+  if (!(max > 0)) return { top: 1, step: 1 };
+  var raw = max / 3;
+  var p = Math.pow(10, Math.floor(Math.log(raw) / Math.LN10));
+  var f = raw / p;
+  var step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10) * p;
+  if (step < 1 && max >= 1) step = 1;
+  return { top: Math.ceil(max / step - 1e-9) * step, step: step };
+}
+function trTick(v, bytes) {
+  if (bytes) return musBytes(v);
+  if (v >= 1000) return fmt(v);
+  return String(Math.round(v * 100) / 100);
+}
+function trShort(d) { return musUtcDay(d); }
+function trAvg(values, dates, today) {
+  return values.map(function(v, i) {
+    if (dates[i] === today) return null;
+    var have = [];
+    for (var k = Math.max(0, i - 6); k <= i; k++) if (values[k] != null && dates[k] !== today) have.push(values[k]);
+    if (have.length < 3) return null;
+    return { v: trSum(have) / have.length, days: have.length };
+  });
+}
+function trChart(spec, height) {
+  var id = 'c' + (TR.seq++);
+  TR.charts[id] = spec;
+  spec.h = height;
+  return '<div class="tr-chart" data-tr="' + id + '" style="height:' + height + 'px"></div>';
+}
+function trMarksOn(dates) {
+  var idx = trIndex(dates);
+  return TR.marks.filter(function(mk) { return idx[mk.day] != null; }).map(function(mk) { return { i: idx[mk.day], n: mk.n }; });
+}
+function trAimsOn(key) {
+  var notes = TR.cf && TR.cf.notes;
+  if (!notes || !notes.aims) return [];
+  return notes.aims.filter(function(a) { return a.metric === key; }).map(function(a) {
+    return { v: a.per === 'week' ? a.value / 7 : a.value, text: 'aim ' + (a.per === 'week' ? musFull(a.value) + ' a week' : musFull(a.value) + ' a day') + (a.label ? ', ' + a.label : '') };
+  });
+}
+function trSvgOpen(w, h, id, aria) {
+  return '<svg class="tr-svg" data-trs="' + id + '" width="' + w + '" height="' + h + '" viewBox="0 0 ' + w + ' ' + h + '" role="img" aria-label="' + esc(aria) + '">' +
+    '<defs><pattern id="hatch-' + id + '" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line class="tr-hatch" x1="0" y1="0" x2="0" y2="6"/></pattern></defs>';
+}
+function trYAxis(top, step, padL, w, y, bytes, compact) {
+  var out = '';
+  for (var v = 0; v <= top + 1e-9; v += step) {
+    var yy = y(v).toFixed(1);
+    out += '<line class="tr-gridline' + (v > 0 ? ' dash' : '') + '" x1="' + padL + '" x2="' + (w - 4) + '" y1="' + yy + '" y2="' + yy + '"/>';
+    if (v > 0 && (!compact || v + step > top + 1e-9)) out += '<text x="' + (padL - 6) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + trTick(v, bytes) + '</text>';
+  }
+  return out;
+}
+
+// Each mark: a dashed line on its day and a numbered circle above the plot.
+// Circles that would touch move right, a short leader keeps them on their day.
+function trMarkSvg(dates, cx, padT, bottom, w) {
+  var out = '', lastX = -99;
+  trMarksOn(dates).forEach(function(mk) {
+    var x = cx(mk.i), at = Math.max(x, lastX + 17);
+    if (at > w - 9) at = w - 9;
+    lastX = at;
+    out += '<line class="tr-mark" x1="' + x.toFixed(1) + '" x2="' + x.toFixed(1) + '" y1="' + padT + '" y2="' + bottom + '"/>';
+    if (Math.abs(at - x) > 1) out += '<line class="tr-mark-lead" x1="' + x.toFixed(1) + '" x2="' + at.toFixed(1) + '" y1="' + padT + '" y2="' + (padT - 3) + '"/>';
+    out += '<circle class="tr-mark-dot" cx="' + at.toFixed(1) + '" cy="' + (padT - 10) + '" r="8"/><text class="tr-mark-n" x="' + at.toFixed(1) + '" y="' + (padT - 6.5) + '" text-anchor="middle">' + mk.n + '</text>';
+  });
+  return out;
+}
+
+// Daily bars with the 7-day average as the line that carries the eye.
+var TR_DRAW = {};
+TR_DRAW.daily = function(spec, w, id) {
+  var h = spec.h, dates = spec.dates, vals = spec.values, n = dates.length, today = trToday();
+  var compact = !!spec.compact;
+  var avg = trAvg(vals, dates, today);
+  var aims = compact ? [] : trAimsOn(spec.key);
+  var max = spec.yMax || 0;
+  if (!spec.yMax) {
+    vals.forEach(function(v) { if (v != null && v > max) max = v; });
+    aims.forEach(function(a) { if (a.v > max) max = a.v; });
+  }
+  var nice = trNice(max);
+  var label = trTick(nice.top, spec.bytes);
+  var padL = compact ? Math.max(22, label.length * 6.5 + 8) : Math.max(30, label.length * 7 + 10);
+  var padT = compact ? 6 : 20, padB = compact ? 18 : 22, padR = 6;
+  var plotW = w - padL - padR, bottom = h - padB;
+  var step = plotW / Math.max(n, 1);
+  var y = function(v) { return bottom - (v / nice.top) * (bottom - padT); };
+  var cx = function(i) { return padL + (i + 0.5) * step; };
+  spec.lay = { padL: padL, step: step, n: n, top: padT, bottom: bottom };
+  var svg = trSvgOpen(w, h, id, spec.aria || '') + trYAxis(nice.top, nice.step, padL, w, y, spec.bytes, compact);
+  // Days without a figure at the start: gone from Cloudflare, or before the count.
+  var run = 0;
+  while (run < n && vals[run] == null) run++;
+  if (run > 0) {
+    var why = trWhy(spec.key, dates[0]);
+    var x1 = padL + run * step;
+    svg += '<rect class="' + (why === 'not kept' ? 'tr-gone' : 'tr-none') + '" x="' + padL + '" y="' + padT + '" width="' + (x1 - padL).toFixed(1) + '" height="' + (bottom - padT).toFixed(1) + '" style="fill:url(#hatch-' + id + ')"/>';
+    if (why && x1 - padL > 64 && !compact) svg += '<text class="tr-gone-lbl" x="' + ((padL + x1) / 2).toFixed(1) + '" y="' + ((padT + bottom) / 2).toFixed(1) + '" text-anchor="middle">' + why + '</text>';
+  }
+  var bw = Math.max(1, Math.min(step * 0.72, 28));
+  vals.forEach(function(v, i) {
+    if (v == null) return;
+    var cut = v > nice.top;
+    var yy = y(cut ? nice.top : v);
+    var hh = Math.max(v > 0 ? 1 : 0, bottom - yy);
+    svg += '<rect class="tr-bar' + (dates[i] === today ? ' today' : '') + '" x="' + (cx(i) - bw / 2).toFixed(1) + '" y="' + (bottom - hh).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + hh.toFixed(1) + '"/>';
+    if (cut) svg += '<path class="tr-clip" d="M' + (cx(i) - 3).toFixed(1) + ',' + (padT + 3) + ' L' + cx(i).toFixed(1) + ',' + padT + ' L' + (cx(i) + 3).toFixed(1) + ',' + (padT + 3) + '"/>';
+  });
+  // The average: dashed where fewer than 7 days stand behind it.
+  var all = '', full = '', prevFull = false;
+  avg.forEach(function(a, i) {
+    if (!a) { prevFull = false; return; }
+    var pt = cx(i).toFixed(1) + ',' + y(Math.min(a.v, nice.top)).toFixed(1);
+    all += (all && avg[i - 1] ? ' L' : ' M') + pt;
+    var isFull = a.days === 7;
+    if (isFull) full += (prevFull ? ' L' : ' M') + pt;
+    prevFull = isFull;
+  });
+  if (all) svg += '<path class="tr-avg thin" d="' + all + '"/>';
+  if (full) svg += '<path class="tr-avg" d="' + full + '"/>';
+  if (n === 1 || avg.filter(function(a) { return a; }).length === 1) {
+    avg.forEach(function(a, i) { if (a) svg += '<circle class="tr-pt" cx="' + cx(i).toFixed(1) + '" cy="' + y(a.v).toFixed(1) + '" r="3"/>'; });
+  }
+  aims.forEach(function(a) {
+    var yy = y(a.v).toFixed(1);
+    svg += '<line class="tr-aim" x1="' + padL + '" x2="' + (w - padR) + '" y1="' + yy + '" y2="' + yy + '"/>' +
+      '<text class="tr-aim-lbl" x="' + (w - padR) + '" y="' + (y(a.v) - 5).toFixed(1) + '" text-anchor="end">' + esc(a.text) + '</text>';
+  });
+  if (!compact) svg += trMarkSvg(dates, cx, padT, bottom, w);
+  // Day names under the axis, as many as fit, the newest always.
+  var every = compact ? Math.max(1, n - 1) : Math.max(1, Math.ceil(n / Math.max(2, Math.floor(plotW / 58))));
+  for (var i = n - 1; i >= 0; i -= every) {
+    var anchor = i === n - 1 && compact ? 'end' : i === 0 && compact ? 'start' : 'middle';
+    var tx = anchor === 'end' ? w - padR : anchor === 'start' ? padL : cx(i);
+    if (anchor === 'middle' && (tx < padL + 18 || tx > w - 18)) continue;
+    svg += '<text x="' + tx.toFixed(1) + '" y="' + (h - 5) + '" text-anchor="' + anchor + '">' + trShort(dates[i]) + '</text>';
+  }
+  if (compact && n > 1 && every === n - 1) svg += '<text x="' + padL + '" y="' + (h - 5) + '" text-anchor="start">' + trShort(dates[0]) + '</text>';
+  svg += '<line class="tr-guide" x1="0" x2="0" y1="' + padT + '" y2="' + bottom + '"/><rect class="tr-hit" x="' + padL + '" y="0" width="' + plotW.toFixed(1) + '" height="' + h + '"/></svg>';
+  spec.hit = function(x) {
+    var i = Math.floor((x - padL) / step);
+    if (i < 0 || i >= n) return null;
+    var d = dates[i], v = vals[i], a = avg[i];
+    var unit = spec.unit || '';
+    var html = '<b>' + trShort(d) + (d === today ? ', today so far' : '') + '</b>';
+    if (v == null) html += '<br>' + (trWhy(spec.key, d) || 'no figure');
+    else {
+      html += '<br>' + (spec.bytes ? musBytes(v) : musFull(v)) + ' ' + unit;
+      if (a) html += '<br>7-day average ' + (spec.bytes ? musBytes(a.v) : (Math.round(a.v * 10) / 10).toLocaleString()) + (a.days < 7 ? ' (' + a.days + ' days)' : '');
+    }
+    TR.marks.forEach(function(mk) { if (mk.day === d) html += '<br><span class="tr-tip-mark">' + mk.n + '. ' + esc(mk.label) + '</span>'; });
+    return { gx: cx(i), html: html };
+  };
+  return svg;
+};
+
+// Rates as points, the 7-day rate as the line. A point over fewer than
+// TR_FLOOR is hollow, and the line stops where its week has fewer.
+TR_DRAW.rate = function(spec, w, id) {
+  var h = spec.h, dates = spec.dates, num = spec.num, den = spec.den, n = dates.length, today = trToday();
+  var roll = dates.map(function(d, i) {
+    if (d === today) return null;
+    var a = 0, b = 0, days = 0;
+    for (var k = Math.max(0, i - 6); k <= i; k++) {
+      if (num[k] == null || den[k] == null || dates[k] === today) continue;
+      a += num[k]; b += den[k]; days++;
+    }
+    return days >= 3 && b > 0 ? { r: a / b, a: a, b: b, days: days } : null;
+  });
+  var max = 0;
+  dates.forEach(function(d, i) {
+    if (den[i] >= TR_FLOOR && num[i] / den[i] > max) max = num[i] / den[i];
+    if (roll[i] && roll[i].b >= TR_FLOOR && roll[i].r > max) max = roll[i].r;
+  });
+  // Each rate keeps its own scale from zero: three different questions.
+  var scale = [[0.05, 0.01], [0.1, 0.025], [0.2, 0.05], [0.25, 0.05], [0.4, 0.1], [0.5, 0.1], [0.75, 0.25], [1, 0.25], [1.5, 0.5], [2, 0.5]];
+  var top = 2, tick = 0.5;
+  scale.some(function(t) { top = t[0]; tick = t[1]; return max <= t[0]; });
+  var padL = 40, padT = 8, padB = 22, padR = 6;
+  var plotW = w - padL - padR, bottom = h - padB;
+  var step = plotW / Math.max(n, 1);
+  var y = function(v) { return bottom - (Math.min(v, top) / top) * (bottom - padT); };
+  var cx = function(i) { return padL + (i + 0.5) * step; };
+  var svg = trSvgOpen(w, h, id, spec.aria || '');
+  for (var v = 0; v <= top + 1e-9; v += tick) {
+    var yy = y(v).toFixed(1);
+    svg += '<line class="tr-gridline' + (v > 0 ? ' dash' : '') + '" x1="' + padL + '" x2="' + (w - 4) + '" y1="' + yy + '" y2="' + yy + '"/>';
+    if (v > 0) svg += '<text x="' + (padL - 6) + '" y="' + (y(v) + 4).toFixed(1) + '" text-anchor="end">' + Math.round(v * 1000) / 10 + '%</text>';
+  }
+  var run = 0;
+  while (run < n && (den[run] == null)) run++;
+  if (run > 0) {
+    var why = trWhy(spec.key, dates[0]);
+    var x1 = padL + run * step;
+    svg += '<rect class="' + (why === 'not kept' ? 'tr-gone' : 'tr-none') + '" x="' + padL + '" y="' + padT + '" width="' + (x1 - padL).toFixed(1) + '" height="' + (bottom - padT).toFixed(1) + '" style="fill:url(#hatch-' + id + ')"/>';
+    if (why && x1 - padL > 64) svg += '<text class="tr-gone-lbl" x="' + ((padL + x1) / 2).toFixed(1) + '" y="' + ((padT + bottom) / 2).toFixed(1) + '" text-anchor="middle">' + why + '</text>';
+  }
+  var line = '', on = false;
+  roll.forEach(function(r, i) {
+    if (!r || r.b < TR_FLOOR) { on = false; return; }
+    line += (on ? ' L' : ' M') + cx(i).toFixed(1) + ',' + y(r.r).toFixed(1);
+    on = true;
+  });
+  if (line) svg += '<path class="tr-rate" d="' + line + '"/>';
+  dates.forEach(function(d, i) {
+    if (den[i] == null || num[i] == null || den[i] === 0) return;
+    var low = den[i] < TR_FLOOR;
+    svg += '<circle class="tr-pt' + (low ? ' low' : '') + (d === today ? ' today' : '') + '" cx="' + cx(i).toFixed(1) + '" cy="' + y(num[i] / den[i]).toFixed(1) + '" r="' + (low ? 2.5 : 3) + '"/>';
+  });
+  trMarksOn(dates).forEach(function(mk) {
+    var x = cx(mk.i).toFixed(1);
+    svg += '<line class="tr-mark" x1="' + x + '" x2="' + x + '" y1="' + padT + '" y2="' + bottom + '"/>';
+  });
+  var every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(plotW / 58))));
+  for (var i = n - 1; i >= 0; i -= every) {
+    if (cx(i) < padL + 18 && i !== n - 1) continue;
+    svg += '<text x="' + Math.min(cx(i), w - 20).toFixed(1) + '" y="' + (h - 5) + '" text-anchor="middle">' + trShort(dates[i]) + '</text>';
+  }
+  svg += '<line class="tr-guide" x1="0" x2="0" y1="' + padT + '" y2="' + bottom + '"/><rect class="tr-hit" x="' + padL + '" y="0" width="' + plotW.toFixed(1) + '" height="' + h + '"/></svg>';
+  spec.hit = function(x) {
+    var i = Math.floor((x - padL) / step);
+    if (i < 0 || i >= n) return null;
+    var d = dates[i];
+    var html = '<b>' + trShort(d) + (d === today ? ', today so far' : '') + '</b><br>';
+    if (den[i] == null) html += trWhy(spec.key, d) || 'no figure';
+    else html += trRateText(num[i], den[i]);
+    if (roll[i]) html += '<br>7 days: ' + trRateText(roll[i].a, roll[i].b);
+    TR.marks.forEach(function(mk) { if (mk.day === d) html += '<br><span class="tr-tip-mark">' + mk.n + '. ' + esc(mk.label) + '</span>'; });
+    return { gx: cx(i), html: html };
+  };
+  return svg;
+};
+function trRateText(a, b, short) {
+  if (!b) return short ? '0 of 0' : 'none to measure';
+  if (b < TR_FLOOR) return musFull(a) + ' of ' + musFull(b) + (short ? '' : ', too few for a rate');
+  return Math.round(a / b * 100) + '% (' + musFull(a) + ' of ' + musFull(b) + ')';
+}
+
+// How far walks go: a step line along the stops, last week as the ghost.
+TR_DRAW.steps = function(spec, w, id) {
+  var h = spec.h, cur = spec.cur, prev = spec.prev, names = spec.names, n = cur.length;
+  var max = 0;
+  cur.concat(prev || []).forEach(function(v) { if (v > max) max = v; });
+  var nice = trNice(max);
+  var label = trTick(nice.top);
+  var padL = Math.max(30, label.length * 7 + 10), padT = 8, padB = 22, padR = 6;
+  var plotW = w - padL - padR, bottom = h - padB;
+  var step = plotW / Math.max(n, 1);
+  var y = function(v) { return bottom - (v / nice.top) * (bottom - padT); };
+  var svg = trSvgOpen(w, h, id, spec.aria || '') + trYAxis(nice.top, nice.step, padL, w, y);
+  var stair = function(list) {
+    var d = '';
+    list.forEach(function(v, i) {
+      var x0 = padL + i * step, x1 = x0 + step, yy = y(v || 0).toFixed(1);
+      d += (i === 0 ? 'M' : ' L') + x0.toFixed(1) + ',' + yy + ' L' + x1.toFixed(1) + ',' + yy;
+    });
+    return d;
+  };
+  if (prev) svg += '<path class="tr-step-ghost" d="' + stair(prev) + ' L' + (padL + n * step).toFixed(1) + ',' + bottom + ' L' + padL + ',' + bottom + ' Z"/>';
+  svg += '<path class="tr-step" d="' + stair(cur) + '"/>';
+  var every = step < 22 ? 2 : 1;
+  for (var i = 0; i < n; i++) {
+    if (i % every && i !== n - 1) continue;
+    svg += '<text x="' + (padL + (i + 0.5) * step).toFixed(1) + '" y="' + (h - 5) + '" text-anchor="middle">' + (i + 1) + '</text>';
+  }
+  svg += '<line class="tr-guide" x1="0" x2="0" y1="' + padT + '" y2="' + bottom + '"/><rect class="tr-hit" x="' + padL + '" y="0" width="' + plotW.toFixed(1) + '" height="' + h + '"/></svg>';
+  spec.hit = function(x) {
+    var i = Math.floor((x - padL) / step);
+    if (i < 0 || i >= n) return null;
+    var html = '<b>' + esc(names[i]) + '</b><br>' + spec.curLabel + ' ' + musFull(cur[i]) + (cur[0] > 0 ? ' (' + Math.round(cur[i] / cur[0] * 100) + '% of the first stop)' : '');
+    if (prev) html += '<br>' + spec.prevLabel + ' ' + musFull(prev[i]);
+    return { gx: padL + (i + 0.5) * step, html: html };
+  };
+  return svg;
+};
+
+// Weekly bars stacked by source family. A week the count does not cover
+// whole is drawn lighter.
+TR_DRAW.stack = function(spec, w, id) {
+  var h = spec.h, weeks = spec.weeks, n = weeks.length;
+  var max = 0;
+  weeks.forEach(function(wk) { if (wk.total > max) max = wk.total; });
+  var nice = trNice(max);
+  var label = trTick(nice.top);
+  var padL = Math.max(30, label.length * 7 + 10), padT = 8, padB = 22, padR = 6;
+  var plotW = w - padL - padR, bottom = h - padB;
+  var step = plotW / Math.max(n, 1);
+  var bw = Math.min(step * 0.7, 56);
+  var y = function(v) { return bottom - (v / nice.top) * (bottom - padT); };
+  var svg = trSvgOpen(w, h, id, spec.aria || '') + trYAxis(nice.top, nice.step, padL, w, y);
+  weeks.forEach(function(wk, i) {
+    var x = padL + i * step + (step - bw) / 2, base = 0;
+    TR_FAMILIES.forEach(function(f) {
+      var v = wk.by[f.key] || 0;
+      if (!v) return;
+      var y0 = y(base), y1 = y(base + v);
+      svg += '<rect class="tr-src-' + f.key + (wk.part ? ' part' : '') + '" x="' + x.toFixed(1) + '" y="' + y1.toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + Math.max(1, y0 - y1).toFixed(1) + '"/>';
+      base += v;
+    });
+    if (wk.total > 0 && step > 26) svg += '<text class="tr-stack-n" x="' + (x + bw / 2).toFixed(1) + '" y="' + (y(wk.total) - 4).toFixed(1) + '" text-anchor="middle">' + fmt(wk.total) + '</text>';
+  });
+  var every = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(plotW / 64))));
+  for (var i = n - 1; i >= 0; i -= every) {
+    svg += '<text x="' + (padL + (i + 0.5) * step).toFixed(1) + '" y="' + (h - 5) + '" text-anchor="middle">' + trShort(weeks[i].to) + '</text>';
+  }
+  svg += '<line class="tr-guide" x1="0" x2="0" y1="' + padT + '" y2="' + bottom + '"/><rect class="tr-hit" x="' + padL + '" y="0" width="' + plotW.toFixed(1) + '" height="' + h + '"/></svg>';
+  spec.hit = function(x) {
+    var i = Math.floor((x - padL) / step);
+    if (i < 0 || i >= n) return null;
+    var wk = weeks[i];
+    var html = '<b>' + trShort(wk.from) + ' to ' + trShort(wk.to) + '</b>' + (wk.part ? ' (counted from ' + trShort(wk.first) + ')' : '') + '<br>' + musFull(wk.total) + ' ' + spec.unit;
+    TR_FAMILIES.slice().reverse().forEach(function(f) { if (wk.by[f.key]) html += '<br><span class="tr-sw tr-sw-' + f.key + '"></span>' + f.label + ' ' + musFull(wk.by[f.key]); });
+    return { gx: padL + (i + 0.5) * step, html: html };
+  };
+  return svg;
+};
+
+function trPaint() {
+  var any = false;
+  Object.keys(TR.charts).forEach(function(id) {
+    var el = document.querySelector('[data-tr="' + id + '"]');
+    if (!el) return;
+    var w = Math.floor(el.clientWidth);
+    if (!w) return;
+    any = true;
+    var spec = TR.charts[id];
+    el.innerHTML = TR_DRAW[spec.type](spec, w, id);
+  });
+  TR.painted = any;
+}
+
+// --- Pieces of the view ---
+
+function trCard(title, body, cls, cap) {
+  return '<div class="card tr-card ' + (cls || '') + '"><div class="kpi-label">' + title + '</div>' + body + (cap ? '<div class="mus-cap">' + cap + '</div>' : '') + '</div>';
+}
+function trDaily(key, dates, height, opts) {
+  opts = opts || {};
+  var m = TR_M[key] || {};
+  return trChart({ type: 'daily', key: opts.whyKey || key, dates: dates, values: opts.values || trValues(key, dates), bytes: !!m.bytes || !!opts.bytes,
+    unit: opts.unit || (m.label ? m.label.toLowerCase() : ''), compact: !!opts.compact, yMax: opts.yMax || 0, aria: opts.aria || (m.label || key) + ' per day' }, height);
+}
+function trPills(name, opts, cur) {
+  return '<div class="mus-controls tr-pills" role="group">' + opts.map(function(o) {
+    return '<button class="mus-btn' + (String(o.v) === String(cur) ? ' active' : '') + '" data-tr-' + name + '="' + o.v + '" aria-pressed="' + (String(o.v) === String(cur)) + '">' + o.label + '</button>';
+  }).join('') + '</div>';
+}
+// Small multiples on one shared scale: each panel names its figure for the
+// last 7 full days and the change against the 7 before.
+function trMultiples(panels, dates, key, opts) {
+  opts = opts || {};
+  // One shared top, set by the typical days: a single day far above them is
+  // cut at the top and marked, its figure stays in the tooltip.
+  var all = [], avgTop = 0, today = trToday();
+  panels.forEach(function(p) {
+    p.values.forEach(function(v) { if (v != null) all.push(v); });
+    trAvg(p.values, dates, today).forEach(function(a) { if (a && a.v > avgTop) avgTop = a.v; });
+  });
+  all.sort(function(a, b) { return a - b; });
+  var max = all.length ? all[all.length - 1] : 0;
+  var typical = all.length ? all[Math.floor((all.length - 1) * 0.97)] : 0;
+  max = Math.min(max, Math.max(typical, avgTop * 1.25));
+  if (all.length && all[all.length - 1] > max) TR.clipped = true;
+  var out = '<div class="tr-multi">';
+  panels.forEach(function(p) {
+    var w = trWeeks(p.get);
+    var fig = w.lastDays ? musFull(w.last) + (w.lastDays < 7 ? ' in ' + w.lastDays + 'd' : '') : 'n/a';
+    out += '<div class="tr-panel"><div class="tr-panel-head"><span class="tr-panel-name">' + esc(p.label) + '</span><span class="tr-panel-fig">' + fig + ' ' + trChange(w) + '</span></div>' +
+      trChart({ type: 'daily', key: key, dates: dates, values: p.values, compact: true, yMax: max || 1, unit: opts.unit || '', aria: p.label + ' per day' }, 92) + '</div>';
+  });
+  return out + '</div>';
+}
+// This week against last week as the dashboard's ghost bars.
+function trGhost(items, unit) {
+  var base = 1;
+  items.forEach(function(it) { base = Math.max(base, it.value || 0, it.prev || 0); });
+  if (!items.length) return '<div class="empty-state">No rows yet</div>';
+  var out = '<div class="fbar-list tr-ghost">';
+  items.forEach(function(it) {
+    out += '<div class="fbar-row" title="' + esc(it.label) + ': ' + musFull(it.value) + ' ' + unit + (it.prev != null ? ', the 7 days before ' + musFull(it.prev) : '') + '">' +
+      '<span class="fbar-labelwrap"><span class="fbar-label">' + esc(it.label) + '</span>' + (it.sub ? '<span class="fbar-sub2">' + it.sub + '</span>' : '') + '</span>' +
+      '<div class="fbar-track">' + (it.prev != null ? '<div class="fbar-ghost" style="width:' + (it.prev / base * 100).toFixed(1) + '%"></div>' : '') +
+      '<div class="fbar-fill" style="width:' + ((it.value || 0) / base * 100).toFixed(1) + '%"></div></div>' +
+      '<span class="fbar-num"><span class="fbar-val">' + fmt(it.value || 0) + '</span>' + (it.prev != null && it.full ? deltaHtml(it.value || 0, it.prev) : '') + '</span></div>';
+  });
+  return out + '</div><div class="fbar-legend"><span class="swatch" style="background:var(--gold-subtle)"></span>' + TR.weekWords.cur +
+    '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent)"></span>' + TR.weekWords.prev + '</div>';
+}
+// A count column summed over this week and the week before. Before the
+// count's first full day, this week is today so far.
+function trCountWeeks(col) {
+  var w = trWeeks(function(dates) { return trAlign(dates, col); });
+  if (!w.lastDays) return { value: w.today || 0, prev: null, full: false };
+  return { value: w.last || 0, prev: w.prevDays ? w.prev || 0 : null, full: w.lastDays === 7 && w.prevDays === 7 };
+}
+function trKeysOf() {
+  var seen = {};
+  for (var a = 0; a < arguments.length; a++) Object.keys(arguments[a] || {}).forEach(function(k) { seen[k] = true; });
+  return Object.keys(seen);
+}
+
+// --- The view ---
+
+async function loadTrends() {
+  var el = document.getElementById('trends-museum');
+  if (TR.at && Date.now() - TR.at < 240000) {
+    if (!TR.painted) renderTrends();
+    return;
+  }
+  if (!TR.cf && !TR.count) el.innerHTML = '<div class="empty-state">Loading the trends...</div>';
+  var got = await Promise.all([trFetch('/api/museum/trends'), trFetch('/api/museum/count')]);
+  TR.cf = got[0];
+  TR.count = got[1];
+  TR.at = Date.now();
+  TR.painted = false;
+  if (S.tab !== 'museum' || MUS.view !== 'trends') return;
+  renderTrends();
+  document.getElementById('updated-museum').textContent = 'Updated ' + now();
+}
+function trFetch(path) {
+  return fetch(path).then(function(r) { return r.json(); }).catch(function() { return null; });
+}
+
+function renderTrends() {
+  var el = document.getElementById('trends-museum');
+  TR.charts = {};
+  TR.seq = 0;
+  var cfOk = trCfOk(), cOk = trCountOk();
+  TR.cfIdx = cfOk ? trIndex(TR.cf.days.map(function(r) { return r.d; })) : {};
+  TR.cIdx = cOk ? trIndex(TR.count.days) : {};
+  var today = trToday();
+  var ws = trWeeks(function(d) { return d.map(trNul); });
+  TR.weekWords = { cur: 'Last 7 full days', prev: 'The 7 before' };
+  if (cOk && TR.count.first >= ws.from) TR.weekWords.cur = TR.count.first > ws.to ? 'Today so far' : 'Since ' + trShort(TR.count.first);
+
+  // Marks: the private notes, and the day the count began.
+  var notes = TR.cf && TR.cf.notes;
+  var marks = notes && notes.events ? notes.events.slice() : [];
+  if (cOk && !marks.some(function(e) { return e.day === TR.count.first; })) marks.push({ day: TR.count.first, label: 'The museum' + String.fromCharCode(39) + 's count begins' });
+  marks.sort(function(a, b) { return a.day < b.day ? -1 : a.day > b.day ? 1 : 0; });
+  TR.marks = marks.map(function(e, i) { return { day: e.day, label: e.label, n: i + 1 }; });
+
+  if (!cfOk && !cOk && !(TR.count && TR.count.state === 'empty')) {
+    el.innerHTML = '<div class="placeholder"><h3>Nothing to show yet</h3><p>' + trCfState() + ' ' + trCountState() + '</p></div>';
+    return;
+  }
+  var dates = trDomain();
+  var html = '';
+
+  // What the numbers are, how far back each reaches, and the marks.
+  var alerts = '';
+  if (TR.cf && TR.cf.gaps) {
+    var gaps = TR.cf.gaps;
+    if (gaps[0] === 'token' || gaps[0] === 'zone') gaps = [gaps[0]];
+    gaps.forEach(function(g) { var t = TR_GAPS[g] || MUS_GAPS[g]; if (t) alerts += '<div class="alert-card a-warn">' + t + '</div>'; });
+  }
+  html += alerts;
+  html += '<div class="mus-note">How the numbers move over the weeks. Cloudflare&rsquo;s totals include bots and our own checks, and a day is Cloudflare&rsquo;s day: it turns at ' + musDayTurn(today) + ' your time. ' +
+    'The museum&rsquo;s own count leaves our own test browsers out. A bot that runs scripts can still be in it.</div>';
+  html += '<div class="tr-head">' + trPills('range', TR_RANGES.map(function(r) { return { v: r.days, label: r.label }; }), TR.range) +
+    '<div class="tr-reach">' + trReachText() + '</div></div>';
+  if (TR.marks.length) {
+    html += '<div class="tr-marks" aria-label="Marks on the time axis">' + TR.marks.map(function(mk) {
+      return '<span class="tr-mark-key"><span class="tr-num">' + mk.n + '</span>' + trShort(mk.day) + ' &middot; ' + esc(mk.label) + '</span>';
+    }).join('') + '</div>';
+  } else if (TR.cf && !TR.cf.notes) {
+    html += '<div class="tr-reach">No marks for posts or ads: the MUSEUM_TREND_NOTES secret is not set.</div>';
+  }
+
+  // --- Reach and use ---
+  html += '<div class="section-divider">Reach and use</div><div class="tr-grid2">';
+  if (cfOk) {
+    html += trCard('Arrivals per day', trDaily('arrivals', dates, 220) + trWowLine('arrivals'), '', TR_M.arrivals.cap);
+  } else {
+    html += trCard('Arrivals per day', '<div class="empty-state">' + trCfState() + '</div>');
+  }
+  var fullCounted = cOk ? TR.count.days.length - 1 : 0;
+  if (cOk && fullCounted >= 7) {
+    html += trCard('Real uses per day', trDaily('real', dates, 220) + trWowLine('real'), '', TR_M.real.cap);
+  } else if (cfOk) {
+    html += trCard('Second stop reached per day, the stand-in', trDaily('second', dates, 220) + trWowLine('second'), '',
+      TR_M.second.cap + (cOk ? ' The museum&rsquo;s count began ' + trShort(TR.count.first) + '. Real uses take this place after its first full week.' : ''));
+  } else if (cOk) {
+    html += trCard('Real uses per day', trDaily('real', dates, 220) + trWowLine('real'), '', TR_M.real.cap);
+  }
+  html += '</div>';
+
+  // --- Every series ---
+  var rows = TR_METRICS.filter(trHas);
+  if (rows.length) {
+    if (!TR_M[TR.metric] || !trHas(TR_M[TR.metric])) TR.metric = rows[0].key;
+    var sel = TR_M[TR.metric];
+    var listOf = function(title, group) {
+      if (!group.length) return '';
+      var out = '<div class="tr-index" role="group" aria-label="' + title + '"><div class="tr-row tr-row-head"><span>' + title + '</span><span>Last 7 full days</span><span class="tr-wide">The 7 before</span><span>Change</span></div>';
+      group.forEach(function(m) {
+        var w = trWow(m.key);
+        var on = m.key === TR.metric;
+        out += '<button class="tr-row' + (on ? ' active' : '') + '" data-tr-metric="' + m.key + '" aria-pressed="' + on + '"><span class="tr-row-name">' + m.label + (m.tag === 'stand-in' ? '<small>stand-in for real uses</small>' : '') + '</span>' +
+          '<span class="mus-num">' + (w.lastDays === 7 ? trFig(m, w.last) : '<span class="mus-na">' + trDaysWord(w.lastDays) + '</span>') + '</span>' +
+          '<span class="mus-num tr-wide">' + (w.prevDays === 7 ? trFig(m, w.prev) : '<span class="mus-na">' + trDaysWord(w.prevDays) + '</span>') + '</span>' +
+          '<span class="mus-num">' + trChange(w, m.bytes) + '</span></button>';
+      });
+      return out + '</div>';
+    };
+    html += '<div class="section-divider">Every series</div>';
+    html += '<div class="card card-full tr-card"><div class="kpi-label">' + sel.label + ' per day</div>' +
+      trDaily(sel.key, dates, 240) + trWowLine(sel.key) + '<div class="mus-cap">' + sel.cap + ' ' + trKeepText(sel) + ' Choose another series below.</div>' +
+      '<div class="tr-lists">' + listOf('Cloudflare&rsquo;s totals', rows.filter(function(m) { return m.cf; })) +
+      listOf('Counted by the museum', rows.filter(function(m) { return m.count; })) + '</div></div>';
+  }
+
+  // --- Where the walk loses people ---
+  html += '<div class="section-divider">Where the walk loses people</div>';
+  var rate = function(title, numKey, denKey, cap) {
+    var ready = trHas(TR_M[numKey]) && trHas(TR_M[denKey]);
+    var body = ready ? trChart({ type: 'rate', key: numKey, dates: dates, num: trValues(numKey, dates), den: trValues(denKey, dates), aria: title }, 170) + trRateWow(numKey, denKey)
+      : '<div class="empty-state">' + (TR_M[numKey].count ? 'From the museum&rsquo;s own count, once it has rows.' : trCfState()) + '</div>';
+    return '<div class="tr-panel">' + '<div class="kpi-label">' + title + '</div>' + body + '<div class="mus-cap">' + cap + '</div></div>';
+  };
+  html += '<div class="card card-full tr-card"><div class="tr-rates">' +
+    rate('Walks started per arrival', 'started', 'arrivals', 'Cloudflare. Arrivals hold many bots, so this rate runs low.') +
+    rate('Second stop per walk started', 'second', 'started', 'Cloudflare. The second stop&rsquo;s picture against the film&rsquo;s index.') +
+    rate('Third stop per walk opened', 'real', 'walks', 'The museum&rsquo;s count. The owner&rsquo;s real use.') +
+    '</div><div class="mus-cap">Each dot is one day, the line its last 7 days. A hollow dot stands on fewer than ' + TR_FLOOR + ', and the line leaves out a week with fewer. Hover or tap for the day&rsquo;s figures.</div></div>';
+
+  html += '<div class="grid tr-grid2">';
+  if (cOk) {
+    var cStops = TR.count.stops || {};
+    var nStops = Math.max(cfOk && TR.cf.stops ? TR.cf.stops.ids.length : 0, 17);
+    var cur = [], prev = [], anyPrev = false, full = true;
+    for (var s = 1; s <= nStops; s++) {
+      var cw = trCountWeeks(cStops[String(s)]);
+      cur.push(cw.value); prev.push(cw.prev == null ? 0 : cw.prev);
+      if (cw.prev != null) anyPrev = true;
+      if (!cw.full) full = false;
+    }
+    html += trCard('How far walks go, counted', trChart({ type: 'steps', cur: cur, prev: anyPrev ? prev : null, names: trStopNames(nStops), curLabel: TR.weekWords.cur, prevLabel: TR.weekWords.prev, aria: 'Walks reaching each stop' }, 200) + trStepsKey(TR.weekWords.cur, anyPrev ? TR.weekWords.prev : ''), '',
+      'Walks that reached each stop, counted by the museum. Stop 3 is a real use.');
+  }
+  if (cfOk && TR.cf.stops) {
+    var ids = TR.cf.stops.ids;
+    var col = function(k) { return function(dates2) { return trCfCol(dates2, TR.cf.stops.days.map(function(v) { return v ? v[k] : null; })); }; };
+    var curS = [], prevS = [], anyP = false;
+    ids.forEach(function(idv, k) {
+      var w = trWeeks(col(k));
+      curS.push(w.last || 0); prevS.push(w.prev || 0);
+      if (w.prevDays) anyP = true;
+    });
+    html += trCard('How far walks go, the stand-in', trChart({ type: 'steps', cur: curS, prev: anyP ? prevS : null, names: ids.map(function(idv, k) { return musStop(idv, k); }), curLabel: 'Last 7 full days', prevLabel: 'The 7 before', aria: 'Pictures asked for at each stop' }, 200) + trStepsKey('Last 7 full days', anyP ? 'The 7 before' : ''), cOk ? '' : 'card-full',
+      'How often each stop&rsquo;s picture was asked for. It stands in for stops reached: the player may fetch a picture a step ahead, and a browser that already holds a picture does not ask again.');
+  }
+  html += '</div>';
+
+  // --- Languages and kinds of page ---
+  if (cfOk && TR.cf.byLang) {
+    var split = TR.split === 'kind' && TR.cf.byKind ? TR.cf.byKind : TR.cf.byLang;
+    var names = TR.split === 'kind' ? MUS_KINDS : MUS_LANGS;
+    var of = TR.of === 'pages' ? 'pages' : 'arrivals';
+    var panels = split.filter(function(p) { return p[of].some(function(v) { return v; }) || TR.split !== 'kind'; }).map(function(p) {
+      var colv = p[of];
+      return { label: names[p.key] || cap(p.key), values: trCfCol(dates, colv), get: function(d2) { return trCfCol(d2, colv); } };
+    });
+    html += '<div class="section-divider">Languages and kinds of page</div>';
+    html += '<div class="card card-full tr-card"><div class="mus-head"><div class="kpi-label">' + (of === 'pages' ? 'Pages opened' : 'Arrivals') + ' per day, by ' + (TR.split === 'kind' ? 'kind of page' : 'language of the page') + '</div>' +
+      '<div class="mus-controls">' + trPills('split', [{ v: 'lang', label: 'Language' }, { v: 'kind', label: 'Kind of page' }], TR.split) +
+      trPills('of', [{ v: 'arrivals', label: 'Arrivals' }, { v: 'pages', label: 'Pages' }], of) + '</div></div>' +
+      trMultiples(panels, dates, 'arrivals', { unit: of === 'pages' ? 'pages' : 'arrivals' }) +
+      '<div class="mus-cap">All panels share one scale, so a small language stays small. The figure beside each name is its last 7 full days. The language of the page asked for, never of a browser. Cloudflare keeps these ' + TR.cf.reach.pagesKeep + ' days.' + trClipText() + '</div></div>';
+  }
+  if (cOk) {
+    if (!(cfOk && TR.cf.byLang)) html += '<div class="section-divider">Languages</div>';
+    html += '<div class="grid tr-grid2">' +
+      trCard('Walks by the walk&rsquo;s language, counted', trGhost(trSplitItems(TR.count.lang, MUS_LANGS), 'walks'), '', 'The language the walk was shown in. Under each name: real uses among the walks.') +
+      trCard('Page arrivals by language, counted', trGhost(trSplitItems({ walks: TR.count.pages.lang }, MUS_LANGS), 'arrivals'), '', 'The language of the site page opened in a browser.') +
+      '</div>';
+  }
+
+  // --- Countries ---
+  if (cfOk && TR.cf.countries && TR.cf.countries.length) {
+    var lands = TR.cf.countries.map(function(c) {
+      return { label: musCountry(c.key), values: trCfCol(dates, c.req), get: function(d2) { return trCfCol(d2, c.req); } };
+    });
+    html += '<div class="section-divider">Countries</div><div class="card card-full tr-card"><div class="kpi-label">Requests per day, the top ' + lands.length + ' countries</div>' +
+      trMultiples(lands, dates, 'pages', { unit: 'requests' }) +
+      '<div class="mus-cap">Requests, not people: one walk asks for hundreds of files, so a country with a few walkers stands tall. Bots included. Cloudflare keeps these a year.' + trClipText() + '</div></div>';
+  }
+
+  // --- The museum's own count ---
+  if (cOk) {
+    html += '<div class="section-divider">Counted by the museum from ' + trShort(TR.count.first) + '</div>';
+    html += trSources();
+    html += '<div class="grid tr-grid2">' +
+      trCard('Page arrivals by kind of page', trGhost(trPageKinds(), 'arrivals'), '', 'A site page opened in a browser. Under each name: how many read to the middle of the text.') +
+      trCard('Door presses by kind of page and place', trDoors(), '', 'A link into the walk pressed, once per page load. Per arrival: presses against page arrivals of that kind, left out under ' + TR_FLOOR + '.') +
+      trCard('Walks by how the screen was held', trGhost(trSplitItems(TR.count.hold, TR_HOLDS), 'walks'), '', 'Upright, sideways or wide, as the walk saw it.') +
+      trCard('Walks by device', trGhost(trSplitItems(TR.count.device, TR_DEVICES), 'walks'), '', 'Worked out on the server from the browser&rsquo;s own description. The description itself is not kept.') +
+      '</div>';
+  } else {
+    html += '<div class="section-divider">Counted by the museum</div>' + trCard('The museum&rsquo;s own count', '<div class="empty-state">' + trCountState() + '</div>', 'card-full');
+  }
+  if (TR.count && TR.count.gaps && TR.count.gaps.length) html += '<div class="mus-cap">Some of the count&rsquo;s questions did not answer: ' + esc(TR.count.gaps.join(', ')) + '. The next refresh asks again.</div>';
+
+  el.innerHTML = html;
+  trPaint();
+}
+
+function trClipText() {
+  if (!TR.clipped) return '';
+  TR.clipped = false;
+  return ' A bar with a small cap on top runs past the shared scale. Hover or tap it for its figure.';
+}
+function trReachText() {
+  var parts = [];
+  if (trCfOk()) {
+    var r = TR.cf.reach;
+    parts.push('Requests, pages opened, visitors, data and countries reach ' + (r.dailyKeep >= 360 ? 'a year' : r.dailyKeep + ' days') + ' back.');
+    parts.push('Arrivals, the walk, its stops, languages and kinds of page reach ' + r.pagesKeep + ' days back' + (r.pages && r.pages > r.daily ? ', so their lines start ' + trShort(r.pages) + ' and the hatched days before are not a drop.' : '.'));
+  }
+  if (trCountOk()) parts.push('The count keeps its rows three months.');
+  return parts.join(' ');
+}
+function trKeepText(m) {
+  if (m.count) return 'Counted from ' + trShort(TR.count.first) + ', rows kept three months.';
+  if (!trCfOk()) return '';
+  return m.keep === 'pages' ? 'Cloudflare keeps this ' + TR.cf.reach.pagesKeep + ' days.' : 'Cloudflare keeps this a year.';
+}
+function trCfState() {
+  if (!TR.cf) return 'Cloudflare&rsquo;s totals did not answer. The next refresh asks again.';
+  if (!TR.cf.configured) return 'Cloudflare&rsquo;s totals are not set up: MUSEUM_CF_API_TOKEN and MUSEUM_ZONE_TAG.';
+  return '';
+}
+function trCountState() {
+  var c = TR.count;
+  if (!c) return 'The museum&rsquo;s count did not answer. The next refresh asks again.';
+  var why = c.why ? ' <span class="mus-na">(' + esc(c.why) + ')</span>' : '';
+  if (c.state === 'unset') return 'The museum&rsquo;s count is not set up here. It is read with CF_ACCOUNT_ID and CF_API_TOKEN, or with MUSEUM_COUNT_ACCOUNT_ID and MUSEUM_COUNT_API_TOKEN when the museum sits in another account.';
+  if (c.state === 'refused') return 'Analytics Engine refused the token for the count&rsquo;s dataset ' + esc(c.dataset) + '. It needs Account Analytics Read on the account that holds it.' + why;
+  if (c.state === 'empty') return 'No rows from the museum&rsquo;s count yet. Its charts appear here from the first day with rows.' + why;
+  if (c.state === 'failed') return 'The museum&rsquo;s count did not answer. The next refresh asks again.' + why;
+  return '';
+}
+function trRateWow(numKey, denKey) {
+  var a = trWeeks(function(d) { return trValues(numKey, d); });
+  var b = trWeeks(function(d) { return trValues(denKey, d); });
+  if (!b.lastDays) return '<div class="tr-wow">No full day yet</div>';
+  var out = (b.lastDays === 7 ? 'Last 7 full days ' : 'The ' + b.lastDays + ' full days so far ') + '<b>' + trRateText(a.last || 0, b.last || 0) + '</b>';
+  if (b.lastDays === 7 && b.prevDays === 7 && b.last >= TR_FLOOR && b.prev >= TR_FLOOR) {
+    var pp = Math.round(((a.last || 0) / b.last - (a.prev || 0) / b.prev) * 100);
+    out += ' &middot; the 7 before ' + Math.round((a.prev || 0) / b.prev * 100) + '% of ' + musFull(b.prev) +
+      ' <span class="kpi-delta ' + (pp > 0 ? 'up' : pp < 0 ? 'down' : 'flat') + '">' + (pp > 0 ? '+' : '') + pp + (Math.abs(pp) === 1 ? ' point' : ' points') + '</span>';
+  }
+  return '<div class="tr-wow">' + out + '</div>';
+}
+function trStopNames(n) {
+  var ids = trCfOk() && TR.cf.stops ? TR.cf.stops.ids : [];
+  var out = [];
+  for (var i = 0; i < n; i++) out.push(ids[i] ? musStop(ids[i], i) : 'Stop ' + (i + 1));
+  return out;
+}
+function trStepsKey(cur, prev) {
+  return '<div class="fbar-legend"><span class="swatch" style="background:var(--gold)"></span>' + cur +
+    (prev ? '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent)"></span>' + prev : '') +
+    ' &middot; the stops in walk order along the bottom</div>';
+}
+// Walks (and real uses among them) per key of one of the row's fields.
+function trSplitItems(pair, names) {
+  if (!pair) return [];
+  var keys = trKeysOf(pair.walks, pair.real);
+  var order = Object.keys(names);
+  keys.sort(function(a, b) { var ia = order.indexOf(a), ib = order.indexOf(b); return (ia < 0 ? 99 : ia) - (ib < 0 ? 99 : ib); });
+  return keys.map(function(k) {
+    var w = trCountWeeks(pair.walks && pair.walks[k]);
+    var item = { label: names[k] || cap(k) || 'unnamed', value: w.value, prev: w.prev, full: w.full };
+    if (pair.real) {
+      var r = trCountWeeks(pair.real[k]);
+      item.sub = 'real uses ' + trRateText(r.value, w.value, true);
+    }
+    return item;
+  }).filter(function(it) { return it.value || it.prev; });
+}
+function trPageKinds() {
+  var p = TR.count.pages;
+  return trKeysOf(p.arrivals).sort().map(function(k) {
+    var a = trCountWeeks(p.arrivals[k]), r = trCountWeeks(p.reads[k]);
+    return { label: TR_COUNT_KINDS[k] || MUS_KINDS[k] || cap(k), value: a.value, prev: a.prev, full: a.full, sub: 'read ' + trRateText(r.value, a.value, true) };
+  }).filter(function(it) { return it.value || it.prev; }).sort(function(a, b) { return b.value - a.value; });
+}
+function trDoors() {
+  var d = TR.count.doors || {}, arr = TR.count.pages.arrivals || {};
+  var places = ['top', 'item', 'end'];
+  var rows = Object.keys(d).map(function(k) {
+    var tot = 0;
+    var cells = places.map(function(p) { var v = trCountWeeks(d[k][p]).value; tot += v; return musFull(v); });
+    var a = trCountWeeks(arr[k]).value;
+    return { tot: tot, row: [esc(TR_COUNT_KINDS[k] || MUS_KINDS[k] || cap(k))].concat(cells).concat([musFull(tot), trRateText(tot, a, true)]) };
+  }).sort(function(a, b) { return b.tot - a.tot; }).map(function(r) { return r.row; });
+  return musTable(['Kind', 'Top', 'Item', 'End', 'All', 'Per arrival'], rows, [1, 2, 3]) + '<div class="mus-cap">' + TR.weekWords.cur + '.</div>';
+}
+// Sources: stacked weekly bars by family, and a table of every word.
+function trSources() {
+  var c = TR.count, src = c.sources || { walks: {}, uses: {}, site: {} };
+  var pick = TR.src === 'site' ? src.site : TR.src === 'uses' ? src.uses : src.walks;
+  var unit = TR.src === 'site' ? 'page arrivals that began a visit' : TR.src === 'uses' ? 'uses' : 'walks opened';
+  var fam = {};
+  TR_FAMILIES.forEach(function(f) { f.words.forEach(function(w) { fam[w] = f.key; }); });
+  var today = trToday(), y = trShift(today, -1);
+  var weeks = [];
+  for (var k = 0; k < 13; k++) {
+    var to = trShift(y, -7 * k), from = trShift(to, -6);
+    if (to < c.first) break;
+    var by = {}, total = 0;
+    trDates(from, to).forEach(function(d) {
+      var i = TR.cIdx[d];
+      if (i == null) return;
+      Object.keys(pick).forEach(function(word) {
+        var f = fam[word] || 'other';
+        var v = pick[word][i] || 0;
+        by[f] = (by[f] || 0) + v;
+        total += v;
+      });
+    });
+    weeks.unshift({ from: from, to: to, by: by, total: total, part: from < c.first, first: c.first });
+  }
+  var head = '<div class="mus-head"><div class="kpi-label">' + cap(unit) + ' per week, by source</div>' +
+    trPills('src', [{ v: 'walks', label: 'Walks opened' }, { v: 'uses', label: 'Uses' }, { v: 'site', label: 'Page arrivals' }], TR.src) + '</div>';
+  var legend = '<div class="tr-legend">' + TR_FAMILIES.filter(function(f) { return TR.src !== 'site' || f.key !== 'inside'; }).map(function(f) {
+    return '<span><span class="tr-sw tr-sw-' + f.key + '"></span>' + f.label + '</span>';
+  }).join('') + '</div>';
+  var chart = weeks.length ? legend + trChart({ type: 'stack', weeks: weeks, unit: unit, aria: cap(unit) + ' per week by source' }, 220)
+    : '<div class="empty-state">No full week yet. The first bar stands after the count&rsquo;s first full day. Today so far: ' + musFull(trSum(Object.keys(pick).map(function(w) { var i = TR.cIdx[today]; return i == null ? 0 : pick[w][i] || 0; })) || 0) + ' ' + unit + '.</div>';
+
+  // The table: the last 28 full days, or what the count has of them.
+  var from28 = trShift(y, -27), span = trDates(from28 < c.first ? c.first : from28, y);
+  var useToday = !span.length || y < c.first;
+  if (useToday) span = [today];
+  var tot = function(series, word) {
+    var s = 0;
+    span.forEach(function(d) { var i = TR.cIdx[d]; if (i != null && series[word]) s += series[word][i] || 0; });
+    return s;
+  };
+  var words = trKeysOf(src.walks, src.uses, src.site);
+  var rows = words.map(function(wd) {
+    var a = tot(src.site, wd), wlk = tot(src.walks, wd), u = tot(src.uses, wd);
+    return { n: wlk + a, row: [esc(TR_WORDS[wd] != null ? TR_WORDS[wd] : wd), musFull(a), musFull(wlk), musFull(u), trRateText(u, wlk, true)] };
+  }).filter(function(r) { return r.n > 0; }).sort(function(a, b) { return b.n - a.n; }).map(function(r) { return r.row; });
+  var spanText = useToday ? 'today so far' : span.length === 28 ? 'the last 28 full days' : 'the ' + span.length + ' full day' + (span.length > 1 ? 's' : '') + ' since ' + trShort(span[0]);
+  var table = musTable(['Source', 'Page arrivals', 'Walks opened', 'Uses', 'Uses per walk'], rows, [1]);
+  return '<div class="card card-full tr-card">' + head + chart +
+    '<div class="mus-cap">One word per visit, worked out when the visit begins. A walk opened from a page of the site after the first one carries no word and counts as From the site. A faded bar is a week the count does not cover whole.</div>' +
+    '<div class="kpi-label" style="margin-top:16px">Every source, ' + spanText + '</div>' + table +
+    '<div class="mus-cap">Uses are the count&rsquo;s museum_use: the second stop or the first close look. The third stop carries no source word, so real uses by source cannot be read. Under ' + TR_FLOOR + ' walks a rate is left out and the plain figures stand.</div></div>';
+}
+
+// --- Hover and tap ---
+
+function trTip() {
+  var t = document.getElementById('tr-tip');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'tr-tip';
+    t.className = 'graph-tooltip tr-tip';
+    t.setAttribute('role', 'status');
+    document.body.appendChild(t);
+  }
+  return t;
+}
+function trTipHide() {
+  var t = document.getElementById('tr-tip');
+  if (t) t.style.opacity = '0';
+  document.querySelectorAll('.tr-guide.on').forEach(function(g) { g.classList.remove('on'); });
+}
+function trTipAt(ev) {
+  var svg = ev.target && ev.target.closest ? ev.target.closest('svg.tr-svg') : null;
+  if (!svg) { trTipHide(); return; }
+  var spec = TR.charts[svg.getAttribute('data-trs')];
+  if (!spec || !spec.hit) return;
+  var box = svg.getBoundingClientRect();
+  var hit = spec.hit(ev.clientX - box.left);
+  if (!hit) { trTipHide(); return; }
+  document.querySelectorAll('.tr-guide.on').forEach(function(g) { g.classList.remove('on'); });
+  var g = svg.querySelector('.tr-guide');
+  if (g) { g.setAttribute('x1', hit.gx.toFixed(1)); g.setAttribute('x2', hit.gx.toFixed(1)); g.classList.add('on'); }
+  var t = trTip();
+  t.innerHTML = hit.html;
+  t.style.opacity = '1';
+  var tw = t.offsetWidth, th = t.offsetHeight;
+  var x = box.left + hit.gx + 12;
+  if (x + tw > window.innerWidth - 8) x = box.left + hit.gx - tw - 12;
+  if (x < 8) x = 8;
+  var top = box.top - th - 6;
+  if (top < 8) top = Math.min(window.innerHeight - th - 8, ev.clientY + 16);
+  t.style.left = x + 'px';
+  t.style.top = top + 'px';
+}
+function trBind() {
+  var root = document.getElementById('trends-museum');
+  root.addEventListener('pointermove', function(ev) { if (ev.pointerType === 'mouse') trTipAt(ev); });
+  root.addEventListener('pointerdown', function(ev) { if (ev.pointerType !== 'mouse') trTipAt(ev); });
+  root.addEventListener('pointerleave', function() { trTipHide(); });
+  root.addEventListener('click', function(ev) {
+    var b = ev.target && ev.target.closest ? ev.target.closest('[data-tr-metric], [data-tr-range], [data-tr-split], [data-tr-of], [data-tr-src]') : null;
+    if (!b) return;
+    if (b.dataset.trMetric) TR.metric = b.dataset.trMetric;
+    else if (b.dataset.trRange != null) TR.range = Number(b.dataset.trRange);
+    else if (b.dataset.trSplit) TR.split = b.dataset.trSplit;
+    else if (b.dataset.trOf) TR.of = b.dataset.trOf;
+    else if (b.dataset.trSrc) TR.src = b.dataset.trSrc;
+    trTipHide();
+    renderTrends();
+  });
+  document.getElementById('content').addEventListener('scroll', trTipHide, { passive: true });
+  var timer = null;
+  window.addEventListener('resize', function() {
+    clearTimeout(timer);
+    timer = setTimeout(function() { if (S.tab === 'museum' && MUS.view === 'trends') { trTipHide(); trPaint(); } }, 150);
+  });
+}
+
+// Now and Trends inside the Museum tab, each with its own address.
+function musMarkView() {
+  document.getElementById('tab-museum').setAttribute('data-view', MUS.view);
+  document.querySelectorAll('.mus-view').forEach(function(b) {
+    var on = b.dataset.musView === MUS.view;
+    b.classList.toggle('active', on);
+    b.setAttribute('aria-selected', on ? 'true' : 'false');
+  });
+}
+function musSetView(view, fromHash) {
+  MUS.view = view === 'trends' ? 'trends' : 'now';
+  musMarkView();
+  trTipHide();
+  if (S.tab !== 'museum') return;
+  var want = MUS.view === 'trends' ? 'museum/trends' : 'museum';
+  if (!fromHash && location.hash.replace('#', '') !== want) location.hash = want;
+  loadTab('museum');
+}
+// --- end of trends ---
+
 function switchTab(tab) {
   S.tab = tab;
   document.body.dataset.tab = tab;
-  location.hash = tab;
+  location.hash = tab === 'museum' && MUS.view === 'trends' ? 'museum/trends' : tab;
 
   // Update sidebar
   document.querySelectorAll('.nav-item').forEach(function(el) {
@@ -3961,7 +5106,7 @@ function loadTab(tab) {
   else if (tab === 'product') loadProduct();
   else if (tab === 'audio') loadAudio();
   else if (tab === 'adgrants') loadAdGrants();
-  else if (tab === 'museum') loadMuseum();
+  else if (tab === 'museum') { if (MUS.view === 'trends') loadTrends(); else loadMuseum(); }
 }
 
 function setRange(days) {
@@ -4007,10 +5152,11 @@ function init() {
   }
 
   // Read hash
-  var hash = location.hash.replace('#', '');
-  if (['overview', 'servers', 'product', 'audio', 'adgrants', 'museum'].indexOf(hash) >= 0) {
-    S.tab = hash;
+  var hash = location.hash.replace('#', '').split('/');
+  if (['overview', 'servers', 'product', 'audio', 'adgrants', 'museum'].indexOf(hash[0]) >= 0) {
+    S.tab = hash[0];
   }
+  if (S.tab === 'museum' && hash[1] === 'trends') { MUS.view = 'trends'; musMarkView(); }
 
   document.body.dataset.tab = S.tab;
   renderRangePills();
@@ -4034,11 +5180,18 @@ function init() {
 
   // Hash change
   window.addEventListener('hashchange', function() {
-    var h = location.hash.replace('#', '');
+    var parts = location.hash.replace('#', '').split('/');
+    var h = parts[0];
+    var view = parts[1] === 'trends' ? 'trends' : 'now';
+    if (h === 'museum' && view !== MUS.view) musSetView(view, true);
     if (h && h !== S.tab && ['overview', 'servers', 'product', 'audio', 'adgrants', 'museum'].indexOf(h) >= 0) {
       switchTab(h);
     }
   });
+  document.querySelectorAll('.mus-view').forEach(function(el) {
+    el.addEventListener('click', function() { musSetView(el.dataset.musView); });
+  });
+  trBind();
 
   // Start loading
   loadServerHealth();
