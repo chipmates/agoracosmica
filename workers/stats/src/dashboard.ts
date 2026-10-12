@@ -3583,7 +3583,8 @@ function consentTable(dimLabel, shownRows, acceptRows, key, labelFn, cls) {
 
 var MUS = { day: '', metric: 'arrivals', answer: null, hours: null, shell: false };
 var MUS_LANGS = { en: 'English', de: 'German', fr: 'French', it: 'Italian', es: 'Spanish', 'pt-BR': 'Portuguese (BR)', bg: 'Bulgarian' };
-var MUS_KINDS = { front: 'Front page', wing: 'Wing page', topic: 'Topic page', about: 'About the museum', walk: 'The walk', privacy: 'Privacy', legal: 'Legal notice', other: 'Other' };
+var MUS_KINDS = { front: 'Front page', wing: 'Wing page', topic: 'Topic page', about: 'About the museum', walk: 'The walk', privacy: 'Privacy', legal: 'Legal notice',
+  'placed-g': 'Placed: grant ads', 'placed-p': 'Placed: paid search', 'placed-f': 'Placed: forum placement', 'placed-o': 'Placed: own posts', other: 'Other' };
 var MUS_METRICS = [
   { key: 'arrivals', label: 'Arrivals' },
   { key: 'pages', label: 'Pages opened' },
@@ -3790,7 +3791,10 @@ function renderMuseum(a) {
       return [esc(MUS_KINDS[k.key] || k.key), musCell(k.today[0]), musCell(k.today[1]), musCell(k.week[0]), musCell(k.week[1])];
     });
     html += chartCard('Pages and arrivals by kind of page',
-      musTable(['Kind', 'Pages today', 'Arrivals today', 'Pages 7 days', 'Arrivals 7 days'], kindRows), 'card-wide');
+      musTable(['Kind', 'Pages today', 'Arrivals today', 'Pages 7 days', 'Arrivals 7 days'], kindRows) +
+      '<div class="mus-cap">Placed: the addresses we put in our own ads and posts, /a/g/ (grant ads), /a/p/ (paid search), /a/f/ (forum placement) or /a/o/ (own posts) in front of a page or the walk. ' +
+      'A page opened there counts in its row here, not under its own kind, and in its language above. A walk opened there counts among the walks opened.</div>',
+      'card-wide');
   } else {
     html += chartCard('Pages and arrivals by kind of page', '<div class="empty-state">Cloudflare did not give page-level totals.</div>', 'card-wide');
   }

@@ -36,9 +36,13 @@ const WEEK_DAYS = 7;
 const ABOUT_SLUGS = new Set(['what-this-museum-is', 'was-dieses-museum-ist', 'qu-est-ce-que-ce-musee', 'cos-e-questo-museo', 'que-es-este-museo', 'o-que-e-este-museu', 'kakvo-e-tozi-muzey']);
 const PRIVACY_SLUGS = new Set(['privacy', 'datenschutz', 'confidentialite', 'privacidad', 'privacidade', 'poveritelnost']);
 const LEGAL_SLUGS = new Set(['imprint', 'impressum']);
-const KIND_ORDER = ['front', 'wing', 'topic', 'about', 'walk', 'privacy', 'legal', 'other'];
+// The addresses of links we place ourselves (ads, our own posts): a letter
+// prefix in front of a real path, /a/g/de/ for the German front page from a
+// grant ad. Each prefix is a kind of its own, whatever page stands behind it.
+const PLACED: Record<string, PageKind> = { g: 'placed-g', p: 'placed-p', f: 'placed-f', o: 'placed-o' };
+const KIND_ORDER = ['front', 'wing', 'topic', 'about', 'walk', 'privacy', 'legal', 'placed-g', 'placed-p', 'placed-f', 'placed-o', 'other'];
 
-export type PageKind = 'front' | 'wing' | 'topic' | 'about' | 'privacy' | 'legal' | 'walk' | 'other';
+export type PageKind = 'front' | 'wing' | 'topic' | 'about' | 'privacy' | 'legal' | 'walk' | 'placed-g' | 'placed-p' | 'placed-f' | 'placed-o' | 'other';
 
 interface Config {
   token: string;
@@ -203,8 +207,15 @@ const floorOf = (now: number, limit: Limit): number => now - limit.notOlderThan 
 
 // --- Reading a path as one of our own pages ---
 
-export function classify(path: string, langs: string[]): { lang: string; kind: PageKind } | null {
+// A placed address keeps the language of the page behind it, and the walk
+// behind one is still a walk opened (`walk`).
+export function classify(path: string, langs: string[]): { lang: string; kind: PageKind; walk?: boolean } | null {
   let p = path.split('?')[0];
+  const placed = /^\/a\/([a-z])(\/.*)$/.exec(p);
+  if (placed && Object.prototype.hasOwnProperty.call(PLACED, placed[1])) {
+    const real = classify(placed[2], langs);
+    return real ? { lang: real.lang, kind: PLACED[placed[1]], walk: real.kind === 'walk' } : null;
+  }
   if (p.endsWith('index.html')) p = p.slice(0, -10);
   const parts = p.split('/').filter(Boolean);
   if (parts[0] === 'w' && parts.length === 2) return { lang: '', kind: 'walk' };
@@ -292,7 +303,7 @@ function addPage(day: DayPages, cfg: Config, path: string, c: number, v: number 
   if (v === null) pages.arrivals = null;
   else if (pages.arrivals !== null) pages.arrivals += v;
   add(pages.byKind, seen.kind);
-  if (seen.kind === 'walk') pages.walks += c;
+  if (seen.kind === 'walk' || seen.walk) pages.walks += c;
   else add(pages.byLang, seen.lang);
 }
 
@@ -655,7 +666,9 @@ async function buildHours(cfg: Config, fetcher: Fetcher, now: number, from: numb
     for (const [a, b] of pieces(aFrom, to, limits.adaptive.maxDuration)) {
       const group = (name: string, filter: string, extra: string) =>
         name + ': httpRequestsAdaptiveGroups(limit: 100, filter: {' + filter + '}, orderBy: [datetimeHour_ASC]) { count ' + extra + 'dimensions { datetimeHour } }';
-      const walks = group('walks', pageSpan(cfg, a, b) + ', clientRequestPath_like: "/w/%"', '');
+      // the walk at its own address and under a placed one, as the day's figure counts it
+      const walks = group('walks', pageSpan(cfg, a, b) + ', clientRequestPath_like: "/w/%"', '') + ' ' +
+        group('walksPlaced', pageSpan(cfg, a, b) + ', clientRequestPath_like: "/a/%/w/%"', '');
       const film = group('film', span(cfg, a, b) + ', clientRequestPath_like: "/film/%/film.json"', '');
       const got = await askFirst(cfg, fetcher, [
         group('pages', pageSpan(cfg, a, b), 'sum { visits } ') + ' ' + walks + ' ' + film,
@@ -685,6 +698,7 @@ async function buildHours(cfg: Config, fetcher: Fetcher, now: number, from: numb
       });
       if (got.form < 2) {
         fill(arr(got.zone.walks), (h, row) => { h.walks = (h.walks || 0) + num(row.count); });
+        fill(arr(got.zone.walksPlaced), (h, row) => { h.walks = (h.walks || 0) + num(row.count); });
         fill(arr(got.zone.film), (h, row) => { h.started = (h.started || 0) + num(row.count); });
       }
     }
