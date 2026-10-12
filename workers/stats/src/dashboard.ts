@@ -862,6 +862,8 @@ td.mus-strong { color: var(--tx); font-weight: 600; }
 .tr-row-head:hover { background: none; }
 .tr-row-head span:not(:first-child) { text-align: right; }
 .tr-row-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; line-height: 1.2; }
+.mus-num small { font-size: 0.6875rem; color: var(--dim); font-weight: 400; }
+.tr-hint { margin: 2px 0 6px; flex: none; }
 .tr-row-name small { display: block; font-size: 0.625rem; color: var(--dim); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .tr-ghost .fbar-labelwrap { min-width: 120px; }
 @media (max-width: 1024px) {
@@ -4201,6 +4203,12 @@ function trWow(key) {
   }
   return w;
 }
+function trListFig(m, w) {
+  if (w.lastDays === 7) return trFig(m, w.last);
+  if (w.lastDays) return trFig(m, w.last) + '<small> in ' + trDaysWord(w.lastDays) + '</small>';
+  if (w.today != null) return trFig(m, w.today) + '<small> today</small>';
+  return '<span class="mus-na">none</span>';
+}
 function trDaysWord(n) { return n ? n + (n > 1 ? ' days' : ' day') : 'none'; }
 function trFig(m, v) {
   if (v == null) return '<span class="mus-na">n/a</span>';
@@ -4270,7 +4278,8 @@ function trAimsOn(key) {
   var notes = TR.cf && TR.cf.notes;
   if (!notes || !notes.aims) return [];
   return notes.aims.filter(function(a) { return a.metric === key; }).map(function(a) {
-    return { v: a.per === 'week' ? a.value / 7 : a.value, text: 'aim ' + (a.per === 'week' ? musFull(a.value) + ' a week' : musFull(a.value) + ' a day') + (a.label ? ', ' + a.label : '') };
+    var fig = musFull(a.value) + (a.per === 'week' ? ' a week' : ' a day');
+    return { v: a.per === 'week' ? a.value / 7 : a.value, text: a.label ? fig + ', ' + a.label : 'aim ' + fig };
   });
 }
 function trSvgOpen(w, h, id, aria) {
@@ -4405,7 +4414,7 @@ TR_DRAW.rate = function(spec, w, id) {
   });
   var max = 0;
   dates.forEach(function(d, i) {
-    if (den[i] >= TR_FLOOR && num[i] / den[i] > max) max = num[i] / den[i];
+    if (den[i] > 0 && num[i] != null && num[i] / den[i] > max) max = num[i] / den[i];
     if (roll[i] && roll[i].b >= TR_FLOOR && roll[i].r > max) max = roll[i].r;
   });
   // Each rate keeps its own scale from zero: three different questions.
@@ -4467,7 +4476,7 @@ TR_DRAW.rate = function(spec, w, id) {
   return svg;
 };
 function trRateText(a, b, short) {
-  if (!b) return short ? '0 of 0' : 'none to measure';
+  if (!b) return short ? '-' : 'none to measure';
   if (b < TR_FLOOR) return musFull(a) + ' of ' + musFull(b) + (short ? '' : ', too few for a rate');
   return Math.round(a / b * 100) + '% (' + musFull(a) + ' of ' + musFull(b) + ')';
 }
@@ -4600,7 +4609,7 @@ function trMultiples(panels, dates, key, opts) {
   var out = '<div class="tr-multi">';
   panels.forEach(function(p) {
     var w = trWeeks(p.get);
-    var fig = w.lastDays ? musFull(w.last) + (w.lastDays < 7 ? ' in ' + w.lastDays + 'd' : '') : 'n/a';
+    var fig = w.lastDays ? musFull(w.last) + (w.lastDays < 7 ? ' in ' + trDaysWord(w.lastDays) : '') : 'n/a';
     out += '<div class="tr-panel"><div class="tr-panel-head"><span class="tr-panel-name">' + esc(p.label) + '</span><span class="tr-panel-fig">' + fig + ' ' + trChange(w) + '</span></div>' +
       trChart({ type: 'daily', key: key, dates: dates, values: p.values, compact: true, yMax: max || 1, unit: opts.unit || '', aria: p.label + ' per day' }, 92) + '</div>';
   });
@@ -4619,8 +4628,9 @@ function trGhost(items, unit) {
       '<div class="fbar-fill" style="width:' + ((it.value || 0) / base * 100).toFixed(1) + '%"></div></div>' +
       '<span class="fbar-num"><span class="fbar-val">' + fmt(it.value || 0) + '</span>' + (it.prev != null && it.full ? deltaHtml(it.value || 0, it.prev) : '') + '</span></div>';
   });
+  var anyPrev = items.some(function(it) { return it.prev != null; });
   return out + '</div><div class="fbar-legend"><span class="swatch" style="background:var(--gold-subtle)"></span>' + TR.weekWords.cur +
-    '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent)"></span>' + TR.weekWords.prev + '</div>';
+    (anyPrev ? '<span class="swatch" style="background:color-mix(in srgb, var(--gold-deep) 22%, transparent)"></span>' + TR.weekWords.prev : '') + '</div>';
 }
 // A count column summed over this week and the week before. Before the
 // count's first full day, this week is today so far.
@@ -4669,18 +4679,19 @@ function renderTrends() {
   TR.weekWords = { cur: 'Last 7 full days', prev: 'The 7 before' };
   if (cOk && TR.count.first >= ws.from) TR.weekWords.cur = TR.count.first > ws.to ? 'Today so far' : 'Since ' + trShort(TR.count.first);
 
-  // Marks: the private notes, and the day the count began.
-  var notes = TR.cf && TR.cf.notes;
-  var marks = notes && notes.events ? notes.events.slice() : [];
-  if (cOk && !marks.some(function(e) { return e.day === TR.count.first; })) marks.push({ day: TR.count.first, label: 'The museum' + String.fromCharCode(39) + 's count begins' });
-  marks.sort(function(a, b) { return a.day < b.day ? -1 : a.day > b.day ? 1 : 0; });
-  TR.marks = marks.map(function(e, i) { return { day: e.day, label: e.label, n: i + 1 }; });
-
   if (!cfOk && !cOk && !(TR.count && TR.count.state === 'empty')) {
     el.innerHTML = '<div class="placeholder"><h3>Nothing to show yet</h3><p>' + trCfState() + ' ' + trCountState() + '</p></div>';
     return;
   }
   var dates = trDomain();
+
+  // Marks on the days in view: the private notes, and the day the count began.
+  var notes = TR.cf && TR.cf.notes;
+  var marks = notes && notes.events ? notes.events.slice() : [];
+  if (cOk && !marks.some(function(e) { return e.day === TR.count.first; })) marks.push({ day: TR.count.first, label: 'The museum' + String.fromCharCode(39) + 's count begins' });
+  marks = marks.filter(function(e) { return e.day >= dates[0] && e.day <= dates[dates.length - 1]; });
+  marks.sort(function(a, b) { return a.day < b.day ? -1 : a.day > b.day ? 1 : 0; });
+  TR.marks = marks.map(function(e, i) { return { day: e.day, label: e.label, n: i + 1 }; });
   var html = '';
 
   // What the numbers are, how far back each reaches, and the marks.
@@ -4694,13 +4705,14 @@ function renderTrends() {
   html += '<div class="mus-note">How the numbers move over the weeks. Cloudflare&rsquo;s totals include bots and our own checks, and a day is Cloudflare&rsquo;s day: it turns at ' + musDayTurn(today) + ' your time. ' +
     'The museum&rsquo;s own count leaves our own test browsers out. A bot that runs scripts can still be in it.</div>';
   html += '<div class="tr-head">' + trPills('range', TR_RANGES.map(function(r) { return { v: r.days, label: r.label }; }), TR.range) +
-    '<div class="tr-reach">' + trReachText() + '</div></div>';
+    '<div class="tr-reach">' + trReachText(dates) + '</div></div>';
   if (TR.marks.length) {
     html += '<div class="tr-marks" aria-label="Marks on the time axis">' + TR.marks.map(function(mk) {
       return '<span class="tr-mark-key"><span class="tr-num">' + mk.n + '</span>' + trShort(mk.day) + ' &middot; ' + esc(mk.label) + '</span>';
     }).join('') + '</div>';
-  } else if (TR.cf && !TR.cf.notes) {
-    html += '<div class="tr-reach">No marks for posts or ads: the MUSEUM_TREND_NOTES secret is not set.</div>';
+  }
+  if (TR.cf && TR.cf.configured && !TR.cf.notes && (TR.cf.gaps || []).indexOf('notes') < 0) {
+    html += '<div class="tr-reach tr-hint">No marks for posts or ads and no aims: the MUSEUM_TREND_NOTES secret is not set.</div>';
   }
 
   // --- Reach and use ---
@@ -4733,7 +4745,7 @@ function renderTrends() {
         var w = trWow(m.key);
         var on = m.key === TR.metric;
         out += '<button class="tr-row' + (on ? ' active' : '') + '" data-tr-metric="' + m.key + '" aria-pressed="' + on + '"><span class="tr-row-name">' + m.label + (m.tag === 'stand-in' ? '<small>stand-in for real uses</small>' : '') + '</span>' +
-          '<span class="mus-num">' + (w.lastDays === 7 ? trFig(m, w.last) : '<span class="mus-na">' + trDaysWord(w.lastDays) + '</span>') + '</span>' +
+          '<span class="mus-num">' + trListFig(m, w) + '</span>' +
           '<span class="mus-num tr-wide">' + (w.prevDays === 7 ? trFig(m, w.prev) : '<span class="mus-na">' + trDaysWord(w.prevDays) + '</span>') + '</span>' +
           '<span class="mus-num">' + trChange(w, m.bytes) + '</span></button>';
       });
@@ -4846,12 +4858,13 @@ function trClipText() {
   TR.clipped = false;
   return ' A bar with a small cap on top runs past the shared scale. Hover or tap it for its figure.';
 }
-function trReachText() {
+function trReachText(dates) {
   var parts = [];
   if (trCfOk()) {
     var r = TR.cf.reach;
     parts.push('Requests, pages opened, visitors, data and countries reach ' + (r.dailyKeep >= 360 ? 'a year' : r.dailyKeep + ' days') + ' back.');
-    parts.push('Arrivals, the walk, its stops, languages and kinds of page reach ' + r.pagesKeep + ' days back' + (r.pages && r.pages > r.daily ? ', so their lines start ' + trShort(r.pages) + ' and the hatched days before are not a drop.' : '.'));
+    var cut = r.pages && r.pages > r.daily && dates[0] < r.pages;
+    parts.push('Arrivals, the walk, its stops, languages and kinds of page reach ' + r.pagesKeep + ' days back' + (cut ? ', so their lines start ' + trShort(r.pages) + ' and the hatched days before are not a drop.' : '.'));
   }
   if (trCountOk()) parts.push('The count keeps its rows three months.');
   return parts.join(' ');
