@@ -4072,10 +4072,8 @@ function renderMuseumHours() {
 }
 
 // --- Museum: trends ---
-// How the museum's numbers move over the weeks, from two sources: Cloudflare's
-// totals (bots included, a day is UTC) and the museum's own count (from its
-// first day with rows). Charts are drawn at the width they are given, so their
-// labels keep their size on a phone.
+// Charts are drawn at the width they are given, so their labels keep their
+// size on a phone. Every figure stays a total: no visitor is followed.
 
 var TR = { cf: null, count: null, at: 0, range: 28, metric: 'started', split: 'lang', of: 'arrivals', src: 'walks', charts: {}, seq: 0, painted: false, marks: [] };
 // A rate over fewer than this many is greyed and its line left out.
@@ -4769,7 +4767,7 @@ function renderTrends() {
   html += '<div class="card card-full tr-card"><div class="tr-rates">' +
     rate('Walks started per arrival', 'started', 'arrivals', 'Cloudflare. Arrivals hold many bots, so this rate runs low.') +
     rate('Second stop per walk started', 'second', 'started', 'Cloudflare. The second stop&rsquo;s picture against the film&rsquo;s index.') +
-    rate('Third stop per walk opened', 'real', 'walks', 'The museum&rsquo;s count. The owner&rsquo;s real use.') +
+    rate('Third stop per walk opened', 'real', 'walks', 'The museum&rsquo;s count. A real use is a walk to the third stop.') +
     '</div><div class="mus-cap">Each dot is one day, the line its last 7 days. A hollow dot stands on fewer than ' + TR_FLOOR + ', and the line leaves out a week with fewer. Hover or tap for the day&rsquo;s figures.</div></div>';
 
   html += '<div class="grid tr-grid2">';
@@ -4814,7 +4812,10 @@ function renderTrends() {
       '<div class="mus-controls">' + trPills('split', [{ v: 'lang', label: 'Language' }, { v: 'kind', label: 'Kind of page' }], TR.split) +
       trPills('of', [{ v: 'arrivals', label: 'Arrivals' }, { v: 'pages', label: 'Pages' }], of) + '</div></div>' +
       trMultiples(panels, dates, 'arrivals', { unit: of === 'pages' ? 'pages' : 'arrivals' }) +
-      '<div class="mus-cap">All panels share one scale, so a small language stays small. The figure beside each name is its last 7 full days. The language of the page asked for, never of a browser. Cloudflare keeps these ' + TR.cf.reach.pagesKeep + ' days.' + trClipText() + '</div></div>';
+      '<div class="mus-cap">All panels share one scale, so a small ' + (TR.split === 'kind' ? 'kind' : 'language') + ' stays small. The figure beside each name is its last 7 full days. ' +
+      (TR.split === 'kind' ? 'A kind shows once it has pages. Placed rows are the addresses of our own ad and post links, counted under their prefix whatever page stands behind it. '
+        : 'The language of the page asked for, never of a browser. ') +
+      'Cloudflare keeps these ' + TR.cf.reach.pagesKeep + ' days.' + trClipText() + '</div></div>';
   }
   if (cOk) {
     if (!(cfOk && TR.cf.byLang)) html += '<div class="section-divider">Languages</div>';
