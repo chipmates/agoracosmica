@@ -437,12 +437,12 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
                 <button
                   className="audio-library__nav-button audio-library__nav-button--left"
                   onClick={handlePrevious}
-                  aria-label="Previous figure"
+                  aria-label={tString('audioLibrary.controls.previousFigure', 'Previous figure')}
                 >
                   <CaretLeft size={32} weight="bold" />
                 </button>
 
-                <div ref={carouselRef} className="audio-library__carousel" role="tablist" aria-label="Select a historical figure">
+                <div ref={carouselRef} className="audio-library__carousel" role="tablist" aria-label={tString('audioLibrary.carousel.figureCarousel', 'Figure carousel')}>
                   {visibleFigures.map((figure) => {
                     const isSelected = selectedFigure?.id === figure.id;
                     const isPlaying = currentlyPlaying?.id === figure.id;
@@ -472,7 +472,7 @@ const AudioLibraryModal: FC<AudioLibraryModalProps> = ({
                 <button
                   className="audio-library__nav-button audio-library__nav-button--right"
                   onClick={handleNext}
-                  aria-label="Next figure"
+                  aria-label={tString('audioLibrary.controls.nextFigure', 'Next figure')}
                 >
                   <CaretRight size={32} weight="bold" />
                 </button>
