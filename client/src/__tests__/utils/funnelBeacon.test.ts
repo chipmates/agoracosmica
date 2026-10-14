@@ -188,3 +188,83 @@ describe('one-shot steps', () => {
     expect(sendBeacon).toHaveBeenCalledTimes(2);
   });
 });
+
+// The real-use steps carry the landing's source class exactly as the first
+// chat does, and council_heard is its own one-shot that never touches engaged.
+describe('engaged and council_heard', () => {
+  function captureBeacon() {
+    const sendBeacon = vi.fn((_url: string, _body: Blob) => true);
+    Object.defineProperty(navigator, 'sendBeacon', { value: sendBeacon, configurable: true, writable: true });
+    return sendBeacon;
+  }
+  async function bodies(sendBeacon: ReturnType<typeof captureBeacon>) {
+    return Promise.all(sendBeacon.mock.calls.map(async (c) => JSON.parse(await c[1].text())));
+  }
+  async function loadWithSource(hash: string) {
+    window.history.replaceState({}, '', `/app${hash}`);
+    vi.resetModules();
+    (await import('../../utils/arrivalSource')).captureArrivalSourceFromUrl();
+    return import('../../utils/funnelBeacon');
+  }
+
+  afterEach(() => {
+    window.history.replaceState({}, '', '/');
+    Reflect.deleteProperty(navigator, 'sendBeacon');
+    vi.resetModules();
+  });
+
+  it('engaged carries the source class on the first arm and on both', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('#src=ad_google');
+    m.sendFunnelBeaconOnce('first_turn');
+    m.noteEngagedListenMilestone();
+    const sent = await bodies(sendBeacon);
+    const engaged = sent.filter((b) => b.step === 'engaged');
+    expect(engaged.map((b) => b.mode)).toEqual(['typed', 'both']);
+    for (const b of engaged) expect(b.source).toBe('ad_google');
+    expect(sent.find((b) => b.step === 'first_turn')!.source).toBe('ad_google');
+  });
+
+  it('engaged goes without a class when the visit brought none', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('');
+    m.noteEngagedListenSeconds(m.ENGAGED_LISTEN_SECONDS);
+    const [row] = await bodies(sendBeacon);
+    expect(row.step).toBe('engaged');
+    expect(row.mode).toBe('listened');
+    expect(row.source).toBeUndefined();
+  });
+
+  it('other steps still carry no class', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('#src=search');
+    m.sendFunnelBeacon('figure_selected', { figureId: 'aurelius' });
+    m.sendFunnelBeacon('council_open');
+    for (const b of await bodies(sendBeacon)) expect(b.source).toBeUndefined();
+  });
+
+  it('council_heard fires once, at two minutes or the first quarter, with the class', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('#src=search');
+    m.noteCouncilHeardSeconds(m.ENGAGED_LISTEN_SECONDS - 1);
+    expect(sendBeacon).not.toHaveBeenCalled();
+    m.noteCouncilHeardSeconds(m.ENGAGED_LISTEN_SECONDS);
+    m.noteCouncilHeardMilestone();
+    m.noteCouncilHeardSeconds(600);
+    const sent = await bodies(sendBeacon);
+    expect(sent).toHaveLength(1);
+    expect(sent[0].step).toBe('council_heard');
+    expect(sent[0].source).toBe('search');
+    expect(sent[0].mode).toBeUndefined();
+    expect(sent[0].figureId).toBeUndefined();
+  });
+
+  it('council_heard never qualifies engaged', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('');
+    m.noteCouncilHeardMilestone();
+    const sent = await bodies(sendBeacon);
+    expect(sent.map((b) => b.step)).toEqual(['council_heard']);
+    expect(sessionStorage.length).toBe(0);
+  });
+});

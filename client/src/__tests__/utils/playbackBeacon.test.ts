@@ -139,3 +139,55 @@ describe('listen tracker', () => {
     ]);
   });
 });
+
+// council_heard and engaged are one-shot per page load, so every case here
+// starts from a fresh page (a fresh module registry).
+describe('council listening', () => {
+  beforeEach(() => {
+    sent.length = 0;
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-01T10:00:00Z'));
+    vi.resetModules();
+  });
+  afterEach(() => vi.useRealTimers());
+
+  const council = { type: 'council' as const, mode: 'council' };
+  const steps = () => sent.filter((s) => s.step).map((s) => s.step);
+
+  it('a council passing its first quarter counts council_heard once, never engaged', async () => {
+    const pb = await import('../../utils/playbackBeacon');
+    const key = pb.listenTrackKey(council, 'https://media/council-a.mp3');
+    pb.noteListenPlay(key, council);
+    for (let t = 10; t <= 400; t += 10) {
+      vi.advanceTimersByTime(10000);
+      pb.noteListenProgress(key, t, 400);
+    }
+    expect(steps()).toEqual(['council_heard']);
+  });
+
+  it('a long council counts council_heard at two minutes heard, before its quarter', async () => {
+    const pb = await import('../../utils/playbackBeacon');
+    const key = pb.listenTrackKey(council, 'https://media/council-b.mp3');
+    pb.noteListenPlay(key, council);
+    for (let t = 10; t <= 110; t += 10) {
+      vi.advanceTimersByTime(10000);
+      pb.noteListenProgress(key, t, 1200);
+    }
+    expect(steps()).toEqual([]);
+    vi.advanceTimersByTime(10000);
+    pb.noteListenProgress(key, 120, 1200);
+    expect(steps()).toEqual(['council_heard']);
+    expect(sent.filter((s) => s.event === 'progress_25')).toHaveLength(0);
+  });
+
+  it('a story counts engaged and never council_heard', async () => {
+    const pb = await import('../../utils/playbackBeacon');
+    const key = pb.listenTrackKey(ctx, 'https://media/story-f.mp3');
+    pb.noteListenPlay(key, ctx);
+    for (let t = 10; t <= 300; t += 10) {
+      vi.advanceTimersByTime(10000);
+      pb.noteListenProgress(key, t, 300);
+    }
+    expect(steps()).toEqual(['engaged']);
+  });
+});

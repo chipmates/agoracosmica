@@ -12,7 +12,9 @@
 // chat_depth (flushed here on chat switch
 // and unload) and the turnstile_* family (services/proxy/turnstile.ts).
 // engaged fires at most twice per page, from the first_turn one-shot and from
-// the listen tracker in utils/playbackBeacon.ts. paid_arrival fires once per
+// the listen tracker in utils/playbackBeacon.ts. council_heard fires once per
+// page, from the same listen tracker for curated councils and from the live
+// council's own clock (services/council/CustomCouncilService.ts). paid_arrival fires once per
 // pageview from utils/pageBeacon.ts. The ask_listen_* trio fires from the
 // paused-chapter ask (hooks/useAskWhileListening.ts), shown deduped per
 // chapter play by the hook itself.
@@ -96,6 +98,10 @@ export type FunnelStep =
   // mode slot and says which half of the product it was. At most two per page:
   // the arm that qualified first, then 'both' if the other one follows.
   | 'engaged'
+  // A council was really listened to: it passed its first quarter, or two
+  // minutes of it were heard, the rule the listened arm of engaged uses. Its
+  // own one-shot, never part of engaged, whose meaning is frozen.
+  | 'council_heard'
   // The landing URL carried the paid-ads parameter. One per pageview,
   // language and the edge dimensions only, so the row describes the parameter
   // rather than the person who clicked it.
@@ -319,13 +325,19 @@ interface FunnelFields {
   bucket?: number;
 }
 
-// The first-chat steps also carry the landing's source class, when there is one.
-const SOURCE_STEPS: ReadonlySet<FunnelStep> = new Set<FunnelStep>(['first_turn', 'first_turn_prefilled']);
+// The first-chat and the real-use steps also carry the landing's source
+// class, when there is one.
+const SOURCE_STEPS: ReadonlySet<FunnelStep> = new Set<FunnelStep>([
+  'first_turn',
+  'first_turn_prefilled',
+  'engaged',
+  'council_heard',
+]);
 
 // Shared transport for both senders. Payload: step, optional figureId/mode
 // (content labels, validated server-side), optional outcome, optional coarse
-// bucket index, language (en/de), the landing's source class on the first-chat
-// steps, and the in-house probe constant when this browser is marked. Country
+// bucket index, language (en/de), the landing's source class on SOURCE_STEPS,
+// and the in-house probe constant when this browser is marked. Country
 // is derived server-side at the CF edge. No user dimension of any kind.
 function postFunnel(step: FunnelStep, fields: FunnelFields): void {
   const body = JSON.stringify({
@@ -452,4 +464,19 @@ export function noteEngagedListenMilestone(): void {
   if (engagedListened) return;
   engagedListened = true;
   qualifyEngaged('listened');
+}
+
+// ============================================
+// council_heard
+// ============================================
+
+/** Seconds heard on one council, reported as they accumulate. */
+export function noteCouncilHeardSeconds(seconds: number): void {
+  if (seconds < ENGAGED_LISTEN_SECONDS) return;
+  sendFunnelBeaconOnce('council_heard');
+}
+
+/** A council passed its first quarter. */
+export function noteCouncilHeardMilestone(): void {
+  sendFunnelBeaconOnce('council_heard');
 }

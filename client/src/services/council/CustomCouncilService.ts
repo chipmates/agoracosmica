@@ -19,6 +19,7 @@ import { getAudioContext } from '../audio/audioQueueManager';
 import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
 import { splitForGatewayCap } from '../audio/utils/splitForGatewayCap';
 import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
+import { noteCouncilHeardSeconds } from '../../utils/funnelBeacon';
 
 // Custom councils render 5% slower than the user's general TTS speed. The
 // debate is denser than a single-figure mode (more voices, more interruption,
@@ -152,6 +153,11 @@ export class CustomCouncilService {
   // one-shot flag so the conversion fires at most once per council.
   private councilHeardSeconds = 0;
   private councilEngagedFired = false;
+  // council_heard (the anonymous count): seconds of this council actually
+  // played, a segment cut by a close counted only up to the cut. Memory only,
+  // it never leaves the browser as a number.
+  private councilListenSeconds = 0;
+  private activeStartedAt = 0;
   // Global audio-focus membership. A live council plays through Web Audio
   // buffer sources (no 'play' event to hook), so we claim focus by hand before
   // each segment and expose cleanup() as the "pause" other players trigger when
@@ -722,8 +728,11 @@ export class CustomCouncilService {
 
       source.onended = () => {
         councilLog(`🎵 Finished playing segment ${segment.id}`);
+        // Still the active source: it ran out. One cut by cleanup() was
+        // counted there, up to the cut.
         if (this.activeSource === source) {
           this.activeSource = null;
+          this._noteCouncilListened(audioBuffer.duration);
         }
         // Council Engaged conversion: accumulate audio heard, fire once at ~60s.
         this.councilHeardSeconds += audioBuffer.duration;
@@ -753,6 +762,7 @@ export class CustomCouncilService {
 
       // Set BEFORE start() so a same-tick cleanup still has the ref to stop.
       this.activeSource = source;
+      this.activeStartedAt = ctx.currentTime;
       source.start();
     });
   }
@@ -1216,6 +1226,13 @@ export class CustomCouncilService {
     return await selfHostedTTS(text, fileBaseName, '', speed, voice, undefined, language, sessionId);
   }
 
+  /** Add seconds of this council that played, for council_heard. */
+  private _noteCouncilListened(seconds: number): void {
+    if (!(seconds > 0)) return;
+    this.councilListenSeconds += seconds;
+    noteCouncilHeardSeconds(this.councilListenSeconds);
+  }
+
   /**
    * Cleanup custom generation resources
    * This stops all audio playback and clears all resources
@@ -1225,6 +1242,14 @@ export class CustomCouncilService {
 
     // Leave audio focus (idempotent — safe when we never held it).
     this.focusHandle.release();
+
+    // A segment cut short still counts toward council_heard, up to the cut.
+    if (this.activeSource) {
+      const source = this.activeSource;
+      const played = source.context.currentTime - this.activeStartedAt;
+      this._noteCouncilListened(Math.min(source.buffer?.duration ?? 0, played));
+    }
+    this.councilListenSeconds = 0;
 
     // Reset the Council Engaged accumulator so the next council starts fresh.
     this.councilHeardSeconds = 0;

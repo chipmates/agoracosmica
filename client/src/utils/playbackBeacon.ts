@@ -13,7 +13,12 @@
 import { isSelfHost } from '../config/deployment';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
-import { noteEngagedListenMilestone, noteEngagedListenSeconds } from './funnelBeacon';
+import {
+  noteCouncilHeardMilestone,
+  noteCouncilHeardSeconds,
+  noteEngagedListenMilestone,
+  noteEngagedListenSeconds,
+} from './funnelBeacon';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -175,7 +180,8 @@ const MAX_TICK_S = 30;
 
 // Which content types count toward the engaged 'listened' arm. The other
 // types still get the full lifecycle, they just do not qualify a visit as
-// engaged on their own.
+// engaged on their own. A council qualifies its own step, council_heard, by
+// the same rule.
 const ENGAGED_LISTEN_TYPES = new Set<PlaybackContentType>(['story', 'teaching']);
 
 interface ListenContext {
@@ -221,6 +227,7 @@ function accrue(state: TrackListen): void {
   if (!(slice > 0) || slice > MAX_TICK_S) return;
   state.played += slice;
   if (ENGAGED_LISTEN_TYPES.has(state.ctx.type)) noteEngagedListenSeconds(state.played);
+  else if (state.ctx.type === 'council') noteCouncilHeardSeconds(state.played);
 }
 
 /**
@@ -265,6 +272,8 @@ function sendMilestones(state: TrackListen): void {
     emit(state, event, 'fetch');
     if (event === 'progress_25' && ENGAGED_LISTEN_TYPES.has(state.ctx.type)) {
       noteEngagedListenMilestone();
+    } else if (event === 'progress_25' && state.ctx.type === 'council') {
+      noteCouncilHeardMilestone();
     }
   }
 }
