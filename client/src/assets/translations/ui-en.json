@@ -1444,7 +1444,7 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: October 5, 2026"
+      "lastUpdated": "Last updated: October 14, 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1474,7 +1474,7 @@
     },
     "cookiePolicy": {
       "title": "Cookie Policy",
-      "lastUpdated": "Last updated: September 29, 2026",
+      "lastUpdated": "Last updated: October 14, 2026",
       "intro": "At Agora Cosmica, we respect your privacy and are committed to being transparent about our use of cookies and similar technologies.",
       "whatAreCookies": {
         "title": "What Are Cookies?",
@@ -1486,7 +1486,7 @@
       },
       "essentialStorage": {
         "title": "Storage on Your Device",
-        "description": "We store only what a function you use needs. For ad measurement, nothing is stored until you say yes.",
+        "description": "We store only what a function you use needs. For ad measurement we store nothing until you answer: your yes or no, and the click ID only after a yes.",
         "table": {
           "type": "Type",
           "purpose": "Purpose",

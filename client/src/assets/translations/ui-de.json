@@ -1446,7 +1446,7 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 5. Oktober 2026"
+      "lastUpdated": "Stand: 14. Oktober 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1476,7 +1476,7 @@
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",
-      "lastUpdated": "Zuletzt aktualisiert: 29. September 2026",
+      "lastUpdated": "Zuletzt aktualisiert: 14. Oktober 2026",
       "intro": "Bei Agora Cosmica respektieren wir deine Privatsphäre und legen Wert auf Transparenz bei der Verwendung von Cookies und ähnlichen Technologien.",
       "whatAreCookies": {
         "title": "Was sind Cookies?",
@@ -1488,7 +1488,7 @@
       },
       "essentialStorage": {
         "title": "Speicherung auf deinem Gerät",
-        "description": "Wir speichern nur, was für eine Funktion nötig ist, die du nutzt. Für die Werbe-Messung wird erst nach deinem Ja etwas gespeichert.",
+        "description": "Wir speichern nur, was für eine Funktion nötig ist, die du nutzt. Für die Werbe-Messung speichern wir erst etwas, wenn du antwortest: dein Ja oder Nein, und die Klick-ID nur nach einem Ja.",
         "table": {
           "type": "Typ",
           "purpose": "Zweck",
