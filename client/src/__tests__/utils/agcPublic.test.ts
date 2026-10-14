@@ -227,6 +227,18 @@ describe('agc-public.js: the source class on the app doors', () => {
     expect(a.getAttribute('href')).toBe('/app?lang=en');
   });
 
+  it('still counts a reload after the card\'s answer as an ad arrival', async () => {
+    // The card leaves an empty gclid key in the address: no click ID, the class kept.
+    setReferrer('https://www.google.com/');
+    const a = door({}, '/app?figure=marcus-aurelius&lang=en');
+    loadPage('/marcus-aurelius/?gclid=');
+    const page = fetches.find((f) => f.url.endsWith('/v1/page'))!;
+    expect(page.body.source).toBe('ad_google');
+    expect(page.body.landing).toBe(1);
+    expect(a.getAttribute('href')).toBe('/app?figure=marcus-aurelius&lang=en#src=ad_google');
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+
   it('marks a door an island renders later, when it is used', () => {
     setReferrer('https://chatgpt.com/');
     loadPage('/marcus-aurelius/');

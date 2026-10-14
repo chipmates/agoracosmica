@@ -280,3 +280,44 @@ describe('ArrivalChoice close control', () => {
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
 });
+
+describe('ArrivalChoice after the legal read', () => {
+  it('carries no trust line, and names Google in the question', async () => {
+    const en = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`)).container;
+    expect(en.querySelector('.agc-consent__trust')).toBeNull();
+    expect(en.querySelector('.agc-consent')!.textContent).not.toMatch(/tracking cookies|profiling/i);
+    expect(en.querySelector('.agc-consent__q')!.textContent).toBe('May we count your visit for Google?');
+    const labels = Array.from(en.querySelectorAll('.agc-consent__imprint a')).map((a) => a.textContent);
+    expect(labels).toEqual(['See the code', 'Privacy policy', 'How Google uses this']);
+    const de = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
+    expect(de.querySelector('.agc-consent')!.textContent).not.toMatch(/Tracking-Cookies|Profiling/);
+    expect(de.querySelector('.agc-consent__q')!.textContent).toBe('Dürfen wir deinen Besuch für Google zählen?');
+  });
+
+  for (const [answer, pick] of [
+    ['yes', (c: HTMLElement) => c.querySelectorAll('button')[0]],
+    ['no', (c: HTMLElement) => c.querySelectorAll('button')[1]],
+    ['the X', (c: HTMLElement) => c.querySelector('button.agc-consent__x')!],
+  ] as const) {
+    it(`after ${answer} the click ID leaves the address, the rest stays, and a reload does not ask`, async () => {
+      const { container } = await mountAt(`/marcus-aurelius/?utm_source=x&gclid=${CLICK}&lang=de#chapter-2`);
+      await act(async () => { fireEvent.click(pick(container) as HTMLElement); });
+      expect(window.location.pathname).toBe('/marcus-aurelius/');
+      expect(window.location.search).toBe('?utm_source=x&gclid=&lang=de');
+      expect(window.location.hash).toBe('#chapter-2');
+      expect(window.location.href).not.toContain(CLICK);
+      const stored = { s: storageKeys(sessionStorage), l: storageKeys(localStorage) };
+      // The reload: a fresh page at the address the answer left.
+      const reloaded = (await mountAt(`${window.location.pathname}${window.location.search}${window.location.hash}`)).container;
+      expect(reloaded.querySelector('.agc-consent')).toBeNull();
+      expect({ s: storageKeys(sessionStorage), l: storageKeys(localStorage) }).toEqual(stored);
+    });
+  }
+
+  it('leaves an address without a click ID untouched', async () => {
+    window.history.replaceState({}, '', '/de/?lang=de#top');
+    const { dropClickIdFromAddress } = await import('../../../../marketing/src/islands/ArrivalChoice');
+    dropClickIdFromAddress();
+    expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe('/de/?lang=de#top');
+  });
+});

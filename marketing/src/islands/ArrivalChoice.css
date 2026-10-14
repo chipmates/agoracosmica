@@ -188,10 +188,8 @@
 }
 .agc-consent__btn:active { transform: translateY(1px); }
 
-/* ---- the imprint: who is asking, and where to check them ------------- */
-/* Phones run it as one inline flow so it costs the fewest lines. From 481 up
-   it becomes a wrapping flex row, so the break falls between the trust line
-   and the links, never mid-claim. */
+/* ---- the imprint: where to check us and Google ----------------------- */
+/* Phones run the links as one inline flow so it costs the fewest lines. */
 .agc-consent__imprint {
   margin: 0.7rem 0 0;
   padding-top: 0.58rem;
@@ -253,9 +251,6 @@
     backdrop-filter: none;
   }
   .agc-consent::before { inset: 4px 4px 0; border-bottom: none; }
-  /* the imprint runs as one inline flow here, so the trust line needs its own
-     gap or it reads into the first link */
-  .agc-consent__trust { margin-right: 0.7em; }
   .agc-consent__q { font-size: 1.16rem; margin-right: 2.2rem; }
   .agc-consent__why { font-size: 0.845rem; }
   .agc-consent__fine { font-size: 0.725rem; }

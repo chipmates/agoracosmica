@@ -12,19 +12,21 @@
 //              real opt-in instead of the bare gclid).
 //   Decline -> revokeAdConsent() (records the choice, clears the gclid, sends
 //              nothing). Remembered, so the visitor is not asked again.
-//   Close   -> a no for this page load only: clearGclid() drops the click ID
-//              from page memory, nothing is stored, nothing goes to Google,
-//              and the card does not come back on this page. Not remembered,
-//              so the next ad arrival is asked again. Safe since the click ID
-//              lives in page memory until a yes (gclidCapture.ts).
+//   Close   -> a no for this visit: clearGclid() drops the click ID from
+//              page memory, nothing is stored, nothing goes to Google. Not
+//              remembered, so the next ad arrival is asked again. Safe since
+//              the click ID lives in page memory until a yes (gclidCapture.ts).
 //
 // Until the answer the click ID stays in page memory and nothing is stored;
-// only a yes stores it. The next page has no click ID in its address, so the
-// card asks on the landing page only.
+// only a yes stores it. After any answer it also leaves the address, so a
+// reload does not ask again. The next page has no click ID in its address, so
+// the card asks on the landing page only.
 //
 // Copy is legally reviewed: the withdrawal notice, the privacy and Google
 // links, the click-ID scope sentence, the account and USA sentence and the
 // age line are all load bearing and none of them may be dropped for space.
+// The site's trust line stays off this card on purpose: beside a yes it reads
+// as a promise about Google's side, which we cannot make.
 // On a short screen the words scroll inside the card instead; the answers
 // and the close control never scroll. A change to what the yes covers bumps
 // AD_CONSENT_VERSION (gclidCapture.ts, agc-public.js), so an earlier yes is
@@ -62,9 +64,8 @@ interface Props {
 
 const COPY = {
   en: {
-    trust: 'Nonprofit · Open Source · No tracking cookies, no profiling',
     kicker: 'One question about this ad',
-    heading: 'May we count your visit?',
+    heading: 'May we count your visit for Google?',
     lead: 'We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.',
     fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
     age: 'If you’re under 16, please say no.',
@@ -77,9 +78,8 @@ const COPY = {
     google: 'How Google uses this',
   },
   de: {
-    trust: 'Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling',
     kicker: 'Eine Frage zu dieser Anzeige',
-    heading: 'Dürfen wir deinen Besuch zählen?',
+    heading: 'Dürfen wir deinen Besuch für Google zählen?',
     lead: 'Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.',
     fine: 'Ein Ja schickt Google die Klick-ID der Anzeige bei jedem Schritt, den du hier machst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, deiner dritten Nachricht, einem Council. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
     age: 'Bist du unter 16, sag bitte Nein.',
@@ -184,6 +184,33 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
     });
   } catch {
     /* same posture */
+  }
+}
+
+/**
+ * After an answer the click ID leaves the address bar, so a reload or a
+ * shared link carries none and the card does not ask again. The key stays,
+ * empty: the landing's source class reads an ad arrival from it
+ * (agc-public.js), and a reload must still count as one. Every other part of
+ * the address is kept as it was.
+ */
+export function dropClickIdFromAddress(): void {
+  try {
+    const { pathname, search, hash } = window.location;
+    let found = false;
+    const kept: string[] = [];
+    for (const part of search.replace(/^\?/, '').split('&')) {
+      if (!part) continue;
+      if (part.split('=')[0] !== 'gclid') kept.push(part);
+      else if (!found) {
+        found = true;
+        kept.push('gclid=');
+      }
+    }
+    if (!found) return;
+    window.history.replaceState(window.history.state, '', `${pathname}?${kept.join('&')}${hash}`);
+  } catch {
+    // history unavailable: the address keeps it, and this page never reads it again
   }
 }
 
@@ -376,6 +403,7 @@ export default function ArrivalChoice({ lang }: Props) {
     grantAdConsent();
     countConsentStep('ad_consent_accepted', lang, answered());
     fireStartExploring();
+    dropClickIdFromAddress();
     // Consent is recorded first, so a crossing held while they were deciding
     // goes out now, dated when it actually happened.
     if (ASK_ON_INTERACTION) flushPreDecisionListening();
@@ -384,14 +412,16 @@ export default function ArrivalChoice({ lang }: Props) {
   const onDecline = (): void => {
     revokeAdConsent();
     countConsentStep('ad_consent_declined', lang, answered());
+    dropClickIdFromAddress();
     if (ASK_ON_INTERACTION) dropPreDecisionListening();
     setShow(false);
   };
-  // A no for this page load only: nothing is recorded, so the next ad
-  // arrival asks again.
+  // A no for this visit: nothing is recorded, so the next ad arrival asks
+  // again.
   const onDismiss = (): void => {
     clearGclid();
     countConsentStep('ad_consent_dismissed', lang, answered());
+    dropClickIdFromAddress();
     if (ASK_ON_INTERACTION) dropPreDecisionListening();
     setShow(false);
   };
@@ -434,7 +464,6 @@ export default function ArrivalChoice({ lang }: Props) {
         </button>
       </div>
       <p className="agc-consent__imprint">
-        <span className="agc-consent__trust">{t.trust}</span>{' '}
         <span className="agc-consent__links">
           <a
             className="agc-consent__link"
