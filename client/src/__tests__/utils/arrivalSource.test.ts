@@ -82,7 +82,7 @@ describe('the counts that carry it', () => {
     window.history.replaceState({}, '', '/');
   });
 
-  it('goes with entry and the first-chat steps, and with nothing else', async () => {
+  it('goes with entry, the first-chat and the real-use steps, and with nothing else', async () => {
     const fetchMock = vi.fn((_url: RequestInfo | URL, _init?: RequestInit) => Promise.resolve(new Response(null, { status: 204 })));
     global.fetch = fetchMock as unknown as typeof fetch;
     await bootAt('/app?lang=en#src=assistant');
@@ -101,7 +101,12 @@ describe('the counts that carry it', () => {
     expect(byStep.first_turn_prefilled).toBe('assistant');
     expect(byStep.figure_selected).toBeUndefined();
     expect(byStep.welcome_shown).toBeUndefined();
-    expect(byStep.engaged).toBeUndefined();
+    expect(byStep.engaged).toBe('assistant');
+    funnel.noteCouncilHeardMilestone();
+    const calls = sendBeacon.mock.calls;
+    const heard = JSON.parse(await (calls[calls.length - 1][1] as Blob).text());
+    expect(heard.step).toBe('council_heard');
+    expect(heard.source).toBe('assistant');
   });
 
   it('is absent when the visit came in without a class', async () => {

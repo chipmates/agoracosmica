@@ -1,8 +1,8 @@
 // The landing's source class, carried into the app by the public page the
 // visitor landed on: its door links end in #src=<class> (agc-public.js). A
 // fragment never travels with a request, and the app reads it once at boot,
-// removes it from the address and holds the class in memory for the entry and
-// first-chat counts. Nothing is stored.
+// removes it from the address and holds the class in memory for the entry,
+// first-chat and real-use counts. Nothing is stored.
 
 import type { SourceClass } from './sourceClass';
 
