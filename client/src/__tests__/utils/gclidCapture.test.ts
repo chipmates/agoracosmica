@@ -6,8 +6,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const CLICK = 'TESTCLICKID0001';
 const OLD_CLICK = 'OLDCLICKID00001';
-const YES = { granted: true, version: '1.1.0', timestamp: Date.now() };
-const NO = { granted: false, version: '1.1.0', timestamp: Date.now() };
+const YES = { granted: true, version: '1.2.0', timestamp: Date.now() };
+const NO = { granted: false, version: '1.2.0', timestamp: Date.now() };
 
 type Capture = typeof import('../../utils/public/gclidCapture');
 
@@ -194,7 +194,7 @@ describe('withdrawal', () => {
 describe('the 12-month memory of an answer', () => {
   const DAY = 24 * 60 * 60 * 1000;
   const aged = (granted: boolean, days: number) =>
-    JSON.stringify({ granted, version: '1.1.0', timestamp: Date.now() - days * DAY });
+    JSON.stringify({ granted, version: '1.2.0', timestamp: Date.now() - days * DAY });
 
   it('counts a yes or no up to a year old', async () => {
     localStorage.setItem('agc_ad_consent', aged(true, 364));
@@ -246,9 +246,9 @@ describe('the 12-month memory of an answer', () => {
 
   it('treats a record without a readable date, or far in the future, as no answer', async () => {
     for (const record of [
-      { granted: true, version: '1.1.0' },
-      { granted: true, version: '1.1.0', timestamp: 'soon' },
-      { granted: true, version: '1.1.0', timestamp: Date.now() + 30 * DAY },
+      { granted: true, version: '1.2.0' },
+      { granted: true, version: '1.2.0', timestamp: 'soon' },
+      { granted: true, version: '1.2.0', timestamp: Date.now() + 30 * DAY },
     ]) {
       localStorage.setItem('agc_ad_consent', JSON.stringify(record));
       const m = await loadAt('/');
@@ -267,19 +267,22 @@ describe('module load without a yes', () => {
 });
 
 describe('an answer given under the earlier card text', () => {
-  const OLD_YES = { granted: true, version: '1.0.0', timestamp: Date.now() };
+  // 1.1.0 is the card before the Google account and USA sentence.
   it('counts as no answer: not granted, not decided, the old click ID dropped unread', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify(OLD_YES));
-    sessionStorage.setItem('agc_gclid', OLD_CLICK);
-    const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
-    expect(m.adConsentGranted()).toBe(false);
-    expect(m.adConsentDecided()).toBe(false);
-    m.captureGclid({ holdUntilAnswer: true });
-    expect(storageKeys(sessionStorage)).toEqual([]);
-    expect(fetchMock).not.toHaveBeenCalled();
+    for (const version of ['1.1.0', '1.0.0']) {
+      sessionStorage.clear();
+      localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version, timestamp: Date.now() }));
+      sessionStorage.setItem('agc_gclid', OLD_CLICK);
+      const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      expect(m.adConsentGranted()).toBe(false);
+      expect(m.adConsentDecided()).toBe(false);
+      m.captureGclid({ holdUntilAnswer: true });
+      expect(storageKeys(sessionStorage)).toEqual([]);
+      expect(fetchMock).not.toHaveBeenCalled();
+    }
   });
   it('a no given under any earlier text stays a no, and is not asked again', async () => {
-    for (const version of ['1.0.0', '0.9.0']) {
+    for (const version of ['1.1.0', '1.0.0', '0.9.0']) {
       localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version, timestamp: Date.now() }));
       const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
       expect(m.adConsentDecided()).toBe(true);
@@ -301,6 +304,6 @@ describe('an answer given under the earlier card text', () => {
     const m = await loadAt(`/marcus-aurelius/?gclid=${CLICK}`);
     m.captureGclid({ holdUntilAnswer: true });
     m.grantAdConsent();
-    expect(JSON.parse(localStorage.getItem('agc_ad_consent')!).version).toBe('1.1.0');
+    expect(JSON.parse(localStorage.getItem('agc_ad_consent')!).version).toBe('1.2.0');
   });
 });

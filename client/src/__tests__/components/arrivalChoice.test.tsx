@@ -5,7 +5,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 
 const CLICK = 'TESTCLICKID0001';
-const YES = JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() });
+const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
 
 let sent: { url: string; body: Record<string, unknown> }[] = [];
 
@@ -147,12 +147,12 @@ describe('heard seconds', () => {
 
 describe('ArrivalChoice after a year', () => {
   it('asks again when the stored answer is older than 365 days', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.1.0', timestamp: Date.now() - 366 * 86_400_000 }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.2.0', timestamp: Date.now() - 366 * 86_400_000 }));
     const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(container.querySelector('.agc-consent')).not.toBeNull();
   });
   it('does not ask within the year', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.1.0', timestamp: Date.now() - 100 * 86_400_000 }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.2.0', timestamp: Date.now() - 100 * 86_400_000 }));
     const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(container.querySelector('.agc-consent')).toBeNull();
   });
@@ -177,18 +177,100 @@ describe('ArrivalChoice copy and version', () => {
     expect(labels).toEqual(['Code ansehen', 'Datenschutzerklärung', 'Wie Google das nutzt']);
   });
 
-  it('asks again when the stored answer was given under the earlier text', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.0.0', timestamp: Date.now() }));
-    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
-    expect(container.querySelector('.agc-consent')).not.toBeNull();
+  it('names the Google account, the USA and no personalised ads right after the steps', async () => {
+    const en = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`)).container;
+    expect(en.querySelector('.agc-consent__fine')!.textContent).toContain(
+      'a council. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you.'
+    );
+    const de = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
+    expect(de.querySelector('.agc-consent__fine')!.textContent).toContain(
+      'einem Council. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich.'
+    );
+  });
+
+  it('carries the age line on its own, between the words and the answers', async () => {
+    for (const [lang, line] of [['en', 'If you’re under 16, please say no.'], ['de', 'Bist du unter 16, sag bitte Nein.']] as const) {
+      const { container, unmount } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, lang);
+      const age = container.querySelector('.agc-consent__age')!;
+      expect(age.textContent).toBe(line);
+      expect(age.previousElementSibling!.classList.contains('agc-consent__words')).toBe(true);
+      expect(age.nextElementSibling!.classList.contains('agc-consent__actions')).toBe(true);
+      unmount();
+    }
+  });
+});
+
+describe('ArrivalChoice close control', () => {
+  const closeOf = (container: HTMLElement) => container.querySelector('button.agc-consent__x') as HTMLButtonElement;
+
+  it('is a named button, last in the tab order, after both answers', async () => {
+    const en = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`)).container;
+    const buttons = Array.from(en.querySelectorAll('button'));
+    expect(buttons.map((b) => b.className)).toEqual(['agc-consent__btn', 'agc-consent__btn', 'agc-consent__x']);
+    expect(closeOf(en).getAttribute('aria-label')).toBe('Close. This counts as no.');
+    expect(en.querySelector('.agc-consent')!.lastElementChild).toBe(closeOf(en));
+    const de = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
+    expect(closeOf(de).getAttribute('aria-label')).toBe('Schließen. Das zählt als Nein.');
+  });
+
+  it('drops the click ID, stores nothing, sends one keyless count and nothing to Google', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'de');
+    // The shown count belongs to the card's arrival, not to the close.
+    await new Promise((r) => setTimeout(r, 0));
+    sent = [];
+    const capture = await import('@client/utils/public/gclidCapture');
+    expect(capture.getGclid()).toBe(CLICK);
+    await act(async () => { fireEvent.click(closeOf(container)); });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(container.querySelector('.agc-consent')).toBeNull();
+    expect(capture.getGclid()).toBeNull();
     expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+    expect(conversions()).toHaveLength(0);
+    expect(sent).toHaveLength(1);
+    expect(sent[0].url).toBe('https://llm.agoracosmica.org/v1/funnel');
+    const { step, path, language, bucket, ...rest } = sent[0].body;
+    expect(step).toBe('ad_consent_dismissed');
+    expect(path).toBe('/marcus-aurelius/');
+    expect(language).toBe('de');
+    expect([0, 1, 2, 3]).toContain(bucket);
+    expect(rest).toEqual({});
+    expect(JSON.stringify(sent[0].body)).not.toContain(CLICK);
+  });
+
+  it('is not remembered: the next ad arrival asks again', async () => {
+    const first = (await mountAt(`/marcus-aurelius/?gclid=${CLICK}`)).container;
+    await act(async () => { fireEvent.click(closeOf(first)); });
+    const next = (await mountAt(`/seneca/?gclid=${CLICK}`)).container;
+    expect(next.querySelector('.agc-consent')).not.toBeNull();
+  });
+
+  it('a yes or a no after the close cannot happen: the card stays gone on this page', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    await act(async () => { fireEvent.click(closeOf(container)); });
+    expect(container.querySelectorAll('button')).toHaveLength(0);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  // 1.1.0 is the card before the Google account and USA sentence.
+  it('asks again when the stored yes was given under the earlier text', async () => {
+    for (const version of ['1.1.0', '1.0.0']) {
+      localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version, timestamp: Date.now() }));
+      const { container, unmount } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      expect(container.querySelector('.agc-consent')).not.toBeNull();
+      expect(storageKeys(sessionStorage)).toEqual([]);
+      unmount();
+    }
   });
 
   it('does not ask again after a no given under the earlier text', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.0.0', timestamp: Date.now() }));
-    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
-    expect(container.querySelector('.agc-consent')).toBeNull();
-    expect(storageKeys(sessionStorage)).toEqual([]);
+    for (const version of ['1.1.0', '1.0.0']) {
+      localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version, timestamp: Date.now() }));
+      const { container, unmount } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      expect(container.querySelector('.agc-consent')).toBeNull();
+      expect(storageKeys(sessionStorage)).toEqual([]);
+      unmount();
+    }
   });
 
   it('still never shows on a paid arrival, whatever version is stored', async () => {

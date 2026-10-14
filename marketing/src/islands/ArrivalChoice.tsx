@@ -12,15 +12,21 @@
 //              real opt-in instead of the bare gclid).
 //   Decline -> revokeAdConsent() (records the choice, clears the gclid, sends
 //              nothing). Remembered, so the visitor is not asked again.
+//   Close   -> a no for this page load only: clearGclid() drops the click ID
+//              from page memory, nothing is stored, nothing goes to Google,
+//              and the card does not come back on this page. Not remembered,
+//              so the next ad arrival is asked again. Safe since the click ID
+//              lives in page memory until a yes (gclidCapture.ts).
 //
-// There is no dismiss control: the two answers are the only exits, and an
-// unanswered card stays on this page. Until the answer the click ID stays in
-// page memory and nothing is stored; only a yes stores it. The next page has
-// no click ID in its address, so the card asks on the landing page only.
+// Until the answer the click ID stays in page memory and nothing is stored;
+// only a yes stores it. The next page has no click ID in its address, so the
+// card asks on the landing page only.
 //
 // Copy is legally reviewed: the withdrawal notice, the privacy and Google
-// links and the click-ID scope sentence are all load bearing and none of
-// them may be dropped for space. A change to what the yes covers bumps
+// links, the click-ID scope sentence, the account and USA sentence and the
+// age line are all load bearing and none of them may be dropped for space.
+// On a short screen the words scroll inside the card instead; the answers
+// and the close control never scroll. A change to what the yes covers bumps
 // AD_CONSENT_VERSION (gclidCapture.ts, agc-public.js), so an earlier yes is
 // asked again (an earlier no stays a no). Lift into publicI18n if it ever
 // needs more languages.
@@ -28,6 +34,7 @@
 import { useEffect, useRef, useState } from 'react';
 import {
   captureGclid,
+  clearGclid,
   getGclid,
   isPaidVisitor,
   adConsentDecided,
@@ -59,9 +66,11 @@ const COPY = {
     kicker: 'One question about this ad',
     heading: 'May we count your visit?',
     lead: 'We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.',
-    fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
+    fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
+    age: 'If you’re under 16, please say no.',
     accept: 'Yes, count it',
     decline: 'No, don’t count it',
+    close: 'Close. This counts as no.',
     link: 'See the code',
     privacy: 'Privacy policy',
     privacyHref: '/privacy/',
@@ -72,9 +81,11 @@ const COPY = {
     kicker: 'Eine Frage zu dieser Anzeige',
     heading: 'Dürfen wir deinen Besuch zählen?',
     lead: 'Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.',
-    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige bei jedem Schritt, den du hier machst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, deiner dritten Nachricht, einem Council. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
+    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige bei jedem Schritt, den du hier machst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, deiner dritten Nachricht, einem Council. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
+    age: 'Bist du unter 16, sag bitte Nein.',
     accept: 'Ja, zählen',
     decline: 'Nein, nicht zählen',
+    close: 'Schließen. Das zählt als Nein.',
     link: 'Code ansehen',
     privacy: 'Datenschutzerklärung',
     privacyHref: '/datenschutz/',
@@ -97,14 +108,15 @@ const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, the interface language, and on the two answer steps
+// step, the page path, the interface language, and on the three answer steps
 // a coarse time-to-answer bucket, and it has to stay that way. A gclid or an
 // id here would pair a user dimension with a consent decision, which is
 // exactly what this measurement must not do.
 type ConsentCounter =
   | 'ad_consent_shown'
   | 'ad_consent_accepted'
-  | 'ad_consent_declined';
+  | 'ad_consent_declined'
+  | 'ad_consent_dismissed';
 
 // How long the card has to be at least half in view before it counts as
 // shown. Without it "shown" would mean "rendered", and an accept rate against
@@ -146,7 +158,7 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
   try {
     // Path only, no query and no hash, exactly like the cta_click beacon.
     // The worker holds it to the same closed shape it holds that one to
-    // (a short slug path or nothing), plus the coarse bucket on the two
+    // (a short slug path or nothing), plus the coarse bucket on the three
     // answer steps.
     const body = JSON.stringify(
       bucket === undefined
@@ -257,8 +269,12 @@ function armDeferredShow(fire: () => void): () => void {
 export default function ArrivalChoice({ lang }: Props) {
   const [show, setShow] = useState(false);
   const cardRef = useRef<HTMLElement | null>(null);
+  const wordsRef = useRef<HTMLDivElement | null>(null);
+  // Whether the words overflow their box (keyboard reach) and whether more
+  // text waits below the fold of it (the fade cue).
+  const [overflow, setOverflow] = useState({ scrolls: false, more: false });
   // Start of the time-to-answer window. Never transmitted, never stored: the
-  // two answer beacons carry the coarse bucket derived from it and nothing
+  // three answer beacons carry the coarse bucket derived from it and nothing
   // else.
   const seenAtRef = useRef<number | null>(null);
   const t = COPY[lang] ?? COPY.en;
@@ -319,6 +335,35 @@ export default function ArrivalChoice({ lang }: Props) {
     };
   }, [show, lang]);
 
+  // A short screen caps the card's height and the words scroll inside it.
+  // Content size moves with the font load and the width, so the children are
+  // observed too, not only the box.
+  useEffect(() => {
+    if (!show) return;
+    const node = wordsRef.current;
+    if (!node) return;
+    const measure = (): void => {
+      const scrolls = node.scrollHeight > node.clientHeight + 1;
+      const more = scrolls && node.scrollTop + node.clientHeight < node.scrollHeight - 2;
+      setOverflow((prev) =>
+        prev.scrolls === scrolls && prev.more === more ? prev : { scrolls, more }
+      );
+    };
+    measure();
+    node.addEventListener('scroll', measure, { passive: true });
+    window.addEventListener('resize', measure);
+    const observer = typeof ResizeObserver === 'undefined' ? null : new ResizeObserver(measure);
+    if (observer) {
+      observer.observe(node);
+      Array.from(node.children).forEach((child) => observer.observe(child));
+    }
+    return () => {
+      node.removeEventListener('scroll', measure);
+      window.removeEventListener('resize', measure);
+      observer?.disconnect();
+    };
+  }, [show]);
+
   if (!show) return null;
 
   // Coarse time-to-answer for the step about to be counted.
@@ -342,6 +387,14 @@ export default function ArrivalChoice({ lang }: Props) {
     if (ASK_ON_INTERACTION) dropPreDecisionListening();
     setShow(false);
   };
+  // A no for this page load only: nothing is recorded, so the next ad
+  // arrival asks again.
+  const onDismiss = (): void => {
+    clearGclid();
+    countConsentStep('ad_consent_dismissed', lang, answered());
+    if (ASK_ON_INTERACTION) dropPreDecisionListening();
+    setShow(false);
+  };
   return (
     <aside
       className="agc-consent"
@@ -362,8 +415,16 @@ export default function ArrivalChoice({ lang }: Props) {
       <h2 className="agc-consent__q" id="agc-consent-q">
         {t.heading}
       </h2>
-      <p className="agc-consent__why">{t.lead}</p>
-      <p className="agc-consent__fine">{t.fine}</p>
+      <div
+        className={`agc-consent__words${overflow.more ? ' agc-consent__words--more' : ''}`}
+        ref={wordsRef}
+        // A scroller must be reachable by keyboard, but only while it scrolls.
+        tabIndex={overflow.scrolls ? 0 : undefined}
+      >
+        <p className="agc-consent__why">{t.lead}</p>
+        <p className="agc-consent__fine">{t.fine}</p>
+      </div>
+      <p className="agc-consent__age">{t.age}</p>
       <div className="agc-consent__actions">
         <button type="button" className="agc-consent__btn" onClick={onAccept}>
           {t.accept}
@@ -402,6 +463,25 @@ export default function ArrivalChoice({ lang }: Props) {
           </a>
         </span>
       </p>
+      {/* Last in the DOM on purpose: the two answers come before the way out,
+          for the tab order and for the screen reader. */}
+      <button
+        type="button"
+        className="agc-consent__x"
+        aria-label={t.close}
+        title={t.close}
+        onClick={onDismiss}
+      >
+        <svg viewBox="0 0 12 12" aria-hidden="true" focusable="false">
+          <path
+            d="M1 1l10 10M11 1L1 11"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.4"
+            strokeLinecap="round"
+          />
+        </svg>
+      </button>
     </aside>
   );
 }

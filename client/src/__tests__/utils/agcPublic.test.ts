@@ -120,7 +120,7 @@ describe('agc-public.js: counting stores nothing', () => {
 
 describe('agc-public.js: the ad click ID', () => {
   const CLICK = 'TESTCLICKID0001';
-  const YES = JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() });
+  const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
   const conversions = () => fetches.filter((f) => f.url.endsWith('/api/conversions'));
 
   it('stores nothing on a grant landing without an answer', () => {
@@ -176,12 +176,17 @@ describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;
   it('stores no click ID under a yes older than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() - 366 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() - 366 * DAY }));
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+  });
+  it('stores no click ID under a yes given to the earlier card text', () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
   it('stores it under a yes younger than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.1.0', timestamp: Date.now() - 300 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() - 300 * DAY }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
   });
