@@ -444,14 +444,15 @@ export default function ArrivalChoice({ lang }: Props) {
           >
             {t.link}
           </a>
+          {/* The dot holds to the link before it, so no line starts with one. */}
           <span className="agc-consent__sep" aria-hidden="true">
-            {' · '}
+            {'\u00a0· '}
           </span>
           <a className="agc-consent__link" href={t.privacyHref}>
             {t.privacy}
           </a>
           <span className="agc-consent__sep" aria-hidden="true">
-            {' · '}
+            {'\u00a0· '}
           </span>
           <a
             className="agc-consent__link"

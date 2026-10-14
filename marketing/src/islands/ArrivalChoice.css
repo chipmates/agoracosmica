@@ -231,6 +231,8 @@
   outline-offset: 2px;
   border-radius: 2px;
 }
+/* The close sits in the corner: its ring goes inside, never past the edge */
+.agc-consent .agc-consent__x:focus-visible { outline-offset: -4px; }
 
 /* ---- phones: a flush bottom plate, so the page above stays readable --- */
 @media (max-width: 480px) {
@@ -254,6 +256,17 @@
   .agc-consent__fine { font-size: 0.725rem; }
   .agc-consent__age { font-size: 0.725rem; }
   .agc-consent__btn { font-size: 0.815rem; }
+}
+
+/* ---- short phones: tighter spacing, so more words show before they scroll */
+@media (max-width: 480px) and (max-height: 700px) {
+  .agc-consent__kicker { display: none; }
+  .agc-consent__q { margin-bottom: 0.32rem; }
+  .agc-consent__why { line-height: 1.36; margin-bottom: 0.34rem; }
+  .agc-consent__fine { line-height: 1.36; }
+  .agc-consent__words { margin-bottom: 0.38rem; }
+  .agc-consent__age { margin-bottom: 0.5rem; }
+  .agc-consent__imprint { margin-top: 0.5rem; padding-top: 0.42rem; }
 }
 
 /* ---- the make-or-break: 320 wide, German, short viewport -------------- */
