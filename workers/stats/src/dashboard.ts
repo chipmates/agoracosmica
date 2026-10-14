@@ -4093,6 +4093,12 @@ var TR_METRICS = [
   { key: 'site', label: 'Page arrivals', tag: 'counted', count: function(c) { return c.steps && c.steps.page_arrival; }, cap: 'A site page opened in a browser, once per page load.' },
   { key: 'reads', label: 'Page reads', tag: 'counted', count: function(c) { return c.steps && c.steps.page_read; }, cap: 'The middle of a page&rsquo;s text came into view.' },
   { key: 'doors', label: 'Door presses', tag: 'counted', count: function(c) { return c.steps && c.steps.door_press; }, cap: 'A link into the walk pressed, once per page load.' },
+  { key: 'askShown', label: 'Ad question shown', tag: 'counted', count: function(c) { return c.steps && c.steps.ask_shown; }, cap: 'The question for visitors from a grant ad, half in view for a second, once per page load. An answer inside that second has no shown row.' },
+  { key: 'askYes', label: 'Ad question: yes', tag: 'counted', count: function(c) { return c.steps && c.steps.ask_yes; }, cap: 'Yes to telling Google the ad brought the visit, once per page load.' },
+  { key: 'askNo', label: 'Ad question: no', tag: 'counted', count: function(c) { return c.steps && c.steps.ask_no; }, cap: 'No to the question, once per page load.' },
+  { key: 'askClose', label: 'Ad question: closed', tag: 'counted', count: function(c) { return c.steps && c.steps.ask_close; }, cap: 'The question closed with its X, once per page load.' },
+  { key: 'guess', label: 'Guess opened', tag: 'counted', count: function(c) { return c.steps && c.steps.guess_open; }, cap: 'The answer to an animal page&rsquo;s guess opened, once per page load.' },
+  { key: 'outWing', label: 'Link to an open wing', tag: 'counted', count: function(c) { return c.steps && c.steps.out_wing; }, cap: 'From a page of a wing in the making, the link to an open wing followed, once per page load.' },
 ];
 var TR_M = {};
 TR_METRICS.forEach(function(m) { TR_M[m.key] = m; });
@@ -4769,6 +4775,13 @@ function renderTrends() {
     rate('Second stop per walk started', 'second', 'started', 'Cloudflare. The second stop&rsquo;s picture against the film&rsquo;s index.') +
     rate('Third stop per walk opened', 'real', 'walks', 'The museum&rsquo;s count. A real use is a walk to the third stop.') +
     '</div><div class="mus-cap">Each dot is one day, the line its last 7 days. A hollow dot stands on fewer than ' + TR_FLOOR + ', and the line leaves out a week with fewer. Hover or tap for the day&rsquo;s figures.</div></div>';
+
+  html += '<div class="section-divider">The ad question</div>';
+  html += '<div class="card card-full tr-card"><div class="tr-rates">' +
+    rate('Yes per question shown', 'askYes', 'askShown', 'The museum&rsquo;s count. Only a yes lets an entry go to Google.') +
+    rate('No per question shown', 'askNo', 'askShown', 'The museum&rsquo;s count.') +
+    rate('Closed per question shown', 'askClose', 'askShown', 'The museum&rsquo;s count. The rest scrolled on without answering.') +
+    '</div><div class="mus-cap">Asked only of visitors from a grant ad, never on animal pages. An answer inside the first second has no shown row, so a rate can run a little high.</div></div>';
 
   html += '<div class="grid tr-grid2">';
   if (cOk) {
