@@ -246,6 +246,11 @@
     border-bottom: none;
     padding: 0.8rem 0.95rem calc(0.7rem + env(safe-area-inset-bottom, 0px));
     animation-name: agc-consent-rise-s;
+    /* Opaque on phones: the plate covers page text there, and the words must
+       read without relying on a blur WebKit may not paint. */
+    background: linear-gradient(158deg, var(--agc-plate-a) 0%, var(--agc-plate-b) 88%);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
   }
   .agc-consent::before { inset: 4px 4px 0; border-bottom: none; }
   /* the imprint runs as one inline flow here, so the trust line needs its own
