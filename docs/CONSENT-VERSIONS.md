@@ -15,7 +15,7 @@ Dates are commit dates from this repository's history. A version reaches visitor
 
 Written on 2026-10-14.
 
-**How it is shown.** At once on the landing page, and only there. A card fixed to the foot of the screen: full width on phones, a corner card on wide screens. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. The question, the age line, both answers, the links and the X stay in view. On phones the plate is opaque.
+**How it is shown.** At once on the landing page, and only there. A card fixed to the foot of the screen: full width on upright phones, a corner card on wide screens, centred in between. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. On short screens (at most 700 px high, phones turned sideways too) the fine print stands before the lead. Same words. The question, the age line, both answers, the links and the X stay in view. On phones, upright or turned sideways, the plate is opaque.
 
 **The X** (new). A no for this visit: the click ID is discarded, nothing is stored, nothing is sent to Google. It is not remembered, so the next arrival from an ad is asked again. Its accessible name: "Schließen. Das zählt als Nein." / "Close. This counts as no."
 

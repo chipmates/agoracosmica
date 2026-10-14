@@ -263,17 +263,47 @@
   .agc-consent__fine { line-height: 1.36; }
 }
 
-/* ---- short phones: tighter spacing, and the facts before the why ------ */
+/* ---- short screens, phones turned sideways too: the facts before the why */
 /* The words scroll here, so what a yes sends, to whom and where comes first
    and the lead follows it. Same words, only their order on screen. */
+@media (max-height: 700px) {
+  .agc-consent__words { display: flex; flex-direction: column; }
+  .agc-consent__why { order: 2; margin: 0.34rem 0 0; }
+}
+
+/* ---- short phones: tighter spacing ----------------------------------- */
 @media (max-width: 480px) and (max-height: 700px) {
   .agc-consent__kicker { display: none; }
   .agc-consent__q { margin-bottom: 0.32rem; }
-  .agc-consent__words { display: flex; flex-direction: column; margin-bottom: 0.38rem; }
-  .agc-consent__why { order: 2; line-height: 1.36; margin: 0.34rem 0 0; }
+  .agc-consent__words { margin-bottom: 0.38rem; }
+  .agc-consent__why { line-height: 1.36; }
   .agc-consent__fine { line-height: 1.36; }
   .agc-consent__age { margin-bottom: 0.5rem; }
   .agc-consent__imprint { margin-top: 0.5rem; padding-top: 0.42rem; }
+}
+
+/* ---- phones turned sideways: within the 55% cap the words had no room
+   left. Phone type, tight spacing and a wider card give them three to five
+   lines, and the plate is opaque as on upright phones. */
+@media (min-width: 481px) and (max-height: 500px) {
+  .agc-consent {
+    width: min(40rem, calc(100% - 1.5rem));
+    padding: 0.7rem 1rem 0.6rem;
+    background: linear-gradient(158deg, var(--agc-plate-a) 0%, var(--agc-plate-b) 88%);
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+  .agc-consent__kicker { display: none; }
+  .agc-consent__q { font-size: 1.16rem; margin-bottom: 0.32rem; }
+  .agc-consent__why,
+  .agc-consent__fine { line-height: 1.36; }
+  .agc-consent__words { margin-bottom: 0.38rem; }
+  .agc-consent__words--more {
+    -webkit-mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.1rem), transparent);
+    mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.1rem), transparent);
+  }
+  .agc-consent__age { margin-bottom: 0.42rem; }
+  .agc-consent__imprint { margin-top: 0.42rem; padding-top: 0.34rem; }
 }
 
 /* ---- the make-or-break: 320 wide, German, short viewport -------------- */
