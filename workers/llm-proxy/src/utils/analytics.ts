@@ -347,8 +347,9 @@ export function trackSignup(
  *
  * blob6 carries the coarse device class (keeps country at blob7 across all
  * event types). blob8 carries the landing's source class on the two first-chat
- * steps (first_turn, first_turn_prefilled) when the visit came in through a
- * door on its landing page, and stays empty everywhere else.
+ * steps (first_turn, first_turn_prefilled) and the two real-use steps
+ * (engaged, council_heard) when the visit came in through a door on its
+ * landing page, and stays empty everywhere else.
  */
 export function trackFunnel(
   env: Env,

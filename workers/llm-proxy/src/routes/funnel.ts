@@ -1,9 +1,9 @@
 // Anonymous funnel-step beacon
 // Fires from the marketing pages (cta_click and paid_arrival via
-// agc-public.js, the ad_consent_* counters via the AdConsentPrompt island),
+// agc-public.js, the ad_consent_* counters via the ArrivalChoice island),
 // from the client app (cinematic_start / cinematic_end / welcome_shown /
-// first_turn / figure_selected / mode_selected / first_reply / engaged via
-// utils/funnelBeacon.ts) and from the museum (the museum_* steps via
+// first_turn / figure_selected / mode_selected / first_reply / engaged /
+// council_heard via utils/funnelBeacon.ts) and from the museum (the museum_* steps via
 // nightagora/src/core/museum-count.ts).
 // Lights up the dark zone between the page-load beacon and the entry/signup
 // beacons: does the intro play, is it watched or skipped, does the consent
@@ -26,7 +26,7 @@ interface FunnelPayload {
   language?: string;
   outcome?: string;
   bucket?: number;
-  // The landing's source class, kept on the first-chat steps only.
+  // The landing's source class, kept on SOURCE_STEPS only.
   source?: unknown;
   probe?: unknown;
   // The museum's fields, read on the museum_* steps only.
@@ -38,12 +38,14 @@ interface FunnelPayload {
 
 // Ad-measurement consent prompt: how many ad arrivals see the question and
 // what they answer. One-shot per page load on the client, counter-only here.
-// The two answers carry a coarse time-to-answer bucket (0 = under 1s,
-// 1 = 1 to 3s, 2 = 3 to 10s, 3 = over 10s, measured from the moment the card
-// came into view). The shown step has nothing to time and keeps bucket 0.
+// The three answers (yes, no, and the close, a no for that page load only)
+// carry a coarse time-to-answer bucket (0 = under 1s, 1 = 1 to 3s,
+// 2 = 3 to 10s, 3 = over 10s, measured from the moment the card came into
+// view). The shown step has nothing to time and keeps bucket 0.
 const CONSENT_ANSWER_STEPS = [
   'ad_consent_accepted',
   'ad_consent_declined',
+  'ad_consent_dismissed',
 ] as const;
 const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
 
@@ -102,6 +104,9 @@ const VALID_STEPS = new Set([
   // enough listening to count as listening. The arm rides in the mode slot.
   // At most two per page load (the first arm, then 'both' if the other one follows).
   'engaged',
+  // A council was really listened to: its first quarter, or two minutes
+  // heard. One-shot per page load, and never part of engaged.
+  'council_heard',
   // Ask while listening, per-occurrence volume counters. shown = the bar
   // arrived under a paused chapter (once per chapter play, deduped on the
   // client so a pause for a sip cannot bury the take rate), sent = a question
@@ -216,8 +221,9 @@ const FIGURE_RE = /^[A-Za-z0-9_-]{1,64}$/;
 const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
-// The steps that may carry the landing's source class (blob8).
-const SOURCE_STEPS = new Set(['first_turn', 'first_turn_prefilled']);
+// The steps that may carry the landing's source class (blob8): the first
+// chat, and the two real-use steps.
+const SOURCE_STEPS = new Set(['first_turn', 'first_turn_prefilled', 'engaged', 'council_heard']);
 
 // Coarse bucket index ceiling (cinematic dwell and the consent time-to-answer
 // set use 0-3, the first_reply reply-time set uses 0-4; the ceiling keeps one

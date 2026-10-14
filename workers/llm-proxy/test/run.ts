@@ -1275,8 +1275,8 @@ async function main(): Promise<number> {
     }
   });
 
-  await test('the retired return_visit and ad_consent_dismissed are dropped quietly', async () => {
-    for (const step of ['return_visit', 'ad_consent_dismissed']) {
+  await test('the retired return_visit is dropped quietly', async () => {
+    for (const step of ['return_visit']) {
       analyticsRows.length = 0;
       const res = await handleFunnel(
         new Request('https://example.invalid/v1/funnel', {
@@ -1289,6 +1289,35 @@ async function main(): Promise<number> {
       assert(res.status < 400, `${step} answered ${res.status}, an old client must see no error`);
       assertEqual(analyticsRows.length, 0, `${step} wrote a row`);
     }
+  });
+
+  // The consent card's counts: the step, the path, the language, the edge
+  // dimensions and, on the three answers, the time-to-answer bucket.
+  await test('every consent step is counted, the close among the answers', async () => {
+    for (const step of ['ad_consent_shown', 'ad_consent_accepted', 'ad_consent_declined', 'ad_consent_dismissed']) {
+      const row = await funnelBeacon({ step, path: '/marcus-aurelius/', language: 'de', bucket: 2 });
+      assert(row !== undefined, `${step} wrote no row`);
+      assertEqual(row.blobs[0], step, 'the step name is blob1');
+      assertEqual(row.blobs[1], '/marcus-aurelius/', 'the path is blob2');
+      assertEqual(row.blobs[3], 'de', 'the language is blob4');
+      assertEqual(row.blobs[4], '200', 'the counter outcome is blob5');
+      assertEqual(row.doubles[0], step === 'ad_consent_shown' ? 0 : 2, `${step} bucket`);
+    }
+  });
+
+  await test('the close keeps the answers\' closed shape: no figure, mode, source or gclid', async () => {
+    const row = await funnelBeacon({
+      step: 'ad_consent_dismissed', path: '/de/', language: 'de', bucket: 3,
+      figureId: 'aurelius', mode: 'story', outcome: 'error', source: 'ad_google', gclid: 'TESTCLICKID0001',
+    });
+    assertEqual(row.blobs[1], '/de/', 'the path, never the figure');
+    assertEqual(row.blobs[2], '', 'no mode');
+    assertEqual(row.blobs[4], '200', 'no outcome');
+    assertEqual(row.blobs[7], '', 'no source class');
+    assertEqual(row.doubles[0], 3, 'the bucket');
+    assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
+    const high = await funnelBeacon({ step: 'ad_consent_dismissed', path: '/de/', language: 'de', bucket: 4 });
+    assertEqual(high.doubles[0], 0, 'a bucket above the consent set collapses to 0');
   });
 
   await test('a step outside the allowlist writes nothing at all', async () => {
@@ -1438,10 +1467,37 @@ async function main(): Promise<number> {
       const odd = await funnelBeacon({ step, figureId: 'aurelius', language: 'en', source: 'https://chatgpt.com' });
       assertEqual(odd.blobs[7], '', `${step} with an unlisted value`);
     }
-    for (const step of ['figure_selected', 'welcome_shown', 'cta_click']) {
+    for (const step of ['figure_selected', 'welcome_shown', 'cta_click', 'council_open', 'ad_consent_accepted']) {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'figure', language: 'en', source: 'search' });
       assertEqual(row.blobs[7], '', `${step} drops the class`);
     }
+  });
+
+  await test('engaged carries the source class in blob8 and keeps its arm', async () => {
+    for (const arm of ['typed', 'listened', 'both']) {
+      const row = await funnelBeacon({ step: 'engaged', mode: arm, language: 'de', source: 'ad_google' });
+      assertEqual(row.blobs[0], 'engaged', 'step');
+      assertEqual(row.blobs[2], arm, 'the arm is unchanged in blob3');
+      assertEqual(row.blobs[7], 'ad_google', `${arm} keeps the class`);
+    }
+    const bare = await funnelBeacon({ step: 'engaged', mode: 'listened', language: 'en' });
+    assertEqual(bare.blobs[7], '', 'without a class');
+    const odd = await funnelBeacon({ step: 'engaged', mode: 'typed', language: 'en', source: 'google.com' });
+    assertEqual(odd.blobs[7], '', 'an unlisted value');
+    const noArm = await funnelBeacon({ step: 'engaged', language: 'en', source: 'search' });
+    assertEqual(noArm, undefined, 'an engaged row without an arm is still dropped');
+  });
+
+  await test('council_heard is counted, with the source class and nothing of a council', async () => {
+    const row = await funnelBeacon({ step: 'council_heard', language: 'de', source: 'search' });
+    assert(row !== undefined, 'council_heard wrote no row');
+    assertEqual(row.blobs[0], 'council_heard', 'step');
+    assertEqual(row.blobs[3], 'de', 'language');
+    assertEqual(row.blobs[7], 'search', 'the class in blob8');
+    const bare = await funnelBeacon({ step: 'council_heard', language: 'en' });
+    assertEqual(bare.blobs[7], '', 'without a class');
+    const odd = await funnelBeacon({ step: 'council_heard', language: 'en', source: 'https://chatgpt.com' });
+    assertEqual(odd.blobs[7], '', 'an unlisted value');
   });
 
   await test('the intro steps carry the door label in the mode slot, a closed pair', async () => {
@@ -1533,6 +1589,12 @@ async function main(): Promise<number> {
     assertEqual(urls.length, 3, 'one upload per event');
     assert(urls.every(u => u.includes('/customers/7266866262:uploadClickConversions')), 'the grant account only');
     assert(bodies.every(b => b.includes('"currency_code":"USD"')), 'the grant account currency');
+    // The card promises this: measurement only, never personalised ads.
+    for (const body of bodies) {
+      const consent = JSON.parse(body).conversions[0].consent;
+      assertEqual(consent.ad_user_data, 'GRANTED', 'measurement granted');
+      assertEqual(consent.ad_personalization, 'DENIED', 'personalised ads denied');
+    }
   });
 
   // -------------------------------------------------------------------------
