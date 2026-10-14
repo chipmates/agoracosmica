@@ -11,7 +11,7 @@ Dates are commit dates from this repository's history. A version reaches visitor
 - Any answer older than 12 months is removed and the card asks again (from 2026-09-28, commit `1c693642`; before that an answer had no time limit).
 - Visitors from paid ads (`p=1` in the address) are never asked and never have a click ID kept.
 
-## 1.2.0, on deploy
+## 1.2.0, live from 14 October 2026
 
 Written on 2026-10-14.
 
