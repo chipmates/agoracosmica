@@ -38,7 +38,7 @@ const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR (blob1 = 'museum_stop' AND b
 
 // The animal pages' kinds, as the site's build writes them (site/functions/_count/lists.js). A new animal page
 // adds its kind here, or its rows stay out of animalUse.
-export const ANIMAL_PAGES = ['megalodon', 'biggest_dinosaurs', 't_rex', 'spinosaurus', 'woolly_mammoth', 'brachiosaurus'] as const;
+export const ANIMAL_PAGES = ['megalodon', 'biggest_dinosaurs', 't_rex', 'spinosaurus', 'woolly_mammoth', 'brachiosaurus', 'triceratops'] as const;
 // The steps that carry the arrival's start rule on these pages.
 export const ANIMAL_USE_STEPS = ['page_arrival', 'page_read', 'guess_open', 'out_wing'] as const;
 const quotedList = (list: readonly string[]) => '(' + list.map((v) => "'" + v + "'").join(', ') + ')';
