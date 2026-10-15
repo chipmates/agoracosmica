@@ -36,6 +36,13 @@ function question(dataset: string, name: string, fields: Field[], where: string)
 
 const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR (blob1 = 'museum_stop' AND blob3 = '3'))";
 
+// The animal pages' kinds, as the site's build writes them (site/functions/_count/lists.js). A new animal page
+// adds its kind here, or its rows stay out of animalUse.
+export const ANIMAL_PAGES = ['megalodon', 'biggest_dinosaurs', 't_rex', 'spinosaurus', 'woolly_mammoth', 'brachiosaurus'] as const;
+// The steps that carry the arrival's start rule on these pages.
+export const ANIMAL_USE_STEPS = ['page_arrival', 'page_read', 'guess_open', 'out_wing'] as const;
+const quotedList = (list: readonly string[]) => '(' + list.map((v) => "'" + v + "'").join(', ') + ')';
+
 export function countQuestions(dataset: string): CountQuestion[] {
   return [
     question(dataset, 'steps', [['blob1', 's']], ''),
@@ -48,6 +55,9 @@ export function countQuestions(dataset: string): CountQuestion[] {
     question(dataset, 'pageKinds', [['blob1', 's'], ['blob2', 'k']], "blob1 IN ('page_arrival', 'page_read')"),
     question(dataset, 'pageLang', [['blob4', 'k']], "blob1 = 'page_arrival'"),
     question(dataset, 'doors', [['blob2', 's'], ['blob3', 'k']], "blob1 = 'door_press'"),
+    // Use on the animal pages by source: visits that began on one of them, by step and source word.
+    question(dataset, 'animalUse', [['blob1', 's'], ['blob6', 'k']],
+      'blob1 IN ' + quotedList(ANIMAL_USE_STEPS) + ' AND blob2 IN ' + quotedList(ANIMAL_PAGES) + " AND blob7 = 'start'"),
   ];
 }
 
@@ -132,6 +142,8 @@ export interface CountAnswer {
   device?: { walks: Series; real: Series };
   pages?: { arrivals: Series; reads: Series; lang: Series };
   doors?: Record<string, Series>;
+  // Per step (arrival, read, guess, wing link), the source word's per-day totals: visits that began on an animal page.
+  animalUse?: Record<string, Series>;
   gaps?: string[];
 }
 
@@ -228,6 +240,8 @@ async function buildCount(c: Creds, fetcher: Fetcher, now: number): Promise<Coun
   };
   const isStep = (step: string) => (r: Record<string, unknown>) => r.s === step;
   const pair = (name: string) => ({ walks: columns(name, 'k', isStep('museum_arrival')), real: columns(name, 'k', isStep('museum_stop')) });
+  const animalUse: Record<string, Series> = {};
+  for (const step of ANIMAL_USE_STEPS) animalUse[step] = columns('animalUse', 'k', isStep(step));
   const doors: Record<string, Series> = {};
   for (const r of read.get('doors') || []) {
     const kind = plainKey(r.s);
@@ -256,6 +270,7 @@ async function buildCount(c: Creds, fetcher: Fetcher, now: number): Promise<Coun
       lang: columns('pageLang', 'k'),
     },
     doors,
+    animalUse,
     gaps,
   };
 }
