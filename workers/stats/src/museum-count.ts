@@ -43,6 +43,37 @@ export const ANIMAL_PAGES = ['megalodon', 'biggest_dinosaurs', 't_rex', 'spinosa
 export const ANIMAL_USE_STEPS = ['page_arrival', 'page_read', 'guess_open', 'out_wing'] as const;
 const quotedList = (list: readonly string[]) => '(' + list.map((v) => "'" + v + "'").join(', ') + ')';
 
+// animalUse leaves the worker summed by week (Monday to Sunday, UTC), and every weekly cell under 5 as the string
+// '<5', so no cell can tell what a single visit did.
+const SMALL = 5;
+export type WeekCell = number | '<5';
+export interface WeeklyUse { weeks: string[]; by: Record<string, Record<string, WeekCell[]>> }
+
+export function mondayOf(day: string): string {
+  const t = Date.parse(day + 'T00:00:00Z');
+  return new Date(t - ((new Date(t).getUTCDay() + 6) % 7) * DAY_MS).toISOString().slice(0, 10);
+}
+
+// Per-day columns (one list per key, aligned with days, which run day by day) into weekly cells.
+export function weekly(days: string[], perStep: Record<string, Record<string, number[]>>): WeeklyUse {
+  const weeks: string[] = [];
+  const slot = days.map((d) => {
+    const m = mondayOf(d);
+    if (weeks[weeks.length - 1] !== m) weeks.push(m);
+    return weeks.length - 1;
+  });
+  const by: WeeklyUse['by'] = {};
+  for (const step of Object.keys(perStep)) {
+    by[step] = {};
+    for (const word of Object.keys(perStep[step])) {
+      const sums = weeks.map(() => 0);
+      perStep[step][word].forEach((n, i) => { sums[slot[i]] += n; });
+      by[step][word] = sums.map((n): WeekCell => (n < SMALL ? '<5' : n));
+    }
+  }
+  return { weeks, by };
+}
+
 export function countQuestions(dataset: string): CountQuestion[] {
   return [
     question(dataset, 'steps', [['blob1', 's']], ''),
@@ -92,6 +123,9 @@ export function guardCountSql(sql: string, dataset: string): string | null {
   let flat = where ? where[1] : '';
   while (/\([^()]*\)/.test(flat)) flat = flat.replace(/\([^()]*\)/g, ' _ ');
   if (!where || /\bOR\b/i.test(flat)) return 'probe rows not left out';
+  // Language, hold, device class and country may split a total, never narrow one: a filter on them is a finer cell
+  // than the split the field count allows.
+  if (/\bblob[4589]\b/.test(where[1])) return 'a total narrowed by language, hold, device class or country';
   if (/\bindex\d|\bdouble\d|\bCOUNT\s*\(|\bDISTINCT\b|\buniq|\bany\s*\(|\bgroupArray|\bargM|\btopK|\bmin\s*\(|\bmax\s*\(/i.test(s)) return 'not a total';
   if (/\b(HOUR|MINUTE|SECOND|toHour|toMinute|toSecond|toStartOfHour|toStartOfMinute|toStartOfFiveMinutes|toStartOfFifteenMinutes|toUnixTimestamp|toRelative|formatDateTime|toDateTime)\b/i.test(s)) return 'finer than a day';
   // The time may stand only in the day bucket and in the window.
@@ -142,8 +176,9 @@ export interface CountAnswer {
   device?: { walks: Series; real: Series };
   pages?: { arrivals: Series; reads: Series; lang: Series };
   doors?: Record<string, Series>;
-  // Per step (arrival, read, guess, wing link), the source word's per-day totals: visits that began on an animal page.
-  animalUse?: Record<string, Series>;
+  // Visits that began on an animal page: per step (arrival, read, guess, wing link) and source word, weekly cells
+  // from the Monday in weeks, each under 5 shown as '<5'. Never by day.
+  animalUse?: WeeklyUse;
   gaps?: string[];
 }
 
@@ -240,8 +275,8 @@ async function buildCount(c: Creds, fetcher: Fetcher, now: number): Promise<Coun
   };
   const isStep = (step: string) => (r: Record<string, unknown>) => r.s === step;
   const pair = (name: string) => ({ walks: columns(name, 'k', isStep('museum_arrival')), real: columns(name, 'k', isStep('museum_stop')) });
-  const animalUse: Record<string, Series> = {};
-  for (const step of ANIMAL_USE_STEPS) animalUse[step] = columns('animalUse', 'k', isStep(step));
+  const animalDaily: Record<string, Series> = {};
+  for (const step of ANIMAL_USE_STEPS) animalDaily[step] = columns('animalUse', 'k', isStep(step));
   const doors: Record<string, Series> = {};
   for (const r of read.get('doors') || []) {
     const kind = plainKey(r.s);
@@ -270,7 +305,7 @@ async function buildCount(c: Creds, fetcher: Fetcher, now: number): Promise<Coun
       lang: columns('pageLang', 'k'),
     },
     doors,
-    animalUse,
+    animalUse: weekly(days, animalDaily),
     gaps,
   };
 }
