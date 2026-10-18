@@ -6,6 +6,7 @@
 import { buildKokoroFallbackBody, QWEN_EN_TO_KOKORO } from '../src/ttsEngine';
 import { proxyWithFailoverFromBuffer } from '../src/proxy';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
+import { corsHeaders, handlePreflight } from '../src/cors';
 import type { Env, ServerInfo } from '../src/types';
 
 // ---------------------------------------------------------------------------
@@ -326,6 +327,40 @@ async function main(): Promise<number> {
     assertEqual(puts.length, 2, 'daily and burst counters');
     assert(puts.every(key => key.includes(keyed)), 'both keys use the keyed hash');
     assert(puts.every(key => !key.includes('203.0.113.9')), 'no plain address in a key');
+  });
+
+  // -------------------------------------------------------------------------
+  // CORS: only our own origins and our own Pages previews
+  // -------------------------------------------------------------------------
+
+  function originRequest(origin: string, method = 'GET'): Request {
+    return new Request('https://audio.agoracosmica.org/v1/audio/speech', { method, headers: { Origin: origin } });
+  }
+
+  await test('the production origin is allowed', async () => {
+    const env = fakeEnv();
+    assertEqual(corsHeaders(originRequest('https://agoracosmica.org'), env)['Access-Control-Allow-Origin'], 'https://agoracosmica.org', 'ACAO');
+    assertEqual(handlePreflight(originRequest('https://agoracosmica.org', 'OPTIONS'), env).status, 204, 'preflight');
+  });
+
+  await test('our own Pages previews are allowed', async () => {
+    const env = fakeEnv();
+    const preview = 'https://pr-1.agora-cosmica.pages.dev';
+    assertEqual(corsHeaders(originRequest(preview), env)['Access-Control-Allow-Origin'], preview, 'ACAO');
+    assertEqual(handlePreflight(originRequest(preview, 'OPTIONS'), env).status, 204, 'preflight');
+  });
+
+  await test('other pages.dev projects get no CORS', async () => {
+    const env = fakeEnv();
+    for (const evil of [
+      'https://evil.pages.dev',
+      'https://evil-agora-cosmica.pages.dev',
+      'https://pr-1.agoracosmica.pages.dev',
+      'http://pr-1.agora-cosmica.pages.dev',
+    ]) {
+      assertEqual(corsHeaders(originRequest(evil), env)['Access-Control-Allow-Origin'], undefined, `no ACAO for ${evil}`);
+      assertEqual(handlePreflight(originRequest(evil, 'OPTIONS'), env).status, 403, `preflight refused for ${evil}`);
+    }
   });
 
   // -------------------------------------------------------------------------

@@ -28,7 +28,8 @@ function getCorsHeaders(request: Request, env: Env): Record<string, string> {
     'http://127.0.0.1:5173',
   ];
 
-  const isPagesPreview = origin.endsWith('.agoracosmica.pages.dev') && origin.startsWith('https://');
+  // Our Pages project is agora-cosmica; the unhyphenated name is not ours to trust.
+  const isPagesPreview = origin.endsWith('.agora-cosmica.pages.dev') && origin.startsWith('https://');
   const isAllowed = allowed.includes(origin) || DEV_ORIGINS.includes(origin) || isPagesPreview;
 
   return {

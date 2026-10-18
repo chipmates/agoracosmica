@@ -11,8 +11,8 @@ function getOriginHeader(request: Request, env: Env): string | null {
   if (!origin) return null;
   const allowed = getAllowedOrigins(env);
   if (allowed.includes(origin)) return origin;
-  // Allow CF Pages preview deployments
-  if (origin.endsWith('.pages.dev') && origin.startsWith('https://')) return origin;
+  // Previews of our own Pages project only: pages.dev is shared by every Cloudflare customer.
+  if (origin.startsWith('https://') && origin.endsWith('.agora-cosmica.pages.dev')) return origin;
   // Allow localhost in dev
   if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) return origin;
   return null;
