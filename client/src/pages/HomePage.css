@@ -317,6 +317,9 @@
 }
 
 .error-message button {
+  /* The button clips its overflow, so flex would squeeze it below its label */
+  flex-shrink: 0;
+  white-space: nowrap;
   background: color-mix(in srgb, var(--mode-quest) 14%, transparent);
   border: 1px solid color-mix(in srgb, var(--mode-quest) 55%, transparent);
   color: var(--text-primary);
