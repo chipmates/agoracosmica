@@ -112,14 +112,16 @@ export async function refreshHealth(env: Env): Promise<CachedHealth> {
   if (snapshotAge(cached) < HEALTH_TTL_SECONDS) return cached;
 
   const servers = getServers(env);
+  // One origin in both slots: probe it once and let both slots read it.
+  const single = servers.nbg1.url === servers.fsn1.url;
   const [fsn1Health, nbg1Health] = await Promise.all([
     fetchServerHealth(servers.fsn1.url),
-    fetchServerHealth(servers.nbg1.url),
+    single ? Promise.resolve(null) : fetchServerHealth(servers.nbg1.url),
   ]);
 
   const updated: CachedHealth = {
     fsn1: fsn1Health,
-    nbg1: nbg1Health,
+    nbg1: single ? fsn1Health : nbg1Health,
     updatedAt: Date.now(),
   };
 
@@ -140,12 +142,17 @@ export async function refreshHealth(env: Env): Promise<CachedHealth> {
 export async function getAggregatedHealth(env: Env): Promise<Response> {
   const cached = await refreshHealth(env);
   const age = snapshotAge(cached);
+  // Report each real server once, under its own id: a retired slot that
+  // borrows the other server never shows up as a healthy second box.
+  const servers = getServers(env);
+  const report: Record<string, unknown> = {};
+  for (const [server, health] of [[servers.fsn1, cached.fsn1], [servers.nbg1, cached.nbg1]] as const) {
+    if (server.id in report) continue;
+    report[server.id] = health ? { status: 'healthy', gpu_slots: health.gpu_slots } : { status: 'unknown' };
+  }
   return new Response(
     JSON.stringify({
-      servers: {
-        fsn1: cached.fsn1 ? { status: 'healthy', gpu_slots: cached.fsn1.gpu_slots } : { status: 'unknown' },
-        nbg1: cached.nbg1 ? { status: 'healthy', gpu_slots: cached.nbg1.gpu_slots } : { status: 'unknown' },
-      },
+      servers: report,
       updatedAt: cached.updatedAt ? new Date(cached.updatedAt).toISOString() : null,
       ageSeconds: Number.isFinite(age) ? Math.round(age) : null,
     }),

@@ -6,6 +6,7 @@
 import { buildKokoroFallbackBody, QWEN_EN_TO_KOKORO } from '../src/ttsEngine';
 import { proxyWithFailoverFromBuffer } from '../src/proxy';
 import { getServers } from '../src/config';
+import { getAggregatedHealth } from '../src/health';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
 import type { Env, ServerInfo } from '../src/types';
@@ -131,6 +132,29 @@ async function main(): Promise<number> {
       const res = await proxyWithFailoverFromBuffer(encode({ input: 'hi' }), speechRequest(), FSN1, FSN1, fakeEnv(), 1000);
       assertEqual(res.status, 502, 'both-down answer');
       assertEqual(calls.length, 1, 'a single upstream call');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+  });
+
+  await test('one origin left reports one server, not a healthy second box', async () => {
+    const kv = new Map<string, string>();
+    const env = {
+      ...fakeEnv(),
+      SERVER_NBG1_URL: '',
+      HEALTH_CACHE: { get: async (k: string) => kv.get(k) ?? null, put: async (k: string, v: string) => { kv.set(k, v); } },
+    } as unknown as Env;
+    const calls: string[] = [];
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      calls.push(String(input));
+      return new Response(JSON.stringify({ gpu_slots: { available: 2, max: 4 } }), { status: 200 });
+    }) as typeof fetch;
+    try {
+      const body = (await (await getAggregatedHealth(env)).json()) as { servers: Record<string, { status: string }> };
+      assertEqual(Object.keys(body.servers).join(','), 'fsn1', 'only the server that answers');
+      assertEqual(body.servers.fsn1.status, 'healthy', 'fsn1 healthy');
+      assertEqual(calls.length, 1, 'probed once');
     } finally {
       globalThis.fetch = realFetch;
     }
