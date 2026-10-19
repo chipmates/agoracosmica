@@ -170,4 +170,4 @@ Only `main` is officially supported. If you run a fork or an older tag, please r
 
 We thank the following researchers for responsibly disclosed reports:
 
-*Be the first.*
+- [@Char0n1507](https://github.com/Char0n1507), October 2026: the audio proxy's CORS allowlist accepted any `*.pages.dev` origin ([GHSA-c835-mf7g-7wwc](https://github.com/chipmates/agoracosmica/security/advisories/GHSA-c835-mf7g-7wwc)).
