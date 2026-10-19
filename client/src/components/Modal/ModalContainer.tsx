@@ -24,6 +24,24 @@ interface ModalContainerProps {
   modalType?: ModalType;
 }
 
+// Hand focus back to the opener. An opener inside a region that has since
+// collapsed (a closed menu, or one a resize hid) cannot take it, so the control
+// that expands that region gets it instead of the page body.
+const restoreFocus = (target: Element | null): void => {
+  if (!(target instanceof HTMLElement) || !target.isConnected) return;
+  target.focus();
+  if (document.activeElement === target) return;
+  for (let region = target.parentElement; region; region = region.parentElement) {
+    if (!region.id) continue;
+    const toggle = Array.from(document.querySelectorAll<HTMLElement>('[aria-controls]')).find(
+      (el) => el !== target && (el.getAttribute('aria-controls') ?? '').split(/\s+/).includes(region.id)
+    );
+    if (!toggle) continue;
+    toggle.focus();
+    if (document.activeElement === toggle) return;
+  }
+};
+
 /**
  * 2025 State-of-the-Art Modal Container - UltraThink Edition
  * 
@@ -88,17 +106,12 @@ const ModalContainer: FC<ModalContainerProps> = ({
         if (modalRef.current) {
           modalRef.current.removeEventListener('animationend', handleAnimationEnd);
         }
-        if (previousActiveElement.current && previousActiveElement.current instanceof HTMLElement) {
-          previousActiveElement.current.focus();
-        }
+        restoreFocus(previousActiveElement.current);
       };
     }
 
     return () => {
-      // Restore focus to previously active element
-      if (previousActiveElement.current && previousActiveElement.current instanceof HTMLElement) {
-        previousActiveElement.current.focus();
-      }
+      restoreFocus(previousActiveElement.current);
     };
   }, [isOpen, onAnimationComplete]);
   
@@ -121,9 +134,10 @@ const ModalContainer: FC<ModalContainerProps> = ({
       const firstElement = focusableElements[0];
       const lastElement = focusableElements[focusableElements.length - 1];
       
-      // Shift + Tab
+      // Shift + Tab. Focus starts on the dialog itself, which sits before its
+      // first control, so the trap must catch that step too.
       if (e.shiftKey) {
-        if (document.activeElement === firstElement) {
+        if (document.activeElement === firstElement || document.activeElement === modalRef.current) {
           lastElement.focus();
           e.preventDefault();
         }
