@@ -4,6 +4,7 @@ import OptimizedImage from './OptimizedImage';
 import OptimizedFigureImage from './OptimizedFigureImage';
 import { sanitizeContent } from '../utils/sanitizeContent';
 import { getDisplayShortName } from '../utils/figureDisplayName';
+import { splitMessageParagraphs } from '../utils/messageParagraphs';
 import { useTranslation } from '../hooks/useTranslation';
 import { CrisisNote } from './CrisisNote';
 import { clearCrisisNote, dismissCrisisNote, readCrisisNote, resetConversationCrisisNote, subscribeCrisisNote } from '../services/safety/crisisNote';
@@ -192,17 +193,7 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
       return <div className="message-content-inner" dangerouslySetInnerHTML={{ __html: sanitizedHtml }} />;
     }
     
-    // Split text only on actual paragraph breaks (multiple newlines or proper punctuation + newline)
-    // This ensures text split by commas stays in the same paragraph
-    const paragraphs = content
-      // Replace single newlines that follow commas with spaces to prevent unwanted breaks
-      .replace(/,\n(?!\n)/g, ', ')
-      // Split on double newlines or newlines after proper sentence ending punctuation
-      .split(/\n\n|[.!?]\n/)
-      .map(p => p.trim())
-      .filter(Boolean);
-    
-    return paragraphs.map((para, idx) => (
+    return splitMessageParagraphs(content).map((para, idx) => (
       <p key={idx} className="message-paragraph">{para}</p>
     ));
   };
