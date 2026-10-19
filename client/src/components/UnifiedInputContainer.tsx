@@ -1,7 +1,7 @@
 // src/components/UnifiedInputContainer.tsx
 import { useState, useRef, useEffect, useCallback, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
-import { Microphone, Keyboard, PaperPlaneTilt, Sparkle } from '@phosphor-icons/react';
-import { processAudio, processTextMessage } from '../services/audioService';
+import { Microphone, Keyboard, PaperPlaneTilt, Sparkle, SpeakerSlash } from '@phosphor-icons/react';
+import { processAudio, processTextMessage, cleanupAudioResources } from '../services/audioService';
 import { EmptyAudioError } from '../services/audio/stt/sttUtils';
 import ProcessingLoader from './ProcessingLoader';
 import { ttsScheduler } from '../controllers/conversationStreamDriver';
@@ -36,6 +36,11 @@ let CapacitorKeyboard: any = null;
 // or frame-less blob Whisper cannot decode. This duration check is the reliable
 // guard (a Blob has no duration, and decoding a corrupt blob would itself fail).
 const MIN_AUDIO_MS = 300;
+
+// The queue reports the end of playback whenever it runs dry, also between two
+// sentences while the next one is still being voiced. The stop icon waits out
+// such a gap instead of blinking off and on.
+const STOP_VOICE_HOLD_MS = 1200;
 
 interface UnifiedInputContainerProps {
   selectedFigure: string;
@@ -92,6 +97,26 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const processingStage = useDomainStore((state) => state.conversation.processingStage);
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
+
+  // Stop voice: on at once when the Echo starts speaking, held through a short
+  // gap in the queue, off at once after a tap. Upstream TTS is cancelled BEFORE
+  // playback stops, so a chunk finishing after the stop cannot re-take focus.
+  const voicePlaying = useDomainStore((state) => state.session.isAudioPlaying);
+  const [stopShown, setStopShown] = useState<boolean>(voicePlaying);
+  useEffect(() => {
+    if (voicePlaying) {
+      setStopShown(true);
+      return undefined;
+    }
+    const timer = window.setTimeout(() => setStopShown(false), STOP_VOICE_HOLD_MS);
+    return () => window.clearTimeout(timer);
+  }, [voicePlaying]);
+  const stopVoice = useCallback(() => {
+    ttsScheduler.cancelAll();
+    cleanupAudioResources();
+    setStopShown(false);
+  }, []);
+  const stopVoiceLabel = tString('chat.stopVoice', 'Stop voice');
 
   // One-shot composer prefill staged by a public-page ask link. Once Free Talk
   // renders, the question the visitor actually clicked sits in the text input
@@ -704,6 +729,22 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
               )}
 
               <div className="input-actions">
+                {/* The slot keeps its width while silent, so the text field
+                    never reflows and mic and send never move. */}
+                <span className="stop-voice-slot">
+                  {stopShown && (
+                    <button
+                      className="action-button stop-voice-button"
+                      onClick={stopVoice}
+                      type="button"
+                      aria-label={stopVoiceLabel}
+                      title={stopVoiceLabel}
+                    >
+                      <SpeakerSlash size={22} color="var(--gold-base)" aria-hidden="true" />
+                    </button>
+                  )}
+                </span>
+
                 {/* Only show mic button if voice input is enabled in settings */}
                 {loadServiceConfig().sttEnabled !== false && (
                   <button
@@ -735,7 +776,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
               </div>
             </div>
           ) : (
-            <div className="voice-input-area">
+            <div className={`voice-input-area${stopShown ? ' voice-input-area--stop' : ''}`}>
               <button
                 className={`record-button ${isRecording ? 'recording' : ''}`}
                 onClick={() => {
@@ -818,6 +859,17 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                   )}
                 </div>
               </button>
+              {stopShown && (
+                <button
+                  className="stop-voice-button stop-voice-button--bar"
+                  onClick={stopVoice}
+                  type="button"
+                  aria-label={stopVoiceLabel}
+                  title={stopVoiceLabel}
+                >
+                  <SpeakerSlash size={isMobile ? 26 : 24} color="var(--gold-primary)" aria-hidden="true" />
+                </button>
+              )}
             </div>
           )}
         </div>

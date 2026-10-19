@@ -65,9 +65,9 @@ function emit(eventName: string): void {
 // The gate's mobile breakpoint. Below it the primary controls (consent button,
 // composer) sit at the bottom edge, where the challenge box would land.
 const NARROW_VIEWPORT_PX = 768;
-// Bottom-edge chat controls the box must clear. Measured, not assumed:
-// neither has a fixed offset.
-const BOTTOM_CONTROL_SELECTOR = '.unified-input-container, .stop-voice-pill';
+// The bottom-edge chat control the box must clear (the stop-voice icon lives
+// inside it). Measured, not assumed: it has no fixed offset.
+const BOTTOM_CONTROL_SELECTOR = '.unified-input-container';
 // The 'normal' widget, plus the air kept between it and whatever it clears.
 const CHALLENGE_BOX_PX = 72;
 const CLEARANCE_GAP_PX = 12;

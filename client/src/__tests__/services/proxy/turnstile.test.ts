@@ -114,7 +114,7 @@ describe('turnstile widget placement', () => {
     vi.unstubAllEnvs();
     setInnerWidth(originalInnerWidth);
     setInnerHeight(originalInnerHeight);
-    document.querySelectorAll('.unified-input-container, .stop-voice-pill').forEach((el) => el.remove());
+    document.querySelectorAll('.unified-input-container').forEach((el) => el.remove());
     document.getElementById(CONTAINER_ID)?.remove();
     document.querySelectorAll('script[src*="challenges.cloudflare.com"]').forEach((s) => s.remove());
     delete (window as unknown as Record<string, unknown>).turnstile;
@@ -179,19 +179,6 @@ describe('turnstile widget placement', () => {
     options['before-interactive-callback']();
 
     expect(container.style.bottom).toBe('167px');
-  });
-
-  it('clears the stop-voice pill pinned above the composer', async () => {
-    setInnerWidth(1440);
-    setInnerHeight(900);
-    mountComposer(80);
-    mountBottomControl('stop-voice-pill', 44, 94);
-    const { options, container } = await renderWidget();
-
-    options['before-interactive-callback']();
-
-    // Pill top is at 762, and it is the highest bottom control on screen.
-    expect(container.style.bottom).toBe('150px');
   });
 
   it('re-lifts the escalated box when the composer mounts after the challenge', async () => {

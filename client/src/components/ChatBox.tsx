@@ -13,10 +13,8 @@ import VoiceInteractionHelper from './VoiceInteractionHelper';
 // voice helper duplicated the composer bar's own wording and re-fired over the
 // Echo's replies, so it is removed from the flow but kept in the tree.
 const VOICE_HELPER_REMOVED = true;
-import { Flag, SpeakerSlash } from '@phosphor-icons/react';
+import { Flag } from '@phosphor-icons/react';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
-import { ttsScheduler } from '../controllers/conversationStreamDriver';
-import { cleanupAudioResources } from '../services/audioService';
 import { useDomainStore } from '../stores';
 import { readCarriedThread, hasCarriedQuestionPending, CARRIED_THREAD_EVENT } from '../utils/public/entryIntent';
 import { ANSWER_FIRST_REPLY, ANSWER_PROVENANCE, QUIET_PLATE_PRESENCE } from '../config/features';
@@ -45,7 +43,7 @@ interface ChatBoxProps {
   isLoading?: boolean;
   firstTextArrived?: boolean;
   isReviewMode?: boolean;
-  isAudioPlaying?: boolean;
+  isAudioPlaying?: boolean; // unused here: the stop-voice control lives in the composer
 }
 
 const ChatBoxSurface: FC<ChatBoxProps> = ({
@@ -53,7 +51,6 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
   selectedFigureName,
   isLoading = false,
   isReviewMode = false,
-  isAudioPlaying = false,
 }) => {
   const { tString, tNode, language } = useTranslation();
   const chatBoxRef = useRef<HTMLDivElement>(null);
@@ -403,23 +400,6 @@ const ChatBoxSurface: FC<ChatBoxProps> = ({
 
       </div>
 
-
-      {/* Stop voice: visible while the Echo speaks. Cancels upstream TTS
-          generation BEFORE stopping playback, so a straggler chunk finishing
-          after the stop cannot re-take audio focus. */}
-      {isAudioPlaying && !isReviewMode && (
-        <button
-          type="button"
-          className="stop-voice-pill"
-          onClick={() => {
-            ttsScheduler.cancelAll();
-            cleanupAudioResources();
-          }}
-        >
-          <SpeakerSlash size={18} weight="bold" aria-hidden="true" />
-          <span>{tString('chat.stopVoice', 'Stop voice')}</span>
-        </button>
-      )}
 
       {/* Voice Interaction Helper — REMOVED from the flow 2026-07-23 (helper
           doctrine: the composer bar already carries the same guidance, and the

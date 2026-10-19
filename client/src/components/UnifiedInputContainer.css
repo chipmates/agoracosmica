@@ -270,6 +270,69 @@
   background-color: var(--coral-hover-bg); /* Uses design system color with opacity */
 }
 
+/* Stop voice, text form: the slot left of mic and send keeps its width while
+   the Echo is silent, so the field never reflows when the icon comes and goes. */
+.stop-voice-slot {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+}
+
+.stop-voice-button {
+  animation: stop-voice-in 0.2s ease-out;
+}
+
+/* Stop voice, record-bar form: a sibling of the bar, never inside it. The bar
+   gives up the key's width while the voice plays, and its idle waveform (pure
+   decoration) gives up about the same, so the label does not move or clip. */
+.voice-input-area--stop {
+  display: flex;
+  gap: 6px;
+}
+
+.voice-input-area--stop .record-button {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+.voice-input-area--stop .waveform.inactive {
+  display: none;
+}
+
+.stop-voice-button--bar {
+  flex: 0 0 auto;
+  width: 48px;
+  height: var(--input-height-desktop);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--gold-deep) 45%, transparent);
+  background: var(--bg-deep-space);
+  cursor: pointer;
+  transition: border-color 0.2s var(--transition-bezier);
+}
+
+/* Inset like the bar's own ring: the area clips anything drawn outside. */
+.stop-voice-button--bar:focus-visible {
+  outline: 2px dashed var(--gold-primary);
+  outline-offset: -6px;
+}
+
+@media (hover: hover) {
+  .stop-voice-button--bar:hover {
+    border-color: color-mix(in srgb, var(--gold-subtle) var(--a-60), transparent);
+  }
+}
+
+@keyframes stop-voice-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Voice input area */
 .voice-input-area {
   width: 100%;
@@ -493,6 +556,10 @@
     height: var(--input-height-mobile);
   }
 
+  .stop-voice-button--bar {
+    height: var(--input-height-mobile);
+  }
+
   /* Mobile text input: two-row layout so the textarea gets the full width
      instead of competing with the counter + buttons in a 56px strip. */
   .text-input-area {
@@ -575,7 +642,8 @@
   }
   
   .record-button,
-  .text-input-area {
+  .text-input-area,
+  .stop-voice-button--bar {
     height: var(--input-height-tablet);
   }
   
@@ -627,6 +695,12 @@
     animation: none;
     height: 10px;
   }
+
+  .stop-voice-button,
+  .stop-voice-button--bar {
+    animation: none;
+    transition: none;
+  }
   
   .pulse,
   .pulse-element {
@@ -650,6 +724,10 @@
   
   .action-button {
     outline: 1px solid ButtonText;
+  }
+
+  .stop-voice-button--bar {
+    border: 2px solid ButtonText;
   }
 }
 
@@ -771,6 +849,18 @@
     /* Shift text slightly right to appear visually centered */
     position: relative;
     left: 15px; /* Compensate for the control area on the right */
+  }
+}
+
+/* Wider screens draw a narrower idle waveform, so the key and its gap shrink
+   to the same width and the bar's label still does not move. */
+@media (min-width: 481px) {
+  .voice-input-area--stop {
+    gap: 4px;
+  }
+
+  .stop-voice-button--bar {
+    width: 44px;
   }
 }
 
