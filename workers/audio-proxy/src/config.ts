@@ -1,10 +1,13 @@
 import type { Env } from './types';
 
 export function getServers(env: Env) {
-  return {
-    fsn1: { id: 'fsn1', url: env.SERVER_FSN1_URL },
-    nbg1: { id: 'nbg1', url: env.SERVER_NBG1_URL },
-  };
+  const fsn1 = { id: 'fsn1', url: env.SERVER_FSN1_URL };
+  const nbg1 = { id: 'nbg1', url: env.SERVER_NBG1_URL };
+  // One origin left: an empty URL hands its sessions and its fallback slot to
+  // the other, so no request waits on an address that no longer answers.
+  if (!fsn1.url && nbg1.url) return { fsn1: nbg1, nbg1 };
+  if (!nbg1.url && fsn1.url) return { fsn1, nbg1: fsn1 };
+  return { fsn1, nbg1 };
 }
 
 export const TIMEOUTS = {

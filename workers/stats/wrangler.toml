@@ -11,7 +11,8 @@ preview_urls = false
 # Environment Variables
 [vars]
 SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
-SERVER_NBG1_URL = "https://nbg1.agoracosmica.org"
+# NBG1 retired: an empty URL hands its share to FSN1 (one server since Oct 2026).
+SERVER_NBG1_URL = ""
 # Unix epoch (seconds) of public launch. When > 0, every Analytics Engine query
 # is floored at this timestamp and the sidebar shows "Stats since: <date>".
 # Leave at "0" to disable (shows full AE history, no label).

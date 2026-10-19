@@ -5,6 +5,7 @@
 
 import { buildKokoroFallbackBody, QWEN_EN_TO_KOKORO } from '../src/ttsEngine';
 import { proxyWithFailoverFromBuffer } from '../src/proxy';
+import { getServers } from '../src/config';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
 import type { Env, ServerInfo } from '../src/types';
@@ -102,6 +103,37 @@ async function main(): Promise<number> {
     assertEqual(parsed.voice, QWEN_EN_TO_KOKORO.en_lyra, 'voice rewritten');
     assertEqual(parsed.input, 'hello', 'text preserved');
     assertEqual(parsed.language, 'English', 'language preserved');
+  });
+
+  await test('two origins stay two', () => {
+    const s = getServers(fakeEnv());
+    assertEqual(s.fsn1.url, 'https://fsn1.example', 'fsn1 kept');
+    assertEqual(s.nbg1.url, 'https://nbg1.example', 'nbg1 kept');
+  });
+
+  await test('an empty origin hands both slots to the one left', () => {
+    const noNbg1 = getServers({ ...fakeEnv(), SERVER_NBG1_URL: '' } as Env);
+    assertEqual(noNbg1.nbg1.url, 'https://fsn1.example', 'nbg1 slot goes to fsn1');
+    assertEqual(noNbg1.nbg1.id, 'fsn1', 'labelled by the server that answers');
+    const noFsn1 = getServers({ ...fakeEnv(), SERVER_FSN1_URL: '' } as Env);
+    assertEqual(noFsn1.fsn1.url, 'https://nbg1.example', 'fsn1 slot goes to nbg1');
+    assertEqual(noFsn1.fsn1.id, 'nbg1', 'labelled by the server that answers');
+  });
+
+  await test('one origin in both slots is asked once, not twice', async () => {
+    const calls: string[] = [];
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL) => {
+      calls.push(String(input));
+      return new Response('down', { status: 503 });
+    }) as typeof fetch;
+    try {
+      const res = await proxyWithFailoverFromBuffer(encode({ input: 'hi' }), speechRequest(), FSN1, FSN1, fakeEnv(), 1000);
+      assertEqual(res.status, 502, 'both-down answer');
+      assertEqual(calls.length, 1, 'a single upstream call');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
   });
 
   await test('every mapped Qwen voice has a non-empty Kokoro id', () => {

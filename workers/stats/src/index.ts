@@ -199,12 +199,12 @@ async function handleServerStats(env: Env): Promise<Response> {
     }
   }
 
-  const [fsn1, nbg1] = await Promise.all([
-    fetchServer(env.SERVER_FSN1_URL, 'fsn1'),
-    fetchServer(env.SERVER_NBG1_URL, 'nbg1'),
-  ]);
-
-  const data = { fsn1, nbg1 };
+  // An empty URL marks a retired server: it is left out, not reported as down.
+  const configured = (
+    [['fsn1', env.SERVER_FSN1_URL], ['nbg1', env.SERVER_NBG1_URL]] as const
+  ).filter(([, url]) => Boolean(url));
+  const results = await Promise.all(configured.map(([id, url]) => fetchServer(url, id)));
+  const data = Object.fromEntries(configured.map(([id], i) => [id, results[i]]));
   serverCache = { data, at: now };
 
   return Response.json(data, {

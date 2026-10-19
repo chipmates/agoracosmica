@@ -35,14 +35,16 @@ export async function proxyWithFailoverFromBuffer(
   timeoutMs: number,
   degradedBody?: ArrayBuffer | null
 ): Promise<Response> {
-  const primaryResult = await tryUpstream(request, body, primary, env, timeoutMs);
-  if (primaryResult) return primaryResult;
+  // With one origin left both slots hold it: try it once, never twice in a row.
+  const origins = fallback.url === primary.url ? [primary] : [primary, fallback];
 
-  const fallbackResult = await tryUpstream(request, body, fallback, env, timeoutMs);
-  if (fallbackResult) return fallbackResult;
+  for (const server of origins) {
+    const result = await tryUpstream(request, body, server, env, timeoutMs);
+    if (result) return result;
+  }
 
   if (degradedBody) {
-    for (const server of [primary, fallback]) {
+    for (const server of origins) {
       const degraded = await tryUpstream(request, degradedBody, server, env, timeoutMs, {
         'X-TTS-Engine-Fallback': 'kokoro',
       });

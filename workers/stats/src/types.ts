@@ -57,6 +57,7 @@ export interface BatchQueryRequest {
 }
 
 export interface ServerStatsCache {
-  data: { fsn1: unknown; nbg1: unknown } | null;
+  /** Keyed by server id; a retired server is absent. */
+  data: Partial<Record<'fsn1' | 'nbg1', unknown>> | null;
   at: number;
 }

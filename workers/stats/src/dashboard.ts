@@ -1481,11 +1481,16 @@ function momentumChip(cur, prev) {
 // Health line for the top of Overview: "is anything on fire" before any metric.
 // Server reachability comes from the (async) server poll; errors and rate limits
 // from this period's analytics. The status bar remains the real-time alarm.
+// Only the servers the worker reports: a retired one is absent, not down.
+function serverIds(d) {
+  return ['fsn1', 'nbg1'].filter(function(id) { return d && d[id] !== undefined; });
+}
+
 function healthChipHtml(errors, rl, serverData) {
   var level = 'ok';
   var parts = [];
   if (serverData) {
-    ['fsn1', 'nbg1'].forEach(function(id) {
+    serverIds(serverData).forEach(function(id) {
       var s = serverData[id];
       if (!s || s.error) { parts.push(id.toUpperCase() + ' unreachable'); level = 'err'; }
     });
@@ -2064,7 +2069,7 @@ function updateStatus() {
 
   if (S.serverData) {
     var d = S.serverData;
-    ['fsn1', 'nbg1'].forEach(function(id) {
+    serverIds(d).forEach(function(id) {
       var s = d[id];
       if (!s || s.error) {
         msgs.push(id.toUpperCase() + ' unreachable');
@@ -2122,7 +2127,7 @@ async function loadServerHealth() {
     S.lastServer = Date.now();
 
     // Track GPU history (for sparklines)
-    ['fsn1', 'nbg1'].forEach(function(id) {
+    serverIds(S.serverData).forEach(function(id) {
       var s = S.serverData[id];
       if (s && s.gpu && typeof s.gpu.utilization_percent === 'number') {
         S.gpuHist[id].push(s.gpu.utilization_percent);
@@ -2415,7 +2420,7 @@ async function loadOverview() {
   if (S.fetchError) alerts += '<div class="alert-card a-err">Stats API unreachable. The numbers below are stale or absent, not real zeros. Retry in a moment.</div>';
   if (totalRl > 0) alerts += '<div class="alert-card a-warn">' + totalRl + ' users hit rate limits ' + RANGE_LABEL[S.range] + '</div>';
   if (S.serverData) {
-    ['fsn1', 'nbg1'].forEach(function(id) {
+    serverIds(S.serverData).forEach(function(id) {
       var s = S.serverData[id];
       if (!s || s.error) alerts += '<div class="alert-card a-err">' + id.toUpperCase() + ' unreachable: ' + (s ? s.error : 'offline') + '</div>';
     });
@@ -2673,7 +2678,7 @@ function updateOverviewServers() {
   if (!el) return;
   if (!S.serverData) { el.innerHTML = '<span style="color:var(--dim);font-size:0.8125rem">Waiting for data...</span>'; return; }
   var html = '<div style="display:flex;gap:12px;flex-wrap:wrap">';
-  ['fsn1', 'nbg1'].forEach(function(id) {
+  serverIds(S.serverData).forEach(function(id) {
     var s = S.serverData[id];
     if (!s || s.error) {
       html += '<div style="flex:1;min-width:120px"><span class="status-dot" style="background:var(--err);display:inline-block;margin-right:6px"></span><span style="color:var(--err);font-size:0.8125rem">' + id.toUpperCase() + ' offline</span></div>';
@@ -2698,7 +2703,7 @@ function renderServers() {
   }
 
   var html = '';
-  ['fsn1', 'nbg1'].forEach(function(id) {
+  serverIds(S.serverData).forEach(function(id) {
     var s = S.serverData[id];
     var label = id === 'fsn1' ? 'FSN1 Falkenstein' : 'NBG1 Nurnberg';
 
