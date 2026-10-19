@@ -41,7 +41,7 @@ Legitimate interest under Art. 6(1)(f) GDPR, for providing a philosophical dialo
 |---|---|---|---|
 | Cloudflare | Pages, Workers, R2, KV | EU edge (R2 in Western Europe) | DPA via Cloudflare dashboard |
 | Nebius | LLM inference (free tier) | United Kingdom (primary model) and Finland (EU, fallback model) | Zero data retention enabled in both regions |
-| Hetzner | GPU servers (speech synthesis and transcription) | Germany (Falkenstein, Nürnberg) | German company, GDPR-native |
+| Hetzner | GPU server (speech synthesis and transcription) | Germany (Falkenstein) | German company, GDPR-native |
 | OpenRouter | LLM inference (your own key) | US-based router. The visitor picks the downstream provider and can select a provider with zero data retention in the EU | The visitor's own relationship |
 
 ### Cookies
@@ -115,7 +115,7 @@ German at `/datenschutz`, English at `/privacy`. It covers the chat processing, 
 | Frontend | EU edge | Cloudflare Pages |
 | Worker execution | Cloudflare EU edge network | Cloudflare Workers |
 | Object storage | Western Europe | Cloudflare R2 |
-| Speech synthesis and transcription | Germany (Falkenstein, Nürnberg) | Hetzner |
+| Speech synthesis and transcription | Germany (Falkenstein) | Hetzner |
 | LLM, free tier | United Kingdom or Finland, depending on which model answers | Nebius |
 | Safety logs | EU edge | Cloudflare KV |
 | Visitor data | The visitor's own device | Browser (IndexedDB) |

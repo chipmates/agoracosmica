@@ -221,7 +221,7 @@ const DatenschutzPage: FC = () => {
             <strong>Webhosting:</strong> Die Website wird über Cloudflare Pages (Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA) als Content-Delivery-Netzwerk ausgeliefert. Cloudflare ist unter dem EU-US Data Privacy Framework (DPF) zertifiziert. Bei der Auslieferung der statischen Website-Dateien (HTML, CSS, JavaScript) werden IP-Adressen in Cloudflare Access Logs erfasst. Es werden keine Chat-Inhalte, Audio-Daten oder sonstige Nutzerdaten über Cloudflare Pages verarbeitet.
           </p>
           <p>
-            <strong>Audio-Server:</strong> Für die Sprachverarbeitung (TTS/STT) betreiben wir eigene Server bei Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Deutschland. Standorte: Falkenstein und Nürnberg, Deutschland. Die Datenschutzerklärung von Hetzner: <a href="https://www.hetzner.com/legal/privacy-policy">https://www.hetzner.com/legal/privacy-policy</a>.
+            <strong>Audio-Server:</strong> Für die Sprachverarbeitung (TTS/STT) betreiben wir einen eigenen Server bei Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Deutschland. Standort: Falkenstein, Deutschland. Die Datenschutzerklärung von Hetzner: <a href="https://www.hetzner.com/legal/privacy-policy">https://www.hetzner.com/legal/privacy-policy</a>.
           </p>
           <p>
             Die Datenerhebung erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Der Betreiber hat ein berechtigtes Interesse an der technisch fehlerfreien Darstellung und zuverlässigen Bereitstellung des Dienstes.
@@ -253,11 +253,11 @@ const DatenschutzPage: FC = () => {
         <section className="legal-section">
           <h2>Audio-Dienst (Sprachsynthese und Spracherkennung)</h2>
           <p>
-            Für die Sprachausgabe (Text-to-Speech) und Spracheingabe (Speech-to-Text) nutzen wir selbst betriebene Server in Deutschland:
+            Für die Sprachausgabe (Text-to-Speech) und Spracheingabe (Speech-to-Text) nutzen wir einen selbst betriebenen Server in Deutschland:
           </p>
           <ul>
-            <li>Standort: Hetzner GEX130, Falkenstein und Nürnberg, Deutschland</li>
-            <li>Sprache wird ausschließlich auf diesen Servern erzeugt und erkannt</li>
+            <li>Standort: Hetzner GEX130, Falkenstein, Deutschland</li>
+            <li>Sprache wird ausschließlich auf diesem Server erzeugt und erkannt</li>
             <li>Für die Sprachausgabe wird der zu sprechende Text dorthin übertragen, zum Beispiel die Antwort einer Persönlichkeit oder eine Geschichte. Für die Spracheingabe wird Ihre Aufnahme dorthin übertragen und in Text umgewandelt.</li>
             <li>Beides läuft über unseren Audio-Proxy bei Cloudflare, der die Daten weiterleitet und nichts speichert</li>
             <li>Texte und Aufnahmen werden unmittelbar nach der Verarbeitung gelöscht. Ihre Stimme wird nicht aufgezeichnet oder gespeichert.</li>
@@ -344,7 +344,7 @@ const DatenschutzPage: FC = () => {
               <tr>
                 <td style={{ padding: '0.5rem' }}>Hetzner Online GmbH</td>
                 <td style={{ padding: '0.5rem' }}>Audio-Server (TTS/STT)</td>
-                <td style={{ padding: '0.5rem' }}>Falkenstein + Nürnberg, DE</td>
+                <td style={{ padding: '0.5rem' }}>Falkenstein, DE</td>
               </tr>
             </tbody>
           </table>

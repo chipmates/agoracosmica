@@ -202,7 +202,7 @@
       "speed": "Sprechgeschwindigkeit",
       "speedSlower": "Langsamer",
       "speedFaster": "Schneller",
-      "privacyNote": "Stimmen werden auf unseren Servern in Falkenstein und Nürnberg generiert. Audio bleibt nur im Arbeitsspeicher und wird nach jeder Anfrage gelöscht.",
+      "privacyNote": "Stimmen werden auf unserem Server in Falkenstein generiert. Audio bleibt nur im Arbeitsspeicher und wird nach jeder Anfrage gelöscht.",
       "smartRouting": "Automatisch ausgewählt basierend auf deiner Sprache: Deutsch → OpenAI, Englisch → Kokoro",
       "gpt4oNote": "GPT-4o TTS funktioniert am besten mit englischen Inhalten. Für nicht-englische Sprachen bietet der Standard-OpenAI-TTS möglicherweise eine bessere Qualität.",
       "kokoroNote": "Selbst gehostetes Kokoro TTS auf EU-Servern. Keine Datenspeicherung. Alle Audioverarbeitung bleibt in Deutschland.",
@@ -236,7 +236,7 @@
       "enabled": "Spracheingabe aktivieren",
       "service": "Sprache-zu-Text-Dienst",
       "privacyTitle": "Whisper · Selbst gehostet in Deutschland",
-      "privacyNote": "Spracherkennung läuft auf unseren eigenen Servern. Deine Stimme bleibt nur im Arbeitsspeicher und wird nach jeder Anfrage gelöscht.",
+      "privacyNote": "Spracherkennung läuft auf unserem eigenen Server. Deine Stimme bleibt nur im Arbeitsspeicher und wird nach jeder Anfrage gelöscht.",
       "shortcut": "Du kannst schnell zwischen Text- und Spracheingabe wechseln mit",
       "shortcutTip": "Du kannst schnell zwischen Text- und Spracheingabe wechseln mit",
       "mobileNotice": "Beta-Spracheingabe: Die Spracherkennung hat auf mobilen Browsern nur begrenzte Unterstützung. Für zuverlässige Spracheingabe empfehlen wir, auf unsere mobile App zu warten.",
@@ -1446,7 +1446,7 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 14. Oktober 2026"
+      "lastUpdated": "Stand: 19. Oktober 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1823,7 +1823,7 @@
         "title": "Stimme & Sprache",
         "description": "Selbst gehostet in Deutschland. Keine Audio-Verarbeitung durch Dritte.",
         "points": [
-          "Zwei Server in Falkenstein und Nürnberg (Hetzner)",
+          "Ein Server in Falkenstein (Hetzner)",
           "Audio bleibt nur im Arbeitsspeicher, nach jeder Anfrage gelöscht",
           "Tägliche Prüfung bestätigt, dass nichts gespeichert wird"
         ]

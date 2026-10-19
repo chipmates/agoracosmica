@@ -204,7 +204,7 @@
       "speed": "Voice Speed",
       "speedSlower": "Slower",
       "speedFaster": "Faster",
-      "privacyNote": "Voices generated on our servers in Falkenstein and Nuremberg. Audio held in RAM only and deleted after each request.",
+      "privacyNote": "Voices generated on our server in Falkenstein. Audio held in RAM only and deleted after each request.",
       "smartRouting": "Auto-selected based on your language: German → OpenAI, English → Kokoro",
       "gpt4oNote": "GPT-4o TTS works best with English content. For non-English languages, the standard OpenAI TTS may provide better quality.",
       "kokoroNote": "Self-hosted Kokoro TTS on EU servers. Zero data retention. All audio processing stays in Germany.",
@@ -238,7 +238,7 @@
       "enabled": "Enable Voice Input",
       "service": "Speech-to-Text Service",
       "privacyTitle": "Whisper · Self-hosted in Germany",
-      "privacyNote": "Speech recognition runs on our own servers. Your voice is held in RAM only and deleted after each request.",
+      "privacyNote": "Speech recognition runs on our own server. Your voice is held in RAM only and deleted after each request.",
       "shortcut": "You can quickly toggle between text and voice input with",
       "shortcutTip": "You can quickly toggle between text and voice input with",
       "mobileNotice": "Beta Voice Input: Speech recognition has limited support on mobile browsers. For reliable voice input, we recommend waiting for our mobile app.",
@@ -525,7 +525,7 @@
         "hetzner": {
           "name": "Hetzner Online",
           "region": "Germany",
-          "purpose": "Voice and speech servers",
+          "purpose": "Voice and speech server",
           "status": "AVV in place"
         },
         "nebius": {
@@ -1444,7 +1444,7 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: October 14, 2026"
+      "lastUpdated": "Last updated: October 19, 2026"
     },
     "imprint": {
       "title": "Impressum",
@@ -1821,7 +1821,7 @@
         "title": "Voice & Speech",
         "description": "Self-hosted in Germany. No third-party audio processing.",
         "points": [
-          "Two servers in Falkenstein and Nuremberg (Hetzner)",
+          "One server in Falkenstein (Hetzner)",
           "Audio held in RAM only, deleted after each request",
           "Daily check confirms nothing is logged or stored"
         ]
