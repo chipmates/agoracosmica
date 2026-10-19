@@ -53,7 +53,7 @@ export async function proxyWithFailoverFromBuffer(
   }
 
   // Both failed
-  return new Response(JSON.stringify({ error: 'Both audio servers unavailable' }), {
+  return new Response(JSON.stringify({ error: 'Audio server unavailable' }), {
     status: 502,
     headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
   });

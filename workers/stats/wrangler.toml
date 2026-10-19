@@ -11,7 +11,7 @@ preview_urls = false
 # Environment Variables
 [vars]
 SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
-# NBG1 retired: an empty URL hands its share to FSN1 (one server since Oct 2026).
+# NBG1 retired: the URL stays empty and unused, the panel shows FSN1 only (one server since Oct 2026).
 SERVER_NBG1_URL = ""
 # Unix epoch (seconds) of public launch. When > 0, every Analytics Engine query
 # is floored at this timestamp and the sidebar shows "Stats since: <date>".
@@ -40,9 +40,9 @@ MUSEUM_COUNT_DATASET = "museum_count"
 #                        it is not set up and asks Cloudflare nothing)
 # - CF_API_TOKEN       (API token with Analytics Engine read permission)
 # - CF_ACCOUNT_ID      (Cloudflare account ID for Analytics Engine queries)
-# - AUDIO_API_KEY      (Bearer token for GEX130 servers — same as audio worker)
+# - AUDIO_API_KEY      (Bearer token for the GEX130 server — same as audio worker)
 # - ORIGIN_VERIFY_KEY  (X-Origin-Verify header — same value as audio worker;
-#                       required once nginx on FSN1+NBG1 enforces the check)
+#                       required once nginx on FSN1 enforces the check)
 
 [[routes]]
 pattern = "stats.agoracosmica.org/*"

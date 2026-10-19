@@ -1,5 +1,5 @@
-# Cloudflare Worker — Audio Proxy with Load-Aware Routing + Failover
-# Routes TTS/STT requests to 2 GEX130 servers (FSN1 + NBG1)
+# Cloudflare Worker: Audio Proxy with a health check
+# Routes TTS/STT requests to one GEX130 server (FSN1, Falkenstein)
 
 name = "agora-cosmica-audio"
 main = "src/index.ts"
@@ -33,9 +33,9 @@ SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
 SERVER_NBG1_URL = ""
 
 # Secrets (set via wrangler secret put):
-# - AUDIO_API_KEY      (Bearer token for both GEX130 servers)
+# - AUDIO_API_KEY      (Bearer token for the GEX130 server)
 # - ORIGIN_VERIFY_KEY  (X-Origin-Verify header injected on every upstream call;
-#                       nginx on FSN1+NBG1 rejects requests missing/wrong value.
+#                       nginx on FSN1 rejects requests missing/wrong value.
 #                       Defense against direct-to-origin abuse with leaked AUDIO_API_KEY.
 #                       Generate: openssl rand -hex 32)
 # - LOAD_TEST_BYPASS_KEY  (optional; if set, X-Load-Test-Auth header skips rate limits)

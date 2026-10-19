@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Two Cloudflare Workers act as thin proxies with no user data and no per-request logs, next to the media CDN that serves pre-recorded audio. Backends include Nebius in the United Kingdom and Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPUs in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 628" preserveAspectRatio="xMidYMid meet" role="img" aria-label="Agora Cosmica architecture diagram. Three tiers: your browser holds all user data and the encrypted BYOK key. Two Cloudflare Workers act as thin proxies with no user data and no per-request logs, next to the media CDN that serves pre-recorded audio. Backends include Nebius in the United Kingdom and Finland for the free tier, OpenRouter for BYOK inference with ZDR providers available, Hetzner GPU in Germany for self-hosted live audio, and Cloudflare R2 in EU storage for pre-recorded media. A fourth self-host row shows the same app running from docker compose with a local LLM via Ollama, vLLM, or LM Studio, so conversations stay on your machine.">
   <defs>
     <radialGradient id="bg" cx="50%" cy="35%" r="80%">
       <stop offset="0%" stop-color="#1c2452"/>
@@ -112,7 +112,7 @@
     <rect x="576" y="212" width="266" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
     <text x="604" y="246" class="label box-title">Audio Proxy</text>
     <text x="604" y="275" class="label box-sub">GPU-aware rate limits</text>
-    <text x="604" y="299" class="label box-sub">Server failover</text>
+    <text x="604" y="299" class="label box-sub">Health check</text>
 
     <!-- Media CDN → Cloudflare R2 -->
     <rect x="861" y="212" width="291" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
@@ -154,7 +154,7 @@
 
     <!-- Hetzner GEX130 GPUs -->
     <rect x="576" y="432" width="266" height="96" rx="12" class="panel-box" filter="url(#lift)"/>
-    <text x="604" y="466" class="label box-title">Hetzner GPUs</text>
+    <text x="604" y="466" class="label box-title">Hetzner GPU</text>
     <text x="604" y="495" class="label box-sub">Self-hosted live audio</text>
     <text x="604" y="519" class="label box-sub">EU (Germany)</text>
 
