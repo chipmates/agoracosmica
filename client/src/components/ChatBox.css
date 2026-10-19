@@ -365,6 +365,12 @@
     text-align: justify; /* the scored desktop look: long lines carry justify well */
     hyphens: auto;
   }
+
+  /* A question runs a line or two, and justify only stretches its word gaps */
+  .message.user .message-content {
+    text-align: left;
+    hyphens: none;
+  }
 }
 
 /* Tablet optimization */
