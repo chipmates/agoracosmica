@@ -6,11 +6,7 @@ import './ProcessingLoader.css';
 import '../styles/liquid-glass.css';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLiquidGlass } from '../hooks/useLiquidGlass';
-import {
-  TURNSTILE_INTERACTIVE_START_EVENT,
-  TURNSTILE_INTERACTIVE_END_EVENT,
-  isTurnstileInteractive,
-} from '../services/proxy/turnstile';
+import { useSecurityCheckState, useSecurityNoticeHost } from './SecurityCheckNotice';
 
 export type ProcessingStage = 'preparing' | 'hearing' | 'contemplating' | 'shaping';
 export type CapacityState = 'normal' | 'highDemand' | 'takingLonger';
@@ -84,8 +80,23 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const [showOptOut, setShowOptOut] = useState(false);
   const [quoteIndex, setQuoteIndex] = useState(0);
   // Seeded from the module state: on a challenge re-render the escalation can
-  // beat this component's mount, so the events alone would miss it.
-  const [turnstileInteractive, setTurnstileInteractive] = useState(isTurnstileInteractive);
+  // beat this component's mount, so the events alone would miss it. This card
+  // shows the waiting line itself, so the page-level notice steps aside.
+  const { waiting: securityWait, interactive: turnstileInteractive } = useSecurityCheckState();
+  useSecurityNoticeHost();
+  const securityCheck = securityWait || turnstileInteractive;
+  // Time spent on the bot check is not time the server is busy, so the
+  // capacity clock does not count it.
+  const checkPausedMsRef = useRef(0);
+  const checkSinceRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (securityCheck && checkSinceRef.current === null) {
+      checkSinceRef.current = Date.now();
+    } else if (!securityCheck && checkSinceRef.current !== null) {
+      checkPausedMsRef.current += Date.now() - checkSinceRef.current;
+      checkSinceRef.current = null;
+    }
+  }, [securityCheck]);
 
   // 1. Delayed appearance — kills flicker on fast responses (<250ms).
   useEffect(() => {
@@ -96,7 +107,9 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   // 2. Capacity-state transitions driven by wait duration.
   useEffect(() => {
     const tick = setInterval(() => {
-      const waitSec = (Date.now() - mountedAtRef.current) / 1000;
+      const now = Date.now();
+      const checkMs = checkPausedMsRef.current + (checkSinceRef.current === null ? 0 : now - checkSinceRef.current);
+      const waitSec = (now - mountedAtRef.current - checkMs) / 1000;
       if (waitSec >= TAKING_LONGER_AT_S) setDerivedCapacity('takingLonger');
       else if (waitSec >= HIGH_DEMAND_AT_S) setDerivedCapacity('highDemand');
       else setDerivedCapacity('normal');
@@ -105,23 +118,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
     return () => clearInterval(tick);
   }, []);
 
-  // 3. Bot check escalated to a checkbox the visitor has to tick. The widget
-  // sits at the bottom of the screen behind this overlay, so the copy has to
-  // point at it or the request dies waiting.
-  useEffect(() => {
-    const onStart = () => setTurnstileInteractive(true);
-    const onEnd = () => setTurnstileInteractive(false);
-    window.addEventListener(TURNSTILE_INTERACTIVE_START_EVENT, onStart);
-    window.addEventListener(TURNSTILE_INTERACTIVE_END_EVENT, onEnd);
-    // Catch a change that slipped between the seeded initial state and here.
-    setTurnstileInteractive(isTurnstileInteractive());
-    return () => {
-      window.removeEventListener(TURNSTILE_INTERACTIVE_START_EVENT, onStart);
-      window.removeEventListener(TURNSTILE_INTERACTIVE_END_EVENT, onEnd);
-    };
-  }, []);
-
-  // 4. Quote rotation — one pool at a time (based on current stage + capacity).
+  // 3. Quote rotation — one pool at a time (based on current stage + capacity).
   // Changing the pool resets the rotation so a transition into a new pool starts from quote 0.
   const capacityForQuotes: CapacityState =
     derivedCapacity === 'takingLonger' ? 'highDemand' : derivedCapacity;
@@ -176,9 +173,11 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
         <div className="cosmic-processing-text">
           <h3 className="cosmic-processing-title">{tNode('processing.title')}</h3>
           <div className="cosmic-processing-subtitle-container">
-            {/* While the bot check waits on a tap, the capacity copy would
-                blame a busy server for a wait only the visitor can end. */}
-            {isStageAware || turnstileInteractive ? (
+            {/* While the bot check runs, the capacity copy would blame a busy
+                server for a wait the server has no part in. The box sits
+                behind this overlay at the bottom, so the interactive copy has
+                to point at it or the request dies waiting. */}
+            {isStageAware || securityCheck ? (
               <>
                 <p className="cosmic-processing-subtitle cosmic-processing-figure">
                   <span className="figure-name" title={lastName}>
@@ -191,6 +190,10 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
                       'processing.securityCheck',
                       'Quick security check. Tap the box at the bottom of the screen and your message continues.',
                     )}
+                  </p>
+                ) : securityWait ? (
+                  <p className="cosmic-processing-note cosmic-processing-security cosmic-processing-security--wait">
+                    {tString('processing.securityWait', 'One moment, a quick security check is running.')}
                   </p>
                 ) : (
                   <p className="cosmic-processing-quote">{quote}</p>
@@ -207,7 +210,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
               </p>
             )}
 
-            {derivedCapacity === 'takingLonger' && !turnstileInteractive && (
+            {derivedCapacity === 'takingLonger' && !securityCheck && (
               <p className="cosmic-processing-note" aria-live="polite">
                 {tString(
                   'processing.takingLonger',

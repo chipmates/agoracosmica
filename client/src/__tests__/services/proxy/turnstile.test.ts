@@ -1,7 +1,8 @@
 // The Turnstile widget is a fixed overlay sitting on top of the whole app, so
 // the invariant under test is pointer reachability, not the challenge itself:
 // the box may only take a tap while it is actually asking for one, and when it
-// asks it has to clear the composer and the bottom controls at every width.
+// asks it has to clear every control a visitor can reach on that screen (the
+// consent card, the figure pick, the composer) at every width.
 //
 // The module injects its own <script> and reads window.turnstile, so the tests
 // stub the loader by dispatching the script's load event on append, and reset
@@ -9,10 +10,13 @@
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
-vi.mock('../../../utils/funnelBeacon', () => ({
+vi.mock('../../../utils/funnelBeacon', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('../../../utils/funnelBeacon')>()),
   sendFunnelBeacon: vi.fn(),
   sendFunnelBeaconOnce: vi.fn(),
 }));
+
+import { sendFunnelBeacon } from '../../../utils/funnelBeacon';
 
 type TurnstileOptions = {
   sitekey: string;
@@ -93,6 +97,30 @@ function mountComposer(heightPx: number): HTMLElement {
   return mountBottomControl('unified-input-container', heightPx);
 }
 
+/** Give an element a fixed viewport rect (jsdom lays nothing out). */
+function setRect(el: HTMLElement, x: number, y: number, w: number, h: number): HTMLElement {
+  el.getBoundingClientRect = () => ({
+    x, y, top: y, left: x, bottom: y + h, right: x + w, width: w, height: h, toJSON: () => ({}),
+  }) as DOMRect;
+  return el;
+}
+
+/** A tappable control at a fixed spot, like the pick screen's Select. */
+function mountButton(label: string, x: number, y: number, w: number, h: number): HTMLButtonElement {
+  const el = document.createElement('button');
+  el.textContent = label;
+  el.className = 'test-control';
+  setRect(el, x, y, w, h);
+  document.body.appendChild(el);
+  return el;
+}
+
+/** The figure pick at 390x844, as measured on 18 Oct: Select and See all 30 on one row. */
+function mountPickScreen(): void {
+  mountButton('Select', 20, 708, 178, 46);
+  mountButton('See all 30', 216, 709, 154, 44);
+}
+
 describe('turnstile widget placement', () => {
   beforeEach(() => {
     vi.resetModules();
@@ -114,7 +142,7 @@ describe('turnstile widget placement', () => {
     vi.unstubAllEnvs();
     setInnerWidth(originalInnerWidth);
     setInnerHeight(originalInnerHeight);
-    document.querySelectorAll('.unified-input-container').forEach((el) => el.remove());
+    document.querySelectorAll('.unified-input-container, .test-control').forEach((el) => el.remove());
     document.getElementById(CONTAINER_ID)?.remove();
     document.querySelectorAll('script[src*="challenges.cloudflare.com"]').forEach((s) => s.remove());
     delete (window as unknown as Record<string, unknown>).turnstile;
@@ -206,6 +234,113 @@ describe('turnstile widget placement', () => {
     expect(container.style.bottom).toBe('760px');
   });
 
+  it('lifts the asking box off the Select button of the figure pick', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    mountPickScreen();
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    // Select's top is at 708: the box sits a gap above it, not over it at 96.
+    expect(container.style.bottom).toBe('148px');
+  });
+
+  it('climbs past stacked controls to the first clear gap', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    mountPickScreen();
+    mountButton('Play intro', 157, 637, 130, 34);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    // Above Select (148) the box would still touch Play intro, so it clears that too.
+    expect(container.style.bottom).toBe('219px');
+  });
+
+  it('keeps the consent line clear along with the Terms link inside it', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    const line = setRect(document.createElement('p'), 40, 690, 310, 40);
+    line.className = 'test-control';
+    line.append('By continuing you agree to the ');
+    const link = setRect(document.createElement('a'), 105, 702, 119, 19);
+    link.setAttribute('href', '/terms');
+    link.textContent = 'Terms of Service';
+    line.appendChild(link);
+    document.body.appendChild(line);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    expect(container.style.bottom).toBe('166px');
+  });
+
+  it('may sit over a control that a modal backdrop already covers', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    mountPickScreen();
+    const backdrop = document.createElement('div');
+    document.body.appendChild(backdrop);
+    const realHitTest = document.elementFromPoint;
+    document.elementFromPoint = () => backdrop;
+    try {
+      const { options, container } = await renderWidget();
+      options['before-interactive-callback']();
+      expect(container.style.bottom).toBe('96px');
+    } finally {
+      document.elementFromPoint = realHitTest;
+      backdrop.remove();
+    }
+  });
+
+  it('leaves controls outside its own column alone', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    // The box spans 45 to 345 at this width; a corner icon at 350 is beside it.
+    mountButton('Menu', 350, 700, 40, 40);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    expect(container.style.bottom).toBe('96px');
+  });
+
+  it('moves when a control lands under it, and holds a clear spot after', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+    expect(container.style.bottom).toBe('96px');
+
+    // The consent card closes and the pick screen arrives under the box.
+    mountPickScreen();
+    await vi.waitFor(() => expect(container.style.bottom).toBe('148px'), { timeout: 3000 });
+
+    // Gone again: the spot is still clear, so the box does not hop back.
+    document.querySelectorAll('.test-control').forEach((el) => el.remove());
+    await new Promise((r) => setTimeout(r, 900));
+    expect(container.style.bottom).toBe('148px');
+  });
+
+  it('measures the same way at 768 and 1280', async () => {
+    for (const [width, floor] of [[768, 96], [1280, 16]] as const) {
+      setInnerWidth(width);
+      setInnerHeight(800);
+      const select = mountButton('Select', width / 2 - 60, 800 - floor - 40, 120, 46);
+      const { options, container } = await renderWidget();
+      options['before-interactive-callback']();
+      // The box clears the button's top by the gap, whatever the floor.
+      expect(container.style.bottom).toBe(`${800 - (800 - floor - 40) + 12}px`);
+      options['error-callback']();
+      select.remove();
+      container.remove();
+      renderMock.mockClear();
+    }
+  });
+
   it('resolves with the token and hides the container on success', async () => {
     const { token, options, container } = await renderWidget();
 
@@ -213,5 +348,66 @@ describe('turnstile widget placement', () => {
 
     await expect(token).resolves.toBe('tok');
     expect(container.style.display).toBe('none');
+  });
+});
+
+describe('turnstile beacons', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
+    capturedOptions = null;
+    renderMock = vi.fn((_el: HTMLElement, options: TurnstileOptions) => {
+      capturedOptions = options;
+      return 'widget-1';
+    });
+    vi.mocked(sendFunnelBeacon).mockClear();
+    stubScriptLoader();
+  });
+
+  afterEach(() => {
+    try { capturedOptions?.['error-callback']?.(); } catch { /* already settled */ }
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    document.getElementById(CONTAINER_ID)?.remove();
+    document.querySelectorAll('script[src*="challenges.cloudflare.com"]').forEach((s) => s.remove());
+    delete (window as unknown as Record<string, unknown>).turnstile;
+  });
+
+  const steps = (): string[] => vi.mocked(sendFunnelBeacon).mock.calls.map((c) => c[0] as string);
+
+  it('keeps the old sequence for an invisible pass and adds one timing row', async () => {
+    const { token, options } = await renderWidget();
+    options.callback('tok');
+    await token;
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_token']);
+    expect(vi.mocked(sendFunnelBeacon).mock.calls[1][1]).toEqual({ bucket: 0, mode: 'ahead' });
+  });
+
+  it('keeps the old sequence for a solved checkbox', async () => {
+    const { token, options } = await renderWidget();
+    options['before-interactive-callback']();
+    options.callback('tok');
+    await token;
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_interactive', 'turnstile_solved', 'turnstile_token']);
+  });
+
+  it('labels the timing row waited when a send was waiting on the check', async () => {
+    const { markTurnstileAwaited } = await import('../../../services/proxy/turnstile');
+    const { token, options } = await renderWidget();
+    markTurnstileAwaited();
+    options.callback('tok');
+    await token;
+
+    expect(vi.mocked(sendFunnelBeacon).mock.calls.at(-1)).toEqual(['turnstile_token', { bucket: 0, mode: 'waited' }]);
+  });
+
+  it('writes no timing row for a failed check', async () => {
+    const { token, options } = await renderWidget();
+    options['error-callback']();
+    await expect(token).rejects.toThrow();
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_failed']);
   });
 });

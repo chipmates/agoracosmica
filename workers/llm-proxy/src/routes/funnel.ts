@@ -100,6 +100,10 @@ const VALID_STEPS = new Set([
   'turnstile_failed',
   'turnstile_abandoned',
   'turnstile_token_aged',
+  // A token handed out: the bucket says how long it took from being asked for,
+  // the mode slot whether a send waited on it ('waited') or it ran ahead of
+  // need ('ahead'). Beside the family above, which keeps its meaning.
+  'turnstile_token',
   // The visit did something rather than only arriving: a first typed turn, or
   // enough listening to count as listening. The arm rides in the mode slot.
   // At most two per page load (the first arm, then 'both' if the other one follows).

@@ -94,6 +94,10 @@ export type FunnelStep =
   // own step: it is housekeeping, not a lost message, and folding it into
   // turnstile_failed drowned the real failures at roughly 14 to 1.
   | 'turnstile_token_aged'
+  // A token was handed out, with how long it took (bucket) and whether a send
+  // was waiting on it ('waited') or it ran ahead of need ('ahead') in the mode
+  // slot. Added beside the family above, none of which changed meaning.
+  | 'turnstile_token'
   // The visit did something rather than only arriving. The arm rides in the
   // mode slot and says which half of the product it was. At most two per page:
   // the arm that qualified first, then 'both' if the other one follows.
@@ -172,6 +176,21 @@ export function replyTimeBucket(elapsedMs: number): number {
     if (seconds < REPLY_TIME_BUCKETS_S[i]) return i;
   }
   return REPLY_TIME_BUCKETS_S.length;
+}
+
+/**
+ * Bot-check time bucket boundaries, in seconds, for turnstile_token. Five
+ * buckets: index 0 = under 2s, 1 = 2-5s, 2 = 5-10s, 3 = 10-30s, 4 = 30s+.
+ */
+export const TURNSTILE_TIME_BUCKETS_S: readonly number[] = [2, 5, 10, 30];
+
+/** Map the time a token took to its coarse bucket index (0-based). */
+export function turnstileTimeBucket(elapsedMs: number): number {
+  const seconds = elapsedMs / 1000;
+  for (let i = 0; i < TURNSTILE_TIME_BUCKETS_S.length; i++) {
+    if (seconds < TURNSTILE_TIME_BUCKETS_S[i]) return i;
+  }
+  return TURNSTILE_TIME_BUCKETS_S.length;
 }
 
 // Dispatch-start stamp for the first_reply time bucket. Module-scoped:

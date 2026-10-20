@@ -14,6 +14,8 @@ import { useAppStateVM } from '../vm/useAppStateVM';
 import { useConversationVM } from '../vm/useConversationVM';
 import { useConversationEffects } from '../hooks/useConversationEffects';
 import { useQuotaSync } from '../hooks/useQuotaSync';
+import { prepareSession } from '../services/proxy/sessionManager';
+import SecurityCheckNotice from '../components/SecurityCheckNotice';
 import { useCouncilState, useCouncilActions, useModeState, useModeActions, useUIStore, useStoreHydration } from '../stores';
 import { getCouncilControllerApi, subscribeCouncilController } from '../controllers/councilControllerRegistry';
 import { cosmicCouncilService } from '../services/council';
@@ -1548,6 +1550,9 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     // this is the single chokepoint with no double-count. The same-figure
     // early return above keeps carousel re-closes out of the count.
     sendFunnelBeacon('figure_selected', { figureId: figure?.id });
+    // A pick is the first sign a message is coming: if the next send would
+    // have to start a bot check, start it now instead.
+    if (useDomainStore.getState().quota.isFreeTier) prepareSession();
 
     // Suppress Effect#14 — we handle mode directly below
     lastSeedSelectTimeRef.current = Date.now();
@@ -1950,6 +1955,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
 
   return (
     <div className="homepage">
+      <SecurityCheckNotice />
       {/* Mobile Navigation: PeekingFAB - show when not in special modes */}
       {isMobileOrTablet && (
         <PeekingFAB

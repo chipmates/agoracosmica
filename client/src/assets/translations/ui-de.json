@@ -1253,7 +1253,8 @@
     },
     "optOut": "Lieber Text lesen",
     "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
-    "securityCheck": "Kurze Sicherheitsprüfung. Tippe unten auf das Kästchen, dann geht es direkt weiter."
+    "securityCheck": "Kurze Sicherheitsprüfung. Tippe unten auf das Kästchen, dann geht es direkt weiter.",
+    "securityWait": "Einen Moment, eine kurze Sicherheitsprüfung läuft."
   },
   "councilProcessing": {
     "title": "Kosmischer Rat wird einberufen",

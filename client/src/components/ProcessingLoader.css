@@ -495,6 +495,12 @@
   opacity: 1;
 }
 
+/* Nothing to do but wait: the same slot, in the calm body colour. */
+.cosmic-processing-overlay .cosmic-processing-note.cosmic-processing-security--wait {
+  color: var(--text-primary);
+  font-weight: 400;
+}
+
 /* Subtle coral tint on the progress bar fill too — one more cue that state shifted. */
 .cosmic-processing-overlay.capacity-takingLonger .cosmic-progress-fill {
   background: color-mix(in srgb, var(--coral-base) 80%, var(--gold-subtle));

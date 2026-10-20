@@ -24,6 +24,7 @@ import { useAutoplayGate } from '../hooks/useAutoplayGate';
 import { MicrophonePermissionError, type MicrophoneErrorType } from './MicrophonePermissionError';
 import { useDomainStore } from '../stores';
 import { detectPII } from '../utils/piiDetection';
+import { prepareSession } from '../services/proxy/sessionManager';
 import './UnifiedInputContainer.css';
 
 // Capacitor keyboard handling for native builds.
@@ -376,6 +377,8 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     // ✅ CRITICAL: Unlock audio FIRST, before getUserMedia prompt
     // This must happen synchronously in the same event turn
     unlock();
+    // A spoken message is on its way: its bot check runs while it is spoken.
+    if (useDomainStore.getState().quota.isFreeTier) prepareSession();
 
     try {
       // Request microphone with echo cancellation for better quality
@@ -708,7 +711,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                   setMessage(e.target.value);
                 }}
                 onKeyDown={handleKeyDown}
-                onFocus={() => setIsFocused(true)}
+                onFocus={() => {
+                  setIsFocused(true);
+                  // Typing has begun: a bot check the send would need runs now.
+                  if (useDomainStore.getState().quota.isFreeTier) prepareSession();
+                }}
                 onBlur={() => setIsFocused(false)}
                 placeholder={isQuotaExhausted
                   ? tString('quota.limitReached', 'Daily limit reached')

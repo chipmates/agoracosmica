@@ -1,0 +1,51 @@
+/* Sits just under the bot-check box (100000) and over every app overlay. */
+.security-check-notice {
+  position: fixed;
+  left: 50%;
+  bottom: 96px;
+  transform: translateX(-50%);
+  z-index: var(--z-loader);
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  width: max-content;
+  max-width: min(360px, calc(100vw - 2 * var(--space-md)));
+  padding: var(--space-sm) var(--space-md);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) 35%, transparent);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--bg-primary) 94%, transparent);
+  backdrop-filter: blur(var(--glass-blur-light));
+  -webkit-backdrop-filter: blur(var(--glass-blur-light));
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  animation: security-check-notice-in 0.3s ease-out;
+}
+
+.security-check-notice__dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--radius-full);
+  background: var(--gold-base);
+  animation: security-check-notice-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes security-check-notice-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes security-check-notice-breathe {
+  0%, 100% { opacity: 0.35; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .security-check-notice,
+  .security-check-notice__dot {
+    animation: none;
+  }
+}

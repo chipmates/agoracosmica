@@ -102,14 +102,15 @@ export async function fetchQuota(): Promise<void> {
     timeoutMs: 10_000,
   });
 
+  // Nobody waits on the counter, so this never raises the waiting notice.
   try {
-    let token = await getSessionToken();
+    let token = await getSessionToken({ background: true });
     let response = await doFetch(token);
 
     if (response.status === 401) {
       // Token rejected (expired or IP changed) — mirror fetchWithSessionRetry's refresh
       invalidateToken();
-      token = await getSessionToken();
+      token = await getSessionToken({ background: true });
       response = await doFetch(token);
     }
 

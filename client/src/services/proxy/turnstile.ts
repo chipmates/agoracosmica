@@ -2,7 +2,7 @@
 // Renders a managed challenge, returns a token for session creation
 
 import { isSelfHost } from '../../config/deployment';
-import { sendFunnelBeacon } from '../../utils/funnelBeacon';
+import { sendFunnelBeacon, turnstileTimeBucket } from '../../utils/funnelBeacon';
 
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 // 30s, not 15s: mobile Safari resuming from bfcache or a long backgrounded tab
@@ -62,39 +62,140 @@ function emit(eventName: string): void {
   } catch { /* ignore */ }
 }
 
-// The gate's mobile breakpoint. Below it the primary controls (consent button,
-// composer) sit at the bottom edge, where the challenge box would land.
+// The gate's mobile breakpoint. Below it the browser's own bottom bar and the
+// thumb zone sit at the bottom edge, so the box never goes lower than this.
 const NARROW_VIEWPORT_PX = 768;
-// The bottom-edge chat control the box must clear (the stop-voice icon lives
-// inside it). Measured, not assumed: it has no fixed offset.
+// The chat composer is cleared as one block, even under an overlay: it holds
+// the stop-voice icon and is where the visitor's eyes return.
 const BOTTOM_CONTROL_SELECTOR = '.unified-input-container';
+// Everything else a visitor can tap. Measured on every screen the box can
+// reach (consent card, figure pick, composer), never listed per screen.
+const TAPPABLE_SELECTOR = [
+  'button', 'a[href]', 'input:not([type="hidden"])', 'textarea', 'select',
+  '[role="button"]', '[role="link"]', '[contenteditable="true"]',
+].join(', ');
 // The 'normal' widget, plus the air kept between it and whatever it clears.
 const CHALLENGE_BOX_PX = 72;
+const CHALLENGE_BOX_WIDTH_PX = 300;
 const CLEARANCE_GAP_PX = 12;
 
-/**
- * How far above the bottom edge the escalated box has to sit: clear of every
- * bottom control on screen, never past the top of the viewport.
- */
-function bottomClearancePx(): number {
-  const floor = window.innerWidth <= NARROW_VIEWPORT_PX ? 96 : 16;
-  let lift = floor;
-  document.querySelectorAll<HTMLElement>(BOTTOM_CONTROL_SELECTOR).forEach((el) => {
-    const rect = el.getBoundingClientRect();
-    const onScreen = rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
-    if (!onScreen) return;
-    lift = Math.max(lift, window.innerHeight - rect.top + CLEARANCE_GAP_PX);
-  });
-  const ceiling = window.innerHeight - CHALLENGE_BOX_PX - CLEARANCE_GAP_PX;
-  // Ceil: a fractional rect must never leave the box a sliver short of clear.
-  return Math.ceil(Math.max(floor, Math.min(lift, ceiling)));
+interface Band { top: number; bottom: number }
+
+function isOnScreen(rect: DOMRect): boolean {
+  return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
 }
+
+/**
+ * Whether a tap at the control's visible centre would reach it. A control
+ * under a modal's backdrop cannot be tapped, so the box may sit over it.
+ */
+function isReachable(el: HTMLElement, rect: DOMRect): boolean {
+  if (typeof document.elementFromPoint !== 'function') return true;
+  const x = Math.min(Math.max(rect.left + rect.width / 2, 0), window.innerWidth - 1);
+  const top = Math.max(rect.top, 0);
+  const bottom = Math.min(rect.bottom, window.innerHeight);
+  const y = Math.min(Math.max((top + bottom) / 2, 0), window.innerHeight - 1);
+  const hit = document.elementFromPoint(x, y);
+  return hit === null || el.contains(hit);
+}
+
+/**
+ * The vertical spans the centred box must stay off: every reachable control in
+ * its column. A link is kept with its sentence, so the consent line stays
+ * readable along with the Terms link inside it.
+ */
+function obstacleBands(boxWidth: number, ignore: HTMLElement | null): Band[] {
+  const left = (window.innerWidth - boxWidth) / 2;
+  const right = left + boxWidth;
+  const bands: Band[] = [];
+  const add = (rect: DOMRect): void => {
+    if (!isOnScreen(rect) || rect.right <= left || rect.left >= right) return;
+    bands.push({ top: rect.top, bottom: rect.bottom });
+  };
+
+  document.querySelectorAll<HTMLElement>(BOTTOM_CONTROL_SELECTOR).forEach((el) => {
+    add(el.getBoundingClientRect());
+  });
+
+  // The hit test must see what lies under the box, not the box itself.
+  const restore = ignore ? ignore.style.pointerEvents : '';
+  if (ignore) ignore.style.pointerEvents = 'none';
+  try {
+    document.querySelectorAll<HTMLElement>(TAPPABLE_SELECTOR).forEach((el) => {
+      if (ignore && ignore.contains(el)) return;
+      const rect = el.getBoundingClientRect();
+      if (!isOnScreen(rect) || !isReachable(el, rect)) return;
+      add(rect);
+      if (el.tagName === 'A') {
+        const sentence = el.parentElement?.closest<HTMLElement>('p, li, label');
+        if (sentence && (!ignore || !ignore.contains(sentence))) add(sentence.getBoundingClientRect());
+      }
+    });
+  } finally {
+    if (ignore) ignore.style.pointerEvents = restore;
+  }
+  return bands;
+}
+
+function overlaps(bands: Band[], lift: number, boxHeight: number): Band[] {
+  const boxBottom = window.innerHeight - lift + CLEARANCE_GAP_PX;
+  const boxTop = window.innerHeight - lift - boxHeight - CLEARANCE_GAP_PX;
+  return bands.filter((b) => b.top < boxBottom && b.bottom > boxTop);
+}
+
+/**
+ * How far above the bottom edge a centred box of this size has to sit: the
+ * lowest spot clear of every control in its column, never past the top of the
+ * viewport. `keep` is the box's current lift, held while it is still clear so
+ * the box does not hop about as the page scrolls under it. On a screen with no
+ * clear spot, the spot covering the fewest controls wins.
+ */
+export function clearLiftPx(
+  boxWidth: number = CHALLENGE_BOX_WIDTH_PX,
+  boxHeight: number = CHALLENGE_BOX_PX,
+  ignore: HTMLElement | null = null,
+  keep: number | null = null,
+): number {
+  const floor = window.innerWidth <= NARROW_VIEWPORT_PX ? 96 : 16;
+  const ceiling = Math.max(floor, window.innerHeight - boxHeight - CLEARANCE_GAP_PX);
+  const bands = obstacleBands(boxWidth, ignore);
+
+  if (keep !== null && keep >= floor && keep <= ceiling && overlaps(bands, keep, boxHeight).length === 0) {
+    return keep;
+  }
+
+  // Each blocking band is climbed at most once, so this ends.
+  let lift = floor;
+  for (let i = 0; i <= bands.length && lift <= ceiling; i++) {
+    const blocking = overlaps(bands, lift, boxHeight);
+    // Ceil: a fractional rect must never leave the box a sliver short of clear.
+    if (blocking.length === 0) return Math.ceil(lift);
+    lift = window.innerHeight - Math.min(...blocking.map((b) => b.top)) + CLEARANCE_GAP_PX;
+  }
+
+  const candidates = [floor, ceiling, ...bands.map((b) => window.innerHeight - b.top + CLEARANCE_GAP_PX)]
+    .map((c) => Math.min(Math.max(c, floor), ceiling));
+  let best = ceiling;
+  let bestCount = Number.POSITIVE_INFINITY;
+  for (const c of candidates) {
+    const count = overlaps(bands, c, boxHeight).length;
+    if (count < bestCount || (count === bestCount && c > best)) {
+      best = c;
+      bestCount = count;
+    }
+  }
+  return Math.ceil(best);
+}
+
+// The lift the asking box sits at now; null while it waits in the corner.
+let centeredLiftPx: number | null = null;
 
 /**
  * Nothing is being asked of the visitor here, so the box must not take taps:
  * it sits over the consent button and the composer on narrow screens.
  */
 function placeInCorner(el: HTMLElement): void {
+  centeredLiftPx = null;
   el.style.position = 'fixed';
   el.style.bottom = '0';
   el.style.left = '';
@@ -106,11 +207,18 @@ function placeInCorner(el: HTMLElement): void {
 
 /**
  * Interactive: a box nobody finds is a dead request, so it moves into view and
- * takes taps again, lifted clear of the bottom controls at every width.
+ * takes taps again, clear of every control on screen at every width.
  */
 function placeInCenter(el: HTMLElement): void {
+  const rect = el.getBoundingClientRect();
+  centeredLiftPx = clearLiftPx(
+    Math.max(rect.width, CHALLENGE_BOX_WIDTH_PX),
+    Math.max(rect.height, CHALLENGE_BOX_PX),
+    el,
+    centeredLiftPx,
+  );
   el.style.position = 'fixed';
-  el.style.bottom = `${bottomClearancePx()}px`;
+  el.style.bottom = `${centeredLiftPx}px`;
   el.style.left = '50%';
   el.style.right = '';
   el.style.transform = 'translateX(-50%)';
@@ -118,8 +226,8 @@ function placeInCenter(el: HTMLElement): void {
   el.style.pointerEvents = 'auto';
 }
 
-// The composer mounts after the challenge escalates and grows with typing,
-// so the lift is re-measured while the box is asking.
+// Screens change under an asking box (the consent card closes, the composer
+// mounts and grows with typing), so the lift is re-measured while it asks.
 const PLACEMENT_RECHECK_MS = 400;
 let placementTimer: ReturnType<typeof setInterval> | null = null;
 
@@ -143,6 +251,7 @@ function stopTrackingPlacement(): void {
 function resetTurnstileState(): void {
   // The widget this challenge belonged to is being torn down.
   stopTrackingPlacement();
+  centeredLiftPx = null;
   if (challengeState === 'interactive') emit(TURNSTILE_INTERACTIVE_END_EVENT);
   challengeState = 'idle';
   if (widgetId !== null) {
@@ -244,14 +353,33 @@ function loadTurnstileScript(): Promise<void> {
   });
 }
 
+// Whether a visitor's send is waiting on the check now running (or about to
+// run), as opposed to a check started ahead of need. Cleared when it settles.
+let visitorWaiting = false;
+
+/** A send is now waiting on the current check. Labels its timing row only. */
+export function markTurnstileAwaited(): void {
+  visitorWaiting = true;
+}
+
 /**
  * Get a Turnstile token for session creation.
  * Uses 'normal' size + 'interaction-only' appearance: the managed check runs
  * with nothing on screen, and only an escalated challenge shows a box. That box
- * moves to the bottom-center and the UI is told, so the visitor knows what to tap.
+ * moves clear of the controls on screen and the UI is told, so the visitor
+ * knows what to tap.
  * Includes a timeout so the app never hangs if the challenge fails silently.
  */
 export async function getTurnstileToken(): Promise<string> {
+  const askedAtMs = Date.now();
+  try {
+    return await runCheck(askedAtMs);
+  } finally {
+    visitorWaiting = false;
+  }
+}
+
+async function runCheck(askedAtMs: number): Promise<string> {
   if (isSelfHost) {
     throw new Error('Turnstile is not used in self-host builds');
   }
@@ -370,6 +498,13 @@ export async function getTurnstileToken(): Promise<string> {
         tokenIssued = true;
         settle();
         if (wasInteractive) sendFunnelBeacon('turnstile_solved');
+        // A new row beside the old ones: how long the token took from the
+        // moment it was asked for (script load included), and whether a send
+        // was waiting on it or it ran ahead of need.
+        sendFunnelBeacon('turnstile_token', {
+          bucket: turnstileTimeBucket(Date.now() - askedAtMs),
+          mode: visitorWaiting ? 'waited' : 'ahead',
+        });
         // Hide widget after successful challenge
         if (container) container.style.display = 'none';
         resolve(token);

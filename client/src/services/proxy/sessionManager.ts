@@ -1,6 +1,7 @@
 // JWT session lifecycle for free-tier users
 // Creates session via Turnstile → Worker, stores JWT in memory, lazily refreshes
-// on the next getSessionToken() call when the cached token is within 5min of expiry.
+// on the next getSessionToken() call when the cached token is within a minute of
+// expiry, or a little earlier through prepareSession() when a send is coming.
 //
 // Identity: a UUID v4 ("clientId") is persisted in localStorage with the UTC
 // day it was issued and sent with every /v1/session call, so the server's daily
@@ -11,10 +12,10 @@
 // accepted trade-off (the per-address ceiling still holds).
 //
 // Refresh policy is LAZY (no setTimeout). An open-but-idle tab does not burn
-// Turnstile + JWT issuance every 5min. Sessions analytics only fire on real
+// Turnstile + JWT issuance on a timer. Sessions analytics only fire on real
 // engagement, not background timers.
 
-import { getTurnstileToken } from './turnstile';
+import { getTurnstileToken, markTurnstileAwaited } from './turnstile';
 import { fetchWithTimeout } from '../../utils/fetchWithTimeout';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
@@ -22,10 +23,30 @@ const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
 const CLIENT_ID_STORAGE_KEY = 'agora_client_id';
 const UUID_V4_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
+// Re-mint when less than this is left: room for a request to reach the worker
+// before the JWT lapses there. The worker checks exp with no leeway.
+const REFRESH_MARGIN_MS = 60_000;
+// prepareSession() looks this far ahead: about the time it takes to type and
+// send a message, so the check runs while the visitor types.
+const PREPARE_LOOKAHEAD_MS = 2 * 60_000;
+// After this long waiting on a session, the visitor is told a check is running.
+export const SESSION_WAIT_NOTICE_MS = 2_500;
+/** A send has waited SESSION_WAIT_NOTICE_MS on the bot check and still waits. */
+export const SESSION_WAIT_START_EVENT = 'agc:session-wait-start';
+/** That wait is over, however it ended. */
+export const SESSION_WAIT_END_EVENT = 'agc:session-wait-end';
+
 // In-memory storage (never persisted — session = per-tab)
 let currentToken: string | null = null;
+// Local clock, from the JWT's own lifetime and the moment it arrived, so a
+// device clock that runs fast or slow cannot shorten or stretch it.
 let tokenExpiresAt: number = 0; // Unix ms
 let pendingSession: Promise<string> | null = null; // Deduplication mutex
+// Which half of a pending session is running: the bot check, or the worker call.
+let sessionPhase: 'idle' | 'check' | 'session' = 'idle';
+let foregroundWaiters = 0;
+let waitNoticeTimer: ReturnType<typeof setTimeout> | null = null;
+let waitNoticeVisible = false;
 // Page memory only: the worker counts a session on the first token request of
 // a page load, so nothing is stored or looked up for the count.
 let sessionCounted = false;
@@ -79,34 +100,114 @@ function writeStoredClientId(clientId: string): void {
   }
 }
 
+function hasTokenFor(ms: number): boolean {
+  return currentToken !== null && tokenExpiresAt - Date.now() > ms;
+}
+
+/** Start a session unless one is already on its way (deduplication mutex). */
+function ensurePendingSession(): Promise<string> {
+  if (!pendingSession) {
+    pendingSession = createSession().finally(() => {
+      pendingSession = null;
+    });
+  }
+  return pendingSession;
+}
+
 /**
  * Get a valid JWT token, creating a session if needed.
- * Auto-refreshes 5 minutes before expiry.
+ * Refreshes when less than REFRESH_MARGIN_MS of the token is left.
  * Deduplicates concurrent calls to prevent multiple session creation.
+ * `background`: nobody is waiting on the answer (the quota fetch at app
+ * start), so no waiting notice is shown for it.
  */
-export async function getSessionToken(): Promise<string> {
-  // Return cached token if still valid (with 5-min buffer)
-  const now = Date.now();
-  if (currentToken && tokenExpiresAt > now + 5 * 60 * 1000) {
-    return currentToken;
+export async function getSessionToken(options: { background?: boolean } = {}): Promise<string> {
+  if (hasTokenFor(REFRESH_MARGIN_MS)) {
+    return currentToken as string;
   }
+  const pending = ensurePendingSession();
+  return options.background ? pending : waitInForeground(pending);
+}
 
-  // Deduplicate concurrent session creation
-  if (pendingSession) {
-    return pendingSession;
-  }
-
-  pendingSession = createSession().finally(() => {
-    pendingSession = null;
+/**
+ * Run the check now if the next send would otherwise have to wait for one:
+ * the same check, moved from the send to the moment the visitor shows intent
+ * (picks a figure, starts typing). Does nothing while a token covers the next
+ * couple of minutes or a check is already running. Never throws.
+ */
+export function prepareSession(): void {
+  if (pendingSession || hasTokenFor(PREPARE_LOOKAHEAD_MS)) return;
+  ensurePendingSession().catch(() => {
+    // The send that follows asks again and reports its own failure.
   });
-  return pendingSession;
+}
+
+/** Whether a send has been waiting on the bot check long enough to say so. */
+export function isSessionWaitVisible(): boolean {
+  return waitNoticeVisible;
+}
+
+function setWaitNotice(visible: boolean): void {
+  if (waitNoticeVisible === visible) return;
+  waitNoticeVisible = visible;
+  try {
+    window.dispatchEvent(new CustomEvent(visible ? SESSION_WAIT_START_EVENT : SESSION_WAIT_END_EVENT));
+  } catch { /* ignore */ }
+}
+
+/** A send waits on this session: after a short grace the wait is shown. */
+function waitInForeground(pending: Promise<string>): Promise<string> {
+  if (sessionPhase === 'check') markTurnstileAwaited();
+  foregroundWaiters += 1;
+  if (waitNoticeTimer === null && !waitNoticeVisible) {
+    waitNoticeTimer = setTimeout(() => {
+      waitNoticeTimer = null;
+      if (foregroundWaiters > 0) setWaitNotice(true);
+    }, SESSION_WAIT_NOTICE_MS);
+  }
+  const done = (): void => {
+    foregroundWaiters = Math.max(0, foregroundWaiters - 1);
+    if (foregroundWaiters > 0) return;
+    if (waitNoticeTimer !== null) {
+      clearTimeout(waitNoticeTimer);
+      waitNoticeTimer = null;
+    }
+    setWaitNotice(false);
+  };
+  pending.then(done, done);
+  return pending;
+}
+
+/** Read exp - iat from the JWT payload; null when it cannot be read. */
+function jwtLifetimeMs(token: string): number | null {
+  try {
+    const part = token.split('.')[1];
+    if (!part) return null;
+    const json = atob(part.replace(/-/g, '+').replace(/_/g, '/'));
+    const payload = JSON.parse(json) as { iat?: unknown; exp?: unknown };
+    if (typeof payload.iat !== 'number' || typeof payload.exp !== 'number') return null;
+    const lifetime = (payload.exp - payload.iat) * 1000;
+    return lifetime > 0 && lifetime <= 24 * 60 * 60 * 1000 ? lifetime : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
  * Create a new session: Turnstile challenge → Worker → JWT
  */
 async function createSession(): Promise<string> {
+  sessionPhase = 'check';
+  try {
+    return await mintSession();
+  } finally {
+    sessionPhase = 'idle';
+  }
+}
+
+async function mintSession(): Promise<string> {
   const turnstileToken = await getTurnstileToken();
+  sessionPhase = 'session';
   const clientId = readStoredClientId();
   const first = !sessionCounted;
 
@@ -125,7 +226,8 @@ async function createSession(): Promise<string> {
   const data: { token: string; expiresAt: string; clientId?: string } = await response.json();
 
   currentToken = data.token;
-  tokenExpiresAt = new Date(data.expiresAt).getTime();
+  const lifetimeMs = jwtLifetimeMs(data.token);
+  tokenExpiresAt = lifetimeMs !== null ? Date.now() + lifetimeMs : new Date(data.expiresAt).getTime();
   sessionCounted = true;
 
   // Persist the server-assigned clientId. On a fresh device this is the first
