@@ -365,11 +365,16 @@ export async function generateFreeTierCouncilResponse({
   const perfMetrics = performanceMonitor.startRequest();
 
   try {
-    const requestBody = {
+    const requestBody: Record<string, unknown> = {
       systemPrompt,
       language,
       messages: messages.map(m => ({ role: m.role, content: m.content })),
     };
+
+    // An analytics label, as on chat: marks an in-house council so its row
+    // can be subtracted at query time.
+    const probe = probeField();
+    if (probe) requestBody.probe = probe;
 
     const response = await fetchWithSessionRetry(`${FREE_TIER_API_URL}/v1/council`, requestBody, signal, 'council');
     readCrisisHeaders(response.headers);
