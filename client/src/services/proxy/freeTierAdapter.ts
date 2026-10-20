@@ -15,6 +15,7 @@ import { probeField } from '../../utils/probeSession';
 import { useDomainStore } from '../../stores/domainStore';
 import { parseFreeTierState } from '../../utils/freeTierState';
 import { createReasoningFilter } from '../../utils/thinkingTagStripper';
+import { readWithIdleLimit } from '../../utils/streamIdle';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -476,7 +477,7 @@ async function parseSSEStream(
 
   try {
     while (true) {
-      const { value, done } = await reader.read();
+      const { value, done } = await readWithIdleLimit(reader);
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });

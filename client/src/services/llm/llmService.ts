@@ -10,6 +10,7 @@ import {
   OPENROUTER_APP_NAME,
 } from './types';
 import { createReasoningFilter, releaseAtFloor, stripReasoningFromText } from '../../utils/thinkingTagStripper';
+import { readWithIdleLimit } from '../../utils/streamIdle';
 
 interface LLMMessage {
   role: 'user' | 'assistant' | 'system';
@@ -354,7 +355,7 @@ class LLMService {
 
     try {
       while (true) {
-        const { value, done } = await reader.read();
+        const { value, done } = await readWithIdleLimit(reader);
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
