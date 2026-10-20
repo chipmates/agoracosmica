@@ -279,6 +279,16 @@ export const performanceMonitor = new PerformanceMonitor();
 const NON_TERMINAL_TAIL =
   /(?:(?:^|[^\d])\d{1,2}\.|\s[IVX]{1,5}\.|\b(?:Dr|Mr|Mrs|Ms|St|Nr|Hl|Prof|ca|bzw|usw|vs|z\.B|d\.h|e\.g|i\.e)\.)$/;
 
+/**
+ * Joins a short last chunk to the one before it. A line break at the seam
+ * stays: in a council it ends one speaker's line before the next label.
+ */
+function joinTail(prev: string, tail: string): string {
+  const seam = (/\s*$/.exec(prev)?.[0] ?? '') + (/^\s*/.exec(tail)?.[0] ?? '');
+  const lineBreak = seam.includes('\n') ? seam.slice(seam.indexOf('\n')) : ' ';
+  return `${prev.trimEnd()}${lineBreak}${tail.trimStart()}`;
+}
+
 export class TextChunker {
   private params: ChunkParams;
   private currentBuffer: string;
@@ -346,12 +356,12 @@ export class TextChunker {
       if (tail.length < TAIL_MERGE_THRESHOLD) {
         if (remainingChunks.length >= 2) {
           const prev = remainingChunks[lastIdx - 1];
-          const merged = `${prev.trimEnd()} ${tail.trimStart()}`;
+          const merged = joinTail(prev, tail);
           if (merged.length <= maxMerged) {
             remainingChunks.splice(lastIdx - 1, 2, merged);
           }
         } else if (this.heldEmission !== null) {
-          const merged = `${this.heldEmission.trimEnd()} ${tail.trimStart()}`;
+          const merged = joinTail(this.heldEmission, tail);
           if (merged.length <= maxMerged) {
             this.heldEmission = merged;
             remainingChunks.pop();

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { TextChunker } from '../../services/audio/llm/llmUtils';
+import { CustomCouncilParser } from '../../services/council/parser';
 
 async function chunksOf(text: string, lang = 'de'): Promise<string[]> {
   const out: string[] = [];
@@ -64,5 +65,56 @@ describe('TextChunker splits an over-long sentence', () => {
     const text = `${'This clause runs on, '.repeat(16)}and then it stops. The next sentence follows here and ends.`;
     const chunks = await chunksOf(text, 'en');
     expect(words(chunks.join(''))).toEqual(words(text));
+  });
+});
+
+describe('TextChunker merges a short last line', () => {
+  // Two lines of one sentence each, long enough to be a chunk apiece, so the
+  // short last line is a chunk of its own and merges into the held one.
+  const ada = 'ADA LOVELACE :: Die Maschine webt algebraische Muster, so wie der Jacquard-Webstuhl Blumen und Blätter webt, '
+    + 'und doch fragt sie nie, warum ein Muster schön ist.';
+  const arthur = 'ARTHUR SCHOPENHAUER :: Der Wille kennt kein Ziel, nur das nächste Verlangen, und wer das einmal gesehen hat, '
+    + 'sucht kein Glück mehr, nur den Augenblick, in dem er stillhält.';
+  const closing = `${ada}\n\n${arthur}\n\nADA LOVELACE :: Danke.`;
+
+  function tokenDeltas(text: string): string[] {
+    const sizes = [3, 1, 5, 2, 7, 4, 6];
+    const out: string[] = [];
+    for (let i = 0, k = 0; i < text.length; k++) {
+      const piece = text.slice(i, i + sizes[k % sizes.length]);
+      i += piece.length;
+      out.push(piece);
+    }
+    return out;
+  }
+
+  async function streamed(text: string): Promise<string[]> {
+    const out: string[] = [];
+    const chunker = new TextChunker('de');
+    for (const d of tokenDeltas(text)) await chunker.processChunk(d, async (c) => { out.push(c); });
+    await chunker.finish(async (c) => { out.push(c); });
+    return out;
+  }
+
+  it('keeps the line break before the next speaker\'s label', async () => {
+    for (const chunks of [await chunksOf(closing), await streamed(closing)]) {
+      expect(chunks.join('')).toContain('stillhält.\n\nADA LOVELACE :: Danke.');
+    }
+  });
+
+  it('leaves the short last line to its own speaker', async () => {
+    for (const chunks of [await chunksOf(closing), await streamed(closing)]) {
+      const parser = new CustomCouncilParser({ participants: ['ARTHUR SCHOPENHAUER', 'ADA LOVELACE'], mode: 'debate' });
+      for (const c of chunks) parser.processChunk(c);
+      const segments = parser.complete().segments;
+      expect(segments.map((s) => s.speaker)).toEqual(['ADA LOVELACE', 'ARTHUR SCHOPENHAUER', 'ADA LOVELACE']);
+      expect(segments[2].content).toBe('Danke.');
+    }
+  });
+
+  it('still merges a short last sentence on the same line with a space', async () => {
+    const chunks = await chunksOf(`${ada} ${arthur.replace('ARTHUR SCHOPENHAUER :: ', '')} Danke.`);
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(chunks[chunks.length - 1]).toMatch(/stillhält\. Danke\.$/);
   });
 });
