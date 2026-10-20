@@ -3,6 +3,7 @@
 
 import { isSelfHost } from '../../config/deployment';
 import { sendFunnelBeacon, turnstileTimeBucket } from '../../utils/funnelBeacon';
+import { shownLanguage } from '../../utils/shownLanguage';
 
 const TURNSTILE_SCRIPT_URL = 'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit';
 // 30s, not 15s: mobile Safari resuming from bfcache or a long backgrounded tab
@@ -480,6 +481,9 @@ async function runCheck(askedAtMs: number): Promise<string> {
     // is the widget's lifetime: the previous widget is removed above, so a late
     // callback from it can never read this one.
     let tokenIssued = false;
+    // Whether this call's promise has settled. Whatever the widget does after
+    // that (a token refresh, a late escalation) asks nothing and counts nothing.
+    let settled = false;
 
     // Back to the corner and tell the UI, so a later invisible re-issue stays
     // quiet and no instruction is left on screen.
@@ -493,15 +497,24 @@ async function runCheck(askedAtMs: number): Promise<string> {
 
     // The check is over, however it ended: nothing is pending any more.
     const settle = (): void => {
+      settled = true;
       endInteractive();
       challengeState = 'idle';
     };
 
-    const onTimeout = (): void => {
+    // A failed widget is torn down: left mounted, its "verification failed" box
+    // sits in the corner over the composer's controls.
+    const removeWidget = (): void => {
       if (widgetId !== null) {
         try { turnstile.remove(widgetId); } catch { /* ignore */ }
         widgetId = null;
       }
+      if (container) container.style.display = 'none';
+    };
+
+    const onTimeout = (): void => {
+      if (settled) return;
+      removeWidget();
       settle();
       sendFunnelBeacon('turnstile_failed', { outcome: 'timeout' });
       reject(new Error('Turnstile challenge timed out. Please try again.'));
@@ -522,10 +535,14 @@ async function runCheck(askedAtMs: number): Promise<string> {
       size: 'normal',
       // Invisible unless a tap is genuinely required (managed-mode default).
       appearance: 'interaction-only',
-      retry: 'auto',
-      'retry-interval': 3000,
+      // The app's language, not the browser's; 'en' and 'de' are both codes
+      // Cloudflare lists.
+      language: shownLanguage(),
+      // A failed check ends here; the next one starts when a send needs it.
+      // Cloudflare's own retry would ask again with no message waiting.
+      retry: 'never',
       'before-interactive-callback': () => {
-        if (interactive) return;
+        if (settled || interactive) return;
         interactive = true;
         clearTimeout(timeout);
         timeout = setTimeout(
@@ -540,6 +557,9 @@ async function runCheck(askedAtMs: number): Promise<string> {
         sendFunnelBeacon('turnstile_interactive');
       },
       callback: (token: string) => {
+        // Cloudflare re-issues the token about five minutes on; this call has
+        // already handed its token out, so the refresh is ignored.
+        if (settled) return;
         clearTimeout(timeout);
         const wasInteractive = interactive;
         tokenIssued = true;
@@ -557,7 +577,9 @@ async function runCheck(askedAtMs: number): Promise<string> {
         resolve(token);
       },
       'error-callback': () => {
+        if (settled) return;
         clearTimeout(timeout);
+        removeWidget();
         settle();
         sendFunnelBeacon('turnstile_failed', { outcome: 'error' });
         reject(new Error('Turnstile challenge failed'));
@@ -572,6 +594,7 @@ async function runCheck(askedAtMs: number): Promise<string> {
           sendFunnelBeacon('turnstile_token_aged');
           return;
         }
+        if (settled) return;
         clearTimeout(timeout);
         settle();
         sendFunnelBeacon('turnstile_failed', { outcome: 'expired' });

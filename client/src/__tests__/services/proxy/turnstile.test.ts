@@ -23,6 +23,8 @@ type TurnstileOptions = {
   size: string;
   appearance: string;
   retry: string;
+  language?: string;
+  'refresh-expired'?: string;
   'before-interactive-callback': () => void;
   callback: (token: string) => void;
   'error-callback': () => void;
@@ -32,6 +34,7 @@ type TurnstileOptions = {
 const CONTAINER_ID = 'turnstile-container';
 
 let renderMock: ReturnType<typeof vi.fn>;
+let removeMock: ReturnType<typeof vi.fn>;
 let capturedOptions: TurnstileOptions | null = null;
 let originalInnerWidth: number;
 let originalInnerHeight: number;
@@ -42,9 +45,10 @@ function stubScriptLoader(): void {
   vi.spyOn(document.head, 'appendChild').mockImplementation(<T extends Node>(node: T): T => {
     const appended = realAppend(node);
     if ((node as unknown as HTMLElement).tagName === 'SCRIPT') {
+      removeMock = vi.fn();
       (window as unknown as Record<string, unknown>).turnstile = {
         render: renderMock,
-        remove: vi.fn(),
+        remove: removeMock,
         reset: vi.fn(),
       };
       node.dispatchEvent(new Event('load'));
@@ -485,5 +489,234 @@ describe('turnstile beacons', () => {
     await expect(token).rejects.toThrow();
 
     expect(steps()).toEqual(['turnstile_started', 'turnstile_failed']);
+  });
+});
+
+// After a check settles, the widget may still act on its own: Cloudflare's
+// retry re-runs a failed check, its refresh re-issues a token after about five
+// minutes. None of that may ask the visitor again, leave a box on screen or
+// count a second time.
+describe('turnstile after the check settles', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
+    capturedOptions = null;
+    renderMock = vi.fn((_el: HTMLElement, options: TurnstileOptions) => {
+      capturedOptions = options;
+      return 'widget-1';
+    });
+    vi.mocked(sendFunnelBeacon).mockClear();
+    setInnerWidth(390);
+    setInnerHeight(844);
+    stubScriptLoader();
+  });
+
+  afterEach(() => {
+    try { capturedOptions?.['error-callback']?.(); } catch { /* already settled */ }
+    vi.useRealTimers();
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    setInnerWidth(originalInnerWidth);
+    setInnerHeight(originalInnerHeight);
+    document.querySelectorAll('.unified-input-container, .test-control').forEach((el) => el.remove());
+    document.getElementById(CONTAINER_ID)?.remove();
+    document.querySelectorAll('script[src*="challenges.cloudflare.com"]').forEach((s) => s.remove());
+    delete (window as unknown as Record<string, unknown>).turnstile;
+  });
+
+  const steps = (): string[] => vi.mocked(sendFunnelBeacon).mock.calls.map((c) => c[0] as string);
+  const failures = (): unknown[] => vi.mocked(sendFunnelBeacon).mock.calls
+    .filter((c) => c[0] === 'turnstile_failed').map((c) => c[1]);
+
+  it('asks Cloudflare not to retry a failed check by itself', async () => {
+    const { options } = await renderWidget();
+
+    expect(options.retry).toBe('never');
+  });
+
+  it('takes the failed box off the screen when the check errors', async () => {
+    mountComposer(120);
+    const { token, options, container } = await renderWidget();
+    options['before-interactive-callback']();
+    expect(container.style.pointerEvents).toBe('auto');
+
+    options['error-callback']();
+
+    await expect(token).rejects.toThrow('Turnstile challenge failed');
+    // Removed, so Cloudflare's "verification failed" box cannot sit over the
+    // composer's mic and send, nor over the error toast's close button.
+    expect(removeMock).toHaveBeenCalledWith('widget-1');
+    expect(container.style.display).toBe('none');
+    expect(container.style.pointerEvents).toBe('none');
+  });
+
+  it('starts no new ask after an error when the widget re-asks by itself', async () => {
+    const { isTurnstileInteractive, TURNSTILE_INTERACTIVE_START_EVENT } = await import('../../../services/proxy/turnstile');
+    const { token, options, container } = await renderWidget();
+    options['error-callback']();
+    await expect(token).rejects.toThrow();
+    const started = vi.fn();
+    window.addEventListener(TURNSTILE_INTERACTIVE_START_EVENT, started);
+
+    try {
+      // A late escalation from the failed widget: nothing waits on it.
+      options['before-interactive-callback']();
+
+      expect(container.style.pointerEvents).toBe('none');
+      expect(isTurnstileInteractive()).toBe(false);
+      expect(started).not.toHaveBeenCalled();
+      expect(steps()).toEqual(['turnstile_started', 'turnstile_failed']);
+    } finally {
+      window.removeEventListener(TURNSTILE_INTERACTIVE_START_EVENT, started);
+    }
+  });
+
+  it('counts a failed check once: no later timeout, no second error', async () => {
+    vi.useFakeTimers();
+    const { token, options } = await renderWidget();
+    options['before-interactive-callback']();
+    options['error-callback']();
+    await expect(token).rejects.toThrow();
+
+    // What the widget's own retry did: ask again, fail again, then the timer.
+    options['before-interactive-callback']();
+    options['error-callback']();
+    await vi.advanceTimersByTimeAsync(130_000);
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_interactive', 'turnstile_failed']);
+    expect(failures()).toEqual([{ outcome: 'error' }]);
+  });
+
+  it('counts a timed-out check once, even if the widget errors after it', async () => {
+    vi.useFakeTimers();
+    const { token, options } = await renderWidget();
+    await vi.advanceTimersByTimeAsync(31_000);
+    await expect(token).rejects.toThrow('timed out');
+
+    options['error-callback']();
+
+    expect(failures()).toEqual([{ outcome: 'timeout' }]);
+  });
+
+  it('writes no row for a token that arrives after the check failed', async () => {
+    const { token, options } = await renderWidget();
+    options['before-interactive-callback']();
+    options['error-callback']();
+    await expect(token).rejects.toThrow();
+
+    options.callback('late-token');
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_interactive', 'turnstile_failed']);
+  });
+
+  it("writes one token row per token handed out, none on Cloudflare's refresh", async () => {
+    const { token, options } = await renderWidget();
+    options.callback('tok');
+    await expect(token).resolves.toBe('tok');
+
+    // About five minutes later: the token ages out and Cloudflare re-issues one.
+    options['expired-callback']();
+    options.callback('tok-refreshed');
+    options['expired-callback']();
+    options.callback('tok-refreshed-again');
+
+    expect(steps().filter((s) => s === 'turnstile_token')).toHaveLength(1);
+    // The aged-token counter keeps its meaning: one row per expiry, as before.
+    expect(steps()).toEqual([
+      'turnstile_started', 'turnstile_token', 'turnstile_token_aged', 'turnstile_token_aged',
+    ]);
+  });
+
+  it('keeps a refresh that asks for a tap hidden and uncounted', async () => {
+    const { isTurnstileInteractive } = await import('../../../services/proxy/turnstile');
+    const { token, options, container } = await renderWidget();
+    options.callback('tok');
+    await token;
+
+    options['expired-callback']();
+    options['before-interactive-callback']();
+
+    expect(isTurnstileInteractive()).toBe(false);
+    expect(container.style.display).toBe('none');
+    expect(container.style.pointerEvents).toBe('none');
+    expect(steps()).not.toContain('turnstile_interactive');
+  });
+
+  it('writes no failure for a refresh that errors after a success', async () => {
+    const { token, options } = await renderWidget();
+    options.callback('tok');
+    await token;
+
+    options['error-callback']();
+
+    expect(steps()).toEqual(['turnstile_started', 'turnstile_token']);
+  });
+});
+
+// The box speaks the app's language: a German app in an English browser asks
+// in German, so the box matches the line above it that says what to tap.
+describe('turnstile language', () => {
+  beforeEach(() => {
+    vi.resetModules();
+    vi.stubEnv('VITE_TURNSTILE_SITE_KEY', 'test-site-key');
+    capturedOptions = null;
+    renderMock = vi.fn((_el: HTMLElement, options: TurnstileOptions) => {
+      capturedOptions = options;
+      return 'widget-1';
+    });
+    stubScriptLoader();
+  });
+
+  afterEach(() => {
+    try { capturedOptions?.['error-callback']?.(); } catch { /* already settled */ }
+    vi.restoreAllMocks();
+    vi.unstubAllEnvs();
+    document.documentElement.lang = '';
+    document.getElementById(CONTAINER_ID)?.remove();
+    document.querySelectorAll('script[src*="challenges.cloudflare.com"]').forEach((s) => s.remove());
+    delete (window as unknown as Record<string, unknown>).turnstile;
+  });
+
+  it("renders in German when the app is German and the browser is English", async () => {
+    expect(navigator.language.toLowerCase().startsWith('en')).toBe(true);
+    const { noteShownLanguage } = await import('../../../utils/shownLanguage');
+    noteShownLanguage('de');
+
+    const { options } = await renderWidget();
+
+    expect(options.language).toBe('de');
+  });
+
+  it('renders in English when the app is English', async () => {
+    const { noteShownLanguage } = await import('../../../utils/shownLanguage');
+    noteShownLanguage('en');
+
+    const { options } = await renderWidget();
+
+    expect(options.language).toBe('en');
+  });
+
+  it('follows a language switch on the next check', async () => {
+    const { noteShownLanguage } = await import('../../../utils/shownLanguage');
+    const { getTurnstileToken } = await import('../../../services/proxy/turnstile');
+    noteShownLanguage('en');
+    const first = await renderWidget();
+    first.options.callback('tok');
+    await first.token;
+
+    noteShownLanguage('de');
+    const second = getTurnstileToken();
+    second.catch(() => { /* settled in afterEach */ });
+    await vi.waitFor(() => expect(renderMock).toHaveBeenCalledTimes(2));
+
+    expect((capturedOptions as TurnstileOptions).language).toBe('de');
+  });
+
+  it('falls back to the page language before the app has reported one', async () => {
+    document.documentElement.lang = 'de';
+
+    const { options } = await renderWidget();
+
+    expect(options.language).toBe('de');
   });
 });
