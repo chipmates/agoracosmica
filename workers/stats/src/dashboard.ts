@@ -2356,6 +2356,11 @@ async function loadOverview() {
     '/cookie-policy': 1, '/cookie-policy/': 1, '/nutzungsbedingungen': 1, '/nutzungsbedingungen/': 1,
     '/de/about': 1, '/de/about/': 1, '/de/contact': 1, '/de/contact/': 1,
     '/de/impressum': 1, '/de/impressum/': 1, '/de/datenschutz': 1, '/de/datenschutz/': 1,
+    // Reading pages outside /figures and /themes: the poems index, the audio
+    // page and the essays, which otherwise land in "other paths".
+    '/poems': 1, '/poems/': 1, '/audio': 1, '/audio/': 1, '/de/audio': 1, '/de/audio/': 1,
+    '/stoicism': 1, '/stoicism/': 1, '/the-heros-journey': 1, '/the-heros-journey/': 1,
+    '/de/stoizismus': 1, '/de/stoizismus/': 1, '/de/heldenreise': 1, '/de/heldenreise/': 1,
   };
   function isMarketingPath(p) {
     for (var j = 0; j < MARKETING_PREFIXES.length; j++) {
@@ -2369,8 +2374,9 @@ async function loadOverview() {
   var pageSplit = splitPageRows(rows(r[26]), isMarketingPath);
   var marketingArrivals = pageSplit.marketing;
   // Every marketing page (figures, themes, about, contact, impressum,
-  // datenschutz + their /de/ variants), so the chart reflects total marketing-
-  // page traffic. Labels are computed in the topMarketingItems map below.
+  // datenschutz, poems, audio, the essays + their /de/ variants), so the chart
+  // reflects total marketing-page traffic. Labels are computed in the
+  // topMarketingItems map below.
   var topMarketingPages = Object.keys(pageSplit.marketingByPath).map(function(path) {
     return { path: path, c: pageSplit.marketingByPath[path] };
   });
