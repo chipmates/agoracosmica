@@ -460,6 +460,18 @@ html:has(.public-page) #root {
     grid-template-columns: 1fr;
   }
 
+  /* 44px tap rows at the home skin's footer pitch; the rows carry the spacing. */
+  .pub-footer__col {
+    gap: 0.15rem;
+  }
+
+  .pub-footer__col a,
+  .pub-footer__star a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
   .pub-footer__bottom {
     flex-direction: column;
     text-align: center;
