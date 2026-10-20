@@ -1463,6 +1463,7 @@ h3.pub-home-subhead::after { display: none; }
   .lib__tabs { gap: 0 1.2rem; }
   .lib__tabgroup--more { padding-left: 1.2rem; }
   .pub-footer__col a { min-height: 44px; }
+  .pub-footer__star a { display: inline-flex; align-items: center; min-height: 44px; }
 
   .pub-cta--sticky { display: block; }
   .pub-footer__inner { padding-bottom: 6rem; }
