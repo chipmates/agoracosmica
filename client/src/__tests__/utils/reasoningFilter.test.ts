@@ -5,6 +5,7 @@ import {
   createReasoningFilter,
   stripReasoningFromText,
   releaseChatStart,
+  releaseAtFloor,
   FIRST_CHUNK_FLOOR,
   TAIL_HOLD_MAX,
 } from '../../utils/thinkingTagStripper';
@@ -118,9 +119,19 @@ describe('createReasoningFilter: when the start is released', () => {
     expect(releaseChatStart('x'.repeat(FIRST_CHUNK_FLOOR))).toBe(true);
   });
 
-  it('holds a stream that opens on whitespace up to the tail hold', () => {
+  it('holds a stream that opens like the seen tails, one space before a word, up to the tail hold', () => {
     expect(releaseChatStart(` ${'x'.repeat(FIRST_CHUNK_FLOOR)}`)).toBe(false);
-    expect(releaseChatStart(`\n${'x'.repeat(TAIL_HOLD_MAX - 1)}`)).toBe(true);
+    expect(releaseChatStart(` ${'x'.repeat(TAIL_HOLD_MAX - 1)}`)).toBe(true);
+  });
+
+  it('releases a stream that opens on a line break at the chunker floor', () => {
+    expect(releaseChatStart(`\n\n${'x'.repeat(FIRST_CHUNK_FLOOR - 2)}`)).toBe(true);
+    expect(releaseChatStart(`  ${'x'.repeat(FIRST_CHUNK_FLOOR - 2)}`)).toBe(true);
+  });
+
+  it('gives a local server the chunker floor only', () => {
+    expect(releaseAtFloor(` ${'x'.repeat(FIRST_CHUNK_FLOOR - 1)}`)).toBe(true);
+    expect(releaseAtFloor('x'.repeat(FIRST_CHUNK_FLOOR - 1))).toBe(false);
   });
 
   it('holds no longer than the chunker would before its first chunk', () => {
@@ -139,9 +150,13 @@ describe('createReasoningFilter: when the start is released', () => {
     }
   });
 
-  it('bounds the wait for a clean reply that opens on whitespace', async () => {
-    const text = `\n\n${reply}`;
-    const deltas = tokenDeltas(text);
+  it('shows a clean reply that opens on line breaks at the same delta as without the filter', async () => {
+    const deltas = tokenDeltas(`\n\n${reply}`);
+    expect(await chunkTimeline(deltas, 'de', true)).toEqual(await chunkTimeline(deltas, 'de', false));
+  });
+
+  it('bounds the wait for a clean reply that opens with one space', async () => {
+    const deltas = tokenDeltas(` ${reply}`);
     const filtered = await chunkTimeline(deltas, 'de', true);
     let sent = 0;
     let holdEnd = deltas.length;

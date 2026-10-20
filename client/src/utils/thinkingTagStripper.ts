@@ -130,9 +130,9 @@ const CLOSE_TAG = '</think>';
 export const FIRST_CHUNK_FLOOR = 140;
 
 /**
- * Reasoning tails seen so far opened with a space and ran to 182 characters at
- * most, while replies open on a word. A stream that opens on whitespace is held
- * this long.
+ * Reasoning tails seen so far opened with one space before a word and ran to
+ * 182 characters at most; no reply of the two serving models opened that way.
+ * A stream that opens so is held this long.
  */
 export const TAIL_HOLD_MAX = 600;
 
@@ -148,9 +148,14 @@ export interface ReasoningFilterOptions {
   release?: (held: string) => boolean;
 }
 
-/** The chat's release rule: the chunker's floor, or longer after a whitespace opening. */
+/** The chat's release rule: the chunker's floor, or longer after a tail's opening. */
 export function releaseChatStart(held: string): boolean {
-  return held.length >= (/^\s/.test(held) ? TAIL_HOLD_MAX : FIRST_CHUNK_FLOOR);
+  return held.length >= (/^ \S/.test(held) ? TAIL_HOLD_MAX : FIRST_CHUNK_FLOOR);
+}
+
+/** The chunker's floor only, for a local server where no tail has been seen. */
+export function releaseAtFloor(held: string): boolean {
+  return held.length >= FIRST_CHUNK_FLOOR;
 }
 
 function partialTagAt(s: string, tag: string): number {

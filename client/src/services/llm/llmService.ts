@@ -9,7 +9,7 @@ import {
   OPENROUTER_REFERER,
   OPENROUTER_APP_NAME,
 } from './types';
-import { createReasoningFilter, stripReasoningFromText } from '../../utils/thinkingTagStripper';
+import { createReasoningFilter, releaseAtFloor, stripReasoningFromText } from '../../utils/thinkingTagStripper';
 
 interface LLMMessage {
   role: 'user' | 'assistant' | 'system';
@@ -335,7 +335,11 @@ class LLMService {
     let buffer = '';
 
     const toolCalls = new Map<number, { name: string; arguments: string; id?: string }>();
-    const reasoning = createReasoningFilter();
+    // A local server can open a clean reply on a space, and no reasoning tail
+    // has been seen there, so it gets the chunker's floor only.
+    const reasoning = createReasoningFilter(
+      providerConfig.kind === 'custom-openai' ? { release: releaseAtFloor } : {},
+    );
 
     const emit = async (rawContent: string) => {
       if (!rawContent) return;
