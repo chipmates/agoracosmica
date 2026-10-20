@@ -41,6 +41,7 @@ export function personSchema(figure: {
       : `Educational AI Echo of the historical ${figure.name}. The portrait is an AI-generated image, not a photograph.`;
   // knowsAbout stays a plain string when no concepts are passed, so nothing
   // changes for the callers that do not supply them.
+  const alternateName = figure.lang === 'de' ? entity?.alternateNamesDe : undefined;
   const knowsAbout = figure.concepts?.length
     ? [figure.tradition, ...figure.concepts].filter(Boolean)
     : figure.tradition;
@@ -57,6 +58,7 @@ export function personSchema(figure: {
     '@type': 'Person',
     '@id': `${url}#person`,
     name: figure.name,
+    ...(alternateName?.length && { alternateName }),
     description: figure.about,
     disambiguatingDescription,
     url,

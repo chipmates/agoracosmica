@@ -13,6 +13,9 @@ export interface FigureEntity {
   wikipediaDe: string;
   birthDate?: string;
   deathDate?: string;
+  /** Other names a German page shows and German searchers use, beside the
+   *  page's own name (schema alternateName on the German page only). */
+  alternateNamesDe?: string[];
 }
 
 export const figureEntities: Record<string, FigureEntity> = {
@@ -30,17 +33,17 @@ export const figureEntities: Record<string, FigureEntity> = {
   'jane-austen': { wikidata: 'https://www.wikidata.org/wiki/Q36322', wikipediaEn: 'https://en.wikipedia.org/wiki/Jane_Austen', wikipediaDe: 'https://de.wikipedia.org/wiki/Jane_Austen', birthDate: '1775-12-16', deathDate: '1817-07-18' },
   'johann-wolfgang-von-goethe': { wikidata: 'https://www.wikidata.org/wiki/Q5879', wikipediaEn: 'https://en.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe', wikipediaDe: 'https://de.wikipedia.org/wiki/Johann_Wolfgang_von_Goethe', birthDate: '1749-08-28', deathDate: '1832-03-22' },
   'joseph-campbell': { wikidata: 'https://www.wikidata.org/wiki/Q295516', wikipediaEn: 'https://en.wikipedia.org/wiki/Joseph_Campbell', wikipediaDe: 'https://de.wikipedia.org/wiki/Joseph_Campbell', birthDate: '1904-03-26', deathDate: '1987-10-30' },
-  'laozi': { wikidata: 'https://www.wikidata.org/wiki/Q9333', wikipediaEn: 'https://en.wikipedia.org/wiki/Laozi', wikipediaDe: 'https://de.wikipedia.org/wiki/Laozi' },
+  'laozi': { wikidata: 'https://www.wikidata.org/wiki/Q9333', wikipediaEn: 'https://en.wikipedia.org/wiki/Laozi', wikipediaDe: 'https://de.wikipedia.org/wiki/Laozi', alternateNamesDe: ['Laotse'] },
   'leonardo-da-vinci': { wikidata: 'https://www.wikidata.org/wiki/Q762', wikipediaEn: 'https://en.wikipedia.org/wiki/Leonardo_da_Vinci', wikipediaDe: 'https://de.wikipedia.org/wiki/Leonardo_da_Vinci', birthDate: '1452-04-15', deathDate: '1519-05-02' },
   'mahatma-gandhi': { wikidata: 'https://www.wikidata.org/wiki/Q1001', wikipediaEn: 'https://en.wikipedia.org/wiki/Mahatma_Gandhi', wikipediaDe: 'https://de.wikipedia.org/wiki/Mohandas_Karamchand_Gandhi', birthDate: '1869-10-02', deathDate: '1948-01-30' },
-  'marcus-aurelius': { wikidata: 'https://www.wikidata.org/wiki/Q1430', wikipediaEn: 'https://en.wikipedia.org/wiki/Marcus_Aurelius', wikipediaDe: 'https://de.wikipedia.org/wiki/Mark_Aurel', birthDate: '0121-04-26', deathDate: '0180-03-17' },
+  'marcus-aurelius': { wikidata: 'https://www.wikidata.org/wiki/Q1430', wikipediaEn: 'https://en.wikipedia.org/wiki/Marcus_Aurelius', wikipediaDe: 'https://de.wikipedia.org/wiki/Mark_Aurel', birthDate: '0121-04-26', deathDate: '0180-03-17', alternateNamesDe: ['Marc Aurel', 'Marcus Aurelius'] },
   'martin-luther-king-jr': { wikidata: 'https://www.wikidata.org/wiki/Q8027', wikipediaEn: 'https://en.wikipedia.org/wiki/Martin_Luther_King_Jr.', wikipediaDe: 'https://de.wikipedia.org/wiki/Martin_Luther_King', birthDate: '1929-01-15', deathDate: '1968-04-04' },
   'maya-angelou': { wikidata: 'https://www.wikidata.org/wiki/Q19526', wikipediaEn: 'https://en.wikipedia.org/wiki/Maya_Angelou', wikipediaDe: 'https://de.wikipedia.org/wiki/Maya_Angelou', birthDate: '1928-04-04', deathDate: '2014-05-28' },
   'meister-eckhart': { wikidata: 'https://www.wikidata.org/wiki/Q76548', wikipediaEn: 'https://en.wikipedia.org/wiki/Meister_Eckhart', wikipediaDe: 'https://de.wikipedia.org/wiki/Meister_Eckhart' },
   'nelson-mandela': { wikidata: 'https://www.wikidata.org/wiki/Q8023', wikipediaEn: 'https://en.wikipedia.org/wiki/Nelson_Mandela', wikipediaDe: 'https://de.wikipedia.org/wiki/Nelson_Mandela', birthDate: '1918-07-18', deathDate: '2013-12-05' },
-  'plato': { wikidata: 'https://www.wikidata.org/wiki/Q859', wikipediaEn: 'https://en.wikipedia.org/wiki/Plato', wikipediaDe: 'https://de.wikipedia.org/wiki/Platon' },
+  'plato': { wikidata: 'https://www.wikidata.org/wiki/Q859', wikipediaEn: 'https://en.wikipedia.org/wiki/Plato', wikipediaDe: 'https://de.wikipedia.org/wiki/Platon', alternateNamesDe: ['Plato'] },
   'rumi': { wikidata: 'https://www.wikidata.org/wiki/Q43347', wikipediaEn: 'https://en.wikipedia.org/wiki/Rumi', wikipediaDe: 'https://de.wikipedia.org/wiki/Rumi_(Dichter)', birthDate: '1207-09-30', deathDate: '1273-12-17' },
-  'siddhartha-gautama': { wikidata: 'https://www.wikidata.org/wiki/Q9441', wikipediaEn: 'https://en.wikipedia.org/wiki/The_Buddha', wikipediaDe: 'https://de.wikipedia.org/wiki/Siddhartha_Gautama' },
+  'siddhartha-gautama': { wikidata: 'https://www.wikidata.org/wiki/Q9441', wikipediaEn: 'https://en.wikipedia.org/wiki/The_Buddha', wikipediaDe: 'https://de.wikipedia.org/wiki/Siddhartha_Gautama', alternateNamesDe: ['Buddha'] },
   'simone-de-beauvoir': { wikidata: 'https://www.wikidata.org/wiki/Q7197', wikipediaEn: 'https://en.wikipedia.org/wiki/Simone_de_Beauvoir', wikipediaDe: 'https://de.wikipedia.org/wiki/Simone_de_Beauvoir', birthDate: '1908-01-09', deathDate: '1986-04-14' },
   'virginia-woolf': { wikidata: 'https://www.wikidata.org/wiki/Q40909', wikipediaEn: 'https://en.wikipedia.org/wiki/Virginia_Woolf', wikipediaDe: 'https://de.wikipedia.org/wiki/Virginia_Woolf', birthDate: '1882-01-25', deathDate: '1941-03-28' },
   'william-blake': { wikidata: 'https://www.wikidata.org/wiki/Q41513', wikipediaEn: 'https://en.wikipedia.org/wiki/William_Blake', wikipediaDe: 'https://de.wikipedia.org/wiki/William_Blake', birthDate: '1757-11-28', deathDate: '1827-08-12' },
