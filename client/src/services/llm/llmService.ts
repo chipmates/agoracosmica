@@ -9,7 +9,7 @@ import {
   OPENROUTER_REFERER,
   OPENROUTER_APP_NAME,
 } from './types';
-import { createThinkingTagFilter, stripThinkingTagsFromText } from '../../utils/thinkingTagStripper';
+import { createReasoningFilter, stripReasoningFromText } from '../../utils/thinkingTagStripper';
 
 interface LLMMessage {
   role: 'user' | 'assistant' | 'system';
@@ -311,7 +311,7 @@ class LLMService {
 
     const rawContent = data.choices[0].message.content || '';
     return {
-      response: stripThinkingTagsFromText(rawContent),
+      response: stripReasoningFromText(rawContent),
       metadata: {
         model: data.model,
         usage: data.usage,
@@ -335,12 +335,12 @@ class LLMService {
     let buffer = '';
 
     const toolCalls = new Map<number, { name: string; arguments: string; id?: string }>();
-    const thinkFilter = createThinkingTagFilter();
+    const reasoning = createReasoningFilter();
 
     const emit = async (rawContent: string) => {
       if (!rawContent) return;
-      // Always-on `<think>` strip — never let thinking blocks reach the UI.
-      const visible = thinkFilter.filter(rawContent);
+      // Always on: reasoning never reaches the UI.
+      const visible = reasoning.push(rawContent);
       if (visible) {
         fullResponse += visible;
         const result = callback(visible);
@@ -408,8 +408,8 @@ class LLMService {
           // Incomplete trailing data, ignore
         }
       }
-      // Flush the think-filter's tail (any non-stripping buffered text).
-      const tail = thinkFilter.flush();
+      // Flush what the reasoning filter still holds.
+      const tail = reasoning.flush();
       if (tail) {
         fullResponse += tail;
         const result = callback(tail);

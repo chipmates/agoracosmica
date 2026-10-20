@@ -119,3 +119,101 @@ function findTrailingPartialTag(s: string): number {
   }
   return -1;
 }
+
+const OPEN_TAG = '<think>';
+const CLOSE_TAG = '</think>';
+
+/**
+ * The TextChunker's first chunk waits for 140 characters of whole sentences
+ * (minChars 80 + 60 in EN and DE), so holding the start this long costs no time.
+ */
+export const FIRST_CHUNK_FLOOR = 140;
+
+/**
+ * Reasoning tails seen so far opened with a space and ran to 182 characters at
+ * most, while replies open on a word. A stream that opens on whitespace is held
+ * this long.
+ */
+export const TAIL_HOLD_MAX = 600;
+
+export interface ReasoningFilter {
+  /** Text that may go on now; empty while the start of the stream is held. */
+  push(chunk: string): string;
+  /** End of stream: whatever is still held, minus any unclosed block. */
+  flush(): string;
+}
+
+export interface ReasoningFilterOptions {
+  /** True once the held start of the stream can only be the reply. */
+  release?: (held: string) => boolean;
+}
+
+/** The chat's release rule: the chunker's floor, or longer after a whitespace opening. */
+export function releaseChatStart(held: string): boolean {
+  return held.length >= (/^\s/.test(held) ? TAIL_HOLD_MAX : FIRST_CHUNK_FLOOR);
+}
+
+function partialTagAt(s: string, tag: string): number {
+  for (let n = Math.min(tag.length - 1, s.length); n > 0; n--) {
+    if (s.endsWith(tag.slice(0, n))) return s.length - n;
+  }
+  return -1;
+}
+
+/**
+ * Drops model reasoning from a stream. Besides `<think>...</think>` blocks, a
+ * model can open with only the tail of its reasoning, closed by `</think>` with
+ * no opening tag. The start of the stream is held until a tag settles it or
+ * `release` says the held text is the reply; a stray `</think>` later is dropped.
+ */
+export function createReasoningFilter(options: ReasoningFilterOptions = {}): ReasoningFilter {
+  const release = options.release ?? releaseChatStart;
+  const blocks = createThinkingTagFilter();
+  let held = '';
+  let started = false;
+  let partial = '';
+
+  const pass = (text: string): string => {
+    let out = (partial + blocks.filter(text)).split(CLOSE_TAG).join('');
+    const cut = partialTagAt(out, CLOSE_TAG);
+    partial = cut === -1 ? '' : out.slice(cut);
+    if (cut !== -1) out = out.slice(0, cut);
+    return out;
+  };
+
+  const start = (text: string): string => {
+    started = true;
+    held = '';
+    return pass(text);
+  };
+
+  return {
+    push(chunk: string): string {
+      if (!chunk) return '';
+      if (started) return pass(chunk);
+      held += chunk;
+      const close = held.indexOf(CLOSE_TAG);
+      const open = held.indexOf(OPEN_TAG);
+      if (close !== -1 && (open === -1 || close < open)) {
+        return start(held.slice(close + CLOSE_TAG.length));
+      }
+      if (open !== -1) return start(held);
+      if (partialTagAt(held, CLOSE_TAG) !== -1) return '';
+      return release(held) ? start(held) : '';
+    },
+    flush(): string {
+      const rest = started ? '' : start(held);
+      const tail = blocks.flush();
+      const out = rest + partial + tail;
+      partial = '';
+      return out;
+    },
+  };
+}
+
+/** The same rules over a whole response. */
+export function stripReasoningFromText(text: string): string {
+  if (!text) return text;
+  const filter = createReasoningFilter();
+  return (filter.push(text) + filter.flush()).trim();
+}

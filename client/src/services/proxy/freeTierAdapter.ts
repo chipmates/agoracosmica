@@ -14,6 +14,7 @@ import type { CarriedEntry } from '../audio/instructionProcessor';
 import { probeField } from '../../utils/probeSession';
 import { useDomainStore } from '../../stores/domainStore';
 import { parseFreeTierState } from '../../utils/freeTierState';
+import { createReasoningFilter } from '../../utils/thinkingTagStripper';
 
 const FREE_TIER_API_URL = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -469,6 +470,8 @@ async function parseSSEStream(
   let buffer = '';
 
   const chunker = streamingCallback ? new TextChunker(language || 'en') : null;
+  // Before the chunker, so reasoning never reaches the screen or the voice.
+  const reasoning = createReasoningFilter();
   const toolCalls = new Map<number, { name: string; arguments: string; id?: string }>();
 
   try {
@@ -487,7 +490,7 @@ async function parseSSEStream(
             const delta = data.choices?.[0]?.delta;
 
             // Text content
-            const content = delta?.content || '';
+            const content = delta?.content ? reasoning.push(delta.content) : '';
             if (content) {
               fullResponse += content;
               if (chunker && streamingCallback) {
@@ -516,6 +519,14 @@ async function parseSSEStream(
     }
   } finally {
     reader.releaseLock();
+  }
+
+  const rest = reasoning.flush();
+  if (rest) {
+    fullResponse += rest;
+    if (chunker && streamingCallback) {
+      await chunker.processChunk(rest, streamingCallback);
+    }
   }
 
   // Flush remaining text in chunker
