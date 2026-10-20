@@ -74,14 +74,18 @@ const TAPPABLE_SELECTOR = [
   'button', 'a[href]', 'input:not([type="hidden"])', 'textarea', 'select',
   '[role="button"]', '[role="link"]', '[contenteditable="true"]',
 ].join(', ');
+// Text a visitor must be able to read while deciding (a disclosure). Kept
+// clear when the screen has room; a control always outranks it.
+const KEEP_CLEAR_SELECTOR = '[data-keep-clear]';
 // The 'normal' widget, plus the air kept between it and whatever it clears.
 const CHALLENGE_BOX_PX = 72;
 const CHALLENGE_BOX_WIDTH_PX = 300;
 const CLEARANCE_GAP_PX = 12;
 
-interface Band { top: number; bottom: number }
+interface Band { top: number; bottom: number; soft: boolean }
+type Rect = Pick<DOMRect, 'top' | 'bottom' | 'left' | 'right' | 'width' | 'height'>;
 
-function isOnScreen(rect: DOMRect): boolean {
+function isOnScreen(rect: Rect): boolean {
   return rect.width > 0 && rect.height > 0 && rect.bottom > 0 && rect.top < window.innerHeight;
 }
 
@@ -89,7 +93,7 @@ function isOnScreen(rect: DOMRect): boolean {
  * Whether a tap at the control's visible centre would reach it. A control
  * under a modal's backdrop cannot be tapped, so the box may sit over it.
  */
-function isReachable(el: HTMLElement, rect: DOMRect): boolean {
+function isReachable(el: HTMLElement, rect: Rect): boolean {
   if (typeof document.elementFromPoint !== 'function') return true;
   const x = Math.min(Math.max(rect.left + rect.width / 2, 0), window.innerWidth - 1);
   const top = Math.max(rect.top, 0);
@@ -97,6 +101,26 @@ function isReachable(el: HTMLElement, rect: DOMRect): boolean {
   const y = Math.min(Math.max((top + bottom) / 2, 0), window.innerHeight - 1);
   const hit = document.elementFromPoint(x, y);
   return hit === null || el.contains(hit);
+}
+
+/**
+ * The part of an element its scrolling ancestors leave visible: a disclosure
+ * scrolled mostly out of its panel only blocks the sliver still showing.
+ */
+function visiblePart(el: HTMLElement): Rect | null {
+  const r = el.getBoundingClientRect();
+  let { top, bottom, left, right } = r;
+  for (let p = el.parentElement; p && p !== document.body; p = p.parentElement) {
+    const style = window.getComputedStyle(p);
+    if (style.overflowX === 'visible' && style.overflowY === 'visible') continue;
+    const q = p.getBoundingClientRect();
+    top = Math.max(top, q.top);
+    bottom = Math.min(bottom, q.bottom);
+    left = Math.max(left, q.left);
+    right = Math.min(right, q.right);
+  }
+  if (bottom <= top || right <= left) return null;
+  return { top, bottom, left, right, width: right - left, height: bottom - top };
 }
 
 /**
@@ -108,9 +132,9 @@ function obstacleBands(boxWidth: number, ignore: HTMLElement | null): Band[] {
   const left = (window.innerWidth - boxWidth) / 2;
   const right = left + boxWidth;
   const bands: Band[] = [];
-  const add = (rect: DOMRect): void => {
+  const add = (rect: Rect, soft = false): void => {
     if (!isOnScreen(rect) || rect.right <= left || rect.left >= right) return;
-    bands.push({ top: rect.top, bottom: rect.bottom });
+    bands.push({ top: rect.top, bottom: rect.bottom, soft });
   };
 
   document.querySelectorAll<HTMLElement>(BOTTOM_CONTROL_SELECTOR).forEach((el) => {
@@ -131,6 +155,11 @@ function obstacleBands(boxWidth: number, ignore: HTMLElement | null): Band[] {
         if (sentence && (!ignore || !ignore.contains(sentence))) add(sentence.getBoundingClientRect());
       }
     });
+    document.querySelectorAll<HTMLElement>(KEEP_CLEAR_SELECTOR).forEach((el) => {
+      if (ignore && ignore.contains(el)) return;
+      const rect = visiblePart(el);
+      if (rect && isOnScreen(rect) && isReachable(el, rect)) add(rect, true);
+    });
   } finally {
     if (ignore) ignore.style.pointerEvents = restore;
   }
@@ -143,33 +172,15 @@ function overlaps(bands: Band[], lift: number, boxHeight: number): Band[] {
   return bands.filter((b) => b.top < boxBottom && b.bottom > boxTop);
 }
 
-/**
- * How far above the bottom edge a centred box of this size has to sit: the
- * lowest spot clear of every control in its column, never past the top of the
- * viewport. `keep` is the box's current lift, held while it is still clear so
- * the box does not hop about as the page scrolls under it. On a screen with no
- * clear spot, the spot covering the fewest controls wins.
- */
-export function clearLiftPx(
-  boxWidth: number = CHALLENGE_BOX_WIDTH_PX,
-  boxHeight: number = CHALLENGE_BOX_PX,
-  ignore: HTMLElement | null = null,
-  keep: number | null = null,
-): number {
-  const floor = window.innerWidth <= NARROW_VIEWPORT_PX ? 96 : 16;
-  const ceiling = Math.max(floor, window.innerHeight - boxHeight - CLEARANCE_GAP_PX);
-  const bands = obstacleBands(boxWidth, ignore);
-
-  if (keep !== null && keep >= floor && keep <= ceiling && overlaps(bands, keep, boxHeight).length === 0) {
-    return keep;
-  }
-
+/** The lowest lift clear of every band; on a screen with none, the one covering the fewest. */
+function lowestClearLift(
+  bands: Band[], floor: number, ceiling: number, boxHeight: number,
+): { lift: number; clear: boolean } {
   // Each blocking band is climbed at most once, so this ends.
   let lift = floor;
   for (let i = 0; i <= bands.length && lift <= ceiling; i++) {
     const blocking = overlaps(bands, lift, boxHeight);
-    // Ceil: a fractional rect must never leave the box a sliver short of clear.
-    if (blocking.length === 0) return Math.ceil(lift);
+    if (blocking.length === 0) return { lift, clear: true };
     lift = window.innerHeight - Math.min(...blocking.map((b) => b.top)) + CLEARANCE_GAP_PX;
   }
 
@@ -184,7 +195,43 @@ export function clearLiftPx(
       bestCount = count;
     }
   }
-  return Math.ceil(best);
+  return { lift: best, clear: false };
+}
+
+/**
+ * How far above the bottom edge a centred box of this size has to sit: the
+ * lowest spot clear of every control in its column, never past the top of the
+ * viewport. `keep` is the box's current lift. It is held while still clear and
+ * within about one box of the lowest spot, so the box does not hop about as
+ * the page scrolls, yet drops back down once a new screen opens room below.
+ */
+export function clearLiftPx(
+  boxWidth: number = CHALLENGE_BOX_WIDTH_PX,
+  boxHeight: number = CHALLENGE_BOX_PX,
+  ignore: HTMLElement | null = null,
+  keep: number | null = null,
+): number {
+  const floor = window.innerWidth <= NARROW_VIEWPORT_PX ? 96 : 16;
+  const ceiling = Math.max(floor, window.innerHeight - boxHeight - CLEARANCE_GAP_PX);
+  const all = obstacleBands(boxWidth, ignore);
+  let bands = all;
+  let found = lowestClearLift(all, floor, ceiling, boxHeight);
+  if (!found.clear && all.some((b) => b.soft)) {
+    bands = all.filter((b) => !b.soft);
+    found = lowestClearLift(bands, floor, ceiling, boxHeight);
+  }
+  // Ceil: a fractional rect must never leave the box a sliver short of clear.
+  const lowest = Math.ceil(found.lift);
+
+  const holdSlack = boxHeight + 2 * CLEARANCE_GAP_PX;
+  if (
+    keep !== null && keep >= floor && keep <= ceiling
+    && keep - lowest <= holdSlack
+    && overlaps(bands, keep, boxHeight).length === 0
+  ) {
+    return keep;
+  }
+  return lowest;
 }
 
 // The lift the asking box sits at now; null while it waits in the corner.

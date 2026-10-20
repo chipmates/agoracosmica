@@ -226,8 +226,9 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             </div>
           </div>
 
-          {/* AI transparency notice (short, names chat/stories/audio) */}
-          <div className={styles.aiNotice} role="note">
+          {/* AI transparency notice (short, names chat/stories/audio); the
+              bot-check box keeps off it whenever the screen has room. */}
+          <div className={styles.aiNotice} role="note" data-keep-clear="">
             <p className={styles.aiNoticeKicker}>{tNode('legal.consent.aiNoticeKicker')}</p>
             <p>{tNode('legal.consent.aiNotice')}</p>
           </div>

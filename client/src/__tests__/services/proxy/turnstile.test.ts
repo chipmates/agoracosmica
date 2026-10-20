@@ -277,6 +277,65 @@ describe('turnstile widget placement', () => {
     expect(container.style.bottom).toBe('166px');
   });
 
+  it('keeps off a marked disclosure when the screen has room above it', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    const notice = setRect(document.createElement('div'), 25, 410, 340, 195);
+    notice.className = 'test-control';
+    notice.setAttribute('data-keep-clear', '');
+    document.body.appendChild(notice);
+    const line = setRect(document.createElement('p'), 40, 650, 310, 70);
+    line.className = 'test-control';
+    const link = setRect(document.createElement('a'), 105, 680, 119, 19);
+    link.setAttribute('href', '/terms');
+    line.appendChild(link);
+    document.body.appendChild(line);
+    mountButton('Start exploring', 95, 755, 200, 44);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    // Above the button, the consent line and the notice: over the quote instead.
+    expect(container.style.bottom).toBe('446px');
+  });
+
+  it('counts only the part of a disclosure its scrolling panel shows', async () => {
+    setInnerWidth(375);
+    setInnerHeight(667);
+    const panel = setRect(document.createElement('div'), 0, 0, 375, 380);
+    panel.className = 'test-control';
+    panel.style.overflowY = 'auto';
+    const notice = setRect(document.createElement('div'), 20, 300, 335, 400);
+    notice.setAttribute('data-keep-clear', '');
+    panel.appendChild(notice);
+    document.body.appendChild(panel);
+    mountButton('Consent line', 30, 480, 315, 40);
+    mountButton('Start exploring', 90, 560, 200, 40);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    // The notice shows only 300 to 380, so the box fits between it and the line.
+    expect(container.style.bottom).toBe('199px');
+  });
+
+  it('lets a control outrank a marked disclosure on a short screen', async () => {
+    setInnerWidth(375);
+    setInnerHeight(667);
+    const notice = setRect(document.createElement('div'), 20, 60, 335, 500);
+    notice.className = 'test-control';
+    notice.setAttribute('data-keep-clear', '');
+    document.body.appendChild(notice);
+    mountButton('Consent line', 30, 580, 315, 40);
+    mountButton('Start exploring', 90, 630, 200, 30);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+
+    // No room around the notice: the box covers part of it, never the controls.
+    expect(container.style.bottom).toBe('99px');
+  });
+
   it('may sit over a control that a modal backdrop already covers', async () => {
     setInnerWidth(390);
     setInnerHeight(844);
@@ -323,6 +382,22 @@ describe('turnstile widget placement', () => {
     document.querySelectorAll('.test-control').forEach((el) => el.remove());
     await new Promise((r) => setTimeout(r, 900));
     expect(container.style.bottom).toBe('148px');
+  });
+
+  it('drops back down when a new screen opens room far below it', async () => {
+    setInnerWidth(390);
+    setInnerHeight(844);
+    // A stack of controls up to y 420 pushes the box high, as on a busy screen.
+    for (let y = 420; y < 760; y += 60) mountButton(`Row ${y}`, 60, y, 270, 44);
+    const { options, container } = await renderWidget();
+
+    options['before-interactive-callback']();
+    expect(container.style.bottom).toBe('436px');
+
+    // The next screen has only a composer at the bottom: the box follows it down.
+    document.querySelectorAll('.test-control').forEach((el) => el.remove());
+    mountComposer(130);
+    await vi.waitFor(() => expect(container.style.bottom).toBe('142px'), { timeout: 3000 });
   });
 
   it('measures the same way at 768 and 1280', async () => {
@@ -400,7 +475,8 @@ describe('turnstile beacons', () => {
     options.callback('tok');
     await token;
 
-    expect(vi.mocked(sendFunnelBeacon).mock.calls.at(-1)).toEqual(['turnstile_token', { bucket: 0, mode: 'waited' }]);
+    const calls = vi.mocked(sendFunnelBeacon).mock.calls;
+    expect(calls[calls.length - 1]).toEqual(['turnstile_token', { bucket: 0, mode: 'waited' }]);
   });
 
   it('writes no timing row for a failed check', async () => {
