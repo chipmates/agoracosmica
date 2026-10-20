@@ -16,8 +16,14 @@ export function createCouncilReasoningFilter(): CouncilReasoningFilter {
   });
 }
 
-/** The same rules over a whole response, for the fallback parser. */
+/**
+ * The same rules over a whole response, for the fallback parser. A script
+ * starts at its first label; a line before it (a tail the chat reader let
+ * through) is dropped, as the streaming parser drops it.
+ */
 export function stripCouncilReasoning(text: string): string {
   const filter = createCouncilReasoningFilter();
-  return (filter.push(text) + filter.flush()).trim();
+  const out = filter.push(text) + filter.flush();
+  const first = new RegExp(LINE_LABEL.source).exec(out);
+  return (first ? out.slice(first.index) : out).trim();
 }

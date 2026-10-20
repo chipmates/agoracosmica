@@ -11,7 +11,11 @@ vi.mock('../../services/proxy/sessionManager', () => ({
 }));
 
 vi.mock('../../services/storage/keyStorageService', () => ({
-  keyStorage: { hasUsableKey: vi.fn(async () => false) },
+  keyStorage: {
+    hasUsableKey: vi.fn(async () => false),
+    getKey: vi.fn(async () => `sk-or-v1-${'a'.repeat(64)}`),
+    markInvalid: vi.fn(async () => {}),
+  },
 }));
 
 vi.mock('../../services/audio/llm', async (importOriginal) => ({
@@ -82,13 +86,22 @@ async function replayFreeTier(text: string): Promise<Replay> {
   return callLLM();
 }
 
-/** BYOK: llmService hands the council raw deltas (its own filter strips only opened blocks). */
+/** Raw deltas straight into the council callback, the most it could be handed. */
 async function replayByok(text: string): Promise<Replay> {
   vi.mocked(keyStorage.hasUsableKey).mockResolvedValueOnce(true);
   vi.mocked(generateResponse).mockImplementationOnce(async (opts: any) => {
     for (const piece of tokenDeltas(text)) await opts.streamingCallback(piece);
     return { response: text, metadata: {} } as any;
   });
+  return callLLM();
+}
+
+/** BYOK as it runs: generateResponse -> llmService (its reader filter) -> llmAdapter's TextChunker -> the council. */
+async function replayByokChain(text: string): Promise<Replay> {
+  const actual = await vi.importActual<typeof import('../../services/audio/llm')>('../../services/audio/llm');
+  vi.mocked(keyStorage.hasUsableKey).mockResolvedValueOnce(true).mockResolvedValueOnce(true);
+  vi.mocked(generateResponse).mockImplementationOnce(actual.generateResponse);
+  vi.mocked(global.fetch).mockImplementation(async () => sseResponse(text));
   return callLLM();
 }
 
@@ -144,6 +157,35 @@ describe('council replay: reasoning tail without an opening tag', () => {
     const replay = await replayFreeTier(qwen);
     expectCleanOpening(replay);
     expect(replay.fullResponse).not.toContain('moderator opens');
+  });
+});
+
+describe('council replay: a tail that opens on a word', () => {
+  // The recording without its leading space: 181 characters, past the chat
+  // reader's 140-character hold, so the reader releases it before </think>.
+  const wordTail = recording.slice(1);
+
+  beforeEach(() => {
+    (generator as any).onProgressiveSegment = null;
+  });
+
+  it('keeps the first speaker\'s opening on the free tier', async () => {
+    expect(wordTail.startsWith('Never')).toBe(true);
+    const replay = await replayFreeTier(wordTail);
+    expectCleanOpening(replay);
+    expect(replay.allSegments).toHaveLength(17);
+  });
+
+  it('keeps the first speaker\'s opening through the real BYOK chain', async () => {
+    const replay = await replayByokChain(wordTail);
+    expectCleanOpening(replay);
+    expect(replay.allSegments).toHaveLength(17);
+  });
+
+  it('keeps the recorded council whole through the real BYOK chain', async () => {
+    const replay = await replayByokChain(recording);
+    expectCleanOpening(replay);
+    expect(replay.allSegments).toHaveLength(17);
   });
 });
 

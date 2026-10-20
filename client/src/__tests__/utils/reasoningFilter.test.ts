@@ -91,10 +91,10 @@ describe('createReasoningFilter: <think> blocks', () => {
 });
 
 describe('createReasoningFilter: after the start', () => {
-  it('drops a stray closing tag split across deltas, and only the tag', () => {
+  it('turns a stray closing tag split across deltas into a line break', () => {
     const f = createReasoningFilter();
     const out = [ENGLISH_REPLY.slice(0, 150), ' more</th', 'ink> words.'].map((c) => f.push(c)).join('') + f.flush();
-    expect(out).toBe(`${ENGLISH_REPLY.slice(0, 150)} more words.`);
+    expect(out).toBe(`${ENGLISH_REPLY.slice(0, 150)} more\n words.`);
   });
 
   it('passes an angle bracket that is not a tag', () => {

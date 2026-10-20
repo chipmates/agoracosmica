@@ -164,7 +164,8 @@ function partialTagAt(s: string, tag: string): number {
  * Drops model reasoning from a stream. Besides `<think>...</think>` blocks, a
  * model can open with only the tail of its reasoning, closed by `</think>` with
  * no opening tag. The start of the stream is held until a tag settles it or
- * `release` says the held text is the reply; a stray `</think>` later is dropped.
+ * `release` says the held text is the reply. A stray `</think>` later becomes a
+ * line break, so what follows it starts a line (a council's first label).
  */
 export function createReasoningFilter(options: ReasoningFilterOptions = {}): ReasoningFilter {
   const release = options.release ?? releaseChatStart;
@@ -174,7 +175,7 @@ export function createReasoningFilter(options: ReasoningFilterOptions = {}): Rea
   let partial = '';
 
   const pass = (text: string): string => {
-    let out = (partial + blocks.filter(text)).split(CLOSE_TAG).join('');
+    let out = (partial + blocks.filter(text)).split(CLOSE_TAG).join('\n');
     const cut = partialTagAt(out, CLOSE_TAG);
     partial = cut === -1 ? '' : out.slice(cut);
     if (cut !== -1) out = out.slice(0, cut);
