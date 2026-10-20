@@ -26,6 +26,8 @@ interface Props {
     description: string;
     firstLine: string;
     text: string;
+    /** Says what of the text is left out, printed under the poem. */
+    note?: string;
     intro: string;
     collectionLine: string;
     lineCount: number;
@@ -119,6 +121,8 @@ const schemas = [
     <div class="pm-poem">
       <div class="pm-poem__text">{poem.text.split('\n\n').map(stanza => (<div class="pm-poem__stanza">{stanza.split('\n').map(line => (<span class="pm-poem__line">{line}</span>))}</div>))}</div>
     </div>
+
+    {poem.note && <p class="pm-intro">{poem.note}</p>}
 
     {poem.intro && <p class="pm-intro">{poem.intro}</p>}
 

@@ -124,9 +124,12 @@ const dickinsonRecords = dickinsonOrder.map(({ key, slug, indexable }) => {
     path: `${poets.dickinson.collectionPath}${slug}/`,
     title: poem.firstLine,
     metaTitle: `${poem.firstLine} by Emily Dickinson`,
-    description: `The full text of ${quoted(poem.firstLine)} by Emily Dickinson, as she wrote it, with her dashes kept.`,
+    description: poem.heldNote
+      ? `The text of ${quoted(poem.firstLine)} by Emily Dickinson, as she wrote it, with her dashes kept and one stanza left out for now.`
+      : `The full text of ${quoted(poem.firstLine)} by Emily Dickinson, as she wrote it, with her dashes kept.`,
     firstLine: poem.firstLine,
     text: poem.text,
+    note: poem.heldNote ?? '',
     intro: '',
     collectionLine: '',
     lineCount: verseLines(poem.text),

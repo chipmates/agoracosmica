@@ -42,9 +42,11 @@ const lang = 'en' as const;
 // --- Poems, manuscript leaves and repositories: one copy in the data module,
 //     shared with the page each poem has of its own ---
 
-// Optional per-poem note (reusable): surfaces a spot where the manuscript reading
-// is kept over a smoothed printed one. Empty for now.
-const POEM_NOTES: Record<string, string> = {};
+// Optional per-poem note under the text, from the data module: where a stanza
+// is left out, it says so.
+const POEM_NOTES: Record<string, string> = Object.fromEntries(
+  Object.entries(POEMS).flatMap(([key, poem]) => (poem.heldNote ? [[key, poem.heldNote]] : [])),
+);
 
 // Echo-voice recording of "This is my letter to the World", the closing teaser
 // by the CTA (you've read her words + seen her hand, now hear her). Set to the

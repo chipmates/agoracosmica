@@ -1,7 +1,7 @@
 ---
 // The browse page for the poems the site hosts: short, famous, and by what
 // they are about. Every entry links to the poem's own page, which carries the
-// full text. Section ids are stable because ad links point at them.
+// text. Section ids are stable because ad links point at them.
 
 import Public from '../layouts/Public.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
@@ -15,7 +15,7 @@ const PAGE_URL = canonicalUrl(PAGE_PATH);
 
 const metaTitle = 'Poems to Read: Short, Famous, by Theme';
 const metaDescription =
-  'Short poems, famous poems, and poems about death, love, nature and hope. Every one complete, free to read, no signup.';
+  'Short poems, famous poems, and poems about death, love, nature and hope, as their authors wrote them. Free to read, no signup.';
 
 const schemas = [
   {

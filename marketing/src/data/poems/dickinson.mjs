@@ -9,12 +9,14 @@
 // material permitted, with credit and a notice to the library).
 // Only poems first printed more than 95 years ago are hosted: a later first
 // printing is still in copyright in the United States, however old the
-// manuscript.
+// manuscript. A stanza the first printing left out stays off the site, with
+// the manuscript leaf that shows it, until its own first printing is known.
 // Plain ESM, not TypeScript: the Node sitemap script imports this module too.
 
 /** `firstPrinted` is the year the poem first reached print: in a newspaper in
  *  her lifetime where there was one, otherwise in the first book that held it.
- *  @type {Record<string, { firstLine: string; firstPrinted: number; text: string }>} */
+ *  `heldNote` is printed under a poem that has a stanza left out.
+ *  @type {Record<string, { firstLine: string; firstPrinted: number; text: string; heldNote?: string }>} */
 export const dickinsonPoems = {
   chariot: {
     firstLine: 'Because I could not stop for Death',
@@ -34,11 +36,6 @@ At Recess – in the Ring –
 We passed the Fields of Gazing Grain –
 We passed the Setting Sun –
 
-Or rather – He passed Us –
-The Dews drew quivering and Chill –
-For only Gossamer, my Gown –
-My Tippet – only Tulle –
-
 We paused before a House that seemed
 A Swelling of the Ground –
 The Roof was scarcely visible –
@@ -48,6 +45,8 @@ Since then – 'tis Centuries – and yet
 Feels shorter than the Day
 I first surmised the Horses Heads
 Were toward Eternity –`,
+    heldNote:
+      'In her manuscript one more stanza stands between the third and the fourth shown here. We leave it out for now, along with the manuscript page it is written on, until we know when that stanza was first printed.',
   },
   dying: {
     firstLine: 'I heard a Fly buzz – when I died',
@@ -242,12 +241,9 @@ Then Space – began to toll,
 As all the Heavens were a Bell,
 And Being, but an Ear,
 And I, and Silence, some strange Race
-Wrecked, solitary, here –
-
-And then a Plank in Reason, broke,
-And I dropped down, and down –
-And hit a World, at every plunge,
-And Finished knowing – then –`,
+Wrecked, solitary, here –`,
+    heldNote:
+      'In her manuscript one more stanza follows the last one shown here. We leave it out for now, along with the manuscript page it is written on, until we know when that stanza was first printed.',
   },
   snake: {
     firstLine: 'A narrow Fellow in the Grass',
@@ -371,14 +367,14 @@ export const dickinsonFacsimileLeaves = {
   brain: ['brain-sky'],
   frigate: ['frigate-book'],
   // Houghton/Harvard (publication permitted, credit Houghton)
-  chariot: ['chariot-1', 'chariot-2'],
+  chariot: ['chariot-1'],
   nobody: ['nobody'],
   loadedgun: ['loaded-gun-1', 'loaded-gun-2'],
   exclusion: ['soul-society'],
   letter: ['letter-world'],
   hope: ['hope'],
   slant: ['slant-light'],
-  funeral: ['funeral-brain-1', 'funeral-brain-2'],
+  funeral: ['funeral-brain-1'],
   snake: ['narrow-fellow-1', 'narrow-fellow-2', 'narrow-fellow-3', 'narrow-fellow-4'],
   wildnights: ['wildnights'],
 };
@@ -406,8 +402,7 @@ export const dickinsonFacsimileSources = {
 /** Reading order of the collection page. The slug is the poem page's URL
  *  segment, fixed here so a re-transcription can never move a live page.
  *  `indexable` is the poem page's own crawl flag. It is false for the two
- *  poems that carry a stanza their first printing left out, until it is
- *  settled when those stanzas first reached print. */
+ *  poems with a stanza their first printing left out. */
 export const dickinsonOrder = [
   { key: 'chariot', slug: 'because-i-could-not-stop-for-death', indexable: false },
   { key: 'dying', slug: 'i-heard-a-fly-buzz-when-i-died', indexable: true },
