@@ -414,6 +414,9 @@ export class CustomCouncilParser {
    * Complete parsing and return final results
    */
   complete(): { segments: Segment[]; metrics: any } {
+    // A stream that ends without a newline leaves its last line in the buffer.
+    if (this.state.buffer.trim()) this.processChunk('\n');
+
     // Finalize any remaining segment
     if (this.state.currentSegment) {
       this._finalizeSegment(this.state.currentSegment);

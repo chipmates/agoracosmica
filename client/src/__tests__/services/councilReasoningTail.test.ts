@@ -146,3 +146,19 @@ describe('council replay: reasoning tail without an opening tag', () => {
     expect(replay.fullResponse).not.toContain('moderator opens');
   });
 });
+
+describe('council replay: the closing line', () => {
+  it('keeps the last speaker\'s line when the stream ends without a newline', async () => {
+    expect(recording.endsWith('\n')).toBe(false);
+    const { allSegments, streamed } = await replayFreeTier(recording);
+    expect(allSegments).toHaveLength(17);
+    const counts: Record<string, number> = {};
+    for (const s of allSegments) counts[s.speaker] = (counts[s.speaker] ?? 0) + 1;
+    expect(counts).toEqual({ 'ADA LOVELACE': 6, 'ALBERT EINSTEIN': 6, 'ARTHUR SCHOPENHAUER': 5 });
+    const last = allSegments[allSegments.length - 1];
+    expect(last.speaker).toBe('ADA LOVELACE');
+    expect(last.content.startsWith('Ein Geschenk, das wir weitergeben können.')).toBe(true);
+    expect(last.content.endsWith('Danke, Albert. Danke, Arthur.')).toBe(true);
+    expect(streamed).toHaveLength(17);
+  });
+});
