@@ -968,6 +968,7 @@
     },
     "endCouncil": "End Council",
     "debateComplete": "Council Complete",
+    "debateCompleteMessage": "The council has finished.",
     "closeReview": "Close Review",
     "quickSelection": {
       "title": "Quick Start",

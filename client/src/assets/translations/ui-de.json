@@ -970,6 +970,7 @@
     },
     "endCouncil": "Rat beenden",
     "debateComplete": "Rat abgeschlossen",
+    "debateCompleteMessage": "Der Rat ist beendet.",
     "closeReview": "Überblick schließen",
     "quickSelection": {
       "title": "Schnellstart",
