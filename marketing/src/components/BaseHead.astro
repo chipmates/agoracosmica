@@ -44,6 +44,9 @@ interface Props {
   /** Robots value when noindex is set. Pages that stay out of the index but
    *  still pass link value on ('noindex, follow') override the default here. */
   robots?: string;
+  /** The 404 page answers for every unknown address, so it names no canonical
+   *  (and no og:url) of its own. */
+  noCanonical?: boolean;
 }
 
 const {
@@ -64,6 +67,7 @@ const {
   noHreflang = false,
   noindex = false,
   robots,
+  noCanonical = false,
   altEn,
   altDe,
 } = Astro.props;
@@ -111,7 +115,7 @@ const metaDescription = clampDescription(description);
 <title>{computedFullTitle}</title>
 {noindex && <meta name="robots" content={robots ?? 'noindex, nofollow'} />}
 <meta name="description" content={metaDescription} />
-<link rel="canonical" href={canonical} />
+{!noCanonical && <link rel="canonical" href={canonical} />}
 {!noHreflang && (
   <>
     <link rel="alternate" hreflang="en" href={alts.en} />
@@ -122,7 +126,7 @@ const metaDescription = clampDescription(description);
 
 <meta property="og:title" content={computedOgTitle} />
 <meta property="og:description" content={metaDescription} />
-<meta property="og:url" content={canonical} />
+{!noCanonical && <meta property="og:url" content={canonical} />}
 <meta property="og:type" content={ogType} />
 <meta property="og:image" content={image} />
 <meta property="og:image:alt" content={imageAlt} />

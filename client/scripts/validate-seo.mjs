@@ -113,10 +113,14 @@ for (const f of files) {
   if (h1 === 0) hard.push(`${rel}: no <h1>`);
   else if (h1 > 1) warn.push(`${rel}: ${h1} <h1> tags (expected 1)`);
 
-  // 8. og + canonical present.
+  // 8. og + canonical present. The 404 page answers for every unknown address
+  //    (and with 200 at /404 itself): no canonical there, and robots noindex.
   for (const og of ['og:title', 'og:description', 'og:image'])
     if (!html.includes(`property="${og}"`)) hard.push(`${rel}: missing ${og}`);
-  if (!html.includes('rel="canonical"')) hard.push(`${rel}: missing canonical`);
+  if (slug === '404') {
+    if (html.includes('rel="canonical"')) hard.push(`${rel}: the 404 page names a canonical`);
+    if (!/<meta name="robots" content="noindex/.test(html)) hard.push(`${rel}: the 404 page lacks robots noindex`);
+  } else if (!html.includes('rel="canonical"')) hard.push(`${rel}: missing canonical`);
 
   // 9. Em-dash in visible body that is NOT a quote attribution. Attribution
   //    dashes ("— Rumi", "— Joseph Campbell") are an allowed typographic

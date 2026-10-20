@@ -4,7 +4,8 @@ import Public from '../layouts/Public.astro';
 // Real 404 page. CF Pages serves this with HTTP status 404 for any path that
 // matches neither a static file nor a _redirects rule, replacing the old
 // catch-all that answered every junk URL with a 200 SPA shell whose canonical
-// pointed at the homepage (a classic soft-404).
+// pointed at the homepage (a classic soft-404). The page also answers 200 at
+// /404 itself, so it stays out of the index and names no canonical.
 const lang = 'en' as const;
 ---
 <Public
@@ -13,6 +14,9 @@ const lang = 'en' as const;
   canonicalPath="/404"
   lang={lang}
   noHreflang
+  noCanonical
+  noindex
+  robots="noindex, follow"
   stickyCta={false}
 >
   <section class="not-found">
