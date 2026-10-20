@@ -80,6 +80,20 @@ const methodologyHref = isDe ? '/de/methodik/' : '/methodology/';
 const contactAnchor = isDe ? 'kontakt' : 'contact';
 const contactAnchorAlt = isDe ? 'contact' : 'kontakt';
 const country = isDe ? 'Deutschland' : 'Germany';
+
+// Kept inline: public-{en,de}.json date the theme pages, so a string there would move their lastmod.
+const museumHref = isDe ? 'https://museumofages.org/de/' : 'https://museumofages.org/';
+const museum = isDe
+  ? {
+      pre: 'Wir betreiben auch das ',
+      link: 'Museum of Ages, ein digitales Museum',
+      post: '. Es baut Orte aus der Geschichte in 3D nach, angefangen mit Leonardo da Vincis letztem Haus in Amboise.',
+    }
+  : {
+      pre: 'We also run ',
+      link: 'Museum of Ages, a digital museum',
+      post: ". It rebuilds places from history in 3D, starting with Leonardo da Vinci's last house in Amboise.",
+    };
 ---
 <div class="pub-content pub-about">
   <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.about') }]} />
@@ -93,6 +107,9 @@ const country = isDe ? 'Deutschland' : 'Germany';
     <div class="pub-section__text">
       <p>{t('about.orgP1')}</p>
       <p>{t('about.orgP2')}</p>
+      <p>
+        {museum.pre}<a class="pub-textlink" href={museumHref} target="_blank" rel="noopener">{museum.link}</a>{museum.post}
+      </p>
     </div>
     <h3 class="pub-about-sub">{t('about.valuesTitle')}</h3>
     <dl class="pub-about-dl">

@@ -10,6 +10,10 @@ interface Props {
 
 const { lang } = Astro.props;
 const t = getT(lang);
+
+// The museum's name stays English in every language; its descriptor always stands beside it.
+const museumHref = lang === 'de' ? 'https://museumofages.org/de/' : 'https://museumofages.org/';
+const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Museum of Ages, a digital museum';
 ---
 <footer class="pub-footer">
   <div class="pub-footer__inner">
@@ -39,6 +43,8 @@ const t = getT(lang);
         <FooterChoice client:visible lang={lang} />
       </div>
       <div class="pub-footer__col">
+        {/* No noreferrer: the museum's edge counter reads only the referrer's host to file the visit. */}
+        <a href={museumHref} target="_blank" rel="noopener">{museumLabel}</a>
         <a href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">GitHub</a>
       </div>
     </div>
