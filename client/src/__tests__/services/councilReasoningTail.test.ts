@@ -159,6 +159,8 @@ describe('council replay: the closing line', () => {
     expect(last.speaker).toBe('ADA LOVELACE');
     expect(last.content.startsWith('Ein Geschenk, das wir weitergeben können.')).toBe(true);
     expect(last.content.endsWith('Danke, Albert. Danke, Arthur.')).toBe(true);
+    // The TextChunker splits this over-long sentence after "kann,".
+    expect(last.content).toContain('die man nicht füllen kann, und den Tönen');
     expect(streamed).toHaveLength(17);
   });
 });

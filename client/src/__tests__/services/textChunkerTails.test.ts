@@ -40,3 +40,29 @@ describe('TextChunker holds non-terminal periods', () => {
     expect(chunks.join(' ').trim()).toBe('Es war der 3.');
   });
 });
+
+describe('TextChunker splits an over-long sentence', () => {
+  const words = (s: string) => s.trim().split(/\s+/);
+
+  it('keeps the space at a clause split, so joined chunks keep their words apart', async () => {
+    const closing = 'Ich nehme von diesem Gespräch mit, dass ein gutes Leben kein Zustand ist, den man erreicht, '
+      + 'sondern ein Muster, das man webt, Faden für Faden, mit den Löchern, die man nicht füllen kann, '
+      + 'und den Tönen, die zwischen den Tönen liegen, und mit allem, was wir einander heute gesagt haben. Danke.';
+    const chunks = await chunksOf(closing);
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(words(chunks.join(''))).toEqual(words(closing));
+  });
+
+  it('keeps the space at a split on a plain space', async () => {
+    const long = `${'Das ist ein sehr langer Satz ohne jede Pause '.repeat(8).trim()}.`;
+    const chunks = await chunksOf(long);
+    expect(chunks.length).toBeGreaterThan(1);
+    expect(words(chunks.join(''))).toEqual(words(long));
+  });
+
+  it('keeps the space after a long English chunk that ends a sentence', async () => {
+    const text = `${'This clause runs on, '.repeat(16)}and then it stops. The next sentence follows here and ends.`;
+    const chunks = await chunksOf(text, 'en');
+    expect(words(chunks.join(''))).toEqual(words(text));
+  });
+});

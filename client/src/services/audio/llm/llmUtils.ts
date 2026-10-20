@@ -543,17 +543,21 @@ export class TextChunker {
 
       if (splitAt < 0) {
         // No good split point — emit as-is (rare: single very long word)
-        result.push(remaining.trim());
+        result.push(remaining);
         remaining = '';
         break;
       }
 
-      result.push(remaining.slice(0, splitAt + 1).trimEnd());
-      remaining = remaining.slice(splitAt + 1).trimStart();
+      // Each part keeps one space at the seam, as whole sentences keep theirs:
+      // the council parser joins parts without adding one.
+      const head = remaining.slice(0, splitAt + 1);
+      const rest = remaining.slice(splitAt + 1);
+      result.push(/\s$/.test(head) || /^\s/.test(rest) ? `${head.trimEnd()} ` : head);
+      remaining = rest.trimStart();
     }
 
     if (remaining.trim()) {
-      result.push(remaining.trim());
+      result.push(remaining);
     }
 
     return result;
