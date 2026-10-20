@@ -39,7 +39,7 @@
   "scripts": {
     "dev": "vite",
     "start": "vite",
-    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && (cd ../marketing && pnpm install --prefer-frozen-lockfile && pnpm build) && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs && node scripts/check-asset-names.mjs && node scripts/check-csp.mjs",
+    "build": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build && pnpm --dir ../marketing install --prefer-frozen-lockfile && pnpm --dir ../marketing build && node scripts/merge-marketing.mjs && node scripts/generate-sitemap.mjs && node scripts/check-asset-names.mjs && node scripts/check-csp.mjs",
     "build:self-host": "node scripts/setup-assets.mjs && node scripts/extract-public-data.mjs && vite build",
     "build:extract": "node scripts/extract-public-data.mjs",
     "build:client": "vite build",
