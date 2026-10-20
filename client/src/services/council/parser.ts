@@ -191,13 +191,14 @@ export class CustomCouncilParser {
       
       const segment = this._parseLine(line);
       if (segment) {
-        // Handle segment completion
-        if (this.state.currentSegment && 
-            this.state.currentSegment.speaker !== segment.speaker) {
-          // Complete current segment
+        // A new label completes the current segment, also when the same
+        // speaker labels two lines in a row.
+        if (this.state.currentSegment) {
+          if (this.state.currentSegment.speaker !== segment.speaker) {
+            this.state.metadata.speakerChanges++;
+          }
           this._finalizeSegment(this.state.currentSegment);
           results.newSegments.push(this.state.currentSegment);
-          this.state.metadata.speakerChanges++;
         }
         
         this.state.currentSegment = segment;
