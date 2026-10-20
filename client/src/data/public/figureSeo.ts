@@ -235,7 +235,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
     de: {
       description: "Entdecke die taoistische Philosophie von Laozi (Laotse): Wu Wei, Einfachheit, Fließen mit der Natur. 12 Kapitel Lebensgeschichte, Lehren aus dem Tao Te King.",
       teachingsHeading: "Laozi (Laotse) über das Tao, Wu Wei und natürliche Harmonie",
-      seoTitle: "Laozi - Taoismus, Wu Wei & Tao Te King | Agora Cosmica",
+      seoTitle: "Laozi (Laotse) - Taoismus, Wu Wei & Tao Te King",
     },
   },
   lovelace: {
