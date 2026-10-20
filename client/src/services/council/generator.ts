@@ -15,7 +15,7 @@ import { mediaBaseUrl } from '../../config/runtime';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
 import { preferencesAdapter } from '../../storage/preferencesAdapter';
 import { keyStorage } from '../storage/keyStorageService';
-import { stripThinkingTagsFromText } from '../../utils/thinkingTagStripper';
+import { createCouncilReasoningFilter, stripCouncilReasoning } from './reasoningFilter';
 import { getVoicesForCouncil } from '../audio/voices';
 import { getFullName } from './speakerRegistry';
 import { councilDiagnostics } from './diagnostics';
@@ -540,11 +540,10 @@ Begin the council now. Remember to use the EXACT format specified in your instru
     const chunks: string[] = [];
     const streamedSegments: Segment[] = []; // Track segments for progressive processing
 
-    // Qwen3 outputs <think>...</think> blocks before the actual response.
-    // We must strip these to prevent thinking text from being parsed as council segments.
-    let thinkStrippingDone = false;
-    let thinkBuffer = '';
-    
+    // Reasoning before the script would be parsed as speech or swallow the
+    // first speaker's line.
+    const reasoningFilter = createCouncilReasoningFilter();
+
     // Initialize streaming parser with progressive callback
     const { CustomCouncilParser } = await import('./parser');
     const streamingParser = new CustomCouncilParser({
@@ -601,38 +600,9 @@ Begin the council now. Remember to use the EXACT format specified in your instru
 
       councilLog('🚀 PERFORMANCE: Temporarily cleared seed data for council generation');
 
-      // Shared streaming callback for both BYOK and free-tier paths
-      const councilStreamingCallback = async (chunk: string) => {
-          chunks.push(chunk);
-          fullResponse += chunk;
-
-          // Strip Qwen3 <think>...</think> blocks before parsing.
-          // Buffer all content until thinking block is resolved, then pass clean text to parser.
-          let cleanChunk: string;
-          if (!thinkStrippingDone) {
-            thinkBuffer += chunk;
-            if (thinkBuffer.includes('</think>')) {
-              // Found end of thinking block — extract content after </think>
-              const endIdx = thinkBuffer.indexOf('</think>');
-              cleanChunk = thinkBuffer.substring(endIdx + '</think>'.length);
-              thinkStrippingDone = true;
-              thinkBuffer = '';
-              councilLog('🧠 Stripped Qwen3 thinking block from stream');
-            } else if (!thinkBuffer.includes('<think') && thinkBuffer.length > 50) {
-              // No <think> tag found and buffer is long enough — not a thinking model
-              cleanChunk = thinkBuffer;
-              thinkStrippingDone = true;
-              thinkBuffer = '';
-            } else {
-              // Still accumulating thinking block or waiting to detect <think>
-              return;
-            }
-          } else {
-            cleanChunk = chunk;
-          }
-
-          // Skip empty chunks after stripping
-          if (!cleanChunk.trim()) return;
+      const feedParser = (cleanChunk: string) => {
+          // A whitespace-only chunk can be the line break between two speakers.
+          if (!cleanChunk) return;
 
           // 🔍 STREAMING DEBUG: Log every chunk to verify streaming is working
           const timeFromStart = Date.now() - (this.streamStartTime || 0);
@@ -678,6 +648,13 @@ Begin the council now. Remember to use the EXACT format specified in your instru
           }
       };
 
+      // Shared streaming callback for both BYOK and free-tier paths
+      const councilStreamingCallback = async (chunk: string) => {
+        chunks.push(chunk);
+        fullResponse += chunk;
+        feedParser(reasoningFilter.push(chunk));
+      };
+
       // Route through BYOK or free-tier based on key availability
       if (hasBYOKKey) {
         await generateResponse({
@@ -705,11 +682,10 @@ Begin the council now. Remember to use the EXACT format specified in your instru
         });
       }
       
-      // Strip <think>...</think> from fullResponse for fallback parser.
-      // The streaming path through llmService now strips these per-chunk via the
-      // shared util, but the council's own buffered copy of `fullResponse` is
-      // pre-strip — clean it here for the fallback parser path.
-      fullResponse = stripThinkingTagsFromText(fullResponse);
+      feedParser(reasoningFilter.flush());
+
+      // The fallback parser reads fullResponse, so it gets the same cleaning.
+      fullResponse = stripCouncilReasoning(fullResponse);
 
       // Flush any remaining content in parser
       const finalParseResult = streamingParser.complete();
