@@ -401,10 +401,9 @@ export const dickinsonFacsimileSources = {
 
 /** Reading order of the collection page. The slug is the poem page's URL
  *  segment, fixed here so a re-transcription can never move a live page.
- *  `indexable` is the poem page's own crawl flag. It is false for the two
- *  poems with a stanza their first printing left out. */
+ *  `indexable` is the poem page's own crawl flag. */
 export const dickinsonOrder = [
-  { key: 'chariot', slug: 'because-i-could-not-stop-for-death', indexable: false },
+  { key: 'chariot', slug: 'because-i-could-not-stop-for-death', indexable: true },
   { key: 'dying', slug: 'i-heard-a-fly-buzz-when-i-died', indexable: true },
   { key: 'alabaster', slug: 'safe-in-their-alabaster-chambers', indexable: true },
   { key: 'nobody', slug: 'im-nobody-who-are-you', indexable: true },
@@ -418,7 +417,7 @@ export const dickinsonOrder = [
   { key: 'brain', slug: 'the-brain-is-wider-than-the-sky', indexable: true },
   { key: 'frigate', slug: 'there-is-no-frigate-like-a-book', indexable: true },
   { key: 'slant', slug: 'theres-a-certain-slant-of-light', indexable: true },
-  { key: 'funeral', slug: 'i-felt-a-funeral-in-my-brain', indexable: false },
+  { key: 'funeral', slug: 'i-felt-a-funeral-in-my-brain', indexable: true },
   { key: 'wildnights', slug: 'wild-nights-wild-nights', indexable: true },
 ];
 
