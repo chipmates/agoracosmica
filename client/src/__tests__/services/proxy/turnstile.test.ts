@@ -27,7 +27,7 @@ type TurnstileOptions = {
   'refresh-expired'?: string;
   'before-interactive-callback': () => void;
   callback: (token: string) => void;
-  'error-callback': () => void;
+  'error-callback': (code?: string) => unknown;
   'expired-callback': () => void;
 };
 
@@ -548,6 +548,16 @@ describe('turnstile after the check settles', () => {
     expect(removeMock).toHaveBeenCalledWith('widget-1');
     expect(container.style.display).toBe('none');
     expect(container.style.pointerEvents).toBe('none');
+  });
+
+  it('tells Cloudflare the error is handled, so it schedules no retry of its own', async () => {
+    const { token, options } = await renderWidget();
+
+    // Anything but true makes Cloudflare log the code and, for crash-class
+    // codes, re-run the check even with retry set to never.
+    expect(options['error-callback']('300030')).toBe(true);
+    await expect(token).rejects.toThrow();
+    expect(options['error-callback']('300030')).toBe(true);
   });
 
   it('starts no new ask after an error when the widget re-asks by itself', async () => {

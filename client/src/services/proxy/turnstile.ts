@@ -576,13 +576,17 @@ async function runCheck(askedAtMs: number): Promise<string> {
         if (container) container.style.display = 'none';
         resolve(token);
       },
+      // True tells Cloudflare the error is handled. Anything else makes it log
+      // the code and re-run a crash-class failure even with retry 'never',
+      // against a widget this callback has already removed.
       'error-callback': () => {
-        if (settled) return;
+        if (settled) return true;
         clearTimeout(timeout);
         removeWidget();
         settle();
         sendFunnelBeacon('turnstile_failed', { outcome: 'error' });
         reject(new Error('Turnstile challenge failed'));
+        return true;
       },
       'expired-callback': () => {
         // Turnstile tokens age out a few minutes after a successful check, and
