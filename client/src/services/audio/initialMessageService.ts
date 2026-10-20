@@ -21,6 +21,10 @@ import {
 } from './initialMessagePathBuilder';
 import { getEnglishEngine } from './voices/voiceResolver';
 
+function isHtmlDocument(text: string): boolean {
+  return /^\s*(<!doctype html|<html[\s>])/i.test(text);
+}
+
 /**
  * Initial Message metadata and content
  */
@@ -158,6 +162,12 @@ class InitialMessageService {
         const response = await fetchWithTimeout(textUrl, { timeoutMs: 10_000 });
         if (response.ok) {
           text = await response.text();
+          // An SPA fallback answers a missing file with the app shell (200).
+          // Its audio twin is the same page, so let the LLM greet instead.
+          if (isHtmlDocument(text)) {
+            console.warn('[InitialMessageService] Greeting file missing (got an HTML page)', { textUrl });
+            return null;
+          }
           if (import.meta.env.DEV) {
             console.log('[InitialMessageService] ✅ Text content loaded', {
               length: text.length,
