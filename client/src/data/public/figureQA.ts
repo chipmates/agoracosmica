@@ -65,7 +65,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "What is Emily Dickinson's idea of telling the truth slant?",
-          a: "For Emily Dickinson, the most essential truths cannot survive the direct route. Stated head on, they blind us, too bright for our infirm delight. So truth must dazzle gradually, the way lightning is eased for children with kind explanation. Tell all the truth, she wrote, but tell it slant.",
+          a: "For Emily Dickinson, a hard truth does not survive the direct route. Said head on, it blinds, the way the sun does when you look straight at it. Said at an angle, through an image, it can be taken in a little at a time, and the person who works it out is the one it changes. Tell all the truth, she wrote, but tell it slant.",
         },
         {
           q: "What did Emily Dickinson actually write?",
@@ -85,7 +85,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was meint Emily Dickinson damit, die Wahrheit schräg zu sagen?",
-          a: "Für Emily Dickinson überstehen die wichtigsten Wahrheiten den direkten Weg nicht. Frontal gesagt blenden sie uns, zu hell für unser schwaches Vermögen, sie zu ertragen. Also muss die Wahrheit nach und nach blenden, so wie man Kindern den Blitz mit guten Worten erträglich macht. Sag die ganze Wahrheit, schrieb sie, doch sag sie schräg.",
+          a: "Für Emily Dickinson übersteht eine schwere Wahrheit den direkten Weg nicht. Frontal gesagt blendet sie, so wie die Sonne, wenn man direkt hineinschaut. Schräg gesagt, über ein Bild, kann man sie Stück für Stück aufnehmen, und wen sie Arbeit kostet, den verändert sie. Sag die ganze Wahrheit, schrieb sie, doch sag sie schräg.",
         },
         {
           q: "Was hat Emily Dickinson eigentlich geschrieben?",
