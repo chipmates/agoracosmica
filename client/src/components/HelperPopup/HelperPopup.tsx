@@ -14,6 +14,8 @@ interface HelperPopupProps {
   showDontAskAgain?: boolean;
   onDontAskAgain?: () => void;
   className?: string;
+  /** A short message: the card form on phones too, never the full screen. */
+  compact?: boolean;
 }
 
 /**
@@ -29,6 +31,7 @@ interface HelperPopupProps {
  * @param props.showDontAskAgain - Show "don't show again" checkbox (default: true)
  * @param props.onDontAskAgain - Callback when "don't show again" is checked
  * @param props.className - Additional CSS classes
+ * @param props.compact - Keep the card form on phones (for a line or two)
  */
 const HelperPopup: FC<HelperPopupProps> = ({
   isOpen,
@@ -38,10 +41,12 @@ const HelperPopup: FC<HelperPopupProps> = ({
   buttonText = 'Got it!',
   showDontAskAgain = true,
   onDontAskAgain,
-  className = ''
+  className = '',
+  compact = false
 }) => {
   const [dontShowAgain, setDontShowAgain] = useState(false);
   const { isMobile } = useResponsive();
+  const fullscreen = isMobile && !compact;
   const { tString } = useTranslation();
   const dontShowLabel = tString('common.dontShowAgain', "Don't show this again");
 
@@ -95,11 +100,11 @@ const HelperPopup: FC<HelperPopupProps> = ({
   // Use React Portal to render outside of any modal stacking context
   // This ensures the helper popup always appears above all other elements
   return createPortal(
-    <div className={`helper-popup-container ${isMobile ? 'fullscreen-mobile' : ''}`}>
+    <div className={`helper-popup-container ${fullscreen ? 'fullscreen-mobile' : ''}`}>
       <div
         ref={popupRef}
         tabIndex={-1}
-        className={`helper-popup ${isMobile ? 'fullscreen-mobile' : ''} ${className}`}
+        className={`helper-popup ${fullscreen ? 'fullscreen-mobile' : ''} ${className}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="helper-title"

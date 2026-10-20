@@ -186,6 +186,7 @@ export function LiveCouncilPlayer({ onClose }: LiveCouncilPlayerProps) {
           content={tString('cosmicCouncil.debateCompleteMessage', 'The council has finished.')}
           buttonText={tString('common.close', 'Close')}
           showDontAskAgain={false}
+          compact
         />
       </div>
     </div>,
