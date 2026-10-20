@@ -146,6 +146,8 @@ export class CustomCouncilService {
   private councilSessionId: string | null;
   private councilVoiceMappings: Record<string, string> | null;
   private abortController: AbortController | null;
+  /** Counts generation starts, so a superseded one cannot end the next. */
+  private generationCount = 0;
   // Reference to the BufferSource currently feeding the speakers, so cleanup
   // can call .stop() on user-close instead of letting the segment play out.
   private activeSource: AudioBufferSourceNode | null;
@@ -285,6 +287,8 @@ export class CustomCouncilService {
    * Start custom council generation with progressive streaming
    */
   async startCustomGeneration(): Promise<GenerationResult> {
+    let processingChain: Promise<void> = Promise.resolve();
+    const generation = ++this.generationCount;
     try {
       // Cancel any previous in-progress generation
       if (this.abortController) {
@@ -316,7 +320,7 @@ export class CustomCouncilService {
 
       // Set up streaming callback with sequential processing queue
       // Maintains segment order by processing one at a time
-      let processingChain = Promise.resolve();
+      processingChain = Promise.resolve();
       const streamingCallback = (segment: Segment | PartialSegment) => {
         processingChain = processingChain
           .then(() => this._handleProgressiveSegment(segment))
@@ -338,6 +342,10 @@ export class CustomCouncilService {
       // All TTS self-hosted — use kokoro voice set (server handles model routing)
       this.councilVoiceMappings = getVoicesForCouncil(allParticipants, 'kokoro');
       councilLog('🎭 [Council] Pre-generated voice mappings:', this.councilVoiceMappings);
+
+      // While this is true, an empty playback queue waits for the next segment
+      // instead of ending the council.
+      this.holisticPipeline.isGenerating = true;
 
       // Generate council using the custom generator with progressive streaming
       const result = await customCouncilGenerator.generateCouncil({
@@ -381,8 +389,7 @@ export class CustomCouncilService {
           councilLog('📈 Progressive streaming completed successfully!');
         }
         
-        // Mark generation as complete
-        this.holisticPipeline.isGenerating = false;
+        this._finishGeneration(processingChain, generation);
 
         // Note: Don't clear voice mappings here - they're needed for TTS during playback
         // Mappings will be cleared in cleanup() when council actually ends
@@ -394,11 +401,29 @@ export class CustomCouncilService {
     } catch (error) {
       const errorMessage = error instanceof Error ? error.message : String(error);
       councilError('❌ Custom generation error:', error);
+      this._finishGeneration(processingChain, generation);
       // 🔄 Hide loader on error
       this._hideLoader();
       this.mainService._notifyError(error as Error);
       return { success: false, error: errorMessage };
     }
+  }
+
+  /**
+   * The stream has ended. Once its last segments are queued, a playback chain
+   * that paused on an empty queue runs again, so the council can finish.
+   * A council started since then owns the pipeline and is left alone.
+   */
+  private _finishGeneration(processingChain: Promise<void>, generation: number): void {
+    processingChain.then(() => {
+      if (generation !== this.generationCount) return;
+      this.holisticPipeline.isGenerating = false;
+      const state = this.progressiveState;
+      if (state && state.segmentsReceived > 0 && !state.isPlaybackChainActive) {
+        state.isPlaybackChainActive = true;
+        this._processNextSegmentForPlayback();
+      }
+    });
   }
 
   /**
