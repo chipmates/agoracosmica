@@ -18,6 +18,11 @@ let waitUntilReadyFn: (() => Promise<void>) | null = null;
 let idleSuspendTimer: ReturnType<typeof setTimeout> | null = null;
 const IDLE_SUSPEND_MS = 30_000;
 
+// Players that borrow the shared context (the live council's buffer sources)
+// hold it while they sound: a suspend under a playing source freezes it and
+// its 'ended' never fires.
+let contextHolds = 0;
+
 // Inter-chunk pause for live TTS (blob URLs only).
 // 200ms matches the validated server-side F5 stitching recipe ("trim+stitch
 // + 200ms silence" — 54-clip sweep, 2026-04-17). The DE gateway already pads
@@ -315,6 +320,36 @@ export const addToAudioQueue = (audioFile: AudioFile): void => {
   }
 };
 
+/** Suspend the shared context after an idle period to save battery. */
+const scheduleIdleSuspend = (): void => {
+  if (!globalAudioContext || globalAudioContext.state !== 'running') return;
+  if (idleSuspendTimer) clearTimeout(idleSuspendTimer);
+  idleSuspendTimer = setTimeout(() => {
+    idleSuspendTimer = null;
+    if (globalAudioContext && globalAudioContext.state === 'running' && !isPlaying && contextHolds === 0) {
+      if (import.meta.env.DEV) {
+        console.log('[AudioQueue] Suspending AudioContext after idle timeout');
+      }
+      globalAudioContext.suspend().catch(() => {});
+    }
+  }, IDLE_SUSPEND_MS);
+};
+
+/**
+ * Keep the shared context running while a borrowed source plays. Returns the
+ * release; once the last hold is released the idle countdown starts again.
+ */
+export const holdAudioContext = (): (() => void) => {
+  contextHolds++;
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    contextHolds--;
+    if (contextHolds === 0 && !isPlaying) scheduleIdleSuspend();
+  };
+};
+
 const playNextInQueue = async (): Promise<void> => {
   if (audioQueue.length === 0) {
     isPlaying = false;
@@ -333,18 +368,7 @@ const playNextInQueue = async (): Promise<void> => {
       activeTranslation = false;
     }
 
-    // Schedule AudioContext suspension after idle period to save battery
-    if (globalAudioContext && globalAudioContext.state === 'running') {
-      if (idleSuspendTimer) clearTimeout(idleSuspendTimer);
-      idleSuspendTimer = setTimeout(() => {
-        if (globalAudioContext && globalAudioContext.state === 'running' && !isPlaying) {
-          if (import.meta.env.DEV) {
-            console.log('[AudioQueue] Suspending AudioContext after idle timeout');
-          }
-          globalAudioContext.suspend().catch(() => {});
-        }
-      }, IDLE_SUSPEND_MS);
-    }
+    scheduleIdleSuspend();
 
     window.dispatchEvent(new CustomEvent('audioEnd'));
     return;

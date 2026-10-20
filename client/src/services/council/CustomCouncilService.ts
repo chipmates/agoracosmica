@@ -15,7 +15,7 @@ import CustomCouncilParser, { type Segment } from './parser';
 import type { CouncilMessage } from './index';
 import { councilLog, councilWarn, councilError } from './logger';
 import { getOrRollCouncilFigureSessionId, touchCouncilFigureSession, clearCouncilSessions } from '../audio/tts/ttsSessions';
-import { getAudioContext } from '../audio/audioQueueManager';
+import { getAudioContext, holdAudioContext } from '../audio/audioQueueManager';
 import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
 import { splitForGatewayCap } from '../audio/utils/splitForGatewayCap';
 import { sendConversion, COUNCIL_ENGAGED_THRESHOLD_S } from '../../utils/public/gclidCapture';
@@ -149,6 +149,9 @@ export class CustomCouncilService {
   // Reference to the BufferSource currently feeding the speakers, so cleanup
   // can call .stop() on user-close instead of letting the segment play out.
   private activeSource: AudioBufferSourceNode | null;
+  // Keeps the shared context out of the audio queue's idle suspend while a
+  // segment sounds.
+  private releaseContextHold: (() => void) | null = null;
   // Council Engaged conversion: seconds of council audio played so far, plus a
   // one-shot flag so the conversion fires at most once per council.
   private councilHeardSeconds = 0;
@@ -703,6 +706,11 @@ export class CustomCouncilService {
     return ctx;
   }
 
+  private _releaseContextHold(): void {
+    this.releaseContextHold?.();
+    this.releaseContextHold = null;
+  }
+
   /**
    * Play a single segment audio and return promise when done
    */
@@ -726,8 +734,11 @@ export class CustomCouncilService {
       source.buffer = audioBuffer;
       source.connect(ctx.destination);
 
+      // Per source, so a late 'ended' from a stopped segment releases only its own hold.
+      let releaseHold = (): void => {};
       source.onended = () => {
         councilLog(`🎵 Finished playing segment ${segment.id}`);
+        releaseHold();
         // Still the active source: it ran out. One cut by cleanup() was
         // counted there, up to the cut.
         if (this.activeSource === source) {
@@ -763,6 +774,9 @@ export class CustomCouncilService {
       // Set BEFORE start() so a same-tick cleanup still has the ref to stop.
       this.activeSource = source;
       this.activeStartedAt = ctx.currentTime;
+      this._releaseContextHold();
+      releaseHold = holdAudioContext();
+      this.releaseContextHold = releaseHold;
       source.start();
     });
   }
@@ -1267,6 +1281,7 @@ export class CustomCouncilService {
       }
       this.activeSource = null;
     }
+    this._releaseContextHold();
 
     // Abort any in-flight LLM stream so further segments stop arriving.
     // Without this, the streaming callback keeps queueing TTS work in the
