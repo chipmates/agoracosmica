@@ -85,12 +85,16 @@ async function incrementCounter(kv: KVNamespace, key: string, current: number, t
 
 // --- Main Rate Limit Check ---
 
-export async function checkAudioRateLimit(
-  request: Request,
-  env: Env,
-  _language: string,
-  _endpoint: 'tts' | 'stt'
-): Promise<AudioRateLimitResult> {
+interface LimitReading {
+  result: AudioRateLimitResult;
+  dailyKey: string;
+  burstKey: string;
+  dailyCount: number;
+  burstCount: number;
+}
+
+/** Read both counters and decide. Writes nothing. */
+async function readAudioLimit(request: Request, env: Env): Promise<LimitReading> {
   const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
   const hash = await hashIP(ip, env.IP_HASH_SALT);
   const dateKey = getDateKey();
@@ -113,31 +117,58 @@ export async function checkAudioRateLimit(
     gpuLoad: 'green',
     resetsAt,
   };
+  const reading = { dailyKey, burstKey, dailyCount, burstCount };
 
   // 1. Hard daily per-IP cap
   if (dailyCount >= RATE_LIMIT_CONFIG.DAILY_PER_IP) {
     return {
-      ...result,
-      allowed: false,
-      code: 'daily_limit',
-      hint: 'rate_limited',
-      message: 'Daily audio limit reached. Resets at midnight UTC.',
+      ...reading,
+      result: {
+        ...result,
+        allowed: false,
+        code: 'daily_limit',
+        hint: 'rate_limited',
+        message: 'Daily audio limit reached. Resets at midnight UTC.',
+      },
     };
   }
 
   // 2. Burst limit (catches bots, never hit by real users)
   if (burstCount >= RATE_LIMIT_CONFIG.BURST_PER_MINUTE) {
     return {
-      ...result,
-      allowed: false,
-      code: 'burst_limit',
-      hint: 'rate_limited',
-      message: 'Too many audio requests. Please slow down.',
+      ...reading,
+      result: {
+        ...result,
+        allowed: false,
+        code: 'burst_limit',
+        hint: 'rate_limited',
+        message: 'Too many audio requests. Please slow down.',
+      },
     };
   }
 
   // GPU capacity is handled server-side by BBA scheduler + failover.
   // No blocking here.
+  return { ...reading, result };
+}
+
+/**
+ * The limiter's verdict without counting anything. Lets a route refuse a
+ * visitor already at a limit before it reads a large body; the counting check
+ * still runs after the read.
+ */
+export async function peekAudioRateLimit(request: Request, env: Env): Promise<AudioRateLimitResult> {
+  return (await readAudioLimit(request, env)).result;
+}
+
+export async function checkAudioRateLimit(
+  request: Request,
+  env: Env,
+  _language: string,
+  _endpoint: 'tts' | 'stt'
+): Promise<AudioRateLimitResult> {
+  const { result, dailyKey, burstKey, dailyCount, burstCount } = await readAudioLimit(request, env);
+  if (!result.allowed) return result;
 
   // --- Allowed: increment counters ---
   await Promise.all([

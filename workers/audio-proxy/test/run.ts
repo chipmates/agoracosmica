@@ -515,6 +515,108 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // STT order: a visitor at a limit is refused before the upload is read
+  // -------------------------------------------------------------------------
+
+  /** The STT harness with one counter already at its limit, and every KV read recorded. */
+  const limitedHarness = (counter: 'daily' | 'burst' | 'none') => {
+    const h = sttHarness();
+    const reads: string[] = [];
+    const putsAtPull: number[] = [];
+    let pulledNow = () => 0;
+    const kv = {
+      get: async (key: string) => {
+        reads.push(key);
+        if (counter === 'daily' && key.startsWith('audio:ip:')) return '500';
+        if (counter === 'burst' && key.startsWith('audio:burst:')) return '60';
+        return null;
+      },
+      put: async (key: string) => { h.puts.push(key); putsAtPull.push(pulledNow()); },
+    } as unknown as KVNamespace;
+    const env = { ...h.env, RATE_LIMITS: kv } as Env;
+    return { ...h, env, reads, putsAtPull, watch: (pulled: () => number) => { pulledNow = pulled; } };
+  };
+
+  /** An upload of `chunks` MiB that hands out a chunk only when the worker reads one. */
+  const countedUpload = (chunks: number): { stream: ReadableStream<Uint8Array>; pulled: () => number } => {
+    let pulled = 0;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (pulled >= chunks) { controller.close(); return; }
+        pulled++;
+        controller.enqueue(new Uint8Array(1024 * 1024));
+      },
+    }, { highWaterMark: 0 });
+    return { stream, pulled: () => pulled };
+  };
+
+  for (const counter of ['daily', 'burst'] as const) {
+    await test(`a visitor at the ${counter} limit gets the 429 before the upload is read`, async () => {
+      const h = limitedHarness(counter);
+      try {
+        const body = countedUpload(4);
+        const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
+        assertEqual(res.status, 429, 'status');
+        assertEqual((await res.json() as { code?: string }).code, `${counter}_limit`, 'refusal code');
+        assertEqual(body.pulled(), 0, 'upload chunks read');
+        assertEqual(h.puts.length, 0, 'counter writes');
+        assertEqual(h.upstream.length, 0, 'upstream calls');
+        await Promise.all(h.pending);
+      } finally {
+        h.restore();
+      }
+    });
+  }
+
+  await test('a declared oversized upload from a visitor at a limit still gets the 413, before any counter is read', async () => {
+    const h = limitedHarness('daily');
+    try {
+      const res = await worker.fetch(upload(new Uint8Array(16), { 'Content-Length': String(STT_LIMIT + 1) }), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(h.reads.length, 0, 'counter reads');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('an allowed upload is counted once, after the whole upload was read', async () => {
+    const h = limitedHarness('none');
+    try {
+      const body = countedUpload(3);
+      h.watch(body.pulled);
+      const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
+      assertEqual(res.status, 200, 'status');
+      assertEqual(h.puts.length, 2, 'daily and burst counters');
+      assert(h.putsAtPull.every(at => at === 3), `chunks read when the counters moved: ${h.putsAtPull.join(', ')}`);
+      assertEqual(h.upstream[0].bytes, 3 * 1024 * 1024, 'bytes forwarded');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('an upload that breaks off moves no counter', async () => {
+    const h = limitedHarness('none');
+    try {
+      let reads = 0;
+      const broken = new ReadableStream<Uint8Array>({
+        pull(c) {
+          if (reads++ === 0) c.enqueue(new Uint8Array(1024));
+          else c.error(new Error('the upload broke off'));
+        },
+      });
+      await worker.fetch(upload(broken), h.env, h.ctx).then(() => undefined, () => undefined);
+      assertEqual(h.puts.length, 0, 'counter writes');
+      assertEqual(h.upstream.length, 0, 'upstream calls');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // Session-end beacon: a bounded read, the route's own answer otherwise
   // -------------------------------------------------------------------------
 

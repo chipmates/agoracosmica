@@ -2,13 +2,13 @@ import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
 import {
-  bodyTooLarge, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
+  bodyTooLarge, declaresMoreThan, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
 } from './bodyLimit';
 import { proxyWithFailoverFromBuffer } from './proxy';
-import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
+import { checkAudioRateLimit, peekAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import { handleStoryArchive } from './storyArchive';
 import { buildKokoroFallbackBody } from './ttsEngine';
-import type { Env } from './types';
+import type { AudioRateLimitResult, Env } from './types';
 
 const STORY_ARCHIVE_PREFIX = '/v1/audio/story-archive/';
 
@@ -206,28 +206,40 @@ export default {
     if (path === '/v1/audio/transcriptions' && request.method === 'POST') {
       const startMs = Date.now();
 
+      // Load-test bypass: see TTS endpoint above for rationale.
+      const sttLoadTestAuth = request.headers.get('X-Load-Test-Auth');
+      const sttSkipRateLimit = !!env.LOAD_TEST_BYPASS_KEY && sttLoadTestAuth === env.LOAD_TEST_BYPASS_KEY;
+
+      const refuseStt = (rateResult: AudioRateLimitResult): Response => {
+        const sttRlCountry = readCountry(request);
+        ctx.waitUntil(Promise.resolve().then(() => {
+          env.ANALYTICS.writeDataPoint({
+            blobs: ['any', 'whisper', '', rateResult.code || 'unknown', 'ratelimit', '', sttRlCountry],
+            doubles: [0],
+            indexes: ['ratelimit'],
+          });
+        }));
+        return buildRateLimitResponse(rateResult, request, env);
+      };
+
+      // Before the upload is read: a declared size over the cap, then a
+      // visitor already at a limit. Neither moves a counter.
+      if (declaresMoreThan(request, STT_MAX_BODY_BYTES)) return bodyTooLarge(request, env);
+      if (!sttSkipRateLimit) {
+        const early = await peekAudioRateLimit(request, env);
+        if (!early.allowed) return refuseStt(early);
+      }
+
       // Size gate before any counter moves. This route is unauthenticated and
       // the body is buffered for the failover retry, so the read is capped.
       const sttBody = await readBodyCapped(request, STT_MAX_BODY_BYTES);
       if (!sttBody) return bodyTooLarge(request, env);
 
-      // Load-test bypass: see TTS endpoint above for rationale.
-      const sttLoadTestAuth = request.headers.get('X-Load-Test-Auth');
-      const sttSkipRateLimit = !!env.LOAD_TEST_BYPASS_KEY && sttLoadTestAuth === env.LOAD_TEST_BYPASS_KEY;
-
+      // The counting check runs after the read, so an upload that is too
+      // large or breaks off is never counted.
       if (!sttSkipRateLimit) {
         const rateResult = await checkAudioRateLimit(request, env, 'English', 'stt');
-        if (!rateResult.allowed) {
-          const sttRlCountry = readCountry(request);
-          ctx.waitUntil(Promise.resolve().then(() => {
-            env.ANALYTICS.writeDataPoint({
-              blobs: ['any', 'whisper', '', rateResult.code || 'unknown', 'ratelimit', '', sttRlCountry],
-              doubles: [0],
-              indexes: ['ratelimit'],
-            });
-          }));
-          return buildRateLimitResponse(rateResult, request, env);
-        }
+        if (!rateResult.allowed) return refuseStt(rateResult);
       }
 
       const sttSessionId = request.headers.get('X-Session-Id');

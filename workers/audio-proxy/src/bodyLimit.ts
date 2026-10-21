@@ -10,8 +10,7 @@ export const STT_MAX_BODY_BYTES = 15 * 1024 * 1024;
  * as well, since the header can be missing (a chunked upload) or wrong.
  */
 export async function readBodyCapped(request: Request, maxBytes: number): Promise<ArrayBuffer | null> {
-  const declared = declaredLength(request);
-  if (declared !== null && declared > maxBytes) return null;
+  if (declaresMoreThan(request, maxBytes)) return null;
   if (!request.body) return new ArrayBuffer(0);
 
   const reader = request.body.getReader();
@@ -52,6 +51,12 @@ export async function readJsonCapped(
   const bytes = await readBodyCapped(request, maxBytes);
   if (!bytes) return { ok: false };
   return { ok: true, body: JSON.parse(new TextDecoder().decode(bytes)) };
+}
+
+/** True when the request's Content-Length already says the body is over `maxBytes`. */
+export function declaresMoreThan(request: Request, maxBytes: number): boolean {
+  const declared = declaredLength(request);
+  return declared !== null && declared > maxBytes;
 }
 
 export function bodyTooLarge(request: Request, env: Env): Response {
