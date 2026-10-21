@@ -159,6 +159,15 @@ const normalizeLocalMode = (stored: unknown): { localMode: LocalModeConfig; migr
   };
 };
 
+// The conversation goes where `llm.kind` points. Local Mode's model switch
+// says what that is: an earlier key save could leave the switch on while the
+// route was OpenRouter's, and a switch that says local must never mean that.
+const withRouteAgreed = (localMode: LocalModeConfig, llm: Partial<LLMConfig> | undefined): LocalModeConfig => {
+  const kind = llm?.kind ?? (llm?.provider === 'custom-openai' ? 'custom-openai' : 'openrouter');
+  const routeLocal = kind === 'custom-openai';
+  return localMode.llmEnabled === routeLocal ? localMode : { ...localMode, llmEnabled: routeLocal };
+};
+
 /**
  * Local Mode as held in a saved settings string, read the way loadServiceConfig
  * reads it. Pure: a render can call it, where loadServiceConfig may take over
@@ -167,7 +176,8 @@ const normalizeLocalMode = (stored: unknown): { localMode: LocalModeConfig; migr
 export const localModeFromRaw = (raw: string | null | undefined): LocalModeConfig => {
   if (raw) {
     try {
-      return normalizeLocalMode((JSON.parse(raw) as Partial<ServiceConfig> | null)?.localMode).localMode;
+      const saved = JSON.parse(raw) as Partial<ServiceConfig> | null;
+      return withRouteAgreed(normalizeLocalMode(saved?.localMode).localMode, saved?.llm);
     } catch {
       // Unreadable settings load as the defaults, here as in loadServiceConfig.
     }
@@ -308,7 +318,7 @@ export const loadServiceConfig = (): ServiceConfig => {
       }
 
       const { localMode, migrated } = normalizeLocalMode(config.localMode);
-      config.localMode = localMode;
+      config.localMode = withRouteAgreed(localMode, config.llm);
       if (migrated) {
         queueMicrotask(() => saveServiceConfig(config));
       }
@@ -367,6 +377,26 @@ export const saveServiceConfig = (config: Partial<ServiceConfig>): boolean => {
     console.error('Error saving service config:', error);
     return false;
   }
+};
+
+/**
+ * The settings after an OpenRouter key is saved: the key's route, unless Local
+ * Mode's model is on, which keeps the conversation (the key waits for it to be
+ * switched off).
+ */
+export const withOpenRouterKey = (config: ServiceConfig, zdr: boolean): ServiceConfig => {
+  if (config.localMode?.llmEnabled && config.llm.kind === 'custom-openai') {
+    return { ...config, llm: { ...config.llm, zdr } };
+  }
+  return {
+    ...config,
+    llm: {
+      provider: LLM_SERVICES.OPENROUTER.name,
+      model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
+      kind: 'openrouter',
+      zdr,
+    },
+  };
 };
 
 // Helper for getting model display names

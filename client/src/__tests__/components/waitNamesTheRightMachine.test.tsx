@@ -26,8 +26,10 @@ import { defaultConfig, saveServiceConfig } from '../../services/audio/config/se
 import de from '../../assets/translations/ui-de.json';
 
 type Local = { llm?: boolean; tts?: boolean; stt?: boolean };
+// Local Mode's model switch is on only together with its route, as the panel saves them.
+const LOCAL_LLM = { provider: 'custom-openai', kind: 'custom-openai' as const, baseURL: 'http://127.0.0.1:1234/v1', model: 'local-model' };
 const setLocal = ({ llm = false, tts = false, stt = false }: Local) =>
-  saveServiceConfig({ ...defaultConfig, localMode: { llmEnabled: llm, ttsEnabled: tts, sttEnabled: stt } });
+  saveServiceConfig({ ...defaultConfig, llm: llm ? LOCAL_LLM : defaultConfig.llm, localMode: { llmEnabled: llm, ttsEnabled: tts, sttEnabled: stt } });
 
 const LOCAL = [de.processing.localWait, de.processing.localTakingLonger, de.councilProcessing.localTakingLonger];
 const BUSY = [

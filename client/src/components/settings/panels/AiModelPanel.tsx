@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useState, useEffect } from 'react';
+import React, { FC, ReactNode, useState, useEffect, useMemo } from 'react';
 import {
   Eye, EyeSlash, CheckCircle, XCircle, WarningCircle,
   Warning, ShieldCheck, LockKey, Sparkle, Info,
@@ -7,8 +7,9 @@ import { useTranslation } from '../../../hooks/useTranslation';
 import { keyStorage } from '../../../services/storage/keyStorageService';
 import { llmService } from '../../../services/llm/llmService';
 import {
-  loadServiceConfig, saveServiceConfig, LLM_SERVICES,
+  loadServiceConfig, saveServiceConfig, LLM_SERVICES, withOpenRouterKey, localModeFromRaw, llmFromRaw,
 } from '../../../services/audio/config/serviceConfig';
+import { isSelfHost } from '../../../config/deployment';
 import { useDomainStore } from '../../../stores/domainStore';
 import { describeFreeTier } from '../../../utils/freeTierState';
 import { formatTime } from '../../../utils/formatDateTime';
@@ -120,10 +121,17 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
   const isByokActive = openRouterKey.validationStatus === 'valid';
   const isRejected = openRouterKey.validationStatus === 'rejected';
 
+  // Local Mode's model answers whenever it is on, a saved key included.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const localLlm = useMemo(
+    () => (localModeFromRaw(savedRaw).llmEnabled ? llmFromRaw(savedRaw) : null),
+    [savedRaw],
+  );
+
   // The free tier's model, its region, and the day's budget, as the worker
   // reported them. Absent until /v1/quota answers, and never read for a BYOK
-  // user: their key decides the model, not our routing.
-  const serving = !isByokActive && freeTier ? describeFreeTier(freeTier) : null;
+  // user, a local model or a self-host instance (which has no free tier).
+  const serving = !isByokActive && !localLlm && !isSelfHost && freeTier ? describeFreeTier(freeTier) : null;
   const modelName = (label: string) => tString(`settings.aiModelKey.models.${label}`, label);
   const regionName = (region: string) => tString(`settings.aiModelKey.regions.${region}`, region);
   const filled = (key: string, values: Record<string, string>): string => {
@@ -131,9 +139,13 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
     return typeof text === 'string' ? text : key;
   };
 
-  const currentModel = isByokActive
-    ? LLM_SERVICES.OPENROUTER.displayNames[BYOK_MODEL]
-    : serving && modelName(serving.now.label);
+  const currentModel = localLlm
+    ? localLlm.model
+    : isByokActive
+      ? LLM_SERVICES.OPENROUTER.displayNames[BYOK_MODEL]
+      : serving && modelName(serving.now.label);
+  const localLine = localLlm?.baseURL ? filled('settings.aiModelKey.localRunsAt', { endpoint: localLlm.baseURL }) : '';
+  const routeActive = isByokActive || Boolean(localLlm);
 
   // Where the answering model runs, and what takes over. Quiet: they describe
   // the setup, not what changed today.
@@ -158,8 +170,8 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       : '';
 
   // The tagline claims one model across both routes, which only holds while the
-  // free tier and BYOK run the same one.
-  const showTagline = isByokActive || serving === null || serving.budget === null;
+  // free tier and BYOK run the same one, and only where there is a free tier.
+  const showTagline = !isSelfHost && !localLlm && (isByokActive || serving === null || serving.budget === null);
 
   const handleKeyChange = (value: string) => {
     setOpenRouterKey(prev => ({
@@ -213,13 +225,8 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       provider: 'openrouter',
       lastValidated: new Date().toISOString(),
     });
-    const config = loadServiceConfig();
-    config.llm = {
-      provider: LLM_SERVICES.OPENROUTER.name,
-      model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
-      zdr: zdrEnabled,
-    };
-    saveServiceConfig(config);
+    // A local model in Local Mode keeps the conversation; the key waits beside it.
+    saveServiceConfig(withOpenRouterKey(loadServiceConfig(), zdrEnabled));
     // The key now answers, so the free-tier counter and limits step aside,
     // as after the key wizard.
     useDomainStore.getState().setIsFreeTier(false);
@@ -353,7 +360,9 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           margin: '0 0 12px',
           lineHeight: 1.5,
         }}>
-          {tNode('settings.aiModelKey.keySectionIntro')}
+          {isSelfHost
+            ? tNode('settings.aiModelKey.keySectionIntroSelfHost')
+            : tNode('settings.aiModelKey.keySectionIntro')}
         </p>
 
         <div style={{ position: 'relative', marginBottom: '6px' }}>
@@ -590,8 +599,8 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       {/* 4. Currently using model card — confirms what's running right now */}
       <div style={{
         padding: '16px 18px',
-        background: isByokActive ? PLATE_GROUND_ACTIVE : PLATE_GROUND,
-        border: isByokActive ? '1px solid var(--gold-primary)' : PLATE_HAIRLINE,
+        background: routeActive ? PLATE_GROUND_ACTIVE : PLATE_GROUND,
+        border: routeActive ? '1px solid var(--gold-primary)' : PLATE_HAIRLINE,
         borderRadius: '6px',
         marginBottom: '14px',
       }}>
@@ -615,6 +624,17 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
             }}>
               {currentModel}
             </span>
+          </div>
+        )}
+        {localLine && (
+          <div style={{
+            fontSize: '13px',
+            color: INK_QUIET,
+            lineHeight: 1.5,
+            marginBottom: '10px',
+            overflowWrap: 'anywhere',
+          }}>
+            {localLine}
           </div>
         )}
         {showTagline && (
@@ -656,22 +676,26 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           alignItems: 'center',
           gap: '8px',
           fontSize: '13px',
-          color: isByokActive ? 'var(--gold-primary)' : INK_BODY,
+          color: routeActive ? 'var(--gold-primary)' : INK_BODY,
           fontWeight: 500,
         }}>
           <span style={{
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: isByokActive ? 'var(--gold-primary)' : isRejected ? ALARM_INK : 'var(--gold-deep)',
+            background: routeActive ? 'var(--gold-primary)' : isRejected ? ALARM_INK : 'var(--gold-deep)',
             display: 'inline-block',
             flexShrink: 0,
           }} />
-          {isByokActive
-            ? tNode('settings.aiModelKey.statusByok')
-            : isRejected
-              ? tNode('settings.aiModelKey.statusRejected')
-              : tNode('settings.aiModelKey.statusFree')}
+          {localLlm
+            ? tNode('settings.aiModelKey.statusLocal')
+            : isByokActive
+              ? tNode('settings.aiModelKey.statusByok')
+              : isRejected
+                ? tNode('settings.aiModelKey.statusRejected')
+                : isSelfHost
+                  ? tNode('settings.aiModelKey.statusNoModel')
+                  : tNode('settings.aiModelKey.statusFree')}
         </div>
       </div>
 

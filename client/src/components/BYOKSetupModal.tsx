@@ -4,7 +4,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useDomainStore } from '../stores/domainStore';
 import { keyStorage } from '../services/storage/keyStorageService';
 import { llmService } from '../services/llm/llmService';
-import { loadServiceConfig, saveServiceConfig, LLM_SERVICES } from '../services/audio/config/serviceConfig';
+import { loadServiceConfig, saveServiceConfig, withOpenRouterKey } from '../services/audio/config/serviceConfig';
 import { isSelfHost } from '../config/deployment';
 import { RippleButton } from './Button';
 import { Key, ShieldCheck, CheckCircle, Eye, EyeSlash, ArrowRight, Warning } from '@phosphor-icons/react';
@@ -69,13 +69,7 @@ const BYOKSetupModal: FC = () => {
         });
 
         // Update service config
-        const config = loadServiceConfig();
-        config.llm = {
-          provider: LLM_SERVICES.OPENROUTER.name,
-          model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
-          zdr: zdrEnabled,
-        };
-        saveServiceConfig(config);
+        saveServiceConfig(withOpenRouterKey(loadServiceConfig(), zdrEnabled));
 
         // Update free-tier status
         useDomainStore.getState().setIsFreeTier(false);

@@ -46,10 +46,13 @@ import { defaultConfig, saveServiceConfig } from '../../services/audio/config/se
 const FITS_AT_360 = 'Europe · Free tier'.length;
 
 const Card = () => null;
+// Local Mode's model switch is on only together with its route, as the panel saves them.
+const LOCAL_LLM = { provider: 'custom-openai', kind: 'custom-openai' as const, baseURL: 'http://127.0.0.1:1234/v1', model: 'local-model' };
 const badgesIn = async (state: { llm: boolean; tts: boolean; stt: boolean; byok: boolean; voice: boolean }) => {
   h.byok = state.byok;
   saveServiceConfig({
     ...defaultConfig,
+    llm: state.llm ? LOCAL_LLM : defaultConfig.llm,
     localMode: { llmEnabled: state.llm, ttsEnabled: state.tts, sttEnabled: state.stt },
   });
   render(

@@ -39,11 +39,13 @@ import { useDomainStore } from '../../stores/domainStore';
 const STORE = 'agora-cosmica-store';
 const OFF = { llmEnabled: false, ttsEnabled: false, sttEnabled: false };
 const ON = { llmEnabled: true, ttsEnabled: true, sttEnabled: true };
+// Local Mode's model switch is on only together with its route, as the panel saves them.
+const LOCAL_LLM = { provider: 'custom-openai', kind: 'custom-openai' as const, baseURL: 'http://127.0.0.1:1234/v1', model: 'local-model' };
 
 /** Another tab saves Local Mode on; this tab has not heard the storage event yet. */
 function otherTabSavesLocalModeOn(): string {
   const blob = JSON.parse(window.localStorage.getItem(STORE) || '{"state":{},"version":1}');
-  const config: ServiceConfig = { ...JSON.parse(blob.state.serviceConfig.raw), localMode: { ...ON } };
+  const config: ServiceConfig = { ...JSON.parse(blob.state.serviceConfig.raw), llm: LOCAL_LLM, localMode: { ...ON } };
   blob.state.serviceConfig = { raw: JSON.stringify(config), parsed: config };
   const value = JSON.stringify(blob);
   window.localStorage.setItem(STORE, value);
@@ -124,12 +126,12 @@ describe('the preference panel render', () => {
 
 describe('Local Mode read from the saved settings', () => {
   it('reads the per-service switches', () => {
-    const raw = JSON.stringify({ ...defaultConfig, localMode: { llmEnabled: true, ttsEnabled: false, sttEnabled: true, sttURL: 'http://127.0.0.1:8000' } });
+    const raw = JSON.stringify({ ...defaultConfig, llm: LOCAL_LLM, localMode: { llmEnabled: true, ttsEnabled: false, sttEnabled: true, sttURL: 'http://127.0.0.1:8000' } });
     expect(localModeFromRaw(raw)).toMatchObject({ llmEnabled: true, ttsEnabled: false, sttEnabled: true, sttURL: 'http://127.0.0.1:8000' });
   });
 
   it('expands the old single switch, as loading does', () => {
-    expect(localModeFromRaw(JSON.stringify({ localMode: { enabled: true } }))).toMatchObject(ON);
+    expect(localModeFromRaw(JSON.stringify({ llm: LOCAL_LLM, localMode: { enabled: true } }))).toMatchObject(ON);
     expect(localModeFromRaw(JSON.stringify({ localMode: { enabled: false } }))).toMatchObject(OFF);
   });
 
