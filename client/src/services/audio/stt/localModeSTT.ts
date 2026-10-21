@@ -56,18 +56,25 @@ export const localModeSTT = async (
     );
   }
 
+  // Any failed or unreadable answer is an outage to the visitor, so the banner
+  // names it; only a well-formed empty transcript stays a plain error.
   if (!response.ok) {
-    if (response.status === 404 || response.status === 503) {
-      throw new LocalModeSttUnavailable(
-        `Local STT endpoint returned ${response.status}`,
-        endpoint,
-      );
-    }
-    const errorData = await response.json().catch(() => ({}));
-    throw new Error((errorData as any).error || `Local STT failed: ${response.status}`);
+    const detail = await response.text().catch(() => '');
+    throw new LocalModeSttUnavailable(
+      `Local STT endpoint returned ${response.status}${detail ? `: ${detail.slice(0, 200)}` : ''}`,
+      endpoint,
+    );
   }
 
-  const data = await response.json();
+  let data: { text?: unknown; language?: string; duration?: number; segments?: unknown[] };
+  try {
+    data = await response.json();
+  } catch {
+    throw new LocalModeSttUnavailable('Local STT answer is not JSON', endpoint);
+  }
+  if (typeof data?.text !== 'string') {
+    throw new LocalModeSttUnavailable('Local STT answer has no text field', endpoint);
+  }
   if (!data.text) {
     throw new Error('No transcription text in response');
   }

@@ -9,8 +9,9 @@
 // reference WAV / embedding. Kokoro voice IDs for EN (e.g. `af_heart`) are
 // also passed through verbatim.
 //
-// A 404, 503 or refused connection throws LocalModeTtsUnavailable. The caller
-// fails closed on it and never sends the text to the hosted path (see index.ts).
+// A refused connection, a failed answer or one without audio throws
+// LocalModeTtsUnavailable. The caller fails closed on it and never sends the
+// text to the hosted path (see index.ts).
 
 import { getVoiceForNormalMode } from '../voices/voiceResolver';
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
@@ -98,20 +99,35 @@ export async function localModeTTS(
     );
   }
 
+  // Any failed answer, or one that carries no audio, is an outage to the
+  // visitor: the caller fails closed and the banner names it.
   if (!response.ok) {
-    if (response.status === 404 || response.status === 503) {
-      throw new LocalModeTtsUnavailable(
-        `Local TTS endpoint returned ${response.status} (model not loaded or service down)`,
-        de ? 'de' : 'en',
-        endpoint,
-      );
-    }
     const errorText = await response.text().catch(() => '');
-    console.error('[Local Mode TTS] API error:', response.status, errorText);
-    throw new Error(`Local TTS failed: ${response.statusText}`);
+    throw new LocalModeTtsUnavailable(
+      `Local TTS endpoint returned ${response.status}${errorText ? `: ${errorText.slice(0, 200)}` : ''}`,
+      de ? 'de' : 'en',
+      endpoint,
+    );
   }
 
-  const arrayBuffer = await response.arrayBuffer();
+  let arrayBuffer: ArrayBuffer;
+  try {
+    arrayBuffer = await response.arrayBuffer();
+  } catch (err) {
+    throw new LocalModeTtsUnavailable(
+      err instanceof Error ? err.message : 'the answer broke off',
+      de ? 'de' : 'en',
+      endpoint,
+    );
+  }
+  const declaredType = response.headers.get('content-type') || '';
+  if (arrayBuffer.byteLength === 0 || /^(text\/|application\/json)/i.test(declaredType)) {
+    throw new LocalModeTtsUnavailable(
+      `Local TTS answer is not audio (${declaredType || 'no type'}, ${arrayBuffer.byteLength} bytes)`,
+      de ? 'de' : 'en',
+      endpoint,
+    );
+  }
   // Append 150 ms tail silence client-side (mirrors the prod gateway's
   // TTS_TAIL_SILENCE_MS=150 — masks the HTML5 <audio> encoder-padding clip
   // at the end of short clips).
