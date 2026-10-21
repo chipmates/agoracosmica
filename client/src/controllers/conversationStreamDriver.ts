@@ -435,6 +435,18 @@ export const createLegacyConversationStream = () => {
             return;
           }
         } catch (error) {
+          // The picked voice failed (Local Mode voice down, hosted voice paused):
+          // the stored greeting still shows, as text without a voice, as the banner says.
+          if (!usingDefaultVoice && !signal.aborted) {
+            const textOnly = await initialMessageService
+              .getInitialMessage(figureId, initialMsgMode, seedId, langCode)
+              .catch(() => null);
+            if (textOnly?.text && !signal.aborted) {
+              pushAssistantText(textOnly.text);
+              return;
+            }
+          }
+          if (signal.aborted) return;
           console.warn('[StreamDriver] Failed to load initial message, falling back to LLM', error);
           // Fall through to LLM generation
         }
