@@ -52,14 +52,14 @@ const NutzungsbedingungenPage: FC = () => {
       <section className="legal-section">
         <h2>§ 1 Scope of Application and Subject Matter of the Contract</h2>
         <p>(1) These Terms of Service apply to the use of the Agora Cosmica platform (hereinafter the "Platform"), operated by ChipMates gemeinnützige GmbH, Schusterstr. 50, 79098 Freiburg im Breisgau (hereinafter the "Provider").</p>
-        <p>(2) The Platform offers a free, AI-powered educational service through which users can access information about historical figures from the fields of philosophy and wisdom (hereinafter the "Service"). The Service uses an AI system to generate responses automatically.</p>
+        <p>(2) The Platform offers an AI-powered educational service through which users can get to know historical figures from philosophy, science, art, and activism in text, audio, and images, and talk with them (hereinafter the "Service"). The Service uses an AI system to generate responses automatically. The Provider charges no fee for the Service. The chat and other features that generate new responses are available within a daily free quota. Instead, the user can add their own key from an AI service provider or connect an AI server they run themselves (hereinafter "own AI access"). Such a key is subject to the prices and terms of the respective AI service provider under its contract with the user. The Provider is not a party to that contract.</p>
         <p>(3) By using the chat service, the user accepts these Terms of Service. The other areas of the Platform (information pages, imprint, etc.) can be used without agreeing to these terms.</p>
         <p>(4) Deviating or supplementary terms of the user do not become part of the contract.</p>
       </section>
 
       <section className="legal-section">
         <h2>§ 2 Description of the Service and Notice on Artificial Intelligence</h2>
-        <p>(1) The chat service is operated entirely by an AI system (artificial intelligence). The user does not interact with a real person but with software that automatically generates text responses.</p>
+        <p>(1) The chat service is operated entirely by an AI system (artificial intelligence). The user does not interact with a real person but with software that automatically generates responses. The responses appear as text and can be read aloud in an AI voice. What the figures say in stories, dialogues, and debates is AI-generated too, and so are the voices they speak in. Their portraits are AI-generated images, not photographs.</p>
         <p>(2) The historical figures presented in the chat are fictional AI simulations. They do not reproduce the actual statements, opinions, or positions of the persons portrayed. They are expressly not authentic reproductions of historical statements.</p>
         <p>(3) AI-generated content can be factually incorrect, incomplete, outdated, or misleading (so-called "hallucinations"). Checking AI-generated content for accuracy and applicability to a specific situation is not part of the Service and is the sole responsibility of the user.</p>
         <p>(4) The Service does not constitute professional advice, in particular no medical, psychological, legal, or financial advice. AI-generated content does not replace consultation of qualified professionals.</p>
@@ -69,7 +69,7 @@ const NutzungsbedingungenPage: FC = () => {
       <section className="legal-section">
         <h2>§ 3 Access and Age Requirement</h2>
         <p>(1) Use of the chat service requires agreement to these Terms of Service as well as confirmation of the minimum age.</p>
-        <p>(2) The chat service is intended for persons aged 16 and over. Persons under 16 may use the Service only with the consent of a parent or legal guardian. In these cases, personal data is processed exclusively on the basis of this consent pursuant to Art. 6(1)(a) GDPR. By confirming their age, the user affirms that they are at least 16 years old or have the required consent of a parent or legal guardian.</p>
+        <p>(2) The chat service is intended for persons aged 16 and over. Persons under 16 may not use it. By confirming their age, the user affirms that they are at least 16 years old.</p>
         <p>(3) Within the scope of application of the US Children's Online Privacy Protection Act (COPPA), use of the Service by persons under 13 is prohibited.</p>
         <p>(4) The Provider reserves the right to restrict access if there are indications that a user does not meet the age requirements.</p>
       </section>
@@ -91,15 +91,15 @@ const NutzungsbedingungenPage: FC = () => {
 
       <section className="legal-section">
         <h2>§ 5 Intellectual Property and Rights of Use</h2>
-        <p>(1) The Platform, its design, its texts, graphics, and software components are protected by copyright. All rights remain with the Provider or the respective rights holders.</p>
+        <p>(1) The Platform's software is open source and licensed under the <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU Affero General Public License, version 3 (AGPL-3.0)</a>. The terms of this license govern the use, distribution, and modification of the software. Third-party components in the software are subject to their own licenses. The other content of the Platform, in particular its texts, stories, audio recordings, portraits, and graphics, is protected by copyright. All rights in it remain with the Provider or the respective rights holders, unless stated otherwise for a particular item.</p>
         <p>(2) Under the current legal situation, there are presumably no copyrights in the AI-generated chat responses, as they lack a personal intellectual creation. Should the Provider nevertheless hold rights to the outputs, the Provider grants the user a non-exclusive, non-transferable right to use them for private and educational purposes.</p>
-        <p>(3) The user's inputs (prompts) remain with the user. The Provider acquires no rights to the inputs and uses them exclusively to provide the Service (transmission to the AI service provider for answering). The Provider does not store or analyze the inputs beyond this; further information is provided in the Privacy Policy.</p>
+        <p>(3) The user's inputs (prompts) remain with the user. The Provider acquires no rights to the inputs and uses them exclusively to provide the Service (forwarding to the AI model that generates the response). With own AI access, the Provider does not receive the typed inputs (see § 6 (2)). The Provider does not store or analyze the inputs beyond this; further information is provided in the Privacy Policy.</p>
       </section>
 
       <section className="legal-section">
         <h2>§ 6 Data Protection</h2>
         <p>(1) The Provider processes personal data exclusively in accordance with the applicable data protection laws, in particular the GDPR and the BDSG (the German Federal Data Protection Act). For details, please see our <a href="/privacy/">Privacy Policy</a>.</p>
-        <p>(2) When the chat is used, the user's inputs are transmitted to an AI service provider, which processes them to generate the response. Further details can be found in the Privacy Policy.</p>
+        <p>(2) When the chat is used without own AI access, the user's inputs are transmitted via the Provider's servers to an AI service provider, which processes them to generate the response. With own AI access, the user's browser sends the typed messages directly to the chosen AI service provider or server, not via the Provider's servers. Further details can be found in the Privacy Policy.</p>
         <p>(3) The user is asked not to enter any personal data (in particular name, address, phone number, email) into the chat.</p>
       </section>
 
@@ -107,7 +107,7 @@ const NutzungsbedingungenPage: FC = () => {
         <h2>§ 7 Protection of Minors</h2>
         <p>(1) The Provider has appointed a Youth Protection Officer pursuant to Sect. 7 JMStV (the German Interstate Treaty on the Protection of Minors in the Media). Their contact details are provided in the <Link to="/impressum#jugendschutz">Imprint</Link>.</p>
         <p>(2) The Service uses technical protective measures to prevent the generation of content harmful to minors. Despite these measures, it cannot be ruled out that AI-generated content may be inappropriate in individual cases.</p>
-        <p>(3) Users and legal guardians can report problematic content via the reporting function in the chat or by email to <a href="mailto:chipmates@chipmates.ai">chipmates@chipmates.ai</a>.</p>
+        <p>(3) Users and legal guardians can report problematic content via the reporting function in the chat or by email to <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.</p>
         <p>(4) If you are in a crisis or need help, please contact the Telefonseelsorge crisis line (0800 111 0 111, free of charge, 24/7) or the Nummer gegen Kummer helpline (116 111).</p>
       </section>
 
@@ -143,7 +143,7 @@ const NutzungsbedingungenPage: FC = () => {
         <h2>§ 12 Applicable Law and Dispute Resolution</h2>
         <p>(1) These Terms of Service are governed by the law of the Federal Republic of Germany, excluding the UN Convention on Contracts for the International Sale of Goods.</p>
         <p>(2) If the user is a consumer within the meaning of Sect. 13 BGB (the German Civil Code) and has their habitual residence in another country, mandatory consumer protection provisions of that country remain unaffected.</p>
-        <p>(3) The European Commission provides a platform for online dispute resolution (ODR): <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr/</a>. The Provider is neither willing nor obliged to participate in dispute resolution proceedings before a consumer arbitration board.</p>
+        <p>(3) The Provider is neither willing nor obliged to participate in dispute resolution proceedings before a consumer conciliation body.</p>
       </section>
 
       <section className="legal-section">
@@ -163,14 +163,14 @@ const NutzungsbedingungenPage: FC = () => {
         <section className="legal-section">
           <h2>§ 1 Geltungsbereich und Vertragsgegenstand</h2>
           <p>(1) Diese Nutzungsbedingungen gelten für die Nutzung der Plattform Agora Cosmica (nachfolgend "Plattform"), betrieben von ChipMates gemeinnützige GmbH, Schusterstr. 50, 79098 Freiburg im Breisgau (nachfolgend "Anbieter").</p>
-          <p>(2) Die Plattform bietet einen kostenfreien, KI-gestützten Bildungsdienst, bei dem Nutzer Informationen über historische Persönlichkeiten aus den Bereichen Philosophie und Weisheit abrufen können (nachfolgend "Dienst"). Der Dienst nutzt ein KI-System zur automatischen Generierung von Antworten.</p>
+          <p>(2) Die Plattform bietet einen KI-gestützten Bildungsdienst, bei dem Nutzer historische Persönlichkeiten aus Philosophie, Wissenschaft, Kunst und Aktivismus in Text, Ton und Bild kennenlernen und mit ihnen ins Gespräch kommen können (nachfolgend "Dienst"). Der Dienst nutzt ein KI-System zur automatischen Generierung von Antworten. Der Anbieter verlangt für den Dienst kein Entgelt. Der Chat und andere Funktionen, die Antworten neu erzeugen, stehen im Rahmen eines täglichen kostenlosen Kontingents zur Verfügung. Stattdessen kann der Nutzer einen eigenen Schlüssel eines KI-Dienstleisters hinterlegen oder einen selbst betriebenen KI-Server anbinden (nachfolgend "eigener KI-Zugang"). Für einen solchen Schlüssel gelten die Preise und Bedingungen des jeweiligen KI-Dienstleisters aus dessen Vertrag mit dem Nutzer. Der Anbieter ist an diesem Vertrag nicht beteiligt.</p>
           <p>(3) Mit der Nutzung des Chat-Dienstes akzeptiert der Nutzer diese Nutzungsbedingungen. Die Nutzung der übrigen Bereiche der Plattform (Informationsseiten, Impressum etc.) ist ohne Zustimmung zu diesen Bedingungen möglich.</p>
           <p>(4) Abweichende oder ergänzende Bedingungen des Nutzers werden nicht Vertragsbestandteil.</p>
         </section>
 
         <section className="legal-section">
           <h2>§ 2 Leistungsbeschreibung und Hinweis auf Künstliche Intelligenz</h2>
-          <p>(1) Der Chat-Dienst wird vollständig von einem KI-System (Künstliche Intelligenz) betrieben. Der Nutzer interagiert nicht mit einer realen Person, sondern mit einer Software, die automatisch Textantworten generiert.</p>
+          <p>(1) Der Chat-Dienst wird vollständig von einem KI-System (Künstliche Intelligenz) betrieben. Der Nutzer interagiert nicht mit einer realen Person, sondern mit einer Software, die automatisch Antworten generiert. Die Antworten erscheinen als Text und können mit einer KI-Stimme vorgelesen werden. Auch was die Persönlichkeiten in Geschichten, Dialogen und Debatten sagen, ist KI-generiert, ebenso die Stimmen, mit denen sie sprechen. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien.</p>
           <p>(2) Die im Chat dargestellten historischen Persönlichkeiten sind fiktive KI-Simulationen. Sie geben nicht die tatsächlichen Aussagen, Meinungen oder Positionen der dargestellten Personen wieder. Es handelt sich ausdrücklich nicht um authentische Wiedergaben historischer Äußerungen.</p>
           <p>(3) KI-generierte Inhalte können sachlich unrichtig, unvollständig, veraltet oder irreführend sein (sogenannte "Halluzinationen"). Die Überprüfung der KI-generierten Inhalte auf Richtigkeit und Anwendbarkeit auf einen konkreten Sachverhalt ist nicht Teil des Dienstes und obliegt allein dem Nutzer.</p>
           <p>(4) Der Dienst stellt keine professionelle Beratung dar, insbesondere keine medizinische, psychologische, rechtliche oder finanzielle Beratung. KI-generierte Inhalte ersetzen nicht die Konsultation qualifizierter Fachpersonen.</p>
@@ -180,7 +180,7 @@ const NutzungsbedingungenPage: FC = () => {
         <section className="legal-section">
           <h2>§ 3 Zugang und Altersanforderung</h2>
           <p>(1) Die Nutzung des Chat-Dienstes setzt die Zustimmung zu diesen Nutzungsbedingungen sowie die Bestätigung des Mindestalters voraus.</p>
-          <p>(2) Der Chat-Dienst ist für Personen ab 16 Jahren bestimmt. Personen unter 16 Jahren dürfen den Dienst nur mit Zustimmung eines Erziehungsberechtigten nutzen. Die Verarbeitung personenbezogener Daten erfolgt in diesen Fällen ausschließlich auf Grundlage dieser Zustimmung gemäß Art. 6 Abs. 1 lit. a) DSGVO. Mit der Altersbestätigung versichert der Nutzer, dass er mindestens 16 Jahre alt ist oder über die erforderliche Zustimmung eines Erziehungsberechtigten verfügt.</p>
+          <p>(2) Der Chat-Dienst ist für Personen ab 16 Jahren bestimmt. Personen unter 16 Jahren dürfen ihn nicht nutzen. Mit der Altersbestätigung versichert der Nutzer, dass er mindestens 16 Jahre alt ist.</p>
           <p>(3) Im Geltungsbereich des US-amerikanischen Children's Online Privacy Protection Act (COPPA) ist die Nutzung des Dienstes durch Personen unter 13 Jahren untersagt.</p>
           <p>(4) Der Anbieter behält sich vor, den Zugang zu beschränken, wenn Anhaltspunkte dafür bestehen, dass ein Nutzer die Altersanforderungen nicht erfüllt.</p>
         </section>
@@ -202,15 +202,15 @@ const NutzungsbedingungenPage: FC = () => {
 
         <section className="legal-section">
           <h2>§ 5 Geistiges Eigentum und Nutzungsrechte</h2>
-          <p>(1) Die Plattform, ihr Design, ihre Texte, Grafiken und Softwarekomponenten sind urheberrechtlich geschützt. Alle Rechte verbleiben beim Anbieter bzw. den jeweiligen Rechteinhabern.</p>
+          <p>(1) Die Software der Plattform ist Open Source und steht unter der <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU Affero General Public License, Version 3 (AGPL-3.0)</a>. Für die Nutzung, Weitergabe und Änderung der Software gelten die Bedingungen dieser Lizenz. Bestandteile Dritter in der Software unterliegen ihren eigenen Lizenzen. Die übrigen Inhalte der Plattform, insbesondere ihre Texte, Geschichten, Audioaufnahmen, Porträts und Grafiken, sind urheberrechtlich geschützt. Alle Rechte daran verbleiben beim Anbieter bzw. den jeweiligen Rechteinhabern, soweit bei einem Inhalt nichts anderes angegeben ist.</p>
           <p>(2) An den KI-generierten Chat-Antworten bestehen nach derzeitiger Rechtslage voraussichtlich keine Urheberrechte, da es an einer persönlichen geistigen Schöpfung fehlt. Soweit dem Anbieter dennoch Rechte an den Outputs zustehen sollten, räumt er dem Nutzer ein einfaches, nicht übertragbares Nutzungsrecht für private und bildungsbezogene Zwecke ein.</p>
-          <p>(3) Die Eingaben (Prompts) des Nutzers verbleiben beim Nutzer. Der Anbieter erwirbt an den Eingaben keine Rechte und nutzt sie ausschließlich zur Erbringung des Dienstes (Übermittlung an den KI-Dienstleister zur Beantwortung). Eine darüber hinausgehende Speicherung oder Auswertung der Eingaben durch den Anbieter erfolgt nicht; weitere Hinweise enthält die Datenschutzerklärung.</p>
+          <p>(3) Die Eingaben (Prompts) des Nutzers verbleiben beim Nutzer. Der Anbieter erwirbt an den Eingaben keine Rechte und nutzt sie ausschließlich zur Erbringung des Dienstes (Weiterleitung an das KI-Modell, das die Antwort erzeugt). Bei eigenem KI-Zugang erhält der Anbieter die geschriebenen Eingaben nicht (siehe § 6 Abs. 2). Eine darüber hinausgehende Speicherung oder Auswertung der Eingaben durch den Anbieter erfolgt nicht; weitere Hinweise enthält die Datenschutzerklärung.</p>
         </section>
 
         <section className="legal-section">
           <h2>§ 6 Datenschutz</h2>
           <p>(1) Der Anbieter verarbeitet personenbezogene Daten ausschließlich nach Maßgabe der geltenden Datenschutzgesetze, insbesondere der DSGVO und des BDSG. Einzelheiten entnehmen Sie bitte unserer <Link to="/datenschutz">Datenschutzerklärung</Link>.</p>
-          <p>(2) Im Rahmen der Chat-Nutzung werden die Eingaben des Nutzers an einen KI-Dienstleister übermittelt, der diese zur Erzeugung der Antwort verarbeitet. Näheres hierzu finden Sie in der Datenschutzerklärung.</p>
+          <p>(2) Im Rahmen der Chat-Nutzung ohne eigenen KI-Zugang werden die Eingaben des Nutzers über die Server des Anbieters an einen KI-Dienstleister übermittelt, der diese zur Erzeugung der Antwort verarbeitet. Bei eigenem KI-Zugang sendet der Browser des Nutzers die geschriebenen Nachrichten direkt an den gewählten KI-Dienstleister oder Server, nicht über die Server des Anbieters. Näheres hierzu finden Sie in der Datenschutzerklärung.</p>
           <p>(3) Der Nutzer wird gebeten, keine personenbezogenen Daten (insbesondere Name, Adresse, Telefonnummer, E-Mail) in den Chat einzugeben.</p>
         </section>
 
@@ -218,7 +218,7 @@ const NutzungsbedingungenPage: FC = () => {
           <h2>§ 7 Jugendschutz</h2>
           <p>(1) Der Anbieter hat gemäß § 7 JMStV einen Jugendschutzbeauftragten bestellt. Dessen Kontaktdaten sind im <Link to="/impressum#jugendschutz">Impressum</Link> angegeben.</p>
           <p>(2) Der Dienst setzt technische Schutzmaßnahmen ein, um die Erzeugung jugendgefährdender Inhalte zu verhindern. Trotz dieser Maßnahmen kann nicht ausgeschlossen werden, dass KI-generierte Inhalte im Einzelfall unangemessen sein können.</p>
-          <p>(3) Nutzer und Erziehungsberechtigte können problematische Inhalte über die Meldefunktion im Chat oder per E-Mail an <a href="mailto:chipmates@chipmates.ai">chipmates@chipmates.ai</a> melden.</p>
+          <p>(3) Nutzer und Erziehungsberechtigte können problematische Inhalte über die Meldefunktion im Chat oder per E-Mail an <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a> melden.</p>
           <p>(4) Sollten Sie sich in einer Krise befinden oder Hilfe benötigen, wenden Sie sich bitte an die Telefonseelsorge (0800 111 0 111, kostenlos, 24/7) oder an die Nummer gegen Kummer (116 111).</p>
         </section>
 
@@ -254,7 +254,7 @@ const NutzungsbedingungenPage: FC = () => {
           <h2>§ 12 Anwendbares Recht und Streitbeilegung</h2>
           <p>(1) Diese Nutzungsbedingungen unterliegen dem Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts.</p>
           <p>(2) Soweit der Nutzer Verbraucher im Sinne des § 13 BGB ist und seinen gewöhnlichen Aufenthalt in einem anderen Staat hat, bleiben zwingende Verbraucherschutzvorschriften dieses Staates unberührt.</p>
-          <p>(3) Die Europäische Kommission stellt eine Plattform zur Online-Streitbeilegung (OS) bereit: <a href="https://ec.europa.eu/consumers/odr/" target="_blank" rel="noopener noreferrer">https://ec.europa.eu/consumers/odr/</a>. Der Anbieter ist weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
+          <p>(3) Der Anbieter ist weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
         </section>
 
         <section className="legal-section">
