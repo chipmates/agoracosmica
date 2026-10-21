@@ -172,8 +172,8 @@
       "manageKeys": "Keys verwalten",
       "ourServers": "Unsere Server",
       "aiModelBadgeFree": "Kostenloser Tarif",
-      "aiModelBadgeByok": "Qwen3 235B · Eigener Key",
-      "aiModelBadgeLocal": "Lokal · Eigenes Modell",
+      "aiModelBadgeByok": "Eigener Key",
+      "aiModelBadgeLocal": "Lokales Modell",
       "aiModelBadgeRejected": "Key abgelehnt",
       "local": "Lokal"
     },

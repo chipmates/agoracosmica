@@ -110,7 +110,7 @@ describe('the preference panel render', () => {
     });
 
     expect(screen.getAllByText('Lokal')).toHaveLength(2);
-    expect(screen.getByText('Lokal · Eigenes Modell')).toBeTruthy();
+    expect(screen.getByText('Lokales Modell')).toBeTruthy();
   });
 
   it('does not write the store when it renders again, so React has nothing to warn about', () => {

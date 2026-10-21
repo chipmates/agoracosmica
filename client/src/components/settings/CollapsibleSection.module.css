@@ -21,6 +21,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  /* Keeps a title that fills its line clear of the badge. */
+  column-gap: 12px;
   cursor: pointer;
   color: var(--text-primary);
   font-family: inherit;
@@ -267,6 +269,13 @@
   .badge {
     font-size: 13px; /* meta floor — was 11px */
     padding: 3px 8px;
+    /* The title keeps its two lines: a badge too long for its share wraps
+       instead of pushing the title into its ellipsis. */
+    max-width: min(9.5rem, 38vw);
+    white-space: normal;
+    overflow-wrap: break-word;
+    text-align: center;
+    line-height: 1.25;
   }
 }
 

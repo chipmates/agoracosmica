@@ -174,8 +174,8 @@
       "manageKeys": "Manage Keys",
       "ourServers": "Our servers",
       "aiModelBadgeFree": "Europe · Free tier",
-      "aiModelBadgeByok": "Qwen3 235B · Your key",
-      "aiModelBadgeLocal": "Local · Your model",
+      "aiModelBadgeByok": "Your key",
+      "aiModelBadgeLocal": "Local model",
       "aiModelBadgeRejected": "Key rejected",
       "local": "Local"
     },

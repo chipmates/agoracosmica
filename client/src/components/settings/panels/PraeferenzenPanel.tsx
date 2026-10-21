@@ -133,12 +133,13 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     return tString('settings.preferences.ourServers', 'Our servers');
   };
 
-  // The free-tier badge must hold whichever model the worker is serving, and
-  // those are not all in the EU. The panel itself names the model and the country.
+  // The badge names the route, the panel names the model: a model's name beside
+  // the title leaves it no room on a phone. The free tier's models are not all
+  // in the EU, so its badge names no model either.
   // A local model wins over a saved key, as it does for the conversation.
   const getAiModelBadge = (): string => {
-    if (localMode?.llmEnabled) return tString('settings.preferences.aiModelBadgeLocal', 'Local · Your model');
-    if (byokKey === 'usable') return tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key');
+    if (localMode?.llmEnabled) return tString('settings.preferences.aiModelBadgeLocal', 'Local model');
+    if (byokKey === 'usable') return tString('settings.preferences.aiModelBadgeByok', 'Your key');
     if (byokKey === 'rejected') return tString('settings.preferences.aiModelBadgeRejected', 'Key rejected');
     return tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
   };
