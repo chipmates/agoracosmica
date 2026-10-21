@@ -14,6 +14,9 @@ import {
   requestAudioLibrary,
 } from '../utils/public/entryIntent';
 
+/** Where Escape on the welcome screen goes: the homepage, kept for this tab. */
+export const WELCOME_EXIT_URL = '/?stay=1';
+
 interface HelperFunctionsParams {
   selectedFigure: Figure | null;
   selectedSeed: Seed | null;
@@ -168,12 +171,14 @@ export function useHelperFunctions({
 
   // Welcome/consent gate dismissal. The welcome modal is a REQUIRED consent
   // gate (age 16+ + terms), so dismissing it must NOT enter the app
-  // un-consented. Escape returns the visitor to the public homepage instead
-  // (same as logout), which keeps a keyboard way out of the modal (no focus
-  // trap) without bypassing the age gate. Profile + consent + the entry/signup/
-  // conversion beacons are written only by the "Begin" path (handleComplete).
+  // un-consented. Escape returns the visitor to the public homepage instead,
+  // which keeps a keyboard way out of the modal without bypassing the age
+  // gate. ?stay=1 pins the homepage: without it, the homepage forwards a
+  // browser holding an older terms record straight back to the app. Profile +
+  // consent + the entry/signup/conversion beacons are written only by the
+  // "Begin" path (handleComplete).
   const handleOnboardingSkip = useCallback((): void => {
-    window.location.href = '/';
+    window.location.href = WELCOME_EXIT_URL;
   }, []);
 
   // Handle WisdomGallery selection
