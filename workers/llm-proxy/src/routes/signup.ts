@@ -1,8 +1,8 @@
 // Anonymous signup beacon
-// Fires from the client when handleEntryComplete runs AND the user is new
-// (no prior profile in IndexedDB). Distinct from entry (signup OR sign-in)
-// and from profile_created (gclid-gated, ad-attributed only). Closes the
-// final gap in the dashboard funnel: total signups including organic.
+// Fires from the client's welcome step when a browser that holds no terms
+// record accepts the terms. Distinct from profile_created (gclid-gated,
+// ad-attributed only). Closes the final gap in the dashboard funnel: total
+// signups including organic.
 //
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics.

@@ -6,7 +6,7 @@ import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
-import { CURRENT_AGB_VERSION } from '../utils/userState';
+import { CURRENT_AGB_VERSION, hasEarlierConsent } from '../utils/userState';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
@@ -35,6 +35,9 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
 
   const handleComplete = useCallback((): void => {
     if (isAnimating) return;
+    // Read before the record below is written: a browser that accepted an
+    // earlier version is not a new entry, signup or profile.
+    const firstAcceptance = !hasEarlierConsent();
     // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG).
     // A full or blocked storage must not trap the user on the welcome screen.
     try {
@@ -58,16 +61,15 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
       locale: language,
     }).catch((err) => console.error('Failed to save profile:', err));
 
-    // Entry funnel beacons: this is the true "entered the app" moment (profile
-    // created + consent given). The signup count goes with every accepted
-    // welcome: deciding "new or returning" would mean reading the browser's
-    // history for counting, so a browser that accepts a new terms version
-    // counts again.
-    sendEntryBeacon();
-    sendSignupBeacon();
-    // profile_created self-gates on a captured gclid + the consent granted on
-    // the landing prompt, so it no-ops for everyone who did not opt in there.
-    sendConversion('profile_created');
+    // Entry funnel beacons: the first acceptance in this browser is the true
+    // "entered the app" moment. Accepting a new terms version counts nothing.
+    if (firstAcceptance) {
+      sendEntryBeacon();
+      sendSignupBeacon();
+      // profile_created self-gates on a captured gclid + the consent granted on
+      // the landing prompt, so it no-ops for everyone who did not opt in there.
+      sendConversion('profile_created');
+    }
 
     setIsAnimating(true);
   }, [isAnimating, language, tString]);

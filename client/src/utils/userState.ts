@@ -50,6 +50,18 @@ export const hasCurrentConsent = (): boolean =>
   readConsentRecord()?.version === CURRENT_AGB_VERSION;
 
 /**
+ * Has this browser accepted any terms version before? Only the presence of the
+ * record is read, never its history or other keys.
+ */
+export const hasEarlierConsent = (): boolean => {
+  try {
+    return localStorage.getItem(CONSENT_STORAGE_KEY) !== null;
+  } catch {
+    return false;
+  }
+};
+
+/**
  * Checks whether the welcome disclosure still has to be shown: no consent
  * record for the current version, or none of the post-consent signals (chat
  * history, a selected figure, a completed or skipped onboarding) present.

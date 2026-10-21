@@ -1,5 +1,6 @@
-// The signup count goes out with every accepted welcome, without reading the
-// browser's history to decide whether the visitor is new.
+// The entry count, the signup count and profile_created go out on a browser's
+// first acceptance only. A stored terms record from an earlier version holds
+// all three back; nothing but that record is read to decide it.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
@@ -18,30 +19,55 @@ vi.mock('../../utils/funnelBeacon', () => ({
 }));
 vi.mock('../../utils/public/gclidCapture', () => ({ sendConversion: beacons.sendConversion }));
 vi.mock('../../storage/preferencesIndexedDbAdapter', () => ({
-  preferencesIndexedDbAdapter: { setUserProfile: vi.fn(() => Promise.resolve()) },
+  preferencesIndexedDbAdapter: {
+    hasUserProfile: vi.fn(() => Promise.resolve(false)),
+    setUserProfile: vi.fn(() => Promise.resolve()),
+  },
 }));
 
 import WelcomeDisclosureModal from '../../components/WelcomeDisclosureModal';
+import { CURRENT_AGB_VERSION } from '../../utils/userState';
 
-describe('WelcomeDisclosureModal signup count', () => {
+const accept = () => {
+  const { container } = render(
+    <WelcomeDisclosureModal isOpen onComplete={() => {}} onSkip={() => {}} />
+  );
+  const buttons = container.querySelectorAll('button');
+  fireEvent.click(buttons[buttons.length - 1]);
+};
+
+describe('WelcomeDisclosureModal counts', () => {
   beforeEach(() => {
     Object.values(beacons).forEach((fn) => fn.mockClear());
     localStorage.clear();
   });
 
-  it('sends the signup count even when history is stored, and lists no keys', () => {
+  it('counts a first acceptance even when history is stored, and lists no keys', () => {
     localStorage.setItem('history_aurelius_1', '[]');
     localStorage.setItem('selectedFigure', 'aurelius');
     const key = vi.mocked(localStorage.key);
     key.mockClear();
-    const { container } = render(
-      <WelcomeDisclosureModal isOpen onComplete={() => {}} onSkip={() => {}} />
-    );
-    const buttons = container.querySelectorAll('button');
-    fireEvent.click(buttons[buttons.length - 1]);
+    accept();
     expect(beacons.sendEntryBeacon).toHaveBeenCalledTimes(1);
     expect(beacons.sendSignupBeacon).toHaveBeenCalledTimes(1);
+    expect(beacons.sendConversion).toHaveBeenCalledWith('profile_created');
     expect(key).not.toHaveBeenCalled();
     expect(vi.mocked(localStorage.getItem).mock.calls.map((c) => c[0])).not.toContain('selectedFigure');
+  });
+
+  it('counts nothing when the browser accepted an earlier version', () => {
+    localStorage.setItem('agb_consent', JSON.stringify({ version: '1.0.0', timestamp: 1 }));
+    accept();
+    expect(beacons.sendEntryBeacon).not.toHaveBeenCalled();
+    expect(beacons.sendSignupBeacon).not.toHaveBeenCalled();
+    expect(beacons.sendConversion).not.toHaveBeenCalled();
+    expect(JSON.parse(localStorage.getItem('agb_consent') as string).version).toBe(CURRENT_AGB_VERSION);
+  });
+
+  it('counts nothing when the welcome is shown again over a current record', () => {
+    localStorage.setItem('agb_consent', JSON.stringify({ version: CURRENT_AGB_VERSION, timestamp: 1 }));
+    accept();
+    expect(beacons.sendSignupBeacon).not.toHaveBeenCalled();
+    expect(beacons.sendEntryBeacon).not.toHaveBeenCalled();
   });
 });

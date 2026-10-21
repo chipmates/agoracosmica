@@ -264,10 +264,10 @@ export function trackPageView(
 }
 
 /**
- * Track an entry beacon. Fires from the client's WelcomeDisclosureModal when
- * the user consents and the profile is created (the post-cinematic welcome
- * step; since the 2026-05-29 refactor). Sits between the page-load beacon
- * (every arrival) and the session row (Turnstile-gated).
+ * Track an entry beacon. Fires from the client's WelcomeDisclosureModal when a
+ * browser accepts the terms for the first time; accepting a new terms version
+ * sends none. Sits between the page-load beacon (every arrival) and the
+ * session row (Turnstile-gated).
  * dataset: agora_llm
  * blobs: ['entry', path, source, language, '200', device, country, '', probe]
  * indexes: ['entry']
@@ -299,8 +299,8 @@ export function trackEntry(
 
 /**
  * Track a new-account signup. Fires from the client's WelcomeDisclosureModal
- * when the user consents AND is new (no prior profile in IndexedDB). Distinct
- * from entry (which fires for everyone who completes the welcome step) and from
+ * with the entry beacon, when a browser that holds no terms record accepts the
+ * welcome; a browser accepting a new terms version sends none. Distinct from
  * profile_created (which is gclid-gated, ad-attributed only). Lets the
  * dashboard show total signups including organic.
  *

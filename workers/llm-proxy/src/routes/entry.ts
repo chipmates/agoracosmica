@@ -1,8 +1,7 @@
 // Anonymous entry beacon
-// Fires from the client when the user transitions from the LoginPage into
-// the app (handleEntryComplete in App.tsx). Sits between the page-load
-// beacon (every arrival) and the session row (Turnstile-gated, only on
-// first chat / audio interaction). Lets the dashboard answer "of all
+// Fires from the client's welcome step when a browser accepts the terms for
+// the first time. Sits between the page-load beacon (every arrival) and the
+// session row (Turnstile-gated, only on first chat / audio interaction). Lets the dashboard answer "of all
 // arrivals, how many decided to enter the app at all" — the most
 // informative bounce stage.
 //
