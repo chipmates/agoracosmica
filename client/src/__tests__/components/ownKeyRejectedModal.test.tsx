@@ -143,6 +143,20 @@ describe('the rejected-key question', () => {
     expect(h.setIsFreeTier).not.toHaveBeenCalled();
   });
 
+  it('Escape answers the question and reaches nothing underneath', async () => {
+    // A story's question sheet closes on Escape from the window; it must stay.
+    const underneath = vi.fn();
+    window.addEventListener('keydown', underneath);
+    try {
+      const { result } = await askFor('chat');
+      fireEvent.keyDown(screen.getByRole('dialog'), { key: 'Escape' });
+      expect(((await result) as OwnKeyRejectedError).choice).toBe('dismissed');
+      expect(underneath).not.toHaveBeenCalled();
+    } finally {
+      window.removeEventListener('keydown', underneath);
+    }
+  });
+
   it('both answers are full touch targets of the same weight', async () => {
     await askFor('chat');
     const [yes, check] = screen.getAllByRole('button');

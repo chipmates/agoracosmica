@@ -198,6 +198,8 @@ interface GenerationResult {
     debugLog: LogEntry[];
   };
   error?: string;
+  /** The visitor's no to the own-key question, kept whole so the page can word it. */
+  ownKey?: OwnKeyRejectedError;
   validationErrors?: string[];
   debugLog?: LogEntry[];
 }
@@ -320,6 +322,7 @@ class CustomCouncilGenerator {
       return {
         success: false,
         error: errorMessage,
+        ...(error instanceof OwnKeyRejectedError ? { ownKey: error } : {}),
         validationErrors: this.validationErrors,
         debugLog: this.generationLog
       };
@@ -735,6 +738,7 @@ Begin the council now. Remember to use the EXACT format specified in your instru
       };
       
     } catch (error) {
+      if (error instanceof OwnKeyRejectedError) throw error;
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new Error(`LLM call failed: ${errorMessage}`);
     } finally {

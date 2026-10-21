@@ -218,6 +218,18 @@
   display: inline-block;
 }
 
+/* Full row under the buttons; outranks the modal's justified paragraphs (index.css). */
+.history-modal-content .clear-buttons-container p.history-summary-note {
+  flex-basis: 100%;
+  margin: 0;
+  text-align: center;
+  hyphens: none;
+  text-wrap: balance;
+  color: var(--text-secondary);
+  font-size: var(--text-sm);
+  line-height: 1.5;
+}
+
 .clear-buttons-container .backup-button,
 .clear-buttons-container .restore-button,
 .clear-buttons-container .clear-all-button,

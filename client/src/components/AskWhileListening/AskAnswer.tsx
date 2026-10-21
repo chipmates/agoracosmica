@@ -32,6 +32,11 @@ function noticeKey(notice: AskNotice): { key: string; fallback: string } {
       return { key: 'askListen.voiceUnavailable', fallback: 'No voice right now. The answer is here to read.' };
     case 'offline':
       return { key: 'askListen.offline', fallback: 'No connection. The chapter still plays.' };
+    case 'keyRejected':
+      return {
+        key: 'errors.conversation.byokInvalidKey',
+        fallback: 'Your OpenRouter key was rejected. Please check it in Settings.',
+      };
     case 'quotaSpent':
       return {
         key: 'askListen.quotaSpent',

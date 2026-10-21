@@ -20,6 +20,7 @@ import {
   ASK_RESUME_TIMEOUT_MS,
   ASK_SCRUB_EPSILON_S,
 } from '../config/askWhileListening';
+import { OwnKeyRejectedError } from '../services/llm/ownKeyConsent';
 
 export type AskState =
   | 'listening'
@@ -50,7 +51,7 @@ export interface AskAnchor {
 }
 
 /** The one quiet line under the sheet, when there is one. */
-export type AskNotice = 'error' | 'voiceUnavailable' | 'offline' | 'quotaSpent' | 'capacity';
+export type AskNotice = 'error' | 'voiceUnavailable' | 'offline' | 'quotaSpent' | 'capacity' | 'keyRejected';
 
 export interface AskDriverInput {
   figureId: string;
@@ -349,6 +350,13 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
           }
         }
         setSpeaking(false);
+        if (error instanceof OwnKeyRejectedError) {
+          // A no to the own-key question: the chat's key line, or nothing
+          // after "check my key", since Settings is open then.
+          setNotice(error.choice === 'check-key' ? null : 'keyRejected');
+          setState('failed');
+          return;
+        }
         if (reason === 'quota') {
           const quota = useDomainStore.getState().quota;
           const spent = quota.isFreeTier && quota.loaded && quota.limit - quota.used <= 0;

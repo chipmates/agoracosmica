@@ -14,6 +14,7 @@ import customCouncilGenerator, { type PartialSegment } from './generator';
 import CustomCouncilParser, { type Segment } from './parser';
 import type { CouncilMessage } from './index';
 import { councilLog, councilWarn, councilError } from './logger';
+import { OwnKeyRejectedError } from '../llm/ownKeyConsent';
 import { getOrRollCouncilFigureSessionId, touchCouncilFigureSession, clearCouncilSessions } from '../audio/tts/ttsSessions';
 import { getAudioContext, holdAudioContext } from '../audio/audioQueueManager';
 import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
@@ -136,6 +137,8 @@ interface GenerationResult {
   success: boolean;
   result?: any;
   error?: string;
+  /** The visitor's no to the own-key question, kept whole so the page can word it. */
+  ownKey?: OwnKeyRejectedError;
   /** Ended by a close or a newer council, not by a fault. */
   stopped?: boolean;
 }
@@ -400,7 +403,7 @@ export class CustomCouncilService {
 
         return { success: true, result };
       } else {
-        throw new Error(result.error || 'Custom generation failed');
+        throw result.ownKey ?? new Error(result.error || 'Custom generation failed');
       }
     } catch (error) {
       if (controller.signal.aborted) {
@@ -416,7 +419,11 @@ export class CustomCouncilService {
       // 🔄 Hide loader on error
       this._hideLoader();
       this.mainService._notifyError(error as Error);
-      return { success: false, error: errorMessage };
+      return {
+        success: false,
+        error: errorMessage,
+        ...(error instanceof OwnKeyRejectedError ? { ownKey: error } : {}),
+      };
     }
   }
 

@@ -34,6 +34,7 @@ const HistoryModal: FC<HistoryModalProps> = (props) => {
     sortedActiveSeeds,
     handleClose,
     handleSummary,
+    summaryNote,
     handleBackup,
     handleRestore,
     handleClearSeedHistory,
@@ -80,6 +81,7 @@ const HistoryModal: FC<HistoryModalProps> = (props) => {
         onRestore={handleRestore}
         onClearAll={handleClearAllHistory}
         onSummary={handleSummary}
+        summaryNote={summaryNote}
         withHaptic={withHaptic}
         tString={tString}
         tNode={tNode}

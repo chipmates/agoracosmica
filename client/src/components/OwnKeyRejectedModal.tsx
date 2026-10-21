@@ -1,4 +1,4 @@
-import { FC, useSyncExternalStore } from 'react';
+import { FC, useEffect, useSyncExternalStore } from 'react';
 import { createPortal } from 'react-dom';
 import { Key } from '@phosphor-icons/react';
 import { ModalContainer } from './Modal';
@@ -46,6 +46,19 @@ const ANSWER_STYLE = {
 const OwnKeyRejectedModal: FC = () => {
   const { tString } = useTranslation();
   const ask = useSyncExternalStore(subscribeOwnKeyAsk, currentOwnKeyAsk, currentOwnKeyAsk);
+
+  // While the question is open, Escape answers it and goes no further: a story's
+  // question sheet underneath closes on Escape too, and must stay with its line.
+  useEffect(() => {
+    if (!ask) return undefined;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== 'Escape') return;
+      event.stopPropagation();
+      answerOwnKeyAsk('dismissed');
+    };
+    window.addEventListener('keydown', onKeyDown, true);
+    return () => window.removeEventListener('keydown', onKeyDown, true);
+  }, [ask]);
 
   if (!ask) return null;
 

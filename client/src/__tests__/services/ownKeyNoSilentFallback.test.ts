@@ -235,6 +235,18 @@ describe('a stored key that OpenRouter rejects', () => {
     expect(conversationLeftForUs()).toEqual([]);
   });
 
+  it("a council's no comes back as the visitor's answer, not as a failed call", async () => {
+    harness.key = { valid: false, timestamp: 1_700_000_000_000 };
+    const consent = await import('../../services/llm/ownKeyConsent');
+    const outcome = council().then(() => null, (error: unknown) => error);
+    await vi.waitFor(() => expect(consent.currentOwnKeyAsk()).not.toBeNull());
+    consent.answerOwnKeyAsk('dismissed');
+
+    const error = await outcome;
+    expect(error).toBeInstanceOf(consent.OwnKeyRejectedError);
+    expect((error as InstanceType<typeof consent.OwnKeyRejectedError>).choice).toBe('dismissed');
+  });
+
   it('a visitor without a stored key still gets the free tier at once, history included', async () => {
     harness.key = null;
     expect(await runUntilQuiet(chatTurn())).toBe('ended');

@@ -11,6 +11,8 @@ interface HistoryToolbarProps {
   onRestore: (event: ChangeEvent<HTMLInputElement>) => void;
   onClearAll: () => void;
   onSummary: () => void;
+  /** One line under the buttons, e.g. why the last summary did not run. */
+  summaryNote?: string | null;
   withHaptic: (action: (...args: any[]) => any, intensity?: 'light' | 'medium' | 'strong') => (...args: any[]) => any;
   tString: (key: string, fallback: string) => string;
   tNode: (key: string) => ReactNode;
@@ -23,6 +25,7 @@ const HistoryToolbar: FC<HistoryToolbarProps> = ({
   onRestore,
   onClearAll,
   onSummary,
+  summaryNote,
   withHaptic,
   tString,
   tNode
@@ -79,6 +82,12 @@ const HistoryToolbar: FC<HistoryToolbarProps> = ({
             />
           )}
         </>
+      )}
+
+      {summaryNote && (
+        <p className="history-summary-note" role="status">
+          {summaryNote}
+        </p>
       )}
     </div>
   );

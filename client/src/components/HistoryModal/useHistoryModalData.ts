@@ -5,6 +5,8 @@ import useSeedTranslation from '../../hooks/useSeedTranslation';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useUIStore } from '../../stores/uiStore';
 import SummaryService from '../../services/SummaryService';
+import { OwnKeyRejectedError } from '../../services/llm/ownKeyConsent';
+import { mapErrorToUserMessage } from '../../services/llm/errorMessages';
 import { splitSummarySections } from './summarySections';
 import { STORAGE_KEYS, parseHistoryKey } from '../../utils/storageKeysV2';
 import { createRequestGate } from '../../utils/async/requestGate';
@@ -68,6 +70,9 @@ export function useHistoryModalData({
   const [selectedModes, setSelectedModes] = useState<string[]>(Object.keys(MODES));
   const [isInitialLoad, setIsInitialLoad] = useState<boolean>(true);
   const [showHistoryHelp, setShowHistoryHelp] = useState<boolean>(false);
+  // The one line under the toolbar after a no to the own-key question.
+  const [summaryNote, setSummaryNote] = useState<string | null>(null);
+  useEffect(() => { setSummaryNote(null); }, [isOpen, selectedSeedId]);
 
   // Ref to track if component is mounted
   const isMountedRef = useRef<boolean>(true);
@@ -390,10 +395,14 @@ export function useHistoryModalData({
       });
       setExpandedSections(newSections);
       return true;
-    } catch {
-      if (isMountedRef.current) {
-        alert(tString('history.alerts.summaryFailed', 'Failed to generate summary'));
+    } catch (error) {
+      if (!isMountedRef.current) return false;
+      if (error instanceof OwnKeyRejectedError) {
+        // The chat's key line, never an alert; nothing after "check my key".
+        setSummaryNote(mapErrorToUserMessage(error, tString) || null);
+        return false;
       }
+      alert(tString('history.alerts.summaryFailed', 'Failed to generate summary'));
       return false;
     } finally {
       document.body.classList.remove('body-no-scroll');
@@ -414,6 +423,7 @@ export function useHistoryModalData({
   const handleSummary = async (): Promise<void> => {
     if (!selectedSeedId) return;
     if (isLoading) return;
+    setSummaryNote(null);
 
     const seedId = selectedSeedId;
     const figureId = selectedFigure.id;
@@ -656,6 +666,7 @@ export function useHistoryModalData({
     showHistoryHelp,
     setShowHistoryHelp,
     sortedActiveSeeds,
+    summaryNote,
 
     // Handlers
     handleClose,

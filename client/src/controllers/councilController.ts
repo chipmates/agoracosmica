@@ -3,6 +3,9 @@ import { useDomainStore } from '../stores';
 import type { ConversationMessage, CouncilConfig } from '../stores/slices/domainTypes';
 import { registerCouncilController, type CouncilControllerApi } from './councilControllerRegistry';
 import { councilError } from '../services/council/logger';
+import { OwnKeyRejectedError } from '../services/llm/ownKeyConsent';
+import { mapErrorToUserMessage } from '../services/llm/errorMessages';
+import { tStringNow } from '../utils/tStringNow';
 
 const deriveInitialPhase = (config: CouncilConfig): string =>
   (config?.currentPhase as string | undefined) ?? 'foundations';
@@ -32,6 +35,18 @@ const setGlobalError = (message: string) => {
   const store = useDomainStore.getState();
   store.setCouncilError(message);
   store.setAppError(message);
+};
+
+// A no to the own-key question gets the chat's line in the page's language;
+// after "check my key" Settings is open and nothing is shown.
+const showCouncilError = (error: unknown, fallback: string) => {
+  if (error instanceof OwnKeyRejectedError) {
+    const line = mapErrorToUserMessage(error, tStringNow);
+    if (line) setGlobalError(line);
+    return;
+  }
+  const message = error instanceof Error ? error.message : (error as { message?: string } | null)?.message;
+  setGlobalError(message ?? fallback);
 };
 
 export interface CouncilController {
@@ -98,8 +113,7 @@ export const createCouncilController = (): CouncilController => {
   };
 
   const handleError = (error: Error | { message?: string }) => {
-    const message = error instanceof Error ? error.message : error?.message ?? 'Council error occurred';
-    setGlobalError(message);
+    showCouncilError(error, 'Council error occurred');
   };
 
   const handleMessageSpoken = ({ speaker, message }: { speaker: string; message: string }) => {
@@ -174,11 +188,10 @@ export const createCouncilController = (): CouncilController => {
       // Config types differ between store and service — cast is intentional
       const result = await cosmicCouncilService.startCouncilDebate(config as Parameters<typeof cosmicCouncilService.startCouncilDebate>[0]);
       if (!result?.success) {
-        throw new Error(result?.error || 'Failed to start council');
+        throw result?.ownKey ?? new Error(result?.error || 'Failed to start council');
       }
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Failed to start council';
-      setGlobalError(message);
+      showCouncilError(error instanceof Error ? error : null, 'Failed to start council');
       store.toggleCouncilMode(false);
       store.resetCouncil();
       throw error;
