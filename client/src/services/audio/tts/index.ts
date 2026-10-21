@@ -74,6 +74,25 @@ const validateSpeed = (speed: number | string | undefined): number => {
   return Math.min(Math.max(parsedSpeed, 0.8), 1.3);
 };
 
+/**
+ * Local Mode voice fails closed: when the local service does not answer, the
+ * call throws and the banner says so. The text never goes to the hosted
+ * gateway instead.
+ */
+const speakLocally = async (speak: () => Promise<AudioFile>, signal?: AbortSignal): Promise<AudioFile> => {
+  try {
+    return await speak();
+  } catch (error) {
+    if (error instanceof LocalModeTtsUnavailable) {
+      // localModeTTS reports a stopped fetch as unavailable too. A stop is not an outage.
+      if (signal?.aborted) throw new DOMException('The speech was stopped', 'AbortError');
+      console.warn(`[TTS] Local Mode unavailable for ${error.language} (${error.url}): ${error.message}`);
+      window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'tts' } }));
+    }
+    throw error;
+  }
+};
+
 // ============================================
 // Main Export
 // ============================================
@@ -96,29 +115,11 @@ export const convertTextToSpeech = async (
   // user, local containers, fail fast.
   const config = loadServiceConfig();
   if (config.localMode?.ttsEnabled) {
-    try {
-      return await localModeTTS(
-        text, fileBaseName, figureName, validatedSpeed,
-        undefined, undefined, language, signal,
-        { kokoroUrl: config.localMode.ttsKokoroURL, qwenUrl: config.localMode.ttsQwenURL },
-      );
-    } catch (error) {
-      // DE local unavailable (no NVIDIA, no Apple Silicon setup script, container
-      // crashed): fall back to the hosted DE path. EN local unavailable: also
-      // fall back. The user sees a small pill in the UI; conversation continues.
-      if (error instanceof LocalModeTtsUnavailable) {
-        console.warn(`[TTS] Local Mode unavailable for ${error.language} (${error.url}): ${error.message} — falling back to hosted`);
-        window.dispatchEvent(new CustomEvent('local-mode-tts-fallback', {
-          detail: { language: error.language, url: error.url, message: error.message }
-        }));
-        // fall through to hosted path
-      } else if (signal?.aborted || (error as Error).name === 'AbortError') {
-        throw error;
-      } else {
-        // Unexpected error from local TTS — surface it.
-        throw error;
-      }
-    }
+    return speakLocally(() => localModeTTS(
+      text, fileBaseName, figureName, validatedSpeed,
+      undefined, undefined, language, signal,
+      { kokoroUrl: config.localMode?.ttsKokoroURL, qwenUrl: config.localMode?.ttsQwenURL },
+    ), signal);
   }
 
   // Circuit breaker: skip TTS if server is down (text-only fallback)

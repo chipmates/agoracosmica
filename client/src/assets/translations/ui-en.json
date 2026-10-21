@@ -1312,7 +1312,9 @@
       "gpuCapacityGerman": "German audio is briefly at capacity. Switch to English to keep hearing responses.",
       "gpuCapacityAll": "Audio is briefly at capacity. Your conversation continues with text while it recovers.",
       "audioRateLimited": "Audio is taking a short break. Your conversation continues with text.",
-      "byokFellBack": "Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings."
+      "byokFellBack": "Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.",
+      "localSttUnavailable": "Local voice input is not reachable. Check Local Mode in Settings, or type your message.",
+      "localTtsUnavailable": "Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings."
     },
     "mic": {
       "generic": {

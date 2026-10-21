@@ -75,7 +75,8 @@ export const transcribeAudio = async (
   }
 
   // Local Mode: route to the local Whisper container, no circuit breaker
-  // (single user, fail fast). On unavailable, fall back to hosted.
+  // (single user, fail fast). When it does not answer, fail closed: the
+  // recording never goes to the hosted servers instead.
   const config = loadServiceConfig();
   if (config.localMode?.sttEnabled) {
     try {
@@ -83,14 +84,10 @@ export const transcribeAudio = async (
       return formatTranscriptionResponse(result, 'local');
     } catch (error) {
       if (error instanceof LocalModeSttUnavailable) {
-        console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message} — falling back to hosted`);
-        window.dispatchEvent(new CustomEvent('local-mode-stt-fallback', {
-          detail: { url: error.url, message: error.message }
-        }));
-        // fall through to hosted
-      } else {
-        throw error;
+        console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message}`);
+        window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'stt' } }));
       }
+      throw error;
     }
   }
 

@@ -9,8 +9,8 @@
 // reference WAV / embedding. Kokoro voice IDs for EN (e.g. `af_heart`) are
 // also passed through verbatim.
 //
-// On a 404 / connection refused from the DE endpoint, the caller's exception
-// handler decides whether to fall back to the hosted DE path (see index.ts).
+// A 404, 503 or refused connection throws LocalModeTtsUnavailable. The caller
+// fails closed on it and never sends the text to the hosted path (see index.ts).
 
 import { getVoiceForNormalMode } from '../voices/voiceResolver';
 import { fetchWithTimeout } from '../../../utils/fetchWithTimeout';
@@ -65,7 +65,7 @@ export async function localModeTTS(
   // blob URLs is flaky (first sample plays then `ended` fires early). Both
   // backends accept either format — Kokoro natively, MLX Qwen via ffmpeg
   // transcode (requires ffmpeg on PATH; otherwise the server returns 503 and
-  // the caller falls back to hosted). Non-iOS browsers stay on WAV so the
+  // the reply has no voice). Non-iOS browsers stay on WAV so the
   // appendTailSilence path below works without a re-encode pass.
   const responseFormat = IS_IOS ? 'mp3' : 'wav';
   const requestBody: Record<string, unknown> = {
@@ -89,8 +89,8 @@ export async function localModeTTS(
       signal,
     });
   } catch (err) {
-    // Connection refused, DNS failure, timeout — treat as unavailable so the
-    // caller can decide whether to fall back to the hosted path.
+    // Connection refused, DNS failure, timeout: treat as unavailable. The
+    // caller tells a stop apart by its own signal.
     throw new LocalModeTtsUnavailable(
       err instanceof Error ? err.message : 'unknown network error',
       de ? 'de' : 'en',

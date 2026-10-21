@@ -1,6 +1,7 @@
 // Network status + circuit breaker banner
-// Shows when: offline, reconnected, TTS/STT circuit breaker opens
-import React, { FC, useState, useEffect, useCallback } from 'react';
+// Shows when: offline, reconnected, TTS/STT circuit breaker opens, a Local Mode
+// audio service does not answer
+import React, { FC, useState, useEffect, useCallback, useRef } from 'react';
 import { useNetworkStatus } from '../hooks/useNetworkStatus';
 import { useTranslation } from '../hooks/useTranslation';
 
@@ -12,7 +13,8 @@ type BannerState =
   | { type: 'reconnected' }
   | { type: 'circuit-breaker'; service: 'tts' | 'stt' }
   | { type: 'rate-limit'; hint: RateLimitHint }
-  | { type: 'byok-fallback' };
+  | { type: 'byok-fallback' }
+  | { type: 'local-mode'; service: 'tts' | 'stt' };
 
 const BANNER_STYLE: React.CSSProperties = {
   position: 'fixed',
@@ -93,6 +95,31 @@ const NetworkStatusBanner: FC = () => {
     return () => window.removeEventListener('byok-fell-back', handleByokFallback);
   }, [handleByokFallback]);
 
+  // Local Mode audio fails closed instead of using our servers. Voice reports
+  // once per chunk of every reply, so its line shows at most once a minute (the
+  // banner covers the menu); transcription reports once per recording.
+  const localModeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const localVoiceShownAt = useRef(-Infinity);
+  useEffect(() => {
+    const handleLocalModeUnavailable = (e: Event) => {
+      const service = (e as CustomEvent).detail?.service === 'stt' ? 'stt' : 'tts';
+      if (service === 'tts') {
+        if (Date.now() - localVoiceShownAt.current < 60_000) return;
+        localVoiceShownAt.current = Date.now();
+      }
+      setBanner({ type: 'local-mode', service });
+      clearTimeout(localModeTimer.current);
+      localModeTimer.current = setTimeout(() => setBanner(prev =>
+        prev.type === 'local-mode' ? { type: 'hidden' } : prev
+      ), 10000);
+    };
+    window.addEventListener('local-mode-unavailable', handleLocalModeUnavailable);
+    return () => {
+      window.removeEventListener('local-mode-unavailable', handleLocalModeUnavailable);
+      clearTimeout(localModeTimer.current);
+    };
+  }, []);
+
   if (banner.type === 'hidden') return null;
 
   let message: string;
@@ -127,6 +154,12 @@ const NetworkStatusBanner: FC = () => {
       break;
     case 'byok-fallback':
       message = tString('errors.network.byokFellBack', 'Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.');
+      bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+      break;
+    case 'local-mode':
+      message = banner.service === 'tts'
+        ? tString('errors.network.localTtsUnavailable', 'Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings.')
+        : tString('errors.network.localSttUnavailable', 'Local voice input is not reachable. Check Local Mode in Settings, or type your message.');
       bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
       break;
   }
