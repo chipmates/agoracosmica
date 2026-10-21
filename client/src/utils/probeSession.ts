@@ -11,8 +11,13 @@
 // Mark a browser (once, from the devtools console on the site, or by opening
 // any page with ?probe=1):
 //   localStorage.setItem('agc_probe', '1')
+// Marked by hand on an open page, conversions stop at once and the counts
+// carry the mark from the next page load.
 // Unmark:
 //   localStorage.removeItem('agc_probe')
+// Unmark in a fresh tab, or remove agc_ad_consent as well: a yes given while
+// marked keeps the test click ID in that tab (sessionStorage), and the tab's
+// next conversion step after unmarking would send it to Google.
 
 const PROBE_KEY = 'agc_probe';
 
