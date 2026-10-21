@@ -2,8 +2,8 @@ import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
 import {
-  bodyTooLarge, bodyUnreadable, declaresMoreThan, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES,
-  STT_MAX_BODY_BYTES,
+  bodyTooLarge, bodyUnreadable, declaresMoreThan, drainBodyCapped, readBodyCapped, readJsonCapped,
+  SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
 } from './bodyLimit';
 import { proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, peekAudioRateLimit, buildRateLimitResponse } from './rateLimit';
@@ -228,12 +228,16 @@ export default {
         return buildRateLimitResponse(rateResult, request, env);
       };
 
-      // Before the upload is read: a declared size over the cap, then a
-      // visitor already at a limit. Neither moves a counter.
+      // Before the upload is kept: a declared size over the cap, then a
+      // visitor already at a limit, whose upload is drained unkept before the
+      // 429. Neither moves a counter.
       if (declaresMoreThan(request, STT_MAX_BODY_BYTES)) return bodyTooLarge(request, env);
       if (!sttSkipRateLimit) {
         const early = await peekAudioRateLimit(request, env);
-        if (!early.allowed) return refuseStt(early);
+        if (!early.allowed) {
+          await drainBodyCapped(request, STT_MAX_BODY_BYTES);
+          return refuseStt(early);
+        }
       }
 
       // Size gate before any counter moves. This route is unauthenticated and

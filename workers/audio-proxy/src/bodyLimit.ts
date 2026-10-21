@@ -37,6 +37,31 @@ export async function readBodyCapped(request: Request, maxBytes: number): Promis
   return bytes.buffer;
 }
 
+/**
+ * Read the body to its end and drop each chunk as it arrives, so memory stays
+ * flat; past `maxBytes` the rest is cancelled. Answering before an upload is
+ * consumed can cost a reused HTTP/1.1 connection its next request. Never
+ * throws: a broken upload has no one left to answer.
+ */
+export async function drainBodyCapped(request: Request, maxBytes: number): Promise<void> {
+  if (!request.body) return;
+  const reader = request.body.getReader();
+  let total = 0;
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) return;
+      total += value.byteLength;
+      if (total > maxBytes) {
+        void reader.cancel().catch(() => {});
+        return;
+      }
+    }
+  } catch {
+    // The upload broke off.
+  }
+}
+
 /** Upper bound for the session-end beacon, which carries one session id. */
 export const SESSION_END_MAX_BODY_BYTES = 16 * 1024;
 
