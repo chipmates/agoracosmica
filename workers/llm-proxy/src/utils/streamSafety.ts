@@ -20,6 +20,15 @@ const CRITICAL_OUTPUT_PATTERNS: RegExp[] = [
   /(?:juden|muslime|jews|muslims).{0,20}(vergasen|vernichten|exterminate|eradicate)/i,
 ];
 
+/**
+ * Shrink every whitespace run to one character, so a long run between two words
+ * of a pattern cannot push the first word out of the kept tail. A run holding a
+ * line break becomes that break, so `.` in a pattern still stops where it did.
+ */
+function collapseWhitespace(text: string): string {
+  return text.replace(/\s+/g, run => (/[\n\r\u2028\u2029]/.test(run) ? '\n' : ' '));
+}
+
 export class StreamSafetyScanner {
   private buffer = '';
   private blocked = false;
@@ -32,7 +41,8 @@ export class StreamSafetyScanner {
   check(text: string): boolean {
     if (this.blocked) return false;
 
-    this.buffer += text;
+    // Collapse after joining: a run can arrive spread over many chunks.
+    this.buffer = collapseWhitespace(this.buffer + text);
 
     // Test the whole buffer before trimming: one network read can carry many
     // deltas, so the start of a long chunk would otherwise never be scanned.

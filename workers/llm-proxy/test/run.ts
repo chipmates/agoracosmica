@@ -721,6 +721,53 @@ async function main(): Promise<number> {
     }
   });
 
+  // A pattern word, a whitespace run longer than the kept tail, then the next
+  // word in a later read: the run must not push the first word out.
+  const LONG_RUN = ' '.repeat(130);
+
+  await test('the scanner catches a pattern whose words a long run of spaces splits across two checks', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('heil' + LONG_RUN), true, 'first word alone is clean');
+    assertEqual(scanner.check('hitler'), false, 'second word completes the pattern');
+  });
+
+  await test('the scanner catches a run of spaces spread over many checks', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Sieg'), true, 'first word alone is clean');
+    for (let i = 0; i < 300; i++) assertEqual(scanner.check(' '), true, `space ${i} alone is clean`);
+    assertEqual(scanner.check('Heil'), false, 'second word completes the pattern');
+  });
+
+  await test('the scanner catches a long run of tabs, line breaks and no-break spaces between two checks', () => {
+    for (const unit of ['\t', '\n', '\r\n', '\u00a0', ' \t\n']) {
+      const scanner = new StreamSafetyScanner();
+      assertEqual(scanner.check('white' + unit.repeat(130)), true, `first word alone is clean (${JSON.stringify(unit)})`);
+      assertEqual(scanner.check('power'), false, `second word completes the pattern (${JSON.stringify(unit)})`);
+    }
+  });
+
+  await test('a line break still ends a phrase for the bounded patterns', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Der Holocaust\n\n\n\nund eine Lüge'), true, 'two lines are not one phrase');
+  });
+
+  await test('the filter catches a pattern whose words a long run of spaces splits across two reads', async () => {
+    const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('heil' + LONG_RUN), CONTENT_FRAME('hitler') + DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes('hitler'), 'the second word reached the client');
+  });
+
+  await test('the filter forwards long whitespace runs byte for byte', async () => {
+    const whole = new TextEncoder().encode(CONTENT_FRAME('Erst' + LONG_RUN + '\t\t\n\n' + LONG_RUN)
+      + CONTENT_FRAME(LONG_RUN + 'dann weiter.') + DONE_FRAME);
+    for (const size of [1, 13, whole.length]) {
+      const pieces: Uint8Array[] = [];
+      for (let at = 0; at < whole.length; at += size) pieces.push(whole.slice(at, at + size));
+      const out = await readBytes(createSafetyFilteredStream(byteStream(pieces)));
+      assert(sameBytes(out, whole), `bytes changed with reads of ${size}`);
+    }
+  });
+
   // -------------------------------------------------------------------------
   // Dispatch: request shaping, metering, availability fallback
   // -------------------------------------------------------------------------
