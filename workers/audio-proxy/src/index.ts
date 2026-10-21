@@ -19,7 +19,7 @@ function readCountry(request: Request): string {
   return 'XX';
 }
 
-export default {
+const router = {
   async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
     // CORS preflight
     if (request.method === 'OPTIONS') {
@@ -280,5 +280,44 @@ export default {
       status: 404,
       headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
     });
+  },
+};
+
+const LOGGED_ROUTES = ['/health', '/v1/audio/health', '/v1/audio/speech', '/v1/audio/session/end', '/v1/audio/transcriptions'];
+
+/** A fixed route name for the log line: the archive path carries visitor text. */
+function routeLabel(request: Request): string {
+  const path = new URL(request.url).pathname;
+  if (path.startsWith(STORY_ARCHIVE_PREFIX)) return STORY_ARCHIVE_PREFIX;
+  return LOGGED_ROUTES.includes(path) ? path : 'other';
+}
+
+/**
+ * The answer to a fault inside the worker. Without it the runtime answers
+ * without CORS, so the client sees a network error instead of a 500. The log
+ * names the error's kind only: a message can quote a body, a key or an address.
+ */
+function unhandled(request: Request, env: Env, err: unknown): Response {
+  const kind = err instanceof Error ? err.name : typeof err;
+  console.error(`[audio] Unhandled ${kind} on ${routeLabel(request)}`);
+  let cors: Record<string, string> = {};
+  try {
+    cors = corsHeaders(request, env);
+  } catch {
+    // A broken origin list must not turn the 500 into a throw.
+  }
+  return new Response(JSON.stringify({ error: 'Internal server error' }), {
+    status: 500,
+    headers: { 'Content-Type': 'application/json', ...cors },
+  });
+}
+
+export default {
+  async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+    try {
+      return await router.fetch(request, env, ctx);
+    } catch (err) {
+      return unhandled(request, env, err);
+    }
   },
 } satisfies ExportedHandler<Env>;

@@ -760,6 +760,83 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // A fault inside the worker: a 500 with CORS and one line naming its kind
+  // -------------------------------------------------------------------------
+
+  const FAULT_IP = '203.0.113.47';
+  const FAULT_SENTINEL = 'sentinel_fault_6d1';
+
+  /** The worker with a counter store whose reads throw `thrown`. */
+  const faultHarness = (thrown: unknown) => {
+    const h = sttHarness();
+    const kv = {
+      get: async () => { throw thrown; },
+      put: async (key: string) => { h.puts.push(key); },
+    } as unknown as KVNamespace;
+    return { ...h, env: { ...h.env, RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env };
+  };
+
+  const faultRoutes: { label: string; request: () => Request }[] = [
+    {
+      label: 'speech',
+      request: () => new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': FAULT_IP, 'Content-Length': '40' },
+        body: JSON.stringify({ input: 'Hello there.', voice: 'af_heart' }).padEnd(40, ' '),
+      }),
+    },
+    {
+      label: 'transcriptions',
+      request: () => upload(new Uint8Array(1000), { 'CF-Connecting-IP': FAULT_IP, 'Content-Length': '1000' }),
+    },
+  ];
+
+  for (const route of faultRoutes) {
+    await test(`a fault on the ${route.label} route gets a 500 with CORS, logged by its kind only`, async () => {
+      const h = faultHarness(new Error(`KV GET failed: ${FAULT_SENTINEL} ${FAULT_IP}`));
+      try {
+        let res: Response | null = null;
+        const logged = await errorLines(async () => {
+          res = await worker.fetch(route.request(), h.env, h.ctx).catch(() => null);
+          await Promise.all(h.pending);
+        });
+        assert(res !== null, 'the fault was thrown out of fetch');
+        const answer = res as unknown as Response;
+        assertEqual(answer.status, 500, 'status');
+        assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
+        assertEqual(typeof (await answer.json() as { error?: string }).error, 'string', 'the usual error shape');
+        assertEqual(logged.length, 1, `error lines: ${logged.join(' | ')}`);
+        assert(logged[0].includes('Error'), `the kind is named: ${logged[0]}`);
+        const hash = await hashIP(FAULT_IP, 'test-salt');
+        for (const secret of [FAULT_SENTINEL, FAULT_IP, hash, 'KV GET failed']) {
+          assert(!logged[0].includes(secret), `the line carries ${secret}: ${logged[0]}`);
+        }
+        assertEqual(h.upstream.length, 0, 'upstream calls');
+      } finally {
+        h.restore();
+      }
+    });
+  }
+
+  await test('a thrown value that is not an Error is named by its type', async () => {
+    const h = faultHarness(`${FAULT_SENTINEL} as a bare string`);
+    try {
+      let res: Response | null = null;
+      const logged = await errorLines(async () => {
+        res = await worker.fetch(faultRoutes[0].request(), h.env, h.ctx).catch(() => null);
+        await Promise.all(h.pending);
+      });
+      assert(res !== null, 'the fault was thrown out of fetch');
+      assertEqual((res as unknown as Response).status, 500, 'status');
+      assertEqual(logged.length, 1, `error lines: ${logged.join(' | ')}`);
+      assert(logged[0].includes('string'), `the type is named: ${logged[0]}`);
+      assert(!logged[0].includes(FAULT_SENTINEL), `the value stays out of the log: ${logged[0]}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // Session-end beacon: a bounded read, the route's own answer otherwise
   // -------------------------------------------------------------------------
 
