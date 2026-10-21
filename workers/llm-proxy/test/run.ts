@@ -38,6 +38,10 @@ import { readBodyCapped } from '../src/middleware/bodyLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { createSafetyFilteredStream } from '../src/services/streamFilter';
 import { StreamSafetyScanner } from '../src/utils/streamSafety';
+import { MainStreamSafetyScanner } from './fixtures/outputScanMain';
+import { MUST_CUT, MUST_PASS } from './fixtures/outputScanSets';
+import { CONSTRUCTIONS, FRAGMENTS, VARIANT_TEXTS } from './fixtures/outputScanTexts';
+import { Random, differential, randomReads, verdict } from './outputScanLib';
 import { dispatchToNebius } from '../src/services/nebius';
 import { forwardConversionToGoogleAds } from '../src/services/googleAdsCapi';
 import { checkServingRegions, regionVerified, runRegionProbe } from '../src/services/regionProbe';
@@ -772,6 +776,323 @@ async function main(): Promise<number> {
       const out = await readBytes(createSafetyFilteredStream(byteStream(pieces)));
       assert(sameBytes(out, whole), `bytes changed with reads of ${size}`);
     }
+  });
+
+  // -------------------------------------------------------------------------
+  // Output scan: the same verdict however the reads cut a text
+  // -------------------------------------------------------------------------
+
+  const wholeVerdict = (text: string): string => verdict(new StreamSafetyScanner(), text);
+
+  await test('a match that ends at a read waits for the next character', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Er nannte es untermensch'), true, 'the word may go on');
+    assertEqual(scanner.check('lich.'), true, 'and it did');
+    assertEqual(scanner.finish(), true, 'settled clean');
+    const other = new StreamSafetyScanner();
+    assertEqual(other.check('Er nannte sie Untermensch'), true, 'the word may go on');
+    assertEqual(other.check('en.'), false, 'and it did not');
+  });
+
+  await test('the end of the stream settles a match that waited', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Du Untermensch'), true, 'no verdict before the end');
+    assertEqual(scanner.finish(), false, 'the end is the context');
+    assertEqual(scanner.isBlocked(), true, 'blocked state');
+  });
+
+  await test('white supremacy passes however it is read', () => {
+    const text = 'They fought white supremacy and won.';
+    for (let cut = 1; cut < text.length; cut++) {
+      assertEqual(verdict(new StreamSafetyScanner(), text, [cut]), 'pass', `cut at ${cut}`);
+    }
+  });
+
+  await test('the compound frees only its noun forms, joined directly or by one hyphen', () => {
+    const cases: [string, string][] = [
+      ['Holocaustleugnung ist strafbar.', 'pass'],
+      ['Holocaust-Leugner werden verurteilt.', 'pass'],
+      ['Holocaustleugnerinnen auch.', 'pass'],
+      ['Holocaustleugnung', 'pass'],
+      ['Holocaustleugnerisch zu denken ist richtig.', 'cut'],
+      ['Holocaust ist erfunden, Leugner wissen das.', 'cut'],
+      ['Holocaustverleugnung', 'cut'],
+      ['Holocaust Leugner', 'cut'],
+      ['Holocaustleugnen ist strafbar.', 'cut'],
+      ['Holocaustleugner leugnen zu Recht, dass es Gaskammern gab.', 'cut'],
+      ['Wir Holocaustleugner leugnen ihn zu Recht.', 'cut'],
+      ['Holocaustleugner leugnen zu Recht.', 'cut'],
+      ['Die Holocaustleugner, die leugnen, haben recht.', 'cut'],
+      ['Holocaustleugnung leugnet nichts, sie sagt die Wahrheit.', 'cut'],
+      ['Holocaust-Leugner leugnen ihn.', 'cut'],
+      ['Holocaust--Leugnung', 'cut'],
+    ];
+    for (const [text, expected] of cases) {
+      assertEqual(wholeVerdict(text), expected, `whole ${JSON.stringify(text)}`);
+      for (let cut = 1; cut < text.length; cut++) {
+        assertEqual(verdict(new StreamSafetyScanner(), text, [cut]), expected, `${JSON.stringify(text)} cut at ${cut}`);
+      }
+    }
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Holocaustleugn'), true, 'the word may go on');
+    assertEqual(scanner.pending(), true, 'and the reads wait for it');
+    assertEqual(scanner.check('er'), true, 'still a noun so far');
+    assertEqual(scanner.pending(), true, 'the word is not ended');
+    assertEqual(scanner.check('isch'), true, 'nor is it yet');
+    assertEqual(scanner.pending(), true, 'the reads still wait');
+    assertEqual(scanner.check(' zu'), false, 'the word ended as the adjective, the denial');
+    const ended = new StreamSafetyScanner();
+    assertEqual(ended.check('Holocaustleugnerisch'), true, 'the word may still go on');
+    assertEqual(ended.finish(), false, 'and the end settles it as the denial');
+  });
+
+  await test('a long run of whitespace after white power settles it as the slogan', () => {
+    for (const [text, expected] of [
+      ['white power    structure', 'pass'],
+      ['white power     structure', 'cut'],
+      ['white power\t\t\t\t\tstructure', 'cut'],
+      ['white power' + ' '.repeat(130) + 'structure', 'cut'],
+      ['white power  \u00a0  structure', 'cut'],
+    ] as [string, string][]) {
+      assertEqual(wholeVerdict(text), expected, `whole ${JSON.stringify(text)}`);
+      for (let cut = 1; cut < Math.min(text.length, 40); cut++) {
+        assertEqual(verdict(new StreamSafetyScanner(), text, [cut]), expected, `${JSON.stringify(text)} cut at ${cut}`);
+      }
+    }
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('white power'), true, 'the structure may follow');
+    for (let i = 0; i < 4; i++) {
+      assertEqual(scanner.check(' '), true, `space ${i + 1} alone decides nothing`);
+      assertEqual(scanner.pending(), true, `the reads wait after space ${i + 1}`);
+    }
+    assertEqual(scanner.check(' '), false, 'the fifth space settles the slogan');
+    const spread = new StreamSafetyScanner();
+    assertEqual(spread.check('white power'), true, 'the structure may follow');
+    assertEqual(spread.check('  '), true, 'two spaces');
+    assertEqual(spread.check('  '), true, 'four spaces');
+    assertEqual(spread.check('structure'), true, 'the structure, after four spaces');
+    assertEqual(spread.pending(), false, 'decided');
+    assertEqual(spread.finish(), true, 'and clean');
+  });
+
+  await test('the white power exclusion does not cross a line break', () => {
+    assertEqual(wholeVerdict('the white power structure'), 'pass', 'a space joins the words');
+    assertEqual(wholeVerdict('the white power\tstructure'), 'pass', 'a tab joins the words');
+    const text = 'White power\n\nStructure of the essay';
+    assertEqual(wholeVerdict(text), 'cut', 'a line break ends the phrase');
+    for (let cut = 1; cut < text.length; cut++) {
+      assertEqual(verdict(new StreamSafetyScanner(), text, [cut]), 'cut', `cut at ${cut}`);
+    }
+  });
+
+  await test('the named mentions pass here and the old scanner cut them', () => {
+    for (const { about, text, main, ours } of CONSTRUCTIONS) {
+      assertEqual(verdict(new MainStreamSafetyScanner(), text), main, `${about}: the old scanner on ${JSON.stringify(text)}`);
+      assertEqual(wholeVerdict(text), ours, `${about}: this scanner on ${JSON.stringify(text)}`);
+    }
+  });
+
+  await test('the output scan gives the same verdict however the reads cut a text', () => {
+    const rng = new Random(7);
+    const soup = (length: number): string => {
+      let text = '';
+      while (text.length < length) text += rng.pick(FRAGMENTS);
+      return text;
+    };
+    const texts = [
+      ...CONSTRUCTIONS.map(c => c.text), ...MUST_CUT, ...MUST_PASS,
+      ...VARIANT_TEXTS.filter(() => rng.next() < 0.15),
+      ...Array.from({ length: 400 }, () => soup(40 + rng.int(360))),
+    ];
+    let cuts = 0;
+    for (const text of texts) {
+      const expected = wholeVerdict(text);
+      if (expected === 'cut') cuts++;
+      for (let i = 0; i < 10; i++) {
+        const reads = randomReads(rng, text.length);
+        assertEqual(verdict(new StreamSafetyScanner(), text, reads), expected, `${JSON.stringify(text)} read as ${reads.join(',')}`);
+      }
+      if (text.length <= 48) {
+        for (let cut = 1; cut < text.length; cut++) {
+          assertEqual(verdict(new StreamSafetyScanner(), text, [cut]), expected, `${JSON.stringify(text)} cut at ${cut}`);
+        }
+      }
+    }
+    assert(cuts > 100 && cuts < texts.length - 100, `the set must mix verdicts (${cuts} of ${texts.length} cut)`);
+  });
+
+  await test('the floor holds: a text the old scanner cut stays cut unless a named exclusion frees it', () => {
+    const texts = [...CONSTRUCTIONS.map(c => c.text), ...MUST_CUT, ...MUST_PASS, ...VARIANT_TEXTS];
+    const differences = differential(texts);
+    const newCuts = differences.filter(d => d.ours === 'cut');
+    assertEqual(newCuts.length, 0, `cut here, passed before: ${newCuts.map(d => JSON.stringify(d.text)).join(' | ')}`);
+    const unnamed = differences.filter(d => d.frees === null);
+    assertEqual(unnamed.length, 0, `freed by no named exclusion: ${unnamed.map(d => JSON.stringify(d.text)).join(' | ')}`);
+    assert(differences.length > 0, 'the exclusions free something');
+  });
+
+  await test('the filter serves the fallback when the last word settles only at the end', async () => {
+    const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('Du Untermensch'), DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(out.indexOf(FALLBACK_MARK) < out.indexOf('[DONE]'), 'the fallback must precede [DONE]');
+    assert(!out.includes('Untermensch'), 'the held read reached the client');
+    const bare = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('Du Untermensch')])));
+    assert(bare.includes(FALLBACK_MARK), 'no fallback served without [DONE]');
+    assert(!bare.includes('Untermensch'), 'the held read reached the client without [DONE]');
+  });
+
+  await test('the filter settles the scan before a [DONE] frame in any of its forms', async () => {
+    for (const done of ['data: [DONE]\n\n', 'data:[DONE]\n\n', 'data: [DONE]\r\n\r\n', 'data:[DONE] \r\n\r\n']) {
+      const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('Du Untermensch'), done])));
+      assert(out.includes(FALLBACK_MARK), `no fallback before ${JSON.stringify(done)}`);
+      assert(out.indexOf(FALLBACK_MARK) < out.indexOf('[DONE]'), `the fallback must precede ${JSON.stringify(done)}`);
+      assert(!out.includes('Untermensch'), `the held read reached the client before ${JSON.stringify(done)}`);
+    }
+    // The frames of a provider that writes no space after the field name are scanned too.
+    const bare = 'data:{"choices":[{"delta":{"content":"Sieg Heil"}}]}\r\n\r\n';
+    const out = await readAll(createSafetyFilteredStream(sse([bare, 'data:[DONE]\r\n\r\n'])));
+    assert(out.includes(FALLBACK_MARK), 'a CRLF frame without the space was not scanned');
+    const clean = 'data:{"choices":[{"delta":{"content":"Grüße"}}]}\r\n\r\ndata:[DONE]\r\n\r\n';
+    assertEqual(await readAll(createSafetyFilteredStream(sse([clean]))), clean, 'a clean CRLF stream changed');
+  });
+
+  await test('the filter forwards a word the next read completes as a clean one', async () => {
+    const whole = new TextEncoder().encode(CONTENT_FRAME('Das war untermensch') + CONTENT_FRAME('lich von ihm.') + DONE_FRAME);
+    for (const size of [1, 7, whole.length]) {
+      const pieces: Uint8Array[] = [];
+      for (let at = 0; at < whole.length; at += size) pieces.push(whole.slice(at, at + size));
+      const out = await readBytes(createSafetyFilteredStream(byteStream(pieces)));
+      assert(sameBytes(out, whole), `bytes changed with reads of ${size}`);
+    }
+  });
+
+  await test('the filter cuts at the read that settles a held match', async () => {
+    const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('White power'), CONTENT_FRAME(', brother.'), DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes('brother'), 'the settling read reached the client');
+    assert(!out.includes('White power'), 'the held read reached the client');
+  });
+
+  // -------------------------------------------------------------------------
+  // Output safety filter: a match that waits holds its reads
+  // -------------------------------------------------------------------------
+
+  /** The content of the frames the client received before any fallback. */
+  const clientContent = (out: string): string => {
+    const shown = out.includes(FALLBACK_MARK) ? out.slice(0, out.indexOf(FALLBACK_MARK)) : out;
+    return [...shown.matchAll(/^data: (\{.*\})$/gm)].map(m => JSON.parse(m[1]).choices?.[0]?.delta?.content ?? '').join('');
+  };
+  const wordTokens = (text: string): string[] => text.match(/\s*\S+/g) ?? [];
+  const pieces = (text: string, size: number): string[] => {
+    const out: string[] = [];
+    for (let at = 0; at < text.length; at += size) out.push(text.slice(at, at + size));
+    return out;
+  };
+  const tokenizations = (text: string): [string, string[]][] => [
+    ['word tokens', wordTokens(text)],
+    ...[1, 2, 3, 5].map((size): [string, string[]] => [`pieces of ${size}`, pieces(text, size)]),
+  ];
+  /** One network read per token, each a frame of its own, then [DONE]. */
+  const tokenStream = (tokens: string[]): ReadableStream<Uint8Array> => sse([...tokens.map(CONTENT_FRAME), DONE_FRAME]);
+  /** What the old scanner forwarded: every token before the one it cut at. */
+  const shownBefore = (tokens: string[]): string => {
+    const scanner = new MainStreamSafetyScanner();
+    let shown = '';
+    for (const token of tokens) {
+      if (!scanner.check(token)) break;
+      shown += token;
+    }
+    return shown;
+  };
+
+  // A text each rule cuts, with the word whose read completes the match.
+  const HELD_CUTS: [string, string][] = [
+    ['Sie nannten ihn einen Untermenschen, und er schwieg.', 'Untermenschen'],
+    ['Er nannte sie einen Untermensch, sagte sie.', 'Untermensch'],
+    ['Das Wort Rassenschande stand im Gesetz.', 'Rassenschande'],
+    ['Er nannte sie Volksverräter, alle.', 'Volksverräter'],
+    ['They chanted white power all night.', 'power'],
+    ['White Power!', 'Power'],
+    ['He said the Holocaust was a hoax, and smiled.', 'hoax'],
+    ['Der Holocaust sei eine Lüge, sagte er.', 'Lüge'],
+    ['Wer den Holocaust leugnet, macht sich strafbar.', 'leugnet'],
+    ['Heil Hitler, rief er.', 'Hitler'],
+    ['Sieg Heil, riefen sie.', 'Heil'],
+    ['Jews must be exterminated, he wrote.', 'exterminated'],
+    ['Man müsse alle Juden vergasen, schrieb er.', 'vergasen'],
+  ];
+
+  await test('no byte of a match that waits reaches the client, in word tokens or small pieces', async () => {
+    for (const [text, marker] of HELD_CUTS) {
+      for (const [how, tokens] of tokenizations(text)) {
+        const out = await readAll(createSafetyFilteredStream(tokenStream(tokens)));
+        assert(out.includes(FALLBACK_MARK), `no fallback for ${JSON.stringify(text)} in ${how}`);
+        const shown = clientContent(out);
+        assert(!shown.includes(marker), `${JSON.stringify(marker)} reached the client in ${how}: ${JSON.stringify(shown)}`);
+        // In word tokens the client sees exactly what the old scanner forwarded; in pieces
+        // at most that (a word still forming, "Untermensche", is held where it was shown).
+        const before = shownBefore(tokens);
+        if (how === 'word tokens') assertEqual(shown, before, `the client saw other text than the old scanner showed for ${JSON.stringify(text)}`);
+        assert(before.startsWith(shown), `more than the old scanner showed reached the client in ${how}: ${JSON.stringify(shown)}, before ${JSON.stringify(before)}`);
+      }
+    }
+  });
+
+  // Clean texts in which a match waits and clears, or a near word passes.
+  const HELD_PASSES = [
+    'Das war untermenschlich von ihm, und Untermenschentum ist ein Wort.',
+    'The white power structure of Atlanta did not yield.',
+    'They fought white supremacy and won.',
+    'Holocaustleugnung ist strafbar, und Holocaustleugner werden verurteilt.',
+    'Eine Volksverräterin, sagte er, sei sie nicht.',
+    'Black power, white powerful men, Übermensch.',
+  ];
+
+  await test('clean text leaves the filter byte for byte while a match waits and clears', async () => {
+    for (const text of HELD_PASSES) {
+      for (const [how, tokens] of tokenizations(text)) {
+        const whole = new TextEncoder().encode([...tokens.map(CONTENT_FRAME), DONE_FRAME].join(''));
+        const out = await readBytes(createSafetyFilteredStream(tokenStream(tokens)));
+        assert(sameBytes(out, whole), `bytes changed for ${JSON.stringify(text)} in ${how}`);
+      }
+    }
+  });
+
+  await test('the filter drops the reads it holds when the provider fails while a match waits', async () => {
+    const encoder = new TextEncoder();
+    const frames = [CONTENT_FRAME('Fine so far. '), CONTENT_FRAME('Du Untermensch')];
+    let firstRead: () => void = () => undefined;
+    const clientReadFirst = new Promise<void>(resolve => { firstRead = resolve; });
+    let pulls = 0;
+    const source = new ReadableStream<Uint8Array>({
+      async pull(controller) {
+        if (pulls < frames.length) {
+          controller.enqueue(encoder.encode(frames[pulls++]));
+          return;
+        }
+        await clientReadFirst;
+        controller.error(new Error('provider failed'));
+      },
+    });
+    const reader = createSafetyFilteredStream(source).getReader();
+    const first = await reader.read();
+    const shown = new TextDecoder().decode(first.value);
+    firstRead();
+    let failed = false;
+    let rest = '';
+    try {
+      for (;;) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        rest += new TextDecoder().decode(value);
+      }
+    } catch {
+      failed = true;
+    }
+    assert(failed, 'the failure must reach the client');
+    assert(shown.includes('Fine so far'), 'the clean read was not forwarded');
+    assert(!(shown + rest).includes('Untermensch'), 'the held read reached the client');
+    assert(!(shown + rest).includes(FALLBACK_MARK), 'a failed stream gets no fallback');
   });
 
   // -------------------------------------------------------------------------
