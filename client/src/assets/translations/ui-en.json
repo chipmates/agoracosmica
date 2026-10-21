@@ -372,8 +372,7 @@
       "hardwareBanner": {
         "full": "NVIDIA GPU detected. The full pipeline (LLM, EN + DE TTS, STT) can run locally with docker compose --profile nvidia up.",
         "apple": "Apple Silicon Mac detected. EN TTS + STT run via docker; for DE local TTS run scripts/setup-local-tts-apple.sh once.",
-        "unknown": "Hardware not detected. Local Mode may still work, try it.",
-        "hosted": "Local Mode not available, using cloud."
+        "unknown": "Hardware not detected. Local Mode may still work, try it."
       },
       "sections": {
         "llm": {
@@ -410,8 +409,7 @@
         "configured": "Reachable",
         "notConfigured": "Not checked",
         "probing": "Checking…",
-        "unreachable": "Unreachable",
-        "hostedFallback": "Using cloud"
+        "unreachable": "Unreachable"
       },
       "checkButton": "Check connections",
       "honestPrivacy": "When all three services below run locally, no conversation, voice, or text data leaves your machine. The same models we run on our servers can run on yours.",
