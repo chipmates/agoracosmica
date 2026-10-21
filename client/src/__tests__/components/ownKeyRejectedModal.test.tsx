@@ -83,17 +83,34 @@ describe('the rejected-key question', () => {
   it('asks in German, names our servers before the yes, and offers the two answers', async () => {
     await askFor('chat');
     const dialog = screen.getByRole('dialog');
-    expect(dialog.getAttribute('aria-label')).toBe('OpenRouter hat deinen Schlüssel nicht angenommen');
+    expect(dialog.getAttribute('aria-label')).toBe('OpenRouter hat deinen Key nicht angenommen');
     expect(dialog.textContent).toContain('Dann läuft dieses Gespräch über unsere Server');
-    expect(buttons()).toEqual(['Ja, kostenlose Nachrichten nutzen', 'Schlüssel prüfen']);
+    expect(buttons()).toEqual(['Ja, kostenlose Nachrichten für heute nutzen', 'Key prüfen']);
   });
 
   it.each<[FreeTierKind, string]>([
-    ['council', 'Ja, kostenlosen Council nutzen'],
-    ['summary', 'Ja, kostenlose Zusammenfassung nutzen'],
+    ['council', 'Ja, kostenlosen Council für heute nutzen'],
+    ['summary', 'Ja, kostenlose Zusammenfassung für heute nutzen'],
   ])('names the %s allowance it would use', async (kind, yes) => {
     await askFor(kind);
     expect(buttons()[0]).toBe(yes);
+  });
+
+  it('says "für heute" on every German yes, and names the key as Settings does', () => {
+    for (const kind of ['chat', 'council', 'summary'] as const) {
+      expect(de.byok.rejected[`${kind}Yes`]).toMatch(/ für heute nutzen$/);
+    }
+    expect(de.byok.rejected.checkKey).toBe('Key prüfen');
+    expect(de.byok.rejected.title).not.toMatch(/Schlüssel/);
+    // The line a no leaves behind, and the Settings card it points to.
+    expect(de.errors.conversation.byokInvalidKey).toMatch(/^Dein OpenRouter-Key /);
+    expect(de.settings.aiModelKey.title).toMatch(/\bKey\b/);
+  });
+
+  it('names the day on every English yes', () => {
+    for (const kind of ['chat', 'council', 'summary'] as const) {
+      expect(en.byok.rejected[`${kind}Yes`]).toMatch(/today's/);
+    }
   });
 
   it('speaks English on English pages', async () => {
@@ -105,7 +122,7 @@ describe('the rejected-key question', () => {
 
   it('yes lets the send go on and shows the free-tier counter from then on', async () => {
     const { result } = await askFor('chat');
-    fireEvent.click(screen.getByText('Ja, kostenlose Nachrichten nutzen'));
+    fireEvent.click(screen.getByText('Ja, kostenlose Nachrichten für heute nutzen'));
     expect(await result).toBe('yes');
     expect(h.setIsFreeTier).toHaveBeenCalledWith(true);
     expect(screen.queryByRole('dialog')).toBeNull();
@@ -116,7 +133,7 @@ describe('the rejected-key question', () => {
     window.addEventListener(OPEN_KEY_SETTINGS_EVENT, opened);
     try {
       const { result } = await askFor('chat');
-      fireEvent.click(screen.getByText('Schlüssel prüfen'));
+      fireEvent.click(screen.getByText('Key prüfen'));
       const error = await result;
       expect(error).toBeInstanceOf(OwnKeyRejectedError);
       expect((error as OwnKeyRejectedError).choice).toBe('check-key');
@@ -130,7 +147,7 @@ describe('the rejected-key question', () => {
 
   it('with no Settings on the page, check my key opens the key dialog instead', async () => {
     const { result } = await askFor('chat');
-    fireEvent.click(screen.getByText('Schlüssel prüfen'));
+    fireEvent.click(screen.getByText('Key prüfen'));
     await result;
     expect(h.openByokModal).toHaveBeenCalledTimes(1);
   });

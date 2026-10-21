@@ -47,7 +47,8 @@ const kickerStyle: React.CSSProperties = {
   color: 'color-mix(in srgb, var(--gold-deep) 70%, var(--gold-primary))',
 };
 
-type ValidationStatus = 'idle' | 'testing' | 'valid' | 'invalid' | 'not_configured';
+// 'rejected': stored, then turned down by OpenRouter during a conversation.
+type ValidationStatus = 'idle' | 'testing' | 'valid' | 'invalid' | 'rejected' | 'not_configured';
 
 interface KeyState {
   value: string;
@@ -100,12 +101,12 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         if (orKey) {
           const meta = await keyStorage.getKeyMetadata('openrouter');
           // A key only reaches storage after a passing test, so show it valid
-          // unless it was later marked invalid (then prompt a re-test).
-          const usable = meta !== null && meta.valid !== false;
+          // unless OpenRouter has since turned it down.
+          const status: ValidationStatus = meta === null ? 'idle' : meta.valid === false ? 'rejected' : 'valid';
           setOpenRouterKey(prev => ({
             ...prev,
             value: orKey,
-            validationStatus: usable ? 'valid' : 'idle',
+            validationStatus: status,
             lastTested: meta?.lastValidated ? new Date(String(meta.lastValidated)) : null,
           }));
         }
@@ -117,6 +118,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
   }, []);
 
   const isByokActive = openRouterKey.validationStatus === 'valid';
+  const isRejected = openRouterKey.validationStatus === 'rejected';
 
   // The free tier's model, its region, and the day's budget, as the worker
   // reported them. Absent until /v1/quota answers, and never read for a BYOK
@@ -165,7 +167,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       value,
       isDirty: true,
       validationStatus:
-        prev.validationStatus === 'valid' || prev.validationStatus === 'invalid'
+        prev.validationStatus === 'valid' || prev.validationStatus === 'invalid' || prev.validationStatus === 'rejected'
           ? 'idle'
           : prev.validationStatus,
     }));
@@ -180,9 +182,13 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
       }));
       return;
     }
+    // The stored key, tested again unchanged after a rejection: a pass makes it
+    // usable again at once, as a save would.
+    const retestOfStored = !openRouterKey.isDirty && openRouterKey.validationStatus === 'rejected';
     setOpenRouterKey(prev => ({ ...prev, validationStatus: 'testing', errorMessage: '' }));
     try {
       const isValid = await llmService.validateKey(openRouterKey.value.trim());
+      if (isValid && retestOfStored) await persistKey(openRouterKey.value.trim());
       setOpenRouterKey(prev => ({
         ...prev,
         validationStatus: isValid ? 'valid' : 'invalid',
@@ -202,6 +208,25 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
     }
   };
 
+  const persistKey = async (value: string) => {
+    await keyStorage.saveKey('openrouter', value, {
+      provider: 'openrouter',
+      lastValidated: new Date().toISOString(),
+    });
+    const config = loadServiceConfig();
+    config.llm = {
+      provider: LLM_SERVICES.OPENROUTER.name,
+      model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
+      zdr: zdrEnabled,
+    };
+    saveServiceConfig(config);
+    // The key now answers, so the free-tier counter and limits step aside,
+    // as after the key wizard.
+    useDomainStore.getState().setIsFreeTier(false);
+    // Notify the parent collapsible badge so it can flip Free → Your key live.
+    window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: true } }));
+  };
+
   const handleSaveKey = async () => {
     if (!openRouterKey.value.trim()) return;
     // Only persist a key that passed a test. Storing an untested key as valid
@@ -209,20 +234,8 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
     // record always means tested-good (markInvalid flips it off on rejection).
     if (openRouterKey.validationStatus !== 'valid') return;
     try {
-      await keyStorage.saveKey('openrouter', openRouterKey.value.trim(), {
-        provider: 'openrouter',
-        lastValidated: new Date().toISOString(),
-      });
-      const config = loadServiceConfig();
-      config.llm = {
-        provider: LLM_SERVICES.OPENROUTER.name,
-        model: LLM_SERVICES.OPENROUTER.models.QWEN3_235B,
-        zdr: zdrEnabled,
-      };
-      saveServiceConfig(config);
+      await persistKey(openRouterKey.value.trim());
       setOpenRouterKey(prev => ({ ...prev, isDirty: false }));
-      // Notify the parent collapsible badge so it can flip Free → Your key live.
-      window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: true } }));
     } catch (error) {
       console.error('Failed to save OpenRouter key:', error);
       setOpenRouterKey(prev => ({
@@ -289,6 +302,11 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         icon: <XCircle size={16} weight="fill" />,
         color: ALARM_INK,
         text: tString('settings.apiKeys.statusInvalid', 'Invalid'),
+      },
+      rejected: {
+        icon: <XCircle size={16} weight="fill" />,
+        color: ALARM_INK,
+        text: tString('settings.apiKeys.statusRejected', 'Rejected by OpenRouter'),
       },
     };
     const cfg = map[openRouterKey.validationStatus];
@@ -645,13 +663,15 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
             width: '8px',
             height: '8px',
             borderRadius: '50%',
-            background: isByokActive ? 'var(--gold-primary)' : 'var(--gold-deep)',
+            background: isByokActive ? 'var(--gold-primary)' : isRejected ? ALARM_INK : 'var(--gold-deep)',
             display: 'inline-block',
             flexShrink: 0,
           }} />
           {isByokActive
             ? tNode('settings.aiModelKey.statusByok')
-            : tNode('settings.aiModelKey.statusFree')}
+            : isRejected
+              ? tNode('settings.aiModelKey.statusRejected')
+              : tNode('settings.aiModelKey.statusFree')}
         </div>
       </div>
 

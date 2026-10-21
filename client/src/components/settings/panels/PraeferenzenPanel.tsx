@@ -56,7 +56,8 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
   // Track BYOK status so the AI Model badge can flip Free ↔ Your key.
   // Initial check on mount; AiModelPanel emits 'byok-key-changed' on save/clear
   // so the badge updates live during the same modal session.
-  const [hasByokKey, setHasByokKey] = useState(false);
+  // 'rejected': a stored key OpenRouter turned down, shown as such rather than as the free tier.
+  const [byokKey, setByokKey] = useState<'none' | 'usable' | 'rejected'>('none');
 
   // Reset onboarding helpers — confirmation/success state lives only here, not persisted.
   const resetHelpPreferences = useUIStore((s) => s.resetHelpPreferences);
@@ -71,21 +72,31 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     window.setTimeout(() => setHelpResetState('idle'), 2400);
   };
   useEffect(() => {
+    let live = true;
     const checkKey = async () => {
+      let state: 'none' | 'usable' | 'rejected' = 'none';
       try {
-        setHasByokKey(await keyStorage.hasUsableKey('openrouter'));
+        if (await keyStorage.hasUsableKey('openrouter')) state = 'usable';
+        else if (await keyStorage.hasKey('openrouter')) state = 'rejected';
       } catch {
-        setHasByokKey(false);
+        // Storage unreadable: show the free tier, as before.
       }
+      if (live) setByokKey(state);
     };
     checkKey();
 
+    // "No key" is also sent on a rejection, which keeps the key stored: read storage then.
     const handleKeyChange = (e: Event): void => {
       const detail = (e as CustomEvent<{ hasKey: boolean }>).detail;
-      if (detail) setHasByokKey(detail.hasKey);
+      if (!detail) return;
+      if (detail.hasKey) setByokKey('usable');
+      else void checkKey();
     };
     window.addEventListener('byok-key-changed', handleKeyChange);
-    return () => window.removeEventListener('byok-key-changed', handleKeyChange);
+    return () => {
+      live = false;
+      window.removeEventListener('byok-key-changed', handleKeyChange);
+    };
   }, []);
 
   // Opened for the key: bring its section into view, below the three above it.
@@ -127,9 +138,9 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
   // A local model wins over a saved key, as it does for the conversation.
   const getAiModelBadge = (): string => {
     if (localMode?.llmEnabled) return tString('settings.preferences.aiModelBadgeLocal', 'Local · Your model');
-    return hasByokKey
-      ? tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key')
-      : tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
+    if (byokKey === 'usable') return tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key');
+    if (byokKey === 'rejected') return tString('settings.preferences.aiModelBadgeRejected', 'Key rejected');
+    return tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
   };
 
   return (

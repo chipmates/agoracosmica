@@ -18,7 +18,7 @@ const FALLBACKS = {
   summaryBody: "You can use one of today's free summaries instead. This conversation then goes through our servers to be summarized.",
   chatYes: "Yes, use today's free messages",
   councilYes: "Yes, use today's free council",
-  summaryYes: 'Yes, use a free summary',
+  summaryYes: "Yes, use one of today's free summaries",
   checkKey: 'Check my key',
 } as const;
 

@@ -176,6 +176,7 @@
       "aiModelBadgeFree": "Europe · Free tier",
       "aiModelBadgeByok": "Qwen3 235B · Your key",
       "aiModelBadgeLocal": "Local · Your model",
+      "aiModelBadgeRejected": "Key rejected",
       "local": "Local"
     },
     "tooltips": {
@@ -294,6 +295,7 @@
       "statusTesting": "Testing...",
       "statusValid": "Valid",
       "statusInvalid": "Invalid",
+      "statusRejected": "Rejected by OpenRouter",
       "buttonTest": "Test Key",
       "buttonSave": "Save",
       "buttonClear": "Clear",
@@ -323,6 +325,7 @@
       "modelTagline": "Frontier-class, picked by us for the free tier. With your own key you choose the model.",
       "statusFree": "Free tier active. 30 free messages a day.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
+      "statusRejected": "Your OpenRouter key was rejected. Before a conversation goes through the free tier, the app asks you.",
       "servedIn": "Server location: {region}",
       "afterBudget": "Once our shared daily budget for it is spent, everyone gets {model}, {region}, until midnight",
       "budgetWithin": "Today: within the shared budget",
@@ -2160,7 +2163,7 @@
       "summaryBody": "You can use one of today's free summaries instead. This conversation then goes through our servers to be summarized.",
       "chatYes": "Yes, use today's free messages",
       "councilYes": "Yes, use today's free council",
-      "summaryYes": "Yes, use a free summary",
+      "summaryYes": "Yes, use one of today's free summaries",
       "checkKey": "Check my key"
     }
   },

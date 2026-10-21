@@ -174,6 +174,7 @@
       "aiModelBadgeFree": "Kostenloser Tarif",
       "aiModelBadgeByok": "Qwen3 235B · Eigener Key",
       "aiModelBadgeLocal": "Lokal · Eigenes Modell",
+      "aiModelBadgeRejected": "Key abgelehnt",
       "local": "Lokal"
     },
     "tooltips": {
@@ -292,6 +293,7 @@
       "statusTesting": "Teste...",
       "statusValid": "Gültig",
       "statusInvalid": "Ungültig",
+      "statusRejected": "Von OpenRouter abgelehnt",
       "buttonTest": "Key testen",
       "buttonSave": "Speichern",
       "buttonClear": "Löschen",
@@ -321,6 +323,7 @@
       "modelTagline": "Frontier-Klasse, von uns für den kostenlosen Tarif gewählt. Mit eigenem Key wählst du das Modell.",
       "statusFree": "Kostenloser Tarif aktiv. 30 kostenlose Nachrichten pro Tag.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
+      "statusRejected": "Dein OpenRouter-Key wurde abgelehnt. Bevor ein Gespräch über den kostenlosen Tarif läuft, fragt dich die App.",
       "servedIn": "Serverstandort: {region}",
       "afterBudget": "Wenn unser gemeinsames Tagesbudget dafür aufgebraucht ist, antwortet für alle bis Mitternacht {model}, {region}",
       "budgetWithin": "Heute: im gemeinsamen Budget",
@@ -1360,7 +1363,7 @@
       "dailyLimit": "Tägliches Nachrichtenlimit erreicht. Deine Unterhaltungen werden morgen fortgesetzt.",
       "llmDown": "Kurzzeitig nicht erreichbar. Bitte versuche es gleich nochmal.",
       "llmRateLimited": "Der KI-Dienst ist gerade ausgelastet. Bitte versuche es gleich nochmal.",
-      "byokInvalidKey": "Dein OpenRouter-Schlüssel wurde abgelehnt. Bitte prüfe ihn in den Einstellungen.",
+      "byokInvalidKey": "Dein OpenRouter-Key wurde abgelehnt. Bitte prüfe ihn in den Einstellungen.",
       "byokInsufficientCredits": "Deinem OpenRouter-Konto ist das Guthaben ausgegangen. Bitte lade es auf, um weiterzumachen.",
       "byokModelNotFound": "Das gewählte KI-Modell ist nicht mehr verfügbar. Wähle in den Einstellungen ein anderes Modell, um weiterzumachen.",
       "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
@@ -2156,14 +2159,14 @@
       }
     },
     "rejected": {
-      "title": "OpenRouter hat deinen Schlüssel nicht angenommen",
+      "title": "OpenRouter hat deinen Key nicht angenommen",
       "chatBody": "Du kannst mit deinen kostenlosen Nachrichten für heute weitermachen. Dann läuft dieses Gespräch über unsere Server, auch alles, was du darin schon geschrieben hast.",
       "councilBody": "Du kannst deinen kostenlosen Council für heute nutzen. Dann läuft deine Frage an den Council über unsere Server.",
       "summaryBody": "Du kannst eine deiner kostenlosen Zusammenfassungen für heute nutzen. Dann läuft dieses Gespräch zum Zusammenfassen über unsere Server.",
-      "chatYes": "Ja, kostenlose Nachrichten nutzen",
-      "councilYes": "Ja, kostenlosen Council nutzen",
-      "summaryYes": "Ja, kostenlose Zusammenfassung nutzen",
-      "checkKey": "Schlüssel prüfen"
+      "chatYes": "Ja, kostenlose Nachrichten für heute nutzen",
+      "councilYes": "Ja, kostenlosen Council für heute nutzen",
+      "summaryYes": "Ja, kostenlose Zusammenfassung für heute nutzen",
+      "checkKey": "Key prüfen"
     }
   },
   "community": {
