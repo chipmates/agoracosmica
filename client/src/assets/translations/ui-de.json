@@ -329,6 +329,7 @@
       "localRunsAt": "Läuft auf deinem Rechner: {endpoint}",
       "keySectionIntroSelfHost": "Ohne OpenRouter-Key antwortet hier nur ein Modell im Lokalen Modus. Du siehst und kontrollierst deine Nutzung.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
+      "statusByokSelfHost": "Dein OpenRouter-Key ist aktiv.",
       "statusRejected": "Dein OpenRouter-Key wurde abgelehnt. Bevor ein Gespräch über den kostenlosen Tarif läuft, fragt dich die App.",
       "statusRejectedSelfHost": "Dein OpenRouter-Key wurde abgelehnt. Prüfe ihn oben oder schalte im Lokalen Modus dein eigenes Modell ein.",
       "servedIn": "Serverstandort: {region}",
@@ -1204,6 +1205,7 @@
       "talkTitleStaged": "Stell deine Frage",
       "talkBody": "Deine Frage gibt die Richtung vor. Gut, wenn die Zeit knapp ist oder dich etwas beschäftigt.",
       "talkMeta": "Sofort. 30 kostenlose Nachrichten pro Tag.",
+      "talkMetaSelfHost": "Sofort. Mit deinem eigenen Key oder Modell.",
       "stagedLabel": "Deine Frage wartet:",
       "allWays": "Alle Wege ansehen",
       "arcEyebrow": "Der Lernweg · Kapitel 1 von 4"

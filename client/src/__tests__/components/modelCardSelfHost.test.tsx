@@ -54,9 +54,11 @@ describe('the open model card on a self-host instance', () => {
     keys.openrouter = 'sk-or-v1-test';
     saveServiceConfig({ ...defaultConfig });
     render(<AiModelPanel SettingCard={Card} CATEGORY_ICONS={{}} />);
-    expect(await screen.findByText('settings.aiModelKey.statusByok')).toBeTruthy();
+    expect(await screen.findByText('settings.aiModelKey.statusByokSelfHost')).toBeTruthy();
     expect(screen.getByText('Qwen3 235B')).toBeTruthy();
     for (const key of FREE_TIER_WORDS) expect(screen.queryByText(key)).toBeNull();
+    // "No daily limit" is said against the free tier's daily limit, which this build does not have.
+    expect(screen.queryByText('settings.aiModelKey.statusByok')).toBeNull();
   });
 
   it('with the local model: the local model', async () => {

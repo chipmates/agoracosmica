@@ -9,6 +9,7 @@ import { LocalStorageAdapter } from '../storage/localAdapter';
 import { peekStagedQuestion } from '../utils/public/entryIntent';
 import useTranslation from '../hooks/useTranslation';
 import { historicalFiguresBase } from '../api/figures';
+import { isSelfHost } from '../config/deployment';
 import { getCachedFigureTranslation, loadFigureTranslation } from '../utils/figureTranslations';
 import type { Figure, Seed } from '../types/global';
 import './ModeSelector-Mini.css';
@@ -361,7 +362,12 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                   </span>
                 )}
                 <span className="doors-door-body">{tString('modes.doors.talkBody', 'Your question sets the direction. Good when time is short, or when something is already on your mind.')}</span>
-                <span className="doors-door-meta">{tString('modes.doors.talkMeta', 'Right now. 30 free messages a day.')}</span>
+                {/* A self-host build has no free tier: its replies come from the visitor's own key or model. */}
+                <span className="doors-door-meta">
+                  {isSelfHost
+                    ? tString('modes.doors.talkMetaSelfHost', 'Right now. With your own key or model.')
+                    : tString('modes.doors.talkMeta', 'Right now. 30 free messages a day.')}
+                </span>
               </button>
             </div>
             <button className="doors-allways" onClick={() => setShowAllWays(true)}>

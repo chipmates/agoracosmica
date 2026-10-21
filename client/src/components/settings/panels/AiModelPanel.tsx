@@ -690,7 +690,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           {localLlm
             ? tNode('settings.aiModelKey.statusLocal')
             : isByokActive
-              ? tNode('settings.aiModelKey.statusByok')
+              ? tNode(isSelfHost ? 'settings.aiModelKey.statusByokSelfHost' : 'settings.aiModelKey.statusByok')
               : isRejected
                 ? tNode(isSelfHost ? 'settings.aiModelKey.statusRejectedSelfHost' : 'settings.aiModelKey.statusRejected')
                 : isSelfHost
