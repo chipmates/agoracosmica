@@ -361,6 +361,9 @@ export const createLegacyConversationStream = () => {
 
       if (initialMsgMode && initialMessageService.hasInitialMessage(figureId, initialMsgMode, seedId)) {
         const usingDefaultVoice = isUsingDefaultVoice(figureId, langCode);
+        // The words are stored: the waiting card waits for the voice, which
+        // may run on the visitor's machine while the model does not.
+        useDomainStore.getState().setProcessingStage('shaping');
 
         if (import.meta.env.DEV) {
           console.log('[StreamDriver] Initial message available', {
@@ -448,7 +451,8 @@ export const createLegacyConversationStream = () => {
           }
           if (signal.aborted) return;
           console.warn('[StreamDriver] Failed to load initial message, falling back to LLM', error);
-          // Fall through to LLM generation
+          // Fall through to LLM generation: the wait is the model's again.
+          useDomainStore.getState().setProcessingStage(null);
         }
       } else if (import.meta.env.DEV) {
         console.log('[StreamDriver] No pre-created message available, using LLM', {
