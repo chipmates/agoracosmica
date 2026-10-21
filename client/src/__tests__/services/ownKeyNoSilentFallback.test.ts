@@ -107,6 +107,7 @@ function installNetwork(): void {
     const url = String(input);
     harness.calls.push({ url, body: typeof init?.body === 'string' ? init.body : '' });
     if (url.includes('openrouter.ai')) {
+      if (harness.rejectWith === 200) return sseResponse('Eine Antwort.');
       return new Response(
         JSON.stringify({ error: { message: 'User not found.', code: harness.rejectWith } }),
         { status: harness.rejectWith, headers: { 'Content-Type': 'application/json' } },
@@ -254,5 +255,38 @@ describe('a stored key that OpenRouter rejects', () => {
     expect(toOpenRouter()).toEqual([]);
     expect(toFreeTier()).toHaveLength(1);
     expect(toFreeTier()[0].body).toContain('Birnbaum');
+  });
+});
+
+describe('zero data retention with a working own key', () => {
+  beforeEach(() => {
+    resetState();
+    installNetwork();
+    harness.rejectWith = 200;
+    harness.key = { valid: true, timestamp: 1_700_000_000_000 };
+  });
+
+  afterEach(() => {
+    for (const controller of controllers.splice(0)) controller.abort();
+  });
+
+  it('is asked of OpenRouter when the stored settings never set the flag', async () => {
+    await runUntilQuiet(chatTurn());
+
+    const [call] = toOpenRouter();
+    expect(call).toBeDefined();
+    expect(JSON.parse(call.body).provider).toMatchObject({ zdr: true, data_collection: 'deny' });
+  });
+
+  it('stays off only when the visitor turned it off', async () => {
+    (harness.state as { serviceConfig: unknown }).serviceConfig = {
+      raw: JSON.stringify({ llm: { provider: 'openrouter', kind: 'openrouter', model: 'qwen/qwen3-235b-a22b-2507', zdr: false } }),
+      parsed: null,
+    };
+    await runUntilQuiet(chatTurn());
+
+    const [call] = toOpenRouter();
+    expect(call).toBeDefined();
+    expect(JSON.parse(call.body).provider).toBeUndefined();
   });
 });

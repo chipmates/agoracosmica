@@ -199,7 +199,8 @@ export const generateResponse = async ({
           model: model || (providerKind === 'openrouter'
             ? LLM_SERVICES.OPENROUTER.models.QWEN3_235B
             : serviceConfig.llm.model),
-          zdr: providerKind === 'openrouter' ? (serviceConfig.llm.zdr ?? false) : false,
+          // On unless the visitor turned it off, as Settings and the key wizard show it.
+          zdr: providerKind === 'openrouter' ? (serviceConfig.llm.zdr ?? true) : false,
           maxTokens,
           temperature,
           languageId: selectedLanguage,
