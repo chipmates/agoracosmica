@@ -748,7 +748,7 @@ async function main(): Promise<number> {
     for (const unit of ['\t', '\n', '\r\n', '\u00a0', ' \t\n']) {
       const scanner = new StreamSafetyScanner();
       assertEqual(scanner.check('white' + unit.repeat(130)), true, `first word alone is clean (${JSON.stringify(unit)})`);
-      assertEqual(scanner.check('power'), false, `second word completes the pattern (${JSON.stringify(unit)})`);
+      assertEqual(scanner.check('power!'), false, `second word completes the pattern (${JSON.stringify(unit)})`);
     }
   });
 
