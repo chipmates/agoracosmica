@@ -32,7 +32,7 @@ interface ServiceProbeResult {
 const HONEST_FRAMING_FALLBACK =
   'When all three services below run locally, no conversation, voice, or text data leaves your machine. The same models we run on our servers can run on yours.';
 
-type HardwareTier = 'full-nvidia' | 'full-apple' | 'reduced' | 'unknown';
+type HardwareTier = 'full-nvidia' | 'full-apple' | 'unknown';
 
 function detectHardwareTier(): HardwareTier {
   if (typeof navigator === 'undefined') return 'unknown';
@@ -273,12 +273,6 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
         text: tString('settings.localMode.hardwareBanner.apple',
           'Apple Silicon Mac detected. EN TTS + STT run via docker; for DE local TTS run `scripts/setup-local-tts-apple.sh` once.'),
         color: 'var(--gold-primary)',
-      },
-      'reduced': {
-        icon: <WarningCircle size={18} weight="fill" />,
-        text: tString('settings.localMode.hardwareBanner.reduced',
-          'Limited hardware detected. EN + STT run locally; DE will fall back to our cloud.'),
-        color: 'var(--gold-subtle)',
       },
       'unknown': {
         icon: <WarningCircle size={18} weight="fill" />,

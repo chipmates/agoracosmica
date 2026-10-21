@@ -370,7 +370,6 @@
       "hardwareBanner": {
         "full": "NVIDIA-GPU erkannt. Die ganze Pipeline (LLM, EN + DE TTS, STT) kann mit docker compose --profile nvidia up lokal laufen.",
         "apple": "Apple-Silicon-Mac erkannt. EN TTS + STT laufen via Docker; für DE TTS lokal einmalig scripts/setup-local-tts-apple.sh ausführen.",
-        "reduced": "Eingeschränkte Hardware. EN + STT laufen lokal; DE läuft über unsere Cloud.",
         "unknown": "Hardware nicht erkannt. Lokaler Modus kann trotzdem funktionieren, probier es.",
         "hosted": "Lokaler Modus nicht verfügbar, Cloud wird genutzt."
       },
