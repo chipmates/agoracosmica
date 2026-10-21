@@ -9,7 +9,7 @@ import { getServers } from '../src/config';
 import { getAggregatedHealth } from '../src/health';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
-import { readBodyCapped } from '../src/bodyLimit';
+import { drainBodyCapped, readBodyCapped } from '../src/bodyLimit';
 import worker from '../src/index';
 import type { Env, ServerInfo } from '../src/types';
 
@@ -627,6 +627,83 @@ async function main(): Promise<number> {
     } finally {
       h.restore();
     }
+  });
+
+  // A stalled upload from a capped visitor: the drain stops after its bound and
+  // the 429 goes out. Tests guard with a real timer of their own, so a drain
+  // without a bound fails instead of hanging the suite.
+  const realSetTimeout = globalThis.setTimeout;
+  const realClearTimeout = globalThis.clearTimeout;
+  const within = <T>(ms: number, work: Promise<T>): Promise<T | 'hung'> => {
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const hung = new Promise<'hung'>((resolve) => { timer = realSetTimeout(() => resolve('hung'), ms); });
+    return Promise.race([work, hung]).finally(() => realClearTimeout(timer ?? null));
+  };
+
+  /** An upload that sends one chunk and then nothing, with the visitor still connected. */
+  const stalledUpload = () => {
+    let reads = 0;
+    let cancelled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (reads++ === 0) c.enqueue(new Uint8Array(64 * 1024));
+        return new Promise<void>(() => {});
+      },
+      cancel() { cancelled = true; },
+    }, { highWaterMark: 0 });
+    return { stream, cancelled: () => cancelled };
+  };
+
+  await test('a stalled drain stops at its bound and cancels the upload', async () => {
+    const upload1 = stalledUpload();
+    const started = Date.now();
+    const outcome = await within(2000, drainBodyCapped(upload(upload1.stream), STT_LIMIT, 50));
+    assert(outcome !== 'hung', 'the drain was still waiting after 2 s');
+    assert(Date.now() - started >= 45, `stopped before its bound: ${Date.now() - started} ms`);
+    assertEqual(upload1.cancelled(), true, 'the upload was cancelled');
+  });
+
+  await test('a capped visitor whose upload stalls gets the 429 with CORS once the drain\'s bound passes', async () => {
+    const h = limitedHarness('daily');
+    // The route's bound is long; run its timers fast.
+    globalThis.setTimeout = ((fn: () => void, ms?: number) =>
+      realSetTimeout(fn, (ms ?? 0) >= 1000 ? 20 : ms ?? 0)) as typeof setTimeout;
+    try {
+      const stalled = stalledUpload();
+      const res = await within(2000, worker.fetch(upload(stalled.stream), h.env, h.ctx));
+      assert(res !== 'hung', 'no answer while the upload stalls');
+      const answer = res as Response;
+      assertEqual(answer.status, 429, 'status');
+      assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
+      assertEqual((await answer.json() as { code?: string }).code, 'daily_limit', 'refusal code');
+      assertEqual(stalled.cancelled(), true, 'the upload was cancelled');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      await Promise.all(h.pending);
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+      h.restore();
+    }
+  });
+
+  await test('a drain that ends before its bound leaves no timer behind', async () => {
+    const pending: number[] = [];
+    globalThis.setTimeout = ((fn: () => void, ms?: number) => {
+      const id = realSetTimeout(fn, ms ?? 0);
+      pending.push(Number(id));
+      return id;
+    }) as typeof setTimeout;
+    const cleared: number[] = [];
+    globalThis.clearTimeout = ((id?: ReturnType<typeof setTimeout>) => {
+      cleared.push(Number(id));
+      realClearTimeout(id ?? null);
+    }) as typeof clearTimeout;
+    try {
+      await drainBodyCapped(upload(chunkedUpload(3 * 1024 * 1024)), STT_LIMIT);
+    } finally {
+      globalThis.setTimeout = realSetTimeout;
+      globalThis.clearTimeout = realClearTimeout;
+    }
+    assert(pending.every(id => cleared.includes(id)), `timers left running: ${pending.filter(id => !cleared.includes(id)).length}`);
   });
 
   await test('a declared oversized upload from a visitor at a limit still gets the 413, before any counter is read', async () => {

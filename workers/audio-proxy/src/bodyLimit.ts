@@ -28,18 +28,33 @@ export async function readBodyCapped(request: Request, maxBytes: number): Promis
 }
 
 /**
- * Read the body to its end and drop each chunk as it arrives, so memory stays
- * flat; past `maxBytes` the rest is cancelled. Answering before an upload is
- * consumed can cost a reused HTTP/1.1 connection its next request. Never
- * throws: a broken upload has no one left to answer.
+ * How long a capped visitor's upload is drained before the 429 goes out
+ * anyway. The app gives up on a transcription after 30 s and closes the
+ * connection, so only a client that is not ours still sends past this.
  */
-export async function drainBodyCapped(request: Request, maxBytes: number): Promise<void> {
+export const DRAIN_MAX_MS = 30_000;
+
+/**
+ * Read the body to its end and drop each chunk as it arrives, so memory stays
+ * flat; past `maxBytes` or `maxMs` the rest is cancelled. Answering before an
+ * upload is consumed can cost a reused HTTP/1.1 connection its next request.
+ * Never throws: a broken upload has no one left to answer.
+ */
+export async function drainBodyCapped(request: Request, maxBytes: number, maxMs = DRAIN_MAX_MS): Promise<void> {
   if (!request.body) return;
-  try {
-    await readInSteps(request.body, maxBytes, () => {});
-  } catch {
-    // The upload broke off.
-  }
+  const stop = new AbortController();
+  let timeIsUp = () => {};
+  const timeUp = new Promise<void>((resolve) => { timeIsUp = resolve; });
+  const timer = setTimeout(() => {
+    stop.abort();
+    timeIsUp();
+  }, maxMs);
+  const drained = readInSteps(request.body, maxBytes, () => {}, stop.signal).then(
+    () => {},
+    () => {}, // The upload broke off.
+  );
+  await Promise.race([drained, timeUp]);
+  clearTimeout(timer);
 }
 
 /** Reads take at least this many bytes, however small the chunks a body arrives in. */
@@ -56,9 +71,9 @@ interface Steps {
 
 /**
  * Hand the body to `keep` in pieces of READ_STEP bytes, the last one shorter.
- * Returns false, with the rest cancelled, once the body passes `maxBytes` or
- * takes more than one read per KiB of it (at least 1,024). Throws when the
- * upload breaks off.
+ * Returns false, with the rest cancelled, once the body passes `maxBytes`,
+ * takes more than one read per KiB of it (at least 1,024) or `signal` aborts.
+ * Throws when the upload breaks off.
  *
  * One read per HTTP chunk cost a second of CPU per 16,000 one-byte chunks in
  * workerd, and each kept chunk pinned about 4.6 KB. workerd's own body
@@ -69,8 +84,10 @@ async function readInSteps(
   body: ReadableStream<Uint8Array>,
   maxBytes: number,
   keep: (piece: Uint8Array) => void,
+  signal?: AbortSignal,
 ): Promise<boolean> {
   const steps = stepsOf(body, Math.max(1024, Math.ceil(maxBytes / 1024)));
+  signal?.addEventListener('abort', () => steps.cancel(), { once: true });
   let total = 0;
   for (;;) {
     let piece: Uint8Array | null;
@@ -81,6 +98,7 @@ async function readInSteps(
       steps.cancel();
       return false;
     }
+    if (signal?.aborted) return false;
     if (!piece) return true;
     total += piece.byteLength;
     if (total > maxBytes) {
