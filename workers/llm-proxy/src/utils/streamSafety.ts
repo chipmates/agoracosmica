@@ -33,16 +33,19 @@ export class StreamSafetyScanner {
     if (this.blocked) return false;
 
     this.buffer += text;
-    // Keep last 120 chars for cross-boundary matching
-    if (this.buffer.length > 120) {
-      this.buffer = this.buffer.slice(-120);
-    }
 
+    // Test the whole buffer before trimming: one network read can carry many
+    // deltas, so the start of a long chunk would otherwise never be scanned.
     for (const pattern of CRITICAL_OUTPUT_PATTERNS) {
       if (pattern.test(this.buffer)) {
         this.blocked = true;
         return false;
       }
+    }
+
+    // Keep the last 120 chars for a match that spans the next chunk
+    if (this.buffer.length > 120) {
+      this.buffer = this.buffer.slice(-120);
     }
 
     return true;

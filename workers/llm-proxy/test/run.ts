@@ -31,6 +31,8 @@ import {
   checkAndIncrementSessionRateLimit,
 } from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
+import { createSafetyFilteredStream } from '../src/services/streamFilter';
+import { StreamSafetyScanner } from '../src/utils/streamSafety';
 import { dispatchToNebius } from '../src/services/nebius';
 import { forwardConversionToGoogleAds } from '../src/services/googleAdsCapi';
 import { checkServingRegions, regionVerified, runRegionProbe } from '../src/services/regionProbe';
@@ -608,6 +610,47 @@ async function main(): Promise<number> {
       async () => null,
     ));
     assertEqual(out, whole, 'stream bytes');
+  });
+
+  // -------------------------------------------------------------------------
+  // Output safety filter: what a network read can hide
+  // -------------------------------------------------------------------------
+
+  // A phrase from the scanner's own list, and filler that is not on it.
+  const BLOCKED_PHRASE = 'Sieg Heil';
+  const FILLER = ' and the river kept running past the old mill'.repeat(4);
+  const FALLBACK_MARK = 'This response could not be displayed';
+
+  await test('the scanner tests a long chunk before it trims', () => {
+    const scanner = new StreamSafetyScanner();
+    assert(FILLER.length > 120, 'the filler must outgrow the kept tail');
+    assertEqual(scanner.check(BLOCKED_PHRASE + FILLER), false, 'pattern at the start of a long chunk');
+    assertEqual(scanner.isBlocked(), true, 'blocked state');
+  });
+
+  await test('the scanner catches a pattern split across two checks', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check(FILLER + ' Sieg '), true, 'first half alone is clean');
+    assertEqual(scanner.check('Heil'), false, 'second half completes the pattern');
+  });
+
+  await test('the scanner catches a split pattern whose second half opens a long chunk', () => {
+    const scanner = new StreamSafetyScanner();
+    assertEqual(scanner.check('Sieg '), true, 'first half alone is clean');
+    assertEqual(scanner.check('Heil' + FILLER), false, 'second half at the start of a long chunk');
+  });
+
+  await test('the filter catches a long frame with the pattern at its start', async () => {
+    const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME(BLOCKED_PHRASE + FILLER), DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes(BLOCKED_PHRASE), 'the blocked phrase reached the client');
+  });
+
+  await test('the filter catches a long read of many frames with the pattern in the first', async () => {
+    const read = CONTENT_FRAME(BLOCKED_PHRASE) + FILLER.split(' ').map(word => CONTENT_FRAME(` ${word}`)).join('');
+    const out = await readAll(createSafetyFilteredStream(sse([read, DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes(BLOCKED_PHRASE), 'the blocked phrase reached the client');
   });
 
   // -------------------------------------------------------------------------
