@@ -14,6 +14,7 @@ import { useTranslation } from '../hooks/useTranslation';
 import { useLiquidGlass } from '../hooks/useLiquidGlass';
 import { Figure } from '../types/global';
 import RenderCounter from '../dev/RenderCounter';
+import { OPEN_KEY_SETTINGS_EVENT } from '../utils/openKeySettings';
 
 // Type definitions
 interface CouncilCategory {
@@ -74,6 +75,8 @@ const Sidebar: FC<SidebarProps> = ({
   
   const [isCarouselOpen, setIsCarouselOpen] = useState<boolean>(false);
   const [isSettingsOpen, setIsSettingsOpen] = useState<boolean>(false);
+  // Set when Settings opens for the key, so it lands on the key section.
+  const [settingsForKey, setSettingsForKey] = useState<boolean>(false);
   const [isMobileOrTablet, setIsMobileOrTablet] = useState<boolean>(window.innerWidth < 1024);
   const [showFigurePreview, setShowFigurePreview] = useState<boolean>(false);
   const [previewFigures, setPreviewFigures] = useState<Figure[]>([]);
@@ -142,6 +145,17 @@ const Sidebar: FC<SidebarProps> = ({
       };
     }
   }, [isMobileOrTablet, isOpen]);
+
+  // "Check my key" from anywhere: claim the event, so the caller's fallback stays shut.
+  useEffect(() => {
+    const handleOpenKeySettings = (event: Event) => {
+      event.preventDefault();
+      setSettingsForKey(true);
+      setIsSettingsOpen(true);
+    };
+    window.addEventListener(OPEN_KEY_SETTINGS_EVENT, handleOpenKeySettings);
+    return () => window.removeEventListener(OPEN_KEY_SETTINGS_EVENT, handleOpenKeySettings);
+  }, []);
 
   // Page Visibility API for battery optimization
   useEffect(() => {
@@ -634,7 +648,10 @@ const Sidebar: FC<SidebarProps> = ({
               <button
                 ref={settingsButtonRef}
                 className="nav-button"
-                onClick={() => handleButtonClick(() => setIsSettingsOpen(true))}
+                onClick={() => handleButtonClick(() => {
+                  setSettingsForKey(false);
+                  setIsSettingsOpen(true);
+                })}
                 onMouseMove={(e) => applyMagneticEffect(e, settingsButtonRef, setSettingsHover)}
                 onMouseLeave={() => resetMagneticEffect(settingsButtonRef, setSettingsHover)}
                 aria-label={tString('navigation.settings', 'Settings')}
@@ -661,6 +678,7 @@ const Sidebar: FC<SidebarProps> = ({
           <SettingsModal
             isOpen={isSettingsOpen}
             onClose={() => setIsSettingsOpen(false)}
+            {...(settingsForKey ? { initialTab: 'preferences', initialSection: 'aiModel' as const } : {})}
           />
         </Suspense>
       )}

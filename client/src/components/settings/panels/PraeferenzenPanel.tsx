@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from 'react';
+import React, { FC, useEffect, useMemo, useRef, useState } from 'react';
 import { Gear, Globe, SpeakerHigh, Microphone, Brain, ArrowCounterClockwise, House } from '@phosphor-icons/react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { keyStorage } from '../../../services/storage/keyStorageService';
@@ -27,6 +27,8 @@ interface PraeferenzenPanelProps {
   selectedLanguage: string;
   onChange: (key: string, value: any) => void;
   onLanguageChange: (language: string) => void;
+  /** Opens this section expanded, e.g. after a rejected key. */
+  expandSection?: 'aiModel';
   // These props are passed down to child panels
   SettingCard: React.ComponentType<any>;
   OptionButtons: React.ComponentType<any>;
@@ -44,6 +46,7 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
   selectedLanguage,
   onChange,
   onLanguageChange,
+  expandSection,
   SettingCard,
   OptionButtons,
   CATEGORY_ICONS,
@@ -84,6 +87,16 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     window.addEventListener('byok-key-changed', handleKeyChange);
     return () => window.removeEventListener('byok-key-changed', handleKeyChange);
   }, []);
+
+  // Opened for the key: bring its section into view, below the three above it.
+  const aiModelRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    if (expandSection !== 'aiModel') return;
+    const timer = window.setTimeout(() => {
+      aiModelRef.current?.scrollIntoView?.({ block: 'start', behavior: 'smooth' });
+    }, 150);
+    return () => window.clearTimeout(timer);
+  }, [expandSection]);
 
   // The saved settings, so the badges follow the Local Mode switches. Read as
   // they are: loadServiceConfig here could update the store during a render.
@@ -197,6 +210,7 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
       </CollapsibleSection>
 
       {/* AI Model & Your Key — combined panel (model + OpenRouter key + ZDR) */}
+      <div ref={aiModelRef}>
       <CollapsibleSection
         title={tString('settings.aiModelKey.title', 'AI Model & Your Key')}
         icon={<Brain size={20} />}
@@ -204,7 +218,7 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
           'settings.aiModelKey.description',
           'The model that powers your conversations and your optional OpenRouter key',
         )}
-        defaultExpanded={false}
+        defaultExpanded={expandSection === 'aiModel'}
         showBadge={true}
         badgeText={getAiModelBadge()}
       >
@@ -213,6 +227,7 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
           CATEGORY_ICONS={CATEGORY_ICONS}
         />
       </CollapsibleSection>
+      </div>
 
       {/* Local Mode — run the whole pipeline on your own machine */}
       <CollapsibleSection

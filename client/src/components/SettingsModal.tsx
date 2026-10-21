@@ -54,6 +54,8 @@ interface SettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
   initialTab?: string;
+  /** A preferences section to open expanded. */
+  initialSection?: 'aiModel';
 }
 
 // Category icons mapping - EXACT same as old SettingsModal
@@ -87,7 +89,7 @@ const TABS: Tab[] = [
   }
 ];
 
-const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) => {
+const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab, initialSection }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'legal');
   const [config, setConfig] = useState<Config>(loadServiceConfig());
   // The edits made here since Settings opened, in order. A save applies only
@@ -200,6 +202,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) 
             selectedLanguage={selectedLanguage}
             onChange={handleChange}
             onLanguageChange={handleLanguageChange}
+            expandSection={initialSection}
             // Pass ALL required props for child panels - EXACT same as old SettingsModal
             SettingCard={SettingCard}
             OptionButtons={OptionButtons}
