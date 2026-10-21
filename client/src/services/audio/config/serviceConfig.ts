@@ -169,6 +169,23 @@ export const localModeFromRaw = (raw: string | null | undefined): LocalModeConfi
   return { ...defaultConfig.localMode! };
 };
 
+/** The model settings as held in a saved settings string. Pure, like localModeFromRaw. */
+export const llmFromRaw = (raw: string | null | undefined): LLMConfig => {
+  if (raw) {
+    try {
+      const llm = (JSON.parse(raw) as Partial<ServiceConfig> | null)?.llm;
+      if (llm) {
+        // An older save has no kind: derived from the provider, as loadServiceConfig does.
+        const kind = llm.kind ?? (llm.provider === 'custom-openai' ? 'custom-openai' : 'openrouter');
+        return { ...defaultConfig.llm, ...llm, kind };
+      }
+    } catch {
+      // Unreadable settings load as the defaults, here as in loadServiceConfig.
+    }
+  }
+  return { ...defaultConfig.llm };
+};
+
 // ============================================
 // Main Functions
 // ============================================

@@ -91,7 +91,9 @@ const TABS: Tab[] = [
 
 const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab, initialSection }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'legal');
-  const [config, setConfig] = useState<Config>(loadServiceConfig());
+  // Lazy: an argument would run loadServiceConfig, which can update the store,
+  // on every render of the modal.
+  const [config, setConfig] = useState<Config>(() => loadServiceConfig());
   // The edits made here since Settings opened, in order. A save applies only
   // these to the settings as saved now, so a change saved meanwhile (Local Mode,
   // another tab) is not written back to what it was when Settings opened.

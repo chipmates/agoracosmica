@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState, useCallback } from 'react';
+import React, { FC, useEffect, useMemo, useState, useCallback } from 'react';
 import {
   CheckCircle, XCircle, WarningCircle, House, Cpu, MicrophoneStage,
   SpeakerHigh, Brain, ArrowSquareOut,
@@ -6,8 +6,9 @@ import {
 import { useTranslation } from '../../../hooks/useTranslation';
 import { RippleButton } from '../../Button';
 import {
-  loadServiceConfig, saveServiceConfig,
+  loadServiceConfig, saveServiceConfig, localModeFromRaw, llmFromRaw,
 } from '../../../services/audio/config/serviceConfig';
+import { useDomainStore } from '../../../stores/domainStore';
 import { keyStorage } from '../../../services/storage/keyStorageService';
 import { llmService } from '../../../services/llm/llmService';
 import {
@@ -104,18 +105,28 @@ const sectionHelpStyle: React.CSSProperties = {
 
 const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }) => {
   const { tString, tNode } = useTranslation();
-  const config = loadServiceConfig();
-  const lm = config.localMode ?? { llmEnabled: false, ttsEnabled: false, sttEnabled: false };
+  // The settings as saved, read from the store: loadServiceConfig in a render
+  // can take over another tab's settings and so update the store mid-render.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const lm = useMemo(() => localModeFromRaw(savedRaw), [savedRaw]);
+  const [savedLlm] = useState(() => llmFromRaw(savedRaw));
 
   const [llmEnabled, setLlmEnabled] = useState<boolean>(lm.llmEnabled);
   const [ttsEnabled, setTtsEnabled] = useState<boolean>(lm.ttsEnabled);
   const [sttEnabled, setSttEnabled] = useState<boolean>(lm.sttEnabled);
 
+  // The switches follow a save made elsewhere, another tab's included.
+  useEffect(() => {
+    setLlmEnabled(lm.llmEnabled);
+    setTtsEnabled(lm.ttsEnabled);
+    setSttEnabled(lm.sttEnabled);
+  }, [lm.llmEnabled, lm.ttsEnabled, lm.sttEnabled]);
+
   const [endpointURL, setEndpointURL] = useState<string>(
-    config.llm.baseURL || 'http://localhost:1234/v1',
+    savedLlm.baseURL || 'http://localhost:1234/v1',
   );
   const [modelName, setModelName] = useState<string>(
-    (config.llm.kind === 'custom-openai' && config.llm.model) || 'qwen3.6-27b-instruct-revised',
+    (savedLlm.kind === 'custom-openai' && savedLlm.model) || 'qwen3.6-27b-instruct-revised',
   );
   const [apiKey, setApiKey] = useState<string>('');
 
