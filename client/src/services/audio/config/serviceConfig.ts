@@ -129,6 +129,46 @@ const validateTTSSettings = (settings: Partial<TTSSettings> = {}): TTSSettings =
   };
 };
 
+// Local Mode: migrate legacy `{enabled: bool}` master toggle to per-service
+// flags. Pre-v1.1.0-beta stored a single `enabled` boolean that controlled
+// LLM + TTS + STT together. From v1.1.0-beta each service flips
+// independently. Legacy `enabled: true` → expand to all three true.
+const normalizeLocalMode = (stored: unknown): { localMode: LocalModeConfig; migrated: boolean } => {
+  const lm = (stored ?? {}) as Partial<LocalModeConfig> & { enabled?: boolean };
+  const urls = { ttsKokoroURL: lm.ttsKokoroURL, ttsQwenURL: lm.ttsQwenURL, sttURL: lm.sttURL };
+  const hasPerService =
+    typeof lm.llmEnabled === 'boolean' ||
+    typeof lm.ttsEnabled === 'boolean' ||
+    typeof lm.sttEnabled === 'boolean';
+  if (hasPerService) {
+    return {
+      localMode: { llmEnabled: !!lm.llmEnabled, ttsEnabled: !!lm.ttsEnabled, sttEnabled: !!lm.sttEnabled, ...urls },
+      migrated: false,
+    };
+  }
+  const legacyOn = lm.enabled === true;
+  return {
+    localMode: { llmEnabled: legacyOn, ttsEnabled: legacyOn, sttEnabled: legacyOn, ...urls },
+    migrated: legacyOn || lm.enabled === false,
+  };
+};
+
+/**
+ * Local Mode as held in a saved settings string, read the way loadServiceConfig
+ * reads it. Pure: a render can call it, where loadServiceConfig may take over
+ * another tab's settings and so update the store.
+ */
+export const localModeFromRaw = (raw: string | null | undefined): LocalModeConfig => {
+  if (raw) {
+    try {
+      return normalizeLocalMode((JSON.parse(raw) as Partial<ServiceConfig> | null)?.localMode).localMode;
+    } catch {
+      // Unreadable settings load as the defaults, here as in loadServiceConfig.
+    }
+  }
+  return { ...defaultConfig.localMode! };
+};
+
 // ============================================
 // Main Functions
 // ============================================
@@ -197,37 +237,8 @@ export const loadServiceConfig = (): ServiceConfig => {
         }
       }
 
-      // Local Mode: migrate legacy `{enabled: bool}` master toggle to per-service
-      // flags. Pre-v1.1.0-beta stored a single `enabled` boolean that controlled
-      // LLM + TTS + STT together. From v1.1.0-beta each service flips
-      // independently. Legacy `enabled: true` → expand to all three true.
-      const lm = (config.localMode ?? {}) as Partial<LocalModeConfig> & { enabled?: boolean };
-      const hasPerService =
-        typeof lm.llmEnabled === 'boolean' ||
-        typeof lm.ttsEnabled === 'boolean' ||
-        typeof lm.sttEnabled === 'boolean';
-      let migrated = false;
-      if (hasPerService) {
-        config.localMode = {
-          llmEnabled: !!lm.llmEnabled,
-          ttsEnabled: !!lm.ttsEnabled,
-          sttEnabled: !!lm.sttEnabled,
-          ttsKokoroURL: lm.ttsKokoroURL,
-          ttsQwenURL: lm.ttsQwenURL,
-          sttURL: lm.sttURL,
-        };
-      } else {
-        const legacyOn = lm.enabled === true;
-        config.localMode = {
-          llmEnabled: legacyOn,
-          ttsEnabled: legacyOn,
-          sttEnabled: legacyOn,
-          ttsKokoroURL: lm.ttsKokoroURL,
-          ttsQwenURL: lm.ttsQwenURL,
-          sttURL: lm.sttURL,
-        };
-        migrated = legacyOn || lm.enabled === false;
-      }
+      const { localMode, migrated } = normalizeLocalMode(config.localMode);
+      config.localMode = localMode;
       if (migrated) {
         queueMicrotask(() => saveServiceConfig(config));
       }

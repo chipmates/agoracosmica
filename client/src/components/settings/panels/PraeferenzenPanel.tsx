@@ -1,10 +1,10 @@
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect, useMemo, useState } from 'react';
 import { Gear, Globe, SpeakerHigh, Microphone, Brain, ArrowCounterClockwise, House } from '@phosphor-icons/react';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { keyStorage } from '../../../services/storage/keyStorageService';
 import { useUIStore } from '../../../stores/uiStore';
 import { useDomainStore } from '../../../stores/domainStore';
-import { loadServiceConfig } from '../../../services/audio/config/serviceConfig';
+import { localModeFromRaw } from '../../../services/audio/config/serviceConfig';
 import styles from '../../SettingsModal.module.css';
 import CollapsibleSection from '../CollapsibleSection';
 
@@ -85,9 +85,10 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     return () => window.removeEventListener('byok-key-changed', handleKeyChange);
   }, []);
 
-  // Re-read on every saved change, so the badges follow the Local Mode switches.
-  useDomainStore((state) => state.serviceConfig.raw);
-  const localMode = loadServiceConfig().localMode;
+  // The saved settings, so the badges follow the Local Mode switches. Read as
+  // they are: loadServiceConfig here could update the store during a render.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const localMode = useMemo(() => localModeFromRaw(savedRaw), [savedRaw]);
 
   const getLanguageBadge = (): string => {
     const langs: Record<string, string> = { en: 'English', de: 'Deutsch' };
