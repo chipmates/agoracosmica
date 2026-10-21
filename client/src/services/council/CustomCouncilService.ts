@@ -1271,9 +1271,9 @@ export class CustomCouncilService {
     language: string = 'en',
     sessionId?: string
   ): Promise<AudioFile> {
-    // All TTS self-hosted on GEX130 — server handles language/model routing
-    const { selfHostedTTS } = await import('../audio/tts/selfHostedTTS');
-    return await selfHostedTTS(text, fileBaseName, '', speed, voice, undefined, language, sessionId);
+    // The router keeps Local Mode on the local service; otherwise the hosted gateway.
+    const { convertTextToSpeechWithVoice } = await import('../audio/tts');
+    return await convertTextToSpeechWithVoice(text, fileBaseName, voice, speed, language, sessionId);
   }
 
   /** Add seconds of this council that played, for council_heard. */

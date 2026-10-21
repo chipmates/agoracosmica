@@ -145,3 +145,25 @@ export const convertTextToSpeech = async (
     throw error;
   }
 };
+
+/**
+ * A council speaker's own voice. In Local Mode the local service speaks it and
+ * fails closed as above; otherwise the hosted gateway, as before.
+ */
+export const convertTextToSpeechWithVoice = async (
+  text: string,
+  fileBaseName: string,
+  voice: string,
+  speed: number,
+  language: string = 'en',
+  sessionId?: string,
+): Promise<AudioFile> => {
+  const config = loadServiceConfig();
+  if (config.localMode?.ttsEnabled) {
+    return speakLocally(() => localModeTTS(
+      text, fileBaseName, '', speed, voice, undefined, language, undefined,
+      { kokoroUrl: config.localMode?.ttsKokoroURL, qwenUrl: config.localMode?.ttsQwenURL },
+    ));
+  }
+  return selfHostedTTS(text, fileBaseName, '', speed, voice, undefined, language, sessionId);
+};
