@@ -49,6 +49,28 @@ const RETRY_DELAY = 1000;
 
 const sleep = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 
+/**
+ * Local Mode transcription, no circuit breaker (single user, fail fast). When
+ * the local service does not answer, fail closed: the recording never goes to
+ * the hosted servers instead.
+ */
+const transcribeLocally = async (
+  audioBlob: Blob,
+  language: string,
+  url: string | undefined,
+): Promise<TranscriptionResponse> => {
+  try {
+    const result = await localModeSTT(audioBlob, language, url);
+    return formatTranscriptionResponse(result, 'local');
+  } catch (error) {
+    if (error instanceof LocalModeSttUnavailable) {
+      console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message}`);
+      window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'stt' } }));
+    }
+    throw error;
+  }
+};
+
 // ============================================
 // Main Export
 // ============================================
@@ -74,21 +96,9 @@ export const transcribeAudio = async (
     throw err;
   }
 
-  // Local Mode: route to the local Whisper container, no circuit breaker
-  // (single user, fail fast). When it does not answer, fail closed: the
-  // recording never goes to the hosted servers instead.
   const config = loadServiceConfig();
   if (config.localMode?.sttEnabled) {
-    try {
-      const result = await localModeSTT(audioBlob, language, config.localMode.sttURL);
-      return formatTranscriptionResponse(result, 'local');
-    } catch (error) {
-      if (error instanceof LocalModeSttUnavailable) {
-        console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message}`);
-        window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'stt' } }));
-      }
-      throw error;
-    }
+    return transcribeLocally(audioBlob, language, config.localMode.sttURL);
   }
 
   if (isCircuitOpen()) {
@@ -98,11 +108,16 @@ export const transcribeAudio = async (
   try {
     let lastError: Error | undefined;
     for (let attempt = 0; attempt <= MAX_RETRIES; attempt++) {
-      try {
-        if (attempt > 0) {
-          await sleep(RETRY_DELAY * attempt);
+      if (attempt > 0) {
+        await sleep(RETRY_DELAY * attempt);
+        // Local Mode switched on during the wait: the recording stays local from here.
+        const current = loadServiceConfig();
+        if (current.localMode?.sttEnabled) {
+          return await transcribeLocally(audioBlob, language, current.localMode.sttURL);
         }
+      }
 
+      try {
         const result = await selfHostedSTT(audioBlob, language);
         recordSuccess();
         return formatTranscriptionResponse(result, 'self-hosted');
