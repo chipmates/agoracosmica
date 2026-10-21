@@ -27,6 +27,8 @@ import ToggleSwitch from '../../ToggleSwitch';
 import { useTranslation } from '../../../hooks/useTranslation';
 import { isMobileOrTablet } from '../../../utils/deviceDetection';
 import { selfHostedTTS } from '../../../services/audio/tts/selfHostedTTS';
+import { convertTextToSpeechWithVoice } from '../../../services/audio/tts';
+import { loadServiceConfig } from '../../../services/audio/config/serviceConfig';
 import { newPreviewSessionId } from '../../../services/audio/tts/ttsSessions';
 import { bindAudioElement } from '../../../services/audio/audioFocus';
 import {
@@ -426,7 +428,8 @@ const VoicePanel: FC<VoicePanelProps> = ({
       console.warn('[VoicePanel] Cached preview fetch failed, falling back to live TTS:', err);
     }
 
-    // 2) Fallback: live self-hosted TTS.
+    // 2) Fallback: a live voice. In Local Mode the local one speaks it, or the
+    //    banner says it is down; the sample never goes to the hosted servers.
     try {
       const technicalId = voice.technical
         ?? (voiceLanguage === 'german'
@@ -435,16 +438,18 @@ const VoicePanel: FC<VoicePanelProps> = ({
       const previewText = voiceLanguage === 'german' ? PREVIEW_TEXT_DE : PREVIEW_TEXT_EN;
       const langCode = voiceLanguage === 'german' ? 'de' : 'en';
 
-      const audio = await selfHostedTTS(
-        previewText,
-        `preview_${voice.id}`,
-        voice.id,
-        1.0,
-        technicalId,
-        undefined,
-        langCode,
-        newPreviewSessionId()
-      );
+      const audio = loadServiceConfig().localMode?.ttsEnabled
+        ? await convertTextToSpeechWithVoice(previewText, `preview_${voice.id}`, technicalId, 1.0, langCode)
+        : await selfHostedTTS(
+          previewText,
+          `preview_${voice.id}`,
+          voice.id,
+          1.0,
+          technicalId,
+          undefined,
+          langCode,
+          newPreviewSessionId()
+        );
 
       await playAudio(new Audio(audio.url));
     } catch (err) {
