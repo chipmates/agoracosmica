@@ -27,8 +27,10 @@ import {
 } from '../src/services/spendGovernor';
 import { alertFallback, alertOutage, alertSpendCrossing } from '../src/services/telegram';
 import {
+  checkAndIncrementCouncilRateLimit,
   checkAndIncrementRateLimit,
   checkAndIncrementSessionRateLimit,
+  checkAndIncrementSummaryRateLimit,
 } from '../src/middleware/rateLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
 import { createSafetyFilteredStream } from '../src/services/streamFilter';
@@ -1502,6 +1504,91 @@ async function main(): Promise<number> {
     );
     assertEqual(response.status, 413, 'status');
     assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS');
+  });
+
+  /** A KV that refuses every write under one prefix, the way KV answers a second write within a second. */
+  const refusingKv = (prefix: string): { kv: KVNamespace; puts: string[] } => {
+    const store = new Map<string, string>();
+    const puts: string[] = [];
+    const kv = {
+      get: async (key: string) => store.get(key) ?? null,
+      put: async (key: string, value: string) => {
+        if (key.startsWith(prefix)) throw new Error('KV PUT failed: 429 Too Many Requests');
+        puts.push(key);
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    return { kv, puts };
+  };
+
+  /** Run with console.warn captured, so a test can read what was logged. */
+  const withWarnings = async (fn: () => Promise<void>): Promise<string[]> => {
+    const warnings: string[] = [];
+    const realWarn = console.warn;
+    console.warn = (...args: unknown[]) => { warnings.push(args.map(String).join(' ')); };
+    try {
+      await fn();
+    } finally {
+      console.warn = realWarn;
+    }
+    return warnings;
+  };
+
+  await test('a refused global counter write still serves the chat', async () => {
+    stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+    const kv = refusingKv('global:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const { ctx, pending } = fakeCtx();
+    let status = 0;
+    const warnings = await withWarnings(async () => {
+      const response = await worker.fetch(await postJson('/v1/chat', env, JSON.stringify(CHAT_BODY)), env, ctx);
+      status = response.status;
+      await response.body?.cancel();
+      await Promise.all(pending);
+    });
+    assertEqual(status, 200, 'status');
+    assert(kv.puts.some(key => key.startsWith(`rate:sub:${IDENTITY}:`)), 'the visitor\'s own counter was written');
+    assertEqual(warnings.filter(w => w.includes('[RateLimit]')).length, 1, 'one fixed warning line');
+  });
+
+  await test('a refused global counter write still counts the visitor', async () => {
+    const kv = refusingKv('global:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('77777777-7777-4777-8777-777777777777');
+    await withWarnings(async () => {
+      for (let i = 1; i <= 3; i++) {
+        const result = await checkAndIncrementRateLimit(fakeRequest('203.0.113.21'), env, identity);
+        assertEqual(result.allowed, true, `request ${i}`);
+        assertEqual(result.daily.used, i, `used after request ${i}`);
+      }
+    });
+  });
+
+  await test('a refused global council or summary write still serves the visitor', async () => {
+    const kv = refusingKv('global:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('88888888-8888-4888-8888-888888888888');
+    await withWarnings(async () => {
+      const council = await checkAndIncrementCouncilRateLimit(fakeRequest(), env, identity);
+      assertEqual(council.allowed, true, 'council allowed');
+      assertEqual(council.used, 1, 'council counted');
+      const summary = await checkAndIncrementSummaryRateLimit(fakeRequest(), env, identity);
+      assertEqual(summary.allowed, true, 'summary allowed');
+      assertEqual(summary.used, 1, 'summary counted');
+    });
+    assert(kv.puts.some(key => key.startsWith('council:sub:')), 'council counter written');
+    assert(kv.puts.some(key => key.startsWith('summary:sub:')), 'summary counter written');
+  });
+
+  await test('a refused per-visitor write still fails the request, as before', async () => {
+    const env = fakeEnv({ RATE_LIMITS: refusingKv('rate:sub:').kv });
+    let threw = false;
+    try {
+      await checkAndIncrementRateLimit(fakeRequest(), env, fakeIdentity('99999999-9999-4999-8999-999999999999'));
+    } catch {
+      threw = true;
+    }
+    assertEqual(threw, true, 'the per-visitor limit keeps its failure mode');
   });
 
   globalThis.fetch = realFetch;

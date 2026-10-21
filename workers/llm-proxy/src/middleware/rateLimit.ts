@@ -48,6 +48,19 @@ function secondsUntil(isoTimestamp: string): number {
 }
 
 /**
+ * Write a global day counter without failing the request. KV refuses a second
+ * write to one key within a second (a 429 that throws), and the global keys
+ * take every visitor's write; a missed increment only undercounts the brake.
+ */
+async function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
+  try {
+    await env.RATE_LIMITS.put(key, value.toString(), { expirationTtl: 86400 });
+  } catch {
+    console.warn('[RateLimit] Global counter write failed, request served');
+  }
+}
+
+/**
  * Check-and-increment against KV. NOT atomic: KV is eventually consistent and
  * has no compare-and-swap, so two concurrent requests from the same identity
  * can both read the same pre-increment value, both pass the check, and both
@@ -109,7 +122,7 @@ export async function checkAndIncrementRateLimit(
 
   await Promise.all([
     env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), { expirationTtl: 86400 }),
-    env.RATE_LIMITS.put(globalKey, globalCount.toString(), { expirationTtl: 86400 }),
+    putGlobalCounter(env, globalKey, globalCount),
     ipKey
       ? env.RATE_LIMITS.put(ipKey, (ipUsed + 1).toString(), { expirationTtl: 86400 })
       : Promise.resolve(),
@@ -181,7 +194,7 @@ export async function checkAndIncrementCouncilRateLimit(
   const count = used + 1;
   await Promise.all([
     env.RATE_LIMITS.put(councilKey, count.toString(), { expirationTtl: 86400 }),
-    env.RATE_LIMITS.put(globalKey, (globalUsed + 1).toString(), { expirationTtl: 86400 }),
+    putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
@@ -215,7 +228,7 @@ export async function checkAndIncrementSummaryRateLimit(
   const count = used + 1;
   await Promise.all([
     env.RATE_LIMITS.put(summaryKey, count.toString(), { expirationTtl: 86400 }),
-    env.RATE_LIMITS.put(globalKey, (globalUsed + 1).toString(), { expirationTtl: 86400 }),
+    putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
