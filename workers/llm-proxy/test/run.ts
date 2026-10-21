@@ -1553,6 +1553,41 @@ async function main(): Promise<number> {
     assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS');
   });
 
+  /** An upload that sends its first bytes and then breaks off, as when the visitor goes away. */
+  const brokenUpload = (): ReadableStream<Uint8Array> => {
+    let reads = 0;
+    return new ReadableStream<Uint8Array>({
+      pull(controller) {
+        if (reads++ === 0) controller.enqueue(new TextEncoder().encode('{"figureId":"aure'));
+        else controller.error(new Error('the upload broke off'));
+      },
+    });
+  };
+
+  for (const route of gated) {
+    await test(`${route.path}: an upload that breaks off mid-body gets the usual 400, no 500 and no error log`, async () => {
+      const upstream = stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { ctx } = fakeCtx();
+      const request = await postJson(route.path, env, brokenUpload());
+      const logged: string[] = [];
+      const realError = console.error;
+      console.error = (...args: unknown[]) => { logged.push(args.map(String).join(' ')); };
+      let response: Response;
+      try {
+        response = await worker.fetch(request, env, ctx);
+      } finally {
+        console.error = realError;
+      }
+      assertEqual(response.status, 400, 'status');
+      assertEqual((await response.json() as { error: string }).error, 'Invalid JSON body', 'message');
+      assertEqual(logged.length, 0, `error lines logged: ${JSON.stringify(logged)}`);
+      assertEqual(kv.puts.length, 0, 'counter writes');
+      assertEqual(upstream.length, 0, 'upstream calls');
+    });
+  }
+
   /** A KV that refuses every write under one prefix, the way KV answers a second write within a second. */
   const refusingKv = (prefix: string): { kv: KVNamespace; puts: string[] } => {
     const store = new Map<string, string>();

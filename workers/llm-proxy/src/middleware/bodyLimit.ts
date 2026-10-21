@@ -18,18 +18,18 @@ export type JsonBodyResult =
  * the header can be missing (a chunked upload) or wrong.
  */
 export async function readJsonBody(request: Request, maxBytes = MAX_JSON_BODY_BYTES): Promise<JsonBodyResult> {
-  const bytes = await readBodyCapped(request, maxBytes);
+  let bytes: Uint8Array | null;
+  try {
+    bytes = await readBodyCapped(request, maxBytes);
+  } catch {
+    // An upload that breaks off mid-read is a bad request, not a worker fault.
+    return { ok: false, response: invalidJson() };
+  }
   if (!bytes) return { ok: false, response: tooLarge() };
   try {
     return { ok: true, body: JSON.parse(new TextDecoder().decode(bytes)) };
   } catch {
-    return {
-      ok: false,
-      response: new Response(
-        JSON.stringify({ error: 'Invalid JSON body' }),
-        { status: 400, headers: { 'Content-Type': 'application/json' } }
-      ),
-    };
+    return { ok: false, response: invalidJson() };
   }
 }
 
@@ -66,6 +66,13 @@ function declaredLength(request: Request): number | null {
   const raw = request.headers.get('Content-Length');
   if (raw === null || !/^\s*\d+\s*$/.test(raw)) return null;
   return Number(raw);
+}
+
+function invalidJson(): Response {
+  return new Response(
+    JSON.stringify({ error: 'Invalid JSON body' }),
+    { status: 400, headers: { 'Content-Type': 'application/json' } }
+  );
 }
 
 function tooLarge(): Response {
