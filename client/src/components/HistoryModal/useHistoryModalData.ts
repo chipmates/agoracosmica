@@ -25,6 +25,13 @@ const isShownMessage = (msg: LiveMessage): boolean =>
 const conversationSignature = (historyKey: string, messages: LiveMessage[]): string =>
   `${historyKey}|${messages.map((msg) => `${msg?.role}:${msg?.timestamp ?? ''}:${msg?.content}`).join('|')}`;
 
+type StoredSummary = { summary: Awaited<ReturnType<typeof SummaryService.generateSummary>>; messages: Message[] };
+
+// A summary runs on when the history closes. Opening it again waits for that
+// request instead of asking anew, which would spend a second daily summary.
+const summariesInFlight = new Map<string, Promise<StoredSummary>>();
+const flightKey = (figureId: string, seedId: string): string => `${figureId}_${seedId}`;
+
 export function useHistoryModalData({
   isOpen,
   onClose,
@@ -359,9 +366,63 @@ export function useHistoryModalData({
     }
   }, [fetchAllHistories, isOpen, selectedFigureId]);
 
+  // Shows the wait for a summary request, then the summary, or the alert.
+  const waitForSummary = useCallback(async (request: Promise<StoredSummary>, seedId: string): Promise<boolean> => {
+    setIsLoading(true);
+    setShowSpinner(true);
+    document.body.classList.add('body-no-scroll');
+    try {
+      const { summary, messages } = await request;
+
+      setHistories(prev => ({
+        ...prev,
+        [seedId]: {
+          ...prev[seedId],
+          summary,
+          hasSummary: true,
+          messages
+        }
+      }));
+
+      const newSections: { [key: string]: boolean } = {};
+      splitSummarySections(summary.content).forEach((_: string, index: number) => {
+        newSections[`section-${seedId}-${index}`] = false;
+      });
+      setExpandedSections(newSections);
+      return true;
+    } catch {
+      if (isMountedRef.current) {
+        alert(tString('history.alerts.summaryFailed', 'Failed to generate summary'));
+      }
+      return false;
+    } finally {
+      document.body.classList.remove('body-no-scroll');
+      if (isMountedRef.current) {
+        setIsLoading(false);
+        setShowSpinner(false);
+      }
+    }
+  }, [tString]);
+
+  // Reopened while its summary still runs: show the wait again.
+  useEffect(() => {
+    if (!isOpen || !selectedSeedId) return;
+    const running = summariesInFlight.get(flightKey(selectedFigureId, selectedSeedId));
+    if (running) void waitForSummary(running, selectedSeedId);
+  }, [isOpen, selectedSeedId, selectedFigureId, waitForSummary]);
+
   const handleSummary = async (): Promise<void> => {
     if (!selectedSeedId) return;
     if (isLoading) return;
+
+    const seedId = selectedSeedId;
+    const figureId = selectedFigure.id;
+    const key = flightKey(figureId, seedId);
+    const running = summariesInFlight.get(key);
+    if (running) {
+      await waitForSummary(running, seedId);
+      return;
+    }
 
     // Gate on summary-specific quota when on free tier.
     const { quota, openRateLimitModal } = useDomainStore.getState();
@@ -370,18 +431,14 @@ export function useHistoryModalData({
       return;
     }
 
-    setIsLoading(true);
-    setShowSpinner(true);
-    document.body.classList.add('body-no-scroll');
-
-    try {
-      const historyData = histories[selectedSeedId];
+    const historyData = histories[seedId];
+    const request = (async (): Promise<StoredSummary> => {
       if (!historyData?.messages) throw new Error('No history found for selected seed');
 
       const summary = await SummaryService.generateSummary(
         historyData.messages,
-        selectedFigure.id,
-        selectedSeedId
+        figureId,
+        seedId
       );
 
       const summaryMessage: Message = {
@@ -393,54 +450,34 @@ export function useHistoryModalData({
 
       const updatedMessages = [summaryMessage];
 
-      setHistories(prev => ({
-        ...prev,
-        [selectedSeedId]: {
-          ...prev[selectedSeedId],
-          summary,
-          hasSummary: true,
-          messages: updatedMessages
-        }
-      }));
-
       const existingStarseed = LocalStorageAdapter.getString(
-        STORAGE_KEYS.getStarSeedHistory(selectedFigure.id, selectedSeedId)
+        STORAGE_KEYS.getStarSeedHistory(figureId, seedId)
       );
       const existingChallenge = LocalStorageAdapter.getString(
-        STORAGE_KEYS.getChallengeHistory(selectedFigure.id, selectedSeedId)
+        STORAGE_KEYS.getChallengeHistory(figureId, seedId)
       );
 
       let storageKey: string;
       if (existingStarseed) {
-        storageKey = STORAGE_KEYS.getStarSeedHistory(selectedFigure.id, selectedSeedId);
+        storageKey = STORAGE_KEYS.getStarSeedHistory(figureId, seedId);
       } else if (existingChallenge) {
-        storageKey = STORAGE_KEYS.getChallengeHistory(selectedFigure.id, selectedSeedId);
+        storageKey = STORAGE_KEYS.getChallengeHistory(figureId, seedId);
       } else {
-        storageKey = STORAGE_KEYS.getStarSeedHistory(selectedFigure.id, selectedSeedId);
+        storageKey = STORAGE_KEYS.getStarSeedHistory(figureId, seedId);
       }
 
       LocalStorageAdapter.setJSON(storageKey, updatedMessages);
 
-      const summaryKey = `summary_${selectedFigure.id}_${selectedSeedId}`;
+      const summaryKey = `summary_${figureId}_${seedId}`;
       LocalStorageAdapter.setJSON(summaryKey, summary);
 
-      const newSections: { [key: string]: boolean } = {};
-      splitSummarySections(summary.content).forEach((_: string, index: number) => {
-        newSections[`section-${selectedSeedId}-${index}`] = false;
-      });
-      setExpandedSections(newSections);
+      return { summary, messages: updatedMessages };
+    })();
+    summariesInFlight.set(key, request);
+    void request.then(() => undefined, () => undefined).finally(() => summariesInFlight.delete(key));
 
+    if (await waitForSummary(request, seedId)) {
       onSummaryGenerated();
-    } catch (error) {
-      if (isMountedRef.current) {
-        alert(tString('history.alerts.summaryFailed', 'Failed to generate summary'));
-      }
-    } finally {
-      document.body.classList.remove('body-no-scroll');
-      if (isMountedRef.current) {
-        setIsLoading(false);
-        setShowSpinner(false);
-      }
     }
   };
 
