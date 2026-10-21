@@ -8,6 +8,8 @@ import { isFirstContactForFigure, resolveNodeState } from '../utils/flowDecision
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { peekStagedQuestion } from '../utils/public/entryIntent';
 import useTranslation from '../hooks/useTranslation';
+import { historicalFiguresBase } from '../api/figures';
+import { getCachedFigureTranslation, loadFigureTranslation } from '../utils/figureTranslations';
 import type { Figure, Seed } from '../types/global';
 import './ModeSelector-Mini.css';
 
@@ -113,6 +115,24 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
     () => (isOpen ? peekStagedQuestion(selectedFigure?.id ?? null, language, tString) : null),
     [isOpen, selectedFigure?.id, language, tString]
   );
+
+  // The figure's name in the page language. On a cold deep link the selected
+  // figure still carries the English placeholder until its translation lands
+  // from the content host, so the name is read from there, as the gallery does.
+  const baseNameEn = historicalFiguresBase.find((f) => f.id === selectedFigure?.id)?.baseNameEn;
+  const [loadedName, setLoadedName] = useState<string | null>(null);
+  useEffect(() => {
+    setLoadedName(null);
+    if (!isOpen || !baseNameEn) return;
+    let alive = true;
+    loadFigureTranslation(baseNameEn, language)
+      .then((translation) => { if (alive && translation?.name) setLoadedName(translation.name); })
+      .catch(() => { /* the selected figure's own name stands */ });
+    return () => { alive = false; };
+  }, [isOpen, baseNameEn, language]);
+  const figureName = loadedName
+    ?? (baseNameEn ? getCachedFigureTranslation(baseNameEn, language)?.name : undefined)
+    ?? selectedFigure?.name;
 
   // Chapter 1's real running time, for the honest meta line on the story door.
   const [chapterMinutes, setChapterMinutes] = useState<number | null>(null);
@@ -292,7 +312,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
             )}
             <h2 id="mode-selector-title" className="doors-title">
               {tString('modes.doors.title', 'How do you want to start with {name}?')
-                .replace('{name}', selectedFigure?.name || tString('common.thisEcho', 'this Echo'))}
+                .replace('{name}', figureName || tString('common.thisEcho', 'this Echo'))}
             </h2>
             {/* No seed subtitle here: the doors are first contact, and the
                 auto-defaulted wisdom name ("1. Der unbearbeitete Block") reads
@@ -411,7 +431,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
               <button
                 className="eclipse-sun"
                 onClick={() => handleModeSelect(getSunTargetMode())}
-                aria-label={`${selectedFigure?.name || 'Continue'} — ${tString(
+                aria-label={`${figureName || 'Continue'} — ${tString(
                   ECLIPSE_MODES.find(m => m.id === getSunTargetMode())?.titleKey || 'modes.selector.story.title'
                 )}`}
               >
@@ -420,7 +440,7 @@ const ModeSelectorMini: FC<ModeSelectorMiniProps> = ({
                     figure={selectedFigure}
                     type="thumbnail"
                     className="eclipse-sun-portrait"
-                    alt={selectedFigure.name}
+                    alt={figureName}
                     width={140}
                     height={140}
                   />

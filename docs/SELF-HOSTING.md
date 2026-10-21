@@ -168,14 +168,14 @@ vLLM and llama.cpp work the same way, and so does any other OpenAI-compatible en
 
 ### What works on a local model
 
-With the recommended 27B-class setup, one exception aside:
+With the recommended 27B-class setup:
 - Free Talk, Wisdom, Prism: stream cleanly in both languages.
 - Story: pre-recorded audio, no model call needed.
 - Summary: works on 27B-class models.
 - Council: a 27B-class model holds the strict `SPEAKER :: dialogue` format.
 - Quest: 27B-class models support tool calling, so the `award_seed` event still fires.
 
-The live-interrupt voice conversation (two-way streaming) stays hosted in this release, since it runs through the multi-tenant GPU gateway. Push-to-talk and read-aloud both work locally once Local Mode is wired.
+Voice in the app is push-to-talk and read-aloud: you record a question, it is transcribed when you stop, and the reply is read aloud. There is no live two-way voice conversation, so with the voice and transcription toggles on, both happen on your machine.
 
 ---
 

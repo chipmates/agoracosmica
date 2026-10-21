@@ -107,6 +107,11 @@ export async function loadFigureTranslation(figureName: string, language: string
   }
 }
 
+/** The translation already loaded for a figure, or undefined; never starts a load. */
+export function getCachedFigureTranslation(figureName: string, language: string = 'en'): FigureTranslation | undefined {
+  return translationCache[language]?.get(getFigureId(figureName));
+}
+
 /**
  * Gets the translation for a figure - synchronous version that returns cached data if available
  * or triggers loading of translation in the background
