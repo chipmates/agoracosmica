@@ -276,7 +276,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             directly ABOVE the always-enabled button and stays co-visible with
             it in this sticky footer, so the tap is an informed affirmative act
             (16+ self-declaration + AGB inclusion, Sec 305 Abs 2 BGB). */}
-        <div className={styles.modalFooter}>
+        <div className={`${styles.modalFooter} ${termsChanged ? styles.footerWithUpdate : ''}`}>
           {termsChanged && (
             <p className={styles.termsUpdated} id="agc-terms-updated">
               {updatedBefore}

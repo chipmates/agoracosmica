@@ -542,6 +542,19 @@
     margin: 0 1rem;
   }
 
+  /* The returning line makes the footer taller; tighter spacing and a smaller
+     line keep the AI notice's sentence in view on a 360 x 740 phone. */
+  .modalFooter.footerWithUpdate {
+    padding-top: 0.5rem;
+    padding-bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+    gap: 0.35rem;
+  }
+
+  .termsUpdated {
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
   .clickwrapStatement {
     font-size: 0.9375rem; /* 15px, keep it legible on the action line */
   }

@@ -66,6 +66,18 @@ describe('the line for a returning browser', () => {
     expect(show()).toBeNull();
   });
 
+  // The phone layout tightens only the returning footer (the CSS module's
+  // footerWithUpdate); a first visit keeps its footer as it was.
+  it('marks the footer only when the line is shown', () => {
+    const footerOf = () => document.getElementById('agc-clickwrap-notice')?.parentElement?.className ?? '';
+    show();
+    expect(footerOf()).not.toMatch(/footerWithUpdate/);
+    cleanup();
+    localStorage.setItem('agb_consent', JSON.stringify({ version: '1.0.0', timestamp: 1 }));
+    show();
+    expect(footerOf()).toMatch(/footerWithUpdate/);
+  });
+
   it('stays away over a record of the current version', () => {
     localStorage.setItem('agb_consent', JSON.stringify({ version: CURRENT_AGB_VERSION, timestamp: 1 }));
     expect(show()).toBeNull();
