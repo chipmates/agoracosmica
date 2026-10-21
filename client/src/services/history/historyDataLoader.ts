@@ -171,13 +171,16 @@ export const loadHistoryData = async (selectedFigure: Figure, options: LoadHisto
       try {
         const summary = JSON.parse(summaryData);
         
-        // Add summary to messages if it exists
-        if (summary.content) {
+        // The seed's history usually holds the same summary already; it shows
+        // once, and as the summary plate, never as a plain reply.
+        const alreadyShown = seedData.messages.some((msg: { isSummary?: boolean; content?: unknown }) => msg.isSummary && msg.content === summary.content);
+        if (summary.content && !alreadyShown) {
           seedData.messages.push({
             role: 'assistant',
             content: summary.content,
             mode: 'summary',
-            timestamp: summary.timestamp
+            isSummary: true,
+            timestamp: summary.timestamp ?? summary.metadata?.timestamp
           });
         }
       } catch (e) {
