@@ -132,6 +132,30 @@ async function readSnapshot(env: Env): Promise<SnapshotResponse> {
   };
 }
 
+const errorKind = (err: unknown): string => (err instanceof Error ? err.name : typeof err);
+
+/**
+ * Write one of a beacon's keys without failing the beacon. KV refuses a second
+ * write to one key within a second, and every beacon writes the shared
+ * aggregate. The line names the write and the error's kind only: a message can
+ * quote a key. Returns whether the write landed.
+ */
+async function putOrLog(
+  env: Env,
+  key: string,
+  value: string,
+  what: 'Rate window' | 'Device' | 'Snapshot',
+  options?: KVNamespacePutOptions,
+): Promise<boolean> {
+  try {
+    await env.COMMUNITY_KV.put(key, value, options);
+    return true;
+  } catch (err) {
+    console.warn(`[community] ${what} write failed (${errorKind(err)}), beacon served`);
+    return false;
+  }
+}
+
 async function writeSnapshot(env: Env, snap: SnapshotResponse): Promise<void> {
   // Don't persist threshold/phase — derived at read time.
   const persisted = {
@@ -139,7 +163,8 @@ async function writeSnapshot(env: Env, snap: SnapshotResponse): Promise<void> {
     totalPower: snap.totalPower,
     updatedAt: snap.updatedAt,
   };
-  await env.COMMUNITY_KV.put(SNAPSHOT_KEY, JSON.stringify(persisted));
+  // A refused write leaves this beacon out of the totals, never counted twice.
+  await putOrLog(env, SNAPSHOT_KEY, JSON.stringify(persisted), 'Snapshot');
 }
 
 async function handlePower(
@@ -188,16 +213,19 @@ async function handlePower(
     const snap = await readSnapshot(env);
     return jsonResponse(snap, 200, cors);
   }
-  await env.COMMUNITY_KV.put(rlKey, '1', { expirationTtl: RATE_LIMIT_WINDOW_S });
+  await putOrLog(env, rlKey, '1', 'Rate window', { expirationTtl: RATE_LIMIT_WINDOW_S });
 
   const next: DeviceRecord = {
     power: Math.floor(payload.power),
     completedFigures: Math.floor(payload.completedFigures),
     lastSeen: Date.now(),
   };
-  await env.COMMUNITY_KV.put(deviceKey, JSON.stringify(next), { expirationTtl: DEVICE_TTL_S });
+  const recorded = await putOrLog(env, deviceKey, JSON.stringify(next), 'Device', { expirationTtl: DEVICE_TTL_S });
 
   const snap = await readSnapshot(env);
+  // The totals move only with the device's record, so a device whose record
+  // was refused is counted on a later beacon, once.
+  if (!recorded) return jsonResponse(snap, 200, cors);
   if (!previous) {
     snap.joinedCount = (snap.joinedCount ?? 0) + 1;
     snap.totalPower = (snap.totalPower ?? 0) + next.power;
@@ -223,24 +251,55 @@ async function handleSnapshot(
   return jsonResponse(snap, 200, cors);
 }
 
+async function route(request: Request, env: Env): Promise<Response> {
+  const url = new URL(request.url);
+  const origin = request.headers.get('origin');
+  const cors = corsHeaders(origin, env.ALLOWED_ORIGINS);
+
+  if (request.method === 'OPTIONS') {
+    return new Response(null, { status: 204, headers: cors });
+  }
+
+  if (url.pathname === '/v1/community/power' && request.method === 'POST') {
+    return handlePower(request, env, cors);
+  }
+
+  if (url.pathname === '/v1/community/snapshot' && request.method === 'GET') {
+    return handleSnapshot(env, cors);
+  }
+
+  return jsonResponse({ error: 'not_found' }, 404, cors);
+}
+
+const LOGGED_ROUTES = ['/v1/community/power', '/v1/community/snapshot'];
+
+function routeLabel(request: Request): string {
+  const path = new URL(request.url).pathname;
+  return LOGGED_ROUTES.includes(path) ? path : 'other';
+}
+
+/**
+ * The answer to a fault inside the worker. Without it the runtime answers
+ * without CORS, so the app sees a network error instead of a 500. The log
+ * names the error's kind and a fixed route only.
+ */
+function unhandled(request: Request, env: Env, err: unknown): Response {
+  console.error(`[community] Unhandled ${errorKind(err)} on ${routeLabel(request)}`);
+  let cors: HeadersInit = {};
+  try {
+    cors = corsHeaders(request.headers.get('origin'), env.ALLOWED_ORIGINS);
+  } catch {
+    // A broken origin list must not turn the 500 into a throw.
+  }
+  return jsonResponse({ error: 'internal_error' }, 500, cors);
+}
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-    const origin = request.headers.get('origin');
-    const cors = corsHeaders(origin, env.ALLOWED_ORIGINS);
-
-    if (request.method === 'OPTIONS') {
-      return new Response(null, { status: 204, headers: cors });
+    try {
+      return await route(request, env);
+    } catch (err) {
+      return unhandled(request, env, err);
     }
-
-    if (url.pathname === '/v1/community/power' && request.method === 'POST') {
-      return handlePower(request, env, cors);
-    }
-
-    if (url.pathname === '/v1/community/snapshot' && request.method === 'GET') {
-      return handleSnapshot(env, cors);
-    }
-
-    return jsonResponse({ error: 'not_found' }, 404, cors);
   },
 };

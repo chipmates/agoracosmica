@@ -289,6 +289,108 @@ async function main(): Promise<void> {
     assertEqual(fake.reads(), 0, 'KV reads');
   });
 
+  // A fault inside the worker, and a KV write the store refuses.
+
+  /** Run with console.warn and console.error captured. */
+  async function captureLogs(fn: () => Promise<void>): Promise<string[]> {
+    const lines: string[] = [];
+    const realWarn = console.warn;
+    const realError = console.error;
+    console.warn = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+    console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+    try {
+      await fn();
+    } finally {
+      console.warn = realWarn;
+      console.error = realError;
+    }
+    return lines;
+  }
+
+  /** The fake KV, refusing every write to keys with one prefix as KV does past one write a second. */
+  function refusingKv(prefix: string) {
+    const fake = fakeKv();
+    const kv = {
+      ...fake.kv,
+      async put(key: string, value: string, opts?: { expirationTtl?: number }) {
+        if (key.startsWith(prefix)) throw new Error(`KV PUT failed: 429 Too Many Requests ${key}`);
+        return fake.kv.put(key, value, opts);
+      },
+    };
+    return { ...fake, kv };
+  }
+
+  const snapshotRequest = () => new Request('https://community.example/v1/community/snapshot', {
+    method: 'GET',
+    headers: { Origin: ORIGIN },
+  });
+
+  for (const [label, request] of [
+    ['/v1/community/power', () => powerRequest('fault-device-01')],
+    ['/v1/community/snapshot', snapshotRequest],
+  ] as const) {
+    await test(`a fault on ${label} answers 500 with CORS and one line by kind`, async () => {
+      const failing = {
+        async get(key: string) { throw new TypeError(`KV GET failed for ${key}`); },
+        async put() { throw new TypeError('KV PUT failed'); },
+      };
+      let res: Response | undefined;
+      const lines = await captureLogs(async () => { res = await worker.fetch(request(), envWith(failing as never)); });
+      assertEqual(res?.status, 500, 'status');
+      assertEqual(res?.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS header on the 500');
+      assertEqual(((await res!.json()) as { error?: string }).error, 'internal_error', 'error body');
+      assertEqual(lines.join(' | '), `[community] Unhandled TypeError on ${label}`, 'log lines');
+    });
+  }
+
+  await test('a fault on an unknown path is logged under a fixed label', async () => {
+    let res: Response | undefined;
+    const lines = await captureLogs(async () => {
+      res = await worker.fetch(new Request('https://community.example/v1/community/power/secret-device-id', {
+        method: 'POST',
+        headers: { Origin: ORIGIN },
+      }), { COMMUNITY_KV: fakeKv().kv, IP_SALT: SALT } as unknown as Env);
+    });
+    assertEqual(res?.status, 500, 'status');
+    assertEqual(lines.join(' | '), '[community] Unhandled TypeError on other', 'log lines');
+  });
+
+  for (const [what, prefix] of [['Rate window', 'rl:'], ['Snapshot', 'aggregate:']] as const) {
+    await test(`a refused ${what.toLowerCase()} write still counts the beacon, one line by kind`, async () => {
+      const fake = refusingKv(prefix);
+      await seed(fake.store, {});
+      const before = fake.store.get('aggregate:snapshot');
+      let res: Response | undefined;
+      const lines = await captureLogs(async () => { res = await worker.fetch(powerRequest('refused-write-01', 2), envWith(fake.kv)); });
+      assertEqual(res?.status, 200, 'status');
+      assertEqual(res?.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS header');
+      const body = (await res!.json()) as { joinedCount: number; totalPower: number };
+      assertEqual(body.joinedCount, 13, 'joinedCount');
+      assertEqual(body.totalPower, 32, 'totalPower');
+      assertEqual(fake.writes.some((w) => w.key.startsWith('device:')), true, 'the device record is written');
+      if (prefix === 'aggregate:') assertEqual(fake.store.get('aggregate:snapshot'), before, 'stored totals unchanged');
+      assertEqual(lines.join(' | '), `[community] ${what} write failed (Error), beacon served`, 'log lines');
+    });
+  }
+
+  await test('a refused device write serves the totals and counts the device once, later', async () => {
+    const fake = refusingKv('device:');
+    await seed(fake.store, {});
+    let res: Response | undefined;
+    const lines = await captureLogs(async () => { res = await worker.fetch(powerRequest('refused-device-1', 2), envWith(fake.kv)); });
+    assertEqual(res?.status, 200, 'status');
+    const body = (await res!.json()) as { joinedCount: number; totalPower: number };
+    assertEqual(body.joinedCount, 12, 'not counted without its record');
+    assertEqual(body.totalPower, 30, 'totalPower');
+    assertEqual(fake.writes.some((w) => w.key === 'aggregate:snapshot'), false, 'totals not written');
+    assertEqual(lines.join(' | '), '[community] Device write failed (Error), beacon served', 'log lines');
+    // After the address window the store takes the write again: counted once.
+    const later = fakeKv();
+    for (const [key, value] of fake.store) if (!key.startsWith('rl:')) later.store.set(key, value);
+    const again = await worker.fetch(powerRequest('refused-device-1', 2), envWith(later.kv));
+    assertEqual(((await again.json()) as { joinedCount: number }).joinedCount, 13, 'counted on the next beacon');
+  });
+
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
   console.log(`${results.length - failed.length}/${results.length} passed`);
