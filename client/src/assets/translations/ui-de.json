@@ -371,7 +371,6 @@
       "description": "Wähle einzeln aus, welche der drei Dienste auf deinem Rechner laufen: LLM, Stimme, Transkription.",
       "toggleOn": "Lokaler Modus ist an",
       "toggleOff": "Auf lokalen Modus umschalten",
-      "toggleHelp": "Wenn aktiv, laufen Gespräche über ein lokales LLM (LM Studio, Ollama, vLLM) und Audio über unsere lokalen Container. Echtzeit-Sprache bleibt vorerst gehostet.",
       "hardwareBanner": {
         "full": "NVIDIA-GPU erkannt. Die ganze Pipeline (LLM, EN + DE TTS, STT) kann mit docker compose --profile nvidia up lokal laufen.",
         "apple": "Apple-Silicon-Mac erkannt. EN TTS + STT laufen via Docker; für DE TTS lokal einmalig scripts/setup-local-tts-apple.sh ausführen.",
