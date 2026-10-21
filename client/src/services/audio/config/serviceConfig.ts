@@ -238,6 +238,22 @@ const withOwnAudioSwitches = (config: ServiceConfig): ServiceConfig => {
   return { ...config, ttsEnabled: true, sttEnabled: true };
 };
 
+/**
+ * The visitor set the voice or transcription switch: whatever it reads now is
+ * their choice, so no forced off stands for it any more and a save keeps it.
+ */
+export const withAudioSwitchChosen = (
+  config: ServiceConfig,
+  field: 'ttsEnabled' | 'sttEnabled',
+  on: boolean,
+): ServiceConfig => {
+  const { [SELF_HOST_FORCED_OFF]: forced, ...own } = config as ServiceConfig & { [SELF_HOST_FORCED_OFF]?: ForcedOff };
+  const chosen = { ...own, [field]: on } as ServiceConfig;
+  if (!forced) return chosen;
+  const left: ForcedOff = { ...forced, [field === 'ttsEnabled' ? 'tts' : 'stt']: false };
+  return (left.tts || left.stt ? { ...chosen, [SELF_HOST_FORCED_OFF]: left } : chosen) as ServiceConfig;
+};
+
 /** The switches as the visitor set them: a forced off still standing goes back to on. */
 const withoutSelfHostAudioGate = (config: Partial<ServiceConfig>): Partial<ServiceConfig> => {
   const { [SELF_HOST_FORCED_OFF]: forced, ...own } = config as Partial<ServiceConfig> & { [SELF_HOST_FORCED_OFF]?: ForcedOff };

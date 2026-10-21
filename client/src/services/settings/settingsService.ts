@@ -6,6 +6,7 @@ import {
   loadServiceConfig,
   saveServiceConfig,
   getModelDisplayName,
+  withAudioSwitchChosen,
   type ServiceConfig
 } from '../audio/config/serviceConfig';
 
@@ -36,6 +37,10 @@ export const handleConfigChange = (config: ServiceConfig, section: string, value
     case 'ttsSettings.speed':
       newConfig.ttsSettings.speed = parseFloat(value);
       break;
+    case 'ttsEnabled':
+    case 'sttEnabled':
+      // The visitor's own switch, also where a self-host build held it off.
+      return withAudioSwitchChosen(newConfig, section, value !== false);
     default:
       (newConfig as any)[section] = value; // stt, displayMode, ttsEnabled, sttEnabled
   }

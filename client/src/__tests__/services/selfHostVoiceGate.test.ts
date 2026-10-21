@@ -31,6 +31,7 @@ describe('voice and transcription in a self-host build', () => {
   afterEach(() => {
     vi.doUnmock('../../config/deployment');
     vi.doUnmock('../../config/runtime');
+    vi.unstubAllEnvs();
   });
 
   it('without an audio service both stay off, as before', async () => {
@@ -79,6 +80,46 @@ describe('voice and transcription in a self-host build', () => {
     m.saveConfiguration(saved);
 
     expect(JSON.parse(m.raw())).toMatchObject({ ttsEnabled: true, sttEnabled: true, ttsSettings: { speed: 1.1 } });
+  });
+
+  // The one screen path that saves an off while the gate's mark stands: the
+  // Stimme or Spracheingabe switch in Settings, turned on and off again (it
+  // reads off while the gate holds it), then the footer save.
+  it.each([
+    ['ttsEnabled', 'ttsEnabled'],
+    ['sttEnabled', 'sttEnabled'],
+  ] as const)('%s turned off in Settings while the gate held it off stays off once Local Mode could serve it', async (field, lmField) => {
+    // As a production build reads it: a development build turns a saved voice-off back on.
+    vi.stubEnv('DEV', false);
+    const m = await load({ selfHost: true });
+    m.saveServiceConfig({ ...m.defaultConfig, localMode: localMode(false, false) });
+
+    const opened = m.loadServiceConfig();
+    expect(opened[field]).toBe(false);
+    const toggledOn = m.handleConfigChange(opened, field, true);
+    const toggledOff = m.handleConfigChange(toggledOn, field, false);
+    m.saveConfiguration(toggledOff);
+    expect(JSON.parse(m.raw())[field]).toBe(false);
+
+    // Then the guide's Local Mode switch for that service, as the panel does it.
+    const c = m.loadServiceConfig();
+    c.localMode = { ...c.localMode!, [lmField]: true };
+    m.saveServiceConfig(c);
+    expect(JSON.parse(m.raw())[field]).toBe(false);
+    expect(m.loadServiceConfig()[field]).toBe(false);
+  });
+
+  it('a switch chosen in Settings leaves the other one to the gate', async () => {
+    const m = await load({ selfHost: true });
+    m.saveServiceConfig({ ...m.defaultConfig, localMode: localMode(false, false) });
+
+    const off = m.handleConfigChange(m.handleConfigChange(m.loadServiceConfig(), 'ttsEnabled', true), 'ttsEnabled', false);
+    m.saveConfiguration(off);
+    expect(JSON.parse(m.raw())).toMatchObject({ ttsEnabled: false, sttEnabled: true });
+
+    const on = m.handleConfigChange(m.loadServiceConfig(), 'ttsEnabled', true);
+    m.saveConfiguration(on);
+    expect(JSON.parse(m.raw())).toMatchObject({ ttsEnabled: true, sttEnabled: true });
   });
 
   it('a visitor who turned voice input off keeps it off when Local Mode could serve it', async () => {
