@@ -402,6 +402,7 @@ button {
   --z-critical: 10000;      /* Critical UI (helper popup, close buttons) */
   --z-maximum: 10002;       /* Absolute maximum (special close buttons) */
   --z-loader: 99999;        /* Loading overlays (cosmic council loader) */
+  --z-question: 100000;     /* A question the visitor must answer while a loader runs */
   
   /* MIGRATION MAP (for reference during transition):
      OLD VALUES → NEW VARIABLES

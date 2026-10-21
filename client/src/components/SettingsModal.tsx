@@ -225,6 +225,8 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab, in
       className={styles.modal}
       animationType="fade-scale"
       backgroundVariant="onboarding"
+      // Opened for the key from a council or the history: above those overlays.
+      {...(initialSection ? { overlayClassName: 'modal-priority' } : {})}
     >
       {/* Changes Alert Dialog - Using the ACTUAL component from old SettingsModal */}
       <ChangesAlertDialog

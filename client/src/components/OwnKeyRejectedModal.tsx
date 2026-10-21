@@ -1,4 +1,5 @@
 import { FC, useSyncExternalStore } from 'react';
+import { createPortal } from 'react-dom';
 import { Key } from '@phosphor-icons/react';
 import { ModalContainer } from './Modal';
 import { useTranslation } from '../hooks/useTranslation';
@@ -64,13 +65,14 @@ const OwnKeyRejectedModal: FC = () => {
     openKeySettings();
   };
 
-  return (
+  // On the body, above every loader: a council or a summary asks while its loader still covers the page.
+  return createPortal(
     <ModalContainer
       isOpen
       onClose={() => answerOwnKeyAsk('dismissed')}
       modalType="compact"
       animationType="fade-scale"
-      overlayClassName="modal-priority"
+      overlayClassName="modal-above-loaders"
       ariaLabel={text('title')}
     >
       <div
@@ -129,7 +131,8 @@ const OwnKeyRejectedModal: FC = () => {
           </button>
         </div>
       </div>
-    </ModalContainer>
+    </ModalContainer>,
+    document.body,
   );
 };
 
