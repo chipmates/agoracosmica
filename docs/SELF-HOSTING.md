@@ -2,7 +2,7 @@
 
 This guide is for an operator running Agora Cosmica on their own hardware. [The README](../README.md) describes the product and what the six formats do.
 
-One `docker compose up` gives you the whole app with your own OpenRouter key. From there, speech and transcription can move onto your machine, and the model itself after them, in any order. Stop at whatever point satisfies you.
+One `docker compose up` gives you the whole app with your own OpenRouter key. From there, speech and transcription can run on your machine, and the model itself after them, in any order. Stop at whatever point satisfies you.
 
 A self-host instance carries all six formats (Story, Wisdom, Prism, Quest, Free Talk, Council), all 30 figures, the pre-recorded audio library in English and German, and push-to-talk transcription. The hosted free tier and the Community panel stay hosted-only. The self-host build is also analytics-silent, spelled out under [what leaves your machine](#what-leaves-your-machine).
 
@@ -41,7 +41,7 @@ Copy `.env.example` to `.env` and edit if you need to override defaults:
 | `AGORA_TTS_KOKORO_PORT` | `8880` | Host-side port for Kokoro (English speech). |
 | `AGORA_STT_PORT` | `8000` | Host-side port for Whisper (transcription). Change it if 8000 is already taken. |
 | `AGORA_TTS_QWEN_PORT` | `8887` | Host-side port for Qwen3-TTS (German, `nvidia` profile). |
-| `AGORA_AUDIO_API_URL` | (empty) | Optional centralized audio backend (see Operator notes). Empty keeps audio local. |
+| `AGORA_AUDIO_API_URL` | (empty) | Optional centralized audio backend (see Operator notes). Empty: voice and transcription come only from the Local Mode toggles. |
 
 After editing `.env`, restart with `docker compose up -d`. The container rewrites `/config.js` from these env vars on every start, so no rebuild is needed.
 
@@ -57,7 +57,7 @@ docker compose pull && docker compose up -d    # update to the latest published 
 
 ## Use Local Mode
 
-Local Mode has three independent toggles in Settings: speech, transcription, and the model. The Kokoro and Whisper containers from the previous step are already running on your machine, so the first two are one click each:
+Local Mode has three independent toggles in Settings: speech, transcription, and the model. A self-host instance has no hosted audio, so until the speech toggle is on the replies have no voice, and until the transcription toggle is on there is no microphone button (unless you set `AGORA_AUDIO_API_URL`, see Operator notes). The Kokoro and Whisper containers from the previous step are already running on your machine, so the first two are one click each:
 
 1. Open <http://localhost:8080>.
 2. Settings → Preferences → Local Mode.

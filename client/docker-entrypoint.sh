@@ -9,7 +9,8 @@
 # Env vars (both optional):
 #   AGORA_MEDIA_BASE_URL  public media CDN. Empty = falls back to the
 #                         build-time default (https://media.agoracosmica.org).
-#   AGORA_AUDIO_API_URL   live audio backend. Empty = live voice disabled,
+#   AGORA_AUDIO_API_URL   live audio backend. Empty = live voice and
+#                         transcription only through Local Mode,
 #                         pre-recorded audio still works.
 
 set -eu

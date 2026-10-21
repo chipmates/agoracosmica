@@ -177,6 +177,8 @@
       "aiModelBadgeByok": "Your key",
       "aiModelBadgeLocal": "Local model",
       "aiModelBadgeRejected": "Key rejected",
+      "aiModelBadgeNoKey": "No key",
+      "audioServer": "Audio server",
       "local": "Local"
     },
     "tooltips": {

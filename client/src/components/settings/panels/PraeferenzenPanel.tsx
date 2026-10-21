@@ -5,6 +5,7 @@ import { keyStorage } from '../../../services/storage/keyStorageService';
 import { useUIStore } from '../../../stores/uiStore';
 import { useDomainStore } from '../../../stores/domainStore';
 import { localModeFromRaw } from '../../../services/audio/config/serviceConfig';
+import { isSelfHost } from '../../../config/deployment';
 import styles from '../../SettingsModal.module.css';
 import CollapsibleSection from '../CollapsibleSection';
 
@@ -121,27 +122,35 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
 
   // Voice and voice input run on our servers in Germany, or locally in Local Mode.
   // The badge names whose servers they are: beside "Local", "Self-hosted" read as the visitor's own.
+  // A self-host instance has none of ours: there the other way is the operator's audio server.
+  const hostedAudioBadge = (): string => (isSelfHost
+    ? tString('settings.preferences.audioServer', 'Audio server')
+    : tString('settings.preferences.ourServers', 'Our servers'));
+
   const getVoiceBadge = (): string => {
     if (!config.ttsEnabled) return tString('common.disabled', 'Disabled');
     if (localMode?.ttsEnabled) return tString('settings.preferences.local', 'Local');
-    return tString('settings.preferences.ourServers', 'Our servers');
+    return hostedAudioBadge();
   };
 
   const getSpeechBadge = (): string => {
     if (!config.sttEnabled) return tString('common.disabled', 'Disabled');
     if (localMode?.sttEnabled) return tString('settings.preferences.local', 'Local');
-    return tString('settings.preferences.ourServers', 'Our servers');
+    return hostedAudioBadge();
   };
 
   // The badge names the route, the panel names the model: a model's name beside
   // the title leaves it no room on a phone. The free tier's models are not all
   // in the EU, so its badge names no model either.
   // A local model wins over a saved key, as it does for the conversation.
+  // A self-host instance has no free tier: without a key there is no model yet.
   const getAiModelBadge = (): string => {
     if (localMode?.llmEnabled) return tString('settings.preferences.aiModelBadgeLocal', 'Local model');
     if (byokKey === 'usable') return tString('settings.preferences.aiModelBadgeByok', 'Your key');
     if (byokKey === 'rejected') return tString('settings.preferences.aiModelBadgeRejected', 'Key rejected');
-    return tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
+    return isSelfHost
+      ? tString('settings.preferences.aiModelBadgeNoKey', 'No key')
+      : tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
   };
 
   return (

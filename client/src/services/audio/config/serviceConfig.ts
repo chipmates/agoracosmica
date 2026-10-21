@@ -4,6 +4,7 @@
 import { useDomainStore } from '../../../stores';
 import { adoptSavedServiceConfig } from '../../../stores/serviceConfigSync';
 import { isSelfHost } from '../../../config/deployment';
+import { audioApiUrl } from '../../../config/runtime';
 
 // ============================================
 // Type Definitions
@@ -187,6 +188,45 @@ export const llmFromRaw = (raw: string | null | undefined): LLMConfig => {
 };
 
 // ============================================
+// Self-host audio gate
+// ============================================
+
+// A self-host build has no hosted audio of its own: voice and transcription
+// stay off until the operator's audio endpoint or the visitor's own service
+// (Local Mode) can serve them. The off this forces is marked on the loaded
+// object (a symbol key: spreads keep it, JSON drops it) so a save made from it
+// writes back the visitor's own switches, not the forced off.
+const SELF_HOST_FORCED_OFF = Symbol('selfHostForcedOff');
+type ForcedOff = { tts: boolean; stt: boolean };
+
+const withSelfHostAudioGate = (config: ServiceConfig): ServiceConfig => {
+  if (!isSelfHost) return config;
+  const lm = config.localMode;
+  const forced: ForcedOff = {
+    tts: config.ttsEnabled !== false && !audioApiUrl && !lm?.ttsEnabled,
+    stt: config.sttEnabled !== false && !audioApiUrl && !lm?.sttEnabled,
+  };
+  if (!forced.tts && !forced.stt) return config;
+  return {
+    ...config,
+    ...(forced.tts ? { ttsEnabled: false } : {}),
+    ...(forced.stt ? { sttEnabled: false } : {}),
+    [SELF_HOST_FORCED_OFF]: forced,
+  } as ServiceConfig;
+};
+
+/** The switches as the visitor set them: a forced off still standing goes back to on. */
+const withoutSelfHostAudioGate = (config: Partial<ServiceConfig>): Partial<ServiceConfig> => {
+  const { [SELF_HOST_FORCED_OFF]: forced, ...own } = config as Partial<ServiceConfig> & { [SELF_HOST_FORCED_OFF]?: ForcedOff };
+  if (!forced) return own;
+  return {
+    ...own,
+    ...(forced.tts && own.ttsEnabled === false ? { ttsEnabled: true } : {}),
+    ...(forced.stt && own.sttEnabled === false ? { sttEnabled: true } : {}),
+  };
+};
+
+// ============================================
 // Main Functions
 // ============================================
 
@@ -199,7 +239,7 @@ export const loadServiceConfig = (): ServiceConfig => {
   if (isLoadingConfig) {
     console.warn('[Config] Prevented re-entrant call to loadServiceConfig');
     const existingConfig = useDomainStore.getState().serviceConfig.parsed as ServiceConfig | null;
-    return existingConfig || defaultConfig;
+    return withSelfHostAudioGate(existingConfig || defaultConfig);
   }
 
   isLoadingConfig = true;
@@ -276,9 +316,7 @@ export const loadServiceConfig = (): ServiceConfig => {
         });
       }
 
-      return isSelfHost
-        ? { ...config, ttsEnabled: false, sttEnabled: false }
-        : config;
+      return withSelfHostAudioGate(config);
     }
   } catch (error) {
     console.error('Error loading service config:', error);
@@ -287,19 +325,18 @@ export const loadServiceConfig = (): ServiceConfig => {
     isLoadingConfig = false;
   }
 
-  return isSelfHost
-    ? { ...defaultConfig, ttsEnabled: false, sttEnabled: false }
-    : defaultConfig;
+  return withSelfHostAudioGate(defaultConfig);
 };
 
 // Save configuration to localStorage
 export const saveServiceConfig = (config: Partial<ServiceConfig>): boolean => {
   try {
     // Validate config before saving
+    const own = withoutSelfHostAudioGate(config);
     const validatedConfig: ServiceConfig = {
       ...defaultConfig,
-      ...config,
-      ttsSettings: validateTTSSettings(config.ttsSettings)
+      ...own,
+      ttsSettings: validateTTSSettings(own.ttsSettings)
     };
 
     // Update Zustand (which will also persist to localStorage via adapter)

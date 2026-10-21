@@ -7,7 +7,8 @@
 //
 //   Self-host build (Docker): BYOK only, no free tier, no usage beacons,
 //   no Turnstile. Pre-recorded audio and all six modes work unchanged;
-//   live voice stays off unless the operator configures an audio endpoint.
+//   live voice and transcription stay off until the operator configures an
+//   audio endpoint or the visitor turns them on in Local Mode.
 //
 // VITE_SELF_HOST=true at build time selects the self-host build. The Docker
 // image sets it; the hosted build leaves it unset. Every behaviour that
@@ -18,8 +19,8 @@
  * True when this is a self-host build (VITE_SELF_HOST=true at build time).
  *
  * Guards the self-host differences: BYOK-only LLM routing, no free-tier
- * session or quota, silent analytics, skipped Turnstile, and audio that
- * stays off until an endpoint is configured.
+ * session or quota, silent analytics, skipped Turnstile, and live audio that
+ * stays off until an endpoint or Local Mode serves it.
  *
  * Vite inlines VITE_SELF_HOST at build time, so branches guarded by this
  * constant are tree-shaken out of the build that does not need them.

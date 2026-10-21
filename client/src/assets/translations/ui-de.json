@@ -175,6 +175,8 @@
       "aiModelBadgeByok": "Eigener Key",
       "aiModelBadgeLocal": "Lokales Modell",
       "aiModelBadgeRejected": "Key abgelehnt",
+      "aiModelBadgeNoKey": "Kein Key",
+      "audioServer": "Audio-Server",
       "local": "Lokal"
     },
     "tooltips": {
