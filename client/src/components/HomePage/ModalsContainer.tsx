@@ -53,7 +53,7 @@ interface ModalsContainerProps {
 const WELCOME_GATE_SHIELD: React.CSSProperties = {
   position: 'fixed',
   inset: 0,
-  zIndex: 9999,
+  zIndex: 'var(--z-consent)',
 };
 
 /**

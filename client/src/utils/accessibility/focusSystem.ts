@@ -275,16 +275,20 @@ export const focusManagement: FocusManagement = {
     
     const firstElement = focusableElements[0];
     const lastElement = focusableElements[focusableElements.length - 1];
-    
+    // Focus often starts on the container itself; from there (or from
+    // anywhere outside it) a Tab must land inside, not on the page behind.
+    const active = document.activeElement;
+    const inside = active !== container && active instanceof Node && container.contains(active);
+
     if (event.shiftKey) {
       // Shift + Tab
-      if (document.activeElement === firstElement) {
+      if (!inside || active === firstElement) {
         event.preventDefault();
         lastElement.focus();
       }
     } else {
       // Tab
-      if (document.activeElement === lastElement) {
+      if (!inside || active === lastElement) {
         event.preventDefault();
         firstElement.focus();
       }

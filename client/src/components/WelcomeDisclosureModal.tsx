@@ -2,6 +2,7 @@ import React, { useState, useCallback, useEffect, useMemo, useRef, FC } from 're
 import { useTranslation } from '../hooks/useTranslation';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { focusManagement } from '../utils/accessibility/focusSystem';
+import { inertOutside } from '../utils/accessibility/inertOutside';
 import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
@@ -18,6 +19,10 @@ import { sendConversion } from '../utils/public/gclidCapture';
 export interface WelcomeOutcome {
   returning: boolean;
 }
+
+// Stay reachable while the screen is open: the bot check that can ask for a
+// tick, and the status lines read out to screen readers.
+const LIVE_OUTSIDE = '#turnstile-container, .security-check-notice, #live-region';
 
 interface WelcomeDisclosureModalProps {
   isOpen: boolean;
@@ -131,6 +136,13 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
       document.removeEventListener('keydown', handleKeyDown);
     };
   }, [isOpen, isAnimating, handleSkip]);
+
+  // The page behind is out of reach while the screen is open, by keyboard,
+  // pointer and screen reader alike.
+  useEffect(() => {
+    if (!isOpen || !overlayRef.current) return undefined;
+    return inertOutside(overlayRef.current, LIVE_OUTSIDE);
+  }, [isOpen]);
 
   // Focus management on open
   useEffect(() => {

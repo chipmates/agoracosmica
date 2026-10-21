@@ -15,7 +15,7 @@
   bottom: 0;
   background: color-mix(in srgb, var(--bg-void) var(--a-95), transparent);
   backdrop-filter: blur(var(--glass-blur-heavy));
-  z-index: var(--z-overlay); /* 9999 */
+  z-index: var(--z-consent); /* over the players and every app modal */
   display: flex;
   align-items: center;
   justify-content: center;

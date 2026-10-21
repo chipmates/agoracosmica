@@ -401,6 +401,7 @@ button {
   --z-overlay: 9999;        /* Critical overlays (audio player, history modal) */
   --z-critical: 10000;      /* Critical UI (helper popup, close buttons) */
   --z-maximum: 10002;       /* Absolute maximum (special close buttons) */
+  --z-consent: 10010;       /* Welcome consent gate: over every app layer, under loaders and the bot check */
   --z-loader: 99999;        /* Loading overlays (cosmic council loader) */
   --z-question: 100000;     /* A question the visitor must answer while a loader runs */
   
