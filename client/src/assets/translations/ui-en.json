@@ -332,6 +332,7 @@
       "keySectionIntroSelfHost": "Without an OpenRouter key, only a model in Local Mode answers here. You see and control your usage.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
       "statusRejected": "Your OpenRouter key was rejected. Before a conversation goes through the free tier, the app asks you.",
+      "statusRejectedSelfHost": "Your OpenRouter key was rejected. Check it above, or turn on your own model in Local Mode.",
       "servedIn": "Server location: {region}",
       "afterBudget": "Once our shared daily budget for it is spent, everyone gets {model}, {region}, until midnight",
       "budgetWithin": "Today: within the shared budget",

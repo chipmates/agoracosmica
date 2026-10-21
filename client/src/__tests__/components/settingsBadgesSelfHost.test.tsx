@@ -5,7 +5,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, cleanup, act } from '@testing-library/react';
 
-const h = vi.hoisted(() => ({ lang: 'de' as 'en' | 'de', byok: false }));
+const h = vi.hoisted(() => ({ lang: 'de' as 'en' | 'de', byok: false, rejected: false }));
 
 vi.mock('../../config/deployment', () => ({ isSelfHost: true }));
 vi.mock('../../hooks/useTranslation', async () => {
@@ -22,7 +22,10 @@ vi.mock('../../hooks/useTranslation', async () => {
   return { useTranslation: () => ({ tString: t, tNode: t, t, language: h.lang }) };
 });
 vi.mock('../../services/storage/keyStorageService', () => ({
-  keyStorage: { hasUsableKey: vi.fn(async () => h.byok) },
+  keyStorage: {
+    hasUsableKey: vi.fn(async () => h.byok),
+    hasKey: vi.fn(async () => h.byok || h.rejected),
+  },
 }));
 vi.mock('../../components/settings/panels/LanguagePanel', () => ({ default: () => null }));
 vi.mock('../../components/settings/panels/VoicePanel', () => ({ default: () => null }));
@@ -61,6 +64,7 @@ describe('the Settings badges on a self-host instance', () => {
   beforeEach(() => {
     h.lang = 'de';
     h.byok = false;
+    h.rejected = false;
   });
   afterEach(() => cleanup());
 
@@ -83,6 +87,14 @@ describe('the Settings badges on a self-host instance', () => {
     await open(true, { llm: false, tts: true, stt: true });
     expect(screen.getAllByText('Lokal')).toHaveLength(2);
     expect(screen.getByText('Eigener Key')).toBeTruthy();
+  });
+
+  it('German, a rejected key: the badge says so, no free tier', async () => {
+    h.rejected = true;
+    await open(true);
+    expect(screen.getByText('Key abgelehnt')).toBeTruthy();
+    expect(screen.queryByText('Kein Key')).toBeNull();
+    expect(screen.queryByText('Kostenloser Tarif')).toBeNull();
   });
 
   it('English: no key, the audio server', async () => {

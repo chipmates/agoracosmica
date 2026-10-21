@@ -330,6 +330,7 @@
       "keySectionIntroSelfHost": "Ohne OpenRouter-Key antwortet hier nur ein Modell im Lokalen Modus. Du siehst und kontrollierst deine Nutzung.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
       "statusRejected": "Dein OpenRouter-Key wurde abgelehnt. Bevor ein Gespräch über den kostenlosen Tarif läuft, fragt dich die App.",
+      "statusRejectedSelfHost": "Dein OpenRouter-Key wurde abgelehnt. Prüfe ihn oben oder schalte im Lokalen Modus dein eigenes Modell ein.",
       "servedIn": "Serverstandort: {region}",
       "afterBudget": "Wenn unser gemeinsames Tagesbudget dafür aufgebraucht ist, antwortet für alle bis Mitternacht {model}, {region}",
       "budgetWithin": "Heute: im gemeinsamen Budget",
