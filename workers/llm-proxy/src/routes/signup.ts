@@ -1,8 +1,8 @@
 // Anonymous signup beacon
-// Fires from the client's welcome step when a browser that holds no terms
-// record accepts the terms. Distinct from profile_created (gclid-gated,
-// ad-attributed only). Closes the final gap in the dashboard funnel: total
-// signups including organic.
+// Fires from the client's welcome step on every accepted welcome, so a browser
+// that accepts a new terms version counts again. Distinct from profile_created
+// (gclid-gated, ad-attributed only). Closes the final gap in the dashboard
+// funnel: total signups including organic.
 //
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics.

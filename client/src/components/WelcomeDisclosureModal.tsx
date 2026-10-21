@@ -52,10 +52,9 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
 
   const handleComplete = useCallback((): void => {
     if (isAnimating) return;
-    // Read before the record below is written: a browser that accepted an
-    // earlier version is not a new entry, signup or profile.
-    const firstAcceptance = !hasEarlierConsent();
-    returningRef.current = !firstAcceptance;
+    // Read before the record below is written, only to send a browser that
+    // accepted earlier terms back where it was. The counts below never use it.
+    returningRef.current = hasEarlierConsent();
     // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG).
     // A full or blocked storage must not trap the user on the welcome screen.
     try {
@@ -82,15 +81,15 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
       .then((exists) => (exists ? undefined : preferencesIndexedDbAdapter.setUserProfile(defaultProfile)))
       .catch((err) => console.error('Failed to save profile:', err));
 
-    // Entry funnel beacons: the first acceptance in this browser is the true
-    // "entered the app" moment. Accepting a new terms version counts nothing.
-    if (firstAcceptance) {
-      sendEntryBeacon();
-      sendSignupBeacon();
-      // profile_created self-gates on a captured gclid + the consent granted on
-      // the landing prompt, so it no-ops for everyone who did not opt in there.
-      sendConversion('profile_created');
-    }
+    // Entry funnel beacons: the "entered the app" moment. They go with every
+    // accepted welcome: deciding "new or returning" would mean reading the
+    // browser's storage for counting, so a browser that accepts a new terms
+    // version counts again.
+    sendEntryBeacon();
+    sendSignupBeacon();
+    // profile_created self-gates on a captured gclid + the consent granted on
+    // the landing prompt, so it no-ops for everyone who did not opt in there.
+    sendConversion('profile_created');
 
     setIsAnimating(true);
   }, [isAnimating, language, tString]);

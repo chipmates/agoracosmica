@@ -1,6 +1,6 @@
-// The entry count, the signup count and profile_created go out on a browser's
-// first acceptance only. A stored terms record from an earlier version holds
-// all three back; nothing but that record is read to decide it.
+// The entry count, the signup count and profile_created go out with every
+// accepted welcome. Nothing stored in the browser decides whether they are
+// sent, so a browser accepting a new terms version counts again.
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, fireEvent } from '@testing-library/react';
@@ -55,19 +55,20 @@ describe('WelcomeDisclosureModal counts', () => {
     expect(vi.mocked(localStorage.getItem).mock.calls.map((c) => c[0])).not.toContain('selectedFigure');
   });
 
-  it('counts nothing when the browser accepted an earlier version', () => {
+  it('counts a browser that accepted an earlier version again', () => {
     localStorage.setItem('agb_consent', JSON.stringify({ version: '1.0.0', timestamp: 1 }));
     accept();
-    expect(beacons.sendEntryBeacon).not.toHaveBeenCalled();
-    expect(beacons.sendSignupBeacon).not.toHaveBeenCalled();
-    expect(beacons.sendConversion).not.toHaveBeenCalled();
+    expect(beacons.sendEntryBeacon).toHaveBeenCalledTimes(1);
+    expect(beacons.sendSignupBeacon).toHaveBeenCalledTimes(1);
+    expect(beacons.sendConversion).toHaveBeenCalledWith('profile_created');
     expect(JSON.parse(localStorage.getItem('agb_consent') as string).version).toBe(CURRENT_AGB_VERSION);
   });
 
-  it('counts nothing when the welcome is shown again over a current record', () => {
+  it('counts a welcome shown again over a current record', () => {
     localStorage.setItem('agb_consent', JSON.stringify({ version: CURRENT_AGB_VERSION, timestamp: 1 }));
     accept();
-    expect(beacons.sendSignupBeacon).not.toHaveBeenCalled();
-    expect(beacons.sendEntryBeacon).not.toHaveBeenCalled();
+    expect(beacons.sendEntryBeacon).toHaveBeenCalledTimes(1);
+    expect(beacons.sendSignupBeacon).toHaveBeenCalledTimes(1);
+    expect(beacons.sendConversion).toHaveBeenCalledWith('profile_created');
   });
 });
