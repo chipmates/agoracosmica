@@ -86,7 +86,7 @@ When you paste an OpenRouter key:
 3. **Storage**: the encrypted record sits in IndexedDB, and in no other store.
 4. **Transit**: browser to OpenRouter directly. Our servers are never on the path.
 
-What we never see: the key, the conversations, the usage.
+What we never see: the key and the usage. A conversation reaches us only if OpenRouter rejects the key and you then say yes in the app to the daily free quota (see [data flow](#data-flow)).
 
 [THREAT-MODEL.md](THREAT-MODEL.md) takes this apart in detail, including the attacks a non-extractable key does not stop.
 

@@ -523,7 +523,7 @@
       },
       "subProcessors": {
         "title": "Sub-processors",
-        "intro": "We work with three EU or DPF-certified vendors. With your own OpenRouter key, your typed messages go straight to OpenRouter under your own account, not through us.",
+        "intro": "We work with three EU or DPF-certified vendors. With your own OpenRouter key, your typed messages go straight to OpenRouter under your own account, not through us. If OpenRouter rejects the key, a conversation goes through us only after you say yes in the app.",
         "hetzner": {
           "name": "Hetzner Online",
           "region": "Germany",

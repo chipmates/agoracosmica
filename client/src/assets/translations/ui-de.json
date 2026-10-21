@@ -521,7 +521,7 @@
       },
       "subProcessors": {
         "title": "Auftragsverarbeiter",
-        "intro": "Wir arbeiten mit drei EU- oder DPF-zertifizierten Anbietern. Mit deinem eigenen OpenRouter-Key gehen deine geschriebenen Nachrichten direkt zu OpenRouter, unter deinem eigenen Konto und nicht über uns.",
+        "intro": "Wir arbeiten mit drei EU- oder DPF-zertifizierten Anbietern. Mit deinem eigenen OpenRouter-Key gehen deine geschriebenen Nachrichten direkt zu OpenRouter, unter deinem eigenen Konto und nicht über uns. Lehnt OpenRouter den Key ab, läuft ein Gespräch erst nach deinem Ja in der App über uns.",
         "hetzner": {
           "name": "Hetzner Online",
           "region": "Deutschland",
