@@ -329,7 +329,7 @@
       "statusLocal": "Local Mode is on. Your messages go to your own model.",
       "statusNoModel": "No model yet. Add your OpenRouter key above, or turn on your own model in Local Mode.",
       "localRunsAt": "Runs at {endpoint}",
-      "keySectionIntroSelfHost": "Without an OpenRouter key, only a model in Local Mode answers here. You see and control your usage.",
+      "keySectionIntroSelfHost": "With an OpenRouter key, conversations run on your own account, where you see and control the usage. Without a key, only a model in Local Mode answers here.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
       "statusByokSelfHost": "Your OpenRouter key is active.",
       "statusRejected": "Your OpenRouter key was rejected. Before a conversation goes through the free tier, the app asks you.",

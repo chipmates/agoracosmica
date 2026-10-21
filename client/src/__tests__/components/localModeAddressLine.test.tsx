@@ -1,6 +1,7 @@
 // The model card under Local Mode says where the model runs. Local Mode takes
 // any address (this computer, another one on the network, a server), so the
-// card names the address and never claims the visitor's own computer.
+// card names the address and never claims the visitor's own computer. On a
+// self-host build the key section's intro reads true sentence by sentence.
 import { describe, it, expect, vi, afterEach } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';
 import type { ReactNode } from 'react';
@@ -76,5 +77,19 @@ describe('the model card under Local Mode', () => {
     expect(text).toContain(line);
     expect(text).toContain(lang === 'de' ? de.settings.aiModelKey.statusLocal : en.settings.aiModelKey.statusLocal);
     expect(text).not.toMatch(/deinem Rechner|your computer/);
+  });
+
+  it.each(['de', 'en'] as const)('self-host, %s: the key intro says what the key does before what answers without one', async (lang) => {
+    h.lang = lang;
+    h.selfHost = true;
+    saveServiceConfig({ ...defaultConfig });
+    const view = render(<AiModelPanel SettingCard={Card} CATEGORY_ICONS={{}} />);
+    await act(async () => { await new Promise((resolve) => setTimeout(resolve, 0)); });
+    const intro = (lang === 'de' ? de : en).settings.aiModelKey.keySectionIntroSelfHost;
+    expect(view.container.textContent).toContain(intro);
+    const [first, second] = intro.split(/(?<=\.) /);
+    expect(first).toMatch(lang === 'de' ? /^Mit einem OpenRouter-Key/ : /^With an OpenRouter key/);
+    expect(second).toMatch(lang === 'de' ? /^Ohne Key/ : /^Without a key/);
+    expect(intro).not.toMatch(/[—–;]|kostenlos|free/i);
   });
 });
