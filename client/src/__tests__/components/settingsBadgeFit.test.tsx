@@ -1,15 +1,15 @@
 // A Settings card's badge sits beside its title, which may take two lines. On
 // a 360 px phone the longest badges that leave "Dein Key & KI-Modell" whole
 // are the free-tier ones, "Kostenloser Tarif" and "Europe · Free tier" (17
-// and 18 characters). The model badge names the route (own key, local model),
-// and the panel below names the model. On narrow screens a longer badge wraps
+// and 18 characters). The model badge names the route (own key, local model,
+// a rejected key), and the panel below names the model. On narrow screens a longer badge wraps
 // instead of cutting the title.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, cleanup, act } from '@testing-library/react';
 import { readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 
-const h = vi.hoisted(() => ({ lang: 'de' as 'en' | 'de', byok: false }));
+const h = vi.hoisted(() => ({ lang: 'de' as 'en' | 'de', byok: false, rejected: false }));
 
 vi.mock('../../hooks/useTranslation', async () => {
   const bundles = {
@@ -25,7 +25,10 @@ vi.mock('../../hooks/useTranslation', async () => {
   return { useTranslation: () => ({ tString: t, tNode: t, t, language: h.lang }) };
 });
 vi.mock('../../services/storage/keyStorageService', () => ({
-  keyStorage: { hasUsableKey: vi.fn(async () => h.byok) },
+  keyStorage: {
+    hasUsableKey: vi.fn(async () => h.byok),
+    hasKey: vi.fn(async () => h.byok || h.rejected),
+  },
 }));
 vi.mock('../../components/settings/panels/LanguagePanel', () => ({ default: () => null }));
 vi.mock('../../components/settings/panels/VoicePanel', () => ({ default: () => null }));
@@ -48,8 +51,9 @@ const FITS_AT_360 = 'Europe · Free tier'.length;
 const Card = () => null;
 // Local Mode's model switch is on only together with its route, as the panel saves them.
 const LOCAL_LLM = { provider: 'custom-openai', kind: 'custom-openai' as const, baseURL: 'http://127.0.0.1:1234/v1', model: 'local-model' };
-const badgesIn = async (state: { llm: boolean; tts: boolean; stt: boolean; byok: boolean; voice: boolean }) => {
+const badgesIn = async (state: { llm: boolean; tts: boolean; stt: boolean; byok: boolean; voice: boolean; rejected?: boolean }) => {
   h.byok = state.byok;
+  h.rejected = state.rejected ?? false;
   saveServiceConfig({
     ...defaultConfig,
     llm: state.llm ? LOCAL_LLM : defaultConfig.llm,
@@ -79,6 +83,7 @@ const STATES = {
   ownKey: { llm: false, tts: false, stt: false, byok: true, voice: true },
   ownKeyMixed: { llm: false, tts: false, stt: true, byok: true, voice: true },
   voiceOff: { llm: false, tts: false, stt: false, byok: false, voice: false },
+  rejected: { llm: false, tts: false, stt: false, byok: false, voice: true, rejected: true },
 };
 
 describe('the Settings card badges leave the title its room', () => {
@@ -102,9 +107,11 @@ describe('the Settings card badges leave the title its room', () => {
   it('the model badge names the route and leaves the model to the panel', async () => {
     expect(await badgesIn(STATES.ownKey)).toContain('Eigener Key');
     expect(await badgesIn(STATES.local)).toContain('Lokales Modell');
+    expect(await badgesIn(STATES.rejected)).toContain('Key abgelehnt');
     h.lang = 'en';
     expect(await badgesIn(STATES.ownKey)).toContain('Your key');
     expect(await badgesIn(STATES.local)).toContain('Local model');
+    expect(await badgesIn(STATES.rejected)).toContain('Key rejected');
   });
 
   it('on narrow screens a badge longer than its share wraps instead of cutting the title', () => {
