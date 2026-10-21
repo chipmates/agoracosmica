@@ -476,6 +476,40 @@ async function parseSSEStream(
   const reasoning = createReasoningFilter();
   const toolCalls = new Map<number, { name: string; arguments: string; id?: string }>();
 
+  const handleLine = async (line: string): Promise<void> => {
+    if (!line.startsWith('data: ') || line.trim() === 'data: [DONE]') return;
+    // The catch covers reading the line only. The callback runs after it, so
+    // a stop or a fault it throws ends the stream.
+    let content = '';
+    try {
+      const data = JSON.parse(line.slice(6));
+      const delta = data.choices?.[0]?.delta;
+
+      // Text content
+      content = delta?.content ? reasoning.push(delta.content) : '';
+      if (content) fullResponse += content;
+
+      // Tool calls (same accumulation as llmService.ts)
+      if (delta?.tool_calls) {
+        for (const tc of delta.tool_calls) {
+          const idx = tc.index ?? 0;
+          if (!toolCalls.has(idx)) {
+            toolCalls.set(idx, { name: '', arguments: '', id: undefined });
+          }
+          const acc = toolCalls.get(idx)!;
+          if (tc.id) acc.id = tc.id;
+          if (tc.function?.name) acc.name = tc.function.name;
+          if (tc.function?.arguments) acc.arguments += tc.function.arguments;
+        }
+      }
+    } catch {
+      // Skip malformed SSE lines
+    }
+    if (content && chunker && streamingCallback) {
+      await chunker.processChunk(content, streamingCallback);
+    }
+  };
+
   let ended = false;
   try {
     while (true) {
@@ -487,40 +521,12 @@ async function parseSSEStream(
       buffer = lines.pop()!; // Keep incomplete last line in buffer
 
       for (const line of lines) {
-        if (line.startsWith('data: ') && line !== 'data: [DONE]') {
-          // The catch covers reading the line only. The callback runs after
-          // it, so a stop or a fault it throws ends the stream.
-          let content = '';
-          try {
-            const data = JSON.parse(line.slice(6));
-            const delta = data.choices?.[0]?.delta;
-
-            // Text content
-            content = delta?.content ? reasoning.push(delta.content) : '';
-            if (content) fullResponse += content;
-
-            // Tool calls (same accumulation as llmService.ts)
-            if (delta?.tool_calls) {
-              for (const tc of delta.tool_calls) {
-                const idx = tc.index ?? 0;
-                if (!toolCalls.has(idx)) {
-                  toolCalls.set(idx, { name: '', arguments: '', id: undefined });
-                }
-                const acc = toolCalls.get(idx)!;
-                if (tc.id) acc.id = tc.id;
-                if (tc.function?.name) acc.name = tc.function.name;
-                if (tc.function?.arguments) acc.arguments += tc.function.arguments;
-              }
-            }
-          } catch {
-            // Skip malformed SSE lines
-          }
-          if (content && chunker && streamingCallback) {
-            await chunker.processChunk(content, streamingCallback);
-          }
-        }
+        await handleLine(line);
       }
     }
+    // A body that closes without a final line break still carries its last line.
+    buffer += decoder.decode();
+    await handleLine(buffer);
     ended = true;
   } finally {
     // Thrown out mid-body: drop the connection, so the reply stops generating.
