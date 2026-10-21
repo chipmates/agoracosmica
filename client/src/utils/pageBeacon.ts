@@ -7,6 +7,7 @@
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
 import { isSelfHost } from '../config/deployment';
+import { mayPostTo } from './productionHost';
 import { probeField } from './probeSession';
 import { sendFunnelBeacon } from './funnelBeacon';
 import { sourceClass } from './sourceClass';
@@ -78,6 +79,7 @@ function isFreshNavigation(): boolean {
  */
 export function sendPageBeacon(): void {
   if (isSelfHost) return; // self-host instances are analytics-silent
+  if (!mayPostTo(API_BASE)) return; // a local or preview copy counts nothing
   try {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const landing = isLandingPageview();

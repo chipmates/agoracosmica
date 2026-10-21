@@ -11,6 +11,7 @@
 // See docs/MEASUREMENT.md for the full disclosure.
 
 import { isSelfHost } from '../config/deployment';
+import { mayPostTo } from './productionHost';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
 import {
@@ -90,6 +91,7 @@ export function sendPlaybackBeacon(
   transport: PlaybackTransport = 'fetch'
 ): void {
   if (isSelfHost) return; // self-host instances are analytics-silent
+  if (!mayPostTo(API_BASE)) return; // a local or preview copy counts nothing
   try {
     const body = JSON.stringify({
       type: payload.type,

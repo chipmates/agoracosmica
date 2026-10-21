@@ -8,6 +8,7 @@
 // Same posture as the entry and page-load beacons.
 
 import { isSelfHost } from '../config/deployment';
+import { mayPostTo } from './productionHost';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
 
@@ -29,6 +30,7 @@ const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
  */
 export function sendSignupBeacon(): void {
   if (isSelfHost) return; // self-host instances are analytics-silent
+  if (!mayPostTo(API_BASE)) return; // a local or preview copy counts nothing
   try {
     const path = typeof window !== 'undefined' ? window.location.pathname : '';
     const body = JSON.stringify({

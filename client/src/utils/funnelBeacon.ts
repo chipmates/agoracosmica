@@ -30,6 +30,7 @@
 // Disclosed in docs/MEASUREMENT.md alongside the other event counters.
 
 import { isSelfHost } from '../config/deployment';
+import { mayPostTo } from './productionHost';
 import { probeField } from './probeSession';
 import { shownLanguage } from './shownLanguage';
 import { arrivalSource } from './arrivalSource';
@@ -360,6 +361,8 @@ const SOURCE_STEPS: ReadonlySet<FunnelStep> = new Set<FunnelStep>([
 // and the in-house probe constant when this browser is marked. Country
 // is derived server-side at the CF edge. No user dimension of any kind.
 function postFunnel(step: FunnelStep, fields: FunnelFields): void {
+  // Off the production site the app runs as it does there, minus the post.
+  if (!mayPostTo(API_BASE)) return;
   const body = JSON.stringify({
     step,
     figureId: fields.figureId || undefined,

@@ -6,6 +6,7 @@
 // nothing reaches Google until consent is granted.
 
 import { isSelfHost } from '../../config/deployment';
+import { mayPostTo } from '../productionHost';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -276,6 +277,7 @@ export async function sendConversion(
   metadata?: Record<string, string>
 ): Promise<void> {
   if (isSelfHost) return; // no ad-conversion reporting on a self-host instance
+  if (!mayPostTo(API_BASE)) return; // nor from a local or preview copy
   if (isPaid) return; // paid arrivals run on clicks only, never forward a gclid
   if (!capturedGclid) return;
   if (!adConsentGranted()) return; // no send until the visitor opts in
