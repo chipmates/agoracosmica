@@ -476,6 +476,7 @@ async function parseSSEStream(
   const reasoning = createReasoningFilter();
   const toolCalls = new Map<number, { name: string; arguments: string; id?: string }>();
 
+  let ended = false;
   try {
     while (true) {
       const { value, done } = await readWithIdleLimit(reader, { signal });
@@ -487,18 +488,16 @@ async function parseSSEStream(
 
       for (const line of lines) {
         if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+          // The catch covers reading the line only. The callback runs after
+          // it, so a stop or a fault it throws ends the stream.
+          let content = '';
           try {
             const data = JSON.parse(line.slice(6));
             const delta = data.choices?.[0]?.delta;
 
             // Text content
-            const content = delta?.content ? reasoning.push(delta.content) : '';
-            if (content) {
-              fullResponse += content;
-              if (chunker && streamingCallback) {
-                await chunker.processChunk(content, streamingCallback);
-              }
-            }
+            content = delta?.content ? reasoning.push(delta.content) : '';
+            if (content) fullResponse += content;
 
             // Tool calls (same accumulation as llmService.ts)
             if (delta?.tool_calls) {
@@ -516,10 +515,16 @@ async function parseSSEStream(
           } catch {
             // Skip malformed SSE lines
           }
+          if (content && chunker && streamingCallback) {
+            await chunker.processChunk(content, streamingCallback);
+          }
         }
       }
     }
+    ended = true;
   } finally {
+    // Thrown out mid-body: drop the connection, so the reply stops generating.
+    if (!ended) void reader.cancel().catch(() => {});
     reader.releaseLock();
   }
 

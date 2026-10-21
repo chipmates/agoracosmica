@@ -354,6 +354,7 @@ class LLMService {
       }
     };
 
+    let ended = false;
     try {
       while (true) {
         const { value, done } = await readWithIdleLimit(reader, { signal });
@@ -365,6 +366,9 @@ class LLMService {
 
         for (const line of lines) {
           if (line.startsWith('data: ') && line !== 'data: [DONE]') {
+            // The catch covers reading the line only. The callback runs after
+            // it, so a stop or a fault it throws ends the stream.
+            let content = '';
             try {
               const data = JSON.parse(line.slice(6));
 
@@ -379,10 +383,7 @@ class LLMService {
 
               const delta = data.choices?.[0]?.delta;
 
-              const content = delta?.content || '';
-              if (content) {
-                await emit(content);
-              }
+              content = delta?.content || '';
 
               if (delta?.tool_calls) {
                 for (const tc of delta.tool_calls) {
@@ -399,19 +400,23 @@ class LLMService {
             } catch (e) {
               console.warn('[LLM] Failed to parse SSE line:', e);
             }
+            if (content) {
+              await emit(content);
+            }
           }
         }
       }
       // Flush any remaining buffer content after stream ends
       if (buffer.trim() && buffer.startsWith('data: ') && buffer !== 'data: [DONE]') {
+        let content = '';
         try {
           const data = JSON.parse(buffer.slice(6));
-          const content = data.choices?.[0]?.delta?.content || '';
-          if (content) {
-            await emit(content);
-          }
+          content = data.choices?.[0]?.delta?.content || '';
         } catch {
           // Incomplete trailing data, ignore
+        }
+        if (content) {
+          await emit(content);
         }
       }
       // Flush what the reasoning filter still holds.
@@ -421,7 +426,10 @@ class LLMService {
         const result = callback(tail);
         if (result instanceof Promise) await result;
       }
+      ended = true;
     } finally {
+      // Thrown out mid-body: drop the connection, so the reply stops generating.
+      if (!ended) void reader.cancel().catch(() => {});
       reader.releaseLock();
     }
 
