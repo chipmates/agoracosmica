@@ -66,6 +66,28 @@ const SHORT_TRADITIONS = {
   vinci: { en: 'Renaissance Polymath', de: 'Renaissance-Universalgelehrter' },
 };
 
+// The period line comes from the English voice profile. Lines with words in
+// them get German text here, keyed by the English line, so a changed English
+// line falls back to germanPeriod's date conversion and the unit test flags it.
+const GERMAN_PERIODS = {
+  'Late Eastern Zhou, roughly 6th-5th century BCE (traditional lifespan ~571-471 BCE, historicity debated)':
+    'Späte Östliche Zhou-Zeit, etwa 6. bis 5. Jahrhundert v. Chr. (überlieferte Lebenszeit ca. 571 bis 471 v. Chr., seine Existenz ist umstritten)',
+  'c. 5th century BCE (traditional chronology: 563-483 BCE, many modern scholars date him later)':
+    'ca. 5. Jahrhundert v. Chr. (überlieferte Datierung: 563 bis 483 v. Chr., viele Fachleute datieren ihn heute später)',
+  'c. 1260-1327/28 (died before the 1329 bull. Place uncertain, often given as Avignon)':
+    'ca. 1260-1327/28 (starb vor der Bulle von 1329, Sterbeort unsicher, oft wird Avignon genannt)',
+};
+
+function germanPeriod(period) {
+  if (GERMAN_PERIODS[period]) return GERMAN_PERIODS[period];
+  return period
+    .replace(/\bc\. ?/g, 'ca. ')
+    .replace(/\bAD\b/g, 'n. Chr.')
+    .replace(/\bBC\b/g, 'v. Chr.')
+    .replace(/\bBCE\b/g, 'v. Chr.')
+    .replace(/\bCE\b/g, 'n. Chr.');
+}
+
 // Theme-to-tag keyword mapping for cross-referencing seeds to themes
 const THEME_KEYWORDS = {
   'meaning-purpose': ['meaning', 'purpose', 'eudaimonia', 'fulfillment', 'direction', 'calling', 'vocation', 'intentional-living', 'values', 'worth'],
@@ -396,7 +418,7 @@ function buildFiguresCatalog(tagsByFigure) {
         learn: figTrans?.learn || '',
         tradition: SHORT_TRADITIONS[id]?.[lang] || seedData?.metadata?.tradition?.split(',')[0]?.trim() || '',
         period: lang === 'de'
-          ? (voiceExcerpt?.period || '').replace(/\bAD\b/g, 'n. Chr.').replace(/\bBC\b/g, 'v. Chr.').replace(/\bBCE\b/g, 'v. Chr.').replace(/\bCE\b/g, 'n. Chr.')
+          ? germanPeriod(voiceExcerpt?.period || '')
           : voiceExcerpt?.period || seedData?.metadata?.historicalPeriod || '',
         essence: lang === 'en' ? (voiceExcerpt?.essence || '') : (langVoice?.essence || ''),
         keyConcepts: langKeyConcepts,
