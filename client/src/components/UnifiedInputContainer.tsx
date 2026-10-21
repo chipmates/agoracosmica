@@ -97,6 +97,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
 
   const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const processingStage = useDomainStore((state) => state.conversation.processingStage);
+  const firstTextArrived = useDomainStore((state) => state.session.firstTextArrived);
+  // The request the visitor chose to read instead of hear: its card is gone,
+  // but until its first words arrive a reply is still on its way.
+  const [readingFor, setReadingFor] = useState<string | null>(null);
+  const replyOnItsWay = readingFor !== null && readingFor === pendingRequestId && !firstTextArrived;
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
 
   // Stop voice: on at once when the Echo starts speaking, held through a short
@@ -663,10 +668,20 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
             // 3. Hide the loader immediately. Text keeps streaming on its own path.
             ttsScheduler.cancelAll();
             sendSessionEndBeacon(getOrRollConversationSessionId());
+            setReadingFor(useDomainStore.getState().conversation.pendingRequestId);
             setIsProcessing(false);
             setProcessingStage(null);
           }}
         />
+      )}
+
+      {replyOnItsWay && (
+        <p className="composer-reply-waiting" role="status">
+          <span className="composer-reply-waiting-dots" aria-hidden="true">
+            <span /><span /><span />
+          </span>
+          {tString('processing.replyOnItsWay', 'The reply is on its way.')}
+        </p>
       )}
 
       {/* Microphone permission error modal */}

@@ -873,6 +873,43 @@
 }
 
 /* PII Warning - a plate note carrying the gold warning ink */
+/* After "read text instead": the voice is skipped, the reply's words are still coming. */
+.composer-reply-waiting {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 0 1rem 0.5rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--text-primary) 80%, transparent);
+}
+
+.composer-reply-waiting-dots {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.composer-reply-waiting-dots span {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold-subtle);
+  animation: composer-reply-waiting-pulse 1.2s ease-in-out infinite;
+}
+
+.composer-reply-waiting-dots span:nth-child(2) { animation-delay: 0.2s; }
+.composer-reply-waiting-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes composer-reply-waiting-pulse {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .composer-reply-waiting-dots span { animation: none; opacity: 0.7; }
+}
+
 .pii-warning {
   background: color-mix(in srgb, var(--gold-deep) 15%, var(--bg-primary));
   border: 1px solid color-mix(in srgb, var(--gold-deep) 42%, transparent);
