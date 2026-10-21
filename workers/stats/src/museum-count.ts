@@ -80,7 +80,8 @@ export function countQuestions(dataset: string): CountQuestion[] {
   return [
     question(dataset, 'steps', [['blob1', 's']], ''),
     question(dataset, 'stops', [['blob3', 'k']], "blob1 = 'museum_stop'"),
-    // Third stops carry the visit's source word since the site began to send it there; older ones sit under ''.
+    // Third stops carry the visit's source word since the site began to send it there. Under '' sit third stops of
+    // walks with no word, and every one written before then.
     question(dataset, 'walkSources', [['blob1', 's'], ['blob6', 'k']], "(blob1 IN ('museum_arrival', 'museum_use') OR " + THIRD_STOP + ')'),
     question(dataset, 'siteSources', [['blob6', 'k']], "blob1 = 'page_arrival' AND blob7 = 'start'"),
     question(dataset, 'walkLang', [['blob1', 's'], ['blob4', 'k']], WALK_AND_REAL),
@@ -173,7 +174,7 @@ export interface CountAnswer {
   days?: string[];
   steps?: Series;
   stops?: Series;
-  // real: third stops by source word, '' for rows written before the stop carried one
+  // real: third stops by source word; '' holds walks with no word and the rows written before the stop carried one
   sources?: { walks: Series; uses: Series; real: Series; site: Series };
   lang?: { walks: Series; real: Series };
   hold?: { walks: Series; real: Series };
