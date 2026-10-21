@@ -24,6 +24,7 @@
 
 import { useDomainStore } from '../../../stores/domainStore';
 import { audioApiUrl } from '../../../config/runtime';
+import { loadServiceConfig } from '../config/serviceConfig';
 
 const DEFAULT_TTL_SECONDS = 3600; // Server default per stickiness memo
 const ROLL_BEFORE_EXPIRY_SECONDS = 60; // Proactively re-mint this long before server evicts
@@ -180,6 +181,8 @@ export function newPreviewSessionId(): string {
  */
 export function sendSessionEndBeacon(sessionId: string | null | undefined): void {
   if (!sessionId) return;
+  // Local Mode voice holds no hosted session, and Local Mode sends nothing to the audio host.
+  if (loadServiceConfig().localMode?.ttsEnabled) return;
 
   const url = `${audioApiUrl}/v1/audio/session/end`;
   const payload = JSON.stringify({ session_id: sessionId });
