@@ -329,7 +329,8 @@ class InitialMessageService {
     // 42% of DE initial-message texts exceed the 500-char DE cap and were silently
     // failing here before this fix (custom-voice DE users fell back to LLM-generated
     // greetings). EN texts are all under the 600-char EN cap so EN renders as 1 chunk.
-    const { selfHostedTTS } = await import('./tts/selfHostedTTS');
+    // Through the router, so Local Mode speaks the greeting locally and fails closed.
+    const { convertTextToSpeech } = await import('./tts');
     const { cleanTextForTts } = await import('../../utils/ttsTextCleaner');
 
     const cleanedText = cleanTextForTts(baseMessage.text);
@@ -346,13 +347,12 @@ class InitialMessageService {
     // the latency of a single call for any text > cap. Order in result matches input.
     const audioFiles = await Promise.all(
       textChunks.map((chunkText, idx) =>
-        selfHostedTTS(
+        convertTextToSpeech(
           chunkText,
           `${requestId}_${idx + 1}`,
           figure,
+          undefined,
           speed,
-          undefined,
-          undefined,
           language,
           sessionId,
         )
