@@ -7,13 +7,34 @@ const LANDING = 'https://agoracosmica.org/de/figures/aurelius';
 
 describe('sourceClass ad parameters', () => {
   it('labels a grant click from the click id alone', () => {
-    expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA`, '')).toBe('ad_google');
+    expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA`, '')).toBe('ad_google_grant');
+    // The consent card leaves the key empty after an answer: still the grant.
+    expect(sourceClass(`${LANDING}?gclid=`, '')).toBe('ad_google_grant');
   });
 
-  it('labels a paid click from the paid marker', () => {
-    expect(sourceClass(`${LANDING}?p=1`, '')).toBe('ad_google');
+  it('labels a paid click from the paid marker alone', () => {
+    expect(sourceClass(`${LANDING}?p=1`, '')).toBe('ad_google_paid');
+    expect(sourceClass(`${LANDING}?p=1`, 'https://www.google.com/')).toBe('ad_google_paid');
     // Any other value of p is not the marker.
     expect(sourceClass(`${LANDING}?p=2`, '')).toBe('direct');
+  });
+
+  it('labels an address with p=1 and a gclid as paid', () => {
+    // The marker we set decides, as the paid counter and the consent path read it.
+    expect(sourceClass(`${LANDING}?p=1&gclid=Cj0KCQiA`, '')).toBe('ad_google_paid');
+    expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA&p=1`, 'https://www.google.de/')).toBe('ad_google_paid');
+    expect(sourceClass(`${LANDING}?p=1&gclid=`, '')).toBe('ad_google_paid');
+  });
+
+  it('labels a Reddit ad link that carries p=1 as Reddit', () => {
+    expect(sourceClass(`${LANDING}?utm_source=reddit&p=1`, '')).toBe('ad_reddit');
+    expect(sourceClass(`${LANDING}?p=1&rdt_cid=abc123`, 'https://www.reddit.com/')).toBe('ad_reddit');
+  });
+
+  it('never writes the value grant and paid used to share', () => {
+    for (const query of ['?gclid=Cj0', '?gclid=', '?p=1', '?p=1&gclid=Cj0', '?utm_source=reddit&p=1']) {
+      expect(sourceClass(`${LANDING}${query}`, 'https://www.google.com/')).not.toBe('ad_google');
+    }
   });
 
   it('labels a Reddit ad from either marker', () => {
@@ -24,10 +45,10 @@ describe('sourceClass ad parameters', () => {
 
   it('puts the ad parameter ahead of the referrer', () => {
     // An ad click usually carries the network's own host as its referrer.
-    expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA`, 'https://www.google.com/')).toBe('ad_google');
+    expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA`, 'https://www.google.com/')).toBe('ad_google_grant');
     expect(sourceClass(`${LANDING}?rdt_cid=abc`, 'https://www.reddit.com/r/philosophy/')).toBe('ad_reddit');
-    // Google first when a URL somehow carries both.
-    expect(sourceClass(`${LANDING}?gclid=Cj0&utm_source=reddit`, '')).toBe('ad_google');
+    // Reddit's markers first when a URL somehow carries both.
+    expect(sourceClass(`${LANDING}?gclid=Cj0&utm_source=reddit`, '')).toBe('ad_reddit');
   });
 
   it('ignores an unparsable landing URL and falls through to the referrer', () => {
@@ -356,6 +377,12 @@ describe('the marketing twin in agc-public.js', () => {
     [LANDING, 'not a url'],
     [`${LANDING}?gclid=Cj0KCQiA`, 'https://www.google.com/'],
     [`${LANDING}?p=1`, ''],
+    [`${LANDING}?p=1`, 'https://www.google.com/'],
+    [`${LANDING}?p=1&gclid=Cj0KCQiA`, ''],
+    [`${LANDING}?gclid=`, ''],
+    [`${LANDING}?utm_source=reddit&p=1`, ''],
+    [`${LANDING}?p=1&rdt_cid=abc`, 'https://www.reddit.com/'],
+    [`${LANDING}?gclid=Cj0&utm_source=reddit`, ''],
     [`${LANDING}?p=2`, ''],
     [`${LANDING}?utm_source=Reddit`, 'https://www.reddit.com/'],
     [`${LANDING}?rdt_cid=abc`, ''],

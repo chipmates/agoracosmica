@@ -207,26 +207,41 @@ describe('engaged and council_heard', () => {
     return import('../../utils/funnelBeacon');
   }
 
+  // An app reached from one of our own pages without a door fragment.
+  function setOwnReferrer() {
+    Object.defineProperty(document, 'referrer', { value: `${window.location.origin}/`, configurable: true });
+  }
+
   afterEach(() => {
     window.history.replaceState({}, '', '/');
     Reflect.deleteProperty(navigator, 'sendBeacon');
+    Object.defineProperty(document, 'referrer', { value: '', configurable: true });
     vi.resetModules();
   });
 
   it('engaged carries the source class on the first arm and on both', async () => {
     const sendBeacon = captureBeacon();
-    const m = await loadWithSource('#src=ad_google');
+    const m = await loadWithSource('#src=ad_google_grant');
     m.sendFunnelBeaconOnce('first_turn');
     m.noteEngagedListenMilestone();
     const sent = await bodies(sendBeacon);
     const engaged = sent.filter((b) => b.step === 'engaged');
     expect(engaged.map((b) => b.mode)).toEqual(['typed', 'both']);
-    for (const b of engaged) expect(b.source).toBe('ad_google');
-    expect(sent.find((b) => b.step === 'first_turn')!.source).toBe('ad_google');
+    for (const b of engaged) expect(b.source).toBe('ad_google_grant');
+    expect(sent.find((b) => b.step === 'first_turn')!.source).toBe('ad_google_grant');
+  });
+
+  it('the first chat of an app opened directly carries direct', async () => {
+    const sendBeacon = captureBeacon();
+    const m = await loadWithSource('');
+    m.sendFunnelBeaconOnce('first_turn');
+    const sent = await bodies(sendBeacon);
+    expect(sent.find((b) => b.step === 'first_turn')!.source).toBe('direct');
   });
 
   it('engaged goes without a class when the visit brought none', async () => {
     const sendBeacon = captureBeacon();
+    setOwnReferrer();
     const m = await loadWithSource('');
     m.noteEngagedListenSeconds(m.ENGAGED_LISTEN_SECONDS);
     const [row] = await bodies(sendBeacon);

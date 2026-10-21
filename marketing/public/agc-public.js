@@ -16,6 +16,7 @@
 //
 // A conversion leaves these pages only after the visitor's yes: the Start
 // Exploring click below and the consent card's own report of the yes.
+// Nothing at all is sent from a page served off the production hosts.
 (function () {
   'use strict';
 
@@ -61,6 +62,16 @@
 
   var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
+  var PAGE_URL = 'https://llm.agoracosmica.org/v1/page';
+
+  // The worker URLs above are production's, so a count or a conversion leaves
+  // only a page served from the production site: a local or preview build of
+  // these pages sends nothing. The worker's ALLOWED_ORIGINS names these hosts.
+  var PRODUCTION_HOSTS = ['agoracosmica.org', 'www.agoracosmica.org'];
+  function onProductionHost() {
+    try { return PRODUCTION_HOSTS.indexOf(window.location.hostname) >= 0; }
+    catch (e) { return false; }
+  }
 
   // The paid-ads parameter on this URL. The URL only: nothing about a paid
   // visit is stored, and later pages of it carry no click ID to guard.
@@ -115,6 +126,7 @@
   // signal: unlike the version removed in 1.1.2, it now requires an explicit
   // opt-in, so the bare gclid alone never sends anything.
   function fireConversion(event, metadata) {
+    if (!onProductionHost()) return;
     if (hasPaidParam()) return; // paid: never forward
     if (!adConsentGranted()) return; // no opt-in: nothing sent, nothing looked up
     var gclid;
@@ -167,6 +179,7 @@
   // navigation that follows the count, and text/plain keeps it a simple CORS
   // request so no preflight gets lost on the way out.
   function postFunnel(payload) {
+    if (!onProductionHost()) return;
     var body = JSON.stringify(payload);
     if (navigator.sendBeacon &&
         navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))) {
@@ -289,13 +302,17 @@
     catch (e) { return ''; }
   }
 
+  // Reddit's markers first, since a Reddit ad link can carry p=1 too. Then
+  // p=1, the marker we set on paid final URLs, decides, not the accounts'
+  // auto-tagging: p=1 with a gclid is paid, as the paid counter reads it.
   function adClass(landingUrl) {
     var params;
     try { params = new URL(landingUrl).searchParams; }
     catch (e) { return undefined; }
-    if (params.has('gclid') || params.get('p') === '1') return 'ad_google';
     var utmSource = (params.get('utm_source') || '').toLowerCase();
     if (utmSource === 'reddit' || params.has('rdt_cid')) return 'ad_reddit';
+    if (params.get('p') === '1') return 'ad_google_paid';
+    if (params.has('gclid')) return 'ad_google_grant';
     return undefined;
   }
 
@@ -371,12 +388,13 @@
   }
 
   function sendPageBeacon() {
+    if (!onProductionHost()) return;
     try {
       var docLang = (document.documentElement.lang || 'en').toLowerCase();
       var language = docLang.indexOf('de') === 0 ? 'de' : 'en';
       var landing = LANDING;
       // Absolute worker URL on purpose (agoracosmica.org has no /v1/* route).
-      fetch('https://llm.agoracosmica.org/v1/page', {
+      fetch(PAGE_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -535,13 +553,16 @@
   armPlayCounter();
   markDoors();
 
-  // Doors an island renders after this script ran get the class when used.
+  // Doors an island renders after this script ran get the class when used,
+  // also when opened in a new tab from the context menu or a long press.
   function markUsedDoor(e) {
     var link = e.target instanceof Element ? e.target.closest('a[href]') : null;
     if (link) markDoor(link);
   }
   document.addEventListener('click', markUsedDoor, true);
   document.addEventListener('auxclick', markUsedDoor, true);
+  document.addEventListener('contextmenu', markUsedDoor, true);
+  document.addEventListener('pointerdown', markUsedDoor, true);
 
   document.addEventListener('click', function (e) {
     var target = e.target instanceof Element ? e.target.closest('[data-agc-cta]') : null;

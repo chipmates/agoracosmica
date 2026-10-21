@@ -14,7 +14,8 @@
 // drift test in __tests__/utils/sourceClass.test.ts compares them list by list.
 
 export type SourceClass =
-  | 'ad_google'
+  | 'ad_google_grant'
+  | 'ad_google_paid'
   | 'ad_reddit'
   | 'search'
   | 'assistant'
@@ -29,6 +30,10 @@ export type SourceClass =
   | 'social'
   | 'referral'
   | 'direct';
+
+// The one value written before grant and paid were told apart. Nothing writes
+// it any more; readers still accept it from rows and from pages loaded before.
+export type LegacySourceClass = 'ad_google';
 
 // One object so the twin can be compared key for key. The keys are in the
 // order the classifier tests them: every specific host list runs before the
@@ -119,8 +124,12 @@ function hostOf(url: string): string {
 }
 
 /**
- * Ad class of a landing URL, from the presence of an ad parameter. The
- * parameter's value is never read, only whether it is there.
+ * Ad class of a landing URL, from the presence of an ad parameter. A click
+ * id's value is never read, only whether it is there. Reddit's markers run
+ * first, because a Reddit ad link can carry p=1 too. Then p=1, the marker we
+ * set on paid final URLs, decides between paid and grant, not the accounts'
+ * auto-tagging setting: an address with p=1 and a gclid is paid, as the paid
+ * counter and the consent path read it.
  */
 function adClass(landingUrl: string): SourceClass | undefined {
   let params: URLSearchParams;
@@ -129,9 +138,10 @@ function adClass(landingUrl: string): SourceClass | undefined {
   } catch {
     return undefined;
   }
-  if (params.has('gclid') || params.get('p') === '1') return 'ad_google';
   const utmSource = (params.get('utm_source') || '').toLowerCase();
   if (utmSource === 'reddit' || params.has('rdt_cid')) return 'ad_reddit';
+  if (params.get('p') === '1') return 'ad_google_paid';
+  if (params.has('gclid')) return 'ad_google_grant';
   return undefined;
 }
 

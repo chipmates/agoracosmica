@@ -5,6 +5,8 @@
 import { existsSync, readFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { createElement } from 'react';
+import { render, act } from '@testing-library/react';
 
 const SCRIPT_REL = 'marketing/public/agc-public.js';
 
@@ -19,6 +21,13 @@ function scriptPath(): string {
 }
 
 const SOURCE = readFileSync(scriptPath(), 'utf8');
+
+// The script posts only from the production hosts, so the suite serves its
+// pages from one; the cases below move it elsewhere on purpose.
+const PRODUCTION = 'https://agoracosmica.org/';
+function serveFrom(url: string): void {
+  (globalThis as unknown as { jsdom: { reconfigure(o: { url: string }): void } }).jsdom.reconfigure({ url });
+}
 
 type Listener = [EventTarget, string, EventListenerOrEventListenerObject, unknown];
 let added: Listener[] = [];
@@ -63,6 +72,7 @@ function setNavigation(type: string | null): void {
 }
 
 beforeEach(() => {
+  serveFrom(PRODUCTION);
   added = [];
   beacons = [];
   fetches = [];
@@ -551,9 +561,9 @@ describe('agc-public.js: the source class on the app doors', () => {
     const a = door({}, '/app?figure=marcus-aurelius&lang=en');
     loadPage('/marcus-aurelius/?gclid=');
     const page = fetches.find((f) => f.url.endsWith('/v1/page'))!;
-    expect(page.body.source).toBe('ad_google');
+    expect(page.body.source).toBe('ad_google_grant');
     expect(page.body.landing).toBe(1);
-    expect(a.getAttribute('href')).toBe('/app?figure=marcus-aurelius&lang=en#src=ad_google');
+    expect(a.getAttribute('href')).toBe('/app?figure=marcus-aurelius&lang=en#src=ad_google_grant');
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
 
@@ -564,6 +574,117 @@ describe('agc-public.js: the source class on the app doors', () => {
     click(late);
     expect(late.getAttribute('href')).toBe('/app?figure=seneca&lang=en#src=assistant');
   });
+
+  it('marks a later door before it opens in a new tab from the menu or a long press', () => {
+    setReferrer('https://chatgpt.com/');
+    loadPage('/marcus-aurelius/');
+    const menu = door({}, '/app?figure=seneca&lang=en');
+    menu.dispatchEvent(new MouseEvent('contextmenu', { bubbles: true, cancelable: true }));
+    expect(menu.getAttribute('href')).toBe('/app?figure=seneca&lang=en#src=assistant');
+    const press = door({}, '/app?figure=rumi&lang=en');
+    press.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(press.getAttribute('href')).toBe('/app?figure=rumi&lang=en#src=assistant');
+  });
+});
+
+describe('agc-public.js: grant, paid and Reddit ads', () => {
+  const pageSource = () => fetches.find((f) => f.url.endsWith('/v1/page'))!.body.source;
+
+  it('labels a grant click by its click ID, and the same address with p=1 as paid', () => {
+    loadPage('/marcus-aurelius/?gclid=TESTCLICKID0001');
+    expect(pageSource()).toBe('ad_google_grant');
+    fetches = [];
+    loadPage('/marcus-aurelius/?p=1&gclid=TESTCLICKID0001');
+    expect(pageSource()).toBe('ad_google_paid');
+  });
+
+  it('labels a paid click by p=1 alone, and its doors carry the paid class', () => {
+    const a = door({}, '/app?lang=en');
+    loadPage('/marcus-aurelius/?p=1');
+    expect(pageSource()).toBe('ad_google_paid');
+    expect(a.getAttribute('href')).toBe('/app?lang=en#src=ad_google_paid');
+  });
+
+  it('labels a Reddit ad link that carries p=1 as Reddit, by either marker', () => {
+    loadPage('/marcus-aurelius/?utm_source=reddit&p=1');
+    expect(pageSource()).toBe('ad_reddit');
+    fetches = [];
+    loadPage('/marcus-aurelius/?p=1&rdt_cid=abc123');
+    expect(pageSource()).toBe('ad_reddit');
+  });
+
+  it('never writes the old shared value', () => {
+    for (const url of ['/?gclid=TESTCLICKID0001', '/?p=1', '/?gclid=', '/?p=1&gclid=x']) {
+      fetches = [];
+      loadPage(url);
+      expect(pageSource()).not.toBe('ad_google');
+    }
+  });
+});
+
+describe('agc-public.js: one reading of p=1 with a gclid', () => {
+  it('is paid for the class, the paid counter and the consent card alike', async () => {
+    setNavigation('navigate');
+    const app = door({}, '/app?lang=en');
+    loadPage('/figures/rumi/?p=1&gclid=TESTCLICKID0001');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(fetches.find((f) => f.url.endsWith('/v1/page'))!.body.source).toBe('ad_google_paid');
+    expect(app.getAttribute('href')).toBe('/app?lang=en#src=ad_google_paid');
+    expect(beacons.filter((b) => b.body.step === 'paid_arrival')).toHaveLength(1);
+    // The app reads the same address the same way.
+    vi.resetModules();
+    const { sourceClass } = await import('../../utils/sourceClass');
+    expect(sourceClass(window.location.href, '')).toBe('ad_google_paid');
+    const { default: ArrivalChoice } = await import('../../../../marketing/src/islands/ArrivalChoice');
+    let view!: ReturnType<typeof render>;
+    await act(async () => {
+      view = render(createElement(ArrivalChoice, { lang: 'en' }));
+    });
+    expect(view.container.querySelector('.agc-consent')).toBeNull();
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(fetches.filter((f) => f.url.endsWith('/api/conversions'))).toEqual([]);
+    view.unmount();
+  });
+});
+
+describe('agc-public.js: only the production hosts post', () => {
+  const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
+
+  async function visitAndUse(): Promise<HTMLAnchorElement> {
+    localStorage.setItem('agc_ad_consent', YES);
+    setNavigation('navigate');
+    const app = door({}, '/app?lang=en');
+    loadPage('/marcus-aurelius/?p=1');
+    loadPage('/seneca/?gclid=TESTCLICKID0001');
+    click(door({ 'data-agc-cta': 'start-exploring', 'data-agc-door': 'hero' }));
+    const audio = document.createElement('audio');
+    document.body.appendChild(audio);
+    audio.dispatchEvent(new Event('playing'));
+    await new Promise((r) => setTimeout(r, 0));
+    return app;
+  }
+
+  for (const host of ['http://localhost:4321/', 'http://127.0.0.1:5173/', 'https://a1b2c3.agora-cosmica.pages.dev/', 'https://agoracosmica.org.example.net/']) {
+    it(`sends nothing from ${host}, and still marks the doors`, async () => {
+      serveFrom(host);
+      const app = await visitAndUse();
+      expect(fetches).toEqual([]);
+      expect(beacons).toEqual([]);
+      expect(vi.mocked(navigator.sendBeacon)).not.toHaveBeenCalled();
+      expect(app.getAttribute('href')).toBe('/app?lang=en#src=ad_google_paid');
+    });
+  }
+
+  for (const host of ['https://agoracosmica.org/', 'https://www.agoracosmica.org/']) {
+    it(`sends from ${host}`, async () => {
+      serveFrom(host);
+      await visitAndUse();
+      expect(fetches.filter((f) => f.url.endsWith('/v1/page'))).toHaveLength(2);
+      expect(fetches.filter((f) => f.url.endsWith('/api/conversions'))).toHaveLength(1);
+      const steps = beacons.map((b) => b.body.step);
+      expect(steps).toEqual(expect.arrayContaining(['paid_arrival', 'cta_click', 'audio_play']));
+    });
+  }
 });
 
 describe('agc-public.js: an answer under the earlier card text', () => {

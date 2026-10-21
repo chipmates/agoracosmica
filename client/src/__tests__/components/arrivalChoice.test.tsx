@@ -9,6 +9,12 @@ const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.no
 
 let sent: { url: string; body: Record<string, unknown> }[] = [];
 
+// The islands post only from the production hosts, so the suite serves its
+// pages from one; the last block moves it elsewhere on purpose.
+function serveFrom(url: string): void {
+  (globalThis as unknown as { jsdom: { reconfigure(o: { url: string }): void } }).jsdom.reconfigure({ url });
+}
+
 function storageKeys(store: Storage): string[] {
   return Array.from({ length: store.length }, (_, i) => store.key(i) as string);
 }
@@ -25,6 +31,7 @@ async function mountAt(url: string, lang: 'en' | 'de' = 'en') {
 }
 
 beforeEach(() => {
+  serveFrom('https://agoracosmica.org/');
   sent = [];
   sessionStorage.clear();
   localStorage.clear();
@@ -356,4 +363,26 @@ describe('ArrivalChoice after the legal read', () => {
     dropClickIdFromAddress();
     expect(`${window.location.pathname}${window.location.search}${window.location.hash}`).toBe('/de/?lang=de#top');
   });
+});
+
+describe('off the production hosts', () => {
+  const closeOf = (container: HTMLElement) => container.querySelector('button.agc-consent__x') as HTMLButtonElement;
+  for (const host of ['http://localhost:4321/', 'https://a1b2c3.agora-cosmica.pages.dev/']) {
+    it(`a yes, its seconds and a close on ${host} send nothing`, async () => {
+      serveFrom(host);
+      const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      expect(container.querySelector('.agc-consent')).not.toBeNull();
+      const [yes] = Array.from(container.querySelectorAll('button'));
+      await act(async () => { fireEvent.click(yes); });
+      const heard = await import('../../../../marketing/src/utils/heardSeconds');
+      for (let i = 0; i < 40; i++) heard.addHeardSeconds(1, 'aurelius');
+      const next = (await mountAt(`/seneca/?gclid=${CLICK}`)).container;
+      if (next.querySelector('.agc-consent')) {
+        await act(async () => { fireEvent.click(closeOf(next)); });
+      }
+      await new Promise((r) => setTimeout(r, 0));
+      expect(sent).toEqual([]);
+      expect(vi.mocked(navigator.sendBeacon)).not.toHaveBeenCalled();
+    });
+  }
 });

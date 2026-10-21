@@ -41,6 +41,19 @@ export { adConsentGranted, revokeAdConsent } from '@client/utils/public/gclidCap
 
 const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
 
+// The worker URLs are production's, so the islands post only from a page served
+// on the production site: a local or preview build sends nothing. Same hosts as
+// PRODUCTION_HOSTS in public/agc-public.js. Lives here so it rides this chunk.
+export const PRODUCTION_HOSTS: readonly string[] = ['agoracosmica.org', 'www.agoracosmica.org'];
+
+export function onProductionHost(): boolean {
+  try {
+    return typeof window !== 'undefined' && PRODUCTION_HOSTS.includes(window.location.hostname);
+  } catch {
+    return false;
+  }
+}
+
 // sessionStorage on purpose: the marketing site is a multi-page app, so the
 // seconds have to survive a navigation to keep counting across a visit. Tab
 // scoped, never localStorage, and it holds a number of seconds and nothing else.
@@ -132,6 +145,7 @@ function canCount(): boolean {
 }
 
 function fireListened(figureId?: string, timestamp: number = Date.now()): void {
+  if (!onProductionHost()) return;
   restoreOnce();
   if (fired) return;
   if (isPaidVisitor()) return; // paid arrivals run on clicks only

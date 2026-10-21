@@ -48,6 +48,7 @@ import {
   armPreDecisionListening,
   dropPreDecisionListening,
   flushPreDecisionListening,
+  onProductionHost,
 } from '../utils/heardSeconds';
 import './ArrivalChoice.css';
 
@@ -155,6 +156,7 @@ function nowMs(): number {
 const countedSteps = new Set<ConsentCounter>();
 
 function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: number): void {
+  if (!onProductionHost()) return;
   if (countedSteps.has(step)) return;
   countedSteps.add(step);
   try {
@@ -220,6 +222,7 @@ export function dropClickIdFromAddress(): void {
 }
 
 function fireStartExploring(): void {
+  if (!onProductionHost()) return;
   const gclid = getGclid();
   if (!gclid) return;
   try {
