@@ -101,6 +101,48 @@ ttsScheduler.setBufferProvider(getBufferDurationSeconds);
  */
 export { ttsScheduler };
 
+// "Read text instead" holds for the request it was chosen on: words that
+// arrive after the click are shown, never voiced.
+let readingRequestId: string | null = null;
+const readingListeners = new Set<(requestId: string) => void>();
+const greetingRequestIds = new Set<string>();
+
+const isReading = (requestId: string): boolean => readingRequestId === requestId;
+
+/** Settles when the visitor chooses to read this request instead of hearing it. */
+const whenReading = (requestId: string): { chosen: Promise<void>; stop: () => void } => {
+  let listener: ((id: string) => void) | null = null;
+  const chosen = new Promise<void>((resolve) => {
+    if (isReading(requestId)) {
+      resolve();
+      return;
+    }
+    listener = (id: string) => {
+      if (id === requestId) resolve();
+    };
+    readingListeners.add(listener);
+  });
+  return { chosen, stop: () => { if (listener) readingListeners.delete(listener); } };
+};
+
+/**
+ * The visitor reads instead of waiting for the voice. Without a request (the
+ * words are still being transcribed) only the voice work queued so far goes.
+ */
+export function readTextInstead(requestId: string | null): void {
+  ttsScheduler.cancelAll();
+  if (!requestId) return;
+  readingRequestId = requestId;
+  // Its card was up, so nothing of this request has played: what is queued goes.
+  cleanupAudioResources();
+  for (const listener of [...readingListeners]) listener(requestId);
+}
+
+/** Whether a request is the greeting that opens a conversation (no question was asked). */
+export function isGreetingRequest(requestId: string | null): boolean {
+  return requestId !== null && greetingRequestIds.has(requestId);
+}
+
 const createAbortError = () => {
   if (typeof DOMException !== 'undefined') {
     return new DOMException('Streaming aborted', 'AbortError');
@@ -246,7 +288,7 @@ export const createLegacyConversationStream = () => {
         console.error('[ConversationStreamDriver] Failed to apply assistant chunk', error);
       }
 
-      if (config.ttsEnabled === false) {
+      if (config.ttsEnabled === false || isReading(String(requestId))) {
         return;
       }
 
@@ -305,8 +347,9 @@ export const createLegacyConversationStream = () => {
           ttsProvider,
         );
 
-        // Guard: reject stale TTS results from previous sessions
-        if (currentStreamSession !== String(requestId)) {
+        // Guard: reject stale TTS results from previous sessions, and voice
+        // finished just as the visitor chose to read instead.
+        if (currentStreamSession !== String(requestId) || isReading(String(requestId))) {
           if (audioFile.url.startsWith('blob:')) URL.revokeObjectURL(audioFile.url);
           return;
         }
@@ -338,6 +381,10 @@ export const createLegacyConversationStream = () => {
     // This prevents the "empty payload" exit bug for challenge/freetalk modes
 
     if (isInitial) {
+      greetingRequestIds.add(String(requestId));
+      if (greetingRequestIds.size > 20) {
+        greetingRequestIds.delete(greetingRequestIds.values().next().value as string);
+      }
       const initialMsgMode = toInitialMessageMode(mode);
       const seedId = activeSeed?.id ? Number(activeSeed.id) : null;
 
@@ -392,17 +439,47 @@ export const createLegacyConversationStream = () => {
             // dynamicAudioCache key becomes slider-independent (cached blob is always
             // 1.0-baked, slider changes apply via playbackRate without re-render).
             const sessionId = getOrRollConversationSessionId();
-            initialMessage = await initialMessageService.getInitialMessageWithDynamicAudio(
+            const voiceStop = new AbortController();
+            const voiced = initialMessageService.getInitialMessageWithDynamicAudio(
               figureId, initialMsgMode, seedId, langCode,
               1.0,
               String(requestId),
-              sessionId
+              sessionId,
+              voiceStop.signal,
             );
+            // The words are stored: a visitor who chooses to read gets them
+            // without waiting for the voice, and the voice stops being made.
+            const reading = whenReading(String(requestId));
+            const first = await Promise.race([
+              voiced.then((message) => ({ message })),
+              reading.chosen.then(() => null),
+            ]).finally(reading.stop);
+            if (first === null) {
+              voiceStop.abort();
+              voiced.then(
+                (late) => late?.audioUrls.forEach((url) => { if (url.startsWith('blob:')) URL.revokeObjectURL(url); }),
+                () => {},
+              );
+            } else {
+              initialMessage = first.message;
+            }
           } else {
             // Custom voice + TTS disabled: text only (avoid wrong-voice playback)
             const textOnly = await initialMessageService.getInitialMessage(
               figureId, initialMsgMode, seedId, langCode
             );
+            if (textOnly?.text && !signal.aborted) {
+              pushAssistantText(textOnly.text);
+              return;
+            }
+          }
+
+          // Chosen to read: the stored words, never the voice.
+          if (isReading(String(requestId)) && !signal.aborted) {
+            initialMessage?.audioUrls.forEach((url) => { if (url.startsWith('blob:')) URL.revokeObjectURL(url); });
+            const textOnly = initialMessage?.text
+              ? initialMessage
+              : await initialMessageService.getInitialMessage(figureId, initialMsgMode, seedId, langCode).catch(() => null);
             if (textOnly?.text && !signal.aborted) {
               pushAssistantText(textOnly.text);
               return;

@@ -4,7 +4,7 @@ import { Microphone, Keyboard, PaperPlaneTilt, Sparkle, SpeakerSlash } from '@ph
 import { processAudio, processTextMessage, cleanupAudioResources } from '../services/audioService';
 import { EmptyAudioError } from '../services/audio/stt/sttUtils';
 import ProcessingLoader from './ProcessingLoader';
-import { ttsScheduler } from '../controllers/conversationStreamDriver';
+import { isGreetingRequest, readTextInstead, ttsScheduler } from '../controllers/conversationStreamDriver';
 import { getOrRollConversationSessionId, sendSessionEndBeacon } from '../services/audio/tts/ttsSessions';
 import { preferTextInput, saveInputPreference, registerInputToggleShortcut, hasExplicitInputPreference } from '../utils/inputMethodDetection';
 import {
@@ -26,6 +26,7 @@ import { useDomainStore } from '../stores';
 import { detectPII } from '../utils/piiDetection';
 import { prepareFreeTierSession } from '../services/proxy/prepareFreeTierSession';
 import './UnifiedInputContainer.css';
+
 
 // Capacitor keyboard handling for native builds.
 // CapacitorKeyboard stays null on web; the listeners below are no-ops.
@@ -103,8 +104,10 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
   const voiceInputOn = useMemo(() => serviceConfigFromRaw(savedRaw).sttEnabled !== false, [savedRaw]);
   // The request the visitor chose to read instead of hear: its card is gone,
-  // but until its first words arrive a reply is still on its way.
+  // but until its first words arrive a reply is still on its way. Chosen while
+  // spoken words were still being transcribed, it holds for the request they start.
   const [readingFor, setReadingFor] = useState<string | null>(null);
+  const readNextRequestRef = useRef(false);
   const replyOnItsWay = readingFor !== null && readingFor === pendingRequestId && !firstTextArrived;
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
 
@@ -208,6 +211,12 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   }, [openRateLimitModal, quota.resetsAt, quota.limit]);
 
   useEffect(() => {
+    if (pendingRequestId && readNextRequestRef.current) {
+      readNextRequestRef.current = false;
+      setReadingFor(pendingRequestId);
+      readTextInstead(pendingRequestId);
+      return;
+    }
     setIsProcessing(Boolean(pendingRequestId));
   }, [pendingRequestId]);
 
@@ -339,6 +348,8 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     setPiiWarning(false);
 
     try {
+      setReadingFor(null);
+      readNextRequestRef.current = false;
       setIsProcessing(true);
       // Text-input path skips STT, so we start directly in 'preparing' and the
       // stream driver will advance to 'contemplating'/'shaping' as the LLM runs.
@@ -368,6 +379,8 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       console.error('Error processing text message:', err);
       setIsProcessing(false);
       setProcessingStage(null);
+    } finally {
+      if (!useDomainStore.getState().conversation.pendingRequestId) readNextRequestRef.current = false;
     }
   };
   
@@ -534,6 +547,8 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
         return;
       }
 
+      setReadingFor(null);
+      readNextRequestRef.current = false;
       setIsProcessing(true);
       // Voice path starts in 'preparing'; processAudio will bump it to 'hearing'
       // once the Whisper request actually fires.
@@ -578,6 +593,10 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       }
       setIsProcessing(false);
       setProcessingStage(null);
+    } finally {
+      // A choice to read made while the words were transcribed ends with them
+      // when they started no request.
+      if (!useDomainStore.getState().conversation.pendingRequestId) readNextRequestRef.current = false;
     }
   }, [isRecording, onSubmitMessage]);
 
@@ -660,19 +679,14 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
           figureName={selectedFigure}
           stage={processingStage ?? 'preparing'}
           onSwitchToText={() => {
-            // User chose to read instead of wait for voice.
-            // 1. Cancel the TTS queue (~80% of remaining work for this turn).
-            //    The ≤2 in-flight HTTP requests at moment-of-click (BBA-2 cap)
-            //    will finish and their audio gets discarded — LT-12 adds proper
-            //    AbortController threading to cut those too.
-            // 2. Fire session-end beacon (LT-11) so the gateway can evict this
-            //    session's Qwen cache entry and free the admission slot for a
-            //    new user. Fire-and-forget; server endpoint may not exist yet
-            //    (pre-Server-Claude rollout) — that's fine, TTL handles expiry.
-            // 3. Hide the loader immediately. Text keeps streaming on its own path.
-            ttsScheduler.cancelAll();
+            // Read instead of hear: nothing of this request is voiced from here
+            // on, words that arrive later included. The session-end beacon lets
+            // the gateway free this session's slot; the text keeps coming.
+            const pending = useDomainStore.getState().conversation.pendingRequestId;
+            readTextInstead(pending);
             sendSessionEndBeacon(getOrRollConversationSessionId());
-            setReadingFor(useDomainStore.getState().conversation.pendingRequestId);
+            setReadingFor(pending);
+            readNextRequestRef.current = pending === null;
             setIsProcessing(false);
             setProcessingStage(null);
           }}
@@ -684,7 +698,9 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
           <span className="composer-reply-waiting-dots" aria-hidden="true">
             <span /><span /><span />
           </span>
-          {tString('processing.replyOnItsWay', 'The reply is on its way.')}
+          {isGreetingRequest(pendingRequestId)
+            ? tString('processing.greetingOnItsWay', 'The greeting is on its way.')
+            : tString('processing.replyOnItsWay', 'The reply is on its way.')}
         </p>
       )}
 

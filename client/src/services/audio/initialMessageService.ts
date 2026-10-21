@@ -295,7 +295,8 @@ class InitialMessageService {
     language: SupportedLanguage = 'en',
     speed: number = 1.0,
     requestId: string,
-    sessionId?: string
+    sessionId?: string,
+    signal?: AbortSignal,
   ): Promise<InitialMessage | null> {
     // Step 1: Get text content from R2
     const baseMessage = await this.getInitialMessage(figure, mode, seedId, language, true);
@@ -359,6 +360,7 @@ class InitialMessageService {
           speed,
           language,
           sessionId,
+          signal,
         )
       )
     );

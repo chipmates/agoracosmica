@@ -1257,6 +1257,7 @@
     },
     "optOut": "Lieber Text lesen",
     "replyOnItsWay": "Die Antwort ist unterwegs.",
+    "greetingOnItsWay": "Die Begrüßung ist unterwegs.",
     "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
     "localWait": "Dein Rechner arbeitet noch. Einen Moment.",
     "localTakingLonger": "Dein Rechner braucht länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",

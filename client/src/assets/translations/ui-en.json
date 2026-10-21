@@ -1255,6 +1255,7 @@
     },
     "optOut": "Read text instead",
     "replyOnItsWay": "The reply is on its way.",
+    "greetingOnItsWay": "The greeting is on its way.",
     "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait.",
     "localWait": "Your computer is still working. One moment.",
     "localTakingLonger": "Your computer is taking longer. Wait a moment for the voice, or read now and skip the wait.",
