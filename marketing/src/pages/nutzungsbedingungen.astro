@@ -1,11 +1,12 @@
 ---
 import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
+import { termsVersionLine } from '@client/utils/public/termsVersion';
 
 const title = 'Nutzungsbedingungen';
-// Version maps the stored consent record (WelcomeDisclosureModal
-// CURRENT_AGB_VERSION) to this published text.
-const lastUpdated = 'Version 1.0.0 · Stand: 27. April 2026';
+// The version the in-app consent record carries; version and date come from
+// client/src/utils/public/termsVersion.json.
+const lastUpdated = termsVersionLine('de');
 const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMates gemeinnützige GmbH. Geltungsbereich, KI-Hinweise, Altersanforderung, Nutzungsregeln, Haftung und Streitbeilegung.';
 ---
 <Public

@@ -205,11 +205,20 @@ for (const f of files) {
 }
 
 // 12. Terms-of-service pair: both language versions published, both carrying
-//     the version string that the in-app consent record points at, and the EN
-//     convenience translation naming the German text as the binding one.
+//     the version and the date the in-app consent record points at (read from
+//     the one file a version step changes), and the EN convenience translation
+//     naming the German text as the binding one.
+const TERMS = JSON.parse(
+  readFileSync(join(SCRIPTS_DIR, '..', 'src', 'utils', 'public', 'termsVersion.json'), 'utf8'),
+);
+const termsDate = (locale) => {
+  const [y, m, d] = TERMS.date.split('-').map(Number);
+  return new Intl.DateTimeFormat(locale, { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' })
+    .format(new Date(Date.UTC(y, m - 1, d)));
+};
 const TERMS_PAGES = [
-  { rel: 'terms/index.html', mustContain: ['Version 1.0.0', 'legally binding'] },
-  { rel: 'nutzungsbedingungen/index.html', mustContain: ['Version 1.0.0'] },
+  { rel: 'terms/index.html', mustContain: [`Version ${TERMS.version}`, `Last updated: ${termsDate('en-US')}`, 'legally binding'] },
+  { rel: 'nutzungsbedingungen/index.html', mustContain: [`Version ${TERMS.version}`, `Stand: ${termsDate('de-DE')}`] },
 ];
 for (const { rel, mustContain } of TERMS_PAGES) {
   const p = join(DIST, rel);

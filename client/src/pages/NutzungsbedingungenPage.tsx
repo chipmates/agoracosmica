@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import CloseButton from '../components/Button/CloseButton';
 import './LegalPages.css';
 import { useTranslation } from '../hooks/useTranslation';
+import { termsVersionLine } from '../utils/public/termsVersion';
 
 const NutzungsbedingungenPage: FC = () => {
   const navigate = useNavigate();
@@ -280,9 +281,8 @@ const NutzungsbedingungenPage: FC = () => {
       <div className="legal-container">
         <header className="legal-header">
           <h1 className="legal-title">{tNode('legal.terms.title')}</h1>
-          {/* Version maps the stored consent record (WelcomeDisclosureModal
-              CURRENT_AGB_VERSION) to this published text. */}
-          <p className="legal-date">Version 1.0.0 · {tNode('legal.terms.lastUpdated')}</p>
+          {/* The version the consent record carries (utils/public/termsVersion). */}
+          <p className="legal-date">{termsVersionLine(language)}</p>
         </header>
 
         {language === 'en' ? englishBody : germanBody}

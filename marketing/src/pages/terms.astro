@@ -1,13 +1,14 @@
 ---
 import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
+import { termsVersionLine } from '@client/utils/public/termsVersion';
 
 // SIBLING FILE: the in-app SPA copy of this English translation lives in
 // client/src/pages/NutzungsbedingungenPage.tsx. Any wording change here must
 // be mirrored there (and vice versa), so both surfaces stay identical.
 
 const title = 'Terms of Service';
-const lastUpdated = 'Version 1.0.0 · Last updated: April 27, 2026';
+const lastUpdated = termsVersionLine('en');
 const description = 'Terms of Service of the Agora Cosmica platform by ChipMates gemeinnützige GmbH. English convenience translation covering scope, AI notices, age requirement, rules of use, liability, and dispute resolution.';
 ---
 <Public

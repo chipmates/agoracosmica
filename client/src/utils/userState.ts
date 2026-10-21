@@ -4,6 +4,7 @@
 
 import { LocalStorageAdapter } from '../storage/localAdapter';
 import { useDomainStore } from '../stores';
+import { CURRENT_AGB_VERSION } from './public/termsVersion';
 
 /**
  * Storage key prefixes for conversation history
@@ -17,11 +18,12 @@ export const HISTORY_PREFIXES: readonly string[] = [
 ] as const;
 
 /**
- * Version of the disclosure the consent record was written against. Single
- * site: the welcome modal stamps it, the gate below compares against it, so a
- * future wording change re-prompts every device by bumping this one line.
+ * Version of the terms the consent record was written against. The value and
+ * the terms' date live in utils/public/termsVersion.json: the welcome modal
+ * stamps it, the gate below compares against it, so a version step there
+ * re-prompts every browser.
  */
-export const CURRENT_AGB_VERSION = '1.0.0';
+export { CURRENT_AGB_VERSION };
 
 const CONSENT_STORAGE_KEY = 'agb_consent';
 
