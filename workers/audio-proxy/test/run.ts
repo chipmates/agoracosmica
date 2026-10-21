@@ -760,6 +760,110 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // A refused counter write: KV takes one write per key per second, and a
+  // council fires seven speech chunks at once from one address
+  // -------------------------------------------------------------------------
+
+  const REFUSED_IP = '203.0.113.48';
+
+  /** The worker with a counter store that refuses every write under `prefix`. */
+  const refusingHarness = (prefix: string) => {
+    const h = sttHarness();
+    const kv = {
+      get: async () => null,
+      put: async (key: string) => {
+        if (key.startsWith(prefix)) throw new Error('KV PUT failed: 429 Too Many Requests');
+        h.puts.push(key);
+      },
+    } as unknown as KVNamespace;
+    return { ...h, env: { ...h.env, RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env };
+  };
+
+  /** Run `fn` and return every console.warn line it caused. */
+  const warnLines = async (fn: () => Promise<void>): Promise<string[]> => {
+    const lines: string[] = [];
+    const realWarn = console.warn;
+    console.warn = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+    try {
+      await fn();
+    } finally {
+      console.warn = realWarn;
+    }
+    return lines;
+  };
+
+  const speechAt = (ip: string) => new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': ip, 'Content-Length': '40' },
+    body: JSON.stringify({ input: 'Hello there.', voice: 'af_heart' }).padEnd(40, ' '),
+  });
+
+  const refusedRoutes: { label: string; request: () => Request }[] = [
+    { label: 'speech', request: () => speechAt(REFUSED_IP) },
+    { label: 'transcriptions', request: () => upload(new Uint8Array(1000), { 'CF-Connecting-IP': REFUSED_IP, 'Content-Length': '1000' }) },
+  ];
+
+  for (const route of refusedRoutes) {
+    await test(`a refused counter write still serves the ${route.label} request`, async () => {
+      const h = refusingHarness('audio:');
+      try {
+        let res: Response | null = null;
+        const warned = await warnLines(async () => {
+          res = await worker.fetch(route.request(), h.env, h.ctx).catch(() => null);
+          await Promise.all(h.pending);
+        });
+        assert(res !== null, 'the refused write was thrown out of fetch');
+        const answer = res as unknown as Response;
+        assertEqual(answer.status, 200, 'status');
+        assertEqual(h.upstream.length, 1, 'upstream calls');
+        const lines = warned.filter(w => w.includes('[rateLimit]'));
+        assertEqual(lines.length, 2, `one line per refused write: ${warned.join(' | ')}`);
+        const hash = await hashIP(REFUSED_IP, 'test-salt');
+        for (const line of lines) {
+          for (const secret of [REFUSED_IP, hash, 'audio:', 'KV PUT failed']) {
+            assert(!line.includes(secret), `the line carries ${secret}: ${line}`);
+          }
+        }
+      } finally {
+        h.restore();
+      }
+    });
+  }
+
+  await test('a refused burst write still writes the daily counter', async () => {
+    const h = refusingHarness('audio:burst:');
+    try {
+      const warned = await warnLines(async () => {
+        const res = await worker.fetch(speechAt(REFUSED_IP), h.env, h.ctx).catch(() => null);
+        assertEqual(res?.status, 200, 'status');
+        await Promise.all(h.pending);
+      });
+      assert(h.puts.some(key => key.startsWith('audio:ip:')), 'the daily counter was written');
+      assertEqual(warned.filter(w => w.includes('[rateLimit] Burst')).length, 1, `one burst line: ${warned.join(' | ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a refused daily write still writes the burst counter and keeps the count', async () => {
+    const h = refusingHarness('audio:ip:');
+    try {
+      const req = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+        method: 'POST', headers: { 'CF-Connecting-IP': REFUSED_IP },
+      });
+      const warned = await warnLines(async () => {
+        const result = await checkAudioRateLimit(req, h.env, 'English', 'tts').catch(() => null);
+        assertEqual(result?.allowed, true, 'allowed');
+        assertEqual(result?.daily.used, 1, 'the visitor\'s count as read plus this one');
+      });
+      assert(h.puts.some(key => key.startsWith('audio:burst:')), 'the burst counter was written');
+      assertEqual(warned.filter(w => w.includes('[rateLimit] Daily')).length, 1, `one daily line: ${warned.join(' | ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // A fault inside the worker: a 500 with CORS and one line naming its kind
   // -------------------------------------------------------------------------
 

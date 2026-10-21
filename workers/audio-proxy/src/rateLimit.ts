@@ -79,8 +79,24 @@ async function getCounter(kv: KVNamespace, key: string): Promise<number> {
   return val ? parseInt(val, 10) || 0 : 0;
 }
 
-async function incrementCounter(kv: KVNamespace, key: string, current: number, ttl: number): Promise<void> {
-  await kv.put(key, String(current + 1), { expirationTtl: ttl });
+/**
+ * Write a counter without failing the request. KV refuses a second write to
+ * one key within a second (a 429 that throws), and every speech chunk from one
+ * address writes the same two keys, a council seven at once. A missed
+ * increment only undercounts the brake.
+ */
+async function incrementCounter(
+  kv: KVNamespace,
+  key: string,
+  current: number,
+  ttl: number,
+  kind: 'Daily' | 'Burst',
+): Promise<void> {
+  try {
+    await kv.put(key, String(current + 1), { expirationTtl: ttl });
+  } catch {
+    console.warn(`[rateLimit] ${kind} counter write failed, request served`);
+  }
 }
 
 // --- Main Rate Limit Check ---
@@ -172,8 +188,8 @@ export async function checkAudioRateLimit(
 
   // --- Allowed: increment counters ---
   await Promise.all([
-    incrementCounter(env.RATE_LIMITS, dailyKey, dailyCount, 86_400),
-    incrementCounter(env.RATE_LIMITS, burstKey, burstCount, 120),
+    incrementCounter(env.RATE_LIMITS, dailyKey, dailyCount, 86_400, 'Daily'),
+    incrementCounter(env.RATE_LIMITS, burstKey, burstCount, 120, 'Burst'),
   ]);
 
   result.daily.used = dailyCount + 1;
