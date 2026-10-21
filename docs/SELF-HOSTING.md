@@ -64,6 +64,7 @@ Local Mode has three independent toggles in Settings: speech, transcription, and
 3. Flip the **TTS** toggle. Click *Test*. You should see "Reachable" in green next to the field.
 4. Flip the **STT** toggle. Same drill.
 5. Click *Save*.
+6. If the **Voice** or **Voice Input** card in Preferences still says *Disabled* (German: *Stimme*, *Spracheingabe*, *Deaktiviert*), that card's own switch is off. Open the card, switch it on, and click *Save Changes* at the bottom of Settings.
 
 > **What changed:** microphone audio and the voice you hear now stay on your machine. Your chat text still goes to OpenRouter (or wherever the LLM is set) until the next step.
 

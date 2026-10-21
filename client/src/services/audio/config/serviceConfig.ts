@@ -53,6 +53,11 @@ export interface ServiceConfig {
   ttsEnabled: boolean;
   llm: LLMConfig;
   localMode?: LocalModeConfig;
+  /**
+   * Self-host builds: set by every save that keeps the visitor's own voice and
+   * transcription switches. Earlier self-host builds saved a forced off instead.
+   */
+  ownAudioSwitches?: boolean;
 }
 
 interface LLMServiceDefinition {
@@ -215,6 +220,14 @@ const withSelfHostAudioGate = (config: ServiceConfig): ServiceConfig => {
   } as ServiceConfig;
 };
 
+// Earlier self-host builds saved that forced off on every save, their key gate
+// included, so an off saved without the mark is no choice: it reads as on, and
+// the gate decides. The first save from this build writes the mark.
+const withOwnAudioSwitches = (config: ServiceConfig): ServiceConfig => {
+  if (!isSelfHost || config.ownAudioSwitches === true) return config;
+  return { ...config, ttsEnabled: true, sttEnabled: true };
+};
+
 /** The switches as the visitor set them: a forced off still standing goes back to on. */
 const withoutSelfHostAudioGate = (config: Partial<ServiceConfig>): Partial<ServiceConfig> => {
   const { [SELF_HOST_FORCED_OFF]: forced, ...own } = config as Partial<ServiceConfig> & { [SELF_HOST_FORCED_OFF]?: ForcedOff };
@@ -239,7 +252,7 @@ export const loadServiceConfig = (): ServiceConfig => {
   if (isLoadingConfig) {
     console.warn('[Config] Prevented re-entrant call to loadServiceConfig');
     const existingConfig = useDomainStore.getState().serviceConfig.parsed as ServiceConfig | null;
-    return withSelfHostAudioGate(existingConfig || defaultConfig);
+    return withSelfHostAudioGate(withOwnAudioSwitches(existingConfig || defaultConfig));
   }
 
   isLoadingConfig = true;
@@ -253,7 +266,7 @@ export const loadServiceConfig = (): ServiceConfig => {
       const parsedConfig = JSON.parse(savedConfig) as Partial<ServiceConfig>;
 
       // Validate and merge with defaults
-      const config: ServiceConfig = {
+      let config: ServiceConfig = {
         ...defaultConfig,
         ...parsedConfig,
         // TTS/STT: always self-hosted on GEX130 (legacy values map to 'self-hosted' via aliases)
@@ -300,6 +313,8 @@ export const loadServiceConfig = (): ServiceConfig => {
         queueMicrotask(() => saveServiceConfig(config));
       }
 
+      config = withOwnAudioSwitches(config);
+
       // DEV override: ensure TTS is enabled during development to avoid
       // silent failures due to stale mobile defaults stored in localStorage.
       if (import.meta.env.DEV && config.ttsEnabled === false) {
@@ -336,7 +351,8 @@ export const saveServiceConfig = (config: Partial<ServiceConfig>): boolean => {
     const validatedConfig: ServiceConfig = {
       ...defaultConfig,
       ...own,
-      ttsSettings: validateTTSSettings(own.ttsSettings)
+      ttsSettings: validateTTSSettings(own.ttsSettings),
+      ...(isSelfHost ? { ownAudioSwitches: true } : {}),
     };
 
     // Update Zustand (which will also persist to localStorage via adapter)

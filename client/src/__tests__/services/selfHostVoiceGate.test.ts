@@ -88,6 +88,49 @@ describe('voice and transcription in a self-host build', () => {
     expect(m.loadServiceConfig()).toMatchObject({ ttsEnabled: true, sttEnabled: false });
   });
 
+  // What a self-host build before this one saved on every save, its key gate
+  // included: the forced off, written as if it were the visitor's choice.
+  const savedByAnEarlierBuild = (m: Awaited<ReturnType<typeof load>>, lm: ReturnType<typeof localMode>) =>
+    JSON.stringify({ ...m.defaultConfig, ttsEnabled: false, sttEnabled: false, localMode: lm });
+
+  it('a browser an earlier build set up: its saved off is no choice, Local Mode serves both', async () => {
+    const m = await load({ selfHost: true });
+    const { useDomainStore } = await import('../../stores/domainStore');
+    useDomainStore.getState().setServiceConfig({ raw: savedByAnEarlierBuild(m, localMode(true, true)), parsed: null });
+    expect(m.loadServiceConfig()).toMatchObject({ ttsEnabled: true, sttEnabled: true });
+  });
+
+  it('a browser an earlier build set up: the guide\'s two switches turn voice and microphone on', async () => {
+    const m = await load({ selfHost: true });
+    const { useDomainStore } = await import('../../stores/domainStore');
+    useDomainStore.getState().setServiceConfig({ raw: savedByAnEarlierBuild(m, localMode(false, false)), parsed: null });
+    expect(m.loadServiceConfig()).toMatchObject({ ttsEnabled: false, sttEnabled: false });
+
+    // The panel's toggles: load, flip one switch, save; twice.
+    for (const key of ['ttsEnabled', 'sttEnabled'] as const) {
+      const c = m.loadServiceConfig();
+      c.localMode = { ...c.localMode!, [key]: true };
+      m.saveServiceConfig(c);
+    }
+    expect(m.loadServiceConfig()).toMatchObject({ ttsEnabled: true, sttEnabled: true });
+  });
+
+  it('after a save on this build, an off is the visitor\'s again', async () => {
+    const m = await load({ selfHost: true });
+    const { useDomainStore } = await import('../../stores/domainStore');
+    useDomainStore.getState().setServiceConfig({ raw: savedByAnEarlierBuild(m, localMode(true, true)), parsed: null });
+    const c = m.loadServiceConfig();
+    m.saveServiceConfig({ ...c, sttEnabled: false });
+    expect(m.loadServiceConfig()).toMatchObject({ ttsEnabled: true, sttEnabled: false });
+  });
+
+  it('the hosted build reads a saved off as the visitor\'s, mark or not', async () => {
+    const m = await load({ selfHost: false });
+    const { useDomainStore } = await import('../../stores/domainStore');
+    useDomainStore.getState().setServiceConfig({ raw: savedByAnEarlierBuild(m, localMode(true, true)), parsed: null });
+    expect(m.loadServiceConfig()).toMatchObject({ sttEnabled: false });
+  });
+
   it('the hosted build is unchanged: both on as saved', async () => {
     const m = await load({ selfHost: false });
     m.saveServiceConfig({ ...m.defaultConfig, localMode: localMode(false, false) });
