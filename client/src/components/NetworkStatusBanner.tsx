@@ -26,14 +26,22 @@ const BANNER_STYLE: React.CSSProperties = {
   textAlign: 'center',
   fontSize: '14px',
   fontWeight: 500,
-  color: 'var(--text-on-dark, #fff)',
   transition: 'opacity 0.3s ease',
 };
 
-// The warning ember with the night ink reads at 5.0:1. Opaque, because the
-// page showing through would pull it under 4.5:1.
+// Every line is opaque on a design-system colour with the night ink: warning
+// 5.0:1, error 5.4:1, success 6.8:1. The page showing through would pull them
+// under 4.5:1.
 const WARNING_COLORS: React.CSSProperties = {
   background: 'var(--color-warning)',
+  color: 'var(--bg-void)',
+};
+const ERROR_COLORS: React.CSSProperties = {
+  background: 'var(--color-error)',
+  color: 'var(--bg-void)',
+};
+const SUCCESS_COLORS: React.CSSProperties = {
+  background: 'var(--color-success)',
   color: 'var(--bg-void)',
 };
 
@@ -136,11 +144,11 @@ const NetworkStatusBanner: FC = () => {
   switch (banner.type) {
     case 'offline':
       message = tString('errors.network.offline', 'You are offline. Some features may not work.');
-      colors = { background: 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)' };
+      colors = ERROR_COLORS;
       break;
     case 'reconnected':
       message = tString('errors.network.reconnected', 'Connection restored');
-      colors = { background: 'color-mix(in srgb, var(--success-color, #22c55e) 90%, transparent)' };
+      colors = SUCCESS_COLORS;
       break;
     case 'circuit-breaker':
       message = banner.service === 'tts'
@@ -154,7 +162,7 @@ const NetworkStatusBanner: FC = () => {
         colors = WARNING_COLORS;
       } else if (banner.hint === 'disable_tts') {
         message = tString('errors.network.gpuCapacityAll', 'Audio servers are busy. Turn off TTS in settings to continue chatting.');
-        colors = { background: 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)' };
+        colors = ERROR_COLORS;
       } else {
         message = tString('errors.network.audioRateLimited', 'Audio rate limited. Please wait a moment.');
         colors = WARNING_COLORS;
