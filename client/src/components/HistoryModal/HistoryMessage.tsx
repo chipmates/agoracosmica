@@ -1,5 +1,7 @@
 import React, { FC, ReactNode } from 'react';
 import { sanitizeContent } from '../../utils/sanitizeContent';
+import { formatDateTime } from '../../utils/formatDateTime';
+import { useDomainStore } from '../../stores/domainStore';
 import { MODES } from './historyModalConstants';
 import type { Message } from './historyModalTypes';
 
@@ -18,6 +20,8 @@ const HistoryMessage: FC<HistoryMessageProps> = ({
   seekerLabel,
   formatSummary
 }) => {
+  const language = useDomainStore((state) => state.language.current);
+
   if (entry.isSummary) {
     return <React.Fragment key={index}>{formatSummary(entry.content)}</React.Fragment>;
   }
@@ -38,7 +42,7 @@ const HistoryMessage: FC<HistoryMessageProps> = ({
         </strong>
         {entry.timestamp && (
           <span className="message-timestamp">
-            {new Date(entry.timestamp).toLocaleString()}
+            {formatDateTime(entry.timestamp, language)}
           </span>
         )}
       </div>
