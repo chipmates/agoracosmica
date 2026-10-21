@@ -2,8 +2,8 @@
 
 import { authenticateRequest } from '../middleware/auth';
 import { readJsonBody } from '../middleware/bodyLimit';
-import { checkAndIncrementSummaryRateLimit } from '../middleware/rateLimit';
-import { dispatchToNebius } from '../services/nebius';
+import { checkAndIncrementSummaryRateLimit, giveBackSummary } from '../middleware/rateLimit';
+import { dispatchToNebius, type DispatchResult } from '../services/nebius';
 import { fallbackModel } from '../services/modelRouting';
 import { alertOutage } from '../services/telegram';
 import { isInjection, screenCouncilContent } from '../utils/contentScreen';
@@ -123,6 +123,62 @@ export function screenSummaryHistory(history: string): { history: string | null;
   return { history: kept.join('\n\n'), droppedCategory };
 }
 
+/**
+ * How long a summary's first bytes must stand before it counts. A visitor who
+ * is already gone is noticed when those bytes are written, a few milliseconds
+ * later in local workerd, and a give-back inside the window buys at most a
+ * second of the model's answer.
+ */
+const DELIVERY_GRACE_MS = 1000;
+
+/**
+ * The summary stream, telling `settle` once whether it reached the visitor:
+ * yes when its first bytes stood for DELIVERY_GRACE_MS or the stream ended
+ * after them, no when it ends empty, fails or is cancelled before that. The
+ * runtime reads ahead of the socket, so a read alone does not prove delivery.
+ */
+function watchDelivery(
+  source: ReadableStream<Uint8Array>,
+  settle: (delivered: boolean) => void,
+): ReadableStream<Uint8Array> {
+  const reader = source.getReader();
+  let handedOut = false;
+  let settled = false;
+  let timer: ReturnType<typeof setTimeout> | null = null;
+  const decide = (delivered: boolean) => {
+    if (settled) return;
+    settled = true;
+    if (timer !== null) clearTimeout(timer);
+    settle(delivered);
+  };
+  return new ReadableStream<Uint8Array>({
+    async pull(controller) {
+      let result: ReadableStreamReadResult<Uint8Array>;
+      try {
+        result = await reader.read();
+      } catch (err) {
+        decide(false);
+        controller.error(err);
+        return;
+      }
+      if (result.done) {
+        decide(handedOut);
+        controller.close();
+        return;
+      }
+      controller.enqueue(result.value);
+      if (!handedOut && result.value.byteLength > 0) {
+        handedOut = true;
+        timer = setTimeout(() => decide(true), DELIVERY_GRACE_MS);
+      }
+    },
+    cancel(reason) {
+      decide(false);
+      return reader.cancel(reason);
+    },
+  }, { highWaterMark: 0 });
+}
+
 export async function handleSummary(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
   const startMs = Date.now();
 
@@ -166,7 +222,9 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   }
   const screenedHistory = screened.history;
 
-  // 3. Check summary-specific rate limit (2/day per identity; see rateLimit.ts for race caveats)
+  // 3. Check summary-specific rate limit (2/day per identity; see rateLimit.ts for race caveats).
+  // Counted now, so parallel requests meet the cap, and given back below when
+  // no summary reaches the visitor.
   const rateLimit = await checkAndIncrementSummaryRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
     trackRateLimit(env, 'summary', 'summary', readCountry(request), readDevice(request));
@@ -188,20 +246,31 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
     );
   }
 
+  const countedAt = Date.now();
+  let settle: (delivered: boolean) => void = () => {};
+  const delivered = new Promise<boolean>((resolve) => { settle = resolve; });
+  ctx.waitUntil(delivered.then((yes) => (yes ? undefined : giveBackSummary(env, rateLimit.key, countedAt))));
+
   // 4. Build system prompt server-side
   const figureName = figureId.charAt(0).toUpperCase() + figureId.slice(1);
   const systemPrompt = buildSummaryPrompt(figureName, seedTitle);
 
   // 5. Proxy to Nebius. A recap is not a conversation turn: no figure voice, no
   // mode evaluation behind it, so it stays on the model it has always used.
-  const dispatch = await dispatchToNebius({
-    systemPrompt,
-    messages: [{ role: 'user', content: screenedHistory }],
-    env,
-    model: fallbackModel(env),
-    maxTokens: 4000,
-    temperature: 0.7,
-  });
+  let dispatch: DispatchResult;
+  try {
+    dispatch = await dispatchToNebius({
+      systemPrompt,
+      messages: [{ role: 'user', content: screenedHistory }],
+      env,
+      model: fallbackModel(env),
+      maxTokens: 4000,
+      temperature: 0.7,
+    });
+  } catch (err) {
+    settle(false);
+    throw err;
+  }
 
   const track = (status: number) => {
     trackLlmEvent(env, {
@@ -220,6 +289,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   };
 
   if (!dispatch.ok || !dispatch.stream) {
+    settle(false);
     const failure = dispatch.error ?? new Response(
       JSON.stringify({ error: 'LLM service temporarily unavailable. Please try again.' }),
       { status: 502, headers: { 'Content-Type': 'application/json' } }
@@ -241,7 +311,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   headers.set('X-Summary-Resets-At', rateLimit.resetsAt);
 
   // 7. Apply output safety filter
-  const filteredBody = createSafetyFilteredStream(dispatch.stream);
+  const filteredBody = watchDelivery(createSafetyFilteredStream(dispatch.stream), settle);
 
   // 8. Anonymous analytics (fire-and-forget)
   ctx.waitUntil(Promise.resolve().then(() => track(200)));

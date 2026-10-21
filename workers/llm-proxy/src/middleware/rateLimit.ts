@@ -210,11 +210,16 @@ export async function checkAndIncrementCouncilRateLimit(
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
 
+/** A summary check's result, with the visitor's counter key for giving the summary back. */
+export interface SummaryRateLimitResult extends EndpointRateLimitResult {
+  key: string;
+}
+
 export async function checkAndIncrementSummaryRateLimit(
   _request: Request,
   env: Env,
   payload: JWTPayload,
-): Promise<EndpointRateLimitResult> {
+): Promise<SummaryRateLimitResult> {
   const subject = payload.sub;
   const dateKey = getDateKey();
   const summaryKey = `summary:sub:${subject}:${dateKey}`;
@@ -232,7 +237,7 @@ export async function checkAndIncrementSummaryRateLimit(
 
   // Same identity-rotation backstop as council (see comment there).
   if (used >= limit || globalUsed >= RATE_LIMITS.GLOBAL_SUMMARY_DAILY) {
-    return { allowed: false, used, limit, resetsAt, retryAfterSeconds };
+    return { allowed: false, used, limit, resetsAt, retryAfterSeconds, key: summaryKey };
   }
 
   const count = used + 1;
@@ -241,7 +246,31 @@ export async function checkAndIncrementSummaryRateLimit(
     putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
-  return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
+  return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds, key: summaryKey };
+}
+
+/** KV takes one write per key per second; a sooner second write is refused. */
+const KV_WRITE_SPACING_MS = 1000;
+
+/**
+ * Give back one summary that was counted but never delivered. The counter is
+ * read again, so a reservation made since stays counted, and the write waits
+ * out KV's spacing after the reservation's own write. A refused write is
+ * logged by its kind and that summary stays spent. The global brake keeps its
+ * count: the model may have read the history before the visitor left.
+ */
+export async function giveBackSummary(env: Env, key: string, countedAt: number): Promise<void> {
+  const wait = countedAt + KV_WRITE_SPACING_MS - Date.now();
+  if (wait > 0) await new Promise(resolve => setTimeout(resolve, wait));
+  try {
+    const raw = await env.RATE_LIMITS.get(key);
+    const used = raw ? parseInt(raw, 10) || 0 : 0;
+    if (used <= 0) return;
+    await env.RATE_LIMITS.put(key, String(used - 1), { expirationTtl: 86400 });
+  } catch (err) {
+    const kind = err instanceof Error ? err.name : typeof err;
+    console.warn(`[RateLimit] Summary give-back failed (${kind}), the summary stays spent`);
+  }
 }
 
 /**

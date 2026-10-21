@@ -2492,6 +2492,161 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // A summary counted before the model answers is given back when none was delivered
+  // -------------------------------------------------------------------------
+
+  const summaryKey = () => `summary:sub:${IDENTITY}:${new Date().toISOString().slice(0, 10)}`;
+  const globalSummaryKey = () => `global:summary:${new Date().toISOString().slice(0, 10)}`;
+  const timerSetTimeout = globalThis.setTimeout;
+
+  /**
+   * Run with timers of a second or more cut to 20 ms (the give-back's wait for
+   * KV's one write per key per second, and the delivery grace), and a real 3 s
+   * guard so a give-back that never settles fails instead of hanging.
+   */
+  const withFastTimers = async (fn: () => Promise<void>): Promise<void> => {
+    globalThis.setTimeout = ((handler: () => void, ms?: number) =>
+      timerSetTimeout(handler, (ms ?? 0) >= 1000 ? 20 : ms ?? 0)) as typeof setTimeout;
+    let guard: ReturnType<typeof setTimeout> | undefined;
+    try {
+      await Promise.race([
+        fn(),
+        new Promise<never>((_, reject) => { guard = timerSetTimeout(() => reject(new Error('still waiting after 3 s')), 3000); }),
+      ]);
+    } finally {
+      globalThis.setTimeout = timerSetTimeout;
+      clearTimeout(guard ?? null);
+    }
+  };
+
+  /** One summary request through the router; `use` decides how much of the answer the visitor reads. */
+  const summaryRun = async (
+    env: Env,
+    use: (response: Response) => Promise<void>,
+    body: Record<string, unknown> = SUMMARY_BODY,
+  ): Promise<{ status: number; pending: Promise<unknown>[] }> => {
+    const { ctx, pending } = fakeCtx();
+    const response = await worker.fetch(await postJson('/v1/summary', env, JSON.stringify(body)), env, ctx);
+    await use(response);
+    await Promise.all(pending);
+    return { status: response.status, pending };
+  };
+
+  const readsAll = async (response: Response) => { await response.text(); };
+  const leavesAtOnce = async (response: Response) => { await response.body?.cancel(); };
+
+  await test('an upstream error gives the summary back', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => new Response('provider down', { status: 500 }));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { status } = await summaryRun(env, readsAll);
+      assertEqual(status, 502, 'status');
+      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+      assertEqual(await kv.kv.get(globalSummaryKey()), '1', 'the global brake keeps its count');
+    });
+  });
+
+  await test('a visitor who leaves before the first byte gets the summary back', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { status } = await summaryRun(env, leavesAtOnce);
+      assertEqual(status, 200, 'status');
+      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+    });
+  });
+
+  await test('a model that answers 200 with nothing gives the summary back', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => sseResponse([]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      await summaryRun(env, readsAll);
+      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+    });
+  });
+
+  await test('a visitor gone when the first bytes go out gets the summary back', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      // The runtime reads the first chunk, finds the connection gone and cancels.
+      await summaryRun(env, async (response) => {
+        const reader = response.body!.getReader();
+        await reader.read();
+        await reader.cancel();
+      });
+      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+    });
+  });
+
+  await test('a delivered summary stays counted, read whole or left after its first bytes', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      await summaryRun(env, readsAll);
+      assertEqual(await kv.kv.get(summaryKey()), '1', 'counted after a whole read');
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
+      await summaryRun(env, async (response) => {
+        const reader = response.body!.getReader();
+        await reader.read();
+        await new Promise(resolve => timerSetTimeout(resolve, 100));
+        await reader.cancel();
+      });
+      assertEqual(await kv.kv.get(summaryKey()), '2', 'counted after the first bytes stood');
+    });
+  });
+
+  await test('the cap stays strict: a give-back keeps a parallel reservation and a third summary is refused', async () => {
+    await withFastTimers(async () => {
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      // The model fails the request whose seed topic says so.
+      stubFetch((sent) => (JSON.stringify(sent).includes('upstream-fails')
+        ? new Response('provider down', { status: 500 })
+        : sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME])));
+      // Both reserve before either answers; the failed one is given back.
+      const [failed, served] = await Promise.all([
+        summaryRun(env, readsAll, { ...SUMMARY_BODY, seedTitle: 'upstream-fails' }),
+        summaryRun(env, readsAll),
+      ]);
+      assertEqual(`${failed.status},${served.status}`, '502,200', 'statuses');
+      assertEqual(await kv.kv.get(summaryKey()), '1', 'the delivered one stays counted');
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME]));
+      assertEqual((await summaryRun(env, readsAll)).status, 200, 'the second of two a day');
+      assertEqual((await summaryRun(env, readsAll)).status, 429, 'a third is refused');
+      assertEqual(await kv.kv.get(summaryKey()), '2', 'summaries counted');
+    });
+  });
+
+  await test('a refused give-back write is logged by its kind and the summary stays spent', async () => {
+    await withFastTimers(async () => {
+      stubFetch(() => new Response('provider down', { status: 500 }));
+      const store = new Map<string, string>();
+      const kv = {
+        get: async (key: string) => store.get(key) ?? null,
+        put: async (key: string, value: string) => {
+          if (key.startsWith('summary:sub:') && store.has(key)) throw new Error(`KV PUT failed: 429 ${key}`);
+          store.set(key, value);
+        },
+      } as unknown as KVNamespace;
+      const env = fakeEnv({ RATE_LIMITS: kv });
+      let status = 0;
+      const warnings = await withWarnings(async () => { status = (await summaryRun(env, readsAll)).status; });
+      assertEqual(status, 502, 'status');
+      assertEqual(store.get(summaryKey()), '1', 'summaries counted');
+      const lines = warnings.filter(w => w.includes('[RateLimit]'));
+      assertEqual(lines.length, 1, `warning lines: ${warnings.join(' | ')}`);
+      assert(lines[0].includes('Error'), `the kind is named: ${lines[0]}`);
+      assert(!lines[0].includes(IDENTITY) && !lines[0].includes('KV PUT failed'), `no key or message in the line: ${lines[0]}`);
+    });
+  });
+
+  // -------------------------------------------------------------------------
   // Council headroom
   // -------------------------------------------------------------------------
 
