@@ -30,6 +30,13 @@ const BANNER_STYLE: React.CSSProperties = {
   transition: 'opacity 0.3s ease',
 };
 
+// The warning ember with the night ink reads at 5.0:1. Opaque, because the
+// page showing through would pull it under 4.5:1.
+const WARNING_COLORS: React.CSSProperties = {
+  background: 'var(--color-warning)',
+  color: 'var(--bg-void)',
+};
+
 const NetworkStatusBanner: FC = () => {
   const { isOnline } = useNetworkStatus();
   const { tString } = useTranslation();
@@ -123,44 +130,44 @@ const NetworkStatusBanner: FC = () => {
   if (banner.type === 'hidden') return null;
 
   let message: string;
-  let bgColor: string;
+  let colors: React.CSSProperties;
 
   switch (banner.type) {
     case 'offline':
       message = tString('errors.network.offline', 'You are offline. Some features may not work.');
-      bgColor = 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)';
+      colors = { background: 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)' };
       break;
     case 'reconnected':
       message = tString('errors.network.reconnected', 'Connection restored');
-      bgColor = 'color-mix(in srgb, var(--success-color, #22c55e) 90%, transparent)';
+      colors = { background: 'color-mix(in srgb, var(--success-color, #22c55e) 90%, transparent)' };
       break;
     case 'circuit-breaker':
       message = banner.service === 'tts'
         ? tString('errors.network.ttsUnavailable', 'Audio is temporarily unavailable. Showing text only.')
         : tString('errors.network.sttUnavailable', 'Speech recognition is temporarily unavailable. Please type instead.');
-      bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+      colors = WARNING_COLORS;
       break;
     case 'rate-limit':
       if (banner.hint === 'switch_to_english') {
         message = tString('errors.network.gpuCapacityGerman', 'GPU capacity is high. Switch to English for continued audio.');
-        bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+        colors = WARNING_COLORS;
       } else if (banner.hint === 'disable_tts') {
         message = tString('errors.network.gpuCapacityAll', 'Audio servers are busy. Turn off TTS in settings to continue chatting.');
-        bgColor = 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)';
+        colors = { background: 'color-mix(in srgb, var(--error-color, #ef4444) 90%, transparent)' };
       } else {
         message = tString('errors.network.audioRateLimited', 'Audio rate limited. Please wait a moment.');
-        bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+        colors = WARNING_COLORS;
       }
       break;
     case 'byok-fallback':
       message = tString('errors.network.byokFellBack', 'Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.');
-      bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+      colors = WARNING_COLORS;
       break;
     case 'local-mode':
       message = banner.service === 'tts'
         ? tString('errors.network.localTtsUnavailable', 'Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings.')
         : tString('errors.network.localSttUnavailable', 'Local voice input is not reachable. Check Local Mode in Settings, or type your message.');
-      bgColor = 'color-mix(in srgb, var(--warning-color, #f59e0b) 90%, transparent)';
+      colors = WARNING_COLORS;
       break;
   }
 
@@ -168,7 +175,7 @@ const NetworkStatusBanner: FC = () => {
     <div
       role="alert"
       aria-live="assertive"
-      style={{ ...BANNER_STYLE, background: bgColor }}
+      style={{ ...BANNER_STYLE, ...colors }}
     >
       {message}
     </div>
