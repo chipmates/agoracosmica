@@ -22,6 +22,11 @@ const translationCache: TranslationCache = {
   de: new Map()
 };
 
+// The figure list asks for all thirty on every render, long before the first
+// answer. One request per file and page load: later asks share it, and its
+// outcome, a failure included, stands until the next load.
+const loads = new Map<string, Promise<FigureTranslation>>();
+
 /**
  * Extracts a figure ID from a figure name
  * 
@@ -64,7 +69,7 @@ export function getFigureId(figureName: string): string {
  * @param {string} language - The language code (e.g., "en", "de")
  * @returns {Promise<FigureTranslation>} The translated figure data
  */
-export async function loadFigureTranslation(figureName: string, language: string = 'en'): Promise<FigureTranslation> {
+export function loadFigureTranslation(figureName: string, language: string = 'en'): Promise<FigureTranslation> {
   // Supported languages, fallback to English if not supported
   const supportedLanguages = ['en', 'de'];
   if (!supportedLanguages.includes(language)) {
@@ -72,33 +77,44 @@ export async function loadFigureTranslation(figureName: string, language: string
   }
 
   const figureId = getFigureId(figureName);
-  
+
   // Check if we have a cached version
-  if (translationCache[language]?.has(figureId)) {
-    return translationCache[language].get(figureId)!;
+  const cached = translationCache[language]?.get(figureId);
+  if (cached) {
+    return Promise.resolve(cached);
   }
-  
+
+  const key = `${language}/${figureId}`;
+  let load = loads.get(key);
+  if (!load) {
+    load = fetchFigureTranslation(figureName, figureId, language);
+    loads.set(key, load);
+  }
+  return load;
+}
+
+async function fetchFigureTranslation(figureName: string, figureId: string, language: string): Promise<FigureTranslation> {
   try {
     // Fetch from R2 (was dynamic import from bundled assets)
     const response = await fetch(getContentUrl(`figure-translations/${language}/${figureId}.json`));
     if (!response.ok) throw new Error(`HTTP ${response.status}`);
     const translation: FigureTranslation = await response.json();
-    
+
     // Cache the translation
     if (!translationCache[language]) {
       translationCache[language] = new Map();
     }
     translationCache[language].set(figureId, translation);
-    
+
     return translation;
   } catch (error) {
     console.warn(`Failed to load translation for figure ${figureId} in ${language}:`, error);
-    
+
     // If we fail to load the specified language, try falling back to English
     if (language !== 'en') {
       return loadFigureTranslation(figureName, 'en');
     }
-    
+
     // If even English fails, return a basic object with the figure name only
     return {
       name: figureName,
