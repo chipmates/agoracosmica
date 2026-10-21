@@ -277,6 +277,37 @@
     text-align: center;
     line-height: 1.25;
   }
+
+  /* A title's longest word keeps its line: the badge wraps first. */
+  .headerLeft,
+  .titleWrapper {
+    min-width: min-content;
+  }
+
+  .title {
+    word-break: normal;
+    overflow-wrap: break-word;
+  }
+
+  .headerRight {
+    min-width: 0;
+  }
+}
+
+@media (max-width: 359px) {
+  /* The narrowest phones: a little less frame, so a two-line title is not cut. */
+  .header {
+    padding: 14px 12px;
+    column-gap: 8px;
+  }
+
+  .headerLeft {
+    gap: 10px;
+  }
+
+  .headerRight {
+    gap: 8px;
+  }
 }
 
 @media (max-width: 480px) {
