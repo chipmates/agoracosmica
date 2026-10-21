@@ -13,9 +13,14 @@ import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
 import { classifyEntryForFunnel } from '../utils/public/entryIntent';
 import { sendConversion } from '../utils/public/gclidCapture';
 
+/** How the welcome closed: `returning` when the browser had accepted terms before. */
+export interface WelcomeOutcome {
+  returning: boolean;
+}
+
 interface WelcomeDisclosureModalProps {
   isOpen: boolean;
-  onComplete: () => void;
+  onComplete: (outcome: WelcomeOutcome) => void;
   onSkip: () => void;
 }
 
@@ -32,12 +37,14 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
   const completedRef = useRef(false);
+  const returningRef = useRef(false);
 
   const handleComplete = useCallback((): void => {
     if (isAnimating) return;
     // Read before the record below is written: a browser that accepted an
     // earlier version is not a new entry, signup or profile.
     const firstAcceptance = !hasEarlierConsent();
+    returningRef.current = !firstAcceptance;
     // Store consent in localStorage (technisch erforderlich, § 25 Abs. 2 Nr. 2 TDDDG).
     // A full or blocked storage must not trap the user on the welcome screen.
     try {
@@ -53,13 +60,16 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     } catch (err) {
       console.error('Failed to persist consent record:', err);
     }
-    // No profile UI at entry — default to the Seeker. The user can rename or
-    // change the avatar later in settings.
-    preferencesIndexedDbAdapter.setUserProfile({
+    // No profile UI at entry: a browser without a profile gets the Seeker,
+    // renamed later in settings. A stored name and picture stay as they are.
+    const defaultProfile = {
       name: tString('entry.defaultName', 'Seeker'),
       avatar: null,
       locale: language,
-    }).catch((err) => console.error('Failed to save profile:', err));
+    };
+    preferencesIndexedDbAdapter.hasUserProfile()
+      .then((exists) => (exists ? undefined : preferencesIndexedDbAdapter.setUserProfile(defaultProfile)))
+      .catch((err) => console.error('Failed to save profile:', err));
 
     // Entry funnel beacons: the first acceptance in this browser is the true
     // "entered the app" moment. Accepting a new terms version counts nothing.
@@ -82,7 +92,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   const handleBurstEnd = useCallback((e: React.AnimationEvent<HTMLDivElement>) => {
     if (isAnimating && e.target === modalRef.current && !completedRef.current) {
       completedRef.current = true;
-      onComplete();
+      onComplete({ returning: returningRef.current });
     }
   }, [isAnimating, onComplete]);
 
@@ -155,7 +165,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
     const timer = setTimeout(() => {
       if (!completedRef.current) {
         completedRef.current = true;
-        onComplete();
+        onComplete({ returning: returningRef.current });
       }
     }, 1500);
     return () => clearTimeout(timer);

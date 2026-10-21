@@ -62,6 +62,14 @@ export const hasEarlierConsent = (): boolean => {
 };
 
 /**
+ * Whether any conversation history is stored in this browser.
+ */
+export const hasStoredHistory = (): boolean =>
+  LocalStorageAdapter.keys().some((key) =>
+    HISTORY_PREFIXES.some((prefix) => key.startsWith(prefix))
+  );
+
+/**
  * Checks whether the welcome disclosure still has to be shown: no consent
  * record for the current version, or none of the post-consent signals (chat
  * history, a selected figure, a completed or skipped onboarding) present.

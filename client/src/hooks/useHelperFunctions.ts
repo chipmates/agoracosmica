@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import { getHistoricalFigures } from '../api/figures';
-import { completeOnboarding } from '../utils/userState';
+import { completeOnboarding, hasStoredHistory } from '../utils/userState';
+import type { WelcomeOutcome } from '../components/WelcomeDisclosureModal';
 import { Figure, Seed, Language, ConversationMode } from '../types/global';
 import { useDomainStore } from '../stores';
 import {
@@ -33,7 +34,7 @@ interface HelperFunctionsParams {
 interface HelperFunctionsResult {
   getTranslatedFigureName: () => string;
   getCurrentSeedName: () => string;
-  handleOnboardingComplete: () => void;
+  handleOnboardingComplete: (outcome?: WelcomeOutcome) => void;
   handleOnboardingSkip: () => void;
   handleWisdomGallerySelect: (figure: Figure) => void;
   handleWisdomGalleryExploreAll: () => void;
@@ -119,8 +120,9 @@ export function useHelperFunctions({
   // After the welcome step closes, route the visitor on, based on any intent
   // captured from the public page they came from. A council intent (theme
   // page) opens that council; a figure intent (figure page) lands on that
-  // figure's mode selector; otherwise the WisdomGallery opens as before.
-  const routeAfterOnboarding = useCallback((): void => {
+  // figure's mode selector. Otherwise a first visit opens the WisdomGallery,
+  // and a browser that accepted earlier terms goes back where it was.
+  const routeAfterOnboarding = useCallback((returning: boolean): void => {
     // Audio-library deep-link: the library opens over whatever this arrival
     // would otherwise land on, so closing it leaves the visitor somewhere real.
     if (readLibraryIntent()) {
@@ -144,15 +146,24 @@ export function useHelperFunctions({
         return;
       }
     }
-    handleWisdomGalleryOpen();
-  }, [getFigureById, handleSelectFigure, handleWisdomGalleryOpen, startCuratedCouncilById]);
+    if (!returning) {
+      handleWisdomGalleryOpen();
+      return;
+    }
+    // The same landing as a return with the current terms: the restore effects
+    // reopen a stored figure and conversation once the welcome is closed, and
+    // a browser with neither gets the figure list.
+    if (!hasStoredHistory() && !useDomainStore.getState().figures.selectedId) {
+      handleFigureCarouselOpen();
+    }
+  }, [getFigureById, handleSelectFigure, handleWisdomGalleryOpen, handleFigureCarouselOpen, startCuratedCouncilById]);
 
   // Handle onboarding completion
-  const handleOnboardingComplete = useCallback((): void => {
+  const handleOnboardingComplete = useCallback((outcome?: WelcomeOutcome): void => {
     completeOnboarding();
     useDomainStore.getState().markVisited();
     handleOnboardingClose();
-    routeAfterOnboarding();
+    routeAfterOnboarding(outcome?.returning === true);
   }, [handleOnboardingClose, routeAfterOnboarding]);
 
   // Welcome/consent gate dismissal. The welcome modal is a REQUIRED consent

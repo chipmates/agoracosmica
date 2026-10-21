@@ -9,6 +9,7 @@ const WisdomGalleryModal = lazy(() => import('../WisdomGalleryModalV2'));
 
 import RenderCounter from '../../dev/RenderCounter';
 import type { Figure, Seed } from '../../types/global';
+import type { WelcomeOutcome } from '../WelcomeDisclosureModal';
 
 interface ModalsContainerProps {
   // History Modal props
@@ -32,7 +33,7 @@ interface ModalsContainerProps {
 
   // Onboarding props
   showOnboarding: boolean;
-  handleOnboardingComplete: () => void;
+  handleOnboardingComplete: (outcome: WelcomeOutcome) => void;
   handleOnboardingSkip: () => void;
 
   // Wisdom Gallery props
