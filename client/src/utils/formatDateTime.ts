@@ -23,3 +23,12 @@ export function formatTime(value: string | number | Date, appLanguage: string): 
     return new Date(value).toLocaleTimeString(lang);
   }
 }
+
+export function formatDate(value: string | number | Date, appLanguage: string): string {
+  const { locale, lang } = localeFor(appLanguage);
+  try {
+    return new Date(value).toLocaleDateString(locale, { dateStyle: 'long' });
+  } catch {
+    return new Date(value).toLocaleDateString(lang, { dateStyle: 'long' });
+  }
+}

@@ -1365,6 +1365,13 @@
       "byokInvalidKey": "Your OpenRouter key was rejected. Please check it in Settings.",
       "byokInsufficientCredits": "Your OpenRouter account is out of credits. Please top it up to continue.",
       "byokModelNotFound": "The selected AI model is no longer available. Pick a different model in Settings to continue.",
+      "byokRefused": {
+        "budget": "OpenRouter stopped this request because a spending limit on your key is reached. Raise it at OpenRouter, or wait until it resets.",
+        "budgetUntil": "OpenRouter stopped this request because a spending limit on your key is reached. It resets on {date}, or you can raise it at OpenRouter.",
+        "moderation": "OpenRouter stopped this request because the model's moderation flagged it.",
+        "guardrail": "OpenRouter stopped this request because a rule in your OpenRouter account blocks it. Check the rules there.",
+        "forbidden": "OpenRouter did not allow this request. Check at OpenRouter which permissions and limits apply to your key."
+      },
       "timeout": "The request took too long. Please try again.",
       "network": "Connection issue. Please check your network and try again.",
       "securityCheckBlocked": "The security check could not load. An ad blocker or strict privacy setting is likely blocking challenges.cloudflare.com. Allow it for this site, then try again.",

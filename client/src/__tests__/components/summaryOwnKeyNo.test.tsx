@@ -31,7 +31,7 @@ vi.mock('../../services/history/historyDataLoader', () => ({
 
 import { useHistoryModalData } from '../../components/HistoryModal/useHistoryModalData';
 import SummaryService from '../../services/SummaryService';
-import { OwnKeyRejectedError } from '../../services/llm/ownKeyConsent';
+import { OwnKeyRejectedError, OwnKeyRefusedError } from '../../services/llm/ownKeyConsent';
 
 async function openHistory() {
   const view = renderHook(() => useHistoryModalData({
@@ -90,6 +90,15 @@ describe('a summary after a rejected own key', () => {
       finish({ content: 'KERNEINSICHTEN:\nGeduld.', metadata: { figureId: 'aurelius', seedId: 'freetalk', timestamp: '2026-10-21T05:42:00.000Z' } });
       await run;
     });
+  });
+
+  it('a summary OpenRouter refused (403) says why in the history, never an alert', async () => {
+    vi.mocked(SummaryService.generateSummary).mockRejectedValueOnce(new OwnKeyRefusedError('moderation'));
+    const view = await openHistory();
+    await act(async () => { await view.result.current.handleSummary(); });
+
+    expect(alert).not.toHaveBeenCalled();
+    expect(view.result.current.summaryNote).toBe('errors.conversation.byokRefused.moderation');
   });
 
   it('any other failure keeps its alert', async () => {

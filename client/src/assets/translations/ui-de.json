@@ -1367,6 +1367,13 @@
       "byokInvalidKey": "Dein OpenRouter-Key wurde abgelehnt. Bitte prüfe ihn in den Einstellungen.",
       "byokInsufficientCredits": "Deinem OpenRouter-Konto ist das Guthaben ausgegangen. Bitte lade es auf, um weiterzumachen.",
       "byokModelNotFound": "Das gewählte KI-Modell ist nicht mehr verfügbar. Wähle in den Einstellungen ein anderes Modell, um weiterzumachen.",
+      "byokRefused": {
+        "budget": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit für deinen Key erreicht ist. Heb es bei OpenRouter an oder warte, bis es zurückgesetzt wird.",
+        "budgetUntil": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit für deinen Key erreicht ist. Es wird am {date} zurückgesetzt, oder du hebst es bei OpenRouter an.",
+        "moderation": "OpenRouter hat diese Anfrage gestoppt, weil die Moderation des Modells sie markiert hat.",
+        "guardrail": "OpenRouter hat diese Anfrage gestoppt, weil eine Regel in deinem OpenRouter-Konto sie blockiert. Prüfe die Regeln dort.",
+        "forbidden": "OpenRouter hat diese Anfrage nicht erlaubt. Prüfe bei OpenRouter, welche Rechte und Limits für deinen Key gelten."
+      },
       "timeout": "Die Anfrage hat zu lange gedauert. Bitte versuche es nochmal.",
       "network": "Verbindungsproblem. Bitte prüfe dein Netzwerk und versuche es nochmal.",
       "securityCheckBlocked": "Die Sicherheitsprüfung konnte nicht geladen werden. Vermutlich blockiert ein Werbeblocker oder strenger Privatsphäre-Schutz challenges.cloudflare.com. Erlaube es für diese Seite und versuche es nochmal.",

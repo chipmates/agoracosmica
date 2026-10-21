@@ -33,7 +33,7 @@ vi.mock('../../stores/domainStore', () => ({
 }));
 
 import { useAskWhileListening } from '../../hooks/useAskWhileListening';
-import { OwnKeyRejectedError } from '../../services/llm/ownKeyConsent';
+import { OwnKeyRejectedError, OwnKeyRefusedError } from '../../services/llm/ownKeyConsent';
 import type { AskDriverInput, UseAskArgs } from '../../hooks/useAskWhileListening';
 import { ASK_DWELL_MS, ASK_RESUME_TIMEOUT_MS } from '../../config/askWhileListening';
 
@@ -369,6 +369,26 @@ describe('useAskWhileListening', () => {
     // After "check my key" Settings is open, so the sheet says nothing.
     expect(view.view.result.current.notice).toBe(notice);
   });
+
+  it.each(['budget', 'moderation', 'guardrail', 'forbidden'] as const)(
+    'a %s refusal from OpenRouter (403) says why, not the rejected key or the retry line',
+    async (reason) => {
+      const fake = makeDriver();
+      const view = mount({ driver: fake.driver });
+      pauseInto(view);
+      dwell();
+      act(() => view.view.result.current.openComposer());
+      act(() => view.view.result.current.setDraft('why the garden?'));
+      act(() => view.view.result.current.send());
+
+      await act(async () => {
+        fake.fail(new OwnKeyRefusedError(reason));
+        await Promise.resolve();
+      });
+      expect(view.view.result.current.state).toBe('failed');
+      expect(view.view.result.current.notice).toBe(`keyRefused:${reason}`);
+    },
+  );
 
   it('lands a 429 in limited, with the capacity line when the quota is not spent', async () => {
     const fake = makeDriver();

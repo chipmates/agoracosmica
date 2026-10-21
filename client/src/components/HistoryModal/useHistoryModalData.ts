@@ -5,7 +5,7 @@ import useSeedTranslation from '../../hooks/useSeedTranslation';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useUIStore } from '../../stores/uiStore';
 import SummaryService from '../../services/SummaryService';
-import { OwnKeyRejectedError } from '../../services/llm/ownKeyConsent';
+import { isOwnKeyError } from '../../services/llm/ownKeyConsent';
 import { mapErrorToUserMessage } from '../../services/llm/errorMessages';
 import { splitSummarySections } from './summarySections';
 import { STORAGE_KEYS, parseHistoryKey } from '../../utils/storageKeysV2';
@@ -397,7 +397,7 @@ export function useHistoryModalData({
       return true;
     } catch (error) {
       if (!isMountedRef.current) return false;
-      if (error instanceof OwnKeyRejectedError) {
+      if (isOwnKeyError(error)) {
         // The chat's key line, never an alert; nothing after "check my key".
         setSummaryNote(mapErrorToUserMessage(error, tString) || null);
         return false;

@@ -177,7 +177,7 @@ describe('the free tier after a rejected key', () => {
     resetOwnKeyConsentForTests();
   });
 
-  it.each([401, 403])('HTTP %i: asks, sends nothing before the yes, then answers from the free tier as before', async (status) => {
+  it.each([401])('HTTP %i: asks, sends nothing before the yes, then answers from the free tier as before', async (status) => {
     installNetwork(status);
     const { task } = chatTurn();
 

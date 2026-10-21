@@ -16,7 +16,7 @@ import {
 } from './llmUtils';
 import { loadServiceConfig } from '../config/serviceConfig';
 import { isSelfHost } from '../../../config/deployment';
-import { ensureFreeTierAllowed, OwnKeyRejectedError } from '../../llm/ownKeyConsent';
+import { ensureFreeTierAllowed, OwnKeyRejectedError, ownKeyRefusalFrom } from '../../llm/ownKeyConsent';
 
 // ============================================
 // Type Definitions
@@ -231,7 +231,13 @@ export const generateResponse = async ({
         if (providerKind === 'custom-openai') {
           throw error;
         }
-        if ((error?.status === 401 || error?.status === 403) && !isSelfHost) {
+        // A 403 refuses this request (a spending limit, moderation, a
+        // guardrail, a permission), not the key: the key stays, nothing goes
+        // to the free tier, and the visitor is told why.
+        if (error?.status === 403) {
+          throw ownKeyRefusalFrom(error?.detail);
+        }
+        if (error?.status === 401 && !isSelfHost) {
           console.warn('[LLM] BYOK key rejected (HTTP', error.status, '), marking it invalid');
           await keyStorage.markInvalid('openrouter');
           if (typeof window !== 'undefined') {

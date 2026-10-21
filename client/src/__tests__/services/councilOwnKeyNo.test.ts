@@ -4,6 +4,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
 const KEY_LINE = 'Dein OpenRouter-Key wurde abgelehnt (test line).';
+const LIMIT_LINE = 'OpenRouter hat diese Anfrage gestoppt (test line).';
 
 const h = vi.hoisted(() => ({
   shown: [] as Array<string | null>,
@@ -31,7 +32,7 @@ vi.mock('../../services/storage/keyStorageService', () => ({
 const state = {
   language: {
     current: 'de',
-    uiTranslations: { errors: { conversation: { byokInvalidKey: KEY_LINE } } },
+    uiTranslations: { errors: { conversation: { byokInvalidKey: KEY_LINE, byokRefused: { budget: LIMIT_LINE } } } },
   },
   council: { config: null },
   setCouncilError: (message: string | null) => { h.shown.push(message); },
@@ -48,7 +49,7 @@ vi.mock('../../stores', () => ({ useDomainStore: { getState: () => state } }));
 vi.mock('../../stores/domainStore', () => ({ useDomainStore: { getState: () => state } }));
 
 import { createCouncilController } from '../../controllers/councilController';
-import { OwnKeyRejectedError } from '../../services/llm/ownKeyConsent';
+import { OwnKeyRejectedError, OwnKeyRefusedError } from '../../services/llm/ownKeyConsent';
 
 /** The service as the council chain reports a no: the error event, then the failed result. */
 function declineWith(choice: 'dismissed' | 'check-key'): void {
@@ -84,6 +85,19 @@ describe('a council after a rejected own key', () => {
 
     // setCouncilError(null) on start is the only write.
     expect(h.shown.filter((line) => line !== null)).toEqual([]);
+  });
+
+  it('a request OpenRouter refused (403) shows why, in the page language', async () => {
+    const error = new OwnKeyRefusedError('budget');
+    h.reply = (emit) => {
+      emit('onError', error);
+      return { success: false, error: error.message, ownKey: error };
+    };
+    await controller.startCouncil(CONFIG).catch(() => {});
+
+    const lines = h.shown.filter((line) => line !== null);
+    expect(lines.length).toBeGreaterThan(0);
+    for (const line of lines) expect(line).toBe(LIMIT_LINE);
   });
 
   it('any other failure still shows its message', async () => {

@@ -14,7 +14,7 @@ import customCouncilGenerator, { type PartialSegment } from './generator';
 import CustomCouncilParser, { type Segment } from './parser';
 import type { CouncilMessage } from './index';
 import { councilLog, councilWarn, councilError } from './logger';
-import { OwnKeyRejectedError } from '../llm/ownKeyConsent';
+import { isOwnKeyError, type OwnKeyError } from '../llm/ownKeyConsent';
 import { getOrRollCouncilFigureSessionId, touchCouncilFigureSession, clearCouncilSessions } from '../audio/tts/ttsSessions';
 import { getAudioContext, holdAudioContext } from '../audio/audioQueueManager';
 import { registerContentPlayer, type AudioFocusHandle } from '../audio/audioFocus';
@@ -138,7 +138,7 @@ interface GenerationResult {
   result?: any;
   error?: string;
   /** The visitor's no to the own-key question, kept whole so the page can word it. */
-  ownKey?: OwnKeyRejectedError;
+  ownKey?: OwnKeyError;
   /** Ended by a close or a newer council, not by a fault. */
   stopped?: boolean;
 }
@@ -422,7 +422,7 @@ export class CustomCouncilService {
       return {
         success: false,
         error: errorMessage,
-        ...(error instanceof OwnKeyRejectedError ? { ownKey: error } : {}),
+        ...(isOwnKeyError(error) ? { ownKey: error } : {}),
       };
     }
   }

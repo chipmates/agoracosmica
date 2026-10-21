@@ -5,7 +5,9 @@
 
 import { FreeTierError } from '../proxy/freeTierAdapter';
 import { LLMApiError } from './llmService';
-import { OwnKeyRejectedError } from './ownKeyConsent';
+import { OwnKeyRejectedError, OwnKeyRefusedError } from './ownKeyConsent';
+import { formatDate } from '../../utils/formatDateTime';
+import { shownLanguage } from '../../utils/shownLanguage';
 
 type TStringFn = (key: string, fallback?: string) => string;
 
@@ -23,6 +25,15 @@ export function mapErrorToUserMessage(error: unknown, tString: TStringFn): strin
   // under it.
   if (error instanceof OwnKeyRejectedError) {
     return error.choice === 'check-key' ? '' : tString(`${KEY}.byokInvalidKey`);
+  }
+
+  // ── Own key kept, this one request refused (HTTP 403) ──────────────────
+  if (error instanceof OwnKeyRefusedError) {
+    if (error.reason === 'budget' && error.resetsAt) {
+      return tString(`${KEY}.byokRefused.budgetUntil`)
+        .replace('{date}', formatDate(error.resetsAt, shownLanguage()));
+    }
+    return tString(`${KEY}.byokRefused.${error.reason}`);
   }
 
   // ── Structured worker errors (free-tier path) ───────────────────────────

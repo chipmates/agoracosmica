@@ -37,6 +37,14 @@ function noticeKey(notice: AskNotice): { key: string; fallback: string } {
         key: 'errors.conversation.byokInvalidKey',
         fallback: 'Your OpenRouter key was rejected. Please check it in Settings.',
       };
+    case 'keyRefused:budget':
+    case 'keyRefused:moderation':
+    case 'keyRefused:guardrail':
+    case 'keyRefused:forbidden':
+      return {
+        key: `errors.conversation.byokRefused.${notice.slice('keyRefused:'.length)}`,
+        fallback: 'OpenRouter did not allow this request. Check at OpenRouter which permissions and limits apply to your key.',
+      };
     case 'quotaSpent':
       return {
         key: 'askListen.quotaSpent',

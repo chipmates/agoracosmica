@@ -36,13 +36,24 @@ interface LLMRequest {
 interface LLMErrorResponse {
   error: {
     message: string;
-    type: string;
-    code?: string;
+    type?: string;
+    code?: string | number;
+    metadata?: Record<string, unknown>;
   };
 }
 
+/** What the provider said about a failed request, as it said it. */
+export interface LLMErrorDetail {
+  message: string;
+  metadata?: Record<string, unknown>;
+}
+
 export class LLMApiError extends Error {
-  constructor(message: string, public readonly status: number) {
+  constructor(
+    message: string,
+    public readonly status: number,
+    public readonly detail?: LLMErrorDetail,
+  ) {
     super(message);
     this.name = 'LLMApiError';
   }
@@ -448,8 +459,10 @@ class LLMService {
   }
 
   private handleError(error: LLMErrorResponse, status: number, providerConfig: ProviderConfig): LLMApiError {
-    const message = error.error?.message || 'Unknown error';
+    const message = error?.error?.message || 'Unknown error';
     const isOpenRouter = providerConfig.kind === 'openrouter';
+    const metadata = error?.error?.metadata;
+    const detail: LLMErrorDetail = metadata && typeof metadata === 'object' ? { message, metadata } : { message };
 
     switch (status) {
       case 401:
@@ -458,6 +471,7 @@ class LLMService {
             ? 'Invalid API key. Please check your OpenRouter key.'
             : 'Endpoint returned 401. Check the API key, or leave it blank if your local server does not require one.',
           status,
+          detail,
         );
       case 402:
         return new LLMApiError(
@@ -465,6 +479,7 @@ class LLMService {
             ? 'Insufficient credits. Please add credits to your OpenRouter account.'
             : `Endpoint returned 402: ${message}`,
           status,
+          detail,
         );
       case 404:
         return new LLMApiError(
@@ -472,18 +487,20 @@ class LLMService {
             ? `Model not found: ${message}`
             : 'Endpoint returned 404. Check the model name matches what your server has loaded.',
           status,
+          detail,
         );
       case 429:
-        return new LLMApiError('Rate limit exceeded. Please wait a moment and try again.', status);
+        return new LLMApiError('Rate limit exceeded. Please wait a moment and try again.', status, detail);
       case 503:
         return new LLMApiError(
           isOpenRouter
             ? 'Service temporarily unavailable. Please try again.'
             : 'Endpoint returned 503. The model may still be loading on your local server.',
           status,
+          detail,
         );
       default:
-        return new LLMApiError(`LLM error: ${message}`, status);
+        return new LLMApiError(`LLM error: ${message}`, status, detail);
     }
   }
 

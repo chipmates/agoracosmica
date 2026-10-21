@@ -20,7 +20,7 @@ import {
   ASK_RESUME_TIMEOUT_MS,
   ASK_SCRUB_EPSILON_S,
 } from '../config/askWhileListening';
-import { OwnKeyRejectedError } from '../services/llm/ownKeyConsent';
+import { OwnKeyRejectedError, OwnKeyRefusedError, type OwnKeyRefusalReason } from '../services/llm/ownKeyConsent';
 
 export type AskState =
   | 'listening'
@@ -51,7 +51,9 @@ export interface AskAnchor {
 }
 
 /** The one quiet line under the sheet, when there is one. */
-export type AskNotice = 'error' | 'voiceUnavailable' | 'offline' | 'quotaSpent' | 'capacity' | 'keyRejected';
+export type AskNotice =
+  | 'error' | 'voiceUnavailable' | 'offline' | 'quotaSpent' | 'capacity' | 'keyRejected'
+  | `keyRefused:${OwnKeyRefusalReason}`;
 
 export interface AskDriverInput {
   figureId: string;
@@ -354,6 +356,12 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
           // A no to the own-key question: the chat's key line, or nothing
           // after "check my key", since Settings is open then.
           setNotice(error.choice === 'check-key' ? null : 'keyRejected');
+          setState('failed');
+          return;
+        }
+        if (error instanceof OwnKeyRefusedError) {
+          // The key stands; OpenRouter refused this question, and says why.
+          setNotice(`keyRefused:${error.reason}`);
           setState('failed');
           return;
         }

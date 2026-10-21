@@ -10,7 +10,7 @@
 
 import { generateResponse } from '../audio/llm';
 import { generateFreeTierCouncilResponse } from '../proxy/freeTierAdapter';
-import { ensureFreeTierAllowed, OwnKeyRejectedError } from '../llm/ownKeyConsent';
+import { ensureFreeTierAllowed, isOwnKeyError, OwnKeyRejectedError, type OwnKeyError } from '../llm/ownKeyConsent';
 import { isSelfHost } from '../../config/deployment';
 import { mediaBaseUrl } from '../../config/runtime';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
@@ -199,7 +199,7 @@ interface GenerationResult {
   };
   error?: string;
   /** The visitor's no to the own-key question, kept whole so the page can word it. */
-  ownKey?: OwnKeyRejectedError;
+  ownKey?: OwnKeyError;
   validationErrors?: string[];
   debugLog?: LogEntry[];
 }
@@ -322,7 +322,7 @@ class CustomCouncilGenerator {
       return {
         success: false,
         error: errorMessage,
-        ...(error instanceof OwnKeyRejectedError ? { ownKey: error } : {}),
+        ...(isOwnKeyError(error) ? { ownKey: error } : {}),
         validationErrors: this.validationErrors,
         debugLog: this.generationLog
       };
@@ -738,7 +738,7 @@ Begin the council now. Remember to use the EXACT format specified in your instru
       };
       
     } catch (error) {
-      if (error instanceof OwnKeyRejectedError) throw error;
+      if (isOwnKeyError(error)) throw error;
       const errorMessage = error instanceof Error ? error.message : String(error);
       throw new Error(`LLM call failed: ${errorMessage}`);
     } finally {

@@ -14,7 +14,7 @@ import CuratedCouncilService from './CuratedCouncilService';
 import CustomCouncilService from './CustomCouncilService';
 import { useDomainStore } from '../../stores/domainStore';
 import { councilLog, councilWarn, councilError } from './logger';
-import { OwnKeyRejectedError } from '../llm/ownKeyConsent';
+import { isOwnKeyError, type OwnKeyError } from '../llm/ownKeyConsent';
 
 interface ServiceConfig {
   tts?: string;
@@ -110,7 +110,7 @@ interface StartCouncilResult {
   message?: string;
   error?: string;
   /** The visitor's no to the own-key question, kept whole so the page can word it. */
-  ownKey?: OwnKeyRejectedError;
+  ownKey?: OwnKeyError;
 }
 
 export class CosmicCouncilService {
@@ -228,7 +228,7 @@ export class CosmicCouncilService {
       return {
         success: false,
         error: error.message,
-        ...(error instanceof OwnKeyRejectedError ? { ownKey: error } : {}),
+        ...(isOwnKeyError(error) ? { ownKey: error } : {}),
       };
     }
   }

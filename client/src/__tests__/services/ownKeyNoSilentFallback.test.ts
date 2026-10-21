@@ -1,7 +1,8 @@
-// A stored OpenRouter key that OpenRouter turns down (401 or 403) must not
-// carry the conversation to our servers on its own. Each route that could fall
-// back is driven to the rejection, and the network log is read before anyone
-// answers: only OpenRouter may have seen the conversation.
+// A stored OpenRouter key that OpenRouter turns down must not carry the
+// conversation to our servers on its own. Each route that could fall back is
+// driven to the rejection (401) or the refusal (403), and the network log is
+// read before anyone answers: only OpenRouter may have seen the conversation.
+// Only a 401 marks the key rejected.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const harness = vi.hoisted(() => ({
@@ -221,7 +222,8 @@ describe('a stored key that OpenRouter rejects', () => {
       await runUntilQuiet(run());
 
       expect(toOpenRouter().length).toBeGreaterThan(0);
-      expect(keyStorage.markInvalid).toHaveBeenCalled();
+      if (status === 401) expect(keyStorage.markInvalid).toHaveBeenCalled();
+      else expect(keyStorage.markInvalid).not.toHaveBeenCalled();
       expect(toFreeTier()).toEqual([]);
       expect(conversationLeftForUs()).toEqual([]);
     });

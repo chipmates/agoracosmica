@@ -27,6 +27,58 @@ export class OwnKeyRejectedError extends Error {
   }
 }
 
+/** Why OpenRouter refused one request while the key itself stands. */
+export type OwnKeyRefusalReason = 'budget' | 'moderation' | 'guardrail' | 'forbidden';
+
+/**
+ * OpenRouter answered an own-key request with 403: a spending limit, a
+ * moderation flag, a guardrail or a missing permission. Only a 401 rejects the
+ * key, so this one keeps it, and the free tier is never offered for it.
+ */
+export class OwnKeyRefusedError extends Error {
+  constructor(
+    public readonly reason: OwnKeyRefusalReason,
+    /** When the spending limit resets, as OpenRouter gave it (ISO 8601). */
+    public readonly resetsAt: string | null = null,
+  ) {
+    super(`OpenRouter refused the request (${reason})`);
+    this.name = 'OwnKeyRefusedError';
+  }
+}
+
+/** Either outcome of an own key that did not answer: rejected, or refused once. */
+export type OwnKeyError = OwnKeyRejectedError | OwnKeyRefusedError;
+
+export function isOwnKeyError(error: unknown): error is OwnKeyError {
+  return error instanceof OwnKeyRejectedError || error instanceof OwnKeyRefusedError;
+}
+
+const isoInstant = (value: unknown): string | null =>
+  typeof value === 'string' && !Number.isNaN(Date.parse(value)) ? value : null;
+
+/**
+ * Reads OpenRouter's 403 body (message and metadata) the way its error page
+ * describes it: budget errors carry `limit_source` and `resets_at`, moderation
+ * errors `reasons` and `flagged_input`, guardrail blocks "Request blocked".
+ */
+export function ownKeyRefusalFrom(
+  detail: { message?: unknown; metadata?: Record<string, unknown> } | null | undefined,
+): OwnKeyRefusedError {
+  const message = typeof detail?.message === 'string' ? detail.message : '';
+  const meta = detail?.metadata ?? {};
+  if (typeof meta.limit_source === 'string' || /budget|limit exceeded/i.test(message)) {
+    const resets = isoInstant(meta.resets_at) ?? isoInstant(/resets (\S+?)\.?$/i.exec(message)?.[1]);
+    return new OwnKeyRefusedError('budget', resets);
+  }
+  if (Array.isArray(meta.reasons) || typeof meta.flagged_input === 'string' || /flagged|moderation/i.test(message)) {
+    return new OwnKeyRefusedError('moderation');
+  }
+  if (Array.isArray(meta.patterns) || /^request blocked|guardrail/i.test(message)) {
+    return new OwnKeyRefusedError('guardrail');
+  }
+  return new OwnKeyRefusedError('forbidden');
+}
+
 export interface OwnKeyAsk {
   readonly kind: FreeTierKind;
   readonly scope: string;

@@ -3,7 +3,7 @@ import { useDomainStore } from '../stores';
 import type { ConversationMessage, CouncilConfig } from '../stores/slices/domainTypes';
 import { registerCouncilController, type CouncilControllerApi } from './councilControllerRegistry';
 import { councilError } from '../services/council/logger';
-import { OwnKeyRejectedError } from '../services/llm/ownKeyConsent';
+import { isOwnKeyError } from '../services/llm/ownKeyConsent';
 import { mapErrorToUserMessage } from '../services/llm/errorMessages';
 import { tStringNow } from '../utils/tStringNow';
 
@@ -37,10 +37,11 @@ const setGlobalError = (message: string) => {
   store.setAppError(message);
 };
 
-// A no to the own-key question gets the chat's line in the page's language;
-// after "check my key" Settings is open and nothing is shown.
+// A no to the own-key question, or a request OpenRouter refused, gets the
+// chat's line in the page's language; after "check my key" Settings is open
+// and nothing is shown.
 const showCouncilError = (error: unknown, fallback: string) => {
-  if (error instanceof OwnKeyRejectedError) {
+  if (isOwnKeyError(error)) {
     const line = mapErrorToUserMessage(error, tStringNow);
     if (line) setGlobalError(line);
     return;
