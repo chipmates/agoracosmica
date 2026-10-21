@@ -101,6 +101,10 @@ export const processAudio = async (
     // the STT-specific one while Whisper is transcribing.
     useDomainStore.getState().setProcessingStage('hearing');
     const transcription: TranscriptionResult = await transcribeAudio(audioBlob, config.stt, selectedLanguage);
+    // Heard: the wait is the model's now, which may run somewhere else.
+    if (useDomainStore.getState().conversation.processingStage === 'hearing') {
+      useDomainStore.getState().setProcessingStage('preparing');
+    }
     const selectedFigureId = useDomainStore.getState().figures.selectedId;
 
     // Get the full figure name from the selected figure object

@@ -334,8 +334,8 @@ export class CustomCouncilService {
           .catch(error => councilError('Segment processing failed:', error));
       };
 
-      // 🔄 Update loader - streaming starting
-      this._updateLoaderStage('streaming');
+      // The loader stays 'generating' until the first speech is written: that
+      // wait is the model's, the one after it the first voice's.
 
       // 🎭 Generate voice mappings BEFORE council generation starts
       // This ensures mappings are available when TTS is called during progressive streaming
@@ -495,6 +495,7 @@ export class CustomCouncilService {
 
     if (this.progressiveState.isFirstSegment) {
       councilLog('🎯 FIRST COMPLETE SEGMENT RECEIVED - Starting playback pipeline');
+      this._updateLoaderStage('streaming');
     }
 
     // Create segment metadata for tracking
@@ -939,6 +940,9 @@ export class CustomCouncilService {
       return;
     }
     
+    // The text is all here; what the loader waits on now is the first voice.
+    this._updateLoaderStage('streaming');
+
     // Initialize holistic pipeline
     this.holisticPipeline.segments = segments as ExtendedSegment[];
     this.holisticPipeline.currentDisplayIndex = 0;

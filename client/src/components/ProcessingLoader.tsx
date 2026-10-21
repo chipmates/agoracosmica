@@ -20,14 +20,15 @@ const TAKING_LONGER_AT_S = 25;
 const QUOTE_ROTATION_MS = 4000;
 
 type WaitService = 'llm' | 'tts' | 'stt';
-// The services a wait at each stage can be on. 'hearing' lasts until the first
-// reply text, 'shaping' streams the rest of it; no stage is the first load.
-const STAGE_SERVICES: Record<ProcessingStage | 'none', WaitService[]> = {
-  preparing: ['llm'],
-  hearing: ['stt', 'llm'],
-  contemplating: ['llm'],
-  shaping: ['llm', 'tts'],
-  none: ['llm', 'tts'],
+// The one service each stage waits on. 'hearing' lasts until the transcript is
+// back, then the model has the wait; 'shaping' waits for the first voice. A card
+// without a stage waits for the reply's text. In mixed Local Mode only a wait on
+// the visitor's own service is theirs to hear about.
+const STAGE_SERVICE: Record<ProcessingStage, WaitService> = {
+  preparing: 'llm',
+  hearing: 'stt',
+  contemplating: 'llm',
+  shaping: 'tts',
 };
 
 interface ProcessingLoaderProps {
@@ -79,7 +80,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const localWait = useMemo(() => {
     const lm = localModeFromRaw(savedRaw);
     const local: Record<WaitService, boolean> = { llm: lm.llmEnabled, tts: lm.ttsEnabled, stt: lm.sttEnabled };
-    return STAGE_SERVICES[stage ?? 'none'].some((service) => local[service]);
+    return local[STAGE_SERVICE[stage ?? 'contemplating']];
   }, [savedRaw, stage]);
 
   const mountedAtRef = useRef<number>(Date.now());
@@ -209,8 +210,10 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
               <p className="cosmic-processing-quote">{quote}</p>
             )}
 
+            {/* Inside the card's own status region: a second live region
+                would be read out on top of it. */}
             {derivedCapacity === 'takingLonger' && !securityCheck && (
-              <p className="cosmic-processing-note" aria-live="polite">
+              <p className="cosmic-processing-note">
                 {localWait
                   ? tString(
                     'processing.localTakingLonger',

@@ -80,13 +80,15 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
     return pool.length > 0 ? pool : NORMAL_QUOTES[st];
   };
 
-  // The busy lines speak of our servers. A council on the visitor's own model
-  // or voices (Local Mode) waits on their machine and says so plainly.
+  // The busy lines speak of our servers. A wait on the visitor's own model or
+  // voices (Local Mode) is on their machine and says so plainly; in mixed Local
+  // Mode only the service the stage waits on counts: 'generating' runs until the
+  // first speech is written, then the first voice is awaited.
   const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
   const localWait = useMemo(() => {
     const lm = localModeFromRaw(savedRaw);
-    return lm.llmEnabled || lm.ttsEnabled;
-  }, [savedRaw]);
+    return stage === 'streaming' ? lm.ttsEnabled : lm.llmEnabled;
+  }, [savedRaw, stage]);
 
   const mountedAtRef = useRef<number>(Date.now());
   const [shouldShow, setShouldShow] = useState(false);
@@ -224,8 +226,9 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
               </div>
             )}
 
+            {/* Inside the card's own status region: no second live region. */}
             {derivedCapacity === 'takingLonger' && (
-              <p className="cosmic-processing-note" aria-live="polite">
+              <p className="cosmic-processing-note">
                 {localWait
                   ? tString(
                     'councilProcessing.localTakingLonger',

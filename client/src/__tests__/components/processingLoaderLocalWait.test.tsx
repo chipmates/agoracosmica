@@ -82,10 +82,11 @@ describe('the processing card in a long wait', () => {
     for (const busy of busyLines(en as unknown as typeof de)) expect(shown).not.toContain(busy);
   });
 
-  it('a local voice in the shaping stage, and the first load, count as a local wait', () => {
+  it('a local voice in the shaping stage, and a first load on the own model, count as a local wait', () => {
     setLocal(false, true, false);
     expect(linesShown('shaping', 10)).toContain(de.processing.localWait);
     cleanup();
+    setLocal(true, false, false);
     expect(linesShown(undefined, 26)).toContain(de.processing.localTakingLonger);
   });
 
