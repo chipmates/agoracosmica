@@ -17,6 +17,7 @@ import { Figure, Seed, ConversationMode } from '../../types/global';
 import { getDisplayShortName } from '../../utils/figureDisplayName';
 import { sendFunnelBeacon } from '../../utils/funnelBeacon';
 import { ASK_WHILE_LISTENING, NAV_BATCH } from '../../config/features';
+import { useDomainStore } from '../../stores/domainStore';
 
 // Type definitions
 interface ServiceConfig {
@@ -205,6 +206,10 @@ const MainContent: FC<MainContentProps> = ({
     const timer = window.setTimeout(() => setPulsing(false), SEED_GATHERED_PULSE_MS);
     return () => window.clearTimeout(timer);
   }, [gatheredSeedKey]);
+
+  // A pending request has its card in the composer, with its stage and the
+  // way to read instead; a second card here would cover it.
+  const requestPending = useDomainStore((state) => Boolean(state.conversation.pendingRequestId));
 
   const seedGathered = ASK_WHILE_LISTENING && !!seedKey && gatheredSeedKey === seedKey;
   const gatheredLine = t(SEED_GATHERED_KEY);
@@ -452,7 +457,7 @@ const MainContent: FC<MainContentProps> = ({
                 ) : (
                   <>
                     {/* Processing Loader for translations and initial loading */}
-                    {loading && !firstTextArrived && (
+                    {loading && !firstTextArrived && (isCouncilMode || !requestPending) && (
                       <ProcessingLoader figureName={selectedFigure?.name || 'Unknown'} />
                     )}
                     

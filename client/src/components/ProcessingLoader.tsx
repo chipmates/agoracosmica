@@ -32,7 +32,7 @@ const STAGE_SERVICES: Record<ProcessingStage | 'none', WaitService[]> = {
 
 interface ProcessingLoaderProps {
   figureName: string;
-  /** Which pipeline phase the request is in. Omit for legacy quote pool (backwards compat). */
+  /** Which pipeline phase the request is in. Without one (a first load) the card waits on the reply's text. */
   stage?: ProcessingStage;
   /** If provided, a "read text instead" button appears after OPT_OUT_AT_S. */
   onSwitchToText?: () => void;
@@ -58,20 +58,6 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const { tNode, tString } = useTranslation();
   const { glassClasses } = useLiquidGlass('audio');
 
-  // Legacy quote pool — used when no stage is provided (keeps backwards compat with any caller
-  // that hasn't migrated to the stage-aware API yet).
-  const LEGACY_QUOTES = useMemo(
-    () => [
-      tString('processing.contemplating', 'Contemplating...'),
-      tString('processing.crafting', 'Crafting response...'),
-      tString('processing.considering', 'Considering...'),
-      tString('processing.exploring', 'Exploring...'),
-      tString('processing.reflecting', 'Reflecting...'),
-      tString('processing.connecting', 'Connecting ideas...'),
-    ],
-    [tString],
-  );
-
   // Stage+capacity-aware quote pools. Keys structured as processing.<capacity>.<stage>.<letter>.
   const quotePoolFor = (cap: CapacityState, st: ProcessingStage): string[] => {
     const prefix = cap === 'normal' ? 'processing.normal' : 'processing.highDemand';
@@ -84,7 +70,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
       const value = tString(key, '');
       if (value) pool.push(value);
     }
-    return pool.length > 0 ? pool : LEGACY_QUOTES;
+    return pool.length > 0 ? pool : [tString('processing.normal.preparing.a', 'One moment.')];
   };
 
   // The busy lines speak of our servers. When part of the wait runs in Local
@@ -146,15 +132,15 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
     derivedCapacity === 'takingLonger' ? 'highDemand' : derivedCapacity;
   const activePool = useMemo(
     () => {
-      if (!stage) return LEGACY_QUOTES;
       if (capacityForQuotes !== 'normal' && localWait) {
         return [tString('processing.localWait', 'Your computer is still working. One moment.')];
       }
-      return quotePoolFor(capacityForQuotes, stage);
+      // A first load waits on the reply's text, as a request does once it is heard.
+      return quotePoolFor(capacityForQuotes, stage ?? 'contemplating');
     },
-    // quotePoolFor closes over tString; LEGACY_QUOTES already memoized on tString.
+    // quotePoolFor closes over tString.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stage, capacityForQuotes, localWait, tString, LEGACY_QUOTES],
+    [stage, capacityForQuotes, localWait, tString],
   );
 
   useEffect(() => {
@@ -170,10 +156,6 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
 
   const quote = activePool[quoteIndex] ?? activePool[0] ?? '';
   const lastName = formatFigureName(figureName);
-
-  // When stage is provided we use the new standalone-sentence pattern (no "ist/is" prefix).
-  // When stage is absent (legacy path), keep the old "<Name> is <quote>" rendering.
-  const isStageAware = Boolean(stage);
 
   const overlayClasses = `cosmic-processing-overlay capacity-${derivedCapacity}`;
 
@@ -205,37 +187,26 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
                 server for a wait the server has no part in. The box sits
                 behind this overlay at the bottom, so the interactive copy has
                 to point at it or the request dies waiting. */}
-            {isStageAware || securityCheck ? (
-              <>
-                <p className="cosmic-processing-subtitle cosmic-processing-figure">
-                  <span className="figure-name" title={lastName}>
-                    {lastName}
-                  </span>
-                </p>
-                {turnstileInteractive ? (
-                  <p className="cosmic-processing-note cosmic-processing-security">
-                    {tString(
-                      'processing.securityCheck',
-                      'Quick security check. Tap the box at the bottom of the screen and your message continues.',
-                    )}
-                  </p>
-                ) : securityWait ? (
-                  <p className="cosmic-processing-note cosmic-processing-security cosmic-processing-security--wait">
-                    {tString('processing.securityWait', 'One moment, a quick security check is running.')}
-                  </p>
-                ) : (
-                  <p className="cosmic-processing-quote">{quote}</p>
+            {/* The name stands on its own line and each line is a whole
+                sentence: "<name> ist <line>" does not hold in German. */}
+            <p className="cosmic-processing-subtitle cosmic-processing-figure">
+              <span className="figure-name" title={lastName}>
+                {lastName}
+              </span>
+            </p>
+            {turnstileInteractive ? (
+              <p className="cosmic-processing-note cosmic-processing-security">
+                {tString(
+                  'processing.securityCheck',
+                  'Quick security check. Tap the box at the bottom of the screen and your message continues.',
                 )}
-              </>
-            ) : (
-              <p className="cosmic-processing-subtitle">
-                <span className="figure-name" title={lastName}>
-                  {lastName}
-                </span>
-                <span>
-                  {tNode('processing.is')} {quote}
-                </span>
               </p>
+            ) : securityWait ? (
+              <p className="cosmic-processing-note cosmic-processing-security cosmic-processing-security--wait">
+                {tString('processing.securityWait', 'One moment, a quick security check is running.')}
+              </p>
+            ) : (
+              <p className="cosmic-processing-quote">{quote}</p>
             )}
 
             {derivedCapacity === 'takingLonger' && !securityCheck && (

@@ -1205,12 +1205,6 @@
   "processing": {
     "title": "Verarbeite deine Nachricht",
     "is": "ist",
-    "contemplating": "denkt über deine Frage nach...",
-    "crafting": "formuliert eine durchdachte Antwort...",
-    "considering": "berücksichtigt deine Perspektive...",
-    "exploring": "erkundet Weisheiten zum Teilen...",
-    "reflecting": "reflektiert über deine Anfrage...",
-    "connecting": "verbindet sich mit alten Einsichten...",
     "normal": {
       "preparing": {
         "a": "Moment.",

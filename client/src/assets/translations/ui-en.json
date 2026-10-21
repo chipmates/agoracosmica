@@ -1203,12 +1203,6 @@
   "processing": {
     "title": "Processing Your Message",
     "is": "is",
-    "contemplating": "contemplating your question...",
-    "crafting": "crafting a thoughtful response...",
-    "considering": "considering your perspective...",
-    "exploring": "exploring wisdom to share...",
-    "reflecting": "reflecting on your inquiry...",
-    "connecting": "connecting with ancient insights...",
     "normal": {
       "preparing": {
         "a": "One moment.",
