@@ -34,7 +34,7 @@ This is pattern matching, fullest in English and German, with a smaller set in S
 
 ## What the figures are told
 
-On the free tier these rules are served on every model and in every format when the screen flags distress. If you bring your own key or run the app locally, your messages do not pass through our edge. The browser screen still stops a first-person statement and shows the helplines, and the forced rules and the banner, which ride on our edge's answer, are not there. Quoted from the code:
+On the free tier these rules are served on every model and in every format when the screen flags distress. If you bring your own key or run the app locally, your messages do not pass through our edge. The browser screen still stops a first-person statement and shows the helplines, and the forced rules and the banner, which ride on our edge's answer, are not there. Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation pass through our edge, and then it gets the free tier's rules. Quoted from the code:
 
 > When the visitor sounds hopeless, unsafe, or as if they would rather not be here, name one person in their life or a helpline they can reach today BEFORE anything from your own practice. Your practices may follow the referral. They never replace it.
 

@@ -1,6 +1,6 @@
 # Threat model: your API key on this device
 
-Agora Cosmica lets you bring your own OpenRouter key. The key stays in your browser and travels only to OpenRouter. This page is for anyone deciding whether to paste a key into a web app at all: it says in plain language what protects it, and just as plainly what does not.
+Agora Cosmica lets you bring your own OpenRouter key. The key stays in your browser and travels only to OpenRouter. If OpenRouter rejects it, the app asks before a conversation goes on through our servers on the daily free quota, and the key still goes nowhere else. This page is for anyone deciding whether to paste a key into a web app at all: it says in plain language what protects it, and just as plainly what does not.
 
 For the wider picture (data flows, subprocessors, edge protections) see [SECURITY-ARCHITECTURE.md](SECURITY-ARCHITECTURE.md). For reporting a vulnerability see [SECURITY.md](../SECURITY.md).
 

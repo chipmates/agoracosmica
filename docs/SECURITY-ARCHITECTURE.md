@@ -57,10 +57,10 @@ The recorded catalog is rendered by a third-party speech vendor before release, 
 The diagram in [the README](../README.md#what-the-code-does-with-your-data) shows the whole shape. The privacy-relevant boundaries:
 
 - **Browser to Cloudflare Workers**: TLS only. A worker sees the request and holds no per-request log of it.
-- **Workers to inference**: free-tier chat is forwarded to Nebius without being persisted. Requests on your own key never pass through a worker: the browser calls OpenRouter directly (see the key path below).
+- **Workers to inference**: free-tier chat is forwarded to Nebius without being persisted. Requests on your own key never pass through a worker: the browser calls OpenRouter directly (see the key path below). Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation, including what was written before, pass through a worker as in the free mode.
 - **Workers to R2**: internal Cloudflare network. The audio worker reads recorded audio out of the bucket, and the browser fetches the rest from the media host.
 - **Workers to the speech server**: TLS with two-token edge auth (see edge protections).
-- **Your own key**: browser to OpenRouter directly. Our servers never see it.
+- **Your own key**: browser to OpenRouter directly. Our servers never see it. If OpenRouter rejects the key, nothing goes to the free tier on its own: the app asks first. Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation, including what was written before, pass through our servers as in the free mode.
 
 ---
 

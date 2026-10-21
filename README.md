@@ -99,7 +99,7 @@ The interface targets WCAG 2.2 AA: keyboard paths, screen reader labels, 44 px t
 
 You enter with one click on a consent screen (16 or older, and the terms). There is no account. Conversation history, your profile and any API key you add live in IndexedDB in your browser, encrypted at rest with AES-256-GCM. The API key sits under a device key the browser marks non-extractable: a script on the page can use it and cannot read it out. [The threat model](docs/THREAT-MODEL.md) says what that protects against and what it does not.
 
-The free tier is 30 messages a day per device. They pass through a Cloudflare Worker to DeepSeek V4 Pro at Nebius in the United Kingdom, with Qwen3-235B in Finland as the fallback when the day's shared budget is spent, the primary errors, or the first token takes longer than five seconds. Each reply names the model that answered. Every free reply costs us money at a provider, which is why the day has a budget behind it. The worker keeps no per-request log. With your own OpenRouter key, requests go from your browser to OpenRouter directly, pinned to one model with zero data retention on by default, and the key never reaches us.
+The free tier is 30 messages a day per device. They pass through a Cloudflare Worker to DeepSeek V4 Pro at Nebius in the United Kingdom, with Qwen3-235B in Finland as the fallback when the day's shared budget is spent, the primary errors, or the first token takes longer than five seconds. Each reply names the model that answered. Every free reply costs us money at a provider, which is why the day has a budget behind it. The worker keeps no per-request log. With your own OpenRouter key, requests go from your browser to OpenRouter directly, pinned to one model with zero data retention on by default, and the key never reaches us. Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation, including what was written before, pass through our servers as in the free mode.
 
 Live speech runs on Qwen3-TTS for English and German on our own GPU server in Germany, with faster-whisper for speech-to-text. The recorded catalog is served from Cloudflare R2 in Western Europe.
 
@@ -115,7 +115,7 @@ What we count is aggregate, with no user dimension and no key that joins two row
 | Your setup | Where the request goes |
 |---|---|
 | Hosted free tier | Browser, through our Cloudflare Worker, to Nebius: DeepSeek V4 Pro in the United Kingdom, Qwen3-235B in Finland as the fallback |
-| Your own OpenRouter key | Browser directly to OpenRouter, pinned to Qwen3 235B, zero data retention on by default, our worker outside the path |
+| Your own OpenRouter key | Browser directly to OpenRouter, pinned to Qwen3 235B, zero data retention on by default, our worker outside the path. If OpenRouter rejects the key, the app asks first, and only a yes sends that conversation the free-tier way |
 | Local Mode | An OpenAI-compatible endpoint you run, set in Settings, with local speech set up separately |
 
 | Limit | Allowance |
