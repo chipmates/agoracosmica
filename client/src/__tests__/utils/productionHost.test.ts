@@ -3,6 +3,8 @@
 // preview or a copy elsewhere sends nothing, and the live site sends as before.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { existsSync, readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { onProductionHost, mayPostTo, PRODUCTION_HOSTS } from '../../utils/productionHost';
 
 const WORKER = 'https://llm.agoracosmica.org';
@@ -95,6 +97,20 @@ function endpoints(): string[] {
 describe('onProductionHost', () => {
   it('names the two hosts of the live site, the same two the public pages use', () => {
     expect([...PRODUCTION_HOSTS]).toEqual(['agoracosmica.org', 'www.agoracosmica.org']);
+  });
+
+  it('is the same list the public pages hold, in their script and in their islands', async () => {
+    const { PRODUCTION_HOSTS: ISLAND_HOSTS } = await import('../../../../marketing/src/utils/heardSeconds');
+    expect([...ISLAND_HOSTS]).toEqual([...PRODUCTION_HOSTS]);
+    // The suite runs from client/ or the repository root.
+    const scriptPath = ['../marketing/public/agc-public.js', 'marketing/public/agc-public.js']
+      .map((rel) => resolve(process.cwd(), rel))
+      .find((path) => existsSync(path));
+    expect(scriptPath, 'agc-public.js found').toBeDefined();
+    const script = readFileSync(scriptPath!, 'utf8');
+    const declared = script.match(/var PRODUCTION_HOSTS = (\[[^\]]*\]);/);
+    expect(declared, 'agc-public.js declares PRODUCTION_HOSTS').not.toBeNull();
+    expect(JSON.parse(declared![1].replace(/'/g, '"'))).toEqual([...PRODUCTION_HOSTS]);
   });
 
   it('is true on the live site and false everywhere else', () => {
