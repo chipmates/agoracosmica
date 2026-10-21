@@ -105,6 +105,11 @@ function namesCount(sql: string, env: Env): boolean {
   return new RegExp('\\b' + countDatasetOf(env) + '\\b', 'i').test(sql);
 }
 
+// The error's kind only: a JSON parse error quotes the start of the body.
+function errorKind(err: unknown): string {
+  return err instanceof Error ? err.name : typeof err;
+}
+
 function bodyTooLarge(): Response {
   return Response.json({ error: 'Request body too large' }, { status: 413 });
 }
@@ -130,7 +135,7 @@ async function handleQuery(request: Request, env: Env): Promise<Response> {
 
     return Response.json(await response.json());
   } catch (err) {
-    console.error('[query]', err);
+    console.error('[query]', errorKind(err));
     return Response.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -171,7 +176,7 @@ async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
       ),
     });
   } catch (err) {
-    console.error('[batch]', err);
+    console.error('[batch]', errorKind(err));
     return Response.json({ error: 'Internal error' }, { status: 500 });
   }
 }

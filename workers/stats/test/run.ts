@@ -105,6 +105,23 @@ async function main(): Promise<void> {
       assertEqual(((await response.json()) as { error?: string }).error, 'Internal error', 'error body');
       assertEqual(fetched.length, 0, 'queries sent');
     });
+
+    await test(`${route.path}: a parse error is logged by its kind, without the body`, async () => {
+      const sentinel = 'sentinel_body_9f2c';
+      const lines: string[] = [];
+      const realError = console.error;
+      console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+      let status = 0;
+      try {
+        status = (await worker.fetch(post(route.path, sentinel), env)).status;
+      } finally {
+        console.error = realError;
+      }
+      assertEqual(status, 500, 'status');
+      assertEqual(lines.length, 1, 'error lines');
+      assertEqual(lines[0].includes('SyntaxError'), true, `the kind is named: ${lines[0]}`);
+      assertEqual(lines[0].includes(sentinel), false, `the body stays out of the log: ${lines[0]}`);
+    });
   }
 
   const failed = results.filter((r) => r.error);
