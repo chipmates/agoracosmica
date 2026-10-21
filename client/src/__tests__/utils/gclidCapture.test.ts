@@ -198,6 +198,23 @@ describe('a browser marked as ours (?probe=1 or the stored flag)', () => {
     await m.sendConversion('profile_created');
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
+
+  it('sends nothing once the flag is set by hand on an open page, after its first beacon', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify(YES));
+    const m = await loadAt(`/app?gclid=${CLICK}`);
+    const funnel = await import('../../utils/funnelBeacon');
+    m.captureGclid();
+    // the page's first beacon reads the flag while the browser is still unmarked
+    funnel.sendFunnelBeacon('figure_selected', { figureId: 'aurelius' });
+    const posted = () => fetchMock.mock.calls.map((c) => String(c[0]));
+    expect(posted().filter((u) => u.endsWith('/v1/funnel'))).toHaveLength(1);
+    localStorage.setItem('agc_probe', '1');
+    for (const event of ['profile_created', 'dialogue_started', 'conversation_deepened', 'council_engaged'] as const) {
+      await m.sendConversion(event);
+    }
+    expect(posted().filter((u) => u.endsWith('/api/conversions'))).toEqual([]);
+    expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_'))).toEqual([]);
+  });
 });
 
 describe('withdrawal', () => {

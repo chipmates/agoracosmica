@@ -9,7 +9,7 @@
 
 import { isSelfHost } from '../../config/deployment';
 import { mayPostTo } from '../productionHost';
-import { isProbeSession } from '../probeSession';
+import { isProbeSessionNow } from '../probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -283,7 +283,7 @@ export async function sendConversion(
   if (!mayPostTo(API_BASE)) return; // nor from a local or preview copy
   if (isPaid) return; // paid arrivals run on clicks only, never forward a gclid
   if (!capturedGclid) return;
-  if (isProbeSession()) return; // our own test browsers send Google nothing
+  if (isProbeSessionNow()) return; // our own test browsers send Google nothing
   if (!adConsentGranted()) return; // no send until the visitor opts in
 
   try {

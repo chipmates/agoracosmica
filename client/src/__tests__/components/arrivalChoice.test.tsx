@@ -158,6 +158,23 @@ describe('ArrivalChoice counts from an in-house browser', () => {
     }
   });
 
+  it('sends Google nothing once the flag is set by hand on an open page, after its first count', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(container.querySelector('.agc-consent')).not.toBeNull();
+    const heard = await import('../../../../marketing/src/utils/heardSeconds');
+    // the page's first count reads the flag while the browser is still unmarked
+    const { probeField } = await import('@client/utils/probeSession');
+    expect(probeField()).toBeUndefined();
+    localStorage.setItem('agc_probe', '1');
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    for (let i = 0; i < 40; i++) heard.addHeardSeconds(1, 'aurelius');
+    await new Promise((r) => setTimeout(r, 0));
+    expect(conversions()).toHaveLength(0);
+    expect(sessionStorage.getItem('agc_listened_seconds')).toBeNull();
+    expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_'))).toEqual([]);
+  });
+
   it('sends no probe field from an unmarked browser', async () => {
     const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     const [yes] = Array.from(container.querySelectorAll('button'));

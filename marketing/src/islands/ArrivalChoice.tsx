@@ -43,7 +43,7 @@ import {
   grantAdConsent,
   revokeAdConsent,
 } from '@client/utils/public/gclidCapture';
-import { isProbeSession, probeField } from '@client/utils/probeSession';
+import { isProbeSessionNow, probeField } from '@client/utils/probeSession';
 import {
   armPreDecisionListening,
   dropPreDecisionListening,
@@ -225,7 +225,7 @@ function fireStartExploring(): void {
   if (!onProductionHost()) return;
   const gclid = getGclid();
   if (!gclid) return;
-  if (isProbeSession()) return; // our own test browsers send Google nothing
+  if (isProbeSessionNow()) return; // our own test browsers send Google nothing
   try {
     if (sessionStorage.getItem(SS_FIRED)) return;
     sessionStorage.setItem(SS_FIRED, '1');

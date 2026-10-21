@@ -16,8 +16,9 @@
 
 const PROBE_KEY = 'agc_probe';
 
-// Read once per page: the flag is set by hand and never flips mid-session, and
-// a cached read keeps the beacon path free of storage access.
+// Read once per page for the beacons: a cached read keeps their path free of
+// storage access, so a flag set by hand on an open page marks the beacons from
+// the next page load. The conversion senders read it fresh (isProbeSessionNow).
 let cached: boolean | null = null;
 
 // A page opened with ?probe=1 is marked by its own address, so the answer
@@ -44,6 +45,21 @@ export function isProbeSession(): boolean {
     cached = false;
   }
   return cached;
+}
+
+/**
+ * The same question, read fresh on every call, for the conversion senders: a
+ * browser marked by hand on an open page must send Google nothing from that
+ * moment on, and the app is one page load for a whole session. The beacons keep
+ * the cached read above.
+ */
+export function isProbeSessionNow(): boolean {
+  if (urlMarksProbe()) return true;
+  try {
+    return typeof localStorage !== 'undefined' && localStorage.getItem(PROBE_KEY) === '1';
+  } catch {
+    return false;
+  }
 }
 
 /**

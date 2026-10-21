@@ -34,7 +34,7 @@ import {
   isPaidVisitor,
   LISTENED_THRESHOLD_S,
 } from '@client/utils/public/gclidCapture';
-import { isProbeSession } from '@client/utils/probeSession';
+import { isProbeSessionNow } from '@client/utils/probeSession';
 
 // For the footer switch. Every island that reaches gclidCapture must also reach
 // this module, so the two share one chunk named after this file: a chunk named
@@ -142,7 +142,7 @@ let onFirstPlayback: (() => void) | null = null;
 // click ID. Armed is the one case where seconds may be counted before the
 // answer, because the answer is still coming and an accept may still use them.
 function canCount(): boolean {
-  if (isPaidVisitor() || getGclid() === null || isProbeSession()) return false;
+  if (isPaidVisitor() || getGclid() === null || isProbeSessionNow()) return false;
   return adConsentGranted() || preDecisionArmed;
 }
 
@@ -153,7 +153,7 @@ function fireListened(figureId?: string, timestamp: number = Date.now()): void {
   if (isPaidVisitor()) return; // paid arrivals run on clicks only
   const gclid = getGclid();
   if (!gclid) return;
-  if (isProbeSession()) return; // our own test browsers send Google nothing
+  if (isProbeSessionNow()) return; // our own test browsers send Google nothing
   if (!adConsentGranted()) return; // no opt-in, no send
   fired = true;
   try {
