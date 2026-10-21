@@ -237,11 +237,15 @@ export const generateResponse = async ({
         if (error?.status === 403) {
           throw ownKeyRefusalFrom(error?.detail);
         }
-        if (error?.status === 401 && !isSelfHost) {
+        if (error?.status === 401) {
           console.warn('[LLM] BYOK key rejected (HTTP', error.status, '), marking it invalid');
           await keyStorage.markInvalid('openrouter');
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: false } }));
+          }
+          // A self-host build has no free tier to offer: the rejection is the answer.
+          if (isSelfHost) {
+            throw error;
           }
           if (!freeTierFallback) {
             throw new OwnKeyRejectedError(null, error.status);
@@ -256,6 +260,10 @@ export const generateResponse = async ({
     // Self-host / Local Mode has no free-tier proxy. Reaching here means there
     // is no usable provider; surface a clear error rather than calling a worker
     // that is not deployed. The key gate makes this unreachable in normal use.
+    // A key OpenRouter rejected stays stored until replaced, and is named as such.
+    if (isSelfHost && providerKind === 'openrouter' && await keyStorage.hasKey('openrouter')) {
+      throw new OwnKeyRejectedError(null, 401);
+    }
     if (isSelfHost || providerKind === 'custom-openai') {
       throw new Error(
         providerKind === 'custom-openai'
