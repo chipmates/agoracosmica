@@ -171,6 +171,35 @@ describe('a paid arrival (?p=1)', () => {
   });
 });
 
+describe('a browser marked as ours (?probe=1 or the stored flag)', () => {
+  it('keeps the click ID after a yes as for anyone, and sends no conversion', async () => {
+    for (const mark of ['address', 'stored'] as const) {
+      sessionStorage.clear();
+      localStorage.clear();
+      fetchMock.mockClear();
+      localStorage.setItem('agc_ad_consent', JSON.stringify(YES));
+      if (mark === 'stored') localStorage.setItem('agc_probe', '1');
+      const m = await loadAt(`/app?${mark === 'address' ? 'probe=1&' : ''}gclid=${CLICK}`);
+      m.captureGclid();
+      expect(m.getGclid(), mark).toBe(CLICK);
+      expect(sessionStorage.getItem('agc_gclid'), mark).toBe(CLICK);
+      for (const event of ['profile_created', 'dialogue_started', 'conversation_deepened', 'council_engaged'] as const) {
+        await m.sendConversion(event);
+      }
+      expect(fetchMock, mark).not.toHaveBeenCalled();
+      expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_')), mark).toEqual([]);
+    }
+  });
+
+  it('an unmarked browser with the same yes and click ID still sends', async () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify(YES));
+    const m = await loadAt(`/app?gclid=${CLICK}`);
+    m.captureGclid();
+    await m.sendConversion('profile_created');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+  });
+});
+
 describe('withdrawal', () => {
   it('clears the click ID, the step markers and the listening seconds, and records the no', async () => {
     localStorage.setItem('agc_ad_consent', JSON.stringify(YES));

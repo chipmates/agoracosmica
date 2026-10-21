@@ -10,8 +10,9 @@
 // fire.
 //
 // Same consent posture as every other conversion: a gclid must be present,
-// the page must not be on the paid ?p=1 split, and ad-measurement consent
-// must be granted. Nothing here decides any of that, it only asks. The gate
+// the page must not be on the paid ?p=1 split, ad-measurement consent must be
+// granted, and the browser must not be one of our own marked test browsers.
+// Nothing here decides any of that, it only asks. The gate
 // sits on the accumulator, not just on the send, so a visitor this could
 // never be sent for gets no seconds counted, nothing written and nothing read.
 //
@@ -33,6 +34,7 @@ import {
   isPaidVisitor,
   LISTENED_THRESHOLD_S,
 } from '@client/utils/public/gclidCapture';
+import { isProbeSession } from '@client/utils/probeSession';
 
 // For the footer switch. Every island that reaches gclidCapture must also reach
 // this module, so the two share one chunk named after this file: a chunk named
@@ -140,7 +142,7 @@ let onFirstPlayback: (() => void) | null = null;
 // click ID. Armed is the one case where seconds may be counted before the
 // answer, because the answer is still coming and an accept may still use them.
 function canCount(): boolean {
-  if (isPaidVisitor() || getGclid() === null) return false;
+  if (isPaidVisitor() || getGclid() === null || isProbeSession()) return false;
   return adConsentGranted() || preDecisionArmed;
 }
 
@@ -151,6 +153,7 @@ function fireListened(figureId?: string, timestamp: number = Date.now()): void {
   if (isPaidVisitor()) return; // paid arrivals run on clicks only
   const gclid = getGclid();
   if (!gclid) return;
+  if (isProbeSession()) return; // our own test browsers send Google nothing
   if (!adConsentGranted()) return; // no opt-in, no send
   fired = true;
   try {

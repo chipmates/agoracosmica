@@ -183,6 +183,29 @@ describe('agc-public.js: the ad click ID', () => {
     expect(storageKeys(localStorage)).not.toContain('agc_paid');
   });
 
+  it('sends no conversion from a browser marked as ours, and still counts the click with the marker', async () => {
+    for (const mark of ['address', 'stored'] as const) {
+      fetches = [];
+      beacons = [];
+      sessionStorage.clear();
+      localStorage.clear();
+      localStorage.setItem('agc_ad_consent', YES);
+      if (mark === 'stored') localStorage.setItem('agc_probe', '1');
+      loadPage(`/marcus-aurelius/?${mark === 'address' ? 'probe=1&' : ''}gclid=${CLICK}`);
+      expect(sessionStorage.getItem('agc_gclid'), mark).toBe(CLICK);
+      click(door({ 'data-agc-cta': 'start-exploring', 'data-agc-figure': 'aurelius' }));
+      await new Promise((r) => setTimeout(r, 0));
+      expect(conversions(), mark).toHaveLength(0);
+      expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_')), mark).toEqual([]);
+      const cta = beacons.filter((b) => b.body.step === 'cta_click');
+      expect(cta, mark).toHaveLength(1);
+      expect(cta[0].body.probe, mark).toBe(1);
+      for (const [target, type, fn, opts] of added) target.removeEventListener(type, fn, opts as EventListenerOptions);
+      added = [];
+      document.body.innerHTML = '';
+    }
+  });
+
   it('never puts a click ID in any count', async () => {
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     click(door({ 'data-agc-cta': 'start-exploring' }));

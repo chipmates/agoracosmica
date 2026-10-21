@@ -136,6 +136,28 @@ describe('ArrivalChoice counts from an in-house browser', () => {
     expect(accepted[0].body.probe).toBe(1);
   });
 
+  it('shows the card to a marked browser and counts its yes, but sends Google nothing', async () => {
+    for (const mark of ['address', 'stored'] as const) {
+      sent = [];
+      sessionStorage.clear();
+      localStorage.clear();
+      if (mark === 'stored') localStorage.setItem('agc_probe', '1');
+      const { container } = await mountAt(`/marcus-aurelius/?${mark === 'address' ? 'probe=1&' : ''}gclid=${CLICK}`);
+      expect(container.querySelector('.agc-consent'), mark).not.toBeNull();
+      const [yes] = Array.from(container.querySelectorAll('button'));
+      await act(async () => { fireEvent.click(yes); });
+      await new Promise((r) => setTimeout(r, 0));
+      // the yes is kept as for anyone, so the card can be tried on the live site
+      expect(JSON.parse(localStorage.getItem('agc_ad_consent')!).granted, mark).toBe(true);
+      expect(sessionStorage.getItem('agc_gclid'), mark).toBe(CLICK);
+      const accepted = funnel().filter((c) => c.body.step === 'ad_consent_accepted');
+      expect(accepted, mark).toHaveLength(1);
+      expect(accepted[0].body.probe, mark).toBe(1);
+      expect(conversions(), mark).toHaveLength(0);
+      expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_')), mark).toEqual([]);
+    }
+  });
+
   it('sends no probe field from an unmarked browser', async () => {
     const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     const [yes] = Array.from(container.querySelectorAll('button'));
@@ -175,6 +197,22 @@ describe('heard seconds', () => {
     expect(conversions()).toHaveLength(1);
     expect(conversions()[0].body.event).toBe('listened');
     expect(Number(sessionStorage.getItem('agc_listened_seconds'))).toBeGreaterThanOrEqual(30);
+  });
+
+  it('counts no seconds and sends no listened for a marked browser with a yes', async () => {
+    for (const mark of ['address', 'stored'] as const) {
+      sent = [];
+      sessionStorage.clear();
+      localStorage.clear();
+      if (mark === 'stored') localStorage.setItem('agc_probe', '1');
+      const { capture, heard } = await loadHeard(`/marcus-aurelius/?${mark === 'address' ? 'probe=1&' : ''}gclid=${CLICK}`);
+      capture.captureGclid({ holdUntilAnswer: true });
+      capture.grantAdConsent();
+      for (let i = 0; i < 40; i++) heard.addHeardSeconds(1, 'aurelius');
+      expect(conversions(), mark).toHaveLength(0);
+      expect(sessionStorage.getItem('agc_listened_seconds'), mark).toBeNull();
+      expect(sessionStorage.getItem('agc_conv_fired_listened'), mark).toBeNull();
+    }
   });
 
   it('counts nothing on a paid arrival with an old yes', async () => {

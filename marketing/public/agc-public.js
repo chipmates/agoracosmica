@@ -15,7 +15,8 @@
 //   - Mobile burger menu toggle in the navbar
 //
 // A conversion leaves these pages only after the visitor's yes: the Start
-// Exploring click below and the consent card's own report of the yes.
+// Exploring click below and the consent card's own report of the yes. A
+// browser marked as one of ours (?probe=1) sends none.
 // Nothing at all is sent from a page served off the production hosts.
 (function () {
   'use strict';
@@ -132,6 +133,7 @@
     var gclid;
     try { gclid = sessionStorage.getItem(SS_GCLID); } catch (e) { return; }
     if (!gclid) return;
+    if (probeField()) return; // our own test browsers send Google nothing
     try {
       var firedKey = 'agc_conv_fired_' + event;
       if (sessionStorage.getItem(firedKey)) return;

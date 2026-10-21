@@ -3,10 +3,13 @@
 // its question; only a yes stores it (sessionStorage, this tab), so later pages
 // and the app can report steps. The answer lives in localStorage. A paid
 // arrival (?p=1) never keeps a click ID. No tracking cookies, no pixel, and
-// nothing reaches Google until consent is granted.
+// nothing reaches Google until consent is granted. A browser marked as one of
+// ours (utils/probeSession.ts) never sends a conversion, here or from the
+// public pages, though its card and answers work as for anyone.
 
 import { isSelfHost } from '../../config/deployment';
 import { mayPostTo } from '../productionHost';
+import { isProbeSession } from '../probeSession';
 
 const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
 
@@ -280,6 +283,7 @@ export async function sendConversion(
   if (!mayPostTo(API_BASE)) return; // nor from a local or preview copy
   if (isPaid) return; // paid arrivals run on clicks only, never forward a gclid
   if (!capturedGclid) return;
+  if (isProbeSession()) return; // our own test browsers send Google nothing
   if (!adConsentGranted()) return; // no send until the visitor opts in
 
   try {
