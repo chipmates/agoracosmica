@@ -58,14 +58,14 @@ const openPanel = () => render(
   />,
 );
 
-const badges = (lines: { selfHosted: string; local: string; aiModelBadgeFree: string; aiModelBadgeLocal: string }) => ({
-  hosted: screen.queryAllByText(lines.selfHosted).length,
+const badges = (lines: { ourServers: string; local: string; aiModelBadgeFree: string; aiModelBadgeLocal: string }) => ({
+  hosted: screen.queryAllByText(lines.ourServers).length,
   local: screen.queryAllByText(lines.local).length,
   freeModel: screen.queryAllByText(lines.aiModelBadgeFree).length,
   localModel: screen.queryAllByText(lines.aiModelBadgeLocal).length,
 });
 
-const DE = de.settings.preferences as unknown as { selfHosted: string; local: string; aiModelBadgeFree: string; aiModelBadgeLocal: string };
+const DE = de.settings.preferences as unknown as { ourServers: string; local: string; aiModelBadgeFree: string; aiModelBadgeLocal: string };
 const EN = en.settings.preferences as unknown as typeof DE;
 
 describe('the Settings badges in Local Mode', () => {

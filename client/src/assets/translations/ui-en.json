@@ -172,7 +172,7 @@
     "preferences": {
       "hint": "Click any section below to expand and modify settings",
       "manageKeys": "Manage Keys",
-      "selfHosted": "Self-hosted",
+      "ourServers": "Our servers",
       "aiModelBadgeFree": "Europe · Free tier",
       "aiModelBadgeByok": "Qwen3 235B · Your key",
       "aiModelBadgeLocal": "Local · Your model",

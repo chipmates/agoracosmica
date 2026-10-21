@@ -170,8 +170,8 @@
     "preferences": {
       "hint": "Klicke auf einen Bereich, um die Einstellungen zu erweitern und anzupassen",
       "manageKeys": "Keys verwalten",
-      "selfHosted": "Selbst gehostet",
-      "aiModelBadgeFree": "Europa · Kostenlos",
+      "ourServers": "Unsere Server",
+      "aiModelBadgeFree": "Kostenloser Tarif",
       "aiModelBadgeByok": "Qwen3 235B · Eigener Key",
       "aiModelBadgeLocal": "Lokal · Eigenes Modell",
       "local": "Lokal"

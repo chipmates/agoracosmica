@@ -95,16 +95,17 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
   };
 
   // Voice and voice input run on our servers in Germany, or locally in Local Mode.
+  // The badge names whose servers they are: beside "Local", "Self-hosted" read as the visitor's own.
   const getVoiceBadge = (): string => {
     if (!config.ttsEnabled) return tString('common.disabled', 'Disabled');
     if (localMode?.ttsEnabled) return tString('settings.preferences.local', 'Local');
-    return tString('settings.preferences.selfHosted', 'Self-hosted');
+    return tString('settings.preferences.ourServers', 'Our servers');
   };
 
   const getSpeechBadge = (): string => {
     if (!config.sttEnabled) return tString('common.disabled', 'Disabled');
     if (localMode?.sttEnabled) return tString('settings.preferences.local', 'Local');
-    return tString('settings.preferences.selfHosted', 'Self-hosted');
+    return tString('settings.preferences.ourServers', 'Our servers');
   };
 
   // The free-tier badge must hold whichever model the worker is serving, and
