@@ -105,9 +105,21 @@ function namesCount(sql: string, env: Env): boolean {
   return new RegExp('\\b' + countDatasetOf(env) + '\\b', 'i').test(sql);
 }
 
-// The error's kind only: a JSON parse error quotes the start of the body.
-function errorKind(err: unknown): string {
-  return err instanceof Error ? err.name : typeof err;
+// A JSON parse error quotes the start of the body, so it is logged by its kind
+// only; any other error keeps its message.
+function describeError(err: unknown): string {
+  if (!(err instanceof Error)) return typeof err;
+  if (err.name === 'SyntaxError') return err.name;
+  return `${err.name}: ${err.message.slice(0, 200)}`;
+}
+
+// A fixed reason per status: the engine's error text can quote the query.
+function engineReason(status: number): string {
+  if (status === 400 || status === 422) return 'query rejected';
+  if (status === 401 || status === 403) return 'token rejected';
+  if (status === 429) return 'rate limited';
+  if (status >= 500) return 'engine error';
+  return 'unexpected status';
 }
 
 function bodyTooLarge(): Response {
@@ -128,14 +140,14 @@ async function handleQuery(request: Request, env: Env): Promise<Response> {
 
     const response = await queryAnalyticsEngine(applyLaunchFloor(query, env), env);
     if (!response.ok) {
-      const text = await response.text();
-      console.error(`[AE] ${response.status}: ${text.slice(0, 500)}`);
+      void response.body?.cancel().catch(() => {});
+      console.error(`[AE] ${response.status}: ${engineReason(response.status)}`);
       return Response.json({ error: 'Query failed', status: response.status }, { status: 502 });
     }
 
     return Response.json(await response.json());
   } catch (err) {
-    console.error('[query]', errorKind(err));
+    console.error('[query]', describeError(err));
     return Response.json({ error: 'Internal error' }, { status: 500 });
   }
 }
@@ -176,7 +188,7 @@ async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
       ),
     });
   } catch (err) {
-    console.error('[batch]', errorKind(err));
+    console.error('[batch]', describeError(err));
     return Response.json({ error: 'Internal error' }, { status: 500 });
   }
 }

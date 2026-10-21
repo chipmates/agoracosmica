@@ -124,6 +124,60 @@ async function main(): Promise<void> {
     });
   }
 
+  // What the query routes log: never a body or the query, the message of any
+  // error that cannot quote them.
+
+  /** Run one call with fetch answered by `answer` and every console.error line recorded. */
+  async function logged(answer: () => Response | Promise<Response>, call: () => Promise<Response>): Promise<{ response: Response; lines: string[] }> {
+    const lines: string[] = [];
+    const previous = globalThis.fetch;
+    const realError = console.error;
+    globalThis.fetch = (async () => answer()) as unknown as typeof fetch;
+    console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+    try {
+      return { response: await call(), lines };
+    } finally {
+      globalThis.fetch = previous;
+      console.error = realError;
+    }
+  }
+
+  await test('/api/query: an Analytics Engine refusal is logged by its status, never its text', async () => {
+    const sentinel = 'sentinel_sql_4e7';
+    const { response, lines } = await logged(
+      () => new Response(`error in query: SELECT ${sentinel} FROM agora_llm`, { status: 400 }),
+      () => worker.fetch(post('/api/query', JSON.stringify({ query: `SELECT ${sentinel} FROM agora_llm` })), env),
+    );
+    assertEqual(response.status, 502, 'status');
+    assertEqual(((await response.json()) as { status?: number }).status, 400, 'the upstream status for the page');
+    assertEqual(lines.length, 1, `error lines: ${lines.join(' | ')}`);
+    assertEqual(lines[0].includes('[AE] 400'), true, `the status is named: ${lines[0]}`);
+    assertEqual(lines[0].includes(sentinel), false, `the query stays out of the log: ${lines[0]}`);
+    assertEqual(lines[0].includes('error in query'), false, `the engine's text stays out of the log: ${lines[0]}`);
+  });
+
+  await test('/api/query: a failure that is not a parse error keeps its message in the log', async () => {
+    const { response, lines } = await logged(
+      () => { throw new TypeError('fetch failed'); },
+      () => worker.fetch(post('/api/query', JSON.stringify({ query: 'SELECT 1 as c' })), env),
+    );
+    assertEqual(response.status, 500, 'status');
+    assertEqual(lines.length, 1, `error lines: ${lines.join(' | ')}`);
+    assertEqual(lines[0].includes('TypeError'), true, `the kind is named: ${lines[0]}`);
+    assertEqual(lines[0].includes('fetch failed'), true, `the message is kept: ${lines[0]}`);
+  });
+
+  await test('/api/query-batch: a failure that is not a parse error keeps its message in the log', async () => {
+    const { response, lines } = await logged(
+      () => Response.json({ data: [] }),
+      () => worker.fetch(post('/api/query-batch', JSON.stringify({ queries: [null] })), env),
+    );
+    assertEqual(response.status, 500, 'status');
+    assertEqual(lines.length, 1, `error lines: ${lines.join(' | ')}`);
+    assertEqual(lines[0].includes('TypeError'), true, `the kind is named: ${lines[0]}`);
+    assertEqual(lines[0].includes("reading 'sql'"), true, `the message is kept: ${lines[0]}`);
+  });
+
   // Body reads in 64 KiB steps, however small the chunks a body arrives in.
 
   /**
