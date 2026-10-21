@@ -6,9 +6,13 @@ import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
 import { DASHBOARD_HTML } from './dashboard';
 import { handleMuseum } from './museum';
 import { handleMuseumCount, countDatasetOf } from './museum-count';
+import { readJsonCapped } from './bodyLimit';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
+// The dashboard's largest batch holds about 10 KB of SQL, and a batch takes at
+// most 64 queries; 1 MiB leaves room for longer questions from scripts.
+const MAX_QUERY_BODY_BYTES = 1024 * 1024;
 
 let serverCache: ServerStatsCache = { data: null, at: 0 };
 
@@ -101,9 +105,15 @@ function namesCount(sql: string, env: Env): boolean {
   return new RegExp('\\b' + countDatasetOf(env) + '\\b', 'i').test(sql);
 }
 
+function bodyTooLarge(): Response {
+  return Response.json({ error: 'Request body too large' }, { status: 413 });
+}
+
 async function handleQuery(request: Request, env: Env): Promise<Response> {
   try {
-    const { query } = (await request.json()) as { query: string; dataset?: string };
+    const read = await readJsonCapped(request, MAX_QUERY_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    const { query } = read.body as { query: string; dataset?: string };
     if (!query || !query.trim().toUpperCase().startsWith('SELECT')) {
       return Response.json({ error: 'Only SELECT queries allowed' }, { status: 400 });
     }
@@ -129,7 +139,9 @@ async function handleQuery(request: Request, env: Env): Promise<Response> {
 
 async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
   try {
-    const body = (await request.json()) as BatchQueryRequest;
+    const read = await readJsonCapped(request, MAX_QUERY_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    const body = read.body as BatchQueryRequest;
     const queries = body?.queries;
 
     if (!Array.isArray(queries) || queries.length === 0 || queries.length > 64) {

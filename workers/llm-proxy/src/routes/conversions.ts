@@ -6,6 +6,7 @@
 import type { Env } from '../utils/types';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
 import { trackRateLimit, readCountry, readDevice } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 
 type ConversionEvent =
   | 'profile_created'
@@ -55,7 +56,9 @@ export async function handleConversions(
 
   let payload: ConversionPayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as ConversionPayload;
   } catch {
     return Response.json({ error: 'Invalid JSON' }, { status: 400 });
   }

@@ -7,6 +7,7 @@
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
 import { trackPageView, readCountry, readDevice, readProbe, readLanding, readSource } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
 interface PagePayload {
@@ -41,7 +42,9 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
 
   let payload: PagePayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as PagePayload;
   } catch {
     // Be quiet on malformed beacons — the client doesn't get to know.
     return new Response(null, { status: 204 });

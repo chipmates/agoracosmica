@@ -19,6 +19,8 @@
  *   ≥250,000      → 60 (Global community)
  */
 
+import { readJsonCapped } from './bodyLimit';
+
 export interface Env {
   COMMUNITY_KV: KVNamespace;
   ALLOWED_ORIGINS: string;
@@ -52,6 +54,8 @@ const RATE_LIMIT_WINDOW_S = 60 * 60 * 6; // 6h per-IP write rate-limit
 // The aggregate is never decremented, so a device that returns after its
 // record expired counts as newly joined.
 const DEVICE_TTL_S = 60 * 60 * 24 * 365;
+// A heartbeat carries a device id of at most 128 characters and two numbers.
+const MAX_POWER_BODY_BYTES = 16 * 1024;
 
 interface ThresholdTier {
   upTo: number; // active-user ceiling, exclusive
@@ -145,7 +149,9 @@ async function handlePower(
 ): Promise<Response> {
   let payload: PowerPayload;
   try {
-    payload = (await request.json()) as PowerPayload;
+    const read = await readJsonCapped(request, MAX_POWER_BODY_BYTES);
+    if (!read.ok) return jsonResponse({ error: 'body_too_large' }, 413, cors);
+    payload = read.body as PowerPayload;
   } catch {
     return jsonResponse({ error: 'invalid_json' }, 400, cors);
   }

@@ -11,6 +11,7 @@
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
 import { trackPlayback, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
 interface PlaybackPayload {
@@ -68,7 +69,9 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
 
   let payload: PlaybackPayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as PlaybackPayload;
   } catch {
     // Be quiet on malformed beacons — the client doesn't get to know.
     return new Response(null, { status: 204 });

@@ -16,6 +16,7 @@
 // docs/MEASUREMENT.md alongside the other event counters.
 
 import { trackFunnel, trackMuseum, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
 interface FunnelPayload {
@@ -268,7 +269,9 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
 
   let payload: FunnelPayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as FunnelPayload;
   } catch {
     // Be quiet on malformed beacons — the client doesn't get to know.
     return new Response(null, { status: 204 });

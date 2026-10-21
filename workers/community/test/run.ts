@@ -108,6 +108,73 @@ async function main(): Promise<void> {
     assertEqual(rl?.ttl, 60 * 60 * 6, 'address window');
   });
 
+  // The cap's contract, written out so the suite also runs against a tree that predates it.
+  const POWER_LIMIT = 16 * 1024;
+
+  /** A valid heartbeat padded with an ignored field to exactly `bytes` bytes. */
+  function paddedPower(bytes: number): Uint8Array {
+    const base = { deviceId: 'padded-device-01', power: 2, completedFigures: 1 };
+    const bare = JSON.stringify({ ...base, pad: '' });
+    const encoded = new TextEncoder().encode(JSON.stringify({ ...base, pad: 'x'.repeat(bytes - bare.length) }));
+    assertEqual(encoded.length, bytes, 'padded body size');
+    return encoded;
+  }
+
+  function rawPowerRequest(body: string | Uint8Array | ReadableStream<Uint8Array>, headers: Record<string, string> = {}): Request {
+    return new Request('https://community.example/v1/community/power', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'cf-connecting-ip': IP, ...headers },
+      body,
+      ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+    } as RequestInit);
+  }
+
+  /** The fake KV with every read counted as well. */
+  function countedKv() {
+    const fake = fakeKv();
+    let reads = 0;
+    const kv = { ...fake.kv, async get(key: string, type?: 'json') { reads++; return fake.kv.get(key, type); } };
+    return { ...fake, kv, reads: () => reads };
+  }
+
+  await test('a heartbeat one byte over its cap gets a 413 before any KV access', async () => {
+    const fake = countedKv();
+    await seed(fake.store, {});
+    const body = paddedPower(POWER_LIMIT + 1);
+    const res = await worker.fetch(rawPowerRequest(body, { 'Content-Length': String(body.length) }), envWith(fake.kv));
+    assertEqual(res.status, 413, 'status');
+    assertEqual(((await res.json()) as { error?: string }).error, 'body_too_large', 'error body');
+    assertEqual(res.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS header on the error');
+    assertEqual(fake.reads(), 0, 'KV reads');
+    assertEqual(fake.writes.length, 0, 'KV writes');
+  });
+
+  await test('a chunked heartbeat over its cap is stopped by the bounded read', async () => {
+    const fake = countedKv();
+    await seed(fake.store, {});
+    const bytes = paddedPower(POWER_LIMIT + 1);
+    const stream = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(bytes); c.close(); } });
+    const res = await worker.fetch(rawPowerRequest(stream), envWith(fake.kv));
+    assertEqual(res.status, 413, 'status');
+    assertEqual(fake.writes.length, 0, 'KV writes');
+  });
+
+  await test('a heartbeat at its cap is still counted', async () => {
+    const { kv, store } = fakeKv();
+    await seed(store, {});
+    const body = paddedPower(POWER_LIMIT);
+    const res = await worker.fetch(rawPowerRequest(body, { 'Content-Length': String(body.length) }), envWith(kv));
+    assertEqual(res.status, 200, 'status');
+    assertEqual(((await res.json()) as { joinedCount: number }).joinedCount, 13, 'joinedCount');
+  });
+
+  await test('a heartbeat that is not JSON keeps its 400', async () => {
+    const { kv } = fakeKv();
+    const res = await worker.fetch(rawPowerRequest('{"deviceId":'), envWith(kv));
+    assertEqual(res.status, 400, 'status');
+    assertEqual(((await res.json()) as { error?: string }).error, 'invalid_json', 'error body');
+  });
+
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
   console.log(`${results.length - failed.length}/${results.length} passed`);

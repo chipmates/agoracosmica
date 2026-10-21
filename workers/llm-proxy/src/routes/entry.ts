@@ -10,6 +10,7 @@
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
 import { trackEntry, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
 interface EntryPayload {
@@ -37,7 +38,9 @@ export async function handleEntry(request: Request, env: Env): Promise<Response>
 
   let payload: EntryPayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as EntryPayload;
   } catch {
     return new Response(null, { status: 204 });
   }

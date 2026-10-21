@@ -1,7 +1,9 @@
 import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
-import { bodyTooLarge, readBodyCapped, STT_MAX_BODY_BYTES } from './bodyLimit';
+import {
+  bodyTooLarge, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
+} from './bodyLimit';
 import { proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import { handleStoryArchive } from './storyArchive';
@@ -158,7 +160,9 @@ export default {
     if (path === '/v1/audio/session/end' && request.method === 'POST') {
       let sessionId: string | null = null;
       try {
-        const body = (await request.json()) as { session_id?: string };
+        const read = await readJsonCapped(request, SESSION_END_MAX_BODY_BYTES);
+        if (!read.ok) return bodyTooLarge(request, env);
+        const body = read.body as { session_id?: string };
         sessionId = typeof body.session_id === 'string' ? body.session_id : null;
       } catch {
         // Malformed JSON → still 204. Beacon is idempotent.

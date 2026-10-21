@@ -515,6 +515,99 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // Session-end beacon: a bounded read, the route's own answer otherwise
+  // -------------------------------------------------------------------------
+
+  // The cap's contract, written out so the suite also runs against a tree that predates it.
+  const SESSION_END_LIMIT = 16 * 1024;
+  const SESSION_ID = '0f8e2b7a-3c1d-4e5f-9a6b-7c8d9e0f1a2b';
+
+  /** A session-end body padded with an ignored field to exactly `bytes` bytes. */
+  const sessionEndBody = (bytes: number): Uint8Array => {
+    const bare = JSON.stringify({ session_id: SESSION_ID, pad: '' });
+    const encoded = new TextEncoder().encode(JSON.stringify({ session_id: SESSION_ID, pad: 'x'.repeat(bytes - bare.length) }));
+    assertEqual(encoded.length, bytes, 'padded body size');
+    return encoded;
+  };
+
+  const sessionEnd = (
+    body: string | Uint8Array | ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Request => new Request('https://audio.agoracosmica.org/v1/audio/session/end', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', ...headers },
+    body,
+    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+  } as RequestInit);
+
+  const evictions = (h: ReturnType<typeof sttHarness>) => h.upstream.filter(call => call.url.endsWith('/v1/audio/session/end'));
+
+  await test('a session-end beacon one byte over its cap gets a 413, and nothing is sent on', async () => {
+    const h = sttHarness();
+    try {
+      const body = sessionEndBody(SESSION_END_LIMIT + 1);
+      const res = await worker.fetch(sessionEnd(body, { 'Content-Length': String(body.length) }), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the refusal');
+      assertEqual((await res.json() as { error?: string }).error, 'Request body too large', 'the usual error shape');
+      await Promise.all(h.pending);
+      assertEqual(evictions(h).length, 0, 'eviction calls');
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a chunked session-end beacon over its cap is stopped by the bounded read', async () => {
+    const h = sttHarness();
+    try {
+      const bytes = sessionEndBody(SESSION_END_LIMIT + 1);
+      const stream = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(bytes); c.close(); } });
+      const res = await worker.fetch(sessionEnd(stream), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      await Promise.all(h.pending);
+      assertEqual(evictions(h).length, 0, 'eviction calls');
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a session-end beacon at its cap still evicts its session', async () => {
+    const h = sttHarness();
+    try {
+      const body = sessionEndBody(SESSION_END_LIMIT);
+      const res = await worker.fetch(sessionEnd(body, { 'Content-Length': String(body.length) }), h.env, h.ctx);
+      assertEqual(res.status, 204, 'status');
+      await Promise.all(h.pending);
+      assertEqual(evictions(h).length, 1, 'eviction calls');
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a bad or broken session-end beacon still gets its quiet 204', async () => {
+    const broken = (): ReadableStream<Uint8Array> => {
+      let reads = 0;
+      return new ReadableStream<Uint8Array>({
+        pull(c) {
+          if (reads++ === 0) c.enqueue(new TextEncoder().encode('{"session_id":"0f8e'));
+          else c.error(new Error('the upload broke off'));
+        },
+      });
+    };
+    for (const body of ['{"session_id":', 'null', broken()]) {
+      const h = sttHarness();
+      try {
+        const res = await worker.fetch(sessionEnd(body), h.env, h.ctx);
+        assertEqual(res.status, 204, 'status');
+        await Promise.all(h.pending);
+        assertEqual(evictions(h).length, 0, 'eviction calls');
+      } finally {
+        h.restore();
+      }
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // CORS: only our own origins and our own Pages previews
   // -------------------------------------------------------------------------
 

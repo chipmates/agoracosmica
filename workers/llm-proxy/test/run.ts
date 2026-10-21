@@ -46,6 +46,9 @@ import { handleEntry } from '../src/routes/entry';
 import { handlePage } from '../src/routes/page';
 import { handleQuota } from '../src/routes/quota';
 import { handleSession } from '../src/routes/session';
+import { handlePlayback } from '../src/routes/playback';
+import { handleConversions } from '../src/routes/conversions';
+import { handleSignup } from '../src/routes/signup';
 import { signJWT } from '../src/utils/jwt';
 import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
@@ -1587,6 +1590,124 @@ async function main(): Promise<number> {
       assertEqual(upstream.length, 0, 'upstream calls');
     });
   }
+
+  // -------------------------------------------------------------------------
+  // Size caps on the beacon and session routes
+  // -------------------------------------------------------------------------
+
+  // The caps' contract, written out so the suite also runs against a tree that predates them.
+  const BEACON_LIMIT = 16 * 1024;
+  const SESSION_LIMIT = 64 * 1024;
+
+  type RouteHandler = (request: Request, env: Env, ctx: ExecutionContext) => Promise<Response>;
+  // `base` is a body the route turns away right after parsing, without the network.
+  const smallRoutes: {
+    path: string;
+    handler: RouteHandler;
+    limit: number;
+    base: Record<string, unknown>;
+    bad: { status: number; error?: string };
+  }[] = [
+    { path: '/v1/funnel', handler: handleFunnel, limit: BEACON_LIMIT, base: { step: 'not_a_step' }, bad: { status: 204 } },
+    { path: '/v1/playback', handler: handlePlayback, limit: BEACON_LIMIT, base: { type: 'not_a_type' }, bad: { status: 204 } },
+    { path: '/v1/page', handler: handlePage, limit: BEACON_LIMIT, base: { path: '/', language: 'en' }, bad: { status: 204 } },
+    { path: '/api/conversions', handler: handleConversions, limit: BEACON_LIMIT, base: { gclid: 'short' }, bad: { status: 400, error: 'Invalid JSON' } },
+    { path: '/v1/entry', handler: handleEntry, limit: BEACON_LIMIT, base: { path: '/', language: 'en' }, bad: { status: 204 } },
+    { path: '/v1/session', handler: handleSession, limit: SESSION_LIMIT, base: {}, bad: { status: 400, error: 'Invalid JSON body' } },
+    { path: '/v1/signup', handler: handleSignup, limit: BEACON_LIMIT, base: { path: '/', language: 'en' }, bad: { status: 204 } },
+  ];
+
+  const smallRequest = (
+    path: string,
+    body: string | Uint8Array | ReadableStream<Uint8Array>,
+    extraHeaders: Record<string, string> = {},
+  ): Request => new Request(`https://example.invalid${path}`, {
+    method: 'POST',
+    headers: { 'CF-Connecting-IP': '10.0.0.21', 'Content-Type': 'text/plain', ...extraHeaders },
+    body,
+    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+  } as RequestInit);
+
+  /** Run one call with fetch recorded, so a test can prove nothing left the worker. */
+  const withFetchRecorded = async (fn: () => Promise<Response>): Promise<{ response: Response; fetched: string[] }> => {
+    const fetched: string[] = [];
+    const previous = globalThis.fetch;
+    globalThis.fetch = (async (url: string) => {
+      fetched.push(String(url));
+      return new Response('{}', { status: 200 });
+    }) as unknown as typeof fetch;
+    try {
+      return { response: await fn(), fetched };
+    } finally {
+      globalThis.fetch = previous;
+    }
+  };
+
+  for (const route of smallRoutes) {
+    await test(`${route.path}: a body one byte over its cap gets a 413 before any counter, row or call`, async () => {
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { ctx } = fakeCtx();
+      analyticsRows.length = 0;
+      const body = paddedBody(route.base, route.limit + 1);
+      const { response, fetched } = await withFetchRecorded(() =>
+        route.handler(smallRequest(route.path, body, { 'Content-Length': String(body.length) }), env, ctx));
+      assertEqual(response.status, 413, 'status');
+      assertEqual(response.headers.get('Content-Type'), 'application/json', 'content type');
+      assertEqual((await response.json() as { error?: string }).error, 'Request body too large', 'the worker\'s error shape');
+      assertEqual(kv.puts.length, 0, 'counter writes');
+      assertEqual(analyticsRows.length, 0, 'analytics rows');
+      assertEqual(fetched.length, 0, 'outbound calls');
+    });
+
+    await test(`${route.path}: a chunked body over its cap is stopped by the bounded read`, async () => {
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { ctx } = fakeCtx();
+      analyticsRows.length = 0;
+      const { response, fetched } = await withFetchRecorded(() =>
+        route.handler(smallRequest(route.path, chunked(paddedBody(route.base, route.limit + 1))), env, ctx));
+      assertEqual(response.status, 413, 'status');
+      assertEqual(kv.puts.length, 0, 'counter writes');
+      assertEqual(analyticsRows.length, 0, 'analytics rows');
+      assertEqual(fetched.length, 0, 'outbound calls');
+    });
+
+    await test(`${route.path}: a body at its cap gets the same answer as the bare body`, async () => {
+      const { ctx } = fakeCtx();
+      const bare = await withFetchRecorded(() =>
+        route.handler(smallRequest(route.path, JSON.stringify(route.base)), fakeEnv(), ctx));
+      const body = paddedBody(route.base, route.limit);
+      const atCap = await withFetchRecorded(() =>
+        route.handler(smallRequest(route.path, body, { 'Content-Length': String(body.length) }), fakeEnv(), ctx));
+      assertEqual(atCap.response.status, bare.response.status, 'status');
+      assert(atCap.response.status !== 413, 'refused at the cap');
+    });
+
+    await test(`${route.path}: a bad body and a broken upload keep the route's own answer`, async () => {
+      const { ctx } = fakeCtx();
+      for (const body of ['{"step":', brokenUpload()]) {
+        const { response } = await withFetchRecorded(() => route.handler(smallRequest(route.path, body), fakeEnv(), ctx));
+        assertEqual(response.status, route.bad.status, 'status');
+        if (route.bad.error) {
+          assertEqual((await response.json() as { error?: string }).error, route.bad.error, 'message');
+        }
+      }
+    });
+  }
+
+  await test('a beacon\'s 413 reaches the browser through the router with CORS', async () => {
+    const env = fakeEnv({ ALLOWED_ORIGINS: 'https://agoracosmica.org' });
+    const { ctx } = fakeCtx();
+    const body = paddedBody({ step: 'not_a_step' }, BEACON_LIMIT + 1);
+    const response = await worker.fetch(
+      smallRequest('/v1/funnel', body, { 'Content-Length': String(body.length), Origin: 'https://agoracosmica.org' }),
+      env,
+      ctx,
+    );
+    assertEqual(response.status, 413, 'status');
+    assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS');
+  });
 
   /** A KV that refuses every write under one prefix, the way KV answers a second write within a second. */
   const refusingKv = (prefix: string): { kv: KVNamespace; puts: string[] } => {

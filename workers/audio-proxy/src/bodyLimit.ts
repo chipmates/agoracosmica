@@ -37,6 +37,23 @@ export async function readBodyCapped(request: Request, maxBytes: number): Promis
   return bytes.buffer;
 }
 
+/** Upper bound for the session-end beacon, which carries one session id. */
+export const SESSION_END_MAX_BODY_BYTES = 16 * 1024;
+
+/**
+ * Read and parse a JSON body of at most `maxBytes`; `{ ok: false }` when it is
+ * larger. Like request.json(), it throws on a body that is not JSON or an
+ * upload that breaks off, so the route keeps its own answer to a bad body.
+ */
+export async function readJsonCapped(
+  request: Request,
+  maxBytes: number,
+): Promise<{ ok: true; body: unknown } | { ok: false }> {
+  const bytes = await readBodyCapped(request, maxBytes);
+  if (!bytes) return { ok: false };
+  return { ok: true, body: JSON.parse(new TextDecoder().decode(bytes)) };
+}
+
 export function bodyTooLarge(request: Request, env: Env): Response {
   return new Response(JSON.stringify({ error: 'Request body too large' }), {
     status: 413,

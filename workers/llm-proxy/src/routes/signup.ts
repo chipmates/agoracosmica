@@ -8,6 +8,7 @@
 // Same legal posture as the rest of analytics.
 
 import { trackSignup, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
 interface SignupPayload {
@@ -32,7 +33,9 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
 
   let payload: SignupPayload;
   try {
-    payload = await request.json();
+    const read = await readJsonCapped(request, BEACON_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    payload = read.body as SignupPayload;
   } catch {
     return new Response(null, { status: 204 });
   }

@@ -16,6 +16,7 @@
 
 import { verifyTurnstileToken } from '../services/turnstile';
 import { checkAndIncrementSessionRateLimit } from '../middleware/rateLimit';
+import { bodyTooLarge, readJsonCapped, SESSION_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import { signJWT, createJWTPayload } from '../utils/jwt';
 import { trackSession, trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import type { Env } from '../utils/types';
@@ -29,7 +30,9 @@ function isValidClientId(value: unknown): value is string {
 export async function handleSession(request: Request, env: Env): Promise<Response> {
   let body: Record<string, unknown>;
   try {
-    body = await request.json();
+    const read = await readJsonCapped(request, SESSION_MAX_BODY_BYTES);
+    if (!read.ok) return bodyTooLarge();
+    body = read.body as Record<string, unknown>;
   } catch {
     return new Response(
       JSON.stringify({ error: 'Invalid JSON body' }),
