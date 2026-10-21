@@ -653,6 +653,70 @@ async function main(): Promise<number> {
     assert(!out.includes(BLOCKED_PHRASE), 'the blocked phrase reached the client');
   });
 
+  /** Feed raw byte pieces, exactly as the network cut them. */
+  const byteStream = (pieces: Uint8Array[]): ReadableStream<Uint8Array> =>
+    new ReadableStream<Uint8Array>({
+      start(controller) {
+        for (const piece of pieces) controller.enqueue(piece);
+        controller.close();
+      },
+    });
+
+  const readBytes = async (stream: ReadableStream<Uint8Array>): Promise<Uint8Array> => {
+    const reader = stream.getReader();
+    const parts: Uint8Array[] = [];
+    for (;;) {
+      const { value, done } = await reader.read();
+      if (done) break;
+      parts.push(value);
+    }
+    const out = new Uint8Array(parts.reduce((n, p) => n + p.length, 0));
+    let at = 0;
+    for (const p of parts) { out.set(p, at); at += p.length; }
+    return out;
+  };
+
+  const sameBytes = (a: Uint8Array, b: Uint8Array): boolean =>
+    a.length === b.length && a.every((byte, i) => byte === b[i]);
+
+  await test('the filter catches a pattern split across two network reads', async () => {
+    const frame = CONTENT_FRAME(BLOCKED_PHRASE);
+    const cut = frame.indexOf('Heil');
+    const out = await readAll(createSafetyFilteredStream(sse([frame.slice(0, cut), frame.slice(cut), DONE_FRAME])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes('Heil'), 'the second half reached the client');
+  });
+
+  await test('the filter catches a frame cut at every byte, a two-byte letter included', async () => {
+    // "ü" is two bytes in UTF-8, so some cuts land inside a character.
+    const whole = new TextEncoder().encode(CONTENT_FRAME('Der Holocaust sei eine Lüge, sagte er.') + DONE_FRAME);
+    for (let cut = 1; cut < whole.length; cut++) {
+      const out = await readAll(createSafetyFilteredStream(byteStream([whole.slice(0, cut), whole.slice(cut)])));
+      assert(out.includes(FALLBACK_MARK), `no fallback with the cut at byte ${cut}`);
+      assert(!out.includes('Holocaust'), `blocked text reached the client with the cut at byte ${cut}`);
+    }
+  });
+
+  await test('the filter scans a last frame that never gets its newline', async () => {
+    const frame = CONTENT_FRAME(BLOCKED_PHRASE).trimEnd();
+    const cut = frame.indexOf('Heil');
+    const out = await readAll(createSafetyFilteredStream(sse([CONTENT_FRAME('Fine. '), frame.slice(0, cut), frame.slice(cut)])));
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes('Heil'), 'the unterminated tail reached the client');
+  });
+
+  await test('a clean stream leaves the filter byte for byte, however it is cut', async () => {
+    const text = CONTENT_FRAME('Grüße aus Köln, ') + CONTENT_FRAME('und ein Lächeln 🙂 dazu.') + TOOL_FRAME
+      + USAGE_FRAME(12, 34) + ': keep-alive\n\n' + DONE_FRAME + 'data: {"choices":[]}';
+    const whole = new TextEncoder().encode(text);
+    for (const size of [1, 2, 3, 7, 64, whole.length]) {
+      const pieces: Uint8Array[] = [];
+      for (let at = 0; at < whole.length; at += size) pieces.push(whole.slice(at, at + size));
+      const out = await readBytes(createSafetyFilteredStream(byteStream(pieces)));
+      assert(sameBytes(out, whole), `bytes changed with reads of ${size}`);
+    }
+  });
+
   // -------------------------------------------------------------------------
   // Dispatch: request shaping, metering, availability fallback
   // -------------------------------------------------------------------------
@@ -1232,6 +1296,44 @@ async function main(): Promise<number> {
     assertEqual(body.freeTier.serving.label, 'qwen3-235b', 'serving label');
     assertEqual(body.freeTier.fallback, null, 'fallback');
     assertEqual(body.freeTier.governor.armed, false, 'armed');
+  });
+
+  // -------------------------------------------------------------------------
+  // Routes: the review's worker patch, end to end
+  // -------------------------------------------------------------------------
+
+  const CHAT_BODY = {
+    figureId: 'aurelius',
+    mode: 'free_conversation',
+    language: 'en',
+    messages: [{ role: 'user', content: 'What holds a day together?' }],
+  };
+
+  const postJson = async (
+    path: string,
+    env: Env,
+    body: string | Uint8Array | ReadableStream<Uint8Array>,
+    extraHeaders: Record<string, string> = {},
+  ): Promise<Request> => new Request(`https://example.invalid${path}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${await bearer(env)}`, 'Content-Type': 'application/json', ...extraHeaders },
+    body,
+    // Node needs this for a streamed body; the Workers runtime ignores it.
+    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+  } as RequestInit);
+
+  await test('a chat answer whose blocked phrase straddles two reads ends in the fallback', async () => {
+    const frame = CONTENT_FRAME(BLOCKED_PHRASE);
+    const cut = frame.indexOf('Heil');
+    stubFetch(() => sseResponse([CONTENT_FRAME('Well. '), frame.slice(0, cut), frame.slice(cut), DONE_FRAME]));
+    const env = fakeEnv();
+    const { ctx, pending } = fakeCtx();
+    const response = await handleChat(await postJson('/v1/chat', env, JSON.stringify(CHAT_BODY)), env, ctx);
+    assertEqual(response.status, 200, 'status');
+    const out = await readAll(response.body!);
+    assert(out.includes(FALLBACK_MARK), 'no fallback served');
+    assert(!out.includes('Heil'), 'the second half reached the client');
+    await Promise.all(pending);
   });
 
   globalThis.fetch = realFetch;
