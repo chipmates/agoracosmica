@@ -156,12 +156,12 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   // is dropped from the history and the recap is built from what remains.
   const screened = screenSummaryHistory(history);
   if (screened.droppedCategory) {
-    void logComplianceEvent(request, env, {
+    ctx.waitUntil(logComplianceEvent(request, env, {
       type: 'input_blocked',
       severity: getSeverity('input_blocked', screened.droppedCategory),
       category: screened.droppedCategory,
       figureId,
-    });
+    }));
   }
   if (screened.history === null) {
     return new Response(

@@ -76,14 +76,14 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   // 2b. Content safety screen on user messages
   const contentCheck = screenCouncilContent('', messages);
   if (contentCheck.blocked) {
-    void logComplianceEvent(request, env, {
+    ctx.waitUntil(logComplianceEvent(request, env, {
       type: 'input_blocked',
       severity: getSeverity('input_blocked', contentCheck.category || 'unknown'),
       category: contentCheck.category || 'unknown',
       figureId,
       mode,
       language,
-    });
+    }));
     const isCrisis = contentCheck.responseType === 'crisis';
     return new Response(
       JSON.stringify({

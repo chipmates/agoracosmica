@@ -112,12 +112,12 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   // 2b. Layer 2: Server-side content safety screen
   const contentCheck = screenCouncilContent(requestedSystemPrompt, messages);
   if (contentCheck.blocked) {
-    void logComplianceEvent(request, env, {
+    ctx.waitUntil(logComplianceEvent(request, env, {
       type: 'input_blocked',
       severity: getSeverity('input_blocked', contentCheck.category || 'unknown'),
       category: contentCheck.category || 'unknown',
       language,
-    });
+    }));
     const isCrisis = contentCheck.responseType === 'crisis';
     const responseBody: Record<string, unknown> = {
       error: 'content_safety',
