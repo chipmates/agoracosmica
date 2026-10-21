@@ -71,10 +71,14 @@ export function readLanding(value: unknown): string {
  * presence of an ad parameter. The referrer string and every click id stay in
  * the browser, so the row carries a property of the request, like country and
  * device class, and no user dimension.
+ *
+ * ad_google_grant (a gclid) and ad_google_paid (p=1 without one) replaced
+ * ad_google, which is still accepted from pages and app bundles loaded before.
  */
 export const SOURCE_CLASSES = new Set([
-  'ad_google', 'ad_reddit', 'search', 'assistant', 'edu', 'mail', 'messenger',
-  'code', 'news', 'wiki', 'directory', 'reddit', 'social', 'referral', 'direct',
+  'ad_google_grant', 'ad_google_paid', 'ad_google', 'ad_reddit', 'search',
+  'assistant', 'edu', 'mail', 'messenger', 'code', 'news', 'wiki', 'directory',
+  'reddit', 'social', 'referral', 'direct',
 ]);
 
 /** Read the source class off a beacon payload field. Anything else is ''. */
