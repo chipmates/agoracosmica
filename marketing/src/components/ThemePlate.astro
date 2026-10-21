@@ -78,7 +78,7 @@ const creditLine = oil
       artist: oil.artist,
       date: oil.year,
       rights: oil.rights,
-    })
+    }, lang)
   : credit
     ? creditLineOf({
         institution: credit.institution,
@@ -86,7 +86,7 @@ const creditLine = oil
         artist: credit.artist,
         date: credit.date,
         rights: shortRights(credit.rights),
-      })
+      }, lang)
     : '';
 const objectUrl = oil ? oil.objectUrl : credit?.objectUrl;
 
