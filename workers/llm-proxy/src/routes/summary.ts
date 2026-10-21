@@ -224,7 +224,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
 
   // 3. Check summary-specific rate limit (2/day per identity; see rateLimit.ts for race caveats).
   // Counted now, so parallel requests meet the cap, and given back below when
-  // no summary reaches the visitor.
+  // no summary reaches the visitor, up to the identity's daily give-backs.
   const rateLimit = await checkAndIncrementSummaryRateLimit(request, env, authResult.payload);
   if (!rateLimit.allowed) {
     trackRateLimit(env, 'summary', 'summary', readCountry(request), readDevice(request));
@@ -246,10 +246,9 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
     );
   }
 
-  const countedAt = Date.now();
   let settle: (delivered: boolean) => void = () => {};
   const delivered = new Promise<boolean>((resolve) => { settle = resolve; });
-  ctx.waitUntil(delivered.then((yes) => (yes ? undefined : giveBackSummary(env, rateLimit.key, countedAt))));
+  ctx.waitUntil(delivered.then((yes) => (yes ? undefined : giveBackSummary(env, rateLimit))));
 
   // 4. Build system prompt server-side
   const figureName = figureId.charAt(0).toUpperCase() + figureId.slice(1);

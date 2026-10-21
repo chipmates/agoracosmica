@@ -31,6 +31,8 @@ import {
   checkAndIncrementRateLimit,
   checkAndIncrementSessionRateLimit,
   checkAndIncrementSummaryRateLimit,
+  getQuota,
+  giveBackSummary,
 } from '../src/middleware/rateLimit';
 import { readBodyCapped } from '../src/middleware/bodyLimit';
 import { createAwardGuardedStream } from '../src/services/awardGuard';
@@ -2495,23 +2497,21 @@ async function main(): Promise<number> {
   // A summary counted before the model answers is given back when none was delivered
   // -------------------------------------------------------------------------
 
-  const summaryKey = () => `summary:sub:${IDENTITY}:${new Date().toISOString().slice(0, 10)}`;
   const globalSummaryKey = () => `global:summary:${new Date().toISOString().slice(0, 10)}`;
   const timerSetTimeout = globalThis.setTimeout;
 
   /**
-   * Run with timers of a second or more cut to 20 ms (the give-back's wait for
-   * KV's one write per key per second, and the delivery grace), and a real 3 s
-   * guard so a give-back that never settles fails instead of hanging.
+   * Run with timers of a second or more cut to 20 ms (the delivery grace), and
+   * a real guard so a give-back that never settles fails instead of hanging.
    */
-  const withFastTimers = async (fn: () => Promise<void>): Promise<void> => {
+  const withFastTimers = async (fn: () => Promise<void>, guardMs = 3000): Promise<void> => {
     globalThis.setTimeout = ((handler: () => void, ms?: number) =>
       timerSetTimeout(handler, (ms ?? 0) >= 1000 ? 20 : ms ?? 0)) as typeof setTimeout;
     let guard: ReturnType<typeof setTimeout> | undefined;
     try {
       await Promise.race([
         fn(),
-        new Promise<never>((_, reject) => { guard = timerSetTimeout(() => reject(new Error('still waiting after 3 s')), 3000); }),
+        new Promise<never>((_, reject) => { guard = timerSetTimeout(() => reject(new Error(`still waiting after ${guardMs} ms`)), guardMs); }),
       ]);
     } finally {
       globalThis.setTimeout = timerSetTimeout;
@@ -2524,16 +2524,19 @@ async function main(): Promise<number> {
     env: Env,
     use: (response: Response) => Promise<void>,
     body: Record<string, unknown> = SUMMARY_BODY,
-  ): Promise<{ status: number; pending: Promise<unknown>[] }> => {
+  ): Promise<{ status: number; headers: Headers; pending: Promise<unknown>[] }> => {
     const { ctx, pending } = fakeCtx();
     const response = await worker.fetch(await postJson('/v1/summary', env, JSON.stringify(body)), env, ctx);
     await use(response);
     await Promise.all(pending);
-    return { status: response.status, pending };
+    return { status: response.status, headers: response.headers, pending };
   };
 
   const readsAll = async (response: Response) => { await response.text(); };
   const leavesAtOnce = async (response: Response) => { await response.body?.cancel(); };
+  /** The visitor's summaries spent today, as the quota read reports them to the app. */
+  const summariesUsed = async (env: Env): Promise<number> =>
+    (await getQuota(fakeRequest(), env, fakeIdentity(IDENTITY))).summary.used;
 
   await test('an upstream error gives the summary back', async () => {
     await withFastTimers(async () => {
@@ -2542,7 +2545,7 @@ async function main(): Promise<number> {
       const env = fakeEnv({ RATE_LIMITS: kv.kv });
       const { status } = await summaryRun(env, readsAll);
       assertEqual(status, 502, 'status');
-      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
       assertEqual(await kv.kv.get(globalSummaryKey()), '1', 'the global brake keeps its count');
     });
   });
@@ -2554,7 +2557,7 @@ async function main(): Promise<number> {
       const env = fakeEnv({ RATE_LIMITS: kv.kv });
       const { status } = await summaryRun(env, leavesAtOnce);
       assertEqual(status, 200, 'status');
-      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
     });
   });
 
@@ -2564,7 +2567,7 @@ async function main(): Promise<number> {
       const kv = auditedKv();
       const env = fakeEnv({ RATE_LIMITS: kv.kv });
       await summaryRun(env, readsAll);
-      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
     });
   });
 
@@ -2579,7 +2582,7 @@ async function main(): Promise<number> {
         await reader.read();
         await reader.cancel();
       });
-      assertEqual(await kv.kv.get(summaryKey()) ?? '0', '0', 'summaries counted');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
     });
   });
 
@@ -2589,7 +2592,7 @@ async function main(): Promise<number> {
       const kv = auditedKv();
       const env = fakeEnv({ RATE_LIMITS: kv.kv });
       await summaryRun(env, readsAll);
-      assertEqual(await kv.kv.get(summaryKey()), '1', 'counted after a whole read');
+      assertEqual(await summariesUsed(env), 1, 'counted after a whole read');
       stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
       await summaryRun(env, async (response) => {
         const reader = response.body!.getReader();
@@ -2597,7 +2600,7 @@ async function main(): Promise<number> {
         await new Promise(resolve => timerSetTimeout(resolve, 100));
         await reader.cancel();
       });
-      assertEqual(await kv.kv.get(summaryKey()), '2', 'counted after the first bytes stood');
+      assertEqual(await summariesUsed(env), 2, 'counted after the first bytes stood');
     });
   });
 
@@ -2615,11 +2618,11 @@ async function main(): Promise<number> {
         summaryRun(env, readsAll),
       ]);
       assertEqual(`${failed.status},${served.status}`, '502,200', 'statuses');
-      assertEqual(await kv.kv.get(summaryKey()), '1', 'the delivered one stays counted');
+      assertEqual(await summariesUsed(env), 1, 'the delivered one stays counted');
       stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME]));
       assertEqual((await summaryRun(env, readsAll)).status, 200, 'the second of two a day');
       assertEqual((await summaryRun(env, readsAll)).status, 429, 'a third is refused');
-      assertEqual(await kv.kv.get(summaryKey()), '2', 'summaries counted');
+      assertEqual(await summariesUsed(env), 2, 'summaries counted');
     });
   });
 
@@ -2630,7 +2633,7 @@ async function main(): Promise<number> {
       const kv = {
         get: async (key: string) => store.get(key) ?? null,
         put: async (key: string, value: string) => {
-          if (key.startsWith('summary:sub:') && store.has(key)) throw new Error(`KV PUT failed: 429 ${key}`);
+          if (key.startsWith('summary:back:')) throw new Error(`KV PUT failed: 429 ${key}`);
           store.set(key, value);
         },
       } as unknown as KVNamespace;
@@ -2638,12 +2641,82 @@ async function main(): Promise<number> {
       let status = 0;
       const warnings = await withWarnings(async () => { status = (await summaryRun(env, readsAll)).status; });
       assertEqual(status, 502, 'status');
-      assertEqual(store.get(summaryKey()), '1', 'summaries counted');
+      assertEqual(await summariesUsed(env), 1, 'summaries counted');
       const lines = warnings.filter(w => w.includes('[RateLimit]'));
       assertEqual(lines.length, 1, `warning lines: ${warnings.join(' | ')}`);
       assert(lines[0].includes('Error'), `the kind is named: ${lines[0]}`);
       assert(!lines[0].includes(IDENTITY) && !lines[0].includes('KV PUT failed'), `no key or message in the line: ${lines[0]}`);
     });
+  });
+
+  // The give-back budget, written out so the suite also runs against a tree that predates it.
+  const SUMMARIES_A_DAY = 2;
+  const GIVEBACKS_A_DAY = 2;
+
+  /**
+   * The visitor as local workerd shows one who left before the first byte:
+   * the runtime pulls the first chunk, finds the connection gone and cancels.
+   */
+  const goneBeforeFirstByte = async (response: Response) => {
+    const reader = response.body!.getReader();
+    await reader.read();
+    await reader.cancel();
+  };
+
+  await test('one identity that leaves before the first byte again and again reaches the model at most four times a day', async () => {
+    await withFastTimers(async () => {
+      const calls = stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const statuses: number[] = [];
+      for (let i = 0; i < 10; i++) statuses.push((await summaryRun(env, goneBeforeFirstByte)).status);
+      const budget = SUMMARIES_A_DAY + GIVEBACKS_A_DAY;
+      assertEqual(calls.length, budget, 'model calls');
+      assertEqual(statuses.join(','), [...Array(budget).fill(200), ...Array(10 - budget).fill(429)].join(','), 'statuses');
+      assertEqual(await summariesUsed(env), SUMMARIES_A_DAY, 'summaries counted');
+      assertEqual(await kv.kv.get(globalSummaryKey()), String(budget), 'the global brake counts every model call');
+    }, 20_000);
+  });
+
+  await test('past its daily give-backs a failed summary stays spent, and the quota says so', async () => {
+    await withFastTimers(async () => {
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      stubFetch(() => new Response('provider down', { status: 500 }));
+      const statuses: number[] = [];
+      const logged: string[] = [];
+      const realLog = console.log;
+      console.log = (...args: unknown[]) => { logged.push(args.map(String).join(' ')); };
+      try {
+        for (let i = 0; i <= GIVEBACKS_A_DAY; i++) statuses.push((await summaryRun(env, readsAll)).status);
+      } finally {
+        console.log = realLog;
+      }
+      assertEqual(statuses.join(','), '502,502,502', 'statuses');
+      assertEqual(await summariesUsed(env), 1, 'the failure past the give-backs stays spent');
+      const spent = logged.filter(line => line.includes('[RateLimit]'));
+      assertEqual(spent.length, 1, `one line when the give-backs are spent: ${logged.join(' | ')}`);
+      assert(!spent[0].includes(IDENTITY), `no identity in the line: ${spent[0]}`);
+      stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME]));
+      const served = await summaryRun(env, readsAll);
+      assertEqual(served.status, 200, 'the second summary of the day');
+      assertEqual(served.headers.get('X-Summary-Daily-Used'), '2', 'the header counts what is spent');
+      assertEqual((await summaryRun(env, readsAll)).status, 429, 'then the day is spent');
+    });
+  });
+
+  await test('a give-back never outnumbers the reservations', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const day = new Date().toISOString().slice(0, 10);
+    const keys = { key: `summary:sub:${IDENTITY}:${day}`, backKey: `summary:back:sub:${IDENTITY}:${day}` };
+    // One reservation on record, already given back, as when a parallel twin's counter write was lost.
+    await kv.kv.put(keys.key, '1');
+    await kv.kv.put(keys.backKey, '1');
+    kv.puts.length = 0;
+    await giveBackSummary(env, keys);
+    assertEqual(kv.puts.length, 0, 'KV writes');
+    assertEqual(await summariesUsed(env), 0, 'summaries counted');
   });
 
   // -------------------------------------------------------------------------
