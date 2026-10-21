@@ -176,6 +176,7 @@ async function fetchWithSessionRetry(
   body: Record<string, unknown> | FormData,
   signal?: AbortSignal,
   endpoint?: RateLimitEndpoint,
+  timeoutMs: number = 30_000,
 ): Promise<Response> {
   const token = await getSessionToken();
 
@@ -184,7 +185,7 @@ async function fetchWithSessionRetry(
     headers: buildAuthHeaders(token),
     body: JSON.stringify(body),
     signal,
-    timeoutMs: 30_000,
+    timeoutMs,
   });
 
   if (response.status === 401) {
@@ -197,7 +198,7 @@ async function fetchWithSessionRetry(
       headers: buildAuthHeaders(freshToken),
       body: JSON.stringify(body),
       signal,
-      timeoutMs: 30_000,
+      timeoutMs,
     });
 
     if (!retryResponse.ok) {
@@ -406,6 +407,11 @@ export async function generateFreeTierCouncilResponse({
 // Free-tier Summary Generation
 // ============================================
 
+// The recap model can take over 30 s to its first byte, and the worker counts
+// the summary before it asks: the visitor waits under the loader rather than
+// lose one of two daily summaries to a timeout.
+const SUMMARY_TIMEOUT_MS = 90_000;
+
 interface FreeTierSummaryOptions {
   figureId: string;
   seedTitle: string;
@@ -433,7 +439,9 @@ export async function generateFreeTierSummary({
       history,
     };
 
-    const response = await fetchWithSessionRetry(`${FREE_TIER_API_URL}/v1/summary`, requestBody, undefined, 'summary');
+    const response = await fetchWithSessionRetry(
+      `${FREE_TIER_API_URL}/v1/summary`, requestBody, undefined, 'summary', SUMMARY_TIMEOUT_MS,
+    );
 
     updateSummaryQuotaFromHeaders(response);
 
