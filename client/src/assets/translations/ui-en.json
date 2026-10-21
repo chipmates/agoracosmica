@@ -1202,7 +1202,6 @@
   },
   "processing": {
     "title": "Processing Your Message",
-    "is": "is",
     "normal": {
       "preparing": {
         "a": "One moment.",
@@ -1289,12 +1288,13 @@
   },
   "summary": {
     "generatingTitle": "Generating Summary",
-    "distilling": "distilling wisdom from your conversation",
-    "gathering": "gathering insights from your dialogue",
-    "extracting": "extracting the essence of your journey",
-    "crystallizing": "crystallizing the knowledge shared",
-    "weaving": "weaving threads of understanding",
-    "mapping": "mapping the constellation of ideas"
+    "wait": {
+      "a": "Reading your conversation once more.",
+      "b": "Gathering the key ideas.",
+      "c": "Putting what you discussed in order.",
+      "d": "Picking out the open questions.",
+      "e": "Writing the summary."
+    }
   },
   "errors": {
     "somethingWentWrong": "Something went wrong",

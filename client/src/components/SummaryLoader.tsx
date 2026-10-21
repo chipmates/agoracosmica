@@ -37,15 +37,15 @@ const getLastName = (fullName?: string): string => {
 };
 
 const SummaryLoader: FC<SummaryLoaderProps> = ({ figureName }) => {
-  const { t, tNode, tString } = useTranslation();
-  // Memoize quotes to avoid resetting interval on every render
+  const { tNode, tString } = useTranslation();
+  // Whole sentences under the name on its own line: "<name> is <line>" does
+  // not hold in German. Memoized so the rotation is not reset on every render.
   const QUOTES = useMemo(() => [
-    tString('summary.distilling', 'Distilling insights'),
-    tString('summary.gathering', 'Gathering wisdom'),
-    tString('summary.extracting', 'Extracting essence'),
-    tString('summary.crystallizing', 'Crystallizing thoughts'),
-    tString('summary.weaving', 'Weaving connections'),
-    tString('summary.mapping', 'Mapping understanding')
+    tString('summary.wait.a', 'Reading your conversation once more.'),
+    tString('summary.wait.b', 'Gathering the key ideas.'),
+    tString('summary.wait.c', 'Putting what you discussed in order.'),
+    tString('summary.wait.d', 'Picking out the open questions.'),
+    tString('summary.wait.e', 'Writing the summary.'),
   ], [tString]);
 
   const [quote, setQuote] = useState(QUOTES[0]);
@@ -124,15 +124,11 @@ const SummaryLoader: FC<SummaryLoaderProps> = ({ figureName }) => {
         <div className="cosmic-loader-text">
           <h3 className="cosmic-loader-title">{tNode('summary.generatingTitle')}</h3>
           <div className="cosmic-loader-subtitle-container">
-            <p className="cosmic-loader-subtitle">
+            <p className="cosmic-loader-subtitle cosmic-loader-subtitle--stacked">
               <span className="figure-name">
                 {getLastName(figureName)}
               </span>
-              {/* Different sentence structure for German vs English */}
-              {t('processing.is') === 'ist' ?
-                <span>{quote}...</span> :
-                <span>{tNode('processing.is')} {quote}...</span>
-              }
+              <span className="cosmic-loader-line">{quote}</span>
             </p>
             <div className="cosmic-progress-bar">
               <div className="cosmic-progress-track">

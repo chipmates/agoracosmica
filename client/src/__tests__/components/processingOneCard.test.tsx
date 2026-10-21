@@ -81,3 +81,45 @@ describe('the waiting card speaks in whole sentences', () => {
     }
   });
 });
+
+describe('the summary card speaks in whole sentences too', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    cleanup();
+    vi.useRealTimers();
+  });
+
+  for (const lang of ['de', 'en'] as const) {
+    it(`${lang}: the name on its own, then sentences from the summary pool`, async () => {
+      h.lang = lang;
+      const { default: SummaryLoader } = await import('../../components/SummaryLoader');
+      const bundle = lang === 'de' ? de : en;
+      const name = lang === 'de' ? 'Mark Aurel' : 'Aurelius';
+      render(<SummaryLoader figureName={lang === 'de' ? 'Echo von Mark Aurel' : 'Echo of Marcus Aurelius'} />);
+      const seen = new Set<string>();
+      for (let t = 0; t < 21000; t += 500) {
+        act(() => { vi.advanceTimersByTime(500); });
+        const line = document.querySelector('.cosmic-loader-line')?.textContent?.trim();
+        if (line) seen.add(line);
+        expect(document.querySelector('.cosmic-loader-subtitle')?.textContent ?? '').not.toMatch(new RegExp(`^${name}\\s*(ist|is)\\b`));
+      }
+      expect(document.querySelector('.cosmic-loader-overlay .figure-name')?.textContent).toBe(name);
+      expect([...seen].sort()).toEqual(Object.values((bundle.summary as { wait: Record<string, string> }).wait).sort());
+      for (const line of seen) {
+        expect(line).toMatch(/^[A-ZÄÖÜ].*\.$/);
+        expect(line).not.toMatch(/[–—;]/);
+      }
+    });
+  }
+
+  it('the "is" glue and the old fragments are gone from both languages', () => {
+    for (const bundle of [de, en]) {
+      expect((bundle.processing as Record<string, unknown>).is).toBeUndefined();
+      for (const key of ['distilling', 'gathering', 'extracting', 'crystallizing', 'weaving', 'mapping']) {
+        expect((bundle.summary as Record<string, unknown>)[key]).toBeUndefined();
+      }
+    }
+  });
+});

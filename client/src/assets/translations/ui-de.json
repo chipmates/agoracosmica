@@ -1204,7 +1204,6 @@
   },
   "processing": {
     "title": "Verarbeite deine Nachricht",
-    "is": "ist",
     "normal": {
       "preparing": {
         "a": "Moment.",
@@ -1291,12 +1290,13 @@
   },
   "summary": {
     "generatingTitle": "Erstelle Zusammenfassung",
-    "distilling": "destilliere Weisheit aus eurem Gespräch",
-    "gathering": "sammle Erkenntnisse aus eurem Dialog",
-    "extracting": "extrahiere die Essenz deiner Reise",
-    "crystallizing": "kristallisiere das geteilte Wissen",
-    "weaving": "webe Fäden des Verständnisses",
-    "mapping": "zeichne die Konstellation der Ideen"
+    "wait": {
+      "a": "Liest euer Gespräch noch einmal.",
+      "b": "Sammelt die wichtigsten Gedanken.",
+      "c": "Ordnet, was ihr besprochen habt.",
+      "d": "Sucht die offenen Fragen heraus.",
+      "e": "Schreibt die Zusammenfassung."
+    }
   },
   "errors": {
     "somethingWentWrong": "Etwas ist schiefgelaufen",

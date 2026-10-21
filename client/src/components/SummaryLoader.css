@@ -252,6 +252,16 @@
   overflow: hidden;
 }
 
+/* The name on its own line, the sentence under it. */
+.cosmic-loader-subtitle--stacked {
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cosmic-loader-subtitle--stacked .figure-name {
+  margin-right: 0;
+}
+
 /* Progress bar */
 .cosmic-progress-bar {
   width: 100%;
