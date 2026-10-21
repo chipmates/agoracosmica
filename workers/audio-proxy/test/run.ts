@@ -9,6 +9,7 @@ import { getServers } from '../src/config';
 import { getAggregatedHealth } from '../src/health';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
+import { readBodyCapped } from '../src/bodyLimit';
 import worker from '../src/index';
 import type { Env, ServerInfo } from '../src/types';
 
@@ -754,6 +755,196 @@ async function main(): Promise<number> {
       assertEqual(h.puts.length, 0, 'counter writes');
       assertEqual(h.upstream.length, 0, 'upstream calls');
       assertEqual(logged.length, 0, `error lines: ${logged.join(' | ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // Body reads in 64 KiB steps, however small the chunks an upload arrives in
+  // -------------------------------------------------------------------------
+
+  /**
+   * A body that behaves like workerd's own request streams, as measured in
+   * local workerd: the default reader hands out one HTTP chunk per read, and
+   * the BYOB reader's readAtLeast fills at least its minimum unless the body
+   * ends first, then answers an empty read with done. The bytes follow a
+   * pattern, so order and content can be checked.
+   */
+  const nativeBody = (bytes: number, chunk = 1) => {
+    let sent = 0;
+    const stats = { defaultReads: 0, stepReads: 0, cancelled: false };
+    const fill = (view: Uint8Array) => {
+      for (let i = 0; i < view.byteLength; i++) view[i] = (sent + i) % 251;
+      sent += view.byteLength;
+    };
+    const body = {
+      getReader(options?: { mode?: string }) {
+        if (options?.mode === 'byob') {
+          return {
+            async readAtLeast(_min: number, view: Uint8Array) {
+              stats.stepReads++;
+              const out = new Uint8Array(view.buffer, view.byteOffset, Math.min(view.byteLength, bytes - sent));
+              fill(out);
+              return { value: out, done: out.byteLength === 0 };
+            },
+            async cancel() { stats.cancelled = true; },
+            releaseLock() {},
+          };
+        }
+        return {
+          async read() {
+            stats.defaultReads++;
+            if (sent >= bytes) return { value: undefined, done: true };
+            const out = new Uint8Array(Math.min(chunk, bytes - sent));
+            fill(out);
+            return { value: out, done: false };
+          },
+          async cancel() { stats.cancelled = true; },
+          releaseLock() {},
+        };
+      },
+    };
+    return { body: body as unknown as ReadableStream<Uint8Array>, stats, sent: () => sent };
+  };
+
+  const withBody = (request: Request, body: ReadableStream<Uint8Array>): Request =>
+    Object.defineProperty(request, 'body', { value: body });
+
+  const bodylessUpload = (headers: Record<string, string> = {}): Request =>
+    new Request('https://audio.agoracosmica.org/v1/audio/transcriptions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'audio/webm', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': '203.0.113.9', ...headers },
+    });
+
+  const inPattern = (bytes: Uint8Array): boolean => bytes.every((b, i) => b === i % 251);
+
+  /** One read per 64 KiB step, a shorter last step, and the empty read that ends it. */
+  const stepReadsFor = (bytes: number) => Math.floor(bytes / 65536) + (bytes % 65536 ? 1 : 0) + 1;
+
+  await test('a runtime body in 1-byte chunks is read in 64 KiB steps, bytes intact', async () => {
+    const size = 256 * 1024 + 5;
+    const source = nativeBody(size);
+    const out = await readBodyCapped(withBody(bodylessUpload(), source.body), STT_LIMIT);
+    assert(out !== null, 'read refused');
+    const bytes = new Uint8Array(out!);
+    assertEqual(bytes.byteLength, size, 'bytes read');
+    assert(inPattern(bytes), 'bytes out of order or changed');
+    assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+    assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
+  });
+
+  for (const size of [0, 1, 65535, 65536, 65537, 131072]) {
+    await test(`a runtime body of ${size} bytes reads back whole`, async () => {
+      const source = nativeBody(size, 4096);
+      const out = await readBodyCapped(withBody(bodylessUpload(), source.body), STT_LIMIT);
+      assert(out !== null, 'read refused');
+      assertEqual(out!.byteLength, size, 'bytes read');
+      assert(inPattern(new Uint8Array(out!)), 'bytes out of order or changed');
+    });
+  }
+
+  await test('a runtime body keeps its cap to the byte', async () => {
+    const at = await readBodyCapped(withBody(bodylessUpload(), nativeBody(65536, 4096).body), 65536);
+    assertEqual(at?.byteLength, 65536, 'a body at the cap is read');
+    const over = nativeBody(65537, 4096);
+    assertEqual(await readBodyCapped(withBody(bodylessUpload(), over.body), 65536), null, 'one byte over is refused');
+    assertEqual(over.stats.cancelled, true, 'the rest was cancelled');
+  });
+
+  await test('an allowed STT upload in 1-byte chunks is forwarded whole after one read per 64 KiB', async () => {
+    const h = limitedHarness('none');
+    try {
+      const size = 256 * 1024 + 1;
+      const source = nativeBody(size);
+      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
+      assertEqual(res.status, 200, 'status');
+      assertEqual(h.upstream[0]?.bytes, size, 'bytes forwarded');
+      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+      assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a capped visitor\'s upload in 1-byte chunks is drained in 64 KiB steps', async () => {
+    const h = limitedHarness('daily');
+    try {
+      const size = 256 * 1024 + 1;
+      const source = nativeBody(size);
+      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
+      assertEqual(res.status, 429, 'status');
+      assertEqual(source.sent(), size, 'drained to its end');
+      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+      assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a runtime upload past the cap gets the 413 after one read per 64 KiB', async () => {
+    const h = limitedHarness('none');
+    try {
+      const source = nativeBody(STT_LIMIT + 1, 64 * 1024);
+      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(source.stats.cancelled, true, 'the rest was cancelled');
+      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+      assertEqual(source.stats.stepReads, STT_LIMIT / 65536 + 1, 'step reads');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // Any other stream is copied into step-sized pieces as it is read, so a kept
+  // piece never holds on to the chunk it came from.
+  await test('a test stream that reuses one chunk buffer is copied as it is read', async () => {
+    const shared = new Uint8Array(1);
+    let i = 0;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (i === 4000) { c.close(); return; }
+        shared[0] = i++ % 251;
+        c.enqueue(shared);
+      },
+    }, { highWaterMark: 0 });
+    const out = await readBodyCapped(upload(stream), STT_LIMIT);
+    assert(out !== null, 'read refused');
+    assertEqual(out!.byteLength, 4000, 'bytes read');
+    assert(inPattern(new Uint8Array(out!)), 'a kept chunk changed after it was read');
+  });
+
+  await test('a test stream that takes more than one read per KiB of the cap is refused like an oversized body', async () => {
+    const tiny = (count: number) => {
+      let sent = 0;
+      let cancelled = false;
+      const stream = new ReadableStream<Uint8Array>({
+        pull(c) {
+          if (sent === count) { c.close(); return; }
+          sent++;
+          c.enqueue(new Uint8Array(1));
+        },
+        cancel() { cancelled = true; },
+      }, { highWaterMark: 0 });
+      return { stream, cancelled: () => cancelled };
+    };
+    // 1,023 chunks and the read that finds the end: the 1,024 reads a small cap allows.
+    const within = await readBodyCapped(upload(tiny(1023).stream), 16 * 1024);
+    assertEqual(within?.byteLength, 1023, 'a body read in 1,024 reads');
+    const many = tiny(1024);
+    assertEqual((await readBodyCapped(upload(many.stream), 16 * 1024))?.byteLength ?? null, null, 'a 1,025th read is refused');
+    assertEqual(many.cancelled(), true, 'the rest was cancelled');
+    const h = limitedHarness('none');
+    try {
+      const res = await worker.fetch(upload(tiny(STT_LIMIT / 1024).stream), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status on the STT route');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      await Promise.all(h.pending);
     } finally {
       h.restore();
     }

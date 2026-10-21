@@ -124,6 +124,102 @@ async function main(): Promise<void> {
     });
   }
 
+  // Body reads in 64 KiB steps, however small the chunks a body arrives in.
+
+  /**
+   * A body that behaves like workerd's own request streams, as measured in
+   * local workerd: the default reader hands out one HTTP chunk per read, and
+   * the BYOB reader's readAtLeast fills at least its minimum unless the body
+   * ends first, then answers an empty read with done.
+   */
+  function nativeBody(source: Uint8Array, chunk = 1) {
+    let sent = 0;
+    const stats = { defaultReads: 0, stepReads: 0, cancelled: false };
+    const take = (n: number): Uint8Array => {
+      const out = source.slice(sent, sent + n);
+      sent += out.byteLength;
+      return out;
+    };
+    const body = {
+      getReader(options?: { mode?: string }) {
+        if (options?.mode === 'byob') {
+          return {
+            async readAtLeast(_min: number, view: Uint8Array) {
+              stats.stepReads++;
+              const bytes = take(view.byteLength);
+              const out = new Uint8Array(view.buffer, view.byteOffset, bytes.byteLength);
+              out.set(bytes);
+              return { value: out, done: out.byteLength === 0 };
+            },
+            async cancel() { stats.cancelled = true; },
+            releaseLock() {},
+          };
+        }
+        return {
+          async read() {
+            stats.defaultReads++;
+            if (sent >= source.byteLength) return { value: undefined, done: true };
+            return { value: take(chunk), done: false };
+          },
+          async cancel() { stats.cancelled = true; },
+          releaseLock() {},
+        };
+      },
+    };
+    return { body: body as unknown as ReadableStream<Uint8Array>, stats };
+  }
+
+  function withBody(path: string, body: ReadableStream<Uint8Array>): Request {
+    const request = new Request(`https://stats.example${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    return Object.defineProperty(request, 'body', { value: body });
+  }
+
+  /** A stream that hands out `bytes` one byte at a time, all through one reused buffer when `reuse` is set. */
+  function byteByByte(bytes: Uint8Array, reuse = false) {
+    const shared = new Uint8Array(1);
+    let sent = 0;
+    let cancelled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (sent === bytes.byteLength) { c.close(); return; }
+        if (reuse) {
+          shared[0] = bytes[sent++];
+          c.enqueue(shared);
+        } else {
+          c.enqueue(bytes.slice(sent, ++sent));
+        }
+      },
+      cancel() { cancelled = true; },
+    }, { highWaterMark: 0 });
+    return { stream, cancelled: () => cancelled };
+  }
+
+  for (const route of routes) {
+    await test(`${route.path}: a body the runtime hands out in 1-byte chunks costs one read per 64 KiB`, async () => {
+      const source = nativeBody(padded(route.base, 100 * 1024));
+      const { response, fetched } = await withStubbedFetch(() => worker.fetch(withBody(route.path, source.body), env));
+      assertEqual(response.status, 200, 'status');
+      assertEqual(fetched.length, 1, 'queries sent');
+      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+      assertEqual(source.stats.stepReads, 3, 'step reads');
+    });
+
+    await test(`${route.path}: a body whose stream reuses one chunk buffer is copied as it is read`, async () => {
+      const body = new TextEncoder().encode(JSON.stringify(route.base));
+      const { response, fetched } = await withStubbedFetch(() => worker.fetch(post(route.path, byteByByte(body, true).stream), env));
+      assertEqual(response.status, 200, 'status');
+      assertEqual(fetched.length, 1, 'queries sent');
+    });
+
+    await test(`${route.path}: a body that takes more than one read per KiB of the cap is refused like an oversized one`, async () => {
+      const upload = byteByByte(padded(route.base, 1025));
+      const { response, fetched } = await withStubbedFetch(() => worker.fetch(post(route.path, upload.stream), env));
+      assertEqual(response.status, 413, 'status');
+      assertEqual(upload.cancelled(), true, 'the rest was cancelled');
+      assertEqual(fetched.length, 0, 'queries sent');
+    });
+  }
+
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
   console.log(`${results.length - failed.length}/${results.length} passed`);

@@ -175,6 +175,120 @@ async function main(): Promise<void> {
     assertEqual(((await res.json()) as { error?: string }).error, 'invalid_json', 'error body');
   });
 
+  // Body reads in 64 KiB steps, however small the chunks a body arrives in.
+
+  /**
+   * A body that behaves like workerd's own request streams, as measured in
+   * local workerd: the default reader hands out one HTTP chunk per read, and
+   * the BYOB reader's readAtLeast fills at least its minimum unless the body
+   * ends first, then answers an empty read with done.
+   */
+  function nativeBody(source: Uint8Array, chunk = 1) {
+    let sent = 0;
+    const stats = { defaultReads: 0, stepReads: 0, cancelled: false };
+    const take = (n: number): Uint8Array => {
+      const out = source.slice(sent, sent + n);
+      sent += out.byteLength;
+      return out;
+    };
+    const body = {
+      getReader(options?: { mode?: string }) {
+        if (options?.mode === 'byob') {
+          return {
+            async readAtLeast(_min: number, view: Uint8Array) {
+              stats.stepReads++;
+              const bytes = take(view.byteLength);
+              const out = new Uint8Array(view.buffer, view.byteOffset, bytes.byteLength);
+              out.set(bytes);
+              return { value: out, done: out.byteLength === 0 };
+            },
+            async cancel() { stats.cancelled = true; },
+            releaseLock() {},
+          };
+        }
+        return {
+          async read() {
+            stats.defaultReads++;
+            if (sent >= source.byteLength) return { value: undefined, done: true };
+            return { value: take(chunk), done: false };
+          },
+          async cancel() { stats.cancelled = true; },
+          releaseLock() {},
+        };
+      },
+    };
+    return { body: body as unknown as ReadableStream<Uint8Array>, stats };
+  }
+
+  function withBody(body: ReadableStream<Uint8Array>): Request {
+    const request = new Request('https://community.example/v1/community/power', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Origin: ORIGIN, 'cf-connecting-ip': IP },
+    });
+    return Object.defineProperty(request, 'body', { value: body });
+  }
+
+  /** A stream that hands out `bytes` one byte at a time, all through one reused buffer when `reuse` is set. */
+  function byteByByte(bytes: Uint8Array, reuse = false) {
+    const shared = new Uint8Array(1);
+    let sent = 0;
+    let cancelled = false;
+    const stream = new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (sent === bytes.byteLength) { c.close(); return; }
+        if (reuse) {
+          shared[0] = bytes[sent++];
+          c.enqueue(shared);
+        } else {
+          c.enqueue(bytes.slice(sent, ++sent));
+        }
+      },
+      cancel() { cancelled = true; },
+    }, { highWaterMark: 0 });
+    return { stream, cancelled: () => cancelled };
+  }
+
+  await test('a heartbeat the runtime hands out in 1-byte chunks costs one read per 64 KiB', async () => {
+    const { kv, store } = fakeKv();
+    await seed(store, {});
+    const source = nativeBody(paddedPower(POWER_LIMIT));
+    const res = await worker.fetch(withBody(source.body), envWith(kv));
+    assertEqual(res.status, 200, 'status');
+    assertEqual(((await res.json()) as { joinedCount: number }).joinedCount, 13, 'joinedCount');
+    assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+    assertEqual(source.stats.stepReads, 2, 'step reads');
+  });
+
+  await test('a heartbeat from the runtime one byte over its cap gets a 413 after one read', async () => {
+    const fake = countedKv();
+    await seed(fake.store, {});
+    const source = nativeBody(paddedPower(POWER_LIMIT + 1), 4096);
+    const res = await worker.fetch(withBody(source.body), envWith(fake.kv));
+    assertEqual(res.status, 413, 'status');
+    assertEqual(source.stats.cancelled, true, 'the rest was cancelled');
+    assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
+    assertEqual(source.stats.stepReads, 1, 'step reads');
+    assertEqual(fake.reads(), 0, 'KV reads');
+  });
+
+  await test('a heartbeat whose stream reuses one chunk buffer is copied as it is read', async () => {
+    const { kv, store } = fakeKv();
+    await seed(store, {});
+    const body = new TextEncoder().encode(JSON.stringify({ deviceId: 'reused-buffer-01', power: 2, completedFigures: 1 }));
+    const res = await worker.fetch(rawPowerRequest(byteByByte(body, true).stream), envWith(kv));
+    assertEqual(res.status, 200, 'status');
+  });
+
+  await test('a heartbeat that takes more than 1,024 reads is refused like an oversized body', async () => {
+    const fake = countedKv();
+    await seed(fake.store, {});
+    const upload = byteByByte(paddedPower(2000));
+    const res = await worker.fetch(rawPowerRequest(upload.stream), envWith(fake.kv));
+    assertEqual(res.status, 413, 'status');
+    assertEqual(upload.cancelled(), true, 'the rest was cancelled');
+    assertEqual(fake.reads(), 0, 'KV reads');
+  });
+
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
   console.log(`${results.length - failed.length}/${results.length} passed`);
