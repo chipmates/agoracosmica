@@ -34,7 +34,9 @@ function question(dataset: string, name: string, fields: Field[], where: string)
   };
 }
 
-const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR (blob1 = 'museum_stop' AND blob3 = '3'))";
+// A real use is a walk that reaches its third stop.
+const THIRD_STOP = "(blob1 = 'museum_stop' AND blob3 = '3')";
+const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR " + THIRD_STOP + ')';
 
 // The animal pages' kinds, as the site's build writes them (site/functions/_count/lists.js). A new animal page
 // adds its kind here, or its rows stay out of animalUse.
@@ -78,7 +80,8 @@ export function countQuestions(dataset: string): CountQuestion[] {
   return [
     question(dataset, 'steps', [['blob1', 's']], ''),
     question(dataset, 'stops', [['blob3', 'k']], "blob1 = 'museum_stop'"),
-    question(dataset, 'walkSources', [['blob1', 's'], ['blob6', 'k']], "blob1 IN ('museum_arrival', 'museum_use')"),
+    // Third stops carry the visit's source word since the site began to send it there; older ones sit under ''.
+    question(dataset, 'walkSources', [['blob1', 's'], ['blob6', 'k']], "(blob1 IN ('museum_arrival', 'museum_use') OR " + THIRD_STOP + ')'),
     question(dataset, 'siteSources', [['blob6', 'k']], "blob1 = 'page_arrival' AND blob7 = 'start'"),
     question(dataset, 'walkLang', [['blob1', 's'], ['blob4', 'k']], WALK_AND_REAL),
     question(dataset, 'walkHold', [['blob1', 's'], ['blob5', 'k']], WALK_AND_REAL),
@@ -170,7 +173,8 @@ export interface CountAnswer {
   days?: string[];
   steps?: Series;
   stops?: Series;
-  sources?: { walks: Series; uses: Series; site: Series };
+  // real: third stops by source word, '' for rows written before the stop carried one
+  sources?: { walks: Series; uses: Series; real: Series; site: Series };
   lang?: { walks: Series; real: Series };
   hold?: { walks: Series; real: Series };
   device?: { walks: Series; real: Series };
@@ -294,6 +298,7 @@ async function buildCount(c: Creds, fetcher: Fetcher, now: number): Promise<Coun
     sources: {
       walks: columns('walkSources', 'k', isStep('museum_arrival')),
       uses: columns('walkSources', 'k', isStep('museum_use')),
+      real: columns('walkSources', 'k', isStep('museum_stop')),
       site: columns('siteSources', 'k'),
     },
     lang: pair('walkLang'),

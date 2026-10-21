@@ -6,6 +6,7 @@
 // local stub, so nothing reaches Cloudflare.
 
 import worker from '../src/index';
+import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
 import type { Env } from '../src/types';
 
 const results: { name: string; error?: string }[] = [];
@@ -273,6 +274,70 @@ async function main(): Promise<void> {
       assertEqual(fetched.length, 0, 'queries sent');
     });
   }
+
+  // The museum's count: third stops by source word, read by the walk's source question.
+
+  await test('museum count: every question keeps the guard, and the source question still splits by two fields only', async () => {
+    for (const q of countQuestions('museum_count')) assertEqual(guardCountSql(q.sql, 'museum_count'), null, q.name);
+    const walk = countQuestions('museum_count').find((q) => q.name === 'walkSources');
+    if (!walk) throw new Error('no walkSources question');
+    assertEqual(walk.sql.includes("blob1 AS s, blob6 AS k, SUM(_sample_interval) AS n"), true, `fields: ${walk.sql}`);
+    assertEqual(walk.sql.includes("(blob1 IN ('museum_arrival', 'museum_use') OR (blob1 = 'museum_stop' AND blob3 = '3'))"), true, `third stops: ${walk.sql}`);
+    // without its brackets the OR would let probe rows through, and the guard says so
+    const open = walk.sql.replace("(blob1 IN ('museum_arrival', 'museum_use') OR (blob1 = 'museum_stop' AND blob3 = '3'))",
+      "blob1 IN ('museum_arrival', 'museum_use') OR (blob1 = 'museum_stop' AND blob3 = '3')");
+    assertEqual(guardCountSql(open, 'museum_count'), 'probe rows not left out', 'the open OR');
+  });
+
+  await test('museum count: the language, hold and device questions ask what they asked before', async () => {
+    const real = "(blob1 = 'museum_arrival' OR (blob1 = 'museum_stop' AND blob3 = '3'))";
+    for (const name of ['walkLang', 'walkHold', 'walkDevice']) {
+      const q = countQuestions('museum_count').find((x) => x.name === name);
+      assertEqual(Boolean(q && q.sql.endsWith(' AND ' + real + ' GROUP BY d, s, k ORDER BY d')), true, `${name}: ${q && q.sql}`);
+    }
+  });
+
+  await test('museum count: third stops by source word sit beside walks and uses; a stop row without a word stays under the empty word', async () => {
+    const DAY = 86400 * 1000;
+    const day = (back: number) => new Date(Date.now() - back * DAY).toISOString().slice(0, 10);
+    const [d0, d1, d2] = [day(2), day(1), day(0)];
+    const at = (d: string) => d + ' 00:00:00';
+    const asked = new Map(countQuestions('museum_count').map((q) => [q.sql, q.name]));
+    const rows: Record<string, Array<Record<string, unknown>>> = {
+      steps: [{ d: at(d0), s: 'museum_arrival', n: 14 }],
+      walkSources: [
+        { d: at(d0), s: 'museum_arrival', k: 'search', n: 10 }, { d: at(d0), s: 'museum_arrival', k: '', n: 4 },
+        { d: at(d0), s: 'museum_use', k: 'search', n: 3 }, { d: at(d0), s: 'museum_stop', k: '', n: 2 },
+        { d: at(d1), s: 'museum_arrival', k: 'search', n: '8' }, { d: at(d1), s: 'museum_use', k: 'search', n: 2 },
+        { d: at(d1), s: 'museum_stop', k: '', n: 1 }, { d: at(d1), s: 'museum_stop', k: 'search', n: 2 },
+        { d: at(d1), s: 'museum_stop', k: 'ad_grant', n: 1 }, { d: at(d2), s: 'museum_stop', k: 'forum', n: 1 },
+        { d: at(d2), s: 'museum_stop', k: 'not a word', n: 5 },
+      ],
+    };
+    const names: string[] = [];
+    const fetcher = async (_url: string, init: RequestInit) => {
+      const name = asked.get(String(init.body));
+      if (!name) throw new Error('a question this module does not ask: ' + String(init.body));
+      names.push(name);
+      return Response.json({ data: rows[name] || [] });
+    };
+    const countEnv = { MUSEUM_COUNT_ACCOUNT_ID: '0123456789abcdef0123456789abcdef', MUSEUM_COUNT_API_TOKEN: 'test-token' } as unknown as Env;
+    const response = await handleMuseumCount(countEnv, fetcher);
+    assertEqual(response.status, 200, 'status');
+    const body = (await response.json()) as { state: string; days: string[]; gaps: string[]; sources: Record<string, Record<string, number[]>> };
+    assertEqual(body.state, 'ok', 'state');
+    assertEqual(body.gaps.length, 0, 'gaps');
+    assertEqual(names.length, countQuestions('museum_count').length, 'questions asked');
+    assertEqual(JSON.stringify(body.days), JSON.stringify([d0, d1, d2]), 'days');
+    assertEqual(JSON.stringify(Object.keys(body.sources).sort()), JSON.stringify(['real', 'site', 'uses', 'walks']), 'the answer\'s source groups');
+    const same = (got: Record<string, number[]>, want: Record<string, number[]>, what: string) => {
+      const sorted = (o: Record<string, number[]>) => JSON.stringify(Object.keys(o).sort().map((k) => [k, o[k]]));
+      assertEqual(sorted(got), sorted(want), what);
+    };
+    same(body.sources.real, { '': [2, 1, 0], search: [0, 2, 0], ad_grant: [0, 1, 0], forum: [0, 0, 1] }, 'third stops by word');
+    same(body.sources.walks, { search: [10, 8, 0], '': [4, 0, 0] }, 'arrivals by word');
+    same(body.sources.uses, { search: [3, 2, 0] }, 'uses by word');
+  });
 
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
