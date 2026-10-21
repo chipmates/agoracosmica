@@ -136,6 +136,8 @@ interface GenerationResult {
   success: boolean;
   result?: any;
   error?: string;
+  /** Ended by a close or a newer council, not by a fault. */
+  stopped?: boolean;
 }
 
 export class CustomCouncilService {
@@ -289,12 +291,14 @@ export class CustomCouncilService {
   async startCustomGeneration(): Promise<GenerationResult> {
     let processingChain: Promise<void> = Promise.resolve();
     const generation = ++this.generationCount;
+    // Cleanup drops this.abortController, so the catch reads this one.
+    const controller = new AbortController();
     try {
       // Cancel any previous in-progress generation
       if (this.abortController) {
         this.abortController.abort();
       }
-      this.abortController = new AbortController();
+      this.abortController = controller;
 
       // Generate unique session ID for this council to prevent audio file collisions
       this.councilSessionId = `council-${Date.now()}`;
@@ -399,6 +403,13 @@ export class CustomCouncilService {
         throw new Error(result.error || 'Custom generation failed');
       }
     } catch (error) {
+      if (controller.signal.aborted) {
+        // Closed by the visitor or replaced by a newer council: nothing to report,
+        // and the loader may already belong to the newer one.
+        councilLog('🛑 Council generation stopped');
+        this._finishGeneration(processingChain, generation);
+        return { success: true, stopped: true };
+      }
       const errorMessage = error instanceof Error ? error.message : String(error);
       councilError('❌ Custom generation error:', error);
       this._finishGeneration(processingChain, generation);

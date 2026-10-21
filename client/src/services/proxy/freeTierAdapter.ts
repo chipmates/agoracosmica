@@ -322,7 +322,7 @@ export async function generateFreeTierResponse({
     updateQuotaFromHeaders(response);
 
     // Parse SSE stream (same pattern as llmService.ts)
-    const result = await parseSSEStream(response, streamingCallback, onToolCall, language);
+    const result = await parseSSEStream(response, streamingCallback, onToolCall, language, signal);
 
     const perfResult = performanceMonitor.endRequest(perfMetrics, true);
 
@@ -383,7 +383,7 @@ export async function generateFreeTierCouncilResponse({
 
     updateCouncilQuotaFromHeaders(response);
 
-    const result = await parseSSEStream(response, streamingCallback, undefined, language);
+    const result = await parseSSEStream(response, streamingCallback, undefined, language, signal);
 
     const perfResult = performanceMonitor.endRequest(perfMetrics, true);
 
@@ -464,6 +464,7 @@ async function parseSSEStream(
   streamingCallback?: (chunk: string) => Promise<void>,
   onToolCall?: (toolCall: { name: string; arguments: string; id?: string }) => void,
   language?: string,
+  signal?: AbortSignal,
 ): Promise<{ fullResponse: string }> {
   const reader = response.body!.getReader();
   const decoder = new TextDecoder();
@@ -477,7 +478,7 @@ async function parseSSEStream(
 
   try {
     while (true) {
-      const { value, done } = await readWithIdleLimit(reader);
+      const { value, done } = await readWithIdleLimit(reader, { signal });
       if (done) break;
 
       buffer += decoder.decode(value, { stream: true });

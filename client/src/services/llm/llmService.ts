@@ -295,7 +295,7 @@ class LLMService {
     }
 
     if (streamCallback) {
-      return this.handleStreamingResponse(response, streamCallback, onToolCall, providerConfig);
+      return this.handleStreamingResponse(response, streamCallback, onToolCall, providerConfig, signal);
     }
 
     const data = await response.json();
@@ -325,7 +325,8 @@ class LLMService {
     response: Response,
     callback: (chunk: string) => void | Promise<void>,
     onToolCall: ((toolCall: { name: string; arguments: string; id?: string }) => void) | undefined,
-    providerConfig: ProviderConfig
+    providerConfig: ProviderConfig,
+    signal?: AbortSignal,
   ): Promise<{ response: string; metadata: any }> {
     if (!response.body) {
       throw new LLMApiError('Streaming response has no body', 500);
@@ -355,7 +356,7 @@ class LLMService {
 
     try {
       while (true) {
-        const { value, done } = await readWithIdleLimit(reader);
+        const { value, done } = await readWithIdleLimit(reader, { signal });
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
