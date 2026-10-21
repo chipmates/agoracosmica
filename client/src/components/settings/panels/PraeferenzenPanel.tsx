@@ -3,6 +3,8 @@ import { Gear, Globe, SpeakerHigh, Microphone, Brain, ArrowCounterClockwise, Hou
 import { useTranslation } from '../../../hooks/useTranslation';
 import { keyStorage } from '../../../services/storage/keyStorageService';
 import { useUIStore } from '../../../stores/uiStore';
+import { useDomainStore } from '../../../stores/domainStore';
+import { loadServiceConfig } from '../../../services/audio/config/serviceConfig';
 import styles from '../../SettingsModal.module.css';
 import CollapsibleSection from '../CollapsibleSection';
 
@@ -83,27 +85,37 @@ const PraeferenzenPanel: FC<PraeferenzenPanelProps> = ({
     return () => window.removeEventListener('byok-key-changed', handleKeyChange);
   }, []);
 
+  // Re-read on every saved change, so the badges follow the Local Mode switches.
+  useDomainStore((state) => state.serviceConfig.raw);
+  const localMode = loadServiceConfig().localMode;
+
   const getLanguageBadge = (): string => {
     const langs: Record<string, string> = { en: 'English', de: 'Deutsch' };
     return langs[selectedLanguage] || selectedLanguage;
   };
 
-  // TTS/STT are always self-hosted on GEX130 (Germany) — no service selection.
+  // Voice and voice input run on our servers in Germany, or locally in Local Mode.
   const getVoiceBadge = (): string => {
     if (!config.ttsEnabled) return tString('common.disabled', 'Disabled');
+    if (localMode?.ttsEnabled) return tString('settings.preferences.local', 'Local');
     return tString('settings.preferences.selfHosted', 'Self-hosted');
   };
 
   const getSpeechBadge = (): string => {
     if (!config.sttEnabled) return tString('common.disabled', 'Disabled');
+    if (localMode?.sttEnabled) return tString('settings.preferences.local', 'Local');
     return tString('settings.preferences.selfHosted', 'Self-hosted');
   };
 
   // The free-tier badge must hold whichever model the worker is serving, and
   // those are not all in the EU. The panel itself names the model and the country.
-  const getAiModelBadge = (): string => hasByokKey
-    ? tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key')
-    : tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
+  // A local model wins over a saved key, as it does for the conversation.
+  const getAiModelBadge = (): string => {
+    if (localMode?.llmEnabled) return tString('settings.preferences.aiModelBadgeLocal', 'Local · Your model');
+    return hasByokKey
+      ? tString('settings.preferences.aiModelBadgeByok', 'Qwen3 235B · Your key')
+      : tString('settings.preferences.aiModelBadgeFree', 'Europe · Free tier');
+  };
 
   return (
     <div className={styles.tabPanel}>

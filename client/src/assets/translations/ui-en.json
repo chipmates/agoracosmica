@@ -174,7 +174,9 @@
       "manageKeys": "Manage Keys",
       "selfHosted": "Self-hosted",
       "aiModelBadgeFree": "Europe · Free tier",
-      "aiModelBadgeByok": "Qwen3 235B · Your key"
+      "aiModelBadgeByok": "Qwen3 235B · Your key",
+      "aiModelBadgeLocal": "Local · Your model",
+      "local": "Local"
     },
     "tooltips": {
       "voice": "Configure text-to-speech settings for spoken responses. Different services offer various voice qualities.",
