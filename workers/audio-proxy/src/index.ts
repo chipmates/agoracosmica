@@ -2,7 +2,8 @@ import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
 import {
-  bodyTooLarge, declaresMoreThan, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
+  bodyTooLarge, bodyUnreadable, declaresMoreThan, readBodyCapped, readJsonCapped, SESSION_END_MAX_BODY_BYTES,
+  STT_MAX_BODY_BYTES,
 } from './bodyLimit';
 import { proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, peekAudioRateLimit, buildRateLimitResponse } from './rateLimit';
@@ -83,7 +84,12 @@ export default {
       }
 
       // Buffer body once (needed for: language extraction + failover retry)
-      const bodyBuffer = await request.arrayBuffer();
+      let bodyBuffer: ArrayBuffer;
+      try {
+        bodyBuffer = await request.arrayBuffer();
+      } catch {
+        return bodyUnreadable(request, env);
+      }
 
       // Extract language and model from request body for tier-aware limiting
       let language = 'English';
@@ -232,7 +238,12 @@ export default {
 
       // Size gate before any counter moves. This route is unauthenticated and
       // the body is buffered for the failover retry, so the read is capped.
-      const sttBody = await readBodyCapped(request, STT_MAX_BODY_BYTES);
+      let sttBody: ArrayBuffer | null;
+      try {
+        sttBody = await readBodyCapped(request, STT_MAX_BODY_BYTES);
+      } catch {
+        return bodyUnreadable(request, env);
+      }
       if (!sttBody) return bodyTooLarge(request, env);
 
       // The counting check runs after the read, so an upload that is too

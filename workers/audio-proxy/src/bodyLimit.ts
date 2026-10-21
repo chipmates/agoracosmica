@@ -7,7 +7,8 @@ export const STT_MAX_BODY_BYTES = 15 * 1024 * 1024;
 /**
  * The body's bytes, or null when it is larger than `maxBytes`. A declared
  * Content-Length over the limit is refused unread; the read itself is bounded
- * as well, since the header can be missing (a chunked upload) or wrong.
+ * as well, since the header can be missing (a chunked upload) or wrong. Throws
+ * when the upload breaks off mid-read.
  */
 export async function readBodyCapped(request: Request, maxBytes: number): Promise<ArrayBuffer | null> {
   if (declaresMoreThan(request, maxBytes)) return null;
@@ -62,6 +63,14 @@ export function declaresMoreThan(request: Request, maxBytes: number): boolean {
 export function bodyTooLarge(request: Request, env: Env): Response {
   return new Response(JSON.stringify({ error: 'Request body too large' }), {
     status: 413,
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
+  });
+}
+
+/** The answer to an upload that broke off mid-read: a bad request, not a worker fault. */
+export function bodyUnreadable(request: Request, env: Env): Response {
+  return new Response(JSON.stringify({ error: 'Request body could not be read' }), {
+    status: 400,
     headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
   });
 }

@@ -617,6 +617,89 @@ async function main(): Promise<number> {
   });
 
   // -------------------------------------------------------------------------
+  // A broken upload: a quiet 400 with CORS, never an uncaught exception
+  // -------------------------------------------------------------------------
+
+  /** An upload that hands out `first` (if any), then breaks off the way a visitor who leaves does. */
+  const brokenUpload = (first: Uint8Array | null): ReadableStream<Uint8Array> => {
+    let reads = 0;
+    return new ReadableStream<Uint8Array>({
+      pull(c) {
+        if (reads++ === 0 && first) c.enqueue(first);
+        else c.error(new Error('the upload broke off'));
+      },
+    });
+  };
+
+  /** Run `fn` and return every console.error line it caused. */
+  const errorLines = async (fn: () => Promise<void>): Promise<string[]> => {
+    const lines: string[] = [];
+    const realError = console.error;
+    console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
+    try {
+      await fn();
+    } finally {
+      console.error = realError;
+    }
+    return lines;
+  };
+
+  const brokenCases: { label: string; first: Uint8Array | null; headers: Record<string, string> }[] = [
+    { label: 'before its first byte', first: null, headers: {} },
+    { label: 'after one chunk', first: new Uint8Array(1024), headers: {} },
+    { label: 'under a declared length', first: new Uint8Array(64 * 1024), headers: { 'Content-Length': String(5 * 1024 * 1024) } },
+  ];
+  for (const broken of brokenCases) {
+    await test(`an STT upload that breaks off ${broken.label} gets a quiet 400 with CORS`, async () => {
+      const h = limitedHarness('none');
+      try {
+        let res: Response | null = null;
+        const logged = await errorLines(async () => {
+          res = await worker.fetch(upload(brokenUpload(broken.first), broken.headers), h.env, h.ctx);
+          await Promise.all(h.pending);
+        });
+        const answer = res as unknown as Response;
+        assertEqual(answer.status, 400, 'status');
+        assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
+        assertEqual(typeof (await answer.json() as { error?: string }).error, 'string', 'the usual error shape');
+        assertEqual(h.puts.length, 0, 'counter writes');
+        assertEqual(h.upstream.length, 0, 'upstream calls');
+        assertEqual(logged.length, 0, `error lines: ${logged.join(' | ')}`);
+      } finally {
+        h.restore();
+      }
+    });
+  }
+
+  await test('a speech request whose upload breaks off gets a quiet 400 with CORS', async () => {
+    const h = limitedHarness('none');
+    try {
+      const request = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json', Origin: 'https://agoracosmica.org',
+          'CF-Connecting-IP': '203.0.113.9', 'Content-Length': '2048',
+        },
+        body: brokenUpload(new TextEncoder().encode('{"input":"hel')),
+        duplex: 'half',
+      } as RequestInit);
+      let res: Response | null = null;
+      const logged = await errorLines(async () => {
+        res = await worker.fetch(request, h.env, h.ctx);
+        await Promise.all(h.pending);
+      });
+      const answer = res as unknown as Response;
+      assertEqual(answer.status, 400, 'status');
+      assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      assertEqual(h.upstream.length, 0, 'upstream calls');
+      assertEqual(logged.length, 0, `error lines: ${logged.join(' | ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
   // Session-end beacon: a bounded read, the route's own answer otherwise
   // -------------------------------------------------------------------------
 
