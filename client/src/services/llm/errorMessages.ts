@@ -5,6 +5,7 @@
 
 import { FreeTierError } from '../proxy/freeTierAdapter';
 import { LLMApiError } from './llmService';
+import { OwnKeyRejectedError } from './ownKeyConsent';
 
 type TStringFn = (key: string, fallback?: string) => string;
 
@@ -14,8 +15,16 @@ const KEY = 'errors.conversation';
  * Convert any error thrown from the conversation streaming pipeline into a
  * localized, user-friendly message. Keep this pure — UI-side decisions
  * (whether to show a modal, route to BYOK, etc.) live at the call site.
+ * An empty string means there is nothing to show.
  */
 export function mapErrorToUserMessage(error: unknown, tString: TStringFn): string {
+  // ── Own key rejected, free tier not taken ──────────────────────────────
+  // Empty after "check my key": Settings is open, and a toast would only sit
+  // under it.
+  if (error instanceof OwnKeyRejectedError) {
+    return error.choice === 'check-key' ? '' : tString(`${KEY}.byokInvalidKey`);
+  }
+
   // ── Structured worker errors (free-tier path) ───────────────────────────
   if (error instanceof FreeTierError) {
     if (error.status === 400) {

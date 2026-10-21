@@ -10,6 +10,7 @@
 
 import { generateResponse } from '../audio/llm';
 import { generateFreeTierCouncilResponse } from '../proxy/freeTierAdapter';
+import { ensureFreeTierAllowed, OwnKeyRejectedError } from '../llm/ownKeyConsent';
 import { isSelfHost } from '../../config/deployment';
 import { mediaBaseUrl } from '../../config/runtime';
 import { loadServiceConfig, LLM_SERVICES } from '../audio/config/serviceConfig';
@@ -24,6 +25,9 @@ import type { Segment } from './parser';
 import { councilLog, councilWarn, councilError } from './logger';
 import { cleanCouncilTextForTts } from '../../utils/ttsTextCleaner';
 import { screenContent } from '../../utils/contentSafety';
+
+// One council is one conversation: a yes to the free tier covers only its own run.
+let councilRuns = 0;
 
 // ─── Voice profile fetch — module-level cache + language-aware ─────────────
 //
@@ -656,23 +660,40 @@ Begin the council now. Remember to use the EXACT format specified in your instru
       };
 
       // Route through BYOK or free-tier based on key availability
-      if (hasBYOKKey) {
-        await generateResponse({
-          messages: [{ role: 'user', content: apiRequest.userMessage }],
-          instructions: apiRequest.systemMessage,
-          model: apiRequest.config.model,
-          maxTokens: apiRequest.config.maxTokens,
-          temperature: apiRequest.config.temperature,
-          language: apiRequest.config.language,
-          signal: this.signal,
-          streamingCallback: councilStreamingCallback,
-        });
-      } else {
+      let ownProvider = hasBYOKKey;
+      if (ownProvider) {
+        try {
+          await generateResponse({
+            messages: [{ role: 'user', content: apiRequest.userMessage }],
+            instructions: apiRequest.systemMessage,
+            model: apiRequest.config.model,
+            maxTokens: apiRequest.config.maxTokens,
+            temperature: apiRequest.config.temperature,
+            language: apiRequest.config.language,
+            signal: this.signal,
+            streamingCallback: councilStreamingCallback,
+            // A rejected key comes back here, so the free tier answers through
+            // the council route below, never as a chat turn.
+            freeTierFallback: false,
+          });
+        } catch (error) {
+          if (!(error instanceof OwnKeyRejectedError)) throw error;
+          ownProvider = false;
+        }
+      }
+      if (!ownProvider) {
         if (isSelfHost) {
           // No free-tier proxy in a self-host build. The key gate makes a
           // keyless council unreachable; this is the defensive backstop.
           throw new Error('A valid OpenRouter key is required.');
         }
+        // A stored key that was rejected: the council's question goes to our
+        // servers only after the visitor's yes, given for this council.
+        await ensureFreeTierAllowed({
+          kind: 'council',
+          scope: `council:${++councilRuns}`,
+          signal: this.signal,
+        });
         await generateFreeTierCouncilResponse({
           systemPrompt: apiRequest.systemMessage,
           messages: [{ role: 'user' as const, content: apiRequest.userMessage }],

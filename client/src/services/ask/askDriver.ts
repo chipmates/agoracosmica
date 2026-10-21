@@ -281,6 +281,8 @@ class StoryAskDriver implements AskDriver {
         mode: INSTRUCTION_MODES.FREE_CONVERSATION,
         aside: true,
         turnKind: 'aside',
+        // The questions asked in one chapter are one conversation.
+        consentScope: `aside:${figureId}:${seedId}`,
       });
 
       streamDone = true;

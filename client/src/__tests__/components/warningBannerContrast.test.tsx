@@ -33,7 +33,6 @@ const warnings: Array<[string, string, Record<string, unknown>]> = [
   ['an audio service paused', 'circuit-breaker', { service: 'tts', state: 'open', cooldownMs: 60_000 }],
   ['German voice busy', 'audio-rate-limit', { hint: 'switch_to_english' }],
   ['voice rate limited', 'audio-rate-limit', { hint: 'rate_limited' }],
-  ['own key rejected', 'byok-fell-back', {}],
   ['Local Mode down', 'local-mode-unavailable', { service: 'stt' }],
 ];
 

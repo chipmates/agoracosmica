@@ -4,6 +4,7 @@ import { loadServiceConfig } from './audio/config/serviceConfig';
 import { generateResponse } from './audio/llm';
 import { generateFreeTierSummary } from './proxy/freeTierAdapter';
 import { keyStorage } from './storage/keyStorageService';
+import { ensureFreeTierAllowed, OwnKeyRejectedError } from './llm/ownKeyConsent';
 import { stripThinkingTagsFromText } from '../utils/thinkingTagStripper';
 import { Seed, Language } from '../types/global';
 
@@ -68,34 +69,49 @@ class SummaryService {
         hasValidKey = await keyStorage.hasUsableKey('openrouter');
       }
 
-      let responseText: string;
-      let provider: string;
-      let model: string;
+      let responseText = '';
+      let provider = '';
+      let model = '';
+      let ownProvider = hasValidKey;
 
-      if (hasValidKey) {
+      if (ownProvider) {
         // BYOK path: user's own OpenRouter key
         const systemPrompt = this.generateSystemPrompt(figureName, seedInfo);
-        const response: LLMResponse = await generateResponse({
-          messages: [{ role: 'user', content: formattedHistory }],
-          instructions: systemPrompt,
-          model: config.llm.model,
-          maxTokens: 4000,
-          temperature: 0.7,
-          streamingCallback: undefined,
-        });
+        try {
+          const response: LLMResponse = await generateResponse({
+            messages: [{ role: 'user', content: formattedHistory }],
+            instructions: systemPrompt,
+            model: config.llm.model,
+            maxTokens: 4000,
+            temperature: 0.7,
+            streamingCallback: undefined,
+            // A rejected key comes back here, so the free tier answers through
+            // the summary route below, never as a chat turn.
+            freeTierFallback: false,
+          });
 
-        if (!response || typeof response.response !== 'string') {
-          throw new Error('Invalid LLM response format: missing or invalid response content');
+          if (!response || typeof response.response !== 'string') {
+            throw new Error('Invalid LLM response format: missing or invalid response content');
+          }
+          responseText = response.response;
+          provider = config.llm.provider;
+          model = config.llm.model;
+        } catch (error) {
+          if (!(error instanceof OwnKeyRejectedError)) throw error;
+          ownProvider = false;
         }
-        responseText = response.response;
-        provider = config.llm.provider;
-        model = config.llm.model;
-      } else {
+      }
+
+      if (!ownProvider) {
         if (isSelfHost) {
           // No free-tier proxy in a self-host build. The key gate makes a
           // keyless summary unreachable; this is the defensive backstop.
           throw new Error('A valid OpenRouter key is required.');
         }
+        // A stored key that was rejected: the conversation goes to our servers
+        // only after the visitor's yes.
+        await ensureFreeTierAllowed({ kind: 'summary', scope: `summary:${figureName}:${seedId}` });
+
         // Free-tier path: CF Worker → Nebius (2/day rate limit)
         const response = await generateFreeTierSummary({
           figureId: figureName,

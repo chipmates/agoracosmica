@@ -1316,7 +1316,6 @@
       "gpuCapacityGerman": "Deutsche Sprachausgabe ist kurz ausgelastet. Wechsle zu Englisch, um Antworten weiter zu hören.",
       "gpuCapacityAll": "Sprachausgabe ist kurz ausgelastet. Dein Gespräch läuft als Text weiter, bis sie sich erholt.",
       "audioRateLimited": "Sprachausgabe macht eine kurze Pause. Dein Gespräch läuft als Text weiter.",
-      "byokFellBack": "Dein OpenRouter-Schlüssel wurde abgelehnt, daher kam diese Antwort vom kostenlosen Kontingent. Prüfe deinen Schlüssel in den Einstellungen.",
       "localSttUnavailable": "Die lokale Spracheingabe ist nicht erreichbar. Prüfe den lokalen Modus in den Optionen oder tippe deine Nachricht.",
       "localSttEmpty": "Die lokale Spracheingabe hat keine Worte erkannt. Sprich noch einmal oder tippe deine Nachricht.",
       "localTtsUnavailable": "Die lokale Sprachausgabe ist nicht erreichbar, du bekommst Text ohne Audio. Prüfe den lokalen Modus in den Optionen."
@@ -2155,6 +2154,16 @@
         "benefit2": "Ein Schlüssel, viele Modelle",
         "successBody": "Dein Schlüssel ist gespeichert. Gespräche, Councils und Zusammenfassungen sind einsatzbereit."
       }
+    },
+    "rejected": {
+      "title": "OpenRouter hat deinen Schlüssel nicht angenommen",
+      "chatBody": "Du kannst mit deinen kostenlosen Nachrichten für heute weitermachen. Dann läuft dieses Gespräch über unsere Server, auch alles, was du darin schon geschrieben hast.",
+      "councilBody": "Du kannst deinen kostenlosen Council für heute nutzen. Dann läuft deine Frage an den Council über unsere Server.",
+      "summaryBody": "Du kannst eine deiner kostenlosen Zusammenfassungen für heute nutzen. Dann läuft dieses Gespräch zum Zusammenfassen über unsere Server.",
+      "chatYes": "Ja, kostenlose Nachrichten nutzen",
+      "councilYes": "Ja, kostenlosen Council nutzen",
+      "summaryYes": "Ja, kostenlose Zusammenfassung nutzen",
+      "checkKey": "Schlüssel prüfen"
     }
   },
   "community": {

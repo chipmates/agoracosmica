@@ -20,11 +20,13 @@ export function useQuotaSync(): void {
     let cancelled = false;
 
     async function init() {
-      const hasValidKey = await keyStorage.hasUsableKey('openrouter');
+      // A stored key counts even after it was rejected: the free tier only
+      // answers that visitor after a yes, so nothing is fetched for it here.
+      const hasOwnKey = await keyStorage.hasKey('openrouter');
 
       if (cancelled) return;
 
-      if (hasValidKey) {
+      if (hasOwnKey) {
         // BYOK user: no quota tracking needed
         useDomainStore.getState().setIsFreeTier(false);
         return;

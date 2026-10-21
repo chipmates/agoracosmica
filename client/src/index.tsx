@@ -7,6 +7,7 @@ import App from './App';
 import ErrorBoundary from './components/ErrorBoundary';
 import NetworkStatusBanner from './components/NetworkStatusBanner';
 import RateLimitModal from './components/RateLimitModal';
+import OwnKeyRejectedModal from './components/OwnKeyRejectedModal';
 import BYOKSetupModal from './components/BYOKSetupModal';
 import { useDomainStore } from './stores/domainStore';
 import { initializeSeedsCache } from './services/seedCacheInitializer';
@@ -129,6 +130,7 @@ const AppRoot: React.FC = () => (
   <ErrorBoundary>
     <NetworkStatusBanner />
     <RateLimitModal />
+    <OwnKeyRejectedModal />
     <BYOKSetupModal />
     <App />
   </ErrorBoundary>

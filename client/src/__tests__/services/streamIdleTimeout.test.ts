@@ -16,6 +16,8 @@ vi.mock('../../services/storage/keyStorageService', () => ({
     hasUsableKey: vi.fn(async () => false),
     getKey: vi.fn(async () => `sk-or-v1-${'a'.repeat(64)}`),
     markInvalid: vi.fn(async () => {}),
+    // No key stored: the free tier answers without the rejected-key question.
+    getKeyMetadata: vi.fn(async () => null),
   },
 }));
 

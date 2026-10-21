@@ -16,6 +16,7 @@ import {
 } from './llmUtils';
 import { loadServiceConfig } from '../config/serviceConfig';
 import { isSelfHost } from '../../../config/deployment';
+import { ensureFreeTierAllowed, OwnKeyRejectedError } from '../../llm/ownKeyConsent';
 
 // ============================================
 // Type Definitions
@@ -83,6 +84,17 @@ export interface GenerateResponseOptions {
    * a behavior trigger, not a label: it adds the aside rules to the prompt.
    */
   aside?: boolean;
+  /**
+   * The conversation a yes to the free tier covers, once a stored key was
+   * rejected. Defaults to the open chat thread.
+   */
+  consentScope?: string;
+  /**
+   * False for callers with a free-tier route of their own (councils,
+   * summaries): a rejected key then throws OwnKeyRejectedError instead of
+   * turning into a chat request.
+   */
+  freeTierFallback?: boolean;
 }
 
 // ============================================
@@ -105,7 +117,9 @@ export const generateResponse = async ({
   entry,
   anchorSeedId,
   mode,
-  aside
+  aside,
+  consentScope,
+  freeTierFallback = true
 }: GenerateResponseOptions): Promise<LLMResponse> => {
   const perfMetrics = performanceMonitor.startRequest();
 
@@ -211,25 +225,21 @@ export const generateResponse = async ({
         }
       };
       } catch (error: any) {
-        // Hosted build: a rejected OpenRouter key marks itself invalid and falls
-        // through to the free tier. A custom-openai endpoint failing should NOT
-        // fall through to OpenRouter free-tier — that would silently leak the
-        // conversation to Nebius after the user explicitly chose Local Mode.
-        // Surface the error instead.
+        // A Local Mode endpoint failing surfaces as is: the visitor chose to run
+        // locally, so nothing moves to OpenRouter or to the free tier.
         if (providerKind === 'custom-openai') {
           throw error;
         }
         if ((error?.status === 401 || error?.status === 403) && !isSelfHost) {
-          console.warn('[LLM] BYOK key rejected (HTTP', error.status, ') — marking invalid, falling through to free-tier');
+          console.warn('[LLM] BYOK key rejected (HTTP', error.status, '), marking it invalid');
           await keyStorage.markInvalid('openrouter');
-          // The drop to free tier is otherwise silent. Flip the AI Model badge
-          // to Free (byok-key-changed) and raise a banner (byok-fell-back) so a
-          // power user knows their key was rejected and this reply used free tier.
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: false } }));
-            window.dispatchEvent(new CustomEvent('byok-fell-back'));
           }
-          // Fall through to free-tier path below instead of throwing
+          if (!freeTierFallback) {
+            throw new OwnKeyRejectedError(null, error.status);
+          }
+          // On to the free tier below, which asks the visitor first.
         } else {
           throw error;
         }
@@ -246,6 +256,18 @@ export const generateResponse = async ({
           : 'A valid OpenRouter key is required.'
       );
     }
+
+    if (!freeTierFallback) {
+      throw new OwnKeyRejectedError(null);
+    }
+
+    // A stored key that was rejected: the conversation reaches our servers only
+    // after the visitor's yes. Without a stored key this returns at once.
+    await ensureFreeTierAllowed({
+      kind: 'chat',
+      scope: consentScope ?? `chat:${useDomainStore.getState().conversation?.historyKey ?? 'none'}`,
+      signal,
+    });
 
     // ============================================
     // Free-tier path: Nebius via Cloudflare Worker proxy (WP6)

@@ -76,7 +76,6 @@ describe('the status banner colours', () => {
     ['circuit-breaker', { service: 'stt', state: 'open', cooldownMs: 60_000 }],
     ['audio-rate-limit', { hint: 'switch_to_english' }],
     ['audio-rate-limit', { hint: 'rate_limited' }],
-    ['byok-fell-back', {}],
     ['local-mode-unavailable', { service: 'tts' }],
     ['local-mode-unavailable', { service: 'stt', reason: 'empty' }],
   ])('%s %j: still a defined token, 4.5:1 or better', (event, detail) => {

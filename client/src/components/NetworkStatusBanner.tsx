@@ -13,7 +13,6 @@ type BannerState =
   | { type: 'reconnected' }
   | { type: 'circuit-breaker'; service: 'tts' | 'stt' }
   | { type: 'rate-limit'; hint: RateLimitHint }
-  | { type: 'byok-fallback' }
   | { type: 'local-mode'; service: 'tts' | 'stt'; heardNothing?: boolean };
 
 const BANNER_STYLE: React.CSSProperties = {
@@ -95,21 +94,6 @@ const NetworkStatusBanner: FC = () => {
     return () => window.removeEventListener('audio-rate-limit', handleRateLimit);
   }, [handleRateLimit]);
 
-  // BYOK key rejected mid-session — the conversation transparently continued on
-  // the free tier. Let the power user know so they can fix their key.
-  const handleByokFallback = useCallback(() => {
-    setBanner({ type: 'byok-fallback' });
-    const timer = setTimeout(() => setBanner(prev =>
-      prev.type === 'byok-fallback' ? { type: 'hidden' } : prev
-    ), 10000);
-    return () => clearTimeout(timer);
-  }, []);
-
-  useEffect(() => {
-    window.addEventListener('byok-fell-back', handleByokFallback);
-    return () => window.removeEventListener('byok-fell-back', handleByokFallback);
-  }, [handleByokFallback]);
-
   // Local Mode audio fails closed instead of using our servers. Voice reports
   // once per chunk of every reply, so its line shows at most once a minute (the
   // banner covers the menu); transcription reports once per recording.
@@ -167,10 +151,6 @@ const NetworkStatusBanner: FC = () => {
         message = tString('errors.network.audioRateLimited', 'Audio rate limited. Please wait a moment.');
         colors = WARNING_COLORS;
       }
-      break;
-    case 'byok-fallback':
-      message = tString('errors.network.byokFellBack', 'Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.');
-      colors = WARNING_COLORS;
       break;
     case 'local-mode':
       if (banner.service === 'tts') {
