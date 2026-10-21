@@ -14,7 +14,7 @@ import { useAppStateVM } from '../vm/useAppStateVM';
 import { useConversationVM } from '../vm/useConversationVM';
 import { useConversationEffects } from '../hooks/useConversationEffects';
 import { useQuotaSync } from '../hooks/useQuotaSync';
-import { prepareSession } from '../services/proxy/sessionManager';
+import { prepareFreeTierSession } from '../services/proxy/prepareFreeTierSession';
 import SecurityCheckNotice from '../components/SecurityCheckNotice';
 import { useCouncilState, useCouncilActions, useModeState, useModeActions, useUIStore, useStoreHydration } from '../stores';
 import { getCouncilControllerApi, subscribeCouncilController } from '../controllers/councilControllerRegistry';
@@ -1552,7 +1552,7 @@ const HomePage: FC<HomePageProps> = ({ onSelectFigure }) => {
     sendFunnelBeacon('figure_selected', { figureId: figure?.id });
     // A pick is the first sign a message is coming: if the next send would
     // have to start a bot check, start it now instead.
-    if (useDomainStore.getState().quota.isFreeTier) prepareSession();
+    prepareFreeTierSession();
 
     // Suppress Effect#14 — we handle mode directly below
     lastSeedSelectTimeRef.current = Date.now();

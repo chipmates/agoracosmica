@@ -24,7 +24,7 @@ import { useAutoplayGate } from '../hooks/useAutoplayGate';
 import { MicrophonePermissionError, type MicrophoneErrorType } from './MicrophonePermissionError';
 import { useDomainStore } from '../stores';
 import { detectPII } from '../utils/piiDetection';
-import { prepareSession } from '../services/proxy/sessionManager';
+import { prepareFreeTierSession } from '../services/proxy/prepareFreeTierSession';
 import './UnifiedInputContainer.css';
 
 // Capacitor keyboard handling for native builds.
@@ -387,7 +387,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     // This must happen synchronously in the same event turn
     unlock();
     // A spoken message is on its way: its bot check runs while it is spoken.
-    if (useDomainStore.getState().quota.isFreeTier) prepareSession();
+    prepareFreeTierSession();
 
     try {
       // Request microphone with echo cancellation for better quality
@@ -733,7 +733,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                 onFocus={() => {
                   setIsFocused(true);
                   // Typing has begun: a bot check the send would need runs now.
-                  if (useDomainStore.getState().quota.isFreeTier) prepareSession();
+                  prepareFreeTierSession();
                 }}
                 onBlur={() => setIsFocused(false)}
                 placeholder={isQuotaExhausted
