@@ -8,6 +8,8 @@ import '../../styles/liquid-glass.css';
 import useTranslation from '../../hooks/useTranslation';
 import { useLiquidGlass } from '../../hooks/useLiquidGlass';
 import type { CapacityState } from '../ProcessingLoader';
+import { useDomainStore } from '../../stores/domainStore';
+import { localModeFromRaw } from '../../services/audio/config/serviceConfig';
 
 export type LoaderStage = 'generating' | 'streaming' | 'processing';
 
@@ -78,6 +80,14 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
     return pool.length > 0 ? pool : NORMAL_QUOTES[st];
   };
 
+  // The busy lines speak of our servers. A council on the visitor's own model
+  // or voices (Local Mode) waits on their machine and says so plainly.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const localWait = useMemo(() => {
+    const lm = localModeFromRaw(savedRaw);
+    return lm.llmEnabled || lm.ttsEnabled;
+  }, [savedRaw]);
+
   const mountedAtRef = useRef<number>(Date.now());
   const [shouldShow, setShouldShow] = useState(false);
   const [derivedCapacity, setDerivedCapacity] = useState<CapacityState>('normal');
@@ -106,12 +116,14 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
   const capacityForQuotes: CapacityState =
     derivedCapacity === 'takingLonger' ? 'highDemand' : derivedCapacity;
   const activePool = useMemo(
-    () =>
-      capacityForQuotes === 'highDemand'
-        ? highDemandPoolFor(stage)
-        : NORMAL_QUOTES[stage] ?? NORMAL_QUOTES.generating,
+    () => {
+      if (capacityForQuotes !== 'highDemand') return NORMAL_QUOTES[stage] ?? NORMAL_QUOTES.generating;
+      return localWait
+        ? [tString('processing.localWait', 'Your computer is still working. One moment.')]
+        : highDemandPoolFor(stage);
+    },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stage, capacityForQuotes, NORMAL_QUOTES, tString],
+    [stage, capacityForQuotes, localWait, NORMAL_QUOTES, tString],
   );
 
   useEffect(() => {
@@ -214,10 +226,15 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
 
             {derivedCapacity === 'takingLonger' && (
               <p className="cosmic-processing-note" aria-live="polite">
-                {tString(
-                  'councilProcessing.takingLonger',
-                  'Takes longer today. Wait a moment, or read the dialogue now.',
-                )}
+                {localWait
+                  ? tString(
+                    'councilProcessing.localTakingLonger',
+                    'Your computer is taking longer. Wait a moment for the voices, or read the dialogue now.',
+                  )
+                  : tString(
+                    'councilProcessing.takingLonger',
+                    'Takes longer today. Wait a moment, or read the dialogue now.',
+                  )}
               </p>
             )}
 

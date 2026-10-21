@@ -1251,6 +1251,8 @@
     },
     "optOut": "Read text instead",
     "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait.",
+    "localWait": "Your computer is still working. One moment.",
+    "localTakingLonger": "Your computer is taking longer. Wait a moment for the voice, or read now and skip the wait.",
     "securityCheck": "Quick security check. Tap the box at the bottom of the screen and your message continues.",
     "securityWait": "One moment, a quick security check is running."
   },
@@ -1286,7 +1288,8 @@
       }
     },
     "optOut": "Read dialogue instead",
-    "takingLonger": "Takes longer today. Wait a moment for the voices, or read the dialogue now."
+    "takingLonger": "Takes longer today. Wait a moment for the voices, or read the dialogue now.",
+    "localTakingLonger": "Your computer is taking longer. Wait a moment for the voices, or read the dialogue now."
   },
   "summary": {
     "generatingTitle": "Generating Summary",

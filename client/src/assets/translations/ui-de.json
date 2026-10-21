@@ -1253,6 +1253,8 @@
     },
     "optOut": "Lieber Text lesen",
     "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
+    "localWait": "Dein Rechner arbeitet noch. Einen Moment.",
+    "localTakingLonger": "Dein Rechner braucht länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
     "securityCheck": "Kurze Sicherheitsprüfung. Tippe unten auf das Kästchen, dann geht es direkt weiter.",
     "securityWait": "Einen Moment, eine kurze Sicherheitsprüfung läuft."
   },
@@ -1288,7 +1290,8 @@
       }
     },
     "optOut": "Lieber den Dialog lesen",
-    "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt."
+    "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt.",
+    "localTakingLonger": "Dein Rechner braucht länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt."
   },
   "summary": {
     "generatingTitle": "Erstelle Zusammenfassung",

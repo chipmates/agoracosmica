@@ -149,6 +149,7 @@ export async function localModeTTS(
   return {
     name: `${fileBaseName}${ext}`,
     url,
+    blob: audioBlob,
     speed,
     estimatedDuration,
     backend: de ? 'qwen-local' : 'kokoro-local',

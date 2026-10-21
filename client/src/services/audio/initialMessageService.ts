@@ -301,10 +301,14 @@ class InitialMessageService {
     const baseMessage = await this.getInitialMessage(figure, mode, seedId, language, true);
     if (!baseMessage?.text) return null;
 
-    // Step 2: Resolve user's current voice for cache key
+    // Step 2: Resolve user's current voice for cache key. A greeting spoken
+    // locally and one spoken by our servers are kept apart, so a Local Mode
+    // switch always brings the voice that mode speaks in.
     const { getVoiceForNormalMode } = await import('./voices/voiceResolver');
+    const { loadServiceConfig } = await import('./config/serviceConfig');
     const voiceId = getVoiceForNormalMode(figure, 'kokoro', null, language);
-    const cacheKey = `${figure}_${mode}_${seedId ?? 'null'}_${language}_${voiceId}`;
+    const route = loadServiceConfig().localMode?.ttsEnabled ? 'local' : 'hosted';
+    const cacheKey = `${figure}_${mode}_${seedId ?? 'null'}_${language}_${voiceId}_${route}`;
 
     // Step 3: Check cache
     const cached = this.dynamicAudioCache.get(cacheKey);

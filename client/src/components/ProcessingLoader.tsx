@@ -7,6 +7,8 @@ import '../styles/liquid-glass.css';
 import { useTranslation } from '../hooks/useTranslation';
 import { useLiquidGlass } from '../hooks/useLiquidGlass';
 import { useSecurityCheckState, useSecurityNoticeHost } from './SecurityCheckNotice';
+import { useDomainStore } from '../stores/domainStore';
+import { localModeFromRaw } from '../services/audio/config/serviceConfig';
 
 export type ProcessingStage = 'preparing' | 'hearing' | 'contemplating' | 'shaping';
 export type CapacityState = 'normal' | 'highDemand' | 'takingLonger';
@@ -16,6 +18,17 @@ const HIGH_DEMAND_AT_S = 8;
 const OPT_OUT_AT_S = 10;
 const TAKING_LONGER_AT_S = 25;
 const QUOTE_ROTATION_MS = 4000;
+
+type WaitService = 'llm' | 'tts' | 'stt';
+// The services a wait at each stage can be on. 'hearing' lasts until the first
+// reply text, 'shaping' streams the rest of it; no stage is the first load.
+const STAGE_SERVICES: Record<ProcessingStage | 'none', WaitService[]> = {
+  preparing: ['llm'],
+  hearing: ['stt', 'llm'],
+  contemplating: ['llm'],
+  shaping: ['llm', 'tts'],
+  none: ['llm', 'tts'],
+};
 
 interface ProcessingLoaderProps {
   figureName: string;
@@ -74,6 +87,15 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
     return pool.length > 0 ? pool : LEGACY_QUOTES;
   };
 
+  // The busy lines speak of our servers. When part of the wait runs in Local
+  // Mode on the visitor's own machine, a long wait gets its own plain line.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const localWait = useMemo(() => {
+    const lm = localModeFromRaw(savedRaw);
+    const local: Record<WaitService, boolean> = { llm: lm.llmEnabled, tts: lm.ttsEnabled, stt: lm.sttEnabled };
+    return STAGE_SERVICES[stage ?? 'none'].some((service) => local[service]);
+  }, [savedRaw, stage]);
+
   const mountedAtRef = useRef<number>(Date.now());
   const [shouldShow, setShouldShow] = useState(false);
   const [derivedCapacity, setDerivedCapacity] = useState<CapacityState>('normal');
@@ -123,10 +145,16 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const capacityForQuotes: CapacityState =
     derivedCapacity === 'takingLonger' ? 'highDemand' : derivedCapacity;
   const activePool = useMemo(
-    () => (stage ? quotePoolFor(capacityForQuotes, stage) : LEGACY_QUOTES),
+    () => {
+      if (!stage) return LEGACY_QUOTES;
+      if (capacityForQuotes !== 'normal' && localWait) {
+        return [tString('processing.localWait', 'Your computer is still working. One moment.')];
+      }
+      return quotePoolFor(capacityForQuotes, stage);
+    },
     // quotePoolFor closes over tString; LEGACY_QUOTES already memoized on tString.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [stage, capacityForQuotes, tString, LEGACY_QUOTES],
+    [stage, capacityForQuotes, localWait, tString, LEGACY_QUOTES],
   );
 
   useEffect(() => {
@@ -212,10 +240,15 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
 
             {derivedCapacity === 'takingLonger' && !securityCheck && (
               <p className="cosmic-processing-note" aria-live="polite">
-                {tString(
-                  'processing.takingLonger',
-                  'Takes a bit longer today, the voice is on its way.',
-                )}
+                {localWait
+                  ? tString(
+                    'processing.localTakingLonger',
+                    'Your computer is taking longer. Wait a moment for the voice, or read now and skip the wait.',
+                  )
+                  : tString(
+                    'processing.takingLonger',
+                    'Takes a bit longer today, the voice is on its way.',
+                  )}
               </p>
             )}
 

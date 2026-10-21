@@ -101,3 +101,62 @@ describe('a custom-voice greeting in Local Mode', () => {
     expect(heard).toEqual([]);
   });
 });
+
+describe('the greeting kept for a revisit', () => {
+  let warn: ReturnType<typeof vi.spyOn>;
+  let blobUrl: ReturnType<typeof vi.spyOn>;
+  const LOCAL_ON = { llmEnabled: false, ttsEnabled: true, sttEnabled: false, ...URLS };
+
+  beforeEach(() => {
+    warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    blobUrl = vi.spyOn(URL, 'createObjectURL').mockReturnValue('blob:test');
+    vi.mocked(global.fetch).mockClear();
+    (initialMessageService as unknown as { dynamicAudioCache: Map<string, unknown> }).dynamicAudioCache.clear();
+  });
+
+  afterEach(() => {
+    warn.mockRestore();
+    blobUrl.mockRestore();
+    h.localMode = { llmEnabled: false, ttsEnabled: false, sttEnabled: false };
+  });
+
+  it('a greeting spoken locally is kept: the revisit plays it from memory', async () => {
+    h.localMode = LOCAL_ON;
+    serve('ok');
+
+    await greet('de');
+    const spoken = speechRequests().length;
+    expect(spoken).toBeGreaterThan(0);
+
+    const again = await greet('de');
+
+    expect(again?.audioUrls.length).toBeGreaterThan(0);
+    expect(speechRequests().length).toBe(spoken);
+  });
+
+  it('a greeting kept from our servers is not replayed in Local Mode: the local voice speaks it', async () => {
+    serve('ok');
+    await greet('de');
+    expect(speechRequests().some((url) => url.startsWith(LOCAL))).toBe(false);
+
+    h.localMode = LOCAL_ON;
+    vi.mocked(global.fetch).mockClear();
+    await greet('de');
+
+    expect(speechRequests().length).toBeGreaterThan(0);
+    expect(speechRequests().every((url) => url.startsWith(`${URLS.ttsQwenURL}/`))).toBe(true);
+  });
+
+  it('a greeting kept from Local Mode is not replayed with Local Mode off', async () => {
+    h.localMode = LOCAL_ON;
+    serve('ok');
+    await greet('en');
+
+    h.localMode = { llmEnabled: false, ttsEnabled: false, sttEnabled: false };
+    vi.mocked(global.fetch).mockClear();
+    await greet('en');
+
+    expect(speechRequests().length).toBeGreaterThan(0);
+    expect(speechRequests().some((url) => url.startsWith(LOCAL))).toBe(false);
+  });
+});
