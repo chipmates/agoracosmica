@@ -81,7 +81,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
   // ZDR is stored on config.llm.zdr; defaults to true so the protection is on
   // even before the user adds a key (matches the BYOK setup wizard default).
   const [zdrEnabled, setZdrEnabled] = useState<boolean>(
-    () => loadServiceConfig().llm.zdr ?? true,
+    () => llmFromRaw(useDomainStore.getState().serviceConfig.raw).zdr ?? true,
   );
 
   useEffect(() => {

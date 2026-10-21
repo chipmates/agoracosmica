@@ -253,6 +253,94 @@ const withoutSelfHostAudioGate = (config: Partial<ServiceConfig>): Partial<Servi
 // Main Functions
 // ============================================
 
+interface SavedConfigRead {
+  config: ServiceConfig;
+  /** A migration changed the settings: they should be saved back. */
+  fixed: boolean;
+  /** A development build turned a saved voice-off back on. */
+  devTts: boolean;
+}
+
+// The settings in a saved string, validated and migrated, without writing
+// anything. Throws on a string that is not JSON.
+const readSavedConfig = (savedConfig: string): SavedConfigRead => {
+  const parsedConfig = JSON.parse(savedConfig) as Partial<ServiceConfig>;
+  let fixed = false;
+
+  // Validate and merge with defaults
+  let config: ServiceConfig = {
+    ...defaultConfig,
+    ...parsedConfig,
+    // TTS/STT: always self-hosted on GEX130 (legacy values map to 'self-hosted' via aliases)
+    tts: TTS_SERVICES.SELF_HOSTED,
+    stt: STT_SERVICES.SELF_HOSTED,
+    ttsSettings: validateTTSSettings(parsedConfig.ttsSettings),
+    sttEnabled: parsedConfig.sttEnabled !== false
+  };
+  config.llm = { ...config.llm };
+
+  // LLM kind: derive from `provider` when not explicitly set on stored config.
+  if (!config.llm.kind) {
+    config.llm.kind = config.llm.provider === 'custom-openai' ? 'custom-openai' : 'openrouter';
+  }
+
+  // LLM provider migration:
+  //   - 'custom-openai': whitelist (Local Mode user-configured endpoint).
+  //   - anything else: revert to OpenRouter (legacy 'deepinfra' / unknown).
+  if (
+    config.llm.provider !== LLM_SERVICES.OPENROUTER.name &&
+    config.llm.provider !== 'custom-openai'
+  ) {
+    config.llm.provider = LLM_SERVICES.OPENROUTER.name;
+    config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
+    config.llm.kind = 'openrouter';
+    fixed = true;
+  }
+
+  // Validate model is a known OpenRouter model — only when kind is openrouter.
+  // For custom-openai the model is whatever the local server has loaded; we
+  // accept any string.
+  if (config.llm.kind === 'openrouter') {
+    const validModels = Object.values(LLM_SERVICES.OPENROUTER.models);
+    if (!validModels.includes(config.llm.model)) {
+      config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
+      fixed = true;
+    }
+  }
+
+  const { localMode, migrated } = normalizeLocalMode(config.localMode);
+  config.localMode = withRouteAgreed(localMode, config.llm);
+  if (migrated) fixed = true;
+
+  config = withOwnAudioSwitches(config);
+
+  // DEV override: ensure TTS is enabled during development to avoid
+  // silent failures due to stale mobile defaults stored in localStorage.
+  let devTts = false;
+  if (import.meta.env.DEV && config.ttsEnabled === false) {
+    config.ttsEnabled = true;
+    devTts = true;
+  }
+
+  return { config, fixed, devTts };
+};
+
+/**
+ * The settings in a saved string as loadServiceConfig returns them, without
+ * taking over another tab's settings or saving a migration. Pure: a render can
+ * call it.
+ */
+export const serviceConfigFromRaw = (raw: string | null | undefined): ServiceConfig => {
+  if (raw) {
+    try {
+      return withSelfHostAudioGate(readSavedConfig(raw).config);
+    } catch {
+      // Unreadable settings load as the defaults, here as in loadServiceConfig.
+    }
+  }
+  return withSelfHostAudioGate(defaultConfig);
+};
+
 // Re-entrance guard to prevent infinite loops
 let isLoadingConfig = false;
 
@@ -273,63 +361,10 @@ export const loadServiceConfig = (): ServiceConfig => {
     const savedConfig = useDomainStore.getState().serviceConfig.raw;
 
     if (savedConfig) {
-      const parsedConfig = JSON.parse(savedConfig) as Partial<ServiceConfig>;
-
-      // Validate and merge with defaults
-      let config: ServiceConfig = {
-        ...defaultConfig,
-        ...parsedConfig,
-        // TTS/STT: always self-hosted on GEX130 (legacy values map to 'self-hosted' via aliases)
-        tts: TTS_SERVICES.SELF_HOSTED,
-        stt: STT_SERVICES.SELF_HOSTED,
-        ttsSettings: validateTTSSettings(parsedConfig.ttsSettings),
-        sttEnabled: parsedConfig.sttEnabled !== false
-      };
-
-      // LLM kind: derive from `provider` when not explicitly set on stored config.
-      if (!config.llm.kind) {
-        config.llm.kind = config.llm.provider === 'custom-openai' ? 'custom-openai' : 'openrouter';
-      }
-
-      // LLM provider migration:
-      //   - 'custom-openai': whitelist (Local Mode user-configured endpoint).
-      //   - anything else: revert to OpenRouter (legacy 'deepinfra' / unknown).
-      if (
-        config.llm.provider !== LLM_SERVICES.OPENROUTER.name &&
-        config.llm.provider !== 'custom-openai'
-      ) {
-        config.llm.provider = LLM_SERVICES.OPENROUTER.name;
-        config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
-        config.llm.kind = 'openrouter';
-        // Defer save to prevent infinite loops during render
-        queueMicrotask(() => saveServiceConfig(config));
-      }
-
-      // Validate model is a known OpenRouter model — only when kind is openrouter.
-      // For custom-openai the model is whatever the local server has loaded; we
-      // accept any string.
-      if (config.llm.kind === 'openrouter') {
-        const validModels = Object.values(LLM_SERVICES.OPENROUTER.models);
-        if (!validModels.includes(config.llm.model)) {
-          config.llm.model = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
-          // Defer save to prevent infinite loops during render
-          queueMicrotask(() => saveServiceConfig(config));
-        }
-      }
-
-      const { localMode, migrated } = normalizeLocalMode(config.localMode);
-      config.localMode = withRouteAgreed(localMode, config.llm);
-      if (migrated) {
-        queueMicrotask(() => saveServiceConfig(config));
-      }
-
-      config = withOwnAudioSwitches(config);
-
-      // DEV override: ensure TTS is enabled during development to avoid
-      // silent failures due to stale mobile defaults stored in localStorage.
-      if (import.meta.env.DEV && config.ttsEnabled === false) {
-        config.ttsEnabled = true;
-        // Defer to prevent infinite loops during render
+      const { config, fixed, devTts } = readSavedConfig(savedConfig);
+      // Deferred: a render may call this.
+      if (fixed) queueMicrotask(() => saveServiceConfig(config));
+      if (devTts) {
         queueMicrotask(() => {
           try {
             const configStr = JSON.stringify(config);
@@ -340,7 +375,6 @@ export const loadServiceConfig = (): ServiceConfig => {
           } catch {}
         });
       }
-
       return withSelfHostAudioGate(config);
     }
   } catch (error) {

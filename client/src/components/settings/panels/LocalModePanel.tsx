@@ -6,7 +6,7 @@ import {
 import { useTranslation } from '../../../hooks/useTranslation';
 import { RippleButton } from '../../Button';
 import {
-  loadServiceConfig, saveServiceConfig, localModeFromRaw, llmFromRaw,
+  loadServiceConfig, saveServiceConfig, localModeFromRaw, llmFromRaw, type ServiceConfig,
 } from '../../../services/audio/config/serviceConfig';
 import { useDomainStore } from '../../../stores/domainStore';
 import { keyStorage } from '../../../services/storage/keyStorageService';
@@ -101,6 +101,12 @@ const sectionLabelStyle = (active: boolean): React.CSSProperties => ({
 
 const sectionHelpStyle: React.CSSProperties = {
   fontSize: '13px', margin: 0, lineHeight: 1.5, color: INK_BODY,
+};
+
+// The rest of the app (the composer's microphone, the page) listens for this.
+const saveAndAnnounce = (c: ServiceConfig): void => {
+  saveServiceConfig(c);
+  window.dispatchEvent(new Event('configChanged'));
 };
 
 const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }) => {
@@ -203,7 +209,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       c.llm.kind = 'openrouter';
       c.llm.provider = 'openrouter';
     }
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: next } }));
     if (next) void probeLLM();
   }, [endpointURL, modelName, probeLLM]);
@@ -215,7 +221,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       ...(c.localMode ?? { llmEnabled: false, ttsEnabled: false, sttEnabled: false }),
       ttsEnabled: next,
     };
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     if (next) void probeTTS();
   }, [probeTTS]);
 
@@ -226,7 +232,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       ...(c.localMode ?? { llmEnabled: false, ttsEnabled: false, sttEnabled: false }),
       sttEnabled: next,
     };
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     if (next) void probeSTT();
   }, [probeSTT]);
 
@@ -238,7 +244,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
     c.llm.provider = 'custom-openai';
     c.llm.baseURL = endpointURL.trim().replace(/\/+$/, '');
     c.llm.model = modelName.trim() || 'local-model';
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     if (apiKey.trim()) {
       await keyStorage.saveKey('custom-llm', apiKey.trim(), {
         provider: 'custom-llm',
@@ -257,7 +263,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       ttsKokoroURL: kokoroURL.trim().replace(/\/+$/, '') || undefined,
       ttsQwenURL: qwenURL.trim().replace(/\/+$/, '') || undefined,
     };
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     void probeTTS();
   }, [kokoroURL, qwenURL, probeTTS]);
 
@@ -267,7 +273,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       ...(c.localMode ?? { llmEnabled: false, ttsEnabled: false, sttEnabled: false }),
       sttURL: sttURL.trim().replace(/\/+$/, '') || undefined,
     };
-    saveServiceConfig(c);
+    saveAndAnnounce(c);
     void probeSTT();
   }, [sttURL, probeSTT]);
 

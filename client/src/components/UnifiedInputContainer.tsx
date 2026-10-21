@@ -1,5 +1,5 @@
 // src/components/UnifiedInputContainer.tsx
-import { useState, useRef, useEffect, useCallback, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
+import { useState, useRef, useEffect, useCallback, useMemo, FC, KeyboardEvent, ChangeEvent, MouseEvent } from 'react';
 import { Microphone, Keyboard, PaperPlaneTilt, Sparkle, SpeakerSlash } from '@phosphor-icons/react';
 import { processAudio, processTextMessage, cleanupAudioResources } from '../services/audioService';
 import { EmptyAudioError } from '../services/audio/stt/sttUtils';
@@ -18,7 +18,7 @@ import {
 } from '../utils/public/entryIntent';
 import { askTagFigure, resolveAnchorSeedId } from '../data/public/heroEntry';
 import { useUIStore } from '../stores/uiStore';
-import { loadServiceConfig } from '../services/audio/config/serviceConfig';
+import { loadServiceConfig, serviceConfigFromRaw } from '../services/audio/config/serviceConfig';
 import { useTranslation } from '../hooks/useTranslation';
 import { useAutoplayGate } from '../hooks/useAutoplayGate';
 import { MicrophonePermissionError, type MicrophoneErrorType } from './MicrophonePermissionError';
@@ -98,6 +98,10 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   const pendingRequestId = useDomainStore((state) => state.conversation.pendingRequestId);
   const processingStage = useDomainStore((state) => state.conversation.processingStage);
   const firstTextArrived = useDomainStore((state) => state.session.firstTextArrived);
+  // Voice input as saved, read without a store write and redrawn on every
+  // save: a Local Mode switch shows or hides the microphone at once.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  const voiceInputOn = useMemo(() => serviceConfigFromRaw(savedRaw).sttEnabled !== false, [savedRaw]);
   // The request the visitor chose to read instead of hear: its card is gone,
   // but until its first words arrive a reply is still on its way.
   const [readingFor, setReadingFor] = useState<string | null>(null);
@@ -768,7 +772,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                 </span>
 
                 {/* Only show mic button if voice input is enabled in settings */}
-                {loadServiceConfig().sttEnabled !== false && (
+                {voiceInputOn && (
                   <button
                     className="action-button toggle-input"
                     onClick={toggleInputMethod}
@@ -854,7 +858,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
                         </div>
 
                         {/* Only show toggle button if voice input is enabled in settings */}
-                        {loadServiceConfig().sttEnabled !== false && (
+                        {voiceInputOn && (
                           <div
                             className="action-button toggle-input"
                             onClick={(e: MouseEvent) => {

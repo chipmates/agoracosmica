@@ -15,6 +15,7 @@ const h = vi.hoisted(() => ({
     mode: { selected: 'free_conversation' },
     figures: { selectedId: 'aurelius' },
     quota: { used: 0, limit: 30, resetsAt: null, isFreeTier: false, loaded: false },
+    serviceConfig: { raw: null as string | null },
     setProcessingStage: () => {},
     openRateLimitModal: () => {},
   },
@@ -60,7 +61,10 @@ vi.mock('../../stores', () => {
   useDomainStore.getState = () => h.state;
   return { useDomainStore };
 });
-vi.mock('../../services/audio/config/serviceConfig', () => ({ loadServiceConfig: () => ({ sttEnabled: true }) }));
+vi.mock('../../services/audio/config/serviceConfig', () => ({
+  loadServiceConfig: () => ({ sttEnabled: true }),
+  serviceConfigFromRaw: () => ({ sttEnabled: true }),
+}));
 vi.mock('../../hooks/useTranslation', () => ({
   useTranslation: () => ({
     t: (key: string) => key,

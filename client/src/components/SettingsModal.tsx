@@ -1,4 +1,4 @@
-import { useState, useEffect, FC, ReactNode } from 'react';
+import { useState, useEffect, useRef, FC, ReactNode } from 'react';
 import {
   Shield,
   Gear,
@@ -34,6 +34,7 @@ import {
   saveConfiguration,
   loadServiceConfig
 } from '../services/settings/settingsService';
+import { serviceConfigFromRaw } from '../services/audio/config/serviceConfig';
 // TTS/STT fully self-hosted on GEX130 — no provider selection needed
 
 interface Tab {
@@ -91,13 +92,27 @@ const TABS: Tab[] = [
 
 const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab, initialSection }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'legal');
-  // Lazy: an argument would run loadServiceConfig, which can update the store,
-  // on every render of the modal.
-  const [config, setConfig] = useState<Config>(() => loadServiceConfig());
+  // Read without a store write: loadServiceConfig may take over another tab's
+  // settings, which in a render updates the store. The effects below take over.
+  const [config, setConfig] = useState<Config>(
+    () => serviceConfigFromRaw(useDomainStore.getState().serviceConfig.raw),
+  );
   // The edits made here since Settings opened, in order. A save applies only
   // these to the settings as saved now, so a change saved meanwhile (Local Mode,
   // another tab) is not written back to what it was when Settings opened.
   const [edits, setEdits] = useState<Array<[string, unknown]>>([]);
+  const editsRef = useRef(edits);
+  editsRef.current = edits;
+  // A save made while Settings are open (a Local Mode switch, another tab):
+  // the view shows it, with the edits made here on top.
+  const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
+  useEffect(() => {
+    if (!isOpen) return;
+    setConfig(editsRef.current.reduce(
+      (current, [section, value]) => handleConfigChange(current, section, value),
+      loadServiceConfig(),
+    ));
+  }, [savedRaw]); // eslint-disable-line react-hooks/exhaustive-deps
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [showChangesAlert, setShowChangesAlert] = useState<boolean>(false);
   
