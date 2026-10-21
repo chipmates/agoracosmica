@@ -547,6 +547,18 @@
   font-size: 0.95rem;
   box-shadow: none;
   border: 1px solid var(--plate-keyline);
+  /* The chat text's rule (ChatBox.css .message-content): left on narrow
+     screens, where justified German opens wide gaps; justified from 768px. */
+  text-align: left;
+  hyphens: none;
+  word-break: break-word;
+}
+
+@media (min-width: 768px) {
+  .history-modal-content .summary-content {
+    text-align: justify;
+    hyphens: auto;
+  }
 }
 
 .history-modal-content .summary-header {
