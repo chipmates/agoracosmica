@@ -2550,7 +2550,7 @@ async function main(): Promise<number> {
     });
   });
 
-  await test('a visitor who leaves before the first byte gets the summary back', async () => {
+  await test('a cancel before the first read gives the summary back', async () => {
     await withFastTimers(async () => {
       stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), DONE_FRAME]));
       const kv = auditedKv();
@@ -2571,12 +2571,12 @@ async function main(): Promise<number> {
     });
   });
 
-  await test('a visitor gone when the first bytes go out gets the summary back', async () => {
+  await test('a visitor gone before the answer began, found gone after one chunk, gets the summary back', async () => {
     await withFastTimers(async () => {
       stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));
       const kv = auditedKv();
       const env = fakeEnv({ RATE_LIMITS: kv.kv });
-      // The runtime reads the first chunk, finds the connection gone and cancels.
+      // As local workerd does: it pulls the first chunk, finds the connection gone and cancels.
       await summaryRun(env, async (response) => {
         const reader = response.body!.getReader();
         await reader.read();
@@ -2586,6 +2586,8 @@ async function main(): Promise<number> {
     });
   });
 
+  // Local workerd does not notice a visitor who leaves after the headers
+  // arrived inside the grace, so such a summary stays spent, as this one does.
   await test('a delivered summary stays counted, read whole or left after its first bytes', async () => {
     await withFastTimers(async () => {
       stubFetch(() => sseResponse([CONTENT_FRAME('A recap.'), CONTENT_FRAME(' More.'), DONE_FRAME]));

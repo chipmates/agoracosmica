@@ -124,10 +124,11 @@ export function screenSummaryHistory(history: string): { history: string | null;
 }
 
 /**
- * How long a summary's first bytes must stand before it counts. A visitor who
- * is already gone is noticed when those bytes are written, a few milliseconds
- * later in local workerd, and a give-back inside the window buys at most a
- * second of the model's answer.
+ * How long a summary's first bytes must stand before it counts. For a visitor
+ * who left before the answer began, local workerd pulls one chunk and cancels
+ * within milliseconds, so the summary is given back. One who leaves after the
+ * headers arrived is not noticed inside the window there (the runtime keeps
+ * pulling), so that give-back is best effort and the summary stays spent.
  */
 const DELIVERY_GRACE_MS = 1000;
 
