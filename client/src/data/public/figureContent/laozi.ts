@@ -28,7 +28,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Laozi lernen?',
-          a: "Laozi ist der chinesische Denker hinter dem Tao Te King, überliefert für das 6. oder 5. Jahrhundert v. Chr. Ob er gelebt hat, ist unsicher. Geblieben sind etwa fünftausend Zeichen und ein Gedanke darunter. Was nachgibt, überdauert das, was erzwingt. Wasser ist weich und weicht aus, und es höhlt trotzdem den Stein. Von Laozi lernst du, zu handeln, ohne zu erzwingen. Er nennt das Wu Wei.",
+          a: "Laozi (auch Laotse) ist der chinesische Denker hinter dem Tao Te King, überliefert für das 6. oder 5. Jahrhundert v. Chr. Ob er gelebt hat, ist unsicher. Geblieben sind etwa fünftausend Zeichen und ein Gedanke darunter. Was nachgibt, überdauert das, was erzwingt. Wasser ist weich und weicht aus, und es höhlt trotzdem den Stein. Von Laozi lernst du, zu handeln, ohne zu erzwingen. Er nennt das Wu Wei.",
         },
         {
           q: 'Was hat Laozi gelehrt?',
