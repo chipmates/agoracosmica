@@ -1489,7 +1489,9 @@
       "privacyNote": "Privacy Policy",
       "jsbNote": "Youth Protection Officer",
       "startButton": "Start exploring",
-      "aiNoticeKicker": "AI notice"
+      "aiNoticeKicker": "AI notice",
+      "termsUpdated": "New {link} (version\u00a0{version}, {date}), made for today's service.",
+      "termsUpdatedLink": "Terms of Service"
     },
     "cookiePolicy": {
       "title": "Cookie Policy",

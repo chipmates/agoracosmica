@@ -300,6 +300,18 @@
   color: var(--text-primary);
 }
 
+/* A returning browser's note on a new terms version: one calm line over the
+   act, smaller than the statement it introduces. */
+.termsUpdated {
+  margin: 0;
+  max-width: 34rem;
+  text-align: center;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  text-wrap: balance;
+  color: var(--text-secondary);
+}
+
 .consentLink {
   color: var(--gold-primary);
   text-decoration: underline;

@@ -50,6 +50,14 @@ export const hasCurrentConsent = (): boolean =>
   readConsentRecord()?.version === CURRENT_AGB_VERSION;
 
 /**
+ * The version on the stored consent record, or null when no record holds one.
+ */
+export const storedConsentVersion = (): string | null => {
+  const version = readConsentRecord()?.version;
+  return typeof version === 'string' ? version : null;
+};
+
+/**
  * Has this browser accepted any terms version before? Only the presence of the
  * record is read, never its history or other keys.
  */

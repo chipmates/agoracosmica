@@ -1491,7 +1491,9 @@
       "privacyNote": "Datenschutzerklärung",
       "jsbNote": "Jugendschutzbeauftragter",
       "startButton": "Jetzt entdecken",
-      "aiNoticeKicker": "KI-Hinweis"
+      "aiNoticeKicker": "KI-Hinweis",
+      "termsUpdated": "Neue {link} (Version\u00a0{version}, {date}) für den heutigen Dienst.",
+      "termsUpdatedLink": "Nutzungsbedingungen"
     },
     "cookiePolicy": {
       "title": "Cookie-Richtlinie",

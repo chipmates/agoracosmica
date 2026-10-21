@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useRef, FC } from 'react';
+import React, { useState, useCallback, useEffect, useMemo, useRef, FC } from 'react';
 import { useTranslation } from '../hooks/useTranslation';
 import { useBodyScrollLock } from '../hooks/useBodyScrollLock';
 import { focusManagement } from '../utils/accessibility/focusSystem';
@@ -6,7 +6,8 @@ import OptimizedImage from './OptimizedImage';
 import CosmicLogo from './CosmicLogo';
 import styles from './WelcomeDisclosureModal.module.css';
 import { preferencesIndexedDbAdapter } from '../storage/preferencesIndexedDbAdapter';
-import { CURRENT_AGB_VERSION, hasEarlierConsent } from '../utils/userState';
+import { CURRENT_AGB_VERSION, hasEarlierConsent, storedConsentVersion } from '../utils/userState';
+import { formatTermsDate } from '../utils/public/termsVersion';
 import { sendEntryBeacon } from '../utils/entryBeacon';
 import { sendSignupBeacon } from '../utils/signupBeacon';
 import { sendFunnelBeaconOnce } from '../utils/funnelBeacon';
@@ -25,7 +26,7 @@ interface WelcomeDisclosureModalProps {
 }
 
 const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onComplete, onSkip }) => {
-  const { tString, tNode, language } = useTranslation();
+  const { t, tString, tNode, language } = useTranslation();
   const [isAnimating, setIsAnimating] = useState<boolean>(false);
   const [hasAnimated, setHasAnimated] = useState<boolean>(false);
   // Single-action clickwrap (Option C): tapping the button IS the affirmative
@@ -33,6 +34,11 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
   // checkbox is legally required for this non-consent acknowledgment, and the
   // conspicuous statement sits directly above the button. Ad-measurement consent
   // stays a separate non-blocking prompt on the landing page, not here.
+
+  // Read when the screen opens, before accepting rewrites the record: a record
+  // from another version means the terms changed since this browser accepted.
+  const previousVersion = useMemo(() => (isOpen ? storedConsentVersion() : null), [isOpen]);
+  const termsChanged = previousVersion !== null && previousVersion !== CURRENT_AGB_VERSION;
 
   const overlayRef = useRef<HTMLDivElement>(null);
   const modalRef = useRef<HTMLDivElement>(null);
@@ -173,6 +179,15 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
 
   if (!isOpen) return null;
 
+  const termsHref = language === 'de' ? '/nutzungsbedingungen' : '/terms';
+  const [updatedBefore, updatedAfter = ''] = termsChanged
+    ? String(t('legal.consent.termsUpdated', {
+        version: CURRENT_AGB_VERSION,
+        // Day and month stay on one row ("27. April", "April 27").
+        date: formatTermsDate(language === 'de' ? 'de' : 'en').replace(' ', '\u00a0'),
+      })).split('{link}')
+    : [];
+
   return (
     <div
       ref={overlayRef}
@@ -251,9 +266,18 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             it in this sticky footer, so the tap is an informed affirmative act
             (16+ self-declaration + AGB inclusion, Sec 305 Abs 2 BGB). */}
         <div className={styles.modalFooter}>
+          {termsChanged && (
+            <p className={styles.termsUpdated} id="agc-terms-updated">
+              {updatedBefore}
+              <a href={termsHref} target="_blank" rel="noopener" className={styles.consentLink}>
+                {tNode('legal.consent.termsUpdatedLink')}
+              </a>
+              {updatedAfter}
+            </p>
+          )}
           <p className={styles.clickwrapStatement} id="agc-clickwrap-notice">
             {tNode('legal.consent.clickwrapPre')}{' '}
-            <a href={language === 'de' ? '/nutzungsbedingungen' : '/terms'} target="_blank" rel="noopener" className={styles.consentLink}>
+            <a href={termsHref} target="_blank" rel="noopener" className={styles.consentLink}>
               {tNode('legal.consent.termsLink')}
             </a>{' '}
             {tNode('legal.consent.clickwrapMid')}
@@ -262,7 +286,7 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             onClick={handleComplete}
             className={`${styles.beginButton} ${isAnimating ? styles.animating : ''}`}
             disabled={isAnimating}
-            aria-describedby="agc-clickwrap-notice"
+            aria-describedby={termsChanged ? 'agc-terms-updated agc-clickwrap-notice' : 'agc-clickwrap-notice'}
           >
             {tNode('legal.consent.startButton')}
           </button>
