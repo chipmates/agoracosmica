@@ -90,6 +90,10 @@ const TABS: Tab[] = [
 const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) => {
   const [activeTab, setActiveTab] = useState<string>(initialTab || 'legal');
   const [config, setConfig] = useState<Config>(loadServiceConfig());
+  // The edits made here since Settings opened, in order. A save applies only
+  // these to the settings as saved now, so a change saved meanwhile (Local Mode,
+  // another tab) is not written back to what it was when Settings opened.
+  const [edits, setEdits] = useState<Array<[string, unknown]>>([]);
   const [isDirty, setIsDirty] = useState<boolean>(false);
   const [showChangesAlert, setShowChangesAlert] = useState<boolean>(false);
   
@@ -104,6 +108,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) 
   useEffect(() => {
     if (isOpen) {
       setConfig(loadServiceConfig());
+      setEdits([]);
       setSelectedLanguage(language);
       setIsDirty(false);
       setActiveTab(initialTab || 'legal');
@@ -127,6 +132,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) 
       setIsDirty(true);
       return newConfig;
     });
+    setEdits((prev) => [...prev.filter(([key]) => key !== section), [section, value]]);
   };
   
   // Handle language change
@@ -138,7 +144,13 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) 
   
   // Save changes
   const handleSave = (): void => {
-    saveConfiguration(config as any);
+    const saved = edits.reduce(
+      (current, [section, value]) => handleConfigChange(current, section, value),
+      loadServiceConfig(),
+    );
+    saveConfiguration(saved);
+    setConfig(saved);
+    setEdits([]);
     if (selectedLanguage !== language) {
       setLanguage(selectedLanguage);
     }
@@ -149,6 +161,7 @@ const SettingsModal: FC<SettingsModalProps> = ({ isOpen, onClose, initialTab }) 
   // Discard changes
   const handleDiscard = (): void => {
     setConfig(loadServiceConfig());
+    setEdits([]);
     setSelectedLanguage(language);
     setIsDirty(false);
     setShowChangesAlert(false);
