@@ -48,16 +48,28 @@ function secondsUntil(isoTimestamp: string): number {
 }
 
 /**
- * Write a global day counter without failing the request. KV refuses a second
- * write to one key within a second (a 429 that throws), and the global keys
- * take every visitor's write; a missed increment only undercounts the brake.
+ * Write a brake counter without failing the request. KV refuses a second
+ * write to one key within a second (a 429 that throws). A global key takes
+ * every visitor's write and an address key every visitor behind one address
+ * (a school, an office, a carrier's NAT); a missed increment only undercounts
+ * the brake.
  */
-async function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
+async function putBrakeCounter(
+  env: Env,
+  key: string,
+  value: number,
+  ttlSeconds: number,
+  kind: 'Global' | 'Address',
+): Promise<void> {
   try {
-    await env.RATE_LIMITS.put(key, value.toString(), { expirationTtl: 86400 });
+    await env.RATE_LIMITS.put(key, value.toString(), { expirationTtl: ttlSeconds });
   } catch {
-    console.warn('[RateLimit] Global counter write failed, request served');
+    console.warn(`[RateLimit] ${kind} counter write failed, request served`);
   }
+}
+
+function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
+  return putBrakeCounter(env, key, value, 86400, 'Global');
 }
 
 /**
@@ -123,9 +135,7 @@ export async function checkAndIncrementRateLimit(
   await Promise.all([
     env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), { expirationTtl: 86400 }),
     putGlobalCounter(env, globalKey, globalCount),
-    ipKey
-      ? env.RATE_LIMITS.put(ipKey, (ipUsed + 1).toString(), { expirationTtl: 86400 })
-      : Promise.resolve(),
+    ipKey ? putBrakeCounter(env, ipKey, ipUsed + 1, 86400, 'Address') : Promise.resolve(),
   ]);
 
   return {
@@ -160,7 +170,7 @@ export async function checkAndIncrementSessionRateLimit(
   }
 
   const count = used + 1;
-  await env.RATE_LIMITS.put(key, count.toString(), { expirationTtl: 3600 });
+  await putBrakeCounter(env, key, count, 3600, 'Address');
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
 

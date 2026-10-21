@@ -1794,6 +1794,68 @@ async function main(): Promise<number> {
     assertEqual(threw, true, 'the per-visitor limit keeps its failure mode');
   });
 
+  // An address key is shared by everyone behind one address, so two allowed
+  // requests from one school or office within a second collide on it.
+  await test('a refused per-address write still serves the chat', async () => {
+    stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+    const kv = refusingKv('ipcap:chat:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const { ctx, pending } = fakeCtx();
+    let status = 0;
+    const warnings = await withWarnings(async () => {
+      const request = await postJson('/v1/chat', env, JSON.stringify(CHAT_BODY), { 'CF-Connecting-IP': '203.0.113.31' });
+      const response = await worker.fetch(request, env, ctx);
+      status = response.status;
+      await response.body?.cancel();
+      await Promise.all(pending);
+    });
+    assertEqual(status, 200, 'status');
+    assert(kv.puts.some(key => key.startsWith(`rate:sub:${IDENTITY}:`)), 'the visitor\'s own counter was written');
+    assert(kv.puts.some(key => key.startsWith('global:')), 'the global counter was written');
+    assertEqual(warnings.filter(w => w.includes('[RateLimit] Address counter write failed')).length, 1, 'one fixed warning line');
+  });
+
+  await test('a refused per-address write still counts the visitor', async () => {
+    const kv = refusingKv('ipcap:chat:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('77777777-7777-4777-8777-777777777778');
+    await withWarnings(async () => {
+      for (let i = 1; i <= 3; i++) {
+        const result = await checkAndIncrementRateLimit(fakeRequest('203.0.113.32'), env, identity);
+        assertEqual(result.allowed, true, `request ${i}`);
+        assertEqual(result.daily.used, i, `used after request ${i}`);
+      }
+    });
+  });
+
+  await test('a refused session ceiling write still mints the session', async () => {
+    const kv = refusingKv('ipcap:session:');
+    const env = fakeEnv({ RATE_LIMITS: kv.kv, TURNSTILE_SECRET_KEY: 'test-turnstile-secret' });
+    const { ctx } = fakeCtx();
+    const verified: string[] = [];
+    globalThis.fetch = (async (url: string) => {
+      verified.push(String(url));
+      return new Response(JSON.stringify({ success: true, hostname: 'agoracosmica.org' }), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      });
+    }) as unknown as typeof fetch;
+    let status = 0;
+    let token: unknown;
+    const warnings = await withWarnings(async () => {
+      const response = await worker.fetch(new Request('https://example.invalid/v1/session', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': '203.0.113.33' },
+        body: JSON.stringify({ turnstileToken: 'a-solved-token', clientId: IDENTITY }),
+      }), env, ctx);
+      status = response.status;
+      token = (await response.json() as { token?: unknown }).token;
+    });
+    assertEqual(status, 200, 'status');
+    assertEqual(typeof token, 'string', 'a token was minted');
+    assertEqual(verified.length, 1, 'the Turnstile solve was still verified');
+    assertEqual(warnings.filter(w => w.includes('[RateLimit] Address counter write failed')).length, 1, 'one fixed warning line');
+  });
+
   globalThis.fetch = realFetch;
 
   // -------------------------------------------------------------------------
