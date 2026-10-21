@@ -24,6 +24,14 @@ export class LocalModeSttUnavailable extends Error {
   }
 }
 
+/** The local service answered, but heard no words. */
+export class LocalModeSttEmpty extends Error {
+  constructor(public readonly url: string) {
+    super('Local STT heard no words');
+    this.name = 'LocalModeSttEmpty';
+  }
+}
+
 export const localModeSTT = async (
   audioBlob: Blob,
   language?: string,
@@ -57,7 +65,7 @@ export const localModeSTT = async (
   }
 
   // Any failed or unreadable answer is an outage to the visitor, so the banner
-  // names it; only a well-formed empty transcript stays a plain error.
+  // names it; an answer with no words gets its own line.
   if (!response.ok) {
     const detail = await response.text().catch(() => '');
     throw new LocalModeSttUnavailable(
@@ -75,8 +83,8 @@ export const localModeSTT = async (
   if (typeof data?.text !== 'string') {
     throw new LocalModeSttUnavailable('Local STT answer has no text field', endpoint);
   }
-  if (!data.text) {
-    throw new Error('No transcription text in response');
+  if (!data.text.trim()) {
+    throw new LocalModeSttEmpty(endpoint);
   }
 
   return {

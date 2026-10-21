@@ -14,7 +14,7 @@ type BannerState =
   | { type: 'circuit-breaker'; service: 'tts' | 'stt' }
   | { type: 'rate-limit'; hint: RateLimitHint }
   | { type: 'byok-fallback' }
-  | { type: 'local-mode'; service: 'tts' | 'stt' };
+  | { type: 'local-mode'; service: 'tts' | 'stt'; heardNothing?: boolean };
 
 const BANNER_STYLE: React.CSSProperties = {
   position: 'fixed',
@@ -109,12 +109,13 @@ const NetworkStatusBanner: FC = () => {
   const localVoiceShownAt = useRef(-Infinity);
   useEffect(() => {
     const handleLocalModeUnavailable = (e: Event) => {
-      const service = (e as CustomEvent).detail?.service === 'stt' ? 'stt' : 'tts';
+      const detail = (e as CustomEvent).detail;
+      const service = detail?.service === 'stt' ? 'stt' : 'tts';
       if (service === 'tts') {
         if (Date.now() - localVoiceShownAt.current < 60_000) return;
         localVoiceShownAt.current = Date.now();
       }
-      setBanner({ type: 'local-mode', service });
+      setBanner({ type: 'local-mode', service, heardNothing: service === 'stt' && detail?.reason === 'empty' });
       clearTimeout(localModeTimer.current);
       localModeTimer.current = setTimeout(() => setBanner(prev =>
         prev.type === 'local-mode' ? { type: 'hidden' } : prev
@@ -164,9 +165,13 @@ const NetworkStatusBanner: FC = () => {
       colors = WARNING_COLORS;
       break;
     case 'local-mode':
-      message = banner.service === 'tts'
-        ? tString('errors.network.localTtsUnavailable', 'Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings.')
-        : tString('errors.network.localSttUnavailable', 'Local voice input is not reachable. Check Local Mode in Settings, or type your message.');
+      if (banner.service === 'tts') {
+        message = tString('errors.network.localTtsUnavailable', 'Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings.');
+      } else if (banner.heardNothing) {
+        message = tString('errors.network.localSttEmpty', 'Local voice input heard no words. Speak again, or type your message.');
+      } else {
+        message = tString('errors.network.localSttUnavailable', 'Local voice input is not reachable. Check Local Mode in Settings, or type your message.');
+      }
       colors = WARNING_COLORS;
       break;
   }

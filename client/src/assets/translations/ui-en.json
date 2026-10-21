@@ -1311,6 +1311,7 @@
       "audioRateLimited": "Audio is taking a short break. Your conversation continues with text.",
       "byokFellBack": "Your OpenRouter key was rejected, so this reply used the free tier. Check your key in Settings.",
       "localSttUnavailable": "Local voice input is not reachable. Check Local Mode in Settings, or type your message.",
+      "localSttEmpty": "Local voice input heard no words. Speak again, or type your message.",
       "localTtsUnavailable": "Local voice output is not reachable, so you get text without audio. Check Local Mode in Settings."
     },
     "mic": {

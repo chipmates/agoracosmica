@@ -67,11 +67,22 @@ const sttAnswers: Array<[string, () => Response]> = [
   ['a 200 that is not JSON', () => new Response('<html>proxy error</html>', { status: 200, headers: { 'Content-Type': 'text/html' } })],
 ];
 
+const bytes = (text: string) => new TextEncoder().encode(text);
+
 const ttsAnswers: Array<[string, () => Response]> = [
   ['a server error (500)', () => new Response('boom', { status: 500, statusText: 'Internal Server Error' })],
   ['a 200 with a JSON error instead of audio', () => json({ error: 'voice not found' })],
   ['a 200 with an empty body', () => new Response(new Uint8Array(0), { status: 200, headers: { 'Content-Type': 'audio/wav' } })],
+  ['a 200 of octet-stream that is not audio', () => new Response(bytes('not audio at all'), { status: 200, headers: { 'Content-Type': 'application/octet-stream' } })],
+  ['a 200 with no type that is a web page', () => new Response(bytes('<html>proxy page</html>'), { status: 200 })],
 ];
+
+const wav = () => {
+  const body = new Uint8Array(64);
+  body.set(bytes('RIFF'), 0);
+  body.set(bytes('WAVE'), 8);
+  return body;
+};
 
 describe('Local Mode with a local service that answers badly', () => {
   let warn: ReturnType<typeof vi.spyOn>;
@@ -123,9 +134,9 @@ describe('Local Mode with a local service that answers badly', () => {
     expect(hostedCalls()).toEqual([]);
   });
 
-  it('an empty transcript from a working service is not an outage: no banner', async () => {
+  it.each([['an empty text', ''], ['only blanks', '  ']])('transcription: %s shows the heard-nothing line and sends nothing hosted', async (_name, text) => {
     h.localMode = { llmEnabled: false, ttsEnabled: false, sttEnabled: true, ...URLS };
-    serve(() => json({ text: '' }));
+    serve(() => json({ text }));
     render(<NetworkStatusBanner />);
 
     await act(async () => {
@@ -134,7 +145,17 @@ describe('Local Mode with a local service that answers badly', () => {
       expect(failure).not.toBeInstanceOf(LocalModeSttUnavailable);
     });
 
-    expect(screen.queryByRole('alert')).toBeNull();
+    expect(screen.getByRole('alert').textContent).toBe(de.errors.network.localSttEmpty);
+    expect(hostedCalls()).toEqual([]);
+  });
+
+  it('a working local voice that sends WAV as octet-stream still speaks', async () => {
+    h.localMode = { llmEnabled: false, ttsEnabled: true, sttEnabled: false, ...URLS };
+    serve(() => new Response(wav(), { status: 200, headers: { 'Content-Type': 'application/octet-stream' } }));
+
+    const audio = await convertTextToSpeech('Hallo', 1, 'aurelius', 'self-hosted', 1, 'de', 'session-1');
+
+    expect(audio.backend).toBe('qwen-local');
     expect(hostedCalls()).toEqual([]);
   });
 

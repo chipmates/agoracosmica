@@ -5,7 +5,7 @@
 
 import { STT_SERVICES, loadServiceConfig } from '../config/serviceConfig';
 import { selfHostedSTT } from './selfHostedSTT';
-import { localModeSTT, LocalModeSttUnavailable } from './localModeSTT';
+import { localModeSTT, LocalModeSttEmpty, LocalModeSttUnavailable } from './localModeSTT';
 import { validateAudioBlob, formatTranscriptionResponse, TranscriptionResponse, EmptyAudioError, SttHttpError } from './sttUtils';
 
 // ============================================
@@ -66,6 +66,8 @@ const transcribeLocally = async (
     if (error instanceof LocalModeSttUnavailable) {
       console.warn(`[STT] Local Mode unavailable (${error.url}): ${error.message}`);
       window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'stt' } }));
+    } else if (error instanceof LocalModeSttEmpty) {
+      window.dispatchEvent(new CustomEvent('local-mode-unavailable', { detail: { service: 'stt', reason: 'empty' } }));
     }
     throw error;
   }

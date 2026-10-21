@@ -121,7 +121,11 @@ export async function localModeTTS(
     );
   }
   const declaredType = response.headers.get('content-type') || '';
-  if (arrayBuffer.byteLength === 0 || /^(text\/|application\/json)/i.test(declaredType)) {
+  if (
+    arrayBuffer.byteLength === 0
+    || /^(text\/|application\/json)/i.test(declaredType)
+    || (!/^audio\//i.test(declaredType) && !startsLikeAudio(arrayBuffer))
+  ) {
     throw new LocalModeTtsUnavailable(
       `Local TTS answer is not audio (${declaredType || 'no type'}, ${arrayBuffer.byteLength} bytes)`,
       de ? 'de' : 'en',
@@ -149,6 +153,22 @@ export async function localModeTTS(
     estimatedDuration,
     backend: de ? 'qwen-local' : 'kokoro-local',
   };
+}
+
+/**
+ * A body sent without an audio type is audio only when it opens like one of
+ * the containers a browser plays: WAV, MP3 (tag or frame), Ogg, FLAC, WebM, MP4.
+ */
+function startsLikeAudio(buffer: ArrayBuffer): boolean {
+  const head = new Uint8Array(buffer, 0, Math.min(12, buffer.byteLength));
+  const text = (from: number, to: number) => String.fromCharCode(...head.subarray(from, to));
+  return (text(0, 4) === 'RIFF' && text(8, 12) === 'WAVE')
+    || text(0, 3) === 'ID3'
+    || (head[0] === 0xff && (head[1] & 0xe0) === 0xe0)
+    || text(0, 4) === 'OggS'
+    || text(0, 4) === 'fLaC'
+    || (head[0] === 0x1a && head[1] === 0x45 && head[2] === 0xdf && head[3] === 0xa3)
+    || text(4, 8) === 'ftyp';
 }
 
 /**

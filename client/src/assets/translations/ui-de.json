@@ -1313,6 +1313,7 @@
       "audioRateLimited": "Sprachausgabe macht eine kurze Pause. Dein Gespräch läuft als Text weiter.",
       "byokFellBack": "Dein OpenRouter-Schlüssel wurde abgelehnt, daher kam diese Antwort vom kostenlosen Kontingent. Prüfe deinen Schlüssel in den Einstellungen.",
       "localSttUnavailable": "Die lokale Spracheingabe ist nicht erreichbar. Prüfe den lokalen Modus in den Optionen oder tippe deine Nachricht.",
+      "localSttEmpty": "Die lokale Spracheingabe hat keine Worte erkannt. Sprich noch einmal oder tippe deine Nachricht.",
       "localTtsUnavailable": "Die lokale Sprachausgabe ist nicht erreichbar, du bekommst Text ohne Audio. Prüfe den lokalen Modus in den Optionen."
     },
     "mic": {
