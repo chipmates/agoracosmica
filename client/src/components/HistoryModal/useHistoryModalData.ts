@@ -17,6 +17,14 @@ import { isMobileOrTablet } from '../../utils/deviceDetection';
 import { MODES } from './historyModalConstants';
 import type { HistoryModalProps, HistoryData, HistoryLoadResult, Message, Seed } from './historyModalTypes';
 
+type LiveMessage = { role?: string; content?: unknown; timestamp?: unknown; hidden?: boolean } | null | undefined;
+
+const isShownMessage = (msg: LiveMessage): boolean =>
+  !!msg && typeof msg.content === 'string' && msg.content.trim().length > 0 && !msg.hidden;
+
+const conversationSignature = (historyKey: string, messages: LiveMessage[]): string =>
+  `${historyKey}|${messages.map((msg) => `${msg?.role}:${msg?.timestamp ?? ''}:${msg?.content}`).join('|')}`;
+
 export function useHistoryModalData({
   isOpen,
   onClose,
@@ -97,15 +105,10 @@ export function useHistoryModalData({
 
     const sourceMessages = Array.isArray(snapshot.messages) ? snapshot.messages : [];
     const normalizedMessages = sourceMessages
-      .filter((msg: any) =>
-        msg &&
-        typeof msg.content === 'string' &&
-        msg.content.trim().length > 0 &&
-        !msg.hidden
-      )
+      .filter(isShownMessage)
       .map((msg: any) => ({ ...msg, mode }));
 
-    const signature = `${snapshot.historyKey}|${normalizedMessages.map((msg: any) => `${msg.role}:${msg.timestamp ?? ''}:${msg.content}`).join('|')}`;
+    const signature = conversationSignature(snapshot.historyKey, normalizedMessages);
     if (lastSyncSignatureRef.current === signature) return;
 
     let didUpdate = false;
@@ -147,14 +150,21 @@ export function useHistoryModalData({
     return unsubscribe;
   }, [isOpen, syncFromSnapshot]);
 
-  // Trigger sync when modal opens
+  // On open the list comes from storage; the live conversation as it stands is
+  // the baseline, so only a change to it is mirrored later. The snapshot ref
+  // fills only on store updates, and without the baseline the first unrelated
+  // update after opening laid the chat back over a summary made in between.
   useEffect(() => {
     if (!isOpen) {
       lastSyncSignatureRef.current = null;
       return;
     }
-    syncFromSnapshot(conversationSnapshotRef.current);
-  }, [isOpen, selectedFigureId, syncFromSnapshot]);
+    const { historyKey, messages } = useDomainStore.getState().conversation;
+    conversationSnapshotRef.current = { historyKey, messages };
+    lastSyncSignatureRef.current = historyKey
+      ? conversationSignature(historyKey, (Array.isArray(messages) ? messages : []).filter(isShownMessage))
+      : null;
+  }, [isOpen, selectedFigureId]);
 
   // Service methods
   const fetchHistoriesFromAdapter = useCallback(
