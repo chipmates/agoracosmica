@@ -11,6 +11,7 @@ import {
 } from '../../../services/audio/config/serviceConfig';
 import { useDomainStore } from '../../../stores/domainStore';
 import { describeFreeTier } from '../../../utils/freeTierState';
+import { formatTime } from '../../../utils/formatDateTime';
 import { RippleButton } from '../../Button';
 
 interface AiModelPanelProps {
@@ -64,6 +65,7 @@ const BYOK_MODEL = LLM_SERVICES.OPENROUTER.models.QWEN3_235B;
 const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) => {
   const { t, tString, tNode } = useTranslation();
   const freeTier = useDomainStore((state) => state.quota.freeTier);
+  const appLanguage = useDomainStore((state) => state.language.current);
 
   const [openRouterKey, setOpenRouterKey] = useState<KeyState>({
     value: '',
@@ -280,7 +282,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
         icon: <CheckCircle size={16} weight="fill" />,
         color: 'var(--gold-primary)',
         text: openRouterKey.lastTested
-          ? `${tString('settings.apiKeys.statusValid', 'Valid')} (${openRouterKey.lastTested.toLocaleTimeString()})`
+          ? `${tString('settings.apiKeys.statusValid', 'Valid')} (${formatTime(openRouterKey.lastTested, appLanguage)})`
           : tString('settings.apiKeys.statusValid', 'Valid'),
       },
       invalid: {
