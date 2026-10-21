@@ -3,24 +3,10 @@ import { corsHeaders } from './cors';
 import type { Env, ServerInfo } from './types';
 
 /**
- * Forward a request to the primary server. On failure, retry with the fallback.
- * Returns the upstream response with CORS + X-Audio-Server headers.
- */
-export async function proxyWithFailover(
-  request: Request,
-  primary: ServerInfo,
-  fallback: ServerInfo,
-  env: Env,
-  timeoutMs: number
-): Promise<Response> {
-  // Buffer body once — reusable for both attempts and immune to redirects
-  const body = await request.arrayBuffer();
-  return proxyWithFailoverFromBuffer(body, request, primary, fallback, env, timeoutMs);
-}
-
-/**
- * Same as proxyWithFailover but accepts a pre-buffered body.
- * Used when the body was already read for language extraction (TTS rate limiting).
+ * Forward a pre-buffered body to the primary server. On failure, retry with the
+ * fallback. Returns the upstream response with CORS + X-Audio-Server headers.
+ * The caller buffers the body once, under its own size gate, so both attempts
+ * can resend it.
  *
  * `degradedBody` is the same request rewritten for the stack that is always
  * there (English Qwen voice → its Kokoro counterpart). It is tried only after

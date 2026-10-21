@@ -1,7 +1,8 @@
 import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
 import { selectServers, refreshHealth, getAggregatedHealth } from './health';
-import { proxyWithFailover, proxyWithFailoverFromBuffer } from './proxy';
+import { bodyTooLarge, readBodyCapped, STT_MAX_BODY_BYTES } from './bodyLimit';
+import { proxyWithFailoverFromBuffer } from './proxy';
 import { checkAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import { handleStoryArchive } from './storyArchive';
 import { buildKokoroFallbackBody } from './ttsEngine';
@@ -201,6 +202,11 @@ export default {
     if (path === '/v1/audio/transcriptions' && request.method === 'POST') {
       const startMs = Date.now();
 
+      // Size gate before any counter moves. This route is unauthenticated and
+      // the body is buffered for the failover retry, so the read is capped.
+      const sttBody = await readBodyCapped(request, STT_MAX_BODY_BYTES);
+      if (!sttBody) return bodyTooLarge(request, env);
+
       // Load-test bypass: see TTS endpoint above for rationale.
       const sttLoadTestAuth = request.headers.get('X-Load-Test-Auth');
       const sttSkipRateLimit = !!env.LOAD_TEST_BYPASS_KEY && sttLoadTestAuth === env.LOAD_TEST_BYPASS_KEY;
@@ -222,7 +228,7 @@ export default {
 
       const sttSessionId = request.headers.get('X-Session-Id');
       const [primary, fallback] = await selectServers(env, sttSessionId);
-      const response = await proxyWithFailover(request, primary, fallback, env, TIMEOUTS.STT);
+      const response = await proxyWithFailoverFromBuffer(sttBody, request, primary, fallback, env, TIMEOUTS.STT);
 
       // Anonymous analytics (fire-and-forget)
       const server = response.headers.get('X-Audio-Server') || 'unknown';

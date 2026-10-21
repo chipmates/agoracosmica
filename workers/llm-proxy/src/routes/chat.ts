@@ -1,6 +1,7 @@
 // POST /v1/chat — validate + proxy SSE to Nebius
 
 import { authenticateRequest } from '../middleware/auth';
+import { readJsonBody } from '../middleware/bodyLimit';
 import { validateChatRequest } from '../middleware/validation';
 import { checkAndIncrementRateLimit } from '../middleware/rateLimit';
 import { buildSystemPrompt } from '../services/promptLoader';
@@ -45,15 +46,9 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   if ('error' in authResult) return authResult.error;
 
   // 2. Parse and validate request
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
+  const parsed = await readJsonBody(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const validation = validateChatRequest(body);
   if (!validation.valid) {

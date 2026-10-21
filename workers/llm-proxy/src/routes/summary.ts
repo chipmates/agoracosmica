@@ -1,6 +1,7 @@
 // POST /v1/summary — generate conversation summary via Nebius (separate rate limit)
 
 import { authenticateRequest } from '../middleware/auth';
+import { readJsonBody } from '../middleware/bodyLimit';
 import { checkAndIncrementSummaryRateLimit } from '../middleware/rateLimit';
 import { dispatchToNebius } from '../services/nebius';
 import { fallbackModel } from '../services/modelRouting';
@@ -130,15 +131,9 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
   if ('error' in authResult) return authResult.error;
 
   // 2. Parse and validate request
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
+  const parsed = await readJsonBody(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const validation = validateSummaryRequest(body);
   if (!validation.valid) {

@@ -9,6 +9,7 @@ import { getServers } from '../src/config';
 import { getAggregatedHealth } from '../src/health';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
+import worker from '../src/index';
 import type { Env, ServerInfo } from '../src/types';
 
 // ---------------------------------------------------------------------------
@@ -383,6 +384,134 @@ async function main(): Promise<number> {
     assertEqual(puts.length, 2, 'daily and burst counters');
     assert(puts.every(key => key.includes(keyed)), 'both keys use the keyed hash');
     assert(puts.every(key => !key.includes('203.0.113.9')), 'no plain address in a key');
+  });
+
+  // -------------------------------------------------------------------------
+  // STT size gate: before any counter moves, and a bounded read behind it
+  // -------------------------------------------------------------------------
+
+  // The gate's contract, written out so the suite also runs against a tree
+  // that predates the gate.
+  const STT_LIMIT = 15 * 1024 * 1024;
+
+  /** The worker with recorded counter writes and upstream calls. */
+  const sttHarness = () => {
+    const puts: string[] = [];
+    const rateLimits = {
+      get: async () => null,
+      put: async (key: string) => { puts.push(key); },
+    } as unknown as KVNamespace;
+    // A fresh snapshot, so the health refresh never probes the origins.
+    const healthCache = {
+      get: async () => JSON.stringify({ fsn1: null, nbg1: null, updatedAt: Date.now() }),
+      put: async () => {},
+    } as unknown as KVNamespace;
+    const env = {
+      ...fakeEnv(),
+      RATE_LIMITS: rateLimits,
+      HEALTH_CACHE: healthCache,
+      ANALYTICS: { writeDataPoint: () => {} },
+    } as unknown as Env;
+    const pending: Promise<unknown>[] = [];
+    const ctx = {
+      waitUntil: (work: Promise<unknown>) => { pending.push(work); },
+      passThroughOnException: () => {},
+    } as unknown as ExecutionContext;
+    const upstream: { url: string; bytes: number }[] = [];
+    const original = globalThis.fetch;
+    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
+      upstream.push({ url: String(input), bytes: (init?.body as ArrayBuffer | undefined)?.byteLength ?? 0 });
+      return new Response(JSON.stringify({ text: 'hello' }), { status: 200, headers: { 'content-type': 'application/json' } });
+    }) as typeof fetch;
+    const restore = () => { globalThis.fetch = original; };
+    return { env, ctx, pending, puts, upstream, restore };
+  };
+
+  const upload = (
+    body: Uint8Array | ReadableStream<Uint8Array>,
+    headers: Record<string, string> = {},
+  ): Request => new Request('https://audio.agoracosmica.org/v1/audio/transcriptions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'audio/webm', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': '203.0.113.9', ...headers },
+    body,
+    // Node needs this for a streamed body; the Workers runtime ignores it.
+    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+  } as RequestInit);
+
+  const chunkedUpload = (bytes: number): ReadableStream<Uint8Array> => new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (let sent = 0; sent < bytes; sent += 1024 * 1024) {
+        controller.enqueue(new Uint8Array(Math.min(1024 * 1024, bytes - sent)));
+      }
+      controller.close();
+    },
+  });
+
+  await test('an upload one byte over the limit gets a 413 before any counter moves', async () => {
+    const h = sttHarness();
+    try {
+      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT + 1), { 'Content-Length': String(STT_LIMIT + 1) }), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the refusal');
+      assertEqual(typeof (await res.json() as { error?: string }).error, 'string', 'the usual error shape');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      assertEqual(h.upstream.length, 0, 'upstream calls');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('an upload at the limit is forwarded whole', async () => {
+    const h = sttHarness();
+    try {
+      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT), { 'Content-Length': String(STT_LIMIT) }), h.env, h.ctx);
+      assertEqual(res.status, 200, 'status');
+      assertEqual(h.puts.length, 2, 'daily and burst counters');
+      assertEqual(h.upstream.length, 1, 'one upstream call');
+      assertEqual(h.upstream[0].bytes, STT_LIMIT, 'bytes forwarded');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a chunked upload over the limit is stopped by the bounded read', async () => {
+    const h = sttHarness();
+    try {
+      const res = await worker.fetch(upload(chunkedUpload(STT_LIMIT + 1)), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      assertEqual(h.upstream.length, 0, 'upstream calls');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('a chunked upload under the limit is forwarded whole', async () => {
+    const h = sttHarness();
+    try {
+      const res = await worker.fetch(upload(chunkedUpload(3 * 1024 * 1024 + 5)), h.env, h.ctx);
+      assertEqual(res.status, 200, 'status');
+      assertEqual(h.upstream[0].bytes, 3 * 1024 * 1024 + 5, 'bytes forwarded');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('an upload larger than its declared length is still stopped at the limit', async () => {
+    const h = sttHarness();
+    try {
+      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT + 1), { 'Content-Length': '1000' }), h.env, h.ctx);
+      assertEqual(res.status, 413, 'status');
+      assertEqual(h.puts.length, 0, 'counter writes');
+      assertEqual(h.upstream.length, 0, 'upstream calls');
+      await Promise.all(h.pending);
+    } finally {
+      h.restore();
+    }
   });
 
   // -------------------------------------------------------------------------

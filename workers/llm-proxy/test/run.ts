@@ -1392,6 +1392,118 @@ async function main(): Promise<number> {
     assertEqual(log.keys.length, 1, 'records written once waitUntil settled');
   });
 
+  // The size gate's contract, written out so the suite also runs against a
+  // tree that predates the gate.
+  const JSON_LIMIT = 2 * 1024 * 1024;
+
+  /** A valid request body padded with an ignored field to exactly `bytes` bytes. */
+  const paddedBody = (base: Record<string, unknown>, bytes: number): Uint8Array => {
+    const bare = JSON.stringify({ ...base, pad: '' });
+    const text = JSON.stringify({ ...base, pad: 'x'.repeat(bytes - bare.length) });
+    const encoded = new TextEncoder().encode(text);
+    assertEqual(encoded.length, bytes, 'padded body size');
+    return encoded;
+  };
+
+  /** The same bytes as a chunked upload, with no Content-Length. */
+  const chunked = (bytes: Uint8Array): ReadableStream<Uint8Array> => new ReadableStream<Uint8Array>({
+    start(controller) {
+      for (let at = 0; at < bytes.length; at += 64 * 1024) controller.enqueue(bytes.slice(at, at + 64 * 1024));
+      controller.close();
+    },
+  });
+
+  const COUNCIL_BODY = {
+    systemPrompt: 'You are a council of three.',
+    language: 'en',
+    messages: [{ role: 'user', content: 'What is a good life?' }],
+  };
+  const SUMMARY_BODY = {
+    figureId: 'aurelius',
+    language: 'en',
+    history: 'Human [free] (2026-10-21T00:00:00Z): What holds a day together?',
+  };
+  const gated = [
+    { path: '/v1/chat', handler: handleChat, base: CHAT_BODY as Record<string, unknown> },
+    { path: '/v1/council', handler: handleCouncil, base: COUNCIL_BODY as Record<string, unknown> },
+    { path: '/v1/summary', handler: handleSummary, base: SUMMARY_BODY as Record<string, unknown> },
+  ];
+
+  for (const route of gated) {
+    await test(`${route.path}: a body one byte over the limit gets a 413 before any counter moves`, async () => {
+      const upstream = stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { ctx } = fakeCtx();
+      const body = paddedBody(route.base, JSON_LIMIT + 1);
+      const response = await route.handler(
+        await postJson(route.path, env, body, { 'Content-Length': String(body.length) }), env, ctx);
+      assertEqual(response.status, 413, 'status');
+      assertEqual(response.headers.get('Content-Type'), 'application/json', 'content type');
+      const payload = await response.json() as { error?: string };
+      assertEqual(typeof payload.error, 'string', 'the usual error shape');
+      assertEqual(kv.puts.length, 0, 'counter writes');
+      assertEqual(upstream.length, 0, 'upstream calls');
+    });
+
+    await test(`${route.path}: a body at the limit passes the gate`, async () => {
+      stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+      const env = fakeEnv();
+      const { ctx, pending } = fakeCtx();
+      const body = paddedBody(route.base, JSON_LIMIT);
+      const response = await route.handler(
+        await postJson(route.path, env, body, { 'Content-Length': String(body.length) }), env, ctx);
+      assertEqual(response.status, 200, 'status');
+      await response.body?.cancel();
+      await Promise.all(pending);
+    });
+
+    await test(`${route.path}: a chunked body over the limit is stopped by the bounded read`, async () => {
+      const upstream = stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+      const kv = auditedKv();
+      const env = fakeEnv({ RATE_LIMITS: kv.kv });
+      const { ctx } = fakeCtx();
+      const response = await route.handler(
+        await postJson(route.path, env, chunked(paddedBody(route.base, JSON_LIMIT + 1))), env, ctx);
+      assertEqual(response.status, 413, 'status');
+      assertEqual(kv.puts.length, 0, 'counter writes');
+      assertEqual(upstream.length, 0, 'upstream calls');
+    });
+  }
+
+  await test('a chat body larger than its declared length is still stopped at the limit', async () => {
+    const upstream = stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const { ctx } = fakeCtx();
+    const body = paddedBody(CHAT_BODY, JSON_LIMIT + 1);
+    const response = await handleChat(await postJson('/v1/chat', env, body, { 'Content-Length': '200' }), env, ctx);
+    assertEqual(response.status, 413, 'status');
+    assertEqual(kv.puts.length, 0, 'counter writes');
+    assertEqual(upstream.length, 0, 'upstream calls');
+  });
+
+  await test('a chat body that is not JSON still gets its 400', async () => {
+    const env = fakeEnv();
+    const { ctx } = fakeCtx();
+    const response = await handleChat(await postJson('/v1/chat', env, '{"figureId":'), env, ctx);
+    assertEqual(response.status, 400, 'status');
+    assertEqual((await response.json() as { error: string }).error, 'Invalid JSON body', 'message');
+  });
+
+  await test('the 413 reaches the browser through the router with CORS', async () => {
+    const env = fakeEnv({ ALLOWED_ORIGINS: 'https://agoracosmica.org' });
+    const { ctx } = fakeCtx();
+    const body = paddedBody(CHAT_BODY, JSON_LIMIT + 1);
+    const response = await worker.fetch(
+      await postJson('/v1/chat', env, body, { 'Content-Length': String(body.length), Origin: 'https://agoracosmica.org' }),
+      env,
+      ctx,
+    );
+    assertEqual(response.status, 413, 'status');
+    assertEqual(response.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS');
+  });
+
   globalThis.fetch = realFetch;
 
   // -------------------------------------------------------------------------

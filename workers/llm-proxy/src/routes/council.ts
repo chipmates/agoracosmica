@@ -2,6 +2,7 @@
 // Separate from /v1/chat: accepts client-provided system prompt, 1/day rate limit
 
 import { authenticateRequest } from '../middleware/auth';
+import { readJsonBody } from '../middleware/bodyLimit';
 import { checkAndIncrementCouncilRateLimit } from '../middleware/rateLimit';
 import { COUNCIL_LLM_CONFIG, type ServingModel } from '../config';
 import { SAFETY_PREAMBLE } from '../utils/safety';
@@ -89,15 +90,9 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
   if ('error' in authResult) return authResult.error;
 
   // 2. Parse and validate
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return new Response(
-      JSON.stringify({ error: 'Invalid JSON body' }),
-      { status: 400, headers: { 'Content-Type': 'application/json' } }
-    );
-  }
+  const parsed = await readJsonBody(request);
+  if (!parsed.ok) return parsed.response;
+  const body = parsed.body;
 
   const validation = validateCouncilRequest(body);
   if (!validation.valid) {
