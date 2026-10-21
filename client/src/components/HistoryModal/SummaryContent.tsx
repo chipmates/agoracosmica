@@ -1,5 +1,6 @@
 import { FC, ReactNode } from 'react';
 import { CaretDown, CaretRight, BookOpen } from '@phosphor-icons/react';
+import { splitSummarySections } from './summarySections';
 
 interface SummaryContentProps {
   content: string;
@@ -17,7 +18,7 @@ const SummaryContent: FC<SummaryContentProps> = ({
   summaryTitleLabel
 }) => {
   if (!content) return null;
-  const sections = content.split(/\n(?=[A-Z][A-Z\s]+:)/).filter(Boolean);
+  const sections = splitSummarySections(content);
 
   return (
     <div className="summary-content">

@@ -5,6 +5,7 @@ import useSeedTranslation from '../../hooks/useSeedTranslation';
 import { useHapticFeedback } from '../../hooks/useHapticFeedback';
 import { useUIStore } from '../../stores/uiStore';
 import SummaryService from '../../services/SummaryService';
+import { splitSummarySections } from './summarySections';
 import { STORAGE_KEYS, parseHistoryKey } from '../../utils/storageKeysV2';
 import { createRequestGate } from '../../utils/async/requestGate';
 import { abortable, AbortableTask } from '../../utils/async/abortable';
@@ -414,7 +415,7 @@ export function useHistoryModalData({
       LocalStorageAdapter.setJSON(summaryKey, summary);
 
       const newSections: { [key: string]: boolean } = {};
-      summary.content.split(/\n(?=[A-Z][A-Z\s]+:)/).forEach((_: string, index: number) => {
+      splitSummarySections(summary.content).forEach((_: string, index: number) => {
         newSections[`section-${selectedSeedId}-${index}`] = false;
       });
       setExpandedSections(newSections);
