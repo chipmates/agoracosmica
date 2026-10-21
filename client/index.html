@@ -34,6 +34,7 @@
     <meta name="twitter:title" content="Agora Cosmica - A Living Library You Can Talk To" />
     <meta name="twitter:description" content="Listen to life stories, learn from teachings, and converse with AI Echoes of 30 figures from history. Marcus Aurelius to Frida Kahlo. Nonprofit, open source." />
     <meta name="twitter:image" content="https://media.agoracosmica.org/images/ui/og-default/1200.webp" />
+    <script src="/splash-lang.js"></script>
     <link rel="preload" href="/fonts/libre-caslon-text-v5-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="/fonts/SpaceGrotesk[wght].woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="/fonts/fonts.css">
@@ -89,6 +90,12 @@
         max-width: 26ch;
         line-height: 1.4;
         opacity: 0.92;
+        text-wrap: balance;
+      }
+      /* splash-lang.js sets the page language before this paints */
+      html[lang="de"] .agc-splash [lang="en"],
+      html:not([lang="de"]) .agc-splash [lang="de"] {
+        display: none;
       }
       .agc-splash__trust {
         font-size: 0.75rem;
@@ -122,9 +129,9 @@
       <div class="agc-splash" aria-hidden="true">
         <div class="agc-splash__brand">
           <p class="agc-splash__name">Agora Cosmica</p>
-          <p class="agc-splash__tag">A Living Library You Can Talk To</p>
+          <p class="agc-splash__tag"><span lang="en">A Living Library You Can Talk To</span><span lang="de">Eine lebendige Bibliothek, mit der du sprechen kannst</span></p>
         </div>
-        <p class="agc-splash__trust">Nonprofit · Open Source · No tracking cookies, no profiling</p>
+        <p class="agc-splash__trust"><span lang="en">Nonprofit · Open Source · No tracking cookies, no profiling</span><span lang="de">Gemeinnützig · Open Source · Keine Tracking-Cookies, kein Profiling</span></p>
       </div>
     </div>
     <script src="/config.js"></script>
