@@ -8,6 +8,9 @@ import { createFirstVisitSlice } from './slices/firstVisitSlice';
 import { createVoicePreferencesSlice } from './slices/voicePreferencesSlice';
 import { isEnglishEngine, resolveQwenEnglishVoice } from '../services/audio/voices/voiceDefinitions';
 import type { FreeTierState } from '../utils/freeTierState';
+import { bindServiceConfigSync, createServiceConfigStorage, markServiceConfigHydrated } from './serviceConfigSync';
+
+const STORE_NAME = 'agora-cosmica-store';
 
 const debugLog = (...args: any[]) => {
   if (import.meta.env.DEV) {
@@ -307,7 +310,9 @@ export const useDomainStore = create<DomainSlices>()(
           })),
       }),
       {
-        name: 'agora-cosmica-store',
+        name: STORE_NAME,
+        storage: createServiceConfigStorage(),
+        onRehydrateStorage: () => (state) => markServiceConfigHydrated(state?.serviceConfig?.raw),
         version: 1, // Increment when persisted schema changes — triggers migration
         migrate: (persistedState: any, _version: number) => {
           // Future migrations go here:
@@ -405,3 +410,5 @@ export const useDomainStore = create<DomainSlices>()(
     )
   )
 );
+
+bindServiceConfigSync(useDomainStore, STORE_NAME);

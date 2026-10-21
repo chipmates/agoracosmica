@@ -2,6 +2,7 @@
 
 // Architecture: Self-hosted audio (GEX130) + OpenRouter BYOK / Nebius free-tier
 import { useDomainStore } from '../../../stores';
+import { adoptSavedServiceConfig } from '../../../stores/serviceConfigSync';
 import { isSelfHost } from '../../../config/deployment';
 
 // ============================================
@@ -147,6 +148,8 @@ export const loadServiceConfig = (): ServiceConfig => {
   isLoadingConfig = true;
 
   try {
+    // Another tab may have changed the settings since this tab last looked.
+    adoptSavedServiceConfig();
     const savedConfig = useDomainStore.getState().serviceConfig.raw;
 
     if (savedConfig) {
