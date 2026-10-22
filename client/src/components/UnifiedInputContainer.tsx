@@ -108,7 +108,11 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   // spoken words were still being transcribed, it holds for the request they start.
   const [readingFor, setReadingFor] = useState<string | null>(null);
   const readNextRequestRef = useRef(false);
-  const replyOnItsWay = readingFor !== null && readingFor === pendingRequestId && !firstTextArrived;
+  // The same choice, for the sign: until the words start a request, the reply
+  // is still on its way.
+  const [readingNext, setReadingNext] = useState(false);
+  const replyOnItsWay = (readingFor !== null && readingFor === pendingRequestId && !firstTextArrived)
+    || (readingNext && !pendingRequestId);
   const setProcessingStage = useDomainStore((state) => state.setProcessingStage);
 
   // Stop voice: on at once when the Echo starts speaking, held through a short
@@ -213,6 +217,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
   useEffect(() => {
     if (pendingRequestId && readNextRequestRef.current) {
       readNextRequestRef.current = false;
+      setReadingNext(false);
       setReadingFor(pendingRequestId);
       readTextInstead(pendingRequestId);
       return;
@@ -350,6 +355,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     try {
       setReadingFor(null);
       readNextRequestRef.current = false;
+      setReadingNext(false);
       setIsProcessing(true);
       // Text-input path skips STT, so we start directly in 'preparing' and the
       // stream driver will advance to 'contemplating'/'shaping' as the LLM runs.
@@ -380,7 +386,10 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
       setIsProcessing(false);
       setProcessingStage(null);
     } finally {
-      if (!useDomainStore.getState().conversation.pendingRequestId) readNextRequestRef.current = false;
+      if (!useDomainStore.getState().conversation.pendingRequestId) {
+        readNextRequestRef.current = false;
+        setReadingNext(false);
+      }
     }
   };
   
@@ -549,6 +558,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
 
       setReadingFor(null);
       readNextRequestRef.current = false;
+      setReadingNext(false);
       setIsProcessing(true);
       // Voice path starts in 'preparing'; processAudio will bump it to 'hearing'
       // once the Whisper request actually fires.
@@ -596,7 +606,10 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
     } finally {
       // A choice to read made while the words were transcribed ends with them
       // when they started no request.
-      if (!useDomainStore.getState().conversation.pendingRequestId) readNextRequestRef.current = false;
+      if (!useDomainStore.getState().conversation.pendingRequestId) {
+        readNextRequestRef.current = false;
+        setReadingNext(false);
+      }
     }
   }, [isRecording, onSubmitMessage]);
 
@@ -687,6 +700,7 @@ const UnifiedInputContainer: FC<UnifiedInputContainerProps> = ({ selectedFigure,
             sendSessionEndBeacon(getOrRollConversationSessionId());
             setReadingFor(pending);
             readNextRequestRef.current = pending === null;
+            setReadingNext(pending === null);
             setIsProcessing(false);
             setProcessingStage(null);
           }}

@@ -135,6 +135,40 @@ describe('after reading instead, the reply is still on its way', () => {
     expect(screen.getByText(SIGN)).toBeTruthy();
   });
 
+  it('while the words are still being transcribed, the sign already says the reply is on its way', async () => {
+    h.state.conversation.pendingRequestId = null;
+    vi.mocked(processTextMessage).mockImplementationOnce(() => new Promise(() => {}) as never);
+    const rerender = mount();
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Was ist Freiheit?' } });
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
+    fireEvent.click(await screen.findByText('Read text instead'));
+    // No request yet: the card is gone, and the sign stands in for it.
+    expect(screen.queryByText('Read text instead')).toBeNull();
+    expect(screen.getByText(SIGN)).toBeTruthy();
+    expect(screen.getAllByRole('status')).toHaveLength(1);
+
+    // The words start their request: the same sign, until the first words arrive.
+    h.state.conversation.pendingRequestId = 'r5';
+    rerender();
+    expect(screen.getByText(SIGN)).toBeTruthy();
+    h.state.session.firstTextArrived = true;
+    rerender();
+    expect(screen.queryByText(SIGN)).toBeNull();
+  });
+
+  it('a choice to read whose message started no request takes its sign with it', async () => {
+    h.state.conversation.pendingRequestId = null;
+    let settle: () => void = () => {};
+    vi.mocked(processTextMessage).mockImplementationOnce(() => new Promise<void>((resolve) => { settle = resolve; }) as never);
+    mount();
+    fireEvent.change(screen.getByRole('textbox'), { target: { value: 'Was ist Freiheit?' } });
+    fireEvent.keyDown(screen.getByRole('textbox'), { key: 'Enter' });
+    fireEvent.click(await screen.findByText('Read text instead'));
+    expect(screen.getByText(SIGN)).toBeTruthy();
+    await act(async () => { settle(); });
+    expect(screen.queryByText(SIGN)).toBeNull();
+  });
+
   it('a choice to read whose message started no request ends with it', async () => {
     h.state.conversation.pendingRequestId = null;
     let settle: () => void = () => {};
