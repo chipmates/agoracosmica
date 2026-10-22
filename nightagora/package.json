@@ -18,7 +18,7 @@
     "playwright": "^1.61.1",
     "sharp": "^0.35.5",
     "typescript": "^5.9.3",
-    "vite": "^8.1.5"
+    "vite": "^8.1.6"
   },
   "pnpm": {
     "overrides": {
