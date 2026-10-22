@@ -30,8 +30,9 @@ export function mapErrorToUserMessage(error: unknown, tString: TStringFn): strin
   // ── Own key kept, this one request refused (HTTP 403) ──────────────────
   if (error instanceof OwnKeyRefusedError) {
     if (error.reason === 'budget' && error.resetsAt) {
-      return tString(`${KEY}.byokRefused.budgetUntil`)
-        .replace('{date}', formatDate(error.resetsAt, shownLanguage()));
+      // No-break spaces keep the date on one line ("1. November 2026").
+      const date = formatDate(error.resetsAt, shownLanguage()).replace(/ /g, '\u00A0');
+      return tString(`${KEY}.byokRefused.budgetUntil`).replace('{date}', date);
     }
     return tString(`${KEY}.byokRefused.${error.reason}`);
   }

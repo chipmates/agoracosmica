@@ -273,11 +273,11 @@ describe('reading the refusal', () => {
     const error = new OwnKeyRefusedError('budget', '2026-11-02T12:00:00.000Z');
     noteShownLanguage('de');
     const deLine = mapErrorToUserMessage(error, lookup(de));
-    expect(deLine).toContain('2. November 2026');
+    expect(deLine).toContain('2.\u00A0November\u00A02026');
     expect(deLine).not.toContain('{date}');
     noteShownLanguage('en');
     const enLine = mapErrorToUserMessage(error, lookup(en));
-    expect(enLine).toContain('November 2, 2026');
+    expect(enLine).toContain('November\u00A02,\u00A02026');
     expect(enLine).toMatch(/^OpenRouter stopped this request/);
     noteShownLanguage('de');
   });
