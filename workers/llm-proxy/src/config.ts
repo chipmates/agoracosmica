@@ -138,11 +138,10 @@ export const SERVING_MODELS: Record<ServingModelKey, ServingModel> = {
 // Nebius list price. Hard cap serves the unmetered fallback for the rest of the
 // day (yesterday's quality, not an outage); the soft alert only reports.
 //
-// The two figures are deployment values (GOVERNOR_HARD_USD, GOVERNOR_SOFT_USD),
-// so they live in one place and can move from wrangler.toml to a secret without
-// a code change. The constants below are only the floor for a deployment that
-// defines neither: deliberately low, so a missing var costs a day of model
-// quality rather than budget.
+// The two figures are Worker secrets (GOVERNOR_HARD_USD, GOVERNOR_SOFT_USD), kept
+// out of the repository. The constants below are only the floor for a deployment
+// that defines neither: deliberately low, so a missing secret costs a day of
+// model quality rather than budget.
 export const SPEND_GOVERNOR = {
   FLOOR_HARD_CAP_USD: 1,
   FLOOR_SOFT_ALERT_USD: 0.5,
