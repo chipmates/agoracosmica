@@ -24,6 +24,21 @@ interface ModalContainerProps {
   modalType?: ModalType;
 }
 
+// The control last focused or clicked. A lazy dialog can mount after the browser
+// has blurred an opener inside a closed menu, and a WebKit click focuses nothing;
+// either way focus sits on the body, and this names the opener to return to.
+let lastControl: Element | null = null;
+if (typeof document !== 'undefined') {
+  document.addEventListener('focusin', (e) => {
+    lastControl = e.target instanceof Element ? e.target : null;
+  }, true);
+  document.addEventListener('click', (e) => {
+    lastControl = e.target instanceof Element
+      ? e.target.closest('button, a[href], input, select, textarea, [tabindex]')
+      : null;
+  }, true);
+}
+
 // Hand focus back to the opener. An opener inside a region that has since
 // collapsed (a closed menu, or one a resize hid) cannot take it, so the control
 // that expands that region gets it instead of the page body.
@@ -84,7 +99,8 @@ const ModalContainer: FC<ModalContainerProps> = ({
   useEffect(() => {
     if (isOpen) {
       // Save current active element to restore focus later
-      previousActiveElement.current = document.activeElement;
+      const current = document.activeElement;
+      previousActiveElement.current = current && current !== document.body ? current : lastControl;
 
       // Focus the modal element itself
       if (modalRef.current) {

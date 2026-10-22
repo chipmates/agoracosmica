@@ -31,6 +31,38 @@ function Page({ openerDisabled = false, withToggle = true }: { openerDisabled?: 
   );
 }
 
+// A dialog that mounts a tick after its opener's menu closed (as a lazy one
+// does), by which time the browser has already blurred the hidden opener.
+function LatePage() {
+  const [open, setOpen] = useState(false);
+  const [collapsed, setCollapsed] = useState(false);
+  return (
+    <div>
+      <button type="button" aria-controls="navigation">
+        menu
+      </button>
+      <div id="navigation">
+        <button
+          type="button"
+          disabled={collapsed}
+          onClick={(e) => {
+            setCollapsed(true);
+            e.currentTarget.blur();
+            setTimeout(() => setOpen(true), 0);
+          }}
+        >
+          settings
+        </button>
+      </div>
+      {open && (
+        <ModalContainer isOpen onClose={() => setOpen(false)}>
+          <button type="button">first</button>
+        </ModalContainer>
+      )}
+    </div>
+  );
+}
+
 const byText = (text: string) =>
   Array.from(document.querySelectorAll('button')).find((b) => b.textContent === text) as HTMLButtonElement;
 
@@ -95,6 +127,53 @@ describe('ModalContainer focus', () => {
     act(() => {
       fireEvent.keyDown(dialog, { key: 'Escape' });
     });
+    expect(document.activeElement).toBe(document.body);
+  });
+
+  it('finds the opener when a late dialog mounts after focus fell to the body', async () => {
+    render(<LatePage />);
+    const opener = byText('settings');
+    opener.focus();
+    await act(async () => {
+      opener.click();
+      await new Promise((r) => setTimeout(r, 0));
+    });
+    const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+    expect(document.activeElement).toBe(dialog);
+    act(() => {
+      fireEvent.keyDown(dialog, { key: 'Escape' });
+    });
+    expect(document.querySelector('[role="dialog"]')).toBeNull();
+    expect(document.activeElement).toBe(byText('menu'));
+  });
+
+  it('returns to a clicked opener that never took focus', () => {
+    render(<Page />);
+    (document.activeElement as HTMLElement | null)?.blur();
+    act(() => {
+      byText('library').click();
+    });
+    const dialog = document.querySelector('[role="dialog"]') as HTMLElement;
+    act(() => {
+      fireEvent.keyDown(dialog, { key: 'Escape' });
+    });
+    expect(document.activeElement).toBe(byText('library'));
+  });
+
+  it('leaves focus on the body when the last click was on no control', () => {
+    render(<Page />);
+    byText('behind').focus();
+    act(() => {
+      fireEvent.click(document.body);
+    });
+    (document.activeElement as HTMLElement).blur();
+    const Late = () => (
+      <ModalContainer isOpen onClose={() => {}}>
+        <button type="button">inside</button>
+      </ModalContainer>
+    );
+    const { unmount } = render(<Late />);
+    unmount();
     expect(document.activeElement).toBe(document.body);
   });
 });
