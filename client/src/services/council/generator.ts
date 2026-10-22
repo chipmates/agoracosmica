@@ -686,8 +686,12 @@ Begin the council now. Remember to use the EXACT format specified in your instru
       }
       if (!ownProvider) {
         if (isSelfHost) {
-          // No free-tier proxy in a self-host build. The key gate makes a
-          // keyless council unreachable; this is the defensive backstop.
+          // No free-tier proxy in a self-host build. A stored key OpenRouter
+          // rejected is named as such; the key gate makes a keyless council
+          // unreachable, so the plain error is the defensive backstop.
+          if (_councilKind !== 'custom-openai' && await keyStorage.hasKey('openrouter')) {
+            throw new OwnKeyRejectedError(null, 401);
+          }
           throw new Error('A valid OpenRouter key is required.');
         }
         // A stored key that was rejected: the council's question goes to our

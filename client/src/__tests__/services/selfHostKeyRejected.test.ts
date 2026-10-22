@@ -1,6 +1,7 @@
 // A self-host build has no free tier. A key OpenRouter rejects (401) is marked
 // rejected there as on the hosted build, so Settings stops calling it active;
-// nothing is asked and nothing goes anywhere else. A 403 keeps the key.
+// nothing is asked and nothing goes anywhere else, and every route names the
+// rejected key in the page's language. A 403 keeps the key.
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const harness = vi.hoisted(() => ({
@@ -67,9 +68,13 @@ vi.mock('../../stores', () => ({
 
 import { createLegacyConversationStream } from '../../controllers/conversationStreamDriver';
 import type { StreamConversationParams } from '../../controllers/conversationController';
+import SummaryService from '../../services/SummaryService';
+import generator from '../../services/council/generator';
+import { askDriver } from '../../services/ask/askDriver';
 import { keyStorage } from '../../services/storage/keyStorageService';
 import {
   currentOwnKeyAsk,
+  OwnKeyRejectedError,
   OwnKeyRefusedError,
   resetOwnKeyConsentForTests,
 } from '../../services/llm/ownKeyConsent';
@@ -129,6 +134,47 @@ const chatTurn = (): Promise<unknown> => {
   }));
 };
 
+const aside = (): Promise<unknown> => askDriver.ask({
+  figureId: 'aurelius',
+  language: 'de',
+  seedId: '1',
+  contextWindow: 'Ein Kapitel über den Garten.',
+  question: 'Was ist Freiheit?',
+  priorPairs: [],
+  speak: false,
+  signal: new AbortController().signal,
+  onText: () => {},
+  onFirstToken: () => {},
+  onVoiceEnd: () => {},
+});
+
+const summary = (): Promise<unknown> => SummaryService.generateSummary(
+  [
+    { role: 'user', content: 'Was ist Freiheit?' },
+    { role: 'assistant', content: 'Freiheit beginnt im Inneren.' },
+  ],
+  'aurelius',
+  1,
+);
+
+const council = (): Promise<unknown> => {
+  (generator as any).signal = new AbortController().signal;
+  (generator as any).onProgressiveSegment = null;
+  return (generator as any).callLLM({
+    systemMessage: 'council template',
+    userMessage: 'Ist freier Wille real?',
+    expectedSpeakers: ['ADA LOVELACE', 'ALBERT EINSTEIN'],
+    config: { provider: 'openrouter', model: 'qwen/qwen3-235b-a22b-2507', maxTokens: 4000, temperature: 0.8, language: 'de' },
+  });
+};
+
+const routes: Array<[string, () => Promise<unknown>]> = [
+  ['a chat turn', chatTurn],
+  ['a question inside a story', aside],
+  ['a summary', summary],
+  ['a council', council],
+];
+
 const lookup = (key: string, fallback?: string): string => {
   const value = key.split('.').reduce<unknown>((node, part) => (node as Record<string, unknown> | undefined)?.[part], de);
   return typeof value === 'string' ? value : fallback ?? key;
@@ -175,6 +221,22 @@ describe('a self-host build whose stored key OpenRouter turns down', () => {
     expect(elsewhere()).toEqual([]);
     expect(currentOwnKeyAsk()).toBeNull();
     expect(mapErrorToUserMessage((again as { error: unknown }).error, lookup)).toBe(de.errors.conversation.byokInvalidKey);
+  });
+
+  it.each(routes)('%s names the rejected key, then again without trying it', async (_name, run) => {
+    STATUS.code = 401;
+    const first = await outcome(run());
+    const again = await outcome(run());
+
+    for (const result of [first, again]) {
+      expect(result.ok).toBe(false);
+      const error = (result as { error: unknown }).error;
+      expect(error).toBeInstanceOf(OwnKeyRejectedError);
+      expect(mapErrorToUserMessage(error, lookup)).toBe(de.errors.conversation.byokInvalidKey);
+    }
+    expect(toOpenRouter()).toHaveLength(1);
+    expect(elsewhere()).toEqual([]);
+    expect(currentOwnKeyAsk()).toBeNull();
   });
 
   it('a 403 keeps the key and says why', async () => {

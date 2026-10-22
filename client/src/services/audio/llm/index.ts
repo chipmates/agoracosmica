@@ -243,9 +243,10 @@ export const generateResponse = async ({
           if (typeof window !== 'undefined') {
             window.dispatchEvent(new CustomEvent('byok-key-changed', { detail: { hasKey: false } }));
           }
-          // A self-host build has no free tier to offer: the rejection is the answer.
+          // A self-host build has no free tier to offer: the rejection is the
+          // answer, named as such on every route (chat, question, summary, council).
           if (isSelfHost) {
-            throw error;
+            throw new OwnKeyRejectedError(null, error.status);
           }
           if (!freeTierFallback) {
             throw new OwnKeyRejectedError(null, error.status);

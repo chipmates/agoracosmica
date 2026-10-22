@@ -104,8 +104,12 @@ class SummaryService {
 
       if (!ownProvider) {
         if (isSelfHost) {
-          // No free-tier proxy in a self-host build. The key gate makes a
-          // keyless summary unreachable; this is the defensive backstop.
+          // No free-tier proxy in a self-host build. A stored key OpenRouter
+          // rejected is named as such; the key gate makes a keyless summary
+          // unreachable, so the plain error is the defensive backstop.
+          if (_summaryKind !== 'custom-openai' && await keyStorage.hasKey('openrouter')) {
+            throw new OwnKeyRejectedError(null, 401);
+          }
           throw new Error('A valid OpenRouter key is required.');
         }
         // A stored key that was rejected: the conversation goes to our servers
