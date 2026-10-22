@@ -14,6 +14,20 @@ type TStringFn = (key: string, fallback?: string) => string;
 const KEY = 'errors.conversation';
 
 /**
+ * Why OpenRouter refused a request, in the page's language. A spending limit
+ * names its reset day when OpenRouter gave one; a lifetime limit has none.
+ */
+export function ownKeyRefusalLine(error: OwnKeyRefusedError, tString: TStringFn): string {
+  const key = `${KEY}.byokRefused.${error.reason}`;
+  if ((error.reason === 'budget' || error.reason === 'budgetShared') && error.resetsAt) {
+    // No-break spaces keep the date on one line ("1. November 2026").
+    const date = formatDate(error.resetsAt, shownLanguage()).replace(/ /g, '\u00A0');
+    return tString(`${key}Until`).replace('{date}', date);
+  }
+  return tString(key);
+}
+
+/**
  * Convert any error thrown from the conversation streaming pipeline into a
  * localized, user-friendly message. Keep this pure — UI-side decisions
  * (whether to show a modal, route to BYOK, etc.) live at the call site.
@@ -29,12 +43,7 @@ export function mapErrorToUserMessage(error: unknown, tString: TStringFn): strin
 
   // ── Own key kept, this one request refused (HTTP 403) ──────────────────
   if (error instanceof OwnKeyRefusedError) {
-    if (error.reason === 'budget' && error.resetsAt) {
-      // No-break spaces keep the date on one line ("1. November 2026").
-      const date = formatDate(error.resetsAt, shownLanguage()).replace(/ /g, '\u00A0');
-      return tString(`${KEY}.byokRefused.budgetUntil`).replace('{date}', date);
-    }
-    return tString(`${KEY}.byokRefused.${error.reason}`);
+    return ownKeyRefusalLine(error, tString);
   }
 
   // ── Structured worker errors (free-tier path) ───────────────────────────

@@ -6,6 +6,8 @@ import { ArrowRight, ArrowsClockwise, SpeakerSlash } from '@phosphor-icons/react
 import Button from '../Button/Button';
 import { useTranslation } from '../../hooks/useTranslation';
 import type { AskExchange, AskNotice, AskState } from '../../hooks/useAskWhileListening';
+import { OwnKeyRefusedError, type OwnKeyRefusalReason } from '../../services/llm/ownKeyConsent';
+import { ownKeyRefusalLine } from '../../services/llm/errorMessages';
 
 interface AskAnswerProps {
   state: AskState;
@@ -13,6 +15,8 @@ interface AskAnswerProps {
   exchanges: AskExchange[];
   speaking: boolean;
   notice: AskNotice | null;
+  /** The refusal behind a `keyRefused:` notice, for the reset day it may carry. */
+  refusal?: OwnKeyRefusedError | null;
   onStopVoice: () => void;
   onResume: () => void;
   onAskAnother: () => void;
@@ -37,14 +41,6 @@ function noticeKey(notice: AskNotice): { key: string; fallback: string } {
         key: 'errors.conversation.byokInvalidKey',
         fallback: 'Your OpenRouter key was rejected. Please check it in Settings.',
       };
-    case 'keyRefused:budget':
-    case 'keyRefused:moderation':
-    case 'keyRefused:guardrail':
-    case 'keyRefused:forbidden':
-      return {
-        key: `errors.conversation.byokRefused.${notice.slice('keyRefused:'.length)}`,
-        fallback: 'OpenRouter did not allow this request. Check at OpenRouter which permissions and limits apply to your key.',
-      };
     case 'quotaSpent':
       return {
         key: 'askListen.quotaSpent',
@@ -65,6 +61,7 @@ const AskAnswer: FC<AskAnswerProps> = ({
   exchanges,
   speaking,
   notice,
+  refusal = null,
   onStopVoice,
   onResume,
   onAskAnother,
@@ -75,7 +72,20 @@ const AskAnswer: FC<AskAnswerProps> = ({
   const answered = state === 'answered';
   const thinking = state === 'pending';
   const header = tString('askListen.answerHeader', 'Echo of {name}').replace('{name}', figureName);
-  const notes = notice ? noticeKey(notice) : null;
+  const refusalReason = notice?.startsWith('keyRefused:')
+    ? notice.slice('keyRefused:'.length) as OwnKeyRefusalReason
+    : null;
+  let noteText: string | null = null;
+  if (refusalReason) {
+    // The chat's own line, with the reset day when OpenRouter gave one.
+    noteText = ownKeyRefusalLine(
+      refusal?.reason === refusalReason ? refusal : new OwnKeyRefusedError(refusalReason),
+      tString,
+    );
+  } else if (notice) {
+    const { key, fallback } = noticeKey(notice);
+    noteText = tString(key, fallback);
+  }
 
   return (
     <div className="ask-answer">
@@ -106,9 +116,9 @@ const AskAnswer: FC<AskAnswerProps> = ({
         </p>
       )}
 
-      {notes && (
+      {noteText && (
         <p className="ask-answer__notice" role="status">
-          {tString(notes.key, notes.fallback)}
+          {noteText}
         </p>
       )}
       </div>

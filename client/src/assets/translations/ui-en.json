@@ -1369,9 +1369,13 @@
       "byokInsufficientCredits": "Your OpenRouter account is out of credits. Please top it up to continue.",
       "byokModelNotFound": "The selected AI model is no longer available. Pick a different model in Settings to continue.",
       "byokRefused": {
-        "budget": "OpenRouter stopped this request because a spending limit for your key has been reached. Raise it at OpenRouter, or wait until it resets.",
+        "budget": "OpenRouter stopped this request because a spending limit for your key has been reached. Raise it at OpenRouter.",
         "budgetUntil": "OpenRouter stopped this request because a spending limit for your key has been reached. It resets on {date}, or you can raise it at OpenRouter.",
+        "budgetShared": "OpenRouter stopped this request because a spending limit that applies to your key has been reached. Whoever manages it at OpenRouter can raise it.",
+        "budgetSharedUntil": "OpenRouter stopped this request because a spending limit that applies to your key has been reached. It resets on {date}. Whoever manages it at OpenRouter can raise it before then.",
         "moderation": "OpenRouter stopped this request because the model's moderation flagged it.",
+        "contentPolicy": "A content filter stopped this request or its answer.",
+        "modelRefusal": "The model declined to answer this request.",
         "guardrail": "OpenRouter stopped this request because a rule in your OpenRouter account blocks it. Check the rules there.",
         "forbidden": "OpenRouter did not allow this request. Check at OpenRouter which permissions and limits apply to your key."
       },

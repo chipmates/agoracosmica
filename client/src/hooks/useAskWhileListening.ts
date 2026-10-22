@@ -104,6 +104,8 @@ export interface UseAskResult {
   draft: string;
   answerText: string;
   notice: AskNotice | null;
+  /** The refusal behind a `keyRefused:` notice (its reset day, if any). */
+  refusal: OwnKeyRefusedError | null;
   /** The Echo is speaking the answer right now. */
   speaking: boolean;
   /** The hint under the field, shown the first time the sheet opens. */
@@ -158,6 +160,8 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
   const [draft, setDraft] = useState('');
   const [answerText, setAnswerText] = useState('');
   const [notice, setNotice] = useState<AskNotice | null>(null);
+  // Read only beside a `keyRefused:` notice, and set with it.
+  const [refusal, setRefusal] = useState<OwnKeyRefusedError | null>(null);
   const [speaking, setSpeaking] = useState(false);
   const [showHint, setShowHint] = useState<boolean>(() => !readHintSeen());
   const [documentVisible, setDocumentVisible] = useState<boolean>(
@@ -361,6 +365,7 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
         }
         if (error instanceof OwnKeyRefusedError) {
           // The key stands; OpenRouter refused this question, and says why.
+          setRefusal(error);
           setNotice(`keyRefused:${error.reason}`);
           setState('failed');
           return;
@@ -566,6 +571,7 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
       draft,
       answerText,
       notice,
+      refusal,
       speaking,
       showHint: hintVisible,
       openComposer,
@@ -586,6 +592,7 @@ export function useAskWhileListening(args: UseAskArgs): UseAskResult {
       draft,
       answerText,
       notice,
+      refusal,
       speaking,
       hintVisible,
       openComposer,

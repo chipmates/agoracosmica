@@ -89,9 +89,22 @@ const BODIES = {
   budget: {
     error: {
       code: 403,
+      message: 'Budget limit exceeded (monthly limit). $10.20 of $10.00 used; resets 2026-11-02T12:00:00.000Z.',
+      metadata: { limit_source: 'openrouter_key_limit', scope: 'key_limit', limit_usd: 10, spend_usd: 10.2, resets_at: '2026-11-02T12:00:00.000Z' },
+    },
+  },
+  budgetShared: {
+    error: {
+      code: 403,
       message: 'Budget limit exceeded (weekly limit). Contact your org admin. $52.00 of $50.00 used; resets 2026-11-02T12:00:00.000Z.',
       metadata: { limit_source: 'openrouter_guardrail_budget', scope: 'workspace_default_member', limit_usd: 50, spend_usd: 52, resets_at: '2026-11-02T12:00:00.000Z' },
     },
+  },
+  contentPolicy: {
+    error: { code: 403, message: 'Provider returned error', metadata: { error_type: 'content_policy_violation', provider_name: 'Google', raw: '{"finishReason":"SAFETY"}' } },
+  },
+  modelRefusal: {
+    error: { code: 403, message: 'The model refused to respond to this request.', metadata: { error_type: 'refusal', provider_name: 'Anthropic' } },
   },
   moderation: {
     error: {
@@ -240,7 +253,7 @@ describe('a 403 from OpenRouter on a stored own key', () => {
       expect(toUs()).toEqual([]);
 
       const line = mapErrorToUserMessage(error, lookup(de));
-      expect(line).toMatch(/^OpenRouter hat diese Anfrage/);
+      expect(line.startsWith((de.errors.conversation.byokRefused as Record<string, string>)[kind].slice(0, 40))).toBe(true);
       expect(line).not.toBe(de.errors.conversation.byokInvalidKey);
       expect(line).not.toMatch(/[—–;]/);
     });
@@ -258,6 +271,7 @@ describe('a 403 from OpenRouter on a stored own key', () => {
 describe('reading the refusal', () => {
   it('names the reason from the metadata, and from the message where there is none', () => {
     expect(ownKeyRefusalFrom(BODIES.budget.error)).toMatchObject({ reason: 'budget', resetsAt: '2026-11-02T12:00:00.000Z' });
+    expect(ownKeyRefusalFrom(BODIES.budgetShared.error)).toMatchObject({ reason: 'budgetShared', resetsAt: '2026-11-02T12:00:00.000Z' });
     expect(ownKeyRefusalFrom({ message: 'Key limit exceeded (total limit). $5.00 of $5.00 used; resets 2026-11-01T00:00:00.000Z.' }))
       .toMatchObject({ reason: 'budget', resetsAt: '2026-11-01T00:00:00.000Z' });
     expect(ownKeyRefusalFrom({ message: 'Budget limit exceeded (lifetime limit). $5.00 of $5.00 used; resets .' }))
@@ -285,7 +299,9 @@ describe('reading the refusal', () => {
   it('every refusal line exists in both languages, free of dashes and semicolons', () => {
     for (const bundle of [de, en]) {
       const lines = bundle.errors.conversation.byokRefused as Record<string, string>;
-      expect(Object.keys(lines).sort()).toEqual(['budget', 'budgetUntil', 'forbidden', 'guardrail', 'moderation']);
+      expect(Object.keys(lines).sort()).toEqual([
+        'budget', 'budgetShared', 'budgetSharedUntil', 'budgetUntil', 'contentPolicy', 'forbidden', 'guardrail', 'modelRefusal', 'moderation',
+      ]);
       for (const line of Object.values(lines)) expect(line).not.toMatch(/[—–;]/);
     }
   });

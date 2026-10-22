@@ -13,6 +13,7 @@ import {
 import AskComposer from './AskComposer';
 import AskAnswer from './AskAnswer';
 import type { AskExchange, AskNotice, AskState } from '../../hooks/useAskWhileListening';
+import type { OwnKeyRefusedError } from '../../services/llm/ownKeyConsent';
 
 interface AskSheetProps {
   state: AskState;
@@ -22,6 +23,7 @@ interface AskSheetProps {
   exchanges: AskExchange[];
   speaking: boolean;
   notice: AskNotice | null;
+  refusal?: OwnKeyRefusedError | null;
   showHint: boolean;
   onDraftChange: (value: string) => void;
   onSend: () => void;
@@ -44,6 +46,7 @@ const AskSheet: FC<AskSheetProps> = ({
   exchanges,
   speaking,
   notice,
+  refusal = null,
   showHint,
   onDraftChange,
   onSend,
@@ -163,6 +166,7 @@ const AskSheet: FC<AskSheetProps> = ({
           exchanges={exchanges}
           speaking={speaking}
           notice={notice}
+          refusal={refusal}
           onStopVoice={onStopVoice}
           onResume={onResume}
           onAskAnother={onAskAnother}

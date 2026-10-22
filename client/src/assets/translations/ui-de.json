@@ -1371,9 +1371,13 @@
       "byokInsufficientCredits": "Deinem OpenRouter-Konto ist das Guthaben ausgegangen. Bitte lade es auf, um weiterzumachen.",
       "byokModelNotFound": "Das gewählte KI-Modell ist nicht mehr verfügbar. Wähle in den Einstellungen ein anderes Modell, um weiterzumachen.",
       "byokRefused": {
-        "budget": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit für deinen Key erreicht ist. Heb es bei OpenRouter an oder warte, bis es zurückgesetzt wird.",
+        "budget": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit für deinen Key erreicht ist. Heb es bei OpenRouter an.",
         "budgetUntil": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit für deinen Key erreicht ist. Es wird am {date} zurückgesetzt, oder du hebst es bei OpenRouter an.",
+        "budgetShared": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit erreicht ist, das für deinen Key gilt. Wer es bei OpenRouter verwaltet, kann es anheben.",
+        "budgetSharedUntil": "OpenRouter hat diese Anfrage gestoppt, weil ein Ausgabenlimit erreicht ist, das für deinen Key gilt. Es wird am {date} zurückgesetzt. Wer es bei OpenRouter verwaltet, kann es vorher anheben.",
         "moderation": "OpenRouter hat diese Anfrage gestoppt, weil die Moderation des Modells sie markiert hat.",
+        "contentPolicy": "Ein Inhaltsfilter hat diese Anfrage oder die Antwort darauf gestoppt.",
+        "modelRefusal": "Das Modell hat eine Antwort auf diese Anfrage abgelehnt.",
         "guardrail": "OpenRouter hat diese Anfrage gestoppt, weil eine Regel in deinem OpenRouter-Konto sie blockiert. Prüfe die Regeln dort.",
         "forbidden": "OpenRouter hat diese Anfrage nicht erlaubt. Prüfe bei OpenRouter, welche Rechte und Limits für deinen Key gelten."
       },

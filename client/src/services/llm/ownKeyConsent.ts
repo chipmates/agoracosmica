@@ -27,13 +27,19 @@ export class OwnKeyRejectedError extends Error {
   }
 }
 
-/** Why OpenRouter refused one request while the key itself stands. */
-export type OwnKeyRefusalReason = 'budget' | 'moderation' | 'guardrail' | 'forbidden';
+/**
+ * Why OpenRouter refused one request while the key itself stands. `budget` is
+ * the key's own limit, `budgetShared` one set over it (an organisation's
+ * guardrail or a workspace budget), which its manager raises.
+ */
+export type OwnKeyRefusalReason =
+  | 'budget' | 'budgetShared' | 'moderation' | 'contentPolicy' | 'modelRefusal' | 'guardrail' | 'forbidden';
 
 /**
  * OpenRouter answered an own-key request with 403: a spending limit, a
- * moderation flag, a guardrail or a missing permission. Only a 401 rejects the
- * key, so this one keeps it, and the free tier is never offered for it.
+ * moderation flag, a content filter, a model's refusal, a guardrail or a
+ * missing permission. Only a 401 rejects the key, so this one keeps it, and the
+ * free tier is never offered for it.
  */
 export class OwnKeyRefusedError extends Error {
   constructor(
@@ -56,19 +62,28 @@ export function isOwnKeyError(error: unknown): error is OwnKeyError {
 const isoInstant = (value: unknown): string | null =>
   typeof value === 'string' && !Number.isNaN(Date.parse(value)) ? value : null;
 
+// Budgets set over the key: an organisation's guardrail, a workspace's budget.
+const SHARED_LIMIT_SOURCES = new Set(['openrouter_guardrail_budget', 'openrouter_workspace_budget']);
+
 /**
  * Reads OpenRouter's 403 body (message and metadata) the way its error page
- * describes it: budget errors carry `limit_source` and `resets_at`, moderation
- * errors `reasons` and `flagged_input`, guardrail blocks "Request blocked".
+ * describes it: content filters and model refusals carry `error_type`, budget
+ * errors `limit_source` and `resets_at`, moderation errors `reasons` and
+ * `flagged_input`, guardrail blocks "Request blocked".
  */
 export function ownKeyRefusalFrom(
   detail: { message?: unknown; metadata?: Record<string, unknown> } | null | undefined,
 ): OwnKeyRefusedError {
   const message = typeof detail?.message === 'string' ? detail.message : '';
   const meta = detail?.metadata ?? {};
+  if (meta.error_type === 'content_policy_violation') return new OwnKeyRefusedError('contentPolicy');
+  if (meta.error_type === 'refusal') return new OwnKeyRefusedError('modelRefusal');
   if (typeof meta.limit_source === 'string' || /budget|limit exceeded/i.test(message)) {
     const resets = isoInstant(meta.resets_at) ?? isoInstant(/resets (\S+?)\.?$/i.exec(message)?.[1]);
-    return new OwnKeyRefusedError('budget', resets);
+    const shared = typeof meta.limit_source === 'string'
+      ? SHARED_LIMIT_SOURCES.has(meta.limit_source)
+      : /org admin/i.test(message);
+    return new OwnKeyRefusedError(shared ? 'budgetShared' : 'budget', resets);
   }
   if (Array.isArray(meta.reasons) || typeof meta.flagged_input === 'string' || /flagged|moderation/i.test(message)) {
     return new OwnKeyRefusedError('moderation');

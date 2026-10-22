@@ -1107,6 +1107,7 @@ const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
                 exchanges={ask.exchanges}
                 speaking={ask.speaking}
                 notice={ask.notice}
+                refusal={ask.refusal}
                 showHint={ask.showHint}
                 onDraftChange={ask.setDraft}
                 onSend={ask.send}
