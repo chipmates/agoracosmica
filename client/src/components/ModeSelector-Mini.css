@@ -1199,6 +1199,8 @@
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
   font-size: 0.8rem;
   color: var(--text-tertiary);
+  /* Two even lines on a phone, never one word alone */
+  text-wrap: balance;
 }
 
 .doors-allways {
