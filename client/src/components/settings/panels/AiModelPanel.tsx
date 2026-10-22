@@ -361,7 +361,7 @@ const AiModelPanel: FC<AiModelPanelProps> = ({ SettingCard, CATEGORY_ICONS }) =>
           lineHeight: 1.5,
         }}>
           {isSelfHost
-            ? tNode('settings.aiModelKey.keySectionIntroSelfHost')
+            ? tNode(localLlm ? 'settings.aiModelKey.keySectionIntroSelfHostLocal' : 'settings.aiModelKey.keySectionIntroSelfHost')
             : tNode('settings.aiModelKey.keySectionIntro')}
         </p>
 

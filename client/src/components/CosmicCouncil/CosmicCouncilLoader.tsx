@@ -81,7 +81,7 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
   };
 
   // The busy lines speak of our servers. A wait on the visitor's own model or
-  // voices (Local Mode) is on their machine and says so plainly; in mixed Local
+  // voices (Local Mode) is on their own service and says so plainly; in mixed Local
   // Mode only the service the stage waits on counts: 'generating' runs until the
   // first speech is written, then the first voice is awaited.
   const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
@@ -121,7 +121,7 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
     () => {
       if (capacityForQuotes !== 'highDemand') return NORMAL_QUOTES[stage] ?? NORMAL_QUOTES.generating;
       return localWait
-        ? [tString('processing.localWait', 'Your computer is still working. One moment.')]
+        ? [tString('processing.localWait', 'Your Local Mode service is still working. One moment.')]
         : highDemandPoolFor(stage);
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -232,7 +232,7 @@ const CosmicCouncilLoader: FC<CosmicCouncilLoaderProps> = ({
                 {localWait
                   ? tString(
                     'councilProcessing.localTakingLonger',
-                    'Your computer is taking longer. Wait a moment for the voices, or read the dialogue now.',
+                    'Your Local Mode service is taking longer. Wait a moment for the voices, or read the dialogue now.',
                   )
                   : tString(
                     'councilProcessing.takingLonger',

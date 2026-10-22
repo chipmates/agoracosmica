@@ -374,7 +374,7 @@ const LocalModePanel: FC<LocalModePanelProps> = ({ SettingCard, CATEGORY_ICONS }
       title={tString('settings.localMode.title', 'Local Mode')}
       icon={CATEGORY_ICONS.localMode || <House size={20} />}
       description={tString('settings.localMode.description',
-        'Run any combination of the three services on your own machine: LLM, voice, transcription.')}
+        'Run any combination of the three services on your own device or server: LLM, voice, transcription.')}
     >
       {renderTierBanner()}
 

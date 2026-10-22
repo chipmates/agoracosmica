@@ -328,6 +328,7 @@
       "statusNoModel": "Noch kein Modell. Füge oben deinen OpenRouter-Key hinzu oder schalte im Lokalen Modus dein eigenes Modell ein.",
       "localRunsAt": "Läuft unter {endpoint}",
       "keySectionIntroSelfHost": "Mit einem OpenRouter-Key laufen die Gespräche über dein eigenes Konto, wo du die Nutzung siehst und kontrollierst. Ohne Key antwortet hier nur ein Modell im Lokalen Modus.",
+      "keySectionIntroSelfHostLocal": "Gerade antwortet dein eigenes Modell im Lokalen Modus. Schaltest du es aus, laufen die Gespräche mit einem OpenRouter-Key über dein eigenes Konto.",
       "statusByok": "Dein OpenRouter-Key ist aktiv. Kein Tageslimit.",
       "statusByokSelfHost": "Dein OpenRouter-Key ist aktiv.",
       "statusRejected": "Dein OpenRouter-Key wurde abgelehnt. Bevor ein Gespräch über den kostenlosen Tarif läuft, fragt dich die App.",
@@ -376,7 +377,7 @@
     },
     "localMode": {
       "title": "Lokaler Modus",
-      "description": "Wähle einzeln aus, welche der drei Dienste auf deinem Rechner laufen: LLM, Stimme, Transkription.",
+      "description": "Wähle einzeln aus, welche der drei Dienste auf deinem eigenen Gerät oder Server laufen: LLM, Stimme, Transkription.",
       "toggleOn": "Lokaler Modus ist an",
       "toggleOff": "Auf lokalen Modus umschalten",
       "hardwareBanner": {
@@ -1259,8 +1260,8 @@
     "replyOnItsWay": "Die Antwort ist unterwegs.",
     "greetingOnItsWay": "Die Begrüßung ist unterwegs.",
     "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
-    "localWait": "Dein Rechner arbeitet noch. Einen Moment.",
-    "localTakingLonger": "Dein Rechner braucht länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
+    "localWait": "Dein Dienst im Lokalen Modus arbeitet noch. Einen Moment.",
+    "localTakingLonger": "Dein Dienst im Lokalen Modus braucht länger. Warte kurz auf die Stimme oder lies jetzt ohne zu warten.",
     "securityCheck": "Kurze Sicherheitsprüfung. Tippe unten auf das Kästchen, dann geht es direkt weiter.",
     "securityWait": "Einen Moment, eine kurze Sicherheitsprüfung läuft."
   },
@@ -1297,7 +1298,7 @@
     },
     "optOut": "Lieber den Dialog lesen",
     "takingLonger": "Heute dauert es länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt.",
-    "localTakingLonger": "Dein Rechner braucht länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt."
+    "localTakingLonger": "Dein Dienst im Lokalen Modus braucht länger. Warte kurz auf die Stimmen oder lies den Dialog jetzt."
   },
   "summary": {
     "generatingTitle": "Erstelle Zusammenfassung",
@@ -2169,7 +2170,7 @@
       "startButton": "Loslegen",
       "selfHost": {
         "valueBody": "Dein Schlüssel, deine Daten. Du zahlst direkt an OpenRouter.",
-        "benefit1": "Keine Tageslimits, du bestimmst das Tempo",
+        "benefit1": "Nutzung und Kosten siehst du in deinem OpenRouter-Konto",
         "benefit2": "Ein Schlüssel, viele Modelle",
         "successBody": "Dein Schlüssel ist gespeichert. Gespräche, Councils und Zusammenfassungen sind einsatzbereit."
       }

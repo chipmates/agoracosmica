@@ -148,7 +148,7 @@ const BYOKSetupModal: FC = () => {
             }}>
               {[
                 isSelfHost
-                  ? tString('byok.wizard.selfHost.benefit1', 'No daily limits, set your own pace')
+                  ? tString('byok.wizard.selfHost.benefit1', 'See usage and costs in your OpenRouter account')
                   : tString('byok.wizard.benefit1', 'No daily limits on messages, councils, or summaries'),
                 isSelfHost
                   ? tString('byok.wizard.selfHost.benefit2', 'One key, many models')

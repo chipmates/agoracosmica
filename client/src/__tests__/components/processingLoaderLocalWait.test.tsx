@@ -68,7 +68,7 @@ describe('the processing card in a long wait', () => {
     setLocal(true, true, true);
     const shown = linesShown('preparing', 30);
 
-    expect(shown).toContain('Dein Rechner arbeitet noch. Einen Moment.');
+    expect(shown).toContain('Dein Dienst im Lokalen Modus arbeitet noch. Einen Moment.');
     expect(shown).toContain(de.processing.localTakingLonger);
     for (const busy of busyLines(de)) expect(shown).not.toContain(busy);
     expect(shown.join(' ')).not.toMatch(/Volles Haus|Viele Stimmen|Heute dauert/);
@@ -79,7 +79,7 @@ describe('the processing card in a long wait', () => {
     setLocal(true, false, false);
     const shown = linesShown('preparing', 30);
 
-    expect(shown).toContain('Your computer is still working. One moment.');
+    expect(shown).toContain('Your Local Mode service is still working. One moment.');
     expect(shown).toContain(en.processing.localTakingLonger);
     for (const busy of busyLines(en as unknown as typeof de)) expect(shown).not.toContain(busy);
   });

@@ -75,7 +75,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   };
 
   // The busy lines speak of our servers. When part of the wait runs in Local
-  // Mode on the visitor's own machine, a long wait gets its own plain line.
+  // Mode (the visitor's own device or server), a long wait gets its own plain line.
   const savedRaw = useDomainStore((state) => state.serviceConfig.raw);
   const localWait = useMemo(() => {
     const lm = localModeFromRaw(savedRaw);
@@ -134,7 +134,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
   const activePool = useMemo(
     () => {
       if (capacityForQuotes !== 'normal' && localWait) {
-        return [tString('processing.localWait', 'Your computer is still working. One moment.')];
+        return [tString('processing.localWait', 'Your Local Mode service is still working. One moment.')];
       }
       // A first load waits on the reply's text, as a request does once it is heard.
       return quotePoolFor(capacityForQuotes, stage ?? 'contemplating');
@@ -217,7 +217,7 @@ const ProcessingLoader: FC<ProcessingLoaderProps> = ({
                 {localWait
                   ? tString(
                     'processing.localTakingLonger',
-                    'Your computer is taking longer. Wait a moment for the voice, or read now and skip the wait.',
+                    'Your Local Mode service is taking longer. Wait a moment for the voice, or read now and skip the wait.',
                   )
                   : tString(
                     'processing.takingLonger',

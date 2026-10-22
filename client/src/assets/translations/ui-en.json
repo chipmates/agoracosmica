@@ -330,6 +330,7 @@
       "statusNoModel": "No model yet. Add your OpenRouter key above, or turn on your own model in Local Mode.",
       "localRunsAt": "Runs at {endpoint}",
       "keySectionIntroSelfHost": "With an OpenRouter key, conversations run on your own account, where you see and control the usage. Without a key, only a model in Local Mode answers here.",
+      "keySectionIntroSelfHostLocal": "Your own model in Local Mode answers now. Turn it off, and conversations run with an OpenRouter key on your own account.",
       "statusByok": "Your OpenRouter key is active. No daily limit.",
       "statusByokSelfHost": "Your OpenRouter key is active.",
       "statusRejected": "Your OpenRouter key was rejected. Before a conversation goes through the free tier, the app asks you.",
@@ -378,7 +379,7 @@
     },
     "localMode": {
       "title": "Local Mode",
-      "description": "Run any combination of the three services on your own machine: LLM, voice, transcription.",
+      "description": "Run any combination of the three services on your own device or server: LLM, voice, transcription.",
       "toggleOn": "Local Mode is on",
       "toggleOff": "Switch to Local Mode",
       "hardwareBanner": {
@@ -1257,8 +1258,8 @@
     "replyOnItsWay": "The reply is on its way.",
     "greetingOnItsWay": "The greeting is on its way.",
     "takingLonger": "Takes longer today. Wait a moment for the voice, or read now and skip the wait.",
-    "localWait": "Your computer is still working. One moment.",
-    "localTakingLonger": "Your computer is taking longer. Wait a moment for the voice, or read now and skip the wait.",
+    "localWait": "Your Local Mode service is still working. One moment.",
+    "localTakingLonger": "Your Local Mode service is taking longer. Wait a moment for the voice, or read now and skip the wait.",
     "securityCheck": "Quick security check. Tap the box at the bottom of the screen and your message continues.",
     "securityWait": "One moment, a quick security check is running."
   },
@@ -1295,7 +1296,7 @@
     },
     "optOut": "Read dialogue instead",
     "takingLonger": "Takes longer today. Wait a moment for the voices, or read the dialogue now.",
-    "localTakingLonger": "Your computer is taking longer. Wait a moment for the voices, or read the dialogue now."
+    "localTakingLonger": "Your Local Mode service is taking longer. Wait a moment for the voices, or read the dialogue now."
   },
   "summary": {
     "generatingTitle": "Generating Summary",
@@ -2167,7 +2168,7 @@
       "startButton": "Start Chatting",
       "selfHost": {
         "valueBody": "Your key, your data. You pay OpenRouter directly.",
-        "benefit1": "No daily limits, set your own pace",
+        "benefit1": "See usage and costs in your OpenRouter account",
         "benefit2": "One key, many models",
         "successBody": "Your key is saved. Conversations, councils, and summaries are ready."
       }
