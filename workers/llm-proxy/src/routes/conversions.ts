@@ -101,7 +101,7 @@ export async function handleConversions(
   }
   await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
 
-  // Store conversion event in KV (for dashboard display)
+  // The conversion event in KV, kept 90 days.
   const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
   const convKey = `conv:${dateKey}:${payload.event}:${Date.now()}`;
   await env.RATE_LIMITS.put(convKey, JSON.stringify({
@@ -111,7 +111,7 @@ export async function handleConversions(
     date: dateKey,
   }), { expirationTtl: 90 * 86400 }); // Keep 90 days
 
-  // Increment daily counter for quick dashboard queries
+  // A daily counter per event, kept 90 days.
   const counterKey = `conv_count:${dateKey}:${payload.event}`;
   const count = parseInt(await env.RATE_LIMITS.get(counterKey) || '0', 10);
   await env.RATE_LIMITS.put(counterKey, String(count + 1), { expirationTtl: 90 * 86400 });
@@ -144,53 +144,4 @@ export async function handleConversions(
   );
 
   return Response.json({ ok: true });
-}
-
-// Counters exposed on the stats readout. Every accepted event plus
-// mode_selected, whose rows stay readable while its 90-day history lasts.
-const STATS_EVENTS = [
-  'profile_created',
-  'start_exploring',
-  'council_engaged',
-  'listened',
-  'dialogue_started',
-  'conversation_deepened',
-  'mode_selected',
-] as const;
-
-type StatsEvent = (typeof STATS_EVENTS)[number];
-
-// GET endpoint for stats dashboard to read conversion counts
-export async function handleConversionStats(
-  request: Request,
-  env: Env
-): Promise<Response> {
-  const url = new URL(request.url);
-  const days = parseInt(url.searchParams.get('days') || '30', 10);
-  const results: Record<string, Record<StatsEvent, number>> = {};
-
-  const now = new Date();
-  for (let i = 0; i < Math.min(days, 90); i++) {
-    const date = new Date(now);
-    date.setDate(date.getDate() - i);
-    const dateKey = date.toISOString().split('T')[0];
-
-    // One KV round trip per day rather than one per counter: the readout
-    // spans up to 90 days across every event.
-    const counts = await Promise.all(
-      STATS_EVENTS.map(async (event) =>
-        parseInt((await env.RATE_LIMITS.get(`conv_count:${dateKey}:${event}`)) || '0', 10),
-      ),
-    );
-
-    if (counts.some((n) => n > 0)) {
-      const day = {} as Record<StatsEvent, number>;
-      STATS_EVENTS.forEach((event, idx) => {
-        day[event] = counts[idx];
-      });
-      results[dateKey] = day;
-    }
-  }
-
-  return Response.json({ days, results });
 }

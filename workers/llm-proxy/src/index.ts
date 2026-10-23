@@ -7,7 +7,7 @@ import { handleChat } from './routes/chat';
 import { handleCouncil } from './routes/council';
 import { handleQuota } from './routes/quota';
 import { handleSummary } from './routes/summary';
-import { handleConversions, handleConversionStats } from './routes/conversions';
+import { handleConversions } from './routes/conversions';
 import { handlePlayback } from './routes/playback';
 import { handlePage } from './routes/page';
 import { handleEntry } from './routes/entry';
@@ -103,8 +103,6 @@ export default {
         response = await handleQuota(request, env);
       } else if (path === '/api/conversions' && request.method === 'POST') {
         response = await handleConversions(request, env, ctx);
-      } else if (path === '/api/conversions/stats' && request.method === 'GET') {
-        response = await handleConversionStats(request, env);
       } else if (path === '/v1/playback' && request.method === 'POST') {
         response = await handlePlayback(request, env);
       } else if (path === '/v1/page' && request.method === 'POST') {

@@ -2819,6 +2819,39 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('the conversion counters have no readout: GET /api/conversions/stats is a 404 and reads nothing', async () => {
+    const day = new Date().toISOString().slice(0, 10);
+    const reads: string[] = [];
+    const kv = fakeKv();
+    await kv.put(`conv_count:${day}:listened`, '5');
+    const counted = {
+      get: async (key: string) => { reads.push(key); return kv.get(key); },
+      put: kv.put,
+    } as unknown as KVNamespace;
+    const env = fakeEnv({ RATE_LIMITS: counted });
+    const outbound: string[] = [];
+    globalThis.fetch = (async (url: string) => {
+      outbound.push(String(url));
+      throw new Error('no outbound call in this test');
+    }) as unknown as typeof fetch;
+    try {
+      for (const headers of [{}, { Authorization: `Bearer ${await bearer(env)}` }] as Record<string, string>[]) {
+        const { ctx } = fakeCtx();
+        const response = await worker.fetch(
+          new Request(`https://example.invalid/api/conversions/stats?days=90`, { method: 'GET', headers }),
+          env,
+          ctx,
+        );
+        assertEqual(response.status, 404, `status (${headers.Authorization ? 'with' : 'without'} a session)`);
+        assertEqual(await response.text(), JSON.stringify({ error: 'Not found' }), 'the unknown-route body');
+      }
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    assertEqual(reads.length, 0, `KV reads: ${reads.slice(0, 3).join(', ')}`);
+    assertEqual(outbound.length, 0, 'outbound calls');
+  });
+
   // -------------------------------------------------------------------------
   // A summary counted before the model answers is given back when none was delivered
   // -------------------------------------------------------------------------
