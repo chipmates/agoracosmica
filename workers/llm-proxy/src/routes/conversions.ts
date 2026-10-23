@@ -111,11 +111,6 @@ export async function handleConversions(
     date: dateKey,
   }), { expirationTtl: 90 * 86400 }); // Keep 90 days
 
-  // A daily counter per event, kept 90 days.
-  const counterKey = `conv_count:${dateKey}:${payload.event}`;
-  const count = parseInt(await env.RATE_LIMITS.get(counterKey) || '0', 10);
-  await env.RATE_LIMITS.put(counterKey, String(count + 1), { expirationTtl: 90 * 86400 });
-
   // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
   // never written here — it goes only to Google Ads for attribution. Keeping
   // it out of our analytics is what makes the "click ID is not combined with

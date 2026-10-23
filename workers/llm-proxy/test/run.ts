@@ -2852,6 +2852,34 @@ async function main(): Promise<number> {
     assertEqual(outbound.length, 0, 'outbound calls');
   });
 
+  await test('an accepted conversion keeps no daily counter', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const { ctx, pending } = fakeCtx();
+    analyticsRows.length = 0;
+    const outbound: string[] = [];
+    globalThis.fetch = (async (url: string) => {
+      outbound.push(String(url));
+      throw new Error('no outbound call in this test');
+    }) as unknown as typeof fetch;
+    try {
+      const response = await worker.fetch(new Request('https://example.invalid/api/conversions', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.31', 'Content-Type': 'text/plain' },
+        body: JSON.stringify({ gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now(), figureId: 'socrates' }),
+      }), env, ctx);
+      await Promise.all(pending);
+      assertEqual(response.status, 200, 'status');
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    assertEqual(analyticsRows.length, 1, 'the Analytics Engine row the dashboard counts');
+    assert(kv.puts.some(key => key.startsWith('conv_rl:')), 'the per-address limit still counts');
+    const counters = kv.puts.filter(key => key.startsWith('conv_count:'));
+    assertEqual(counters.length, 0, `daily counter writes: ${counters.join(', ')}`);
+    assertEqual(outbound.length, 0, 'outbound calls');
+  });
+
   // -------------------------------------------------------------------------
   // A summary counted before the model answers is given back when none was delivered
   // -------------------------------------------------------------------------
