@@ -7,6 +7,7 @@
 // outbound fetch is refused.
 
 import worker from '../src/index';
+import { ROUTES, dispatch, type Route } from '../src/router';
 import { signJWT } from '../src/utils/jwt';
 import type { Env } from '../src/utils/types';
 
@@ -32,29 +33,29 @@ const SESSION = new Set<string>([
 ]);
 
 // ---------------------------------------------------------------------------
-// The route table, read from the router
+// The route table
 // ---------------------------------------------------------------------------
 
-// The worker's types know no node modules; the file is loaded at run time.
+// The worker's types know no node modules; the files are loaded at run time.
 interface Fs { readFileSync(path: URL, encoding: 'utf8'): string }
 const FS_MODULE: string = 'node:fs';
 
-const PAIR = /path === '([^']+)' && request\.method === '([A-Z]+)'/;
+// A comparison against the path or the method: the shape any route condition takes.
 const CONDITION = /\bpath\b\s*(?:[!=]==?|\.(?:startsWith|endsWith|includes|match|test)\b)|request\.method\s*[!=]==?\s*'(?!OPTIONS')/;
+const LOOKUP = 'const route = routes.find(r => r.path === path && r.method === request.method);';
 
-/** Every pair in the router's chain; a route condition in another shape fails, so none is missed. */
+/** The pairs in ROUTES. A route condition anywhere else in the router fails, so the table is all of it. */
 async function routeTable(): Promise<string[]> {
   const fs = (await import(FS_MODULE)) as Fs;
   const here = (import.meta as unknown as { url: string }).url;
-  const source = fs.readFileSync(new URL('../src/index.ts', here), 'utf8');
-  const pairs: string[] = [];
-  for (const line of source.split('\n')) {
-    if (!CONDITION.test(line)) continue;
-    const pair = PAIR.exec(line);
-    if (!pair) throw new Error(`a route condition this test cannot read: ${line.trim()}`);
-    pairs.push(`${pair[2]} ${pair[1]}`);
+  for (const file of ['../src/index.ts', '../src/router.ts']) {
+    for (const line of fs.readFileSync(new URL(file, here), 'utf8').split('\n')) {
+      if (CONDITION.test(line) && line.trim() !== LOOKUP) {
+        throw new Error(`a route condition outside the table, in ${file.slice(3)}: ${line.trim()}`);
+      }
+    }
   }
-  return pairs;
+  return ROUTES.map(r => `${r.method} ${r.path}`);
 }
 
 // ---------------------------------------------------------------------------
@@ -157,7 +158,7 @@ async function main(): Promise<number> {
   let table: string[] = [];
   await test('the router\'s route table can be read', async () => {
     table = await routeTable();
-    assert(table.length > 0, 'no routes found in src/index.ts');
+    assert(table.length > 0, 'no routes found');
     assertEqual(new Set(table).size, table.length, `a pair routed twice: ${table.join(', ')}`);
   });
 
@@ -178,6 +179,33 @@ async function main(): Promise<number> {
 
   await test('every public route has its reason', () => {
     for (const [pair, why] of Object.entries(PUBLIC)) assert(why.trim().length > 20, `${pair}: the reason is missing`);
+  });
+
+  await test('the table marks public exactly the routes on the public list', () => {
+    for (const route of ROUTES) {
+      const pair = `${route.method} ${route.path}`;
+      assertEqual(route.public === true, pair in PUBLIC, `${pair}: marked public in the table`);
+    }
+  });
+
+  await test('a route not marked public never runs without a valid token, even when its handler checks nothing', async () => {
+    let ran = 0;
+    const careless: Route = { method: 'GET', path: '/v1/stored', handle: () => { ran++; return Response.json({ stored: 42 }); } };
+    const p = probe();
+    const at = (headers: Record<string, string>) => new Request('https://llm.example.invalid/v1/stored', { headers });
+    for (const headers of [
+      {},
+      { Authorization: 'Bearer not-a-token' },
+      { Authorization: `Bearer ${await bearer('not-the-signing-key')}` },
+    ] as Record<string, string>[]) {
+      assertEqual((await dispatch(at(headers), p.env, p.ctx, [careless])).status, 401, 'status');
+    }
+    assertEqual(ran, 0, 'handler runs without a valid token');
+    const served = await dispatch(at({ Authorization: `Bearer ${await bearer(SIGNING_KEY)}` }), p.env, p.ctx, [careless]);
+    assertEqual(served.status, 200, 'status with a valid token');
+    assertEqual(ran, 1, 'handler runs with a valid token');
+    const marked = await dispatch(at({}), p.env, p.ctx, [{ ...careless, public: true }]);
+    assertEqual(marked.status, 200, 'status of the same route marked public');
   });
 
   for (const pair of table.filter(p => SESSION.has(p))) {

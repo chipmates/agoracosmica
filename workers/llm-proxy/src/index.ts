@@ -1,18 +1,7 @@
 // Agora Cosmica — Free-Tier LLM Proxy (WP6)
-// Router, CORS, error boundary
+// CORS, error boundary; the routes and their session check are in router.ts
 
-import { handleHealth } from './routes/health';
-import { handleSession } from './routes/session';
-import { handleChat } from './routes/chat';
-import { handleCouncil } from './routes/council';
-import { handleQuota } from './routes/quota';
-import { handleSummary } from './routes/summary';
-import { handleConversions } from './routes/conversions';
-import { handlePlayback } from './routes/playback';
-import { handlePage } from './routes/page';
-import { handleEntry } from './routes/entry';
-import { handleSignup } from './routes/signup';
-import { handleFunnel } from './routes/funnel';
+import { dispatch } from './router';
 import { primaryModel } from './services/modelRouting';
 import { runRegionProbe } from './services/regionProbe';
 import type { Env } from './utils/types';
@@ -86,40 +75,7 @@ export default {
     const path = url.pathname;
 
     try {
-      let response: Response;
-
-      // Route matching
-      if (path === '/health' && request.method === 'GET') {
-        response = handleHealth();
-      } else if (path === '/v1/session' && request.method === 'POST') {
-        response = await handleSession(request, env);
-      } else if (path === '/v1/chat' && request.method === 'POST') {
-        response = await handleChat(request, env, ctx);
-      } else if (path === '/v1/council' && request.method === 'POST') {
-        response = await handleCouncil(request, env, ctx);
-      } else if (path === '/v1/summary' && request.method === 'POST') {
-        response = await handleSummary(request, env, ctx);
-      } else if (path === '/v1/quota' && request.method === 'GET') {
-        response = await handleQuota(request, env);
-      } else if (path === '/api/conversions' && request.method === 'POST') {
-        response = await handleConversions(request, env, ctx);
-      } else if (path === '/v1/playback' && request.method === 'POST') {
-        response = await handlePlayback(request, env);
-      } else if (path === '/v1/page' && request.method === 'POST') {
-        response = await handlePage(request, env);
-      } else if (path === '/v1/entry' && request.method === 'POST') {
-        response = await handleEntry(request, env);
-      } else if (path === '/v1/signup' && request.method === 'POST') {
-        response = await handleSignup(request, env);
-      } else if (path === '/v1/funnel' && request.method === 'POST') {
-        response = await handleFunnel(request, env);
-      } else {
-        response = new Response(
-          JSON.stringify({ error: 'Not found' }),
-          { status: 404, headers: { 'Content-Type': 'application/json' } }
-        );
-      }
-
+      const response = await dispatch(request, env, ctx);
       return withCors(response, corsHeaders, env);
     } catch (error) {
       // Name and route only: an error message can carry request content.
