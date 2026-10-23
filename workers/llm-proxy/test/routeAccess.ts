@@ -41,17 +41,36 @@ interface Fs { readFileSync(path: URL, encoding: 'utf8'): string }
 const FS_MODULE: string = 'node:fs';
 
 // A comparison against the path or the method: the shape any route condition takes.
-const CONDITION = /\bpath\b\s*(?:[!=]==?|\.(?:startsWith|endsWith|includes|match|test)\b)|request\.method\s*[!=]==?\s*'(?!OPTIONS')/;
-const LOOKUP = 'const route = routes.find(r => r.path === path && r.method === request.method);';
+// Any line that reads the request's address or method. Only the lines below may.
+const READS_ROUTE = /pathname|request\.url|request\.method|\burl\.|\bpath\b|\bswitch\s*\(/;
+const ALLOWED: Record<string, (line: string) => boolean> = {
+  '../src/index.ts': line => [
+    "if (request.method === 'OPTIONS') {",
+    'const url = new URL(request.url);',
+    'const path = url.pathname;',
+    'console.error(`[Worker] Unhandled ${name} on ${request.method} ${path}`);',
+  ].includes(line),
+  '../src/router.ts': line => line === 'path: string;'
+    || /^\{ method: '(GET|POST)', path: '[^']+',( public: true,)? handle: \w+ \},$/.test(line)
+    || line === 'const path = new URL(request.url).pathname;'
+    || line === 'const route = routes.find(r => r.path === path && r.method === request.method);',
+};
+const INDEX_IMPORTS = ["import { dispatch } from './router';", "import { primaryModel } from './services/modelRouting';",
+  "import { runRegionProbe } from './services/regionProbe';", "import type { Env } from './utils/types';"];
 
 /** The pairs in ROUTES. A route condition anywhere else in the router fails, so the table is all of it. */
 async function routeTable(): Promise<string[]> {
   const fs = (await import(FS_MODULE)) as Fs;
   const here = (import.meta as unknown as { url: string }).url;
   for (const file of ['../src/index.ts', '../src/router.ts']) {
-    for (const line of fs.readFileSync(new URL(file, here), 'utf8').split('\n')) {
-      if (CONDITION.test(line) && line.trim() !== LOOKUP) {
-        throw new Error(`a route condition outside the table, in ${file.slice(3)}: ${line.trim()}`);
+    for (const raw of fs.readFileSync(new URL(file, here), 'utf8').split('\n')) {
+      const line = raw.trim();
+      if (line.startsWith('//') || line.startsWith('*') || line.startsWith('/*')) continue;
+      if (READS_ROUTE.test(line) && !ALLOWED[file](line)) {
+        throw new Error(`a read of the path or method outside the table, in ${file.slice(3)}: ${line}`);
+      }
+      if (file === '../src/index.ts' && line.startsWith('import ') && !INDEX_IMPORTS.includes(line)) {
+        throw new Error(`index.ts imports more than the router: ${line}`);
       }
     }
   }
