@@ -32,8 +32,8 @@ export interface Env {
   // to this integer. Never defined in production wrangler.toml. See config.ts:getEffectiveLimit.
   DEV_RATE_LIMIT?: string;
   // Google Ads Conversion API auth chain. All optional — when GOOGLE_ADS_DEVELOPER_TOKEN
-  // is absent, the worker no-ops on CAPI forwarding (events still get captured to KV +
-  // Analytics Engine, just not pushed to Google). See services/googleAdsCapi.ts.
+  // is absent, the worker no-ops on CAPI forwarding (events still reach Analytics
+  // Engine, just not Google). See services/googleAdsCapi.ts.
   GOOGLE_ADS_DEVELOPER_TOKEN?: string;
   GOOGLE_ADS_OAUTH_CLIENT_ID?: string;
   GOOGLE_ADS_OAUTH_CLIENT_SECRET?: string;

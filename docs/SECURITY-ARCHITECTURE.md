@@ -29,7 +29,6 @@ The parts of that the code enforces:
 | **Per-address rate-limit counters** (Cloudflare KV, 24h for the daily chat ceiling and audio, 6h for the community tally, 1h for session mints) | A salted one-way hash of the address, never the address | Bounds what identity rotation from one machine can buy |
 | **Beacon and conversion rate-limit counters** (Cloudflare KV, up to 1h) | The address itself, as the counter's key | Keeps one machine from flooding the counters or the conversion relay |
 | **Community tally** (Cloudflare KV, 12 months after the browser was last seen) | A keyed hash of a random ID the browser keeps, with its voting power and number of completed figures | Each browser counts once in the community total |
-| **Ad conversion records** (Cloudflare KV, 90 days) | The step, the figure if any, and the time, written only after a visitor's yes to ad measurement. Never the click ID | Kept beside the analytics row. No route hands it back, and the dashboard counts conversions from the analytics rows |
 | **Safety screening events** (Cloudflare KV, 90 days) | Event metadata and a salted address hash | Content safety and abuse review |
 | **Aggregate event counters** (Cloudflare Analytics Engine, 90 days) | Keyless rows: endpoint, figure, language, country, coarse device class, status, timing bucket | Knowing whether the service works and where it breaks. Every counter is listed in [MEASUREMENT.md](MEASUREMENT.md) |
 
@@ -149,7 +148,6 @@ The quota is keyed to identity so that everyone behind one carrier address keeps
 | Rate-limit counters, per identity and per hashed address | 24h, 6h for the community tally, and 1h for the session-mint counter | Quota enforcement |
 | Beacon and conversion flood brakes | 1h | Stops a flood on the anonymous counter routes. The only place a plain address appears, and it never reaches analytics |
 | Safety screening events | 90 days | Pseudonymized content moderation review |
-| Ad conversion events (event name, optional figure id, timestamp) | 90 days | None served: no route reads it back. The click id is never in this record |
 | Community tally record (keyed hash of the browser's ID, voting power, completed figures, last seen) | 12 months after last seen | Each browser counts once in the community total |
 | Audio server health snapshot | 2 min | Speech server health, refreshed at most every 15 seconds |
 

@@ -128,7 +128,7 @@ Your privacy posture is what the code does, which is why every claim on this pag
 
 ## Where the data lives, who sees it
 
-- **Storage:** Cloudflare Analytics Engine, 90-day retention by default. Conversion events also sit in a KV record for 90 days (the event name, an optional figure id, a timestamp, and no click id). No route hands that record back, and the dashboard counts conversions from the analytics rows.
+- **Storage:** Cloudflare Analytics Engine, 90-day retention by default.
 - **Access:** an internal operator dashboard at `stats.agoracosmica.org`, gated by Cloudflare Access, so only the team can read it. The worker that receives the counts hands none of them back. Every route it answers without a session token is listed, with the reason, in [`workers/llm-proxy/test/routeAccess.ts`](../workers/llm-proxy/test/routeAccess.ts).
 - **Sharing:** the measurement data in this document is never shared with third parties, never sold, and never given to advertisers. The one thing that does leave, only with the visitor's opt-in, is the Google click id described above, which we forward to Google Ads for conversion matching. It is not part of the analytics data covered here.
 

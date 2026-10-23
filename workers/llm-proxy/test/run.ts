@@ -2852,7 +2852,7 @@ async function main(): Promise<number> {
     assertEqual(outbound.length, 0, 'outbound calls');
   });
 
-  await test('an accepted conversion keeps no daily counter', async () => {
+  await test('an accepted conversion keeps no daily counter and no KV record of its own', async () => {
     const kv = auditedKv();
     const env = fakeEnv({ RATE_LIMITS: kv.kv });
     const { ctx, pending } = fakeCtx();
@@ -2877,6 +2877,9 @@ async function main(): Promise<number> {
     assert(kv.puts.some(key => key.startsWith('conv_rl:')), 'the per-address limit still counts');
     const counters = kv.puts.filter(key => key.startsWith('conv_count:'));
     assertEqual(counters.length, 0, `daily counter writes: ${counters.join(', ')}`);
+    const records = kv.puts.filter(key => key.startsWith('conv:'));
+    assertEqual(records.length, 0, `event record writes: ${records.join(', ')}`);
+    assertEqual(kv.puts.join(','), 'conv_rl:10.0.0.31', 'the only KV write');
     assertEqual(outbound.length, 0, 'outbound calls');
   });
 

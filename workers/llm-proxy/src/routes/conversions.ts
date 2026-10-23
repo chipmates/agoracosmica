@@ -1,5 +1,5 @@
 // Ad Grants conversion tracking endpoint
-// Receives gclid + event from client, stores in KV, writes to Analytics Engine.
+// Receives gclid + event from client and writes the event to Analytics Engine.
 // Forwarding to Google Ads CAPI is gated behind GOOGLE_ADS_DEVELOPER_TOKEN
 // being set as a worker secret — see services/googleAdsCapi.ts.
 
@@ -100,16 +100,6 @@ export async function handleConversions(
     return Response.json({ error: 'Rate limited' }, { status: 429 });
   }
   await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
-
-  // The conversion event in KV, kept 90 days.
-  const dateKey = new Date().toISOString().split('T')[0]; // YYYY-MM-DD
-  const convKey = `conv:${dateKey}:${payload.event}:${Date.now()}`;
-  await env.RATE_LIMITS.put(convKey, JSON.stringify({
-    event: payload.event,
-    figureId: figureId || null,
-    timestamp: payload.timestamp,
-    date: dateKey,
-  }), { expirationTtl: 90 * 86400 }); // Keep 90 days
 
   // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
   // never written here — it goes only to Google Ads for attribution. Keeping
