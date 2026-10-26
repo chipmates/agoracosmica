@@ -17,6 +17,8 @@ button.story-play--hero,
 button.story-play--rail { gap: 0.6rem; border: none; cursor: pointer; }
 /* The phone rail steps aside once the dock is up. */
 body:has(.story-dock) .story-rail { display: none; }
+/* The rail's note runs to two lines in German: centred as the one-line note it replaces. */
+.story-rail .pub-cta__trust { text-align: center; }
 .story-start__meta {
   margin: 0.55rem 0 0;
   font-family: var(--font-ui, 'Space Grotesk', sans-serif);
@@ -189,7 +191,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 }
 .story-dock__title { font-size: 0.85rem; line-height: 1.35; }
 /* The label is the stories' disclosure: it wraps rather than lose a word. */
-.story-dock .story-dock__sub { white-space: normal; }
+/* No ellipsis either: WebKit paints one on a sub-pixel overflow of a line that fits. */
+.story-dock .story-dock__sub { white-space: normal; overflow: visible; text-overflow: clip; }
 .story-dock__sub { font-size: 0.7rem; line-height: 1.4; color: var(--text-tertiary); }
 .story-dock[data-status="error"] .story-dock__sub { color: var(--color-warning, var(--gold-primary)); }
 
