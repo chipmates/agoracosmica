@@ -4913,6 +4913,7 @@ function renderTrends() {
   // --- The museum's own count ---
   if (cOk) {
     html += '<div class="section-divider">Counted by the museum from ' + trShort(TR.count.first) + '</div>';
+    html += trPlausible();
     html += trSources();
     html += '<div class="grid tr-grid2">' +
       trCard('Page arrivals by kind of page', trGhost(trPageKinds(), 'arrivals'), '', 'A site page opened in a browser. Under each name: how many read to the middle of the text.') +
@@ -4927,6 +4928,57 @@ function renderTrends() {
 
   el.innerHTML = html;
   trPaint();
+}
+
+// The count against an independent total: page loads the count saw beside the
+// pages Cloudflare served. The count can only see fewer, so a full day above
+// Cloudflare's figure points at rows no page load sent. Cloudflare's page
+// totals are sampled, so small gaps are left alone.
+var TR_PLAUS = [
+  { label: 'Site pages', step: 'page_arrival', cf: function(r) { return r.pages == null || r.walks == null ? null : r.pages - r.walks; } },
+  { label: 'The walk', step: 'museum_arrival', cf: function(r) { return r.walks; } },
+];
+function trPlausPairs(p, dates) {
+  var c = trAlign(dates, TR.count.steps ? TR.count.steps[p.step] : null);
+  var f = trCfCol(dates, TR.cf.days.map(p.cf));
+  return dates.map(function(d, i) { return c[i] == null || f[i] == null ? null : [c[i], f[i]]; });
+}
+function trPlausSum(pairs) {
+  var a = 0, b = 0, n = 0;
+  pairs.forEach(function(x) { if (x) { a += x[0]; b += x[1]; n++; } });
+  return n ? { count: a, cf: b, days: n } : null;
+}
+function trPlausShare(s) {
+  if (!s) return '<span class="mus-na">n/a</span>';
+  return s.cf > 0 ? Math.round(s.count / s.cf * 100) + '%' : '<span class="mus-na">n/a</span>';
+}
+function trPlausible() {
+  var title = 'The count against Cloudflare';
+  var cfPages = trCfOk() && TR.cf.days.some(function(r) { return r.pages != null; });
+  if (!cfPages) {
+    return trCard(title, '<div class="empty-state">Not wired. This line needs Cloudflare&rsquo;s page totals for the museum: MUSEUM_CF_API_TOKEN and MUSEUM_ZONE_TAG on this worker.</div>', 'card-full');
+  }
+  var today = trToday();
+  var last = trDates(trShift(today, -7), trShift(today, -1));
+  var prev = trDates(trShift(today, -14), trShift(today, -8));
+  var full = trDates(TR.count.first, trShift(today, -1));
+  var rows = [], flags = [];
+  TR_PLAUS.forEach(function(p) {
+    var now = trPlausSum(trPlausPairs(p, last));
+    var before = trPlausSum(trPlausPairs(p, prev));
+    rows.push([p.label, now ? musFull(now.count) : '<span class="mus-na">n/a</span>', now ? musFull(now.cf) : '<span class="mus-na">n/a</span>', trPlausShare(now), trPlausShare(before)]);
+    trPlausPairs(p, full).forEach(function(x, i) {
+      if (x && x[0] - x[1] >= 10 && x[0] > x[1] * 1.1) flags.push(trShort(full[i]) + ', ' + p.label.toLowerCase() + ': ' + musFull(x[0]) + ' counted, ' + musFull(x[1]) + ' served');
+    });
+  });
+  var body = musTable(['', 'Counted', 'Cloudflare', 'Share', 'The 7 before'], rows, [4]);
+  body += flags.length
+    ? '<div class="alert-card a-warn">Counted above what Cloudflare served on ' + flags.length + (flags.length === 1 ? ' day' : ' days') + '. ' + esc(flags.slice(-3).join('. ')) + '. Rows with no page load behind them: look at the count&rsquo;s beacon.</div>'
+    : '<div class="mus-cap">No full day since the count began has more counted than Cloudflare served.</div>';
+  return trCard(title + ', last 7 full days', body, 'card-full',
+    'Counted: page arrivals and walks opened, from the museum&rsquo;s beacon. Cloudflare: the pages it served on the museum&rsquo;s address, bots included. ' +
+    'The count sees fewer, since bots, browsers without scripts, Global Privacy Control and our own test browsers are not counted. ' +
+    'A share that jumps, or a day above Cloudflare by more than a tenth, means rows the site did not serve a page for.');
 }
 
 function trClipText() {
