@@ -30,6 +30,7 @@
   --sp-n-ink-2: var(--text-secondary);
   --sp-n-ink-3: var(--text-tertiary);
   --sp-n-dim: var(--text-dim);
+  --sp-n-cosmic: var(--bg-cosmic-void);
   --sp-n-gold: var(--gold-primary);
   --sp-n-gold-subtle: var(--gold-subtle);
   --sp-n-gold-hover: var(--gold-hover);
@@ -64,14 +65,18 @@
   --sp-mark: var(--sp-n-gold);
   --sp-focus: var(--sp-n-gold-hover);
 }
-/* The dock stays night: the site's tokens come back inside it too. */
-.story-dock {
+/* The dock and the consent card stay night: the site's tokens come back
+   inside them. The card's own mixes of mixed tokens crash WebKit. */
+.story-dock,
+.agc-consent {
   --bg-void: var(--sp-n-void);
   --bg-primary: var(--sp-n-page);
   --bg-card: var(--sp-n-card);
   --text-primary: var(--sp-n-ink);
   --text-secondary: var(--sp-n-ink-2);
   --text-tertiary: var(--sp-n-ink-3);
+  --text-dim: var(--sp-n-dim);
+  --bg-cosmic-void: var(--sp-n-cosmic);
   --gold-primary: var(--sp-n-gold);
   --gold-subtle: var(--sp-n-gold-subtle);
   --gold-hover: var(--sp-n-gold-hover);
