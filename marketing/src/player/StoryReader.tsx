@@ -297,9 +297,21 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     const page = pageRef.current?.getBoundingClientRect();
     const rects = sentence.getClientRects();
     const lastRect = rects[rects.length - 1] ?? sentence.getBoundingClientRect();
+    const firstRect = rects[0] ?? lastRect;
     if (!page) return;
     const width = 280;
-    setPop({ si, left: Math.max(0, Math.min(page.width - width, lastRect.left - page.left)), top: lastRect.bottom - page.top + 8 });
+    const popH = 56;
+    // any scroll closes the popover, so it opens above the sentence when the dock and the toast leave no room below
+    const dockH = parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--sp-dock-h')) || 0;
+    const boxBottom = scrollRef.current?.getBoundingClientRect().bottom ?? window.innerHeight;
+    const floor = Math.min(boxBottom, window.innerHeight - dockH) - 70;
+    const below = lastRect.bottom + 8 + popH <= floor;
+    const anchor = below ? lastRect : firstRect;
+    setPop({
+      si,
+      left: Math.max(0, Math.min(page.width - width, anchor.left - page.left)),
+      top: below ? lastRect.bottom - page.top + 8 : firstRect.top - page.top - 8 - popH,
+    });
   };
 
   // the sentence a popover is about, marked while it is open
@@ -325,7 +337,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const title = n === 0 ? headingText ?? s.introTitle : entry?.title ?? s.storyN(n);
   const kicker = n === 0
     ? [s.introTitle, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ')
-    : [s.storyN(n), entry?.year, entry?.place, entry?.age ? s.ageAt(entry.age) : '', entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ');
+    : [s.storyN(n), entry?.year ? s.approxYear(entry.year) : '', entry?.place, entry?.age ? s.ageAt(entry.age) : '', entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ');
   const kept = here ? null : readProgress(queue, n);
   const nextEntry = queue.entries.find(e => e.n === n + 1);
   const firstParagraph = model?.blocks.find(b => !b.rule && !b.heading);

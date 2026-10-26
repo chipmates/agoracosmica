@@ -35,6 +35,7 @@ import { focusSentence } from './StoryReader';
 import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZE_MIN } from './theme';
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
+import { hideToast } from './toast';
 import { clockLabel, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
@@ -78,6 +79,7 @@ export default function Sheets({ state, labels, facts, wide }: Props) {
   useEffect(() => {
     opener.current = document.activeElement;
     titleRef.current?.focus({ preventScroll: true });
+    if (kind) hideToast();
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.stopPropagation();
@@ -136,7 +138,7 @@ function PlayerSheet({ state, queue, s, w, label, titleRef }: { state: PlayerSta
   const current = state.current ?? 0;
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
-  const kicker = current === 0 ? queue.name : [s.storyN(current), entry?.year].filter(Boolean).join(' · ');
+  const kicker = current === 0 ? queue.name : [s.storyN(current), entry?.year ? s.approxYear(entry.year) : ''].filter(Boolean).join(' · ');
   const playing = state.status === 'playing' || state.status === 'loading';
   const seekRef = useRef<HTMLInputElement | null>(null);
   const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
@@ -226,7 +228,7 @@ function FactsSheet({ queue, n, s, w, titleRef }: { queue: StoryQueue; n: number
           <>
             {(entry.year || entry.age || entry.setting) && (
               <dl className="sp-facts__meta">
-                {entry.year && <div><dt>{Icon.calendar}<span>{w.year}</span></dt><dd>{cleanFact(entry.year)}</dd></div>}
+                {entry.year && <div><dt>{Icon.calendar}<span>{w.year}</span></dt><dd>{s.approxYear(cleanFact(entry.year))}</dd></div>}
                 {entry.age && <div><dt>{Icon.user}<span>{w.age}</span></dt><dd>{cleanFact(entry.age)}</dd></div>}
                 {entry.setting && <div><dt>{Icon.pin}<span>{w.setting}</span></dt><dd>{cleanFact(entry.setting)}</dd></div>}
               </dl>

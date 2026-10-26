@@ -941,8 +941,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   display: flex;
   align-items: center;
   gap: 2px;
-  min-height: 40px;
-  margin: 4px 0 -4px;
+  min-height: 44px;
+  margin: 2px 0 -6px;
   font-size: 0.8125rem;
   color: var(--sp-accent);
   text-decoration: none;
@@ -1530,6 +1530,7 @@ html:has(.story-reader) { overflow: hidden; }
   font-size: 0.9375rem;
   color: var(--sp-ink);
 }
+.sp-toast[hidden] { display: none; }
 .sp-toast button { min-height: 44px; padding: 0 10px; background: none; border: 0; cursor: pointer; font: inherit; color: var(--sp-accent); }
 
 @media (prefers-reduced-motion: reduce) {
