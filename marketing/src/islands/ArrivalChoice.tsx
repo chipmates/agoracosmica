@@ -141,16 +141,17 @@ const ANSWER_BUCKETS_S: readonly number[] = [1, 3, 10];
 export const TAP_GUARD_MS = 700;
 
 // How often a card that is due re-checks whether it can appear without
-// covering what the visitor uses (the player's controls, the line just read).
+// covering what the visitor uses (the reading view, the line just read).
 const CLEAR_CHECK_MS = 400;
 
 // The player's mount, the same on every page that carries the dock.
 const PLAYER_SELECTOR = '[data-astro-transition-persist="story-dock"], script[data-story-queue]';
-// The page's buttons of the story that is playing: the card must not appear
-// over them. The dock needs no check: the card stands above it and stacks
+// The play control is the dock's: the card stands above the dock and stacks
 // under it (ArrivalChoice.css), on the dock's height as measured here, since
-// the router's page change drops the height the dock publishes on <html>.
-const LIVE_PLAY_SELECTOR = '[data-story-play][data-state]:not([data-state="idle"])';
+// the router's page change drops the height the dock publishes on <html>. The
+// page's own copies of the playing story's button may sit under the card: a
+// page carries several, and waiting for all of them to scroll away would leave
+// most listeners unasked.
 const DOCK_SELECTOR = '.story-dock';
 
 function answerBucket(elapsedMs: number): number {
@@ -322,12 +323,6 @@ function arrive(): void {
   armPreDecisionListening();
 }
 
-function boxesOf(selector: string): DOMRect[] {
-  return Array.from(document.querySelectorAll(selector))
-    .map((el) => el.getBoundingClientRect())
-    .filter((box) => box.width > 0 && box.height > 0);
-}
-
 /** No question can come on this page: the held click ID goes now. */
 function standDown(): void {
   clearGclid();
@@ -348,7 +343,7 @@ function armMoment(): void {
         stopMoment = watchStorySeconds(source, () => {
           keepClear = {
             blocked: () => player.getState().readerOpen,
-            boxes: () => boxesOf(LIVE_PLAY_SELECTOR),
+            boxes: () => [],
             subscribe: player.subscribe,
           };
           setPhase('due');
@@ -405,8 +400,7 @@ export default function ArrivalChoice({ lang }: Props) {
   }, []);
 
   // The moment has come: appear as soon as the card's place is clear of the
-  // playing story's buttons or the line just read, and step back while the
-  // reading view covers the page.
+  // line just read, and step back while the reading view covers the page.
   useEffect(() => {
     if (current !== 'due') return;
     let showing = false;

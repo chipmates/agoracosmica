@@ -277,26 +277,20 @@ describe('ArrivalChoice: the moment', () => {
     expect(card(container)!.hasAttribute('aria-hidden')).toBe(false);
   });
 
-  it('waits while it would cover the playing story\'s button, and appears once it is clear', async () => {
-    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
-    const button = document.createElement('button');
-    button.setAttribute('data-story-play', '');
-    button.setAttribute('data-state', 'playing');
-    document.body.appendChild(button);
-    const box = (top: number) => ({ top, bottom: top + 44, left: 0, right: 400, width: 400, height: 44, x: 0, y: top }) as DOMRect;
-    button.getBoundingClientRect = () => box(600);
+  it('waits while it would cover the poem\'s last line, and appears once the line is clear', async () => {
+    const { container } = await mountAt(`/figures/emily-dickinson/poems/hope/?gclid=${CLICK}`, 'en', 'poem');
     const cardBox = { top: 400, bottom: 760, left: 0, right: 390, width: 390, height: 360, x: 0, y: 400 } as DOMRect;
-    const spy = vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
-      return this.classList.contains('agc-consent') ? cardBox : box(0);
+    const none = { top: 0, bottom: 0, left: 0, right: 0, width: 0, height: 0, x: 0, y: 0 } as DOMRect;
+    vi.spyOn(HTMLElement.prototype, 'getBoundingClientRect').mockImplementation(function (this: HTMLElement) {
+      return this.classList.contains('agc-consent') ? cardBox : none;
     });
-    button.getBoundingClientRect = () => box(600);
-    await hear(60);
+    placeLastLine(600); // in view, where the card would stand
+    await pass(9000);
     expect(card(container)).not.toBeNull();
     expect(shownCard(container)).toBeNull();
-    button.getBoundingClientRect = () => box(100);
+    placeLastLine(100);
     await pass(10);
     expect(shownCard(container)).not.toBeNull();
-    spy.mockRestore();
   });
 });
 
