@@ -356,19 +356,26 @@
 }
 
 /* ---- pages with the story player: the card stands on the dock, never over
-   it. The dock publishes its measured height as --story-dock-space. */
-body:has(.story-dock) .agc-consent { bottom: calc(var(--story-dock-space) + 1rem); }
+   it, on the dock's height as the island measures it (--agc-dock-h). It
+   stacks under the dock (120) and the reading view (110), so where they meet
+   the player is the one in front. On phones it tucks 2px under the dock's
+   edge, so no hairline of page shows between them. */
+body:has(.story-dock) .agc-consent {
+  --agc-dock: var(--agc-dock-h, var(--story-dock-space));
+  z-index: 105;
+  bottom: calc(var(--agc-dock) + 1rem);
+}
 @media (min-width: 960px) {
-  body:has(.story-dock) .agc-consent { bottom: calc(var(--story-dock-space) + 1.5rem); }
+  body:has(.story-dock) .agc-consent { bottom: calc(var(--agc-dock) + 1.5rem); }
 }
 @media (max-width: 480px) {
   body:has(.story-dock) .agc-consent {
-    bottom: var(--story-dock-space);
-    padding-bottom: 0.7rem;
+    bottom: calc(var(--agc-dock) - 2px);
+    padding-bottom: calc(0.7rem + 2px);
   }
 }
 @media (max-width: 360px) {
-  body:has(.story-dock) .agc-consent { padding-bottom: 0.5rem; }
+  body:has(.story-dock) .agc-consent { padding-bottom: calc(0.5rem + 2px); }
 }
 
 /* ---- accessibility posture ------------------------------------------- */

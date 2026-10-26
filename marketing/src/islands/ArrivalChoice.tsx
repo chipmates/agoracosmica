@@ -146,9 +146,12 @@ const CLEAR_CHECK_MS = 400;
 
 // The player's mount, the same on every page that carries the dock.
 const PLAYER_SELECTOR = '[data-astro-transition-persist="story-dock"], script[data-story-queue]';
-// What the card must not cover when it appears, beside the dock it sits above.
-const DOCK_SELECTOR = '.story-dock';
+// The page's buttons of the story that is playing: the card must not appear
+// over them. The dock needs no check: the card stands above it and stacks
+// under it (ArrivalChoice.css), on the dock's height as measured here, since
+// the router's page change drops the height the dock publishes on <html>.
 const LIVE_PLAY_SELECTOR = '[data-story-play][data-state]:not([data-state="idle"])';
+const DOCK_SELECTOR = '.story-dock';
 
 function answerBucket(elapsedMs: number): number {
   const seconds = elapsedMs / 1000;
@@ -345,7 +348,7 @@ function armMoment(): void {
         stopMoment = watchStorySeconds(source, () => {
           keepClear = {
             blocked: () => player.getState().readerOpen,
-            boxes: () => [...boxesOf(DOCK_SELECTOR), ...boxesOf(LIVE_PLAY_SELECTOR)],
+            boxes: () => boxesOf(LIVE_PLAY_SELECTOR),
             subscribe: player.subscribe,
           };
           setPhase('due');
@@ -402,14 +405,17 @@ export default function ArrivalChoice({ lang }: Props) {
   }, []);
 
   // The moment has come: appear as soon as the card's place is clear of the
-  // dock, the playing story's buttons and the line just read, and step back
-  // while the reading view covers the page.
+  // playing story's buttons or the line just read, and step back while the
+  // reading view covers the page.
   useEffect(() => {
     if (current !== 'due') return;
     let showing = false;
     const check = (): void => {
       const card = cardRef.current;
       if (!card) return;
+      const dock = document.querySelector(DOCK_SELECTOR);
+      if (dock) card.style.setProperty('--agc-dock-h', `${dock.getBoundingClientRect().height}px`);
+      else card.style.removeProperty('--agc-dock-h');
       const rule = keepClear;
       if (rule?.blocked()) {
         if (showing) {
