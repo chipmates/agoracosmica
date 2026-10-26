@@ -7,6 +7,7 @@
 
 import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
+import { handleMuseum } from '../src/museum';
 import type { Env } from '../src/types';
 import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
@@ -345,6 +346,25 @@ async function main(): Promise<void> {
     same(body.sources.real, { '': [2, 1, 0], search: [0, 2, 0], ad_grant: [0, 1, 0], forum: [0, 0, 1] }, 'third stops by word');
     same(body.sources.walks, { search: [10, 8, 0], '': [4, 0, 0] }, 'arrivals by word');
     same(body.sources.uses, { search: [3, 2, 0] }, 'uses by word');
+  });
+
+  // Stop ids come from request paths: only the walk's own stops keep their name.
+
+  await test('museum: a stop id that is not one of the walk\'s own shows only as other, in the present and in the trends', async () => {
+    const day = new Date().toISOString().slice(0, 10);
+    const still = (stop: string, n: number) => ({ count: n, dimensions: { date: day, clientRequestPath: '/film/vinci/stills/desk/1280/stop-' + stop + '.abc123.webp' } });
+    const list = [still('picture-room', 5), still('flight', 4), still('<img src=x onerror=alert(1)>', 3), still('made-up', 2)];
+    const zone = { settings: {}, days: [], week: [], open: [], pages: [], index: [], sToday: list, sWeek: list, sAll: list, stills: list };
+    const fetcher = async () => Response.json({ data: { viewer: { zones: [zone] } } });
+    const museumEnv = {
+      MUSEUM_CF_API_TOKEN: 'test-token', MUSEUM_ZONE_TAG: '0123456789abcdef0123456789abcdef',
+      MUSEUM_WALK_STOPS: 'picture-room,flight,works', MUSEUM_OPEN_DATE: day,
+    } as unknown as Env;
+    const now = (await (await handleMuseum(new Request('https://stats.example/api/museum'), museumEnv, fetcher)).json()) as { stops: Array<{ id: string; week: number }> };
+    assertEqual(JSON.stringify(now.stops.map((x) => [x.id, x.week])), JSON.stringify([['picture-room', 5], ['flight', 4], ['works', 0], ['other', 5]]), 'the present view\'s stops');
+    const trends = (await (await handleMuseum(new Request('https://stats.example/api/museum/trends'), museumEnv, fetcher)).json()) as { stops: { ids: string[]; days: Array<number[] | null> } };
+    assertEqual(JSON.stringify(trends.stops.ids), JSON.stringify(['picture-room', 'flight', 'works', 'other']), 'the trends\' stop ids');
+    assertEqual(JSON.stringify(trends.stops.days[trends.stops.days.length - 1]), JSON.stringify([5, 4, 0, 5]), 'today\'s stops');
   });
 
   const failed = results.filter((r) => r.error);

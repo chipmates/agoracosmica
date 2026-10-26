@@ -1322,8 +1322,8 @@ function donutSvg(items, cMap, lFn, size) {
 function kpi(label, value, opts) {
   opts = opts || {};
   const heroClass = opts.hero ? ' card-hero' : '';
-  const interClass = opts.click ? ' card-interactive' : '';
-  const clickAttr = opts.click ? ' onclick="' + opts.click + '" tabindex="0" role="button"' : '';
+  const interClass = opts.tab ? ' card-interactive' : '';
+  const clickAttr = opts.tab ? ' data-go-tab="' + opts.tab + '" tabindex="0" role="button"' : '';
   const sparkHtml = opts.spark ? '<div class="kpi-spark">' + sparkSvg(opts.spark, 72, 28, opts.sparkColor || '#D4A539') + '</div>' : '';
   const deltaStr = opts.delta !== undefined ? deltaHtml(value, opts.delta, opts.deltaInvert) : '';
   const subStr = opts.sub ? '<span class="kpi-sub">' + opts.sub + '</span>' : '';
@@ -2457,7 +2457,7 @@ async function loadOverview() {
   // it as normal and point at the 7-day view rather than letting it read as a
   // failure. Only fires on the 24h window with near-zero conversations.
   if (!S.fetchError && S.range === 1 && chats < 3) {
-    alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a onclick="setRange(7)">The 7-day view</a> is the real read, not any single day.</div>';
+    alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a data-set-range="7" tabindex="0" role="button">The 7-day view</a> is the real read, not any single day.</div>';
   }
 
   var html = '';
@@ -2617,7 +2617,7 @@ async function loadOverview() {
   html += kpi('Errors', totalErrors, { sub: totalErrors > 0 ? llmErrors + ' LLM + ' + audioErrors + ' audio' : 'all clear', valColor: totalErrors > 0 ? '#E97451' : '#68C397' });
 
   // Mini server health
-  html += '<div class="card card-interactive" onclick="switchTab(\\\'servers\\\')" onkeydown="if(event.key===\\\'Enter\\\'||event.key===\\\' \\\'){event.preventDefault();switchTab(\\\'servers\\\')}" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
+  html += '<div class="card card-interactive" data-go-tab="servers" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
 
   // Chat activity graph (always visible)
   html += '<div class="section-divider" style="grid-column:1/-1">Activity &amp; content</div>';
@@ -3830,6 +3830,8 @@ function musCountry(code) {
   } catch (e) { return code; }
 }
 function musStop(id, i) {
+  // the server folds every stop id that is not one of the walk's into this one bucket
+  if (id === 'other') return 'Other';
   var words = String(id).split('-').join(' ');
   return (i + 1) + '. ' + cap(words);
 }
@@ -4846,7 +4848,7 @@ function renderTrends() {
   html += '<div class="grid tr-grid2">';
   if (cOk) {
     var cStops = TR.count.stops || {};
-    var nStops = Math.max(cfOk && TR.cf.stops ? TR.cf.stops.ids.length : 0, 17);
+    var nStops = Math.max(cfOk && TR.cf.stops ? TR.cf.stops.ids.filter(function(idv) { return idv !== 'other'; }).length : 0, 17);
     var cur = [], prev = [], anyPrev = false, full = true;
     for (var s = 1; s <= nStops; s++) {
       var cw = trCountWeeks(cStops[String(s)]);
@@ -4976,7 +4978,7 @@ function trRateWow(numKey, denKey) {
   return '<div class="tr-wow">' + out + '</div>';
 }
 function trStopNames(n) {
-  var ids = trCfOk() && TR.cf.stops ? TR.cf.stops.ids : [];
+  var ids = trCfOk() && TR.cf.stops ? TR.cf.stops.ids.filter(function(idv) { return idv !== 'other'; }) : [];
   var out = [];
   for (var i = 0; i < n; i++) out.push(ids[i] ? musStop(ids[i], i) : 'Stop ' + (i + 1));
   return out;
@@ -5218,8 +5220,8 @@ function renderRangePills() {
 
   RANGE_OPTS.forEach(function(opt) {
     var active = opt.val === S.range ? ' active' : '';
-    dHtml += '<button class="range-pill' + active + '" data-range="' + opt.val + '" onclick="setRange(' + opt.val + ')">' + opt.label + '</button>';
-    mHtml += '<button class="range-pill-h' + active + '" data-range="' + opt.val + '" onclick="setRange(' + opt.val + ')">' + opt.label + '</button>';
+    dHtml += '<button class="range-pill' + active + '" data-range="' + opt.val + '" data-set-range="' + opt.val + '">' + opt.label + '</button>';
+    mHtml += '<button class="range-pill-h' + active + '" data-range="' + opt.val + '" data-set-range="' + opt.val + '">' + opt.label + '</button>';
   });
 
   desktopEl.innerHTML = dHtml;
@@ -5263,6 +5265,27 @@ function init() {
   // Sidebar + mobile tab click handlers
   document.querySelectorAll('.nav-item, .mob-tab').forEach(function(el) {
     el.addEventListener('click', function() { switchTab(el.dataset.tab); });
+  });
+
+  // Range pills, the 7-day hint and cards that open a tab: one listener, since
+  // the page's policy allows no inline handlers.
+  function actionOf(ev) {
+    return ev.target && ev.target.closest ? ev.target.closest('[data-set-range], [data-go-tab]') : null;
+  }
+  function act(el) {
+    if (el.dataset.setRange) setRange(Number(el.dataset.setRange));
+    else if (el.dataset.goTab) switchTab(el.dataset.goTab);
+  }
+  document.addEventListener('click', function(ev) {
+    var el = actionOf(ev);
+    if (el) act(el);
+  });
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var el = actionOf(ev);
+    if (!el || el.tagName === 'BUTTON') return;
+    ev.preventDefault();
+    act(el);
   });
 
   // Hash change

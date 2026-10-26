@@ -9,6 +9,7 @@ import { handleMuseum } from './museum';
 import { handleMuseumCount, countDatasetOf } from './museum-count';
 import { readJsonCapped } from './bodyLimit';
 import { accessRefusal, accessDenied } from './access';
+import { dashboardPolicy } from './policy';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
@@ -65,6 +66,9 @@ async function serveDashboard(_request: Request, env: Env): Promise<Response> {
     headers: {
       'Content-Type': 'text/html; charset=utf-8',
       'Cache-Control': 'no-cache',
+      'Content-Security-Policy': await dashboardPolicy(html),
+      'X-Content-Type-Options': 'nosniff',
+      'Referrer-Policy': 'no-referrer',
       'X-Dashboard-Version': VERSION,
     },
   });

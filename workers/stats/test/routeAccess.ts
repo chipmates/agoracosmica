@@ -169,6 +169,21 @@ async function main(): Promise<number> {
     });
   }
 
+  await test('GET / serves the dashboard under its policy', async () => {
+    const request = new Request('https://stats.example.invalid/', { headers: { 'Cf-Access-Jwt-Assertion': person } });
+    const response = await worker.fetch(request, baseEnv as unknown as Env);
+    assertEqual(response.status, 200, 'status');
+    assert((response.headers.get('Content-Type') || '').startsWith('text/html'), 'an HTML answer');
+    const csp = response.headers.get('Content-Security-Policy') || '';
+    for (const part of ["default-src 'none'", "frame-ancestors 'none'", "base-uri 'none'", "form-action 'none'", "connect-src 'self'"]) {
+      assert(csp.indexOf(part) >= 0, `the policy holds ${part}: ${csp}`);
+    }
+    assert(/script-src 'sha256-[A-Za-z0-9+/]{43}='(;|$)/.test(csp), `the script by its hash alone: ${csp}`);
+    assert(csp.indexOf('unsafe-inline') === csp.indexOf("style-src-attr 'unsafe-inline'") + "style-src-attr '".length, `unsafe-inline only for style attributes: ${csp}`);
+    const html = await response.text();
+    assert(!/\son[a-z]+\s*=\s*["']/i.test(html.replace(/<script>[\s\S]*?<\/script>/g, '')), 'no inline event handler in the markup');
+  });
+
   await test('a pair outside the table: 403 without a token, 404 with one', async () => {
     const others: Array<[string, string]> = [['GET', '/index.html'], ['HEAD', '/'], ['POST', '/'], ['GET', '/api/query'],
       ['PUT', '/api/query'], ['GET', '/API/QUERY'], ['GET', '/api/museum/'], ['GET', '/api/conversions/stats'], ['DELETE', '/health']];

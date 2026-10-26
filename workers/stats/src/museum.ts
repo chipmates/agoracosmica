@@ -247,6 +247,13 @@ export function stopOf(path: string): string | null {
   return name.slice(5, dot);
 }
 
+// A stop id comes from a request path, so anyone can make one up. Only the
+// walk's own stops (MUSEUM_WALK_STOPS) keep their name; the rest share one bucket.
+export const OTHER_STOP = 'other';
+export function stopKey(stop: string, allowed: string[]): string {
+  return allowed.indexOf(stop) >= 0 ? stop : OTHER_STOP;
+}
+
 // --- Page-level totals ---
 
 // A count of pages and, where Cloudflare gives it, of arrivals among them.
@@ -307,10 +314,12 @@ function addPage(day: DayPages, cfg: Config, path: string, c: number, v: number 
   else add(pages.byLang, seen.lang);
 }
 
-function addStills(into: Counts, rows: Row[]): void {
+function addStills(into: Counts, rows: Row[], allowed: string[]): void {
   for (const row of rows) {
     const stop = stopOf(String(obj(row.dimensions).clientRequestPath || ''));
-    if (stop) into[stop] = (into[stop] || 0) + num(row.count);
+    if (!stop) continue;
+    const key = stopKey(stop, allowed);
+    into[key] = (into[key] || 0) + num(row.count);
   }
 }
 
@@ -341,9 +350,9 @@ async function readStretch(cfg: Config, fetcher: Fetcher, from: number, weekStar
     if (day) day.started = (day.started || 0) + num(row.count);
   }
   const stops = { today: {} as Counts, week: {} as Counts, all: {} as Counts };
-  addStills(stops.today, arr(got.zone.sToday));
-  addStills(stops.week, arr(got.zone.sWeek));
-  addStills(stops.all, arr(got.zone.sAll));
+  addStills(stops.today, arr(got.zone.sToday), cfg.stops);
+  addStills(stops.week, arr(got.zone.sWeek), cfg.stops);
+  addStills(stops.all, arr(got.zone.sAll), cfg.stops);
   return { from: iso(from), days: [...days.values()], stops };
 }
 
@@ -374,7 +383,7 @@ async function readDay(cfg: Config, fetcher: Fetcher, limits: Limits, from: numb
       const index = arr(got.zone.index)[0];
       day.started = (day.started || 0) + (index ? num(index.count) : 0);
       stops = stops || {};
-      addStills(stops, arr(got.zone.stills));
+      addStills(stops, arr(got.zone.stills), cfg.stops);
     }
   }
   return { day, stops };
@@ -596,7 +605,7 @@ async function buildAnswer(cfg: Config, fetcher: Fetcher, now: number): Promise<
   if (read.stops) {
     const found = read.stops;
     const ids = cfg.stops.slice();
-    for (const id of Object.keys(found.all)) if (ids.indexOf(id) < 0) ids.push(id);
+    if (found.all[OTHER_STOP] || found.week[OTHER_STOP]) ids.push(OTHER_STOP);
     stops = ids.map((id) => ({ id, today: found.today[id] || 0, week: found.week[id] || 0, open: pagesSinceOpen ? found.all[id] || 0 : null }));
   }
 
@@ -899,12 +908,13 @@ async function buildTrends(cfg: Config, fetcher: Fetcher, now: number, notes: Tr
         const d = String(dim.date || '');
         const stop = stopOf(String(dim.clientRequestPath || ''));
         if (!stop || !dayPages.has(d)) continue;
+        const key = stopKey(stop, cfg.stops);
         const c = perDay.get(d) || {};
-        c[stop] = (c[stop] || 0) + num(row.count);
+        c[key] = (c[key] || 0) + num(row.count);
         perDay.set(d, c);
       }
       const ids = cfg.stops.slice();
-      for (const c of perDay.values()) for (const id of Object.keys(c)) if (ids.indexOf(id) < 0) ids.push(id);
+      for (const c of perDay.values()) if (c[OTHER_STOP] && ids.indexOf(OTHER_STOP) < 0) ids.push(OTHER_STOP);
       stops = {
         ids,
         days: [...rows.keys()].map((d) => (dayPages.has(d) ? ids.map((id) => (perDay.get(d) || {})[id] || 0) : null)),
