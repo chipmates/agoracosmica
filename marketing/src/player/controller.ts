@@ -137,6 +137,8 @@ function ensureAudio(): HTMLAudioElement {
   el.addEventListener('waiting', () => {
     if (!el.paused) setState({ status: 'loading' });
   });
+  // timeupdate fires only when a seek completes: the clock shows its target from the start.
+  el.addEventListener('seeking', () => setState({ time: el.currentTime }));
   el.addEventListener('pause', () => {
     const key = currentKey();
     if (key) noteListenPause(key);
@@ -154,7 +156,9 @@ function ensureAudio(): HTMLAudioElement {
   el.addEventListener('timeupdate', () => {
     const key = currentKey();
     if (key) noteListenProgress(key, el.currentTime, el.duration);
-    setState({ time: el.currentTime });
+    // A stall can end without a 'playing' event: moving time with data in hand is playing.
+    const moving = state.status === 'loading' && !el.paused && !el.seeking && el.readyState >= 3;
+    setState(moving ? { time: el.currentTime, status: 'playing' } : { time: el.currentTime });
     saveResume(false);
     updatePositionState();
   });
@@ -411,10 +415,10 @@ function fmtTime(seconds: number): string {
   return `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
 }
 
-/** Whole minutes left in the current story, at least one. */
+/** Whole minutes left in the current story, at least one, rounded as the contents round a story's length. */
 function minutesLeft(): number {
   const left = state.duration > 0 ? state.duration - state.time : 0;
-  return Math.max(1, Math.ceil(left / 60));
+  return Math.max(1, Math.round(left / 60));
 }
 
 /** Mirror the player's state onto the page's own play buttons. */
@@ -480,7 +484,8 @@ function syncHero(pageQueue: StoryQueue | null, onThisPage: boolean): void {
     doText = s.continueStory(point.n);
     whatText = [entry?.title, point.t > 0 ? s.fromTime(fmtTime(point.t)) : ''].filter(Boolean).join(' · ');
   } else if (onThisPage && state.current === 1 && !state.dismissed) {
-    doText = state.status === 'playing' ? s.pause : state.status === 'loading' ? s.loading : s.resume;
+    // While loading the plate names its action; its own "loading" word fades in only on a slow load (CSS).
+    doText = state.status === 'playing' || state.status === 'loading' ? s.pause : s.resume;
     whatText = [first?.title, state.duration > 0 ? s.minutesLeft(minutesLeft()) : first?.minutes ? s.minutes(first.minutes) : '']
       .filter(Boolean).join(' · ');
   }

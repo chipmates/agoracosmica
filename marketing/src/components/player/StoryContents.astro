@@ -66,6 +66,7 @@ const lead = P.tocLead(rows[0]?.age ?? '', rows[rows.length - 1]?.age ?? '', tot
                 <svg class="sp-ring sp-ring--row" viewBox="0 0 36 36" focusable="false">
                   <circle class="sp-ring__track" cx="18" cy="18" r="16.5" />
                   <circle class="sp-ring__run" cx="18" cy="18" r="16.5" pathLength="100" data-story-ring />
+                  <circle class="sp-ring__wait" cx="18" cy="18" r="16.5" pathLength="100" />
                 </svg>
                 <span class="sp-row__core">
                   <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
@@ -91,7 +92,7 @@ const lead = P.tocLead(rows[0]?.age ?? '', rows[rows.length - 1]?.age ?? '', tot
     <details class="sp-ledger">
       <summary>
         <span>{P.ledgerTitle}</span>
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" /></svg>
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
       </summary>
       <dl>
         {rows.filter(r => r.documented || r.recreated).map(r => (

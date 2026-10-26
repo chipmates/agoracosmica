@@ -134,7 +134,9 @@ export default function StoryDock({ lang, labels }: Props) {
   const s = playerStrings(storyLang);
   const label = labels[storyLang];
   const loaded = state.current !== null && !state.dismissed;
-  const offer = !loaded && state.resume !== null;
+  // One offer at a time: where the page's plate offers the kept point, the dock stays down.
+  const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
+  const offer = !loaded && state.resume !== null && !plateOffers;
 
   if (!loaded && !offer) return <div className="story-dock-slot" />;
 
@@ -216,7 +218,11 @@ export default function StoryDock({ lang, labels }: Props) {
               onChange={e => seekTo(Number(e.currentTarget.value))}
             />
           </div>
-          <span className="story-dock__time" aria-hidden="true">{`${fmt(state.time)} / ${fmt(state.duration)}`}</span>
+          {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
+          <span className="story-dock__time">
+            <span className="story-dock__clock" aria-hidden="true">{`${fmt(state.time)} / ${fmt(state.duration)}`}</span>
+            <span className="story-dock__wait">{s.loading}</span>
+          </span>
           <div className="story-dock__aux">
             <button type="button" className="story-btn story-dock__speed" onClick={() => setRate(nextRate)}
               aria-label={s.speedAria(rateLabel(state.rate, storyLang))}>

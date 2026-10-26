@@ -21,6 +21,8 @@
   --story-dock-space: 3.75rem;
   --sp-display: 'Libre Caslon Display', var(--font-content, 'Libre Caslon Text'), Georgia, serif;
   --sp-gutter: 16px;
+  /* A load shorter than this shows no loading word or arc. */
+  --sp-wait-delay: 900ms;
   --sp-n-void: var(--bg-void);
   --sp-n-page: var(--bg-primary);
   --sp-n-astral: var(--bg-astral);
@@ -308,8 +310,20 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .story-play[data-state="playing"] .sp-ring,
 .story-play[data-state="paused"] .sp-ring,
 .story-play[data-state="loading"] .sp-ring { opacity: 1; }
+/* A slow load: after --sp-wait-delay a short arc turns on the ring and the
+   plate's word becomes "loading"; a quick load shows neither. */
+.sp-ring__wait { stroke: var(--sp-ring); stroke-linecap: round; stroke-dasharray: 14 86; opacity: 0; transform-box: fill-box; transform-origin: center; }
+.story-play[data-state="loading"] .sp-ring__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both, sp-turn 1.8s linear var(--sp-wait-delay) infinite; }
 .sp-plate__text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
-.sp-plate__do { font-family: var(--font-ui); font-size: 1.125rem; font-weight: 600; line-height: 1.25; color: var(--sp-ink); }
+.sp-plate__do { display: grid; justify-items: start; font-family: var(--font-ui); font-size: 1.125rem; font-weight: 600; line-height: 1.25; color: var(--sp-ink); }
+.sp-plate__now,
+.sp-plate__do::after { grid-area: 1 / 1; }
+.sp-plate__do::after { content: attr(data-wait); visibility: hidden; opacity: 0; }
+.story-play[data-state="loading"] .sp-plate__now { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
+.story-play[data-state="loading"] .sp-plate__do::after { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
+@keyframes sp-fade-in { from { opacity: 0; visibility: hidden; } to { opacity: 1; visibility: visible; } }
+@keyframes sp-fade-out { from { opacity: 1; visibility: visible; } to { opacity: 0; visibility: hidden; } }
+@keyframes sp-turn { to { transform: rotate(360deg); } }
 .sp-plate__what { font-family: var(--font-content); font-size: 0.9375rem; line-height: 1.35; color: var(--sp-ink-2); }
 @media (max-width: 380px) {
   .sp-plate { gap: 0.75rem; padding-right: 12px; }
@@ -712,6 +726,12 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   white-space: nowrap;
 }
 .story-dock__inner:has(.story-dock__text--away) .story-dock__time { align-self: center; padding-top: 0; }
+.story-dock__time { display: grid; justify-items: end; }
+.story-dock__clock,
+.story-dock__wait { grid-area: 1 / 1; }
+.story-dock__wait { visibility: hidden; opacity: 0; }
+.story-dock[data-status="loading"] .story-dock__clock { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
+.story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
 .story-dock__seek { display: none; grid-area: seek; }
 .story-dock .story-dock__speed { display: none; }
 
@@ -884,6 +904,10 @@ html:has(.story-reader) { overflow: hidden; }
   font-size: 0.9375rem;
   color: var(--sp-ink-2);
 }
+/* Phones: no title in the bar. Its column is 102 px at 360 and 132 at 390, too
+   narrow for the long titles even on two lines; the dock right below names the
+   story in full, and the page opens with it as its heading. */
+@media (max-width: 719.98px) { .story-reader__bartitle { visibility: hidden; } }
 .story-reader__tools { display: flex; align-items: center; gap: 2px; }
 .story-reader__smaller { font-family: var(--font-content); font-size: 0.875rem; padding-top: 4px; }
 .story-reader__larger { font-family: var(--font-content); font-size: 1.3125rem; }
@@ -982,4 +1006,5 @@ html:has(.story-reader) { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .sp-plate, .sp-disc__core, .story-reader__p, .sp-ledger > summary svg { transition: none; }
+  .sp-ring__wait { display: none; }
 }
