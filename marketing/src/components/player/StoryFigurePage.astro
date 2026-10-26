@@ -1,0 +1,184 @@
+---
+// A player figure page, top to bottom. It opens like a book: the title page
+// (who this is, that these are retellings, one plate that plays story 1)
+// faces the contents (the twelve stories by year); on a phone the two stack.
+// Under them the indexed facts of the figure template, in its words: who the
+// figure was, the honesty capsule, the concept answers, the lattice, the
+// themes, the sources. The story text itself is never in this HTML.
+import Breadcrumbs from '../Breadcrumbs.astro';
+import FigureConcepts from '../FigureConcepts.astro';
+import FigureLattice from '../FigureLattice.astro';
+import FigureShadow from '../FigureShadow.astro';
+import FigureQA from '../FigureQA.astro';
+import EchoNote from '../EchoNote.astro';
+import StaticImage from '../StaticImage.astro';
+import SourcesBlock from '../SourcesBlock.astro';
+import StoryHero from './StoryHero.astro';
+import StoryContents from './StoryContents.astro';
+import { getT } from '../../i18n';
+import { publicUrl } from '../../lib/urls';
+import { getSeedsFor } from '../../lib/seeds';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { figureIdToSlug } from '@client/data/public/slugMap';
+import { figureThemes } from '@client/data/public/figureSeo';
+import { getFigureQA } from '@client/data/public/figureQA';
+import { getFigurePageContent } from '@client/data/public/figurePageContent';
+import { buildStoryQueue } from '../../player/queue';
+import { playerStrings } from '../../player/strings';
+import { deepLinks } from '../../player/figureCopy';
+import type { PlayerLang } from '../../player/strings';
+
+interface Props {
+  figureId: string;
+  slug: string;
+  lang: PlayerLang;
+}
+
+const { figureId, slug, lang } = Astro.props;
+const t = getT(lang);
+const de = lang === 'de';
+const P = playerStrings(lang);
+const figure = getFigureById(figureId, lang);
+if (!figure) throw new Error(`Unknown figure: ${figureId}`);
+
+const qa = getFigureQA(figureId, lang);
+const leadAnswer = qa?.pairs[0]?.a ?? '';
+const aboutParas = !leadAnswer ? figure.about.split('\n').map(p => p.trim()).filter(Boolean) : [];
+const meta = [figure.tradition, figure.period].filter(Boolean).join(' · ');
+
+const queue = buildStoryQueue(figureId, slug, figure.name, lang);
+const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
+
+// Deep pages: the ones named under a concept heading sit there, the rest
+// join the "who he was" block.
+const links = deepLinks(figureId, lang);
+const conceptHeadings = new Set([
+  ...(getFigurePageContent(figureId, lang)?.concepts ?? []).map(c => c.h2),
+  ...(qa?.pairs.slice(1) ?? []).map(pair => pair.q),
+]);
+const sectionLinks = links.filter(link => !!link.under && conceptHeadings.has(link.under));
+const aboutLinks = links.filter(link => !sectionLinks.includes(link));
+
+// The figure template's own words for the parts kept from it.
+const S = de
+  ? {
+      deeper: 'Zu einem Thema tiefer:',
+      method: 'Wie wir diese Echos bauen und prüfen',
+      hubLead: 'Weiter erkunden: ',
+      related: 'Menschen, die hier immer wieder auftauchen',
+      themes: 'Große Fragen, die dieses Werk berührt',
+    }
+  : {
+      deeper: 'Go deeper on one thing:',
+      method: 'How we build and fact-check these Echoes',
+      hubLead: 'Keep exploring: ',
+      related: 'People who keep coming up here',
+      themes: 'The big questions this work touches',
+    };
+
+// Related figures from seed connections, most referenced first, as on the
+// figure template.
+const seeds = getSeedsFor(figureId, lang);
+const connectionCounts = new Map<string, number>();
+for (const seed of seeds) {
+  for (const conn of seed.connections ?? []) {
+    if (conn.figure !== figureId && figureIdToSlug[conn.figure]) {
+      connectionCounts.set(conn.figure, (connectionCounts.get(conn.figure) ?? 0) + 1);
+    }
+  }
+}
+const relatedFigureIds = [...connectionCounts.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id).slice(0, 8);
+const themesForFigure = figureThemes[figureId] ?? [];
+const PHILO_FIGURES = new Set([
+  'laozi', 'aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir',
+  'gautama', 'zenji', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell',
+]);
+const isPhilo = PHILO_FIGURES.has(figureId);
+const hubHref = de ? (isPhilo ? '/de/philosophie-lernen/' : '/de/figures/') : (isPhilo ? '/ai-philosophy-tutor/' : '/figures/');
+const hubLinkLabel = isPhilo
+  ? (de ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
+  : (de ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
+---
+<div class="pub-figure story-page">
+  <Breadcrumbs
+    lang={lang}
+    items={[
+      { label: t('breadcrumbs.figures'), path: '/figures' },
+      { label: figure.name },
+    ]}
+  />
+
+  <script is:inline type="application/json" data-story-queue set:html={queueJson} />
+
+  <div class="sp-spread">
+    <StoryHero figureId={figureId} name={figure.name} lang={lang} meta={meta} leadAnswer={leadAnswer} queue={queue} />
+    <StoryContents figureId={figureId} slug={slug} lang={lang} queue={queue} />
+    <section class="sp-about" aria-labelledby="sp-about-title">
+      <h2 class="sp-about__title" id="sp-about-title">{P.aboutTitle}</h2>
+      {leadAnswer && <p class="sp-about__text pub-fig-answer">{leadAnswer}</p>}
+      {aboutParas.map(p => <p class="sp-about__text">{p}</p>)}
+      {aboutLinks.length > 0 && (
+        <div class="sp-about__deeper">
+          <p class="sp-about__lead">{S.deeper}</p>
+          {aboutLinks.map(link => (
+            <p class="sp-about__link"><a class="pub-textlink" href={link.href}>{link.label}</a></p>
+          ))}
+        </div>
+      )}
+    </section>
+  </div>
+
+  <div class="sp-more">
+    <FigureQA figureId={figureId} lang={lang} />
+    <p class="pub-section__text pub-figure__methodlink">
+      <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
+    </p>
+
+    <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player />
+
+    <FigureLattice figureId={figureId} figureName={figure.name} lang={lang}>
+      {relatedFigureIds.length > 0 && (
+        <div class="fig-related" slot="coda">
+          <h3 class="fig-related__title">{S.related}</h3>
+          <div class="pub-grid pub-grid--2">
+            {relatedFigureIds.map(relId => {
+              const relFigure = getFigureById(relId, lang);
+              const relSlug = figureIdToSlug[relId];
+              if (!relFigure || !relSlug) return null;
+              return (
+                <a href={publicUrl(lang, `/figures/${relSlug}`)} class="pub-figure-card pub-figure-card--row">
+                  <StaticImage figureId={relId} type="thumbnail" alt="" loading="lazy" width={64} height={64} sizes="64px" />
+                  <div>
+                    <div class="pub-figure-card__name">{relFigure.name}</div>
+                    <div class="pub-figure-card__tradition">{relFigure.tradition}</div>
+                  </div>
+                </a>
+              );
+            })}
+          </div>
+        </div>
+      )}
+    </FigureLattice>
+
+    {themesForFigure.length > 0 && (
+      <section class="pub-section fig-themes">
+        <h2 class="pub-section__title">{S.themes}</h2>
+        <div class="pub-grid pub-grid--3">
+          {themesForFigure.map(themeId => (
+            <a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-card">
+              <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
+              <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
+            </a>
+          ))}
+        </div>
+        <p class="pub-section__text pub-figure__hublink">
+          {S.hubLead}<a class="pub-textlink" href={hubHref}>{hubLinkLabel}</a>
+        </p>
+      </section>
+    )}
+
+    <FigureShadow figureId={figureId} lang={lang} />
+    <SourcesBlock figureId={figureId} lang={lang} />
+    <EchoNote variant="figure" name={figure.name} lang={lang} />
+  </div>
+</div>

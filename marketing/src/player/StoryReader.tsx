@@ -1,10 +1,13 @@
 // The reading view: the playing story's text, fetched from R2 only when the
-// visitor opens it (never in the page's HTML), with the paragraph that is
-// playing marked from the story's per-paragraph timestamps.
+// visitor opens it (never in the page's HTML), set like a page of a book, with
+// the paragraph that is playing marked from the story's per-paragraph
+// timestamps and kept in view.
 
 import { useEffect, useRef, useState } from 'react';
 import { getPublicAudioUrl } from '@client/utils/public/publicMediaUrl';
-import { RATES, seekTo, setRate } from './controller';
+import { RATES, setRate } from './controller';
+import { rateLabel } from './strings';
+import { currentTheme, setTheme } from './theme';
 import type { PlayerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
@@ -68,28 +71,49 @@ function activeParagraph(stamps: StoryTimestamps | undefined, t: number): number
   return list[lo]?.index ?? null;
 }
 
-function fmt(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) seconds = 0;
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
-}
+const CloseIcon = (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+);
+const SunIcon = (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
+    <path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+  </svg>
+);
+const MoonIcon = (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M19.4 14.7A7.8 7.8 0 0 1 9.3 4.6a7.8 7.8 0 1 0 10.1 10.1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+);
+const DownIcon = (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 4.5v13M6.5 12l5.5 5.5 5.5-5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+);
+const ChevronIcon = (
+  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
+);
+// A hedera, the leaf Roman stonecutters set between words.
+const Hedera = (
+  <svg viewBox="0 0 132 18" aria-hidden="true" focusable="false">
+    <path d="M2 9h44M88 9h42" stroke="currentColor" strokeWidth="1" fill="none" />
+    <path d="M80 9C75 5.4 71.6 2.6 67.4 2.9 63.9 3.2 62.3 5.7 63.6 9 62.3 12.3 63.9 14.8 67.4 15.1 71.6 15.4 75 12.6 80 9Z" fill="currentColor" />
+    <path d="M63.6 9C59.4 9 56.2 10.6 53.6 13.4" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />
+  </svg>
+);
 
 interface Props {
   state: PlayerState;
   s: PlayerStrings;
   label: { brief: string; expanded: string };
-  note: string;
   onClose: () => void;
 }
 
-export default function StoryReader({ state, s, label, note, onClose }: Props) {
+export default function StoryReader({ state, s, label, onClose }: Props) {
   const { queue, current } = state;
   const [text, setText] = useState<StoryText | null>(null);
   const [failed, setFailed] = useState(false);
   const [size, setSize] = useState(1);
+  const [day, setDay] = useState(() => currentTheme() === 'day');
+  const [away, setAway] = useState(false);
   const closeRef = useRef<HTMLButtonElement | null>(null);
-  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const scrollRef = useRef<HTMLDivElement | null>(null);
   const userScrollAt = useRef(0);
 
   useEffect(() => {
@@ -118,21 +142,49 @@ export default function StoryReader({ state, s, label, note, onClose }: Props) {
     return () => document.removeEventListener('keydown', onKey);
   }, [onClose]);
 
-  const activeParagraphIndex = activeParagraph(text?.timestamps, state.time);
+  const activeIndex = activeParagraph(text?.timestamps, state.time);
+  const playing = state.status === 'playing' || state.status === 'loading';
+
+  // The spoken paragraph stays in view: while its start and most of it show,
+  // nothing moves; otherwise it comes to about a third down the view.
+  const bringIntoView = (index: number | null, always: boolean) => {
+    const box = scrollRef.current;
+    if (index === null || !box) return;
+    const el = box.querySelector<HTMLElement>(`[data-p="${index}"]`);
+    if (!el) return;
+    const top = el.offsetTop - box.scrollTop;
+    const view = box.clientHeight;
+    if (!always && top >= 8 && top + Math.min(el.offsetHeight, view * 0.6) <= view - 8) return;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.scrollTo({ top: Math.max(0, el.offsetTop - view * 0.28), behavior: reduce ? 'auto' : 'smooth' });
+  };
 
   useEffect(() => {
-    if (activeParagraphIndex === null || !bodyRef.current) return;
+    if (activeIndex === null) return;
     if (Date.now() - userScrollAt.current < FOLLOW_PAUSE_MS) return;
-    const el = bodyRef.current.querySelector<HTMLElement>(`[data-p="${activeParagraphIndex}"]`);
-    if (!el) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    el.scrollIntoView({ block: 'center', behavior: reduce ? 'auto' : 'smooth' });
-  }, [activeParagraphIndex]);
+    setAway(false);
+    bringIntoView(activeIndex, false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- follows the voice's paragraph only
+  }, [activeIndex, text]);
 
   if (!queue || current === null) return null;
   const entry = queue.entries.find(e => e.n === current);
+  const title = entry?.title ?? s.storyN(current);
+  const kicker = [queue.name, entry?.place, entry?.year].filter(Boolean).join(' · ');
   const markUserScroll = () => {
     userScrollAt.current = Date.now();
+    if (playing && activeIndex !== null) setAway(true);
+  };
+  const followVoice = () => {
+    userScrollAt.current = 0;
+    setAway(false);
+    bringIntoView(activeIndex, true);
+  };
+  const nextRate = RATES[(RATES.indexOf(state.rate) + 1) % RATES.length] ?? 1;
+  const toggleTheme = () => {
+    const next = currentTheme() === 'day' ? 'night' : 'day';
+    setTheme(next);
+    setDay(next === 'day');
   };
 
   return (
@@ -143,71 +195,81 @@ export default function StoryReader({ state, s, label, note, onClose }: Props) {
       aria-label={s.readerAria}
       data-size={TEXT_SIZES[size]}
     >
-      <header className="story-reader__head">
-        <div className="story-reader__titles">
-          <p className="story-reader__kicker">{`${queue.name} · ${s.storyN(current)}`}</p>
-          <h2 className="story-reader__title">{entry?.title ?? s.storyN(current)}</h2>
+      <div className="story-reader__bar">
+        <div className="story-reader__bar-in">
+          <button ref={closeRef} type="button" className="story-btn story-reader__close" onClick={onClose} aria-label={s.readerClose}>
+            {CloseIcon}
+          </button>
+          <span className="story-reader__bartitle">{title}</span>
+          <div className="story-reader__tools" role="group" aria-label={s.toolsAria}>
+            <button type="button" className="story-btn story-reader__smaller" onClick={() => setSize(v => Math.max(0, v - 1))}
+              disabled={size === 0} aria-label={s.textSmaller}>A</button>
+            <button type="button" className="story-btn story-reader__larger" onClick={() => setSize(v => Math.min(TEXT_SIZES.length - 1, v + 1))}
+              disabled={size === TEXT_SIZES.length - 1} aria-label={s.textLarger}>A</button>
+            <button type="button" className="story-btn story-reader__speed" onClick={() => setRate(nextRate)}
+              aria-label={s.speedAria(rateLabel(state.rate, queue.lang))}>{rateLabel(state.rate, queue.lang)}</button>
+            <button type="button" className="story-btn story-reader__theme" onClick={toggleTheme}
+              aria-label={day ? s.nightView : s.dayView}>{day ? MoonIcon : SunIcon}</button>
+          </div>
         </div>
-        <button ref={closeRef} type="button" className="story-btn story-reader__close" onClick={onClose} aria-label={s.readerClose}>
-          <svg viewBox="0 0 16 16" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true">
-            <path d="M3.5 3.5l9 9M12.5 3.5l-9 9" />
-          </svg>
-        </button>
-      </header>
-
-      <div className="story-reader__tools">
-        <div className="story-reader__group" role="group" aria-label={s.textSize}>
-          <button type="button" className="story-btn story-btn--text" onClick={() => setSize(v => Math.max(0, v - 1))}
-            disabled={size === 0} aria-label={s.textSmaller}>A−</button>
-          <button type="button" className="story-btn story-btn--text" onClick={() => setSize(v => Math.min(TEXT_SIZES.length - 1, v + 1))}
-            disabled={size === TEXT_SIZES.length - 1} aria-label={s.textLarger}>A+</button>
-        </div>
-        <div className="story-reader__group" role="group" aria-label={s.speed}>
-          <span className="story-reader__toolname" aria-hidden="true">{s.speed}</span>
-          {RATES.map(rate => (
-            <button key={rate} type="button" className="story-btn story-btn--text" aria-pressed={state.rate === rate}
-              onClick={() => setRate(rate)}>{`${rate}×`}</button>
-          ))}
-        </div>
-        <label className="story-reader__seek">
-          <span className="story-reader__time">{fmt(state.time)}</span>
-          <input
-            type="range"
-            min={0}
-            max={state.duration > 0 ? Math.floor(state.duration) : 0}
-            step={1}
-            value={Math.floor(state.time)}
-            aria-label={s.seekAria}
-            aria-valuetext={`${fmt(state.time)} / ${fmt(state.duration)}`}
-            onChange={e => seekTo(Number(e.currentTarget.value))}
-          />
-          <span className="story-reader__time">{fmt(state.duration)}</span>
-        </label>
       </div>
 
       <div
-        ref={bodyRef}
-        className="story-reader__body"
-        data-nosnippet=""
+        ref={scrollRef}
+        className="story-reader__scroll"
         onWheel={markUserScroll}
         onTouchMove={markUserScroll}
         onKeyDown={markUserScroll}
         tabIndex={0}
       >
-        <p className="story-reader__note">{note}</p>
-        <details className="story-label story-label--reader">
-          <summary>{label.brief}</summary>
-          <p>{label.expanded}</p>
-        </details>
-        {failed && <p className="story-reader__status">{s.textError}</p>}
-        {!failed && !text && <p className="story-reader__status" aria-live="polite">{s.textLoading}</p>}
-        {text?.paragraphs.map((p, i) => (
-          <p key={i} data-p={i} className={i === activeParagraphIndex ? 'story-reader__p is-active' : 'story-reader__p'}
-            aria-current={i === activeParagraphIndex ? 'true' : undefined}>
-            {p}
-          </p>
-        ))}
+        <article className="story-reader__page">
+          <header className="story-reader__head">
+            {kicker && <p className="story-reader__kicker">{kicker}</p>}
+            <h2 className="story-reader__title">{title}</h2>
+            <p className="story-reader__note">{s.retellingNote}</p>
+            <details className="story-label sp-label">
+              <summary>
+                <span className="sp-label__i" aria-hidden="true">i</span>
+                <span className="sp-label__brief">
+                  {label.brief.split(' · ').map((half, i, all) => (
+                    <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{i < all.length - 1 ? `${half} ·` : half}</span></span>
+                  ))}
+                </span>
+              </summary>
+              <p>{label.expanded}</p>
+            </details>
+            {(entry?.documented || entry?.recreated) && (
+              <details className="sp-ledger sp-ledger--one">
+                <summary><span>{s.ledgerTitle}</span>{ChevronIcon}</summary>
+                <div className="sp-ledger__body">
+                  {entry.documented && <p><span className="sp-ledger__key">{s.documented}:</span> {entry.documented}</p>}
+                  {entry.recreated && <p><span className="sp-ledger__key">{s.recreated}:</span> {entry.recreated}</p>}
+                </div>
+              </details>
+            )}
+          </header>
+          <div className="story-reader__orn">{Hedera}</div>
+          <div className="story-reader__body" data-nosnippet="" lang={queue.lang}>
+            {failed && <p className="story-reader__status">{s.textError}</p>}
+            {!failed && !text && <p className="story-reader__status" aria-live="polite">{s.textLoading}</p>}
+            {text?.paragraphs.map((p, i) => (
+              <p key={i} data-p={i} className={i === activeIndex ? 'story-reader__p is-active' : 'story-reader__p'}
+                aria-current={i === activeIndex ? 'true' : undefined}>
+                {p}
+              </p>
+            ))}
+          </div>
+        </article>
       </div>
+
+      {away && (
+        <div className="story-reader__follow">
+          <button type="button" className="story-reader__follow-btn" onClick={followVoice}>
+            {DownIcon}
+            <span>{s.follow}</span>
+          </button>
+        </div>
+      )}
     </section>
   );
 }

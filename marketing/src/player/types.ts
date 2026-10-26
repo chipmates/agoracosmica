@@ -5,6 +5,12 @@ export interface QueueEntry {
   n: number;
   title: string;
   minutes: number | null;
+  /** The factcheck's year and place, for the reading view's kicker. */
+  year?: string | undefined;
+  place?: string | undefined;
+  /** The factcheck's ledger for this story, verbatim. */
+  documented?: string | undefined;
+  recreated?: string | undefined;
 }
 
 /** One figure's stories in one language, as the page hands them to the player. */
@@ -41,4 +47,6 @@ export interface PlayerState {
   readerOpen: boolean;
   /** The visitor closed the dock; the next tap on a story opens it again. */
   dismissed: boolean;
+  /** Stories heard to the end in this browser, for the figure in the queue or on the page. */
+  done: number[];
 }

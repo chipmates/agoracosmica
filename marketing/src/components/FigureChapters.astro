@@ -23,20 +23,16 @@ import { getStoryChapter } from '../lib/stories';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
 import { getChapterFactcheck } from '../lib/factchecks';
 import { cleanDisplayText, cleanFactText } from '../lib/figureWorld';
-import { playerStrings } from '../player/strings';
 
 interface Props {
   figureId: string;
   slug: string;
   figureName: string;
   lang: Lang;
-  /** Story player pages: each chapter plays in place; the story text stays out of snippets. */
-  player?: boolean;
 }
 
-const { figureId, slug, figureName, lang, player = false } = Astro.props;
+const { figureId, slug, figureName, lang } = Astro.props;
 const de = lang === 'de';
-const P = playerStrings(lang);
 
 const S = de
   ? {
@@ -100,12 +96,6 @@ const chapters = seeds.map((seed, i) => {
   <section class="pub-section fig-chapters">
     <h2 class="pub-section__title">{S.heading}</h2>
     <p class="pub-section__text">{S.lead}</p>
-    {player && (
-      <button type="button" class="story-autonext" data-story-autonext aria-pressed="true">
-        <span class="story-autonext__box" aria-hidden="true"></span>
-        <span>{P.autoNext}</span>
-      </button>
-    )}
     <ol class="fig-chapters__list">
       {chapters.map(c => (
         <li class="fig-chapter" id={`idea-${c.n}`}>
@@ -115,9 +105,7 @@ const chapters = seeds.map((seed, i) => {
             {c.meta.length > 0 && (
               <p class="fig-chapter__meta">{c.meta.join('  ·  ')}</p>
             )}
-            {player
-              ? <p class="fig-chapter__text" data-nosnippet>{c.hook || c.summary}</p>
-              : <p class="fig-chapter__text">{c.hook || c.summary}</p>}
+            <p class="fig-chapter__text">{c.hook || c.summary}</p>
             {(c.documented || c.recreated) && (
               <details class="fig-chapter__ledger">
                 <summary class="fig-chapter__ledger-toggle">{S.ledger}</summary>
@@ -135,49 +123,21 @@ const chapters = seeds.map((seed, i) => {
                 </p>
               </details>
             )}
-            {player ? (
-              <p class="fig-chapter__door">
-                <button
-                  type="button"
-                  class="story-play story-play--row"
-                  data-story-play
-                  data-story-n={c.n}
-                  aria-pressed="false"
-                  aria-label={P.listenAria(c.n, c.title)}
-                >
-                  <span class="story-play__icon story-play__icon--play" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l10 5.5-10 5.5z" /></svg></span>
-                  <span class="story-play__icon story-play__icon--pause" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg></span>
-                  <span data-story-play-text>{P.listen}</span>
-                </button>
-              </p>
-            ) : (
-              <p class="fig-chapter__door">
-                <a
-                  class="pub-textlink"
-                  href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${c.n}`}
-                  data-agc-cta="start-exploring"
-                  data-agc-figure={figureId}
-                  data-agc-door="fig_chapter"
-                >
-                  {`${S.listen} ${c.n}${S.listenTail ? ' ' + S.listenTail : ''} →`}
-                </a>
-              </p>
-            )}
+            <p class="fig-chapter__door">
+              <a
+                class="pub-textlink"
+                href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=${c.n}`}
+                data-agc-cta="start-exploring"
+                data-agc-figure={figureId}
+                data-agc-door="fig_chapter"
+              >
+                {`${S.listen} ${c.n}${S.listenTail ? ' ' + S.listenTail : ''} →`}
+              </a>
+            </p>
           </div>
         </li>
       ))}
     </ol>
-    {player && (
-      <p class="story-applink">
-        <a
-          class="pub-textlink"
-          href={`/app?figure=${slug}&lang=${lang}&mode=story&chapter=1`}
-          data-agc-cta="start-exploring"
-          data-agc-figure={figureId}
-          data-agc-door="fig_app_read"
-        >{P.appLink}</a>
-      </p>
-    )}
   </section>
 )}
 

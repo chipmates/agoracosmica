@@ -16,6 +16,7 @@ import { getFigureQA } from '@client/data/public/figureQA';
 import { getSeedsFor } from '../lib/seeds';
 import { cleanDisplayText } from '../lib/figureWorld';
 import { anchorIds } from '../lib/anchors';
+import { playerStrings } from '../player/strings';
 
 interface Props {
   figureId: string;
@@ -43,6 +44,7 @@ interface Block {
   body: string;
   bullets: string[];
   chapter?: number;
+  chapterTitle?: string;
 }
 
 const blocks: Block[] = [];
@@ -54,6 +56,7 @@ for (const c of authored?.concepts ?? []) {
     body: c.body,
     bullets: (seed?.coreInsights ?? []).map(cleanDisplayText),
     chapter: seed ? c.seedId : undefined,
+    chapterTitle: seed ? cleanDisplayText(seed.title) : undefined,
   });
 }
 
@@ -93,10 +96,12 @@ const anchored = blocks.map(b => ({
         ))}
         {b.chapter && player && (
           <p class="fig-concept__link">
-            <button type="button" class="story-play story-play--row" data-story-play data-story-n={b.chapter} aria-pressed="false">
-              <span class="story-play__icon story-play__icon--play" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l10 5.5-10 5.5z" /></svg></span>
-              <span class="story-play__icon story-play__icon--pause" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg></span>
-              <span data-story-play-text>{`${S.chapterLink} (${S.chapterAria} ${b.chapter})`}</span>
+            <button type="button" class="story-play story-play--hear" data-story-play data-story-n={b.chapter} aria-pressed="false">
+              <span class="story-play__disc" aria-hidden="true">
+                <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
+                <svg class="story-play__icon story-play__icon--pause" viewBox="0 0 24 24" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>
+              </span>
+              <span data-story-play-text>{playerStrings(lang).hearStory(b.chapterTitle ?? '')}</span>
             </button>
           </p>
         )}

@@ -1,0 +1,94 @@
+---
+// The title page of a player figure: who this is in a line, that these are
+// retellings, one plate that plays story 1, and the label under it. The plate
+// is the player in place: the controller turns its words into the state
+// (pause, resume, minutes left) and offers a kept point on return.
+import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
+import { getT } from '../../i18n';
+import { numberWord } from '../../lib/figureWorld';
+import { playerStrings } from '../../player/strings';
+import { storyLabel } from '../../player/label';
+import { heroLine } from '../../player/figureCopy';
+import type { PlayerLang } from '../../player/strings';
+import type { StoryQueue } from '../../player/types';
+
+interface Props {
+  figureId: string;
+  name: string;
+  lang: PlayerLang;
+  meta: string;
+  leadAnswer: string;
+  queue: StoryQueue;
+}
+
+const { figureId, name, lang, meta, leadAnswer, queue } = Astro.props;
+const t = getT(lang);
+const P = playerStrings(lang);
+const label = storyLabel(lang);
+const first = queue.entries[0];
+const firstSub = [first?.title, first?.minutes ? P.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
+const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
+// The label breaks only at its middle dot.
+const labelHalves = label.brief.split(' · ');
+---
+<section class="sp-hero" aria-labelledby="sp-name" data-story-hero>
+  <div class="sp-hero__id">
+    <div class="sp-hero__names">
+      <h1 class="sp-hero__name" id="sp-name">{name}</h1>
+      {meta && <p class="sp-hero__meta">{meta}</p>}
+    </div>
+    <figure class="sp-hero__portrait">
+      <picture>
+        <source type="image/webp" srcset={getPublicImageSrcSet(figureId, 'thumbnail', 'webp')} sizes="(min-width: 1024px) 148px, 120px" />
+        <img
+          src={getPublicImageUrl(figureId, 'thumbnail', 320, 'png')}
+          alt={alt}
+          width="320"
+          height="320"
+          loading="eager"
+          fetchpriority="high"
+          decoding="async"
+        />
+      </picture>
+      <figcaption>{P.portraitNote}</figcaption>
+    </figure>
+  </div>
+  <p class="sp-hero__line">{heroLine(figureId, lang, leadAnswer)}</p>
+  <p class="sp-hero__note">{P.heroNote(numberWord(queue.entries.length, lang))}</p>
+
+  <button
+    type="button"
+    class="sp-plate story-play story-play--hero"
+    data-story-play
+    data-story-n="1"
+    data-story-hero-plate
+    aria-pressed="false"
+  >
+    <span class="sp-disc" aria-hidden="true">
+      <svg class="sp-ring" viewBox="0 0 64 64" focusable="false">
+        <circle class="sp-ring__track" cx="32" cy="32" r="30.5" />
+        <circle class="sp-ring__run" cx="32" cy="32" r="30.5" pathLength="100" data-story-ring />
+      </svg>
+      <span class="sp-disc__core">
+        <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
+        <svg class="story-play__icon story-play__icon--pause" viewBox="0 0 24 24" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>
+      </span>
+    </span>
+    <span class="sp-plate__text">
+      <span class="sp-plate__do" data-story-hero-do>{P.playFirst}</span>
+      <span class="sp-plate__what" data-story-hero-what>{firstSub}</span>
+    </span>
+  </button>
+  <p class="sp-startover" data-story-startover hidden>
+    <button type="button" class="sp-startover__btn" data-story-play data-story-n="1">{P.startOver}</button>
+  </p>
+  <details class="story-label sp-label">
+    <summary>
+      <span class="sp-label__i" aria-hidden="true">i</span>
+      <span class="sp-label__brief">{labelHalves.map((half, i) => (
+        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{i < labelHalves.length - 1 ? `${half} ·` : half}</span></Fragment>
+      ))}</span>
+    </summary>
+    <p>{label.expanded}</p>
+  </details>
+</section>

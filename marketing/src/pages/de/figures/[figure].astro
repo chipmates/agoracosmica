@@ -3,7 +3,7 @@
 // so the player's router, stylesheet and dock never enter the build of the
 // figure pages that still use [slug].astro.
 import Public from '../../../layouts/Public.astro';
-import FigureDetailContent from '../../../components/FigureDetailContent.astro';
+import StoryFigurePage from '../../../components/player/StoryFigurePage.astro';
 import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
 import { figurePageHead } from '../../../player/figurePage';
@@ -23,7 +23,7 @@ const { figureId } = Astro.props as { figureId: string };
 const { layout } = figurePageHead(figureId, slug, lang);
 ---
 <Public {...layout}>
-  <PlayerHead slot="head" />
-  <FigureDetailContent figureId={figureId} slug={slug} lang={lang} player />
+  <PlayerHead slot="head" figurePage />
+  <StoryFigurePage figureId={figureId} slug={slug} lang={lang} />
   <PlayerDock slot="dock" lang={lang} />
 </Public>

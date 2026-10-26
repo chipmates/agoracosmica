@@ -1,7 +1,16 @@
 ---
 // Head of a player page: the client router (the dock survives a page change
-// only between pages that carry it) and the player's own stylesheet.
+// only between pages that carry it) and the player's own stylesheet. A figure
+// page also preloads the display face its name is set in.
 import { ClientRouter } from 'astro:transitions';
+import displayFont from '../../player/fonts/libre-caslon-display-latin1.woff?url';
 import '../../player/player.css';
+
+interface Props {
+  figurePage?: boolean;
+}
+
+const { figurePage = false } = Astro.props;
 ---
 <ClientRouter />
+{figurePage && <link rel="preload" href={displayFont} as="font" type="font/woff" crossorigin />}

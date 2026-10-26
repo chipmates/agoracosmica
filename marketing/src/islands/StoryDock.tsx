@@ -3,8 +3,9 @@
 // while the visitor moves between player pages. The page's own play buttons
 // are plain HTML; the controller handles their taps.
 
-import { useCallback, useEffect, useRef, useSyncExternalStore } from 'react';
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
+  RATES,
   acceptResume,
   declineResume,
   dismiss,
@@ -12,13 +13,16 @@ import {
   hasNext,
   installPlayer,
   nextStory,
+  readPageQueue,
+  seekTo,
+  setRate,
   setReaderOpen,
   skipBack,
   subscribe,
   togglePlay,
 } from '../player/controller';
 import StoryReader from '../player/StoryReader';
-import { playerStrings } from '../player/strings';
+import { playerStrings, rateLabel } from '../player/strings';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
 
@@ -44,41 +48,67 @@ const SERVER_STATE: PlayerState = getState();
 
 const Icon = {
   play: (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 2.5l10 5.5-10 5.5z" /></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
   ),
   pause: (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>
   ),
   back: (
-    <svg viewBox="0 0 20 20" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
-      <path d="M4 10a6 6 0 1 0 2-4.5" /><path d="M4 3v3h3" />
-      <text x="10" y="13" textAnchor="middle" fontSize="6.5" fill="currentColor" stroke="none">15</text>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
+      <path d="M6.3 6.6A8.4 8.4 0 1 1 3.6 12.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <path d="M6.6 2.6v4.3H2.3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+      <text x="12.4" y="15.3" textAnchor="middle" fontSize="8" fontWeight="600" fill="currentColor" stroke="none">15</text>
     </svg>
   ),
   next: (
-    <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor" aria-hidden="true"><path d="M3 2.5l8 5.5-8 5.5zM12 2.5h2v11h-2z" /></svg>
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M5.8 6.2v11.6c0 .5.5.8.9.5l8.6-5.8a.6.6 0 0 0 0-1L6.7 5.7c-.4-.3-.9 0-.9.5z" /><rect x="16.6" y="5.6" width="2.4" height="12.8" rx="1" /></svg>
   ),
   close: (
-    <svg viewBox="0 0 16 16" width="14" height="14" fill="none" stroke="currentColor" strokeWidth="1.6" aria-hidden="true"><path d="M3.5 3.5l9 9M12.5 3.5l-9 9" /></svg>
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
+  ),
+  book: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 6.6C9.7 5 6.6 4.7 3.5 5.6v12.8c3.1-.9 6.2-.6 8.5 1M12 6.6c2.3-1.6 5.4-1.9 8.5-1v12.8c-3.1-.9-6.2-.6-8.5 1M12 6.6v12.8" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
+  ),
+  backTo: (
+    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
   ),
 };
+
+/** The figure page a queue belongs to, as a path. */
+function figurePath(lang: PlayerLang, slug: string): string {
+  return `${lang === 'de' ? '/de' : ''}/figures/${slug}/`;
+}
+
+function currentPath(): string {
+  return typeof window === 'undefined' ? '' : window.location.pathname;
+}
 
 export default function StoryDock({ lang, labels }: Props) {
   const state = useSyncExternalStore(subscribe, getState, () => SERVER_STATE);
   const fillRef = useRef<HTMLDivElement | null>(null);
+  const seekRef = useRef<HTMLInputElement | null>(null);
   const readRef = useRef<HTMLButtonElement | null>(null);
+  const [path, setPath] = useState(currentPath);
 
   useEffect(() => {
     installPlayer({ en: labels.en.brief, de: labels.de.brief });
   }, [labels]);
 
+  // The dock lives across pages: it learns where it is after each swap.
+  useEffect(() => {
+    const update = () => setPath(currentPath());
+    document.addEventListener('astro:page-load', update);
+    return () => document.removeEventListener('astro:page-load', update);
+  }, []);
+
   // CSSOM, not a style attribute: the strict style-src blocks attributes.
   const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
   useEffect(() => {
     if (fillRef.current) fillRef.current.style.width = `${pct}%`;
+    if (seekRef.current) seekRef.current.style.setProperty('--story-seek', `${pct}%`);
   }, [pct]);
 
-  // The page keeps room for the dock's real height: the label may wrap.
+  // The page keeps room for the dock's real height: the title and label may wrap.
   const observer = useRef<ResizeObserver | null>(null);
   const measureRef = useCallback((el: HTMLDivElement | null) => {
     observer.current?.disconnect();
@@ -110,16 +140,17 @@ export default function StoryDock({ lang, labels }: Props) {
 
   if (offer && state.resume) {
     const point = state.resume;
-    const text = point.t > 0 ? s.continueAt(point.n, fmt(point.t)) : s.continueNext(point.n);
+    const title = readPageQueue()?.entries.find(e => e.n === point.n)?.title ?? s.storyN(point.n);
+    const text = point.t > 0 ? s.continueAt(title, fmt(point.t)) : s.continueNext(title);
     return (
       <div className="story-dock-slot">
         <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
-          <div className="story-dock__inner">
-            <button type="button" className="story-btn story-btn--wide" onClick={acceptResume}>
-              {Icon.play}
-              <span>{text}</span>
+          <div className="story-dock__offer">
+            <button type="button" className="story-dock__go" onClick={acceptResume}>
+              <span className="story-dock__go-disc" aria-hidden="true">{Icon.play}</span>
+              <span className="story-dock__go-text">{text}</span>
             </button>
-            <button type="button" className="story-btn story-btn--text" onClick={declineResume}>{s.notNow}</button>
+            <button type="button" className="story-dock__no" onClick={declineResume}>{s.notNow}</button>
           </div>
         </div>
       </div>
@@ -130,44 +161,76 @@ export default function StoryDock({ lang, labels }: Props) {
   const current = state.current;
   if (!queue || current === null) return <div className="story-dock-slot" />;
   const entry = queue.entries.find(e => e.n === current);
-  const title = entry ? `${s.storyN(current)}: ${entry.title}` : s.storyN(current);
+  const title = entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
+  const home = figurePath(queue.lang, queue.slug);
+  const away = path !== '' && path !== home;
+  const nextRate = RATES[(RATES.indexOf(state.rate) + 1) % RATES.length] ?? 1;
 
   return (
     <div className="story-dock-slot">
       {state.readerOpen && (
-        <StoryReader state={state} s={s} label={label} note={s.retellingNote} onClose={closeReader} />
+        <StoryReader state={state} s={s} label={label} onClose={closeReader} />
       )}
       <div ref={measureRef} className="story-dock" role="region" aria-label={s.dockLabel} data-status={state.status}>
         <div className="story-dock__progress" aria-hidden="true">
           <div ref={fillRef} className="story-dock__fill" />
         </div>
         <div className="story-dock__inner">
-          <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
-            aria-label={playing ? s.pauseAria : s.playAria}>
-            {playing ? Icon.pause : Icon.play}
-          </button>
-          <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
-            {Icon.back}
-          </button>
-          <div className="story-dock__text">
-            <p className="story-dock__title">{`${queue.name} · ${title}`}</p>
-            <p className="story-dock__sub">
-              {state.status === 'error' ? s.error : label.brief}
+          <div className="story-dock__ctrls">
+            <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
+              {Icon.back}
+            </button>
+            <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
+              aria-label={playing ? s.pauseAria : s.playAria}>
+              {playing ? Icon.pause : Icon.play}
+            </button>
+            <button type="button" className="story-btn story-dock__next" onClick={nextStory} disabled={!hasNext()}
+              aria-label={s.nextAria}>
+              {Icon.next}
+            </button>
+          </div>
+          <div className={away ? 'story-dock__text story-dock__text--away' : 'story-dock__text'}>
+            {away && (
+              <a className="story-dock__home" href={home} aria-label={s.backToAria(queue.name)}>
+                {Icon.backTo}
+                <span>{queue.name}</span>
+              </a>
+            )}
+            <p className="story-dock__title">
+              {!away && <span className="story-dock__who">{`${queue.name} · `}</span>}
+              {title}
             </p>
           </div>
+          <p className="story-dock__sub">{state.status === 'error' ? s.error : label.brief}</p>
+          <div className="story-dock__seek">
+            <input
+              ref={seekRef}
+              type="range"
+              min={0}
+              max={state.duration > 0 ? Math.floor(state.duration) : 0}
+              step={1}
+              value={Math.floor(state.time)}
+              aria-label={s.seekAria}
+              aria-valuetext={`${fmt(state.time)} / ${fmt(state.duration)}`}
+              onChange={e => seekTo(Number(e.currentTarget.value))}
+            />
+          </div>
           <span className="story-dock__time" aria-hidden="true">{`${fmt(state.time)} / ${fmt(state.duration)}`}</span>
-          <button type="button" className="story-btn story-dock__next" onClick={nextStory} disabled={!hasNext()}
-            aria-label={s.nextAria}>
-            {Icon.next}
-          </button>
-          <button ref={readRef} type="button" className="story-btn story-btn--text story-dock__read"
-            aria-expanded={state.readerOpen} onClick={() => setReaderOpen(!state.readerOpen)}>
-            {s.readAlong}
-          </button>
-          <button type="button" className="story-btn story-dock__close" onClick={dismiss} aria-label={s.closeAria}>
-            {Icon.close}
-          </button>
+          <div className="story-dock__aux">
+            <button type="button" className="story-btn story-dock__speed" onClick={() => setRate(nextRate)}
+              aria-label={s.speedAria(rateLabel(state.rate, storyLang))}>
+              {rateLabel(state.rate, storyLang)}
+            </button>
+            <button ref={readRef} type="button" className="story-dock__read"
+              aria-expanded={state.readerOpen} onClick={() => setReaderOpen(!state.readerOpen)}>
+              {Icon.book}
+              <span>{s.readAlong}</span>
+            </button>
+            <button type="button" className="story-btn story-dock__close" onClick={dismiss} aria-label={s.closeAria}>
+              {Icon.close}
+            </button>
+          </div>
         </div>
       </div>
     </div>

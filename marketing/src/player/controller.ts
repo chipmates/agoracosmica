@@ -20,6 +20,7 @@ import {
 import { trackHeardSeconds } from '../utils/heardSeconds';
 import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
+import { applyStoredTheme } from './theme';
 import type { PlayerLang } from './strings';
 import type { PlayerState, ResumePoint, StoryQueue } from './types';
 
@@ -28,6 +29,7 @@ import type { PlayerState, ResumePoint, StoryQueue } from './types';
 export const PLAYBACK_MODE = 'story';
 
 const RESUME_KEY = 'agc_story_resume';
+const DONE_KEY = 'agc_story_done';
 const RESUME_SAVE_MS = 5000;
 const SKIP_S = 15;
 export const RATES: readonly number[] = [0.8, 1, 1.25, 1.5];
@@ -44,6 +46,7 @@ let state: PlayerState = {
   resume: null,
   readerOpen: false,
   dismissed: false,
+  done: [],
 };
 
 const listeners = new Set<() => void>();
@@ -55,8 +58,11 @@ function setState(patch: Partial<PlayerState>): void {
   if (
     before.status !== state.status || before.current !== state.current || before.queue !== state.queue
     || before.autoNext !== state.autoNext || before.dismissed !== state.dismissed
+    || before.resume !== state.resume || before.done !== state.done
   ) {
     syncPageButtons();
+  } else if (before.time !== state.time || before.duration !== state.duration) {
+    syncProgress();
   }
 }
 
@@ -158,6 +164,7 @@ function ensureAudio(): HTMLAudioElement {
     if (key) noteListenEnded(key, el.currentTime, el.duration);
     const { queue, current } = state;
     if (!queue || current === null) return;
+    markDone(queue.figureId, current);
     const next = current < queue.entries.length ? current + 1 : null;
     writeResume(next === null ? null : { figureId: queue.figureId, lang: queue.lang, n: next, t: 0 });
     if (next !== null && state.autoNext) {
@@ -356,6 +363,31 @@ function readResume(): ResumePoint | null {
   }
 }
 
+// ---- finished stories, in this browser ----------------------------------
+
+function readDone(figureId: string): number[] {
+  try {
+    const all = JSON.parse(localStorage.getItem(DONE_KEY) ?? '{}') as Record<string, unknown>;
+    const list = all[figureId];
+    return Array.isArray(list) ? list.filter((n): n is number => Number.isInteger(n) && n > 0 && n < 100) : [];
+  } catch {
+    return [];
+  }
+}
+
+function markDone(figureId: string, n: number): void {
+  const list = readDone(figureId);
+  if (!list.includes(n)) list.push(n);
+  try {
+    const all = JSON.parse(localStorage.getItem(DONE_KEY) ?? '{}') as Record<string, unknown>;
+    all[figureId] = list.sort((a, b) => a - b);
+    localStorage.setItem(DONE_KEY, JSON.stringify(all));
+  } catch {
+    // storage blocked: the marks last as long as the page
+  }
+  setState({ done: list });
+}
+
 // ---- the page: its queue and its buttons --------------------------------
 
 export function readPageQueue(): StoryQueue | null {
@@ -374,12 +406,24 @@ function pageLang(): PlayerLang {
   return document.documentElement.lang.toLowerCase().startsWith('de') ? 'de' : 'en';
 }
 
+function fmtTime(seconds: number): string {
+  const v = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
+  return `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
+}
+
+/** Whole minutes left in the current story, at least one. */
+function minutesLeft(): number {
+  const left = state.duration > 0 ? state.duration - state.time : 0;
+  return Math.max(1, Math.ceil(left / 60));
+}
+
 /** Mirror the player's state onto the page's own play buttons. */
 function syncPageButtons(): void {
   if (typeof document === 'undefined') return;
   const pageQueue = readPageQueue();
   const s = playerStrings(pageLang());
   const onThisPage = sameQueue(pageQueue, state.queue);
+  const done = state.done;
   document.querySelectorAll<HTMLElement>('[data-story-play]').forEach(btn => {
     const n = Number(btn.dataset.storyN);
     const text = btn.querySelector<HTMLElement>('[data-story-play-text]');
@@ -388,15 +432,86 @@ function syncPageButtons(): void {
     const mode = !isCurrent ? 'idle' : state.status === 'playing' ? 'playing' : state.status === 'loading' ? 'loading' : 'paused';
     btn.dataset.state = mode;
     btn.setAttribute('aria-pressed', String(mode === 'playing' || mode === 'loading'));
-    btn.closest('.fig-chapter')?.classList.toggle('is-current', isCurrent);
+    const row = btn.closest('.sp-row');
+    if (row) {
+      const isDone = done.includes(n) && !isCurrent;
+      row.classList.toggle('is-current', isCurrent);
+      row.classList.toggle('is-done', isDone);
+      const base = btn.dataset.ariaBase ?? btn.getAttribute('aria-label') ?? '';
+      btn.dataset.ariaBase = base;
+      const word = mode === 'playing' || mode === 'loading' ? s.playingWord : mode === 'paused' ? s.pausedWord : isDone ? s.finishedWord : '';
+      btn.setAttribute('aria-label', word ? `${base}, ${word}` : base);
+    }
     if (text) {
       text.textContent =
         mode === 'playing' ? s.pause : mode === 'loading' ? s.loading : mode === 'paused' ? s.resume : btn.dataset.idleLabel ?? '';
+    }
+    if (!isCurrent) {
+      // A story that stopped being current gets its minutes and an empty ring back.
+      const m = Number(btn.dataset.storyMinutes);
+      if (m > 0) btn.querySelectorAll<HTMLElement>('[data-story-min]').forEach(min => { min.textContent = s.minutes(m); });
+      btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => ring.setAttribute('stroke-dashoffset', '100'));
     }
   });
   document.querySelectorAll<HTMLElement>('[data-story-autonext]').forEach(btn => {
     btn.setAttribute('aria-pressed', String(state.autoNext));
   });
+  syncHero(pageQueue, onThisPage);
+  syncProgress();
+}
+
+/** The hero plate: story 1 in place, or the kept point offered on return. */
+function syncHero(pageQueue: StoryQueue | null, onThisPage: boolean): void {
+  const plate = document.querySelector<HTMLElement>('[data-story-hero-plate]');
+  if (!plate || !pageQueue) return;
+  const s = playerStrings(pageQueue.lang);
+  const doEl = plate.querySelector<HTMLElement>('[data-story-hero-do]');
+  const whatEl = plate.querySelector<HTMLElement>('[data-story-hero-what]');
+  const startOver = document.querySelector<HTMLElement>('[data-story-startover]');
+  const first = pageQueue.entries[0];
+  const point = state.resume;
+  const offer = !!point && state.current === null && point.figureId === pageQueue.figureId && point.lang === pageQueue.lang;
+  plate.toggleAttribute('data-resume', offer);
+  if (startOver) startOver.hidden = !offer;
+  let doText = s.playFirst;
+  let whatText = [first?.title, first?.minutes ? s.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
+  if (offer && point) {
+    const entry = pageQueue.entries.find(e => e.n === point.n);
+    doText = s.continueStory(point.n);
+    whatText = [entry?.title, point.t > 0 ? s.fromTime(fmtTime(point.t)) : ''].filter(Boolean).join(' · ');
+  } else if (onThisPage && state.current === 1 && !state.dismissed) {
+    doText = state.status === 'playing' ? s.pause : state.status === 'loading' ? s.loading : s.resume;
+    whatText = [first?.title, state.duration > 0 ? s.minutesLeft(minutesLeft()) : first?.minutes ? s.minutes(first.minutes) : '']
+      .filter(Boolean).join(' · ');
+  }
+  if (doEl && doEl.textContent !== doText) doEl.textContent = doText;
+  if (whatEl && whatEl.textContent !== whatText) whatEl.textContent = whatText;
+}
+
+/** The current story's ring and minutes left, on every button that plays it. */
+function syncProgress(): void {
+  if (typeof document === 'undefined') return;
+  const pageQueue = readPageQueue();
+  if (!sameQueue(pageQueue, state.queue) || state.current === null) return;
+  const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
+  const s = playerStrings(pageQueue!.lang);
+  document.querySelectorAll<HTMLElement>(`[data-story-play][data-story-n="${state.current}"]`).forEach(btn => {
+    btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => {
+      ring.setAttribute('stroke-dashoffset', (100 - pct).toFixed(2));
+    });
+    if (state.duration > 0) {
+      const text = s.minutesLeft(minutesLeft());
+      btn.querySelectorAll<HTMLElement>('[data-story-min]').forEach(min => {
+        if (min.textContent !== text) min.textContent = text;
+      });
+    }
+  });
+  const whatEl = document.querySelector<HTMLElement>('[data-story-hero-plate] [data-story-hero-what]');
+  if (whatEl && state.current === 1 && state.duration > 0 && !state.dismissed) {
+    const first = pageQueue!.entries[0];
+    const text = [first?.title, s.minutesLeft(minutesLeft())].filter(Boolean).join(' · ');
+    if (whatEl.textContent !== text) whatEl.textContent = text;
+  }
 }
 
 function offerResumeForPage(): void {
@@ -419,7 +534,10 @@ function onPageClick(e: MouseEvent): void {
     const n = Number(play.dataset.storyN);
     if (!queue || !queue.entries.some(entry => entry.n === n)) return;
     e.preventDefault();
-    playStory(queue, n);
+    const dockWasUp = state.current !== null && !state.dismissed;
+    if (play.hasAttribute('data-resume') && state.resume) acceptResume();
+    else playStory(queue, n);
+    if (!dockWasUp) keepPressedInView(play);
     return;
   }
   const auto = target.closest<HTMLElement>('[data-story-autonext]');
@@ -427,6 +545,24 @@ function onPageClick(e: MouseEvent): void {
     e.preventDefault();
     setAutoNext(!state.autoNext);
   }
+}
+
+/** The dock rises under the thumb: the control just pressed moves up out of its way. */
+function keepPressedInView(el: HTMLElement): void {
+  let frames = 0;
+  const check = () => {
+    const dock = document.querySelector<HTMLElement>('.story-dock');
+    if (!dock) {
+      if (++frames < 30) requestAnimationFrame(check);
+      return;
+    }
+    const over = el.getBoundingClientRect().bottom + 12 - dock.getBoundingClientRect().top;
+    if (over > 0) {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      window.scrollBy({ top: over, behavior: reduce ? 'auto' : 'smooth' });
+    }
+  };
+  requestAnimationFrame(check);
 }
 
 // ---- the lock screen ----------------------------------------------------
@@ -494,6 +630,11 @@ let lockScreenLabel: Record<PlayerLang, string> = { en: '', de: '' };
 
 let installed = false;
 
+function loadDoneForPage(): void {
+  const queue = readPageQueue() ?? state.queue;
+  setState({ done: queue ? readDone(queue.figureId) : [] });
+}
+
 /** Wire the page once per document. The dock island calls this on mount. */
 export function installPlayer(label: Record<PlayerLang, string>): void {
   if (installed) return;
@@ -501,9 +642,13 @@ export function installPlayer(label: Record<PlayerLang, string>): void {
   lockScreenLabel = label;
   document.addEventListener('click', onPageClick);
   document.addEventListener('astro:page-load', () => {
+    loadDoneForPage();
     offerResumeForPage();
     syncPageButtons();
   });
+  document.addEventListener('astro:after-swap', applyStoredTheme);
+  applyStoredTheme();
+  loadDoneForPage();
   window.addEventListener('pagehide', () => saveResume(true));
   installRouterGlue(() => state.current !== null && !state.dismissed);
   offerResumeForPage();

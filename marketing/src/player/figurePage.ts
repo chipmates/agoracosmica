@@ -73,6 +73,7 @@ export function figurePageHead(figureId: string, slug: string, lang: PlayerLang)
       lang,
       stickyCta: false,
       reading: true,
+      storyPage: true,
       ogType: 'profile' as const,
       ogImage: figurePortrait,
       ogImageAlt: de ? `KI-generiertes Porträt: ${figure.name}` : `AI-generated portrait: ${figure.name}`,
