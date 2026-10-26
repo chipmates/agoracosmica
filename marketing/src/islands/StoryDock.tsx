@@ -178,7 +178,9 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
   const home = figurePath(queue.lang, queue.slug);
-  const away = path !== '' && path !== home;
+  // A dock outside the router (the poem door) lives and dies with its page: a link away would stop the story.
+  const routed = typeof document !== 'undefined' && document.querySelector('[data-astro-transition-persist="story-dock"]') !== null;
+  const away = routed && path !== '' && path !== home;
   const inReader = state.readerOpen && state.readerN === current;
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
