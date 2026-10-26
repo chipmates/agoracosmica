@@ -1753,12 +1753,17 @@ function figuresTableHtml(picks, chats, completions) {
 // rather than in SQL. The finish rate follows the same small-base rule as
 // everywhere else, and a row whose dimension slot is empty is named for what
 // it is (a row written before the label shipped) instead of being dropped or
-// silently read as a zero ordinal.
-function listenTableHtml(dimLabel, startRows, finishRows, key, labelFn, emptyLabel) {
+// silently read as a zero ordinal. Story completions (markRows) are their own
+// column: a story completed by reading has no audio finish, and a row that has
+// completions but no start in the window is listed too.
+function listenTableHtml(dimLabel, startRows, finishRows, key, labelFn, emptyLabel, markRows) {
   var starts = byKey(startRows, key, emptyLabel);
   var finishes = byKey(finishRows, key, emptyLabel);
+  var marks = byKey(markRows || [], key, emptyLabel);
   var keys = Object.keys(starts);
-  Object.keys(finishes).forEach(function(k) { if (keys.indexOf(k) < 0) keys.push(k); });
+  [finishes, marks].forEach(function(m) {
+    Object.keys(m).forEach(function(k) { if (keys.indexOf(k) < 0) keys.push(k); });
+  });
   if (keys.length === 0) return '<div class="empty-state">No listening rows for this period</div>';
   // Most-started first, with the unlabelled bucket pinned last so it never
   // heads a ranking it is not part of.
@@ -1774,9 +1779,13 @@ function listenTableHtml(dimLabel, startRows, finishRows, key, labelFn, emptyLab
   var body = keys.slice(0, 14).map(function(k) {
     var s = starts[k] || 0;
     var f = finishes[k] || 0;
-    return [esc(labelFn ? labelFn(k) : k), fmt(s), fmt(f), anyFinish ? shareText(f, s) : '--'];
+    var row = [esc(labelFn ? labelFn(k) : k), fmt(s), fmt(f), anyFinish ? shareText(f, s) : '--'];
+    if (markRows) row.push(fmt(marks[k] || 0));
+    return row;
   });
-  return tableHtml([dimLabel, 'Starts', 'Finished', 'Finish rate'], body);
+  var head = [dimLabel, 'Starts', 'Heard to end', 'Finish rate'];
+  if (markRows) head.push('Completed');
+  return tableHtml(head, body);
 }
 
 // Interior zero-fill for time-bucketed GROUP BY rows. Analytics Engine omits
@@ -2938,6 +2947,12 @@ async function loadProduct() {
     { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' AND timestamp " + prevRange() + " GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
     { sql: "SELECT timestamp as t, blob2 as event, blob3 as endpoint, blob4 as model, double1 as spend FROM agora_llm WHERE blob1 = 'governor' ORDER BY timestamp DESC LIMIT 1", dataset: 'agora_llm' },
+    // --- Story completions, r[53..54] (APPENDED at the end). The other producer
+    // of 'completed': the once-per-browser mark a story gets when its text is
+    // read to the end or its audio ends, with no listened bucket (double1 = 0).
+    // It is the Monday pull's finish_mode, cut to stories. Batch total: 55 of 64. ---
+    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2983,6 +2998,9 @@ async function loadProduct() {
   var listenFigFinish = rows(r[40]);
   var listenChapStarts = rows(r[41]);
   var listenChapFinish = rows(r[42]);
+  var storyMarksFig = rows(r[53]);
+  var storyMarksChap = rows(r[54]);
+  var storyMarks = storyMarksFig.reduce(function(n, x) { return n + Number(x.c); }, 0);
   // Bot-check reads (appended queries r[43..48]).
   var tsStarted = val(r[43]);
   var tsInteractive = val(r[44]);
@@ -3135,7 +3153,8 @@ async function loadProduct() {
   var listenEnded = listenLife.ended || 0;
   html += '<div class="section-divider">Listening</div>';
   var listenHint = 'Rows are tracks, not listeners. One person playing three chapters writes three starts, and nothing ties a track back to a visit, so read this as how content performs and never as how many people listened. ' +
-    'The lifecycle covers stories and teachings only. Finished counts a terminal row carrying a listened bucket, across every content type, which is how the Monday pull counts it, so the finish rate can read high against a stories-and-teachings denominator. ' +
+    'The lifecycle covers stories and teachings only. Audio Finishes and the Heard to end column count a terminal row carrying a listened bucket, across every content type, which is how the Monday pull counts it, so the finish rate can read high against a stories-and-teachings denominator. ' +
+    'Stories Completed and the Completed column count the other producer of a completed row: each story once per browser when its text was read or its audio ended, with no listened time (the mode completions of the Monday pull, stories only). ' +
     'Rows written before ' + NS2_LIVE_DATE + ' have no milestone or bucket at all, so any window reaching back before then undercounts everything here except starts.';
   html += '<div class="hint-banner">' + listenHint + '</div>';
   // A zero here would claim nobody finished, when on a young beacon the truth
@@ -3155,6 +3174,9 @@ async function loadProduct() {
       ? 'no finish rows yet, so there is no rate to read'
       : (listenStarted < 20 ? 'raw count, needs 20+ starts for a rate' : 'finishes over starts, mixed denominators'),
     valColor: audioFinishes === 0 ? 'var(--dim)' : undefined,
+  });
+  html += kpi('Stories Completed', storyMarks, {
+    sub: 'once per story and browser: text read or audio heard to its end',
   });
 
   // The lifecycle as one shared axis. Deliberately no ghost bars: the previous
@@ -3194,8 +3216,8 @@ async function loadProduct() {
     'card-wide');
 
   html += chartCard('Listening by figure',
-    listenTableHtml('Figure', listenFigStarts, listenFigFinish, 'figure', cap, 'unlabelled') +
-    '<div class="kpi-sub" style="margin-top:6px;display:block">Stories and teachings only. The finish rate shows a raw fraction under 20 starts, and stays blank while the finish counter has produced no rows at all.</div>',
+    listenTableHtml('Figure', listenFigStarts, listenFigFinish, 'figure', cap, 'unlabelled', storyMarksFig) +
+    '<div class="kpi-sub" style="margin-top:6px;display:block">Stories and teachings only. Heard to end counts audio that played to its end. Completed counts each story once per browser when its text was read or its audio ended, so a story finished by reading shows there alone. The finish rate shows a raw fraction under 20 starts, and stays blank while the finish counter has produced no rows at all.</div>',
     'card-wide');
 
   // Chapter ranking. blob10 carries the ordinal on story rows only; an empty
@@ -3208,7 +3230,7 @@ async function loadProduct() {
   html += chartCard('Listening by chapter',
     listenTableHtml('Chapter', listenChapStarts, listenChapFinish, 'chapter', function(c) {
       return c === 'unlabelled' ? 'unlabelled' : 'Chapter ' + c;
-    }, 'unlabelled') +
+    }, 'unlabelled', storyMarksChap) +
     '<div class="kpi-sub" style="margin-top:6px;display:block">' + chapNote + '</div>',
     'card-wide');
   html += '</div>';
