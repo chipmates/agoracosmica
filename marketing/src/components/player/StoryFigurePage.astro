@@ -6,6 +6,7 @@
 // figure was, the honesty capsule, the concept answers, the lattice, the
 // themes, the sources. The story text itself is never in this HTML.
 import Breadcrumbs from '../Breadcrumbs.astro';
+import FigureDetailContent from '../FigureDetailContent.astro';
 import FigureConcepts from '../FigureConcepts.astro';
 import FigureLattice from '../FigureLattice.astro';
 import FigureShadow from '../FigureShadow.astro';
@@ -181,4 +182,7 @@ const hubLinkLabel = isPhilo
     <SourcesBlock figureId={figureId} lang={lang} />
     <EchoNote variant="figure" name={figure.name} lang={lang} />
   </div>
+  {/* Never rendered: the reference keeps the shared figure components' styles in
+      the chunk the other figure pages load, so their build stays as on main. */}
+  {false && <FigureDetailContent figureId={figureId} slug={slug} lang={lang} />}
 </div>

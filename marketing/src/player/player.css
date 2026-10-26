@@ -528,7 +528,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 /* ---- who he was ---------------------------------------------------------- */
 .sp-about { grid-area: about; }
 .sp-about__title { margin: 0 0 0.6rem; font-family: var(--sp-display); font-weight: 400; font-size: 1.6875rem; line-height: 1.15; color: var(--sp-ink); }
-.sp-about__text {
+/* Three classes: the figure template's answer rule (two) must not win by load order. */
+.story-page .sp-about .sp-about__text {
   margin: 0 0 0.875rem;
   max-width: 36em;
   font-family: var(--font-content);
@@ -554,7 +555,7 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 @media (min-width: 1024px) {
   .sp-about { border-top: 1px solid var(--sp-hair); padding-top: 1.6rem; }
   .sp-about__title { font-size: 1.5rem; }
-  .sp-about__text { font-size: 1rem; line-height: 1.62; }
+  .story-page .sp-about .sp-about__text { font-size: 1rem; line-height: 1.62; }
 }
 
 /* ---- the facts, in the figure template's words ---------------------------- */
@@ -587,6 +588,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   font-family: var(--font-ui);
   font-size: 0.8125rem;
   font-weight: 500;
+  letter-spacing: normal;
+  text-transform: none;
   color: var(--sp-ink-3);
 }
 .story-page .pub-figure-card.pub-figure-card--row { flex-direction: row; gap: 0.75rem; align-items: center; padding: 0.75rem; }
