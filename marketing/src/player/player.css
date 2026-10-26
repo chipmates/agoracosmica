@@ -132,6 +132,9 @@ body:has(.story-dock) .story-rail { display: none; }
 .story-applink a { color: var(--text-tertiary); border-bottom-color: color-mix(in srgb, var(--text-tertiary) 40%, transparent); }
 
 /* ---- the dock -------------------------------------------------------- */
+/* The room the dock takes at the bottom: the page and the reader keep clear of it. */
+:root { --story-dock-space: 3.75rem; }
+@media (max-width: 719.98px) { :root { --story-dock-space: 6.5rem; } }
 .story-dock {
   position: fixed;
   left: 0;
@@ -229,7 +232,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock__play:hover { background: var(--gold-primary); }
 
 /* Room at the page's end, so the dock never hides the footer. */
-body:has(.story-dock) .public-page { padding-bottom: 6.5rem; }
+body:has(.story-dock) .public-page { padding-bottom: var(--story-dock-space); }
 
 /* ---- the reading view -------------------------------------------------- */
 .story-reader {
@@ -241,7 +244,7 @@ body:has(.story-dock) .public-page { padding-bottom: 6.5rem; }
   z-index: 110;
   display: flex;
   flex-direction: column;
-  padding-bottom: 6.5rem;
+  padding-bottom: var(--story-dock-space);
   background: var(--bg-primary);
   color: var(--text-primary);
 }

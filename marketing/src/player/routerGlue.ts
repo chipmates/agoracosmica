@@ -66,16 +66,24 @@ function onMenuEscape(e: KeyboardEvent): void {
   burger.focus();
 }
 
+// A step back or forward through history: on pages without the router the
+// browser restores those from its page cache, which sends no pageview either.
+let traversing = false;
+
 export function installRouterGlue(storyLoaded: () => boolean): void {
   document.addEventListener('astro:before-preparation', e => {
-    if (!storyLoaded()) e.preventDefault();
+    if (!storyLoaded()) {
+      e.preventDefault();
+      return;
+    }
+    traversing = (e as Event & { navigationType?: string }).navigationType === 'traverse';
   });
   document.addEventListener('astro:before-swap', () => {
     if (getGclid() !== null && !adConsentDecided()) clearGclid();
   });
   document.addEventListener('astro:after-swap', () => {
     bindMenu();
-    sendInternalPageview();
+    if (!traversing) sendInternalPageview();
   });
   document.addEventListener('keydown', onMenuEscape);
 }
