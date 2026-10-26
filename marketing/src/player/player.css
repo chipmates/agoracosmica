@@ -41,7 +41,7 @@
   --sp-mist: color-mix(in srgb, var(--film-mist) var(--a-08, 8%), var(--utility-pure-white));
   --sp-mist-2: color-mix(in srgb, var(--film-mist) var(--a-15, 15%), var(--utility-pure-white));
 }
-@media (max-width: 719.98px) { :root { --story-dock-space: 7.25rem; } }
+@media (max-width: 1023.98px) { :root { --story-dock-space: 7.25rem; } }
 @media (min-width: 720px) { :root { --sp-gutter: 32px; } }
 
 /* Night roles: the page and, in every light, the dock. */
@@ -770,12 +770,13 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   .story-dock__read { gap: 6px; padding: 0 10px 0 8px; }
   .story-dock__read svg { width: 18px; height: 18px; }
 }
-@media (min-width: 720px) {
+/* The one-row dock needs the width of a laptop; tablets keep the phone's rows. */
+@media (min-width: 1024px) {
   .story-dock__progress { display: none; }
   .story-dock__inner {
     padding: 12px var(--sp-gutter);
     display: grid;
-    grid-template-columns: auto minmax(0, 1.1fr) minmax(140px, 1fr) auto auto;
+    grid-template-columns: auto minmax(0, 1.6fr) minmax(140px, 1fr) auto auto;
     grid-template-areas:
       "ctrls text seek time aux"
       "ctrls label seek time aux";
@@ -787,7 +788,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   .story-dock__sub { grid-area: label; align-self: start; margin: 1px 0 0; }
   .story-dock__time { grid-area: time; align-self: center; padding: 0; }
   .story-dock__aux { grid-area: aux; margin-left: 0; }
-  .story-dock__title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  /* The whole title, as on the phone: a long one takes a second line. */
+  .story-dock__title { text-wrap: balance; }
   .story-dock__who { display: inline; }
   .story-dock .story-dock__speed { display: inline-flex; min-width: 52px; }
   .story-dock__seek { display: block; }
