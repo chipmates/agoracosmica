@@ -1,12 +1,14 @@
 // Agora Cosmica — Internal Analytics Dashboard (V2)
 // Serves a self-contained HTML dashboard that queries CF Analytics Engine SQL API.
-// Protected by Cloudflare Access (configured in CF dashboard, not in code).
+// Every request must carry a valid Cloudflare Access JWT (access.ts) before any
+// route runs; the Access policy in the dashboard is the first gate, this the second.
 
 import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
 import { DASHBOARD_HTML } from './dashboard';
 import { handleMuseum } from './museum';
 import { handleMuseumCount, countDatasetOf } from './museum-count';
 import { readJsonCapped } from './bodyLimit';
+import { accessRefusal, accessDenied } from './access';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
@@ -16,63 +18,57 @@ const MAX_QUERY_BODY_BYTES = 1024 * 1024;
 
 let serverCache: ServerStatsCache = { data: null, at: 0 };
 
+export interface Route {
+  method: 'GET' | 'POST';
+  path: string;
+  handle(request: Request, env: Env): Promise<Response>;
+}
+
+// Every pair the worker answers; anything else is a 404, and only behind the
+// Access check. test/routeAccess.ts lists each one.
+export const ROUTES: readonly Route[] = [
+  { method: 'GET', path: '/', handle: serveDashboard },
+  { method: 'GET', path: '/health', handle: handleHealth },
+  { method: 'POST', path: '/api/query', handle: handleQuery },
+  { method: 'POST', path: '/api/query-batch', handle: handleBatchQuery },
+  { method: 'GET', path: '/api/server-stats', handle: (_request, env) => handleServerStats(env) },
+  { method: 'GET', path: '/api/museum', handle: handleMuseum },
+  { method: 'GET', path: '/api/museum/hours', handle: handleMuseum },
+  { method: 'GET', path: '/api/museum/trends', handle: handleMuseum },
+  { method: 'GET', path: '/api/museum/count', handle: (_request, env) => handleMuseumCount(env) },
+];
+
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
-    const url = new URL(request.url);
-
-    // Health check
-    if (url.pathname === '/health' && request.method === 'GET') {
-      return Response.json({ status: 'ok', version: VERSION });
+    const refused = await accessRefusal(request, env);
+    if (refused) {
+      console.error('[access] refused: ' + refused);
+      return accessDenied();
     }
-
-    // SECURITY NOTE: /api/query and /api/query-batch run arbitrary SELECT SQL
-    // against Cloudflare Analytics Engine using env.CF_API_TOKEN. They have NO
-    // in-code authentication — access control is enforced by the Cloudflare
-    // Access policy attached to this Worker's route. If the Access policy is
-    // disabled or misconfigured, these endpoints become open to the public.
-    // Verify the policy is attached on every deploy.
-
-    // Single query (backwards-compat)
-    if (url.pathname === '/api/query' && request.method === 'POST') {
-      return handleQuery(request, env);
-    }
-
-    // Batch query (new: reduces round-trips)
-    if (url.pathname === '/api/query-batch' && request.method === 'POST') {
-      return handleBatchQuery(request, env);
-    }
-
-    // Live server stats (proxied from GEX130 servers)
-    if (url.pathname === '/api/server-stats' && request.method === 'GET') {
-      return handleServerStats(env);
-    }
-
-    // Museum of Ages: Cloudflare's own totals for the museum's zone. Fixed
-    // queries on the server, nothing passed through from the page.
-    if ((url.pathname === '/api/museum' || url.pathname === '/api/museum/hours' || url.pathname === '/api/museum/trends') && request.method === 'GET') {
-      return handleMuseum(request, env);
-    }
-
-    // The museum's own count: fixed, guarded questions only (museum-count.ts).
-    if (url.pathname === '/api/museum/count' && request.method === 'GET') {
-      return handleMuseumCount(env);
-    }
-
-    // Serve dashboard HTML — inject LAUNCH_EPOCH_SECONDS at render time so the
-    // client renders the "Stats since" label without a separate fetch.
-    // String() of parseInt guarantees a valid integer literal (defends against
-    // typos in wrangler.toml that would otherwise produce broken inline JS).
-    const launchEpoch = String(parseInt(env.LAUNCH_EPOCH_SECONDS || '0', 10) || 0);
-    const html = DASHBOARD_HTML.replace(/__LAUNCH_EPOCH_SECONDS__/g, launchEpoch);
-    return new Response(html, {
-      headers: {
-        'Content-Type': 'text/html; charset=utf-8',
-        'Cache-Control': 'no-cache',
-        'X-Dashboard-Version': VERSION,
-      },
-    });
+    const path = new URL(request.url).pathname;
+    const route = ROUTES.find((r) => r.path === path && r.method === request.method);
+    if (!route) return Response.json({ error: 'Not found' }, { status: 404 });
+    return route.handle(request, env);
   },
 };
+
+async function handleHealth(): Promise<Response> {
+  return Response.json({ status: 'ok', version: VERSION });
+}
+
+// The dashboard. LAUNCH_EPOCH_SECONDS is filled in at render time; String() of
+// parseInt keeps it a valid integer literal inside the inline script.
+async function serveDashboard(_request: Request, env: Env): Promise<Response> {
+  const launchEpoch = String(parseInt(env.LAUNCH_EPOCH_SECONDS || '0', 10) || 0);
+  const html = DASHBOARD_HTML.replace(/__LAUNCH_EPOCH_SECONDS__/g, launchEpoch);
+  return new Response(html, {
+    headers: {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-cache',
+      'X-Dashboard-Version': VERSION,
+    },
+  });
+}
 
 // --- Single query ---
 

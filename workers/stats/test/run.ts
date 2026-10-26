@@ -8,6 +8,7 @@
 import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
 import type { Env } from '../src/types';
+import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
 const results: { name: string; error?: string }[] = [];
 
@@ -24,13 +25,18 @@ function assertEqual(actual: unknown, expected: unknown, message: string): void 
   if (actual !== expected) throw new Error(`${message} (expected ${String(expected)}, got ${String(actual)})`);
 }
 
-const env = { CF_API_TOKEN: 'test-token', CF_ACCOUNT_ID: 'test-account' } as unknown as Env;
+const env = { CF_API_TOKEN: 'test-token', CF_ACCOUNT_ID: 'test-account', ACCESS_TEAM_DOMAIN: TEAM_DOMAIN, ACCESS_AUD: AUD } as unknown as Env;
+
+// Every request carries a valid Access JWT; the key set is answered locally and not counted as a query.
+let SIGNER: Signer;
+let TOKEN = '';
 
 /** Run one call with fetch answered locally and recorded. */
 async function withStubbedFetch(fn: () => Promise<Response>): Promise<{ response: Response; fetched: string[] }> {
   const fetched: string[] = [];
   const previous = globalThis.fetch;
   globalThis.fetch = (async (url: string) => {
+    if (String(url) === CERTS_URL) return certsAnswer(SIGNER);
     fetched.push(String(url));
     return Response.json({ data: [] });
   }) as unknown as typeof fetch;
@@ -47,7 +53,7 @@ async function withStubbedFetch(fn: () => Promise<Response>): Promise<{ response
 function post(path: string, body: string | Uint8Array | ReadableStream<Uint8Array>, headers: Record<string, string> = {}): Request {
   return new Request(`https://stats.example${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...headers },
+    headers: { 'Content-Type': 'application/json', 'Cf-Access-Jwt-Assertion': TOKEN, ...headers },
     body,
     ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
   } as RequestInit);
@@ -62,6 +68,8 @@ function padded(base: Record<string, unknown>, bytes: number): Uint8Array {
 }
 
 async function main(): Promise<void> {
+  SIGNER = await makeSigner();
+  TOKEN = await signToken(SIGNER);
   // The cap's contract, written out so the suite also runs against a tree that predates it.
   const QUERY_LIMIT = 1024 * 1024;
   const routes = [
@@ -133,7 +141,7 @@ async function main(): Promise<void> {
     const lines: string[] = [];
     const previous = globalThis.fetch;
     const realError = console.error;
-    globalThis.fetch = (async () => answer()) as unknown as typeof fetch;
+    globalThis.fetch = (async (url: string) => (String(url) === CERTS_URL ? certsAnswer(SIGNER) : answer())) as unknown as typeof fetch;
     console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
     try {
       return { response: await call(), lines };
@@ -225,7 +233,7 @@ async function main(): Promise<void> {
   }
 
   function withBody(path: string, body: ReadableStream<Uint8Array>): Request {
-    const request = new Request(`https://stats.example${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const request = new Request(`https://stats.example${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Cf-Access-Jwt-Assertion': TOKEN } });
     return Object.defineProperty(request, 'body', { value: body });
   }
 

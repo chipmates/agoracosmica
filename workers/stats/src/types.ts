@@ -1,6 +1,13 @@
 // Types for agora-cosmica-stats worker
 
 export interface Env {
+  /**
+   * Cloudflare Access, both secrets: the team domain (<team>.cloudflareaccess.com)
+   * and the Application Audience (AUD) tag of the dashboard's Access application.
+   * While either is missing every request gets the 403 (access.ts).
+   */
+  ACCESS_TEAM_DOMAIN?: string;
+  ACCESS_AUD?: string;
   CF_API_TOKEN: string;
   CF_ACCOUNT_ID: string;
   AUDIO_API_KEY: string;
