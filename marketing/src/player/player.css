@@ -180,6 +180,9 @@ body:has(.story-page) .pub-main { padding-top: 0.25rem; padding-left: var(--sp-g
 .story-page .pub-breadcrumbs li { font-size: 0.8125rem; }
 .story-page .pub-breadcrumbs a { display: inline-flex; align-items: center; min-height: 44px; padding: 0 0.5rem; margin: 0 -0.5rem; }
 .story-page .pub-breadcrumbs [aria-current="page"] { color: var(--sp-ink-2); }
+/* An opaque bar: where the backdrop blur does not render (WebKit shots), the
+   breadcrumb scrolled under it showed through its 90% fill. */
+body:has(.story-page) .pub-navbar { background: var(--bg-void); }
 /* The phone bar keeps the language switch beside the menu button. */
 .pub-navbar .pub-navbar__lang--bar { display: none; }
 body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
