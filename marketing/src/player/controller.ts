@@ -450,7 +450,7 @@ function syncPageButtons(): void {
       // A story that stopped being current gets its minutes and an empty ring back.
       const m = Number(btn.dataset.storyMinutes);
       if (m > 0) btn.querySelectorAll<HTMLElement>('[data-story-min]').forEach(min => { min.textContent = s.minutes(m); });
-      btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => ring.setAttribute('stroke-dashoffset', '100'));
+      btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => ring.style.removeProperty('stroke-dashoffset'));
     }
   });
   document.querySelectorAll<HTMLElement>('[data-story-autonext]').forEach(btn => {
@@ -497,7 +497,8 @@ function syncProgress(): void {
   const s = playerStrings(pageQueue!.lang);
   document.querySelectorAll<HTMLElement>(`[data-story-play][data-story-n="${state.current}"]`).forEach(btn => {
     btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => {
-      ring.setAttribute('stroke-dashoffset', (100 - pct).toFixed(2));
+      // CSSOM: the stylesheet's offset outranks an SVG attribute.
+      ring.style.setProperty('stroke-dashoffset', (100 - pct).toFixed(2));
     });
     if (state.duration > 0) {
       const text = s.minutesLeft(minutesLeft());
