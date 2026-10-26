@@ -3,7 +3,7 @@ import React, { useReducer, useEffect, useRef, useState, useCallback, FC } from 
 import { useDomainStore } from '../stores/domainStore';
 import { useUIStore } from '../stores/uiStore';
 import { useTranslation } from '../hooks/useTranslation';
-import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, Sparkle, BookOpen, BookBookmark, CheckCircle, Scroll, ChatCircleDots } from '@phosphor-icons/react';
+import { Headphones, Info, CaretDown, CaretUp, Play, TrendUp, Trophy, BookOpen, BookBookmark, CheckCircle, Scroll } from '@phosphor-icons/react';
 import StoryAudioPlayer from './StoryAudioPlayer';
 import Button from './Button/Button';
 import HelperPopup from './HelperPopup/HelperPopup';
@@ -1173,27 +1173,6 @@ const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
                 </p>
               </div>
 
-              {/* Ask along the way, only while the feature is live */}
-              {ASK_WHILE_LISTENING && (
-                <div style={{ marginBottom: '1rem' }}>
-                  <h4 style={{
-                    color: 'var(--gold-subtle)',
-                    marginBottom: '0.5rem',
-                    fontSize: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem',
-                    fontWeight: 600
-                  }}>
-                    <ChatCircleDots size={18} style={{ color: 'var(--gold-subtle)' }} />
-                    {tNode('helpers.audioLibrary.welcome.sections.ask.title')}
-                  </h4>
-                  <p style={{ margin: 0, opacity: 0.9, paddingLeft: '26px', lineHeight: 1.5 }}>
-                    {tNode('helpers.audioLibrary.welcome.sections.ask.text')}
-                  </p>
-                </div>
-              )}
-
               {/* Progressive Journey */}
               <div style={{ marginBottom: '1rem' }}>
                 <h4 style={{
@@ -1231,51 +1210,6 @@ const StoryPlayerSurface: FC<StoryPlayerSurfaceProps> = ({
                       );
                     })}
                 </ul>
-              </div>
-
-              {/* Next Steps - Wisdom Mode connection */}
-              <div style={{
-                marginBottom: '1rem',
-                background: 'linear-gradient(135deg, color-mix(in srgb, var(--gold-subtle) 8%, transparent), color-mix(in srgb, var(--gold-subtle) 3%, transparent))',
-                borderRadius: '8px',
-                padding: '0.75rem',
-                border: '1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent)'
-              }}>
-                <h4 style={{
-                  color: 'var(--gold-subtle)',
-                  marginBottom: '0.5rem',
-                  fontSize: '1rem',
-                  display: 'flex',
-                  alignItems: 'center',
-                  gap: '0.5rem',
-                  fontWeight: 600
-                }}>
-                  <Sparkle size={18} style={{ color: 'var(--gold-subtle)' }} />
-                  {tNode('helpers.audioLibrary.welcome.sections.nextSteps.title')}
-                </h4>
-                <p style={{
-                  margin: 0,
-                  opacity: 0.9,
-                  paddingLeft: '26px',
-                  lineHeight: 1.5,
-                  fontSize: '0.9rem'
-                }}>
-                  {(() => {
-                    const text = tString('helpers.audioLibrary.welcome.sections.nextSteps.text', '');
-                    const wisdomWord = language === 'de' ? 'Wisdom Modus' : 'Wisdom Mode';
-                    const parts = text.split(wisdomWord);
-                    if (parts.length === 2) {
-                      return (
-                        <>
-                          {parts[0]}
-                          <span style={{ color: 'var(--purple-base)', fontWeight: 600 }}>{wisdomWord}</span>
-                          {parts[1]}
-                        </>
-                      );
-                    }
-                    return text;
-                  })()}
-                </p>
               </div>
 
               {/* Transparency / Disclaimer - Collapsible */}

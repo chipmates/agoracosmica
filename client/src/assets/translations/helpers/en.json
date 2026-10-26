@@ -84,10 +84,6 @@
           "title": "What to expect",
           "text": "The figure narrates their own wisdom as a first-person story. 10 to 15 minutes, historically grounded."
         },
-        "ask": {
-          "title": "Ask along the way",
-          "text": "Pause the story and ask the figure whatever is on your mind. It answers in its Echo voice, and the chapter carries on right where you stopped."
-        },
         "journey": {
           "title": "12 stories that build on each other",
           "points": [
@@ -95,10 +91,6 @@
             "5 to 8: The teaching deepens",
             "9 to 12: Mastery"
           ]
-        },
-        "nextSteps": {
-          "title": "After that",
-          "text": "In the Wisdom chapter, you can talk directly with the figure about the teaching."
         },
         "transparency": {
           "title": "Notice",
