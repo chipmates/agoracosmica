@@ -183,6 +183,12 @@ body:has(.story-page) .pub-main { padding-top: 0.25rem; padding-left: var(--sp-g
 /* An opaque bar: where the backdrop blur does not render (WebKit shots), the
    breadcrumb scrolled under it showed through its 90% fill. */
 body:has(.story-page) .pub-navbar { background: var(--bg-void); }
+/* The switch's frame is a night token computed on the root: in the day view it
+   takes the day's hairline (hover keeps the site's own rule). */
+@media (prefers-color-scheme: light) {
+  html:not([data-story-theme="night"]):has(.story-page) .pub-navbar__lang:not(:hover) { border-color: var(--sp-hair-strong); }
+}
+html[data-story-theme="day"]:has(.story-page) .pub-navbar__lang:not(:hover) { border-color: var(--sp-hair-strong); }
 /* The phone bar keeps the language switch beside the menu button. */
 .pub-navbar .pub-navbar__lang--bar { display: none; }
 body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
