@@ -13,7 +13,9 @@
 
 import Public from '../../../layouts/Public.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
-import PoemDoor from '../../../components/PoemDoor.astro';
+import StoryDoor from '../../../components/player/StoryDoor.astro';
+import PlayerDock from '../../../components/player/PlayerDock.astro';
+import '../../../player/player.css';
 import {
   dickinsonPoems as POEMS,
   dickinsonFacsimileLeaves as FACS_LEAVES,
@@ -28,9 +30,6 @@ import { numberWord } from '../../../lib/figureWorld';
 const OWN_PAGE: Record<string, string> = Object.fromEntries(
   poemsByPoet('dickinson').map((poem) => [poem.key, poem.path]),
 );
-// Slot 4 of the app's ask contract is this page's own question: the door skips
-// the mode choice and opens Free Talk about the poem the visitor just read.
-const DOOR_HREF = '/app?figure=emily-dickinson&lang=en&ask=f:dickinson:4';
 // Manuscripts + portrait + audio are served from R2 (the media CDN), not
 // bundled, so the public repo stays free of binaries. Image stems below resolve
 // to /images/dickinson/{stem}.webp; audio sits under /trailers/dickinson/.
@@ -208,18 +207,6 @@ const schemas = [
       </div>
     </header>
 
-    {/* The door sits under the first poem: a reader who came for a poem
-        meets one before the offer to talk about it. */}
-    <PoemDoor
-      at="hero"
-      placement="after-first-poem"
-      door="poem_after_first"
-      href={DOOR_HREF}
-      buttonLabel="Ask her Echo about it"
-      figureId="dickinson"
-      shapedBy="her poems and letters"
-    />
-
     {THEMES.map((theme, ti) => (
       <section class="ed-theme" id={`theme-${theme.id}`}>
         <h2 class="ed-theme__title">{theme.title}</h2>
@@ -307,17 +294,9 @@ const schemas = [
                   )}
                 </div>
               </details>
-              {ti === 0 && i === 0 && (
-                <PoemDoor
-                  at="after-first-poem"
-                  placement="after-first-poem"
-                  door="poem_after_first"
-                  href={DOOR_HREF}
-                  buttonLabel="Ask her Echo about it"
-                  figureId="dickinson"
-                  shapedBy="her poems and letters"
-                />
-              )}
+              {/* The door sits under the first poem: a reader who came for a
+                  poem meets one before the offer of her stories. */}
+              {ti === 0 && i === 0 && <StoryDoor figureId="dickinson" slug="emily-dickinson" lang={lang} />}
             </Fragment>
           ))}
         </div>
@@ -382,6 +361,7 @@ const schemas = [
       <p>{dickinsonSourceNote}</p>
     </footer>
   </div>
+  <PlayerDock slot="dock" lang={lang} persist={false} />
 </Public>
 
 <style>

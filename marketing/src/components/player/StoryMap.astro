@@ -1,0 +1,137 @@
+---
+// The map of the stories: the figure's constellation as the app draws it
+// (one star per story, joined in order), drawn here as inline SVG so it costs
+// no script and no wait. The introduction stands before the first star.
+// page.ts marks the heard stars, the playing one and the next, and a tap on
+// a star unfolds that story.
+import { CONSTELLATION_PATTERNS } from '@client/components/ZodiacConstellation';
+import constellationsDe from '@client/assets/translations/constellations/de.json';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { playerStrings } from '../../player/strings';
+import type { PlayerLang } from '../../player/strings';
+import type { StoryQueue } from '../../player/types';
+
+interface Props {
+  figureId: string;
+  lang: PlayerLang;
+  queue: StoryQueue;
+}
+
+const { figureId, lang, queue } = Astro.props;
+const P = playerStrings(lang);
+const enName = getFigureById(figureId, 'en')?.name ?? '';
+const pattern = CONSTELLATION_PATTERNS[`Echo of ${enName}`];
+const stories = queue.entries.filter(e => e.n > 0);
+
+// The app keys its German names by the English name in camel case ("The Stoic Taurus" -> theStoicTaurus).
+function nameKey(name: string): string {
+  const words = name.replace(/[^A-Za-z ]/g, '').split(/\s+/).filter(Boolean);
+  return words.map((w, i) => (i === 0 ? w.toLowerCase() : w[0]!.toUpperCase() + w.slice(1).toLowerCase())).join('');
+}
+const deNames = (constellationsDe as { constellations?: { names?: Record<string, string> } }).constellations?.names ?? {};
+const mapName = pattern ? (lang === 'de' ? deNames[nameKey(pattern.name)] ?? pattern.name : pattern.name) : '';
+
+// The pattern lives on a 0 to 100 field; the drawing scales it by ten. The
+// introduction sits a step before the first star, below it and to its left.
+const K = 10;
+const points = (pattern?.pattern ?? []).slice(0, stories.length).map(([x, y]) => [x * K, y * K] as const);
+const first = points[0];
+const intro = first ? ([first[0] - 40, first[1] + 90] as const) : null;
+const all = intro ? [intro, ...points] : points;
+const xs = all.map(p => p[0]);
+const ys = all.map(p => p[1]);
+const PAD_X = 70;
+// Room above the top row for a number with its "next" mark over it.
+const PAD_TOP = 84;
+const PAD_BOTTOM = 70;
+const x0 = Math.min(...xs) - PAD_X;
+const y0 = Math.min(...ys) - PAD_TOP;
+const w = Math.max(...xs) - x0 + PAD_X;
+const h = Math.max(...ys) - y0 + PAD_BOTTOM;
+const at = (p: readonly [number, number]) => [p[0] - x0, p[1] - y0] as const;
+
+// Where a star's number and its "next" mark go: away from the lines to its
+// neighbours, on the side with the most room.
+function labelSide(i: number): { dx: number; dy: number; anchor: 'start' | 'end' | 'middle' } {
+  const p = points[i]!;
+  const nbrs = [points[i - 1] ?? (i === 0 ? intro : null), points[i + 1]].filter(Boolean) as (readonly [number, number])[];
+  const candidates = [
+    { dx: 30, dy: 8, anchor: 'start' as const, vx: 1, vy: 0 },
+    { dx: -30, dy: 8, anchor: 'end' as const, vx: -1, vy: 0 },
+    { dx: 0, dy: -26, anchor: 'middle' as const, vx: 0, vy: -1 },
+    { dx: 0, dy: 40, anchor: 'middle' as const, vx: 0, vy: 1 },
+  ];
+  let best = candidates[0]!;
+  let bestScore = -Infinity;
+  for (const c of candidates) {
+    // the larger the angle to every neighbour, the clearer the place
+    let score = Infinity;
+    for (const q of nbrs) {
+      const ux = q[0] - p[0];
+      const uy = q[1] - p[1];
+      const len = Math.hypot(ux, uy) || 1;
+      score = Math.min(score, -(c.vx * ux + c.vy * uy) / len);
+    }
+    // keep labels inside the drawing
+    const lx = p[0] - x0 + c.dx;
+    if (c.anchor === 'start' && lx + 150 > w) score -= 1;
+    if (c.anchor === 'end' && lx - 150 < 0) score -= 1;
+    if (score > bestScore) {
+      bestScore = score;
+      best = c;
+    }
+  }
+  return best;
+}
+
+const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
+---
+{pattern && points.length > 0 && (
+  <section class="sp-mapwrap" aria-labelledby="sp-map-title" data-nosnippet>
+    <div class="sp-mapcard">
+      <div class="sp-mapcard__head">
+        <h3 class="sp-mapcard__name" id="sp-map-title">{mapName}</h3>
+        <span class="sp-mapcard__by">{P.mapBy(queue.name)}</span>
+      </div>
+      <svg class="sp-map" data-story-map viewBox={`0 0 ${w} ${h}`} role="group" aria-label={mapName} focusable="false">
+        <path class="sp-map__grat" d={`M0 ${h * 0.34 + 18} Q ${w / 2} ${h * 0.34 - 18} ${w} ${h * 0.34 + 18}`} />
+        <path class="sp-map__grat" d={`M0 ${h * 0.68 + 18} Q ${w / 2} ${h * 0.68 - 18} ${w} ${h * 0.68 + 18}`} />
+        {intro && first && (
+          <line class="sp-map__path" data-link="0-1" x1={at(intro)[0]} y1={at(intro)[1]} x2={at(first)[0]} y2={at(first)[1]} />
+        )}
+        {points.slice(1).map((p, i) => (
+          <line class="sp-map__link" data-link={`${i + 1}-${i + 2}`} x1={at(points[i]!)[0]} y1={at(points[i]!)[1]} x2={at(p)[0]} y2={at(p)[1]} />
+        ))}
+        {intro && (
+          <g class="sp-star sp-star--intro" data-story-star="0" role="button" tabindex="0"
+            aria-label={P.rowAria(0, P.introTitle, [])}>
+            <circle class="sp-star__hit" cx={at(intro)[0]} cy={at(intro)[1]} r="40" />
+            <circle class="sp-star__halo" cx={at(intro)[0]} cy={at(intro)[1]} r="25" />
+            <circle class="sp-star__arc" cx={at(intro)[0]} cy={at(intro)[1]} r="18" pathLength="100" data-star-arc transform={`rotate(-90 ${at(intro)[0]} ${at(intro)[1]})`} />
+            <rect class="sp-star__core" x={at(intro)[0] - 8} y={at(intro)[1] - 8} width="16" height="16" transform={`rotate(45 ${at(intro)[0]} ${at(intro)[1]})`} />
+            <text class="sp-star__intro" x={at(intro)[0]} y={at(intro)[1] + 46} text-anchor="middle">{P.introTitle}</text>
+            <text class="sp-star__next" x={at(intro)[0]} y={at(intro)[1] + 70} text-anchor="middle">{P.nextTag}</text>
+          </g>
+        )}
+        {points.map((p, i) => {
+          const n = i + 1;
+          const [cx, cy] = at(p);
+          const side = labelSide(i);
+          return (
+            <g class="sp-star" data-story-star={n} role="button" tabindex="0"
+              aria-label={P.rowAria(n, title(n), [])}>
+              <circle class="sp-star__hit" cx={cx} cy={cy} r="40" />
+              <circle class="sp-star__halo" cx={cx} cy={cy} r="25" />
+              <circle class="sp-star__arc" cx={cx} cy={cy} r="18" pathLength="100" data-star-arc transform={`rotate(-90 ${cx} ${cy})`} />
+              <circle class="sp-star__core" cx={cx} cy={cy} r="9" />
+              <text class="sp-star__num" x={cx + side.dx} y={cy + side.dy} text-anchor={side.anchor}>{n}</text>
+              <text class="sp-star__next" x={cx + side.dx} y={cy + side.dy + (side.dy < 0 ? -26 : 24)} text-anchor={side.anchor}>{P.nextTag}</text>
+            </g>
+          );
+        })}
+      </svg>
+      <p class="sp-mapnote">{P.mapNote(!!queue.she)}</p>
+    </div>
+    <div class="sp-mapsel" data-story-mapsel hidden></div>
+  </section>
+)}

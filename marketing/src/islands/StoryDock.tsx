@@ -1,28 +1,40 @@
-// React island: the story dock and its reading view. Mounted once per
-// document inside an element the client router persists, so it keeps playing
-// while the visitor moves between player pages. The page's own play buttons
-// are plain HTML; the controller handles their taps.
+// React island: the story dock, its full player, the sheets (facts, display,
+// saved) and the reading view. Mounted once per document inside an element
+// the client router persists, so it keeps playing while the visitor moves
+// between player pages. The page's own controls are plain HTML (page.ts).
 
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
-  RATES,
   acceptResume,
   declineResume,
-  dismiss,
   getState,
   hasNext,
+  hasPrevious,
   installPlayer,
+  listenNow,
   nextStory,
+  openReader,
+  openSheet,
+  previousStory,
   readPageQueue,
   seekTo,
-  setRate,
-  setReaderOpen,
+  setAway,
   skipBack,
+  skipForward,
+  stayHere,
+  stepRate,
   subscribe,
   togglePlay,
+  closeReader,
+  RATE_MAX,
+  RATE_MIN,
 } from '../player/controller';
+import { installPage } from '../player/page';
 import StoryReader from '../player/StoryReader';
-import { playerStrings, rateLabel } from '../player/strings';
+import Sheets from '../player/sheets';
+import { Icon } from '../player/icons';
+import { clockLabel, playerStrings, rateLabel } from '../player/strings';
+import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
 
@@ -35,44 +47,10 @@ interface Props {
   /** The page's language, for the resume offer before any story plays. */
   lang: PlayerLang;
   labels: Record<PlayerLang, Label>;
-}
-
-function fmt(seconds: number): string {
-  if (!Number.isFinite(seconds) || seconds < 0) seconds = 0;
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, '0')}`;
+  facts: Record<PlayerLang, FactWords>;
 }
 
 const SERVER_STATE: PlayerState = getState();
-
-const Icon = {
-  play: (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
-  ),
-  pause: (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>
-  ),
-  back: (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-      <path d="M6.3 6.6A8.4 8.4 0 1 1 3.6 12.4" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-      <path d="M6.6 2.6v4.3H2.3" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-      <text x="12.4" y="15.3" textAnchor="middle" fontSize="8" fontWeight="600" fill="currentColor" stroke="none">15</text>
-    </svg>
-  ),
-  next: (
-    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" focusable="false"><path d="M5.8 6.2v11.6c0 .5.5.8.9.5l8.6-5.8a.6.6 0 0 0 0-1L6.7 5.7c-.4-.3-.9 0-.9.5z" /><rect x="16.6" y="5.6" width="2.4" height="12.8" rx="1" /></svg>
-  ),
-  close: (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-  ),
-  book: (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 6.6C9.7 5 6.6 4.7 3.5 5.6v12.8c3.1-.9 6.2-.6 8.5 1M12 6.6c2.3-1.6 5.4-1.9 8.5-1v12.8c-3.1-.9-6.2-.6-8.5 1M12 6.6v12.8" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
-  ),
-  backTo: (
-    <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M15 5l-7 7 7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-  ),
-};
 
 /** The figure page a queue belongs to, as a path. */
 function figurePath(lang: PlayerLang, slug: string): string {
@@ -83,16 +61,25 @@ function currentPath(): string {
   return typeof window === 'undefined' ? '' : window.location.pathname;
 }
 
-export default function StoryDock({ lang, labels }: Props) {
+export default function StoryDock({ lang, labels, facts }: Props) {
   const state = useSyncExternalStore(subscribe, getState, () => SERVER_STATE);
   const fillRef = useRef<HTMLDivElement | null>(null);
   const seekRef = useRef<HTMLInputElement | null>(null);
-  const readRef = useRef<HTMLButtonElement | null>(null);
   const [path, setPath] = useState(currentPath);
+  const [wide, setWide] = useState(false);
 
   useEffect(() => {
     installPlayer({ en: labels.en.brief, de: labels.de.brief });
+    installPage();
   }, [labels]);
+
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
 
   // The dock lives across pages: it learns where it is after each swap.
   useEffect(() => {
@@ -108,27 +95,35 @@ export default function StoryDock({ lang, labels }: Props) {
     if (seekRef.current) seekRef.current.style.setProperty('--story-seek', `${pct}%`);
   }, [pct]);
 
-  // The page keeps room for the dock's real height: the title and label may wrap.
+  // The page and the reader keep room for the dock's real height: the title may wrap.
   const observer = useRef<ResizeObserver | null>(null);
-  const measureRef = useCallback((el: HTMLDivElement | null) => {
-    observer.current?.disconnect();
-    observer.current = null;
+  const dockEl = useRef<HTMLDivElement | null>(null);
+  const publish = useCallback(() => {
+    const el = dockEl.current;
     const root = document.documentElement.style;
     if (!el) {
+      root.setProperty('--sp-dock-h', '0px');
       root.removeProperty('--story-dock-space');
       return;
     }
-    if (typeof ResizeObserver === 'undefined') return;
-    observer.current = new ResizeObserver(() => {
-      root.setProperty('--story-dock-space', `${Math.ceil(el.getBoundingClientRect().height)}px`);
-    });
+    const h = `${Math.ceil(el.getBoundingClientRect().height)}px`;
+    root.setProperty('--story-dock-space', h);
+    root.setProperty('--sp-dock-h', h);
+  }, []);
+  const measureRef = useCallback((el: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    observer.current = null;
+    dockEl.current = el;
+    publish();
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    observer.current = new ResizeObserver(publish);
     observer.current.observe(el);
-  }, []);
-
-  const closeReader = useCallback(() => {
-    setReaderOpen(false);
-    readRef.current?.focus();
-  }, []);
+  }, [publish]);
+  // The router swaps the root's attributes on a page change and drops the property.
+  useEffect(() => {
+    document.addEventListener('astro:after-swap', publish);
+    return () => document.removeEventListener('astro:after-swap', publish);
+  }, [publish]);
 
   const storyLang: PlayerLang = state.queue?.lang ?? lang;
   const s = playerStrings(storyLang);
@@ -137,15 +132,32 @@ export default function StoryDock({ lang, labels }: Props) {
   // One offer at a time: where the page's plate offers the kept point, the dock stays down.
   const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
   const offer = !loaded && state.resume !== null && !plateOffers;
+  const readerQueue = state.readerOpen ? readPageQueue() ?? state.queue : null;
 
-  if (!loaded && !offer) return <div className="story-dock-slot" />;
+  const overlays = (
+    <>
+      {state.readerOpen && readerQueue && state.readerN !== null && (
+        <StoryReader state={state} queue={readerQueue} n={state.readerN} label={labels[readerQueue.lang]}
+          factsWord={facts[readerQueue.lang].facts} documentedWord={facts[readerQueue.lang].documented}
+          recreatedWord={facts[readerQueue.lang].recreated} />
+      )}
+      {state.sheet && (
+        <Sheets state={state} labels={labels} facts={facts} wide={wide} />
+      )}
+    </>
+  );
+
+  if (!loaded && !offer) {
+    return <div className="story-dock-slot">{overlays}</div>;
+  }
 
   if (offer && state.resume) {
     const point = state.resume;
     const title = readPageQueue()?.entries.find(e => e.n === point.n)?.title ?? s.storyN(point.n);
-    const text = point.t > 0 ? s.continueAt(title, fmt(point.t)) : s.continueNext(title);
+    const text = point.t > 0 ? s.continueAt(title, clockLabel(point.t)) : s.continueNext(title);
     return (
       <div className="story-dock-slot">
+        {overlays}
         <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
           <div className="story-dock__offer">
             <button type="button" className="story-dock__go" onClick={acceptResume}>
@@ -161,82 +173,127 @@ export default function StoryDock({ lang, labels }: Props) {
 
   const queue = state.queue;
   const current = state.current;
-  if (!queue || current === null) return <div className="story-dock-slot" />;
+  if (!queue || current === null) return <div className="story-dock-slot">{overlays}</div>;
   const entry = queue.entries.find(e => e.n === current);
-  const title = entry?.title ?? s.storyN(current);
+  const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
   const home = figurePath(queue.lang, queue.slug);
   const away = path !== '' && path !== home;
-  const nextRate = RATES[(RATES.indexOf(state.rate) + 1) % RATES.length] ?? 1;
+  const inReader = state.readerOpen && state.readerN === current;
+  const card = state.endCard;
+  const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
+  const clock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
+  const rate = rateLabel(state.rate, storyLang);
+
+  const readSlot = inReader && state.away ? (
+    <button type="button" className="story-dock__read story-dock__read--voice" onClick={() => setAway(false)}>
+      {Icon.up}
+      <span>{s.follow}</span>
+    </button>
+  ) : (
+    <button type="button" className="story-dock__read" aria-pressed={inReader}
+      onClick={() => (inReader ? closeReader() : openReader(current))}>
+      {Icon.book}
+      <span>{s.readAlong}</span>
+    </button>
+  );
 
   return (
     <div className="story-dock-slot">
-      {state.readerOpen && (
-        <StoryReader state={state} s={s} label={label} onClose={closeReader} />
-      )}
+      {overlays}
       <div ref={measureRef} className="story-dock" role="region" aria-label={s.dockLabel} data-status={state.status}>
+        {card && nextEntry && (
+          <div className="story-dock__end" role="status">
+            <span className="story-dock__count" aria-hidden="true">{card.left}</span>
+            <div className="story-dock__endtext">
+              <p className="story-dock__endk">{card.n === 0 ? s.endedIntro : s.ended(card.n)}</p>
+              <p className="story-dock__endt">{s.soon(card.next, nextEntry.title)}</p>
+            </div>
+            <div className="story-dock__endacts">
+              <button type="button" className="story-dock__stay" onClick={stayHere}>{s.stay}</button>
+              <button type="button" className="story-dock__now" onClick={listenNow}>{s.listenNow}</button>
+            </div>
+          </div>
+        )}
         <div className="story-dock__progress" aria-hidden="true">
           <div ref={fillRef} className="story-dock__fill" />
         </div>
         <div className="story-dock__inner">
-          <div className="story-dock__ctrls">
-            <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
+          {away && (
+            <a className="story-dock__home" href={home} aria-label={s.backToAria(queue.name)}>
               {Icon.back}
+              <span>{queue.name}</span>
+            </a>
+          )}
+          <button type="button" className="story-dock__open" onClick={() => openSheet('player')}
+            aria-label={`${s.openPlayer}: ${title}`}>
+            <span className="story-dock__title">{title}</span>
+            {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
+            <span className="story-dock__time">
+              <span className="story-dock__clock">{clock}</span>
+              <span className="story-dock__wait">{s.loading}</span>
+              {Icon.up}
+            </span>
+            <span className="story-dock__sub">{state.status === 'error' ? s.error : label.brief}</span>
+          </button>
+          <div className="story-dock__ctrls">
+            {wide && (
+              <button type="button" className="story-btn story-dock__prev" onClick={previousStory} disabled={!hasPrevious() && state.time < 1}
+                aria-label={s.prevAria}>{Icon.prev}</button>
+            )}
+            <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
+              {Icon.back15}
             </button>
             <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
               aria-label={playing ? s.pauseAria : s.playAria}>
               {playing ? Icon.pause : Icon.play}
             </button>
+            {wide && (
+              <button type="button" className="story-btn story-dock__fwd" onClick={skipForward} aria-label={s.fwd15Aria}>
+                {Icon.fwd15}
+              </button>
+            )}
             <button type="button" className="story-btn story-dock__next" onClick={nextStory} disabled={!hasNext()}
               aria-label={s.nextAria}>
               {Icon.next}
             </button>
-          </div>
-          <div className={away ? 'story-dock__text story-dock__text--away' : 'story-dock__text'}>
-            {away && (
-              <a className="story-dock__home" href={home} aria-label={s.backToAria(queue.name)}>
-                {Icon.backTo}
-                <span>{queue.name}</span>
-              </a>
+            {!wide && (
+              <button type="button" className="story-btn story-dock__speed" onClick={() => openSheet('player')}
+                aria-label={s.speedAria(rate)}>
+                {rate}
+              </button>
             )}
-            <p className="story-dock__title">
-              {!away && <span className="story-dock__who">{`${queue.name} · `}</span>}
-              {title}
-            </p>
+            {!wide && readSlot}
           </div>
-          <p className="story-dock__sub">{state.status === 'error' ? s.error : label.brief}</p>
-          <div className="story-dock__seek">
-            <input
-              ref={seekRef}
-              type="range"
-              min={0}
-              max={state.duration > 0 ? Math.floor(state.duration) : 0}
-              step={1}
-              value={Math.floor(state.time)}
-              aria-label={s.seekAria}
-              aria-valuetext={`${fmt(state.time)} / ${fmt(state.duration)}`}
-              onChange={e => seekTo(Number(e.currentTarget.value))}
-            />
-          </div>
-          {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
-          <span className="story-dock__time">
-            <span className="story-dock__clock" aria-hidden="true">{`${fmt(state.time)} / ${fmt(state.duration)}`}</span>
-            <span className="story-dock__wait">{s.loading}</span>
-          </span>
-          <div className="story-dock__aux">
-            <button type="button" className="story-btn story-dock__speed" onClick={() => setRate(nextRate)}
-              aria-label={s.speedAria(rateLabel(state.rate, storyLang))}>
-              {rateLabel(state.rate, storyLang)}
-            </button>
-            <button ref={readRef} type="button" className="story-dock__read"
-              aria-expanded={state.readerOpen} onClick={() => setReaderOpen(!state.readerOpen)}>
-              {Icon.book}
-              <span>{s.readAlong}</span>
-            </button>
-            <button type="button" className="story-btn story-dock__close" onClick={dismiss} aria-label={s.closeAria}>
-              {Icon.close}
-            </button>
-          </div>
+          {wide && (
+            <>
+              <div className="story-dock__seek">
+                <span className="story-dock__t0">{clockLabel(state.time)}</span>
+                <input
+                  ref={seekRef}
+                  type="range"
+                  min={0}
+                  max={state.duration > 0 ? Math.floor(state.duration) : 0}
+                  step={1}
+                  value={Math.floor(state.time)}
+                  aria-label={s.seekAria}
+                  aria-valuetext={clock}
+                  onChange={e => seekTo(Number(e.currentTarget.value))}
+                />
+                <span className="story-dock__t1">{clockLabel(state.duration)}</span>
+              </div>
+              <div className="story-dock__rate" role="group" aria-label={s.speed}>
+                <button type="button" className="story-btn" onClick={() => stepRate(-1)} disabled={state.rate <= RATE_MIN}
+                  aria-label={s.slower}>{Icon.minus}</button>
+                <span className="story-dock__rateval" aria-live="polite">{rate}</span>
+                <button type="button" className="story-btn" onClick={() => stepRate(1)} disabled={state.rate >= RATE_MAX}
+                  aria-label={s.faster}>{Icon.plus}</button>
+              </div>
+              {readSlot}
+              <button type="button" className="story-btn story-dock__handle" onClick={() => openSheet('player')}
+                aria-label={s.openPlayer}>{Icon.up}</button>
+            </>
+          )}
         </div>
       </div>
     </div>

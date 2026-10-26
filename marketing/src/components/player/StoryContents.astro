@@ -1,12 +1,13 @@
 ---
-// The twelve stories as a contents list keyed by year: each row is one button
-// that plays its story, rendered here so search and a slow phone see the list
-// before any script. The controller marks the playing row (a band, a ring,
-// minutes left) and the finished ones (a quiet check).
-import { getChapterFactcheck } from '../../lib/factchecks';
-import { cleanFactText, numberWord } from '../../lib/figureWorld';
+// The introduction and the twelve stories as the book's contents, keyed by
+// year, rendered here so search and a slow phone see the list before any
+// script. A tap on a row unfolds it (listen, read, facts, share) and plays
+// nothing. The panels carry no story text and no facts: the story's first
+// line and the facts are fetched when the visitor opens them.
+import { numberWord } from '../../lib/figureWorld';
 import { figureMinutes } from '../../lib/storyRuntime';
 import { playerStrings } from '../../player/strings';
+import { factWords } from '../../player/factWords';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
 
@@ -19,92 +20,107 @@ interface Props {
 
 const { figureId, slug, lang, queue } = Astro.props;
 const P = playerStrings(lang);
-
-
-const rows = queue.entries.map(entry => {
-  const fc = getChapterFactcheck(figureId, lang, entry.n);
-  return { ...entry, age: cleanFactText(fc?.age) };
-});
+const W = factWords(lang);
+const stories = queue.entries.filter(e => e.n > 0);
 
 // One era for the whole life drops out of the year column; the hero's dates
 // and each row's spoken name carry it.
 const ERAS = [' AD', ' n. Chr.'];
-const era = ERAS.find(e => rows.length > 0 && rows.every(r => (r.year ?? '').endsWith(e)));
+const era = ERAS.find(e => stories.length > 0 && stories.every(r => (r.year ?? '').endsWith(e)));
 const yearShown = (year: string | undefined) => (year ? (era ? year.slice(0, -era.length) : year) : '');
 
 const total = figureMinutes(figureId, lang);
-const lead = P.tocLead(rows[0]?.age ?? '', rows[rows.length - 1]?.age ?? '', total ? P.totalTime(total) : '');
+const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?? '', total ? P.totalTime(total) : '', !!queue.she);
 ---
 <section class="sp-toc" id="stories" aria-labelledby="sp-toc-title">
-  <h2 class="sp-toc__title" id="sp-toc-title">{P.tocTitle(numberWord(rows.length, lang))}</h2>
+  <h2 class="sp-toc__title" id="sp-toc-title">{P.tocTitle(numberWord(stories.length, lang))}</h2>
   <p class="sp-toc__lead">{lead}</p>
+  <div class="sp-toc__tools">
+    <div class="sp-viewswitch" role="group" aria-label={P.viewAria}>
+      <button type="button" data-story-view="list" aria-pressed="true">{P.listView}</button>
+      <button type="button" data-story-view="map" aria-pressed="false">{P.mapView}</button>
+    </div>
+    <button type="button" class="sp-savedbtn" data-story-saved-open hidden>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6.5 4h11v16l-5.5-4-5.5 4z" /></svg>
+      <span data-saved-count></span>
+    </button>
+  </div>
   <ol class="sp-rows">
-    {rows.map(r => {
+    {queue.entries.map(r => {
+      const intro = r.n === 0;
       const shown = yearShown(r.year);
       const approx = shown.startsWith('~');
-      const details = [r.year ? P.approxYear(r.year) : '', r.place ?? '', r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : '']
-        .filter(Boolean);
+      const details = intro
+        ? [r.minutes ? P.minutes(r.minutes) : '']
+        : [r.year ? P.approxYear(r.year) : '', r.place ?? '', r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''];
+      const sub = intro
+        ? (r.minutes ? P.introRowSub(r.minutes) : '')
+        : [r.place, r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''].filter(Boolean).join(' · ');
       return (
-        <li class="sp-row" id={`idea-${r.n}`}>
+        <li class:list={['sp-row', intro && 'sp-row--intro']} id={`idea-${r.n}`} data-n={r.n}>
           <button
             type="button"
-            class="sp-row__btn story-play story-play--row"
-            data-story-play
-            data-story-n={r.n}
-            data-story-minutes={r.minutes ?? undefined}
-            aria-pressed="false"
-            aria-label={P.rowAria(r.n, r.title, details)}
+            class="sp-row__btn"
+            id={`story-${r.n}`}
+            data-story-row={r.n}
+            aria-expanded="false"
+            aria-controls={`sp-panel-${r.n}`}
+            aria-label={P.rowAria(r.n, r.title, details.filter(Boolean))}
           >
-            <span class="sp-row__year" aria-hidden="true">{approx ? <><span class="sp-row__approx">~</span>{shown.slice(1)}</> : shown}</span>
+            <span class="sp-row__year" aria-hidden="true">
+              {intro ? (
+                <svg class="sp-row__scroll" viewBox="0 0 24 24" focusable="false"><path d="M7 4h11v13a3 3 0 0 1-3 3H6" /><path d="M7 4a2.5 2.5 0 0 0-2.5 2.5V8H7" /><path d="M6 20a3 3 0 0 0 3-3v-1H3v1a3 3 0 0 0 3 3z" /><path d="M10 8.5h5M10 12h5" /></svg>
+              ) : approx ? (
+                <><span class="sp-row__approx">{P.approxYear('~').trim()}</span>{shown.slice(1).trim()}</>
+              ) : shown}
+            </span>
             <span class="sp-row__body">
               <span class="sp-row__title">{r.title}</span>
-              <span class="sp-row__where">{[r.place, r.age ? P.ageAt(r.age) : ''].filter(Boolean).join(' · ')}{r.minutes && <span class="sp-row__min" data-story-min>{P.minutes(r.minutes)}</span>}</span>
+              {sub && <span class="sp-row__sub">{sub}</span>}
             </span>
-            <span class="sp-row__end">
-              {r.minutes && <span class="sp-row__min" data-story-min>{P.minutes(r.minutes)}</span>}
-              <span class="sp-row__glyph" aria-hidden="true">
-                <svg class="sp-ring sp-ring--row" viewBox="0 0 36 36" focusable="false">
-                  <circle class="sp-ring__track" cx="18" cy="18" r="16.5" />
-                  <circle class="sp-ring__run" cx="18" cy="18" r="16.5" pathLength="100" data-story-ring />
-                  <circle class="sp-ring__wait" cx="18" cy="18" r="16.5" pathLength="100" />
-                </svg>
-                <span class="sp-row__core">
+            <span class="sp-row__state" aria-hidden="true">
+              <svg class="sp-ring sp-ring--row" viewBox="0 0 24 24" focusable="false">
+                <circle class="sp-ring__track" cx="12" cy="12" r="9" />
+                <circle class="sp-ring__run" cx="12" cy="12" r="9" pathLength="100" data-story-ring />
+              </svg>
+              <svg class="sp-row__check" viewBox="0 0 24 24" focusable="false"><path d="M5 12.6l4.4 4.4L19 7.4" /></svg>
+            </span>
+            <svg class="sp-row__chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" /></svg>
+          </button>
+          <div class="sp-row__panel" id={`sp-panel-${r.n}`} hidden data-nosnippet>
+            <div class="sp-teaser">
+              <p class="sp-teaser__k">{intro ? P.opensIntro : P.opens}</p>
+              <p class="sp-teaser__t" data-story-teaser></p>
+            </div>
+            <div class="sp-acts">
+              <button type="button" class="sp-act sp-act--main" data-story-play data-story-n={r.n} data-door="row_listen" data-state="idle">
+                <span class="sp-act__disc" aria-hidden="true">
                   <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
                   <svg class="story-play__icon story-play__icon--pause" viewBox="0 0 24 24" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>
-                  <svg class="sp-row__check" viewBox="0 0 24 24" focusable="false"><path d="M5 12.6l4.4 4.4L19 7.4" /></svg>
                 </span>
-              </span>
-            </span>
-          </button>
+                <span class="sp-act__words">
+                  <span class="sp-act__t" data-act-t>{P.listen}</span>
+                  <span class="sp-act__s" data-act-s>{r.minutes ? P.minutes(r.minutes) : ''}</span>
+                </span>
+              </button>
+              <button type="button" class="sp-act" data-story-read={r.n} data-door="row_read">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.6C9.7 5 6.6 4.7 3.5 5.6v12.8c3.1-.9 6.2-.6 8.5 1M12 6.6c2.3-1.6 5.4-1.9 8.5-1v12.8c-3.1-.9-6.2-.6-8.5 1M12 6.6v12.8" /></svg>
+                <span>{P.read}</span>
+              </button>
+              <button type="button" class="sp-act" data-story-facts={r.n} data-door="row_facts">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="8.5" /><path d="M8.2 12.3l2.6 2.6 5-5.2" /></svg>
+                <span>{W.facts}</span>
+              </button>
+              <button type="button" class="sp-act" data-story-share={r.n} data-door="row_share">
+                <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 15V4" /><path d="M8 7.5L12 3.5l4 4" /><path d="M6 11v8.5h12V11" /></svg>
+                <span>{P.share}</span>
+              </button>
+            </div>
+          </div>
         </li>
       );
     })}
   </ol>
-
-  <button type="button" class="story-autonext" data-story-autonext aria-pressed="true">
-    <span class="story-autonext__box" aria-hidden="true">
-      <svg viewBox="0 0 24 24" focusable="false"><path d="M5 12.6l4.4 4.4L19 7.4" /></svg>
-    </span>
-    <span>{P.autoNext}</span>
-  </button>
-
-  {rows.some(r => r.documented || r.recreated) && (
-    <details class="sp-ledger">
-      <summary>
-        <span>{P.ledgerTitle}</span>
-        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
-      </summary>
-      <dl>
-        {rows.filter(r => r.documented || r.recreated).map(r => (
-          <div class="sp-ledger__item">
-            <dt>{[r.year, r.title].filter(Boolean).join(' · ')}</dt>
-            {r.documented && <dd><span class="sp-ledger__key">{P.documented}:</span> {r.documented}</dd>}
-            {r.recreated && <dd><span class="sp-ledger__key">{P.recreated}:</span> {r.recreated}</dd>}
-          </div>
-        ))}
-      </dl>
-    </details>
-  )}
 
   <p class="story-applink">
     <a

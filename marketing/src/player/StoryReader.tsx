@@ -1,232 +1,405 @@
-// The reading view: the playing story's text, fetched from R2 only when the
-// visitor opens it (never in the page's HTML), set like a page of a book, with
-// the paragraph that is playing marked from the story's per-paragraph
-// timestamps and kept in view.
+// The reading view: any story's text, or the introduction's, fetched from R2
+// only when the visitor opens it (never in the page's HTML), set like a page
+// of a book. It opens without sound. While its story plays, the spoken
+// sentence is lit and the word marked from the voice's character alignment,
+// the paragraph where the alignment does not fit, and the view follows the
+// voice until the visitor scrolls away.
 
-import { useEffect, useRef, useState } from 'react';
-import { getPublicAudioUrl } from '@client/utils/public/publicMediaUrl';
-import { RATES, setRate } from './controller';
-import { rateLabel } from './strings';
-import { currentTheme, setTheme } from './theme';
-import type { PlayerStrings } from './strings';
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
+import type { MouseEvent as ReactMouseEvent } from 'react';
+import {
+  closeReader,
+  markRead,
+  openReader,
+  openSheet,
+  playFrom,
+  playStory,
+  readProgress,
+  saveSentence,
+  removeSaved,
+  seekTo,
+  setAway,
+  togglePlay,
+} from './controller';
+import { cleanFact, loadFacts, loadText, loadTiming } from './content';
+import type { FactEntry, StoryTiming, TextBlock } from './content';
+import { blockAt, buildModel, sentenceStart, wordAt } from './readalong';
+import type { ReaderModel } from './readalong';
+import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
+import { Icon } from './icons';
+import { shareStory } from './page';
+import { showToast } from './toast';
+import { clockLabel, playerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
-
-// The shape of a story's .timestamps.json, as the app's StoryService reads it.
-interface StoryTimestamps {
-  paragraphs: { index: number; start: number; end: number }[];
-}
-
-interface StoryText {
-  paragraphs: string[];
-  timestamps: StoryTimestamps | undefined;
-}
-
-const cache = new Map<string, StoryText>();
-
-const TEXT_SIZES: readonly string[] = ['s', 'm', 'l', 'xl'];
-
-// After the visitor scrolls the text, the view stops following the voice for
-// a moment, so it never pulls the page out from under a reader.
-const FOLLOW_PAUSE_MS = 4000;
-
-async function loadStoryText(queue: StoryQueue, n: number, signal: AbortSignal): Promise<StoryText> {
-  const key = `${queue.figureId}/${queue.lang}/${n}`;
-  const hit = cache.get(key);
-  if (hit) return hit;
-  const base = getPublicAudioUrl(queue.figureId, queue.lang, n).replace(/\.webm$/, '');
-  const [textRes, stampsRes] = await Promise.all([
-    fetch(`${base}.txt`, { signal }),
-    fetch(`${base}.timestamps.json`, { signal }).catch(() => null),
-  ]);
-  if (!textRes.ok) throw new Error(`text ${textRes.status}`);
-  const raw = (await textRes.text()).replace(/\r\n?/g, '\n');
-  const paragraphs = raw.split('\n\n').map(p => p.trim()).filter(Boolean);
-  let timestamps: StoryTimestamps | undefined;
-  const type = stampsRes?.headers.get('content-type') ?? '';
-  if (stampsRes?.ok && type.includes('json')) {
-    try {
-      const data = (await stampsRes.json()) as StoryTimestamps;
-      if (Array.isArray(data?.paragraphs)) timestamps = data;
-    } catch {
-      // no highlight without timestamps; the text still reads
-    }
-  }
-  const result = { paragraphs, timestamps };
-  cache.set(key, result);
-  return result;
-}
-
-/** The paragraph the voice is in: the last one that started at or before t. */
-function activeParagraph(stamps: StoryTimestamps | undefined, t: number): number | null {
-  const list = stamps?.paragraphs ?? [];
-  const first = list[0];
-  if (!first || t < first.start) return null;
-  let lo = 0;
-  let hi = list.length - 1;
-  while (lo < hi) {
-    const mid = Math.ceil((lo + hi) / 2);
-    if ((list[mid]?.start ?? Infinity) <= t) lo = mid;
-    else hi = mid - 1;
-  }
-  return list[lo]?.index ?? null;
-}
-
-const CloseIcon = (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6.5 6.5l11 11M17.5 6.5l-11 11" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" /></svg>
-);
-const SunIcon = (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false">
-    <circle cx="12" cy="12" r="4" stroke="currentColor" strokeWidth="1.6" />
-    <path d="M12 2.8v2.4M12 18.8v2.4M2.8 12h2.4M18.8 12h2.4M5.5 5.5l1.7 1.7M16.8 16.8l1.7 1.7M5.5 18.5l1.7-1.7M16.8 7.2l1.7-1.7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
-  </svg>
-);
-const MoonIcon = (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M19.4 14.7A7.8 7.8 0 0 1 9.3 4.6a7.8 7.8 0 1 0 10.1 10.1z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" /></svg>
-);
-const DownIcon = (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M12 4.5v13M6.5 12l5.5 5.5 5.5-5.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-);
-const ChevronIcon = (
-  <svg viewBox="0 0 24 24" fill="none" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" /></svg>
-);
-// A hedera, the leaf Roman stonecutters set between words.
-const Hedera = (
-  <svg viewBox="0 0 132 18" aria-hidden="true" focusable="false">
-    <path d="M2 9h44M88 9h42" stroke="currentColor" strokeWidth="1" fill="none" />
-    <path d="M80 9C75 5.4 71.6 2.6 67.4 2.9 63.9 3.2 62.3 5.7 63.6 9 62.3 12.3 63.9 14.8 67.4 15.1 71.6 15.4 75 12.6 80 9Z" fill="currentColor" />
-    <path d="M63.6 9C59.4 9 56.2 10.6 53.6 13.4" stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round" />
-  </svg>
-);
 
 interface Props {
   state: PlayerState;
-  s: PlayerStrings;
+  queue: StoryQueue;
+  n: number;
   label: { brief: string; expanded: string };
-  onClose: () => void;
+  factsWord: string;
+  documentedWord: string;
+  recreatedWord: string;
 }
 
-export default function StoryReader({ state, s, label, onClose }: Props) {
-  const { queue, current } = state;
-  const [text, setText] = useState<StoryText | null>(null);
+const LINE_HEIGHT = { tight: 1.45, normal: 1.62, airy: 1.85 } as const;
+
+// "Show in the text" from the saved sheet: the reader scrolls there once its text is in.
+let pendingFocus: { n: number; si: number } | null = null;
+export function focusSentence(n: number, si: number): void {
+  pendingFocus = { n, si };
+}
+
+function useWide(): boolean {
+  const [wide, setWide] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 1024px)');
+    const update = () => setWide(mq.matches);
+    update();
+    mq.addEventListener('change', update);
+    return () => mq.removeEventListener('change', update);
+  }, []);
+  return wide;
+}
+
+export default function StoryReader({ state, queue, n, label, factsWord, documentedWord, recreatedWord }: Props) {
+  const s = playerStrings(queue.lang);
+  const display = useSyncExternalStore(subscribeDisplay, getDisplay, () => SERVER_DISPLAY);
+  const wide = useWide();
+  const [blocks, setBlocks] = useState<TextBlock[] | null>(null);
+  const [timing, setTiming] = useState<StoryTiming | null>(null);
   const [failed, setFailed] = useState(false);
-  const [size, setSize] = useState(1);
-  const [day, setDay] = useState(() => currentTheme() === 'day');
-  const [away, setAway] = useState(false);
-  const closeRef = useRef<HTMLButtonElement | null>(null);
+  const [facts, setFacts] = useState<FactEntry | null>(null);
+  const [pop, setPop] = useState<{ si: number; left: number; top: number } | null>(null);
+  const readerRef = useRef<HTMLElement | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const userScrollAt = useRef(0);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const pageRef = useRef<HTMLElement | null>(null);
+  const progRef = useRef<HTMLElement | null>(null);
+  const backRef = useRef<HTMLButtonElement | null>(null);
+  const endRef = useRef<HTMLElement | null>(null);
+  const programmaticUntil = useRef(0);
+  const lit = useRef<{ w: number; si: number; bi: number | null }>({ w: -1, si: -1, bi: null });
 
+  const here = state.current === n && !state.dismissed;
+  const playingHere = here && (state.status === 'playing' || state.status === 'loading');
+  const entry = queue.entries.find(e => e.n === n);
+
+  // ---- content, fetched on open ----
   useEffect(() => {
-    if (!queue || current === null) return;
-    const controller = new AbortController();
-    setText(null);
+    let live = true;
+    setBlocks(null);
+    setTiming(null);
     setFailed(false);
-    loadStoryText(queue, current, controller.signal)
-      .then(result => setText(result))
-      .catch(err => {
-        if (err instanceof DOMException && err.name === 'AbortError') return;
-        setFailed(true);
-      });
-    return () => controller.abort();
-  }, [queue, current]);
+    setFacts(null);
+    setPop(null);
+    lit.current = { w: -1, si: -1, bi: null };
+    loadText(queue, n).then(b => live && setBlocks(b)).catch(() => live && setFailed(true));
+    loadTiming(queue, n).then(t => live && setTiming(t)).catch(() => live && setTiming({}));
+    loadFacts(queue).then(f => live && setFacts(f.stories.get(n) ?? null)).catch(() => undefined);
+    scrollRef.current?.scrollTo({ top: 0 });
+    return () => {
+      live = false;
+    };
+    // the queue's figure and language name the content; its object may be rebuilt
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [queue.figureId, queue.lang, n]);
+
+  const model: ReaderModel | null = useMemo(
+    () => (blocks ? buildModel(blocks, timing ?? {}, n === 0) : null),
+    [blocks, timing, n],
+  );
 
   useEffect(() => {
-    closeRef.current?.focus();
+    backRef.current?.focus({ preventScroll: true });
+  }, []);
+
+  // ---- the reader follows the voice into the next story ----
+  const nowCurrent = state.current;
+  const nowDismissed = state.dismissed;
+  const prevCurrent = useRef(nowCurrent);
+  useEffect(() => {
+    const before = prevCurrent.current;
+    prevCurrent.current = nowCurrent;
+    if (before === n && nowCurrent !== null && nowCurrent === n + 1 && !nowDismissed) openReader(nowCurrent);
+  }, [nowCurrent, nowDismissed, n]);
+
+  // ---- display settings onto the page ----
+  useLayoutEffect(() => {
+    const el = readerRef.current;
+    if (!el) return;
+    const size = display.size ?? (wide ? 21 : 19);
+    el.style.setProperty('--sp-read-size', `${size / 16}rem`);
+    el.style.setProperty('--sp-read-lh', String(LINE_HEIGHT[display.spacing]));
+  }, [display.size, display.spacing, wide]);
+
+  // ---- the voice: light the sentence, mark the word ----
+  const follow = useCallback((force: boolean) => {
+    const box = scrollRef.current;
+    const body = bodyRef.current;
+    if (!box || !body) return;
+    const on = body.querySelector<HTMLElement>('.s.on') ?? body.querySelector<HTMLElement>('p.on');
+    if (!on) return;
+    const r = on.getBoundingClientRect();
+    const b = box.getBoundingClientRect();
+    if (!force && r.top >= b.top + 40 && r.bottom <= b.bottom - 40) return;
+    programmaticUntil.current = Date.now() + 800;
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    box.scrollBy({ top: r.top - (b.top + b.height * 0.3), behavior: reduce || force ? 'auto' : 'smooth' });
   }, []);
 
   useEffect(() => {
+    const body = bodyRef.current;
+    if (!body || !model) return;
+    const clear = () => {
+      body.querySelectorAll('.on').forEach(el => el.classList.remove('on'));
+      lit.current = { w: -1, si: -1, bi: null };
+    };
+    if (!here) {
+      clear();
+      return;
+    }
+    let changed = false;
+    if (model.mode === 'word') {
+      const w = wordAt(model, state.time);
+      if (w !== lit.current.w) {
+        body.querySelector(`.w[data-wi="${lit.current.w}"]`)?.classList.remove('on');
+        if (w >= 0) body.querySelector(`.w[data-wi="${w}"]`)?.classList.add('on');
+        const si = w >= 0 ? model.words[w]!.si : -1;
+        if (si !== lit.current.si) {
+          body.querySelector(`.s[data-si="${lit.current.si}"]`)?.classList.remove('on');
+          if (si >= 0) body.querySelector(`.s[data-si="${si}"]`)?.classList.add('on');
+          changed = true;
+        }
+        lit.current = { w, si, bi: null };
+      }
+    } else if (model.mode === 'paragraph') {
+      const bi = blockAt(model, state.time);
+      if (bi !== lit.current.bi) {
+        body.querySelector(`p[data-b="${lit.current.bi}"]`)?.classList.remove('on');
+        if (bi !== null) body.querySelector(`p[data-b="${bi}"]`)?.classList.add('on');
+        lit.current = { w: -1, si: -1, bi };
+        changed = true;
+      }
+    }
+    if (changed && display.follow && !state.away) follow(false);
+  }, [state.time, here, model, display.follow, state.away, follow]);
+
+  // "To the voice" from the dock: back at once.
+  const wasAway = useRef(state.away);
+  useEffect(() => {
+    if (wasAway.current && !state.away && here) follow(true);
+    wasAway.current = state.away;
+  }, [state.away, here, follow]);
+
+  // ---- progress line: the voice while it plays here, else the scroll ----
+  useEffect(() => {
+    const bar = progRef.current;
+    if (!bar) return;
+    if (here && state.duration > 0) bar.style.width = `${Math.min(100, (state.time / state.duration) * 100)}%`;
+  }, [here, state.time, state.duration]);
+
+  const onScroll = () => {
+    const box = scrollRef.current;
+    const bar = progRef.current;
+    if (box && bar && !here) bar.style.width = `${(box.scrollTop / Math.max(1, box.scrollHeight - box.clientHeight)) * 100}%`;
+    if (pop) setPop(null);
+  };
+  const onUserScroll = () => {
+    if (Date.now() < programmaticUntil.current) return;
+    if (playingHere && display.follow && !state.away && model?.mode !== 'none') setAway(true);
+  };
+
+  // ---- read to the end counts as finished ----
+  useEffect(() => {
+    const end = endRef.current;
+    if (!end || !blocks || typeof IntersectionObserver === 'undefined') return;
+    const io = new IntersectionObserver(entries => {
+      if (entries.some(e => e.isIntersecting)) {
+        markRead(n);
+        io.disconnect();
+      }
+    }, { root: scrollRef.current, threshold: 0.2 });
+    io.observe(end);
+    return () => io.disconnect();
+  }, [blocks, n]);
+
+  // ---- a saved sentence to show ----
+  useEffect(() => {
+    if (!model || !pendingFocus || pendingFocus.n !== n) return;
+    const si = pendingFocus.si;
+    pendingFocus = null;
+    const el = bodyRef.current?.querySelector<HTMLElement>(`.s[data-si="${si}"]`);
+    el?.scrollIntoView({ block: 'center' });
+    el?.classList.add('is-picked');
+  }, [model, n]);
+
+  // ---- keys ----
+  useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      if (e.defaultPrevented) return;
+      const target = e.target instanceof Element ? e.target : null;
+      if (target?.closest('input, textarea, .sp-sheet')) return;
+      if (e.key === 'Escape') {
+        if (pop) setPop(null);
+        else closeReader();
+        return;
+      }
+      if (e.key === ' ' && here && !target?.closest('button, a, summary')) {
+        e.preventDefault();
+        togglePlay();
+        return;
+      }
+      if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && here && model && model.mode !== 'none' && !target?.closest('button, a')) {
+        e.preventDefault();
+        const cur = Math.max(0, lit.current.si);
+        const next = Math.max(0, Math.min(model.sentences.length - 1, cur + (e.key === 'ArrowRight' ? 1 : -1)));
+        seekTo(sentenceStart(model, next) + 0.01);
+        return;
+      }
+      if ((e.key === 'm' || e.key === 'M') && !e.metaKey && !e.ctrlKey && !e.altKey) keepCurrent();
     };
     document.addEventListener('keydown', onKey);
     return () => document.removeEventListener('keydown', onKey);
-  }, [onClose]);
+  });
 
-  const activeIndex = activeParagraph(text?.timestamps, state.time);
-  const playing = state.status === 'playing' || state.status === 'loading';
+  // ---- sentences: tap, popover, keep ----
+  const sentenceInView = (): number => {
+    if (here && lit.current.si >= 0) return lit.current.si;
+    const box = scrollRef.current?.getBoundingClientRect();
+    const top = (box?.top ?? 0) + 8;
+    for (const el of Array.from(bodyRef.current?.querySelectorAll<HTMLElement>('.s') ?? [])) {
+      if (el.getBoundingClientRect().bottom > top) return Number(el.dataset.si);
+    }
+    return 0;
+  };
+  const keep = (si: number) => {
+    const text = model?.sentences[si]?.text;
+    if (!text) return;
+    const added = saveSentence(n, si, text);
+    showToast(s.kept, added ? { label: s.undo, run: () => removeSaved(n, si) } : undefined);
+  };
+  const keepCurrent = () => keep(sentenceInView());
 
-  // The spoken paragraph stays in view: while its start and most of it show,
-  // nothing moves; otherwise it comes to about a third down the view.
-  const bringIntoView = (index: number | null, always: boolean) => {
-    const box = scrollRef.current;
-    if (index === null || !box) return;
-    const el = box.querySelector<HTMLElement>(`[data-p="${index}"]`);
-    if (!el) return;
-    const top = el.offsetTop - box.scrollTop;
-    const view = box.clientHeight;
-    if (!always && top >= 8 && top + Math.min(el.offsetHeight, view * 0.6) <= view - 8) return;
-    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    box.scrollTo({ top: Math.max(0, el.offsetTop - view * 0.28), behavior: reduce ? 'auto' : 'smooth' });
+  const onTextClick = (e: ReactMouseEvent) => {
+    const target = e.target instanceof Element ? e.target : null;
+    const sentence = target?.closest<HTMLElement>('.s');
+    if (!sentence || !model) {
+      setPop(null);
+      return;
+    }
+    const si = Number(sentence.dataset.si);
+    if (playingHere && model.mode !== 'none') {
+      seekTo(sentenceStart(model, si));
+      setAway(false);
+      return;
+    }
+    const page = pageRef.current?.getBoundingClientRect();
+    const rects = sentence.getClientRects();
+    const lastRect = rects[rects.length - 1] ?? sentence.getBoundingClientRect();
+    if (!page) return;
+    const width = 280;
+    setPop({ si, left: Math.max(0, Math.min(page.width - width, lastRect.left - page.left)), top: lastRect.bottom - page.top + 8 });
   };
 
+  // the sentence a popover is about, marked while it is open
   useEffect(() => {
-    if (activeIndex === null) return;
-    if (Date.now() - userScrollAt.current < FOLLOW_PAUSE_MS) return;
-    setAway(false);
-    bringIntoView(activeIndex, false);
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- follows the voice's paragraph only
-  }, [activeIndex, text]);
+    const body = bodyRef.current;
+    if (!body || !pop) return;
+    const el = body.querySelector(`.s[data-si="${pop.si}"]`);
+    el?.classList.add('is-picked');
+    return () => el?.classList.remove('is-picked');
+  }, [pop]);
 
-  if (!queue || current === null) return null;
-  const entry = queue.entries.find(e => e.n === current);
-  const title = entry?.title ?? s.storyN(current);
-  const kicker = [queue.name, entry?.place, entry?.year].filter(Boolean).join(' · ');
-  const markUserScroll = () => {
-    userScrollAt.current = Date.now();
-    if (playing && activeIndex !== null) setAway(true);
-  };
-  const followVoice = () => {
-    userScrollAt.current = 0;
-    setAway(false);
-    bringIntoView(activeIndex, true);
-  };
-  const nextRate = RATES[(RATES.indexOf(state.rate) + 1) % RATES.length] ?? 1;
-  const toggleTheme = () => {
-    const next = currentTheme() === 'day' ? 'night' : 'day';
-    setTheme(next);
-    setDay(next === 'day');
+  const savedHere = state.saved.filter(x => x.n === n).map(x => x.si);
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body) return;
+    body.querySelectorAll('.s.is-saved').forEach(el => el.classList.remove('is-saved'));
+    savedHere.forEach(si => body.querySelector(`.s[data-si="${si}"]`)?.classList.add('is-saved'));
+  });
+
+  // ---- the head ----
+  const heading = n === 0 ? model?.blocks.find(b => b.heading) : undefined;
+  const headingText = heading ? blocks?.[model!.blocks.indexOf(heading)]?.text : undefined;
+  const title = n === 0 ? headingText ?? s.introTitle : entry?.title ?? s.storyN(n);
+  const kicker = n === 0
+    ? [s.introTitle, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ')
+    : [s.storyN(n), entry?.year, entry?.place, entry?.age ? s.ageAt(entry.age) : '', entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ');
+  const kept = here ? null : readProgress(queue, n);
+  const nextEntry = queue.entries.find(e => e.n === n + 1);
+  const firstParagraph = model?.blocks.find(b => !b.rule && !b.heading);
+  const sideOpen = wide && (state.sheet === 'facts' || state.sheet === 'display' || state.sheet === 'saved');
+
+  const renderBlock = (b: ReaderModel['blocks'][number], bi: number) => {
+    if (b.heading) return null;
+    if (b.rule) return <hr key={bi} className="story-reader__rule" />;
+    return (
+      <p key={bi} data-b={b.index} className={b === firstParagraph ? 'is-first' : undefined}>
+        {b.sentences.map((si, k) => {
+          const sent = model!.sentences[si]!;
+          const words = [];
+          for (let w = sent.first; w <= sent.last; w += 1) {
+            words.push(<span key={w} className="w" data-wi={w}>{model!.words[w]!.text}</span>);
+            if (w < sent.last) words.push(' ');
+          }
+          return (
+            <span key={si}>
+              {k > 0 ? ' ' : ''}
+              <span className="s" data-si={si}>{words}</span>
+            </span>
+          );
+        })}
+      </p>
+    );
   };
 
   return (
     <section
-      className="story-reader"
+      ref={readerRef}
+      className={`story-reader${sideOpen ? ' has-side' : ''}${playingHere ? ' is-playing' : ''}`}
       role="dialog"
       aria-modal="false"
       aria-label={s.readerAria}
-      data-size={TEXT_SIZES[size]}
+      data-hl={display.highlight}
+      data-face={display.face}
+      data-nosnippet=""
     >
       <div className="story-reader__bar">
         <div className="story-reader__bar-in">
-          <button ref={closeRef} type="button" className="story-btn story-reader__close" onClick={onClose} aria-label={s.readerClose}>
-            {CloseIcon}
+          <button ref={backRef} type="button" className="story-btn story-reader__back" onClick={closeReader} aria-label={s.backToAria(queue.name)}>
+            {Icon.back}
+            <span>{queue.name}</span>
           </button>
           <span className="story-reader__bartitle">{title}</span>
-          <div className="story-reader__tools" role="group" aria-label={s.toolsAria}>
-            <button type="button" className="story-btn story-reader__smaller" onClick={() => setSize(v => Math.max(0, v - 1))}
-              disabled={size === 0} aria-label={s.textSmaller}>A</button>
-            <button type="button" className="story-btn story-reader__larger" onClick={() => setSize(v => Math.min(TEXT_SIZES.length - 1, v + 1))}
-              disabled={size === TEXT_SIZES.length - 1} aria-label={s.textLarger}>A</button>
-            <button type="button" className="story-btn story-reader__speed" onClick={() => setRate(nextRate)}
-              aria-label={s.speedAria(rateLabel(state.rate, queue.lang))}>{rateLabel(state.rate, queue.lang)}</button>
-            <button type="button" className="story-btn story-reader__theme" onClick={toggleTheme}
-              aria-label={day ? s.nightView : s.dayView}>{day ? MoonIcon : SunIcon}</button>
-          </div>
+          <span className="story-reader__sp" />
+          <button type="button" className="story-btn story-reader__facts" onClick={() => openSheet('facts', n)} aria-haspopup="dialog">
+            {Icon.checkCircle}
+            <span>{factsWord}</span>
+          </button>
+          <button type="button" className="story-btn story-reader__mark" onClick={keepCurrent} aria-label={s.bookmark}>
+            {Icon.mark}
+          </button>
+          <button type="button" className="story-btn story-reader__aa" onClick={() => openSheet('display')} aria-label={s.display} aria-haspopup="dialog">
+            Aa
+          </button>
         </div>
+        <div className="story-reader__prog" aria-hidden="true"><i ref={progRef} /></div>
       </div>
 
       <div
         ref={scrollRef}
         className="story-reader__scroll"
-        onWheel={markUserScroll}
-        onTouchMove={markUserScroll}
-        onKeyDown={markUserScroll}
-        tabIndex={0}
+        onScroll={onScroll}
+        onWheel={onUserScroll}
+        onTouchMove={onUserScroll}
+        tabIndex={-1}
       >
-        <article className="story-reader__page">
+        <article ref={pageRef} className="story-reader__page">
           <header className="story-reader__head">
-            {kicker && <p className="story-reader__kicker">{kicker}</p>}
+            <p className="story-reader__kicker">{kicker}</p>
             <h2 className="story-reader__title">{title}</h2>
-            <p className="story-reader__note">{s.retellingNote}</p>
+            <p className="story-reader__note">{s.retellingNote(!!queue.she)}</p>
             <details className="story-label sp-label">
               <summary>
                 <span className="sp-label__i" aria-hidden="true">i</span>
@@ -238,38 +411,92 @@ export default function StoryReader({ state, s, label, onClose }: Props) {
               </summary>
               <p>{label.expanded}</p>
             </details>
-            {(entry?.documented || entry?.recreated) && (
-              <details className="sp-ledger sp-ledger--one">
-                <summary><span>{s.ledgerTitle}</span>{ChevronIcon}</summary>
-                <div className="sp-ledger__body">
-                  {entry.documented && <p><span className="sp-ledger__key">{s.documented}:</span> {entry.documented}</p>}
-                  {entry.recreated && <p><span className="sp-ledger__key">{s.recreated}:</span> {entry.recreated}</p>}
-                </div>
-              </details>
+            {!here && (
+              <button type="button" className="sp-act sp-act--main story-reader__listen" onClick={() => playStory(queue, n)}>
+                <span className="sp-act__disc" aria-hidden="true">{Icon.play}</span>
+                <span className="sp-act__words">
+                  <span className="sp-act__t">{kept ? s.continueFrom : s.listen}</span>
+                  <span className="sp-act__s">{kept ? s.fromTime(clockLabel(kept.t)) : entry?.minutes ? s.minutes(entry.minutes) : ''}</span>
+                </span>
+              </button>
             )}
           </header>
-          <div className="story-reader__orn">{Hedera}</div>
-          <div className="story-reader__body" data-nosnippet="" lang={queue.lang}>
+          <div className="story-reader__orn" aria-hidden="true"><span /></div>
+          <div ref={bodyRef} className="story-reader__body" lang={queue.lang} onClick={onTextClick}>
             {failed && <p className="story-reader__status">{s.textError}</p>}
-            {!failed && !text && <p className="story-reader__status" aria-live="polite">{s.textLoading}</p>}
-            {text?.paragraphs.map((p, i) => (
-              <p key={i} data-p={i} className={i === activeIndex ? 'story-reader__p is-active' : 'story-reader__p'}
-                aria-current={i === activeIndex ? 'true' : undefined}>
-                {p}
-              </p>
-            ))}
+            {!failed && !model && <p className="story-reader__status" aria-live="polite">{s.textLoading}</p>}
+            {model?.blocks.map(renderBlock)}
           </div>
+          {pop && (
+            <div className="story-reader__pop" ref={el => {
+              el?.style.setProperty('left', `${pop.left}px`);
+              el?.style.setProperty('top', `${pop.top}px`);
+            }}>
+              <button type="button" onClick={() => {
+                const si = pop.si;
+                setPop(null);
+                if (model) playFrom(queue, n, sentenceStart(model, si));
+              }}>{Icon.play}<span>{s.fromHere}</span></button>
+              <button type="button" onClick={() => {
+                const si = pop.si;
+                setPop(null);
+                keep(si);
+              }}>{Icon.mark}<span>{s.keep}</span></button>
+            </div>
+          )}
+          {model && (
+            <footer ref={endRef} className="story-reader__end">
+              {facts && (facts.documented.length > 0 || facts.recreated.length > 0) && (
+                <section className="story-reader__ledger">
+                  <h3>{s.ledgerTitle}</h3>
+                  {facts.documented.length > 0 && (
+                    <div className="sp-facts__list sp-facts__list--doc">
+                      <h4>{Icon.checkCircle}<span>{documentedWord}</span></h4>
+                      <ul>{facts.documented.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                    </div>
+                  )}
+                  {facts.recreated.length > 0 && (
+                    <div className="sp-facts__list sp-facts__list--rec">
+                      <h4>{Icon.pencil}<span>{recreatedWord}</span></h4>
+                      <ul>{facts.recreated.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                    </div>
+                  )}
+                </section>
+              )}
+              {nextEntry ? (
+                <div className="story-reader__next">
+                  <p className="story-reader__nextk">{s.nextUp}</p>
+                  <p className="story-reader__nextt">{`${s.storyN(nextEntry.n)} · ${nextEntry.title}`}</p>
+                  <div className="sp-acts sp-acts--two">
+                    <button type="button" className="sp-act sp-act--main" onClick={() => playStory(queue, nextEntry.n)}>
+                      <span className="sp-act__disc" aria-hidden="true">{Icon.play}</span>
+                      <span className="sp-act__words">
+                        <span className="sp-act__t">{s.listen}</span>
+                        <span className="sp-act__s">{nextEntry.minutes ? s.minutes(nextEntry.minutes) : ''}</span>
+                      </span>
+                    </button>
+                    <button type="button" className="sp-act" onClick={() => openReader(nextEntry.n)}>
+                      {Icon.book}<span>{s.read}</span>
+                    </button>
+                  </div>
+                </div>
+              ) : (queue.related?.length ?? 0) > 0 && (
+                <div className="story-reader__next">
+                  <p className="story-reader__nextk">{s.afterLast}</p>
+                  <ul className="story-reader__lives">
+                    {queue.related!.slice(0, 2).map(life => (
+                      <li key={life.href}><a href={life.href}>{life.name}</a></li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <p className="story-reader__share">
+                <button type="button" className="sp-linkbtn" onClick={() => shareStory(queue, n)}>{Icon.share}<span>{s.shareStory}</span></button>
+              </p>
+            </footer>
+          )}
         </article>
       </div>
-
-      {away && (
-        <div className="story-reader__follow">
-          <button type="button" className="story-reader__follow-btn" onClick={followVoice}>
-            {DownIcon}
-            <span>{s.follow}</span>
-          </button>
-        </div>
-      )}
     </section>
   );
 }

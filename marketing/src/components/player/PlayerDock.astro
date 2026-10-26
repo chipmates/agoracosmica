@@ -3,15 +3,26 @@
 // across page changes, so it must render with the same id on every player page.
 import StoryDock from '../../islands/StoryDock';
 import { storyLabel } from '../../player/label';
+import { factWords } from '../../player/factWords';
 import type { PlayerLang } from '../../player/strings';
 
 interface Props {
   lang: PlayerLang;
+  /** False on a page outside the player's router (the poem door): the dock lives with that page. */
+  persist?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, persist = true } = Astro.props;
 const labels = { en: storyLabel('en'), de: storyLabel('de') };
+// The app's own words for the facts, both languages: the dock outlives a language switch.
+const facts = { en: factWords('en'), de: factWords('de') };
 ---
-<div class="story-dock-mount" transition:persist="story-dock">
-  <StoryDock client:load lang={lang} labels={labels} />
-</div>
+{persist ? (
+  <div class="story-dock-mount" transition:persist="story-dock">
+    <StoryDock client:load lang={lang} labels={labels} facts={facts} />
+  </div>
+) : (
+  <div class="story-dock-mount">
+    <StoryDock client:load lang={lang} labels={labels} facts={facts} />
+  </div>
+)}

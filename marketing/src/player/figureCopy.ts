@@ -35,6 +35,25 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
   },
 };
 
+/** The figure's own writing on this site, offered under the plate. */
+export interface OwnWords {
+  href: string;
+  label: string;
+  /** A short note beside the link, on the same line (the text's language). */
+  note?: string;
+}
+
+const OWN_WORDS: Record<string, Record<PlayerLang, OwnWords>> = {
+  aurelius: {
+    en: { href: '/figures/marcus-aurelius/meditations/', label: 'His own words: the Meditations' },
+    de: { href: '/figures/marcus-aurelius/meditations/', label: 'Seine eigenen Worte: die Selbstbetrachtungen', note: 'auf Englisch' },
+  },
+};
+
+export function ownWords(figureId: string, lang: PlayerLang): OwnWords | null {
+  return OWN_WORDS[figureId]?.[lang] ?? null;
+}
+
 function firstSentence(text: string): string {
   const m = text.match(/^.+?[.!?](?=\s|$)/);
   return (m ? m[0] : text).trim();
@@ -46,4 +65,11 @@ export function heroLine(figureId: string, lang: PlayerLang, leadAnswer: string)
 
 export function deepLinks(figureId: string, lang: PlayerLang): DeepLink[] {
   return DEEP_LINKS[figureId]?.[lang] ?? [];
+}
+
+// The women among the thirty, for the notes that name whose words a retelling is not.
+const SHE = new Set(['angelou', 'austen', 'beauvoir', 'bingen', 'dickinson', 'kahlo', 'lovelace', 'tubman', 'woolf']);
+
+export function isShe(figureId: string): boolean {
+  return SHE.has(figureId);
 }

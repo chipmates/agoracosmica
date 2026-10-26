@@ -1,7 +1,9 @@
 ---
 // A player figure page, top to bottom. It opens like a book: the title page
-// (who this is, that these are retellings, one plate that plays story 1)
-// faces the contents (the twelve stories by year); on a phone the two stack.
+// (who this is, that these are retellings, one plate that begins with the
+// introduction) and the map face the contents (the introduction and the
+// twelve stories by year); on a phone they stack and the map is a view of
+// the contents.
 // Under them the indexed facts of the figure template, in its words: who the
 // figure was, the honesty capsule, the concept answers, the lattice, the
 // themes, the sources. The story text itself is never in this HTML.
@@ -16,6 +18,7 @@ import StaticImage from '../StaticImage.astro';
 import SourcesBlock from '../SourcesBlock.astro';
 import StoryHero from './StoryHero.astro';
 import StoryContents from './StoryContents.astro';
+import StoryMap from './StoryMap.astro';
 import { getT } from '../../i18n';
 import { publicUrl } from '../../lib/urls';
 import { getSeedsFor } from '../../lib/seeds';
@@ -47,8 +50,6 @@ const leadAnswer = qa?.pairs[0]?.a ?? '';
 const aboutParas = !leadAnswer ? figure.about.split('\n').map(p => p.trim()).filter(Boolean) : [];
 const meta = [figure.tradition, figure.period].filter(Boolean).join(' · ');
 
-const queue = buildStoryQueue(figureId, slug, figure.name, lang);
-const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
 
 // Deep pages: the ones named under a concept heading sit there, the rest
 // join the "who he was" block.
@@ -89,6 +90,15 @@ for (const seed of seeds) {
   }
 }
 const relatedFigureIds = [...connectionCounts.entries()].sort((a, b) => b[1] - a[1]).map(([id]) => id).slice(0, 8);
+
+// After the last story the reader points to the two lives most tied to this one.
+const relatedLives = relatedFigureIds.slice(0, 2).flatMap(relId => {
+  const relFigure = getFigureById(relId, lang);
+  const relSlug = figureIdToSlug[relId];
+  return relFigure && relSlug ? [{ name: relFigure.name, href: publicUrl(lang, `/figures/${relSlug}`) }] : [];
+});
+const queue = buildStoryQueue(figureId, slug, figure.name, lang, relatedLives);
+const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
 const themesForFigure = figureThemes[figureId] ?? [];
 const PHILO_FIGURES = new Set([
   'laozi', 'aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir',
@@ -114,8 +124,9 @@ const hubLinkLabel = isPhilo
   <div class="sp-spread">
     <StoryHero figureId={figureId} name={figure.name} lang={lang} meta={meta} leadAnswer={leadAnswer} queue={queue} />
     <StoryContents figureId={figureId} slug={slug} lang={lang} queue={queue} />
+    <StoryMap figureId={figureId} lang={lang} queue={queue} />
     <section class="sp-about" aria-labelledby="sp-about-title">
-      <h2 class="sp-about__title" id="sp-about-title">{P.aboutTitle}</h2>
+      <h2 class="sp-about__title" id="sp-about-title">{P.aboutTitle(!!queue.she)}</h2>
       {leadAnswer && <p class="sp-about__text pub-fig-answer">{leadAnswer}</p>}
       {aboutParas.map(p => <p class="sp-about__text">{p}</p>)}
       {aboutLinks.length > 0 && (

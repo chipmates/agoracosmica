@@ -1,12 +1,12 @@
 // The story player's one audio element and its state, shared by the dock
-// island and the page's own buttons. Module memory survives the client
-// router's page swaps, so the story keeps playing while the visitor moves
-// between player pages.
+// island, the reading view and the page's own controls. Module memory
+// survives the client router's page swaps, so the story keeps playing while
+// the visitor moves between player pages.
 //
-// iOS plays sound only from a tap: every start goes through playStory() or
-// togglePlay(), called synchronously from a click handler, and play() runs in
-// that same call. Later starts (the next story, the lock screen) reuse the
-// element the tap unlocked.
+// iOS plays sound only from a tap: every start goes through a function here
+// called synchronously from a click handler, and play() runs in that same
+// call. Later starts (the next story, the lock screen) reuse the element the
+// tap unlocked.
 
 import { getPublicAudioUrl } from '@client/utils/public/publicMediaUrl';
 import {
@@ -22,18 +22,39 @@ import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
 import { applyStoredTheme } from './theme';
 import type { PlayerLang } from './strings';
-import type { PlayerState, ResumePoint, StoryQueue } from './types';
+import type { PlayerState, ResumePoint, SavedSentence, SheetKind, StoryQueue } from './types';
 
 // The worker's mode allow-list (llm-proxy routes/playback.ts) has no
-// 'story_page' yet and would blank it, so page plays count under 'story'.
+// 'story_page' yet and would blank it, so page plays count under 'story', and
+// the introduction under 'foreword' as chapter 0, as the app's foreword does.
 export const PLAYBACK_MODE = 'story';
 
-const RESUME_KEY = 'agc_story_resume';
 const DONE_KEY = 'agc_story_done';
-const RESUME_SAVE_MS = 5000;
+const RATE_KEY = 'agc_story_rate';
+const AFTER_KEY = 'agc_story_after';
+const SAVED_KEY = 'agc_story_saved';
+const PROGRESS_SAVE_MS = 5000;
+/** The app offers a kept place only past ten seconds. */
+const PROGRESS_MIN_S = 10;
 const SKIP_S = 15;
-export const RATES: readonly number[] = [0.8, 1, 1.25, 1.5];
+export const RATE_MIN = 0.5;
+export const RATE_MAX = 2;
+export const RATE_STEP = 0.05;
+const END_CARD_S = 5;
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
+
+function readNumber(key: string): number | null {
+  try {
+    const v = Number(localStorage.getItem(key));
+    return Number.isFinite(v) && v > 0 ? v : null;
+  } catch {
+    return null;
+  }
+}
+
+function clampRate(rate: number): number {
+  return Math.min(RATE_MAX, Math.max(RATE_MIN, Math.round(rate * 100) / 100));
+}
 
 let state: PlayerState = {
   queue: null,
@@ -45,25 +66,21 @@ let state: PlayerState = {
   autoNext: true,
   resume: null,
   readerOpen: false,
+  readerN: null,
   dismissed: false,
   done: [],
+  endCard: null,
+  sheet: null,
+  sheetN: null,
+  away: false,
+  saved: [],
 };
 
 const listeners = new Set<() => void>();
 
 function setState(patch: Partial<PlayerState>): void {
-  const before = state;
   state = { ...state, ...patch };
   listeners.forEach(listener => listener());
-  if (
-    before.status !== state.status || before.current !== state.current || before.queue !== state.queue
-    || before.autoNext !== state.autoNext || before.dismissed !== state.dismissed
-    || before.resume !== state.resume || before.done !== state.done
-  ) {
-    syncPageButtons();
-  } else if (before.time !== state.time || before.duration !== state.duration) {
-    syncProgress();
-  }
 }
 
 export function subscribe(listener: () => void): () => void {
@@ -81,7 +98,7 @@ let audio: HTMLAudioElement | null = null;
 let format: 'webm' | 'mp3' | null = null;
 let fellBack = false;
 let pendingSeek: number | null = null;
-let lastResumeSave = 0;
+let lastProgressSave = 0;
 const startedKeys = new Set<string>();
 
 function pickFormat(): 'webm' | 'mp3' {
@@ -102,13 +119,24 @@ function sourceFor(queue: StoryQueue, n: number): string {
 }
 
 function listenContext(queue: StoryQueue, n: number) {
-  return { type: 'story' as const, figureId: queue.figureId, mode: PLAYBACK_MODE, chapter: n };
+  return n === 0
+    ? { type: 'foreword' as const, figureId: queue.figureId, mode: 'foreword', chapter: 0 }
+    : { type: 'story' as const, figureId: queue.figureId, mode: PLAYBACK_MODE, chapter: n };
 }
 
 /** The tracker's key: the webm address names the track whatever format plays. */
 function currentKey(): string | null {
   if (!state.queue || state.current === null) return null;
   return listenTrackKey(listenContext(state.queue, state.current), webmUrl(state.queue, state.current));
+}
+
+/** The last item of the queue. */
+function lastN(queue: StoryQueue): number {
+  return queue.entries[queue.entries.length - 1]?.n ?? 0;
+}
+
+function hasItem(queue: StoryQueue, n: number): boolean {
+  return queue.entries.some(e => e.n === n);
 }
 
 function ensureAudio(): HTMLAudioElement {
@@ -120,18 +148,13 @@ function ensureAudio(): HTMLAudioElement {
     const key = currentKey();
     const { queue, current } = state;
     if (!key || !queue || current === null) return;
+    const ctx = listenContext(queue, current);
     if (!startedKeys.has(key)) {
       startedKeys.add(key);
-      sendPlaybackBeacon({
-        type: 'story',
-        event: 'started',
-        figureId: queue.figureId,
-        mode: PLAYBACK_MODE,
-        chapter: current,
-        language: queue.lang,
-      });
+      sendPlaybackBeacon({ ...ctx, event: 'started', language: queue.lang });
     }
-    noteListenPlay(key, listenContext(queue, current));
+    noteListenPlay(key, ctx);
+    updatePositionState();
   });
   el.addEventListener('playing', () => setState({ status: 'playing' }));
   el.addEventListener('waiting', () => {
@@ -143,8 +166,10 @@ function ensureAudio(): HTMLAudioElement {
     const key = currentKey();
     if (key) noteListenPause(key);
     if (!el.ended) setState({ status: 'paused' });
-    saveResume(true);
+    saveProgress(true);
+    updatePositionState();
   });
+  // The kept place is set once the source knows its length, never before it loads.
   el.addEventListener('loadedmetadata', () => {
     if (pendingSeek !== null && pendingSeek < el.duration) el.currentTime = pendingSeek;
     pendingSeek = null;
@@ -159,24 +184,13 @@ function ensureAudio(): HTMLAudioElement {
     // A stall can end without a 'playing' event: moving time with data in hand is playing.
     const moving = state.status === 'loading' && !el.paused && !el.seeking && el.readyState >= 3;
     setState(moving ? { time: el.currentTime, status: 'playing' } : { time: el.currentTime });
-    saveResume(false);
+    saveProgress(false);
     updatePositionState();
   });
-  el.addEventListener('ratechange', () => setState({ rate: el.playbackRate }));
-  el.addEventListener('ended', () => {
-    const key = currentKey();
-    if (key) noteListenEnded(key, el.currentTime, el.duration);
-    const { queue, current } = state;
-    if (!queue || current === null) return;
-    markDone(queue.figureId, current);
-    const next = current < queue.entries.length ? current + 1 : null;
-    writeResume(next === null ? null : { figureId: queue.figureId, lang: queue.lang, n: next, t: 0 });
-    if (next !== null && state.autoNext) {
-      startStory(queue, next, 0);
-    } else {
-      setState({ status: 'paused', time: el.duration });
-    }
+  el.addEventListener('ratechange', () => {
+    if (el.playbackRate > 0 && el.playbackRate !== state.rate) setState({ rate: clampRate(el.playbackRate) });
   });
+  el.addEventListener('ended', onEnded);
   el.addEventListener('error', () => {
     // Opus first where the browser claims it, the mp3 once if that fails.
     if (format === 'webm' && !fellBack && state.queue && state.current !== null) {
@@ -197,19 +211,76 @@ function ensureAudio(): HTMLAudioElement {
   return el;
 }
 
+function onEnded(): void {
+  const el = audio;
+  const key = currentKey();
+  if (key && el) noteListenEnded(key, el.currentTime, el.duration);
+  const { queue, current } = state;
+  if (!queue || current === null) return;
+  markDone(queue.figureId, current);
+  clearProgress(queue, current);
+  const next = current < lastN(queue) && hasItem(queue, current + 1) ? current + 1 : null;
+  if (next === null || !state.autoNext) {
+    setState({ status: 'paused', time: el?.duration ?? state.time });
+    updatePositionState();
+    return;
+  }
+  // The plate promised "then story 1", and a locked phone shows no card.
+  if (current === 0 || document.visibilityState === 'hidden') {
+    startStory(queue, next, 0);
+    return;
+  }
+  setState({ status: 'paused', time: el?.duration ?? state.time, endCard: { n: current, next, left: END_CARD_S } });
+  updatePositionState();
+  endTimer = window.setInterval(() => {
+    const card = state.endCard;
+    if (!card) return stopEndTimer();
+    if (card.left <= 1 || document.visibilityState === 'hidden') {
+      stopEndTimer();
+      if (state.queue) startStory(state.queue, card.next, 0);
+      return;
+    }
+    setState({ endCard: { ...card, left: card.left - 1 } });
+  }, 1000);
+}
+
+let endTimer: number | null = null;
+function stopEndTimer(): void {
+  if (endTimer !== null) window.clearInterval(endTimer);
+  endTimer = null;
+}
+
+/** The end card's "Stay here": the next story waits for a tap. */
+export function stayHere(): void {
+  stopEndTimer();
+  setState({ endCard: null });
+}
+
+/** The end card's "Listen now". */
+export function listenNow(): void {
+  const card = state.endCard;
+  stopEndTimer();
+  if (card && state.queue) startStory(state.queue, card.next, 0);
+}
+
 function startStory(queue: StoryQueue, n: number, startAt: number): void {
   const el = ensureAudio();
   const oldKey = currentKey();
   if (oldKey && !el.paused) noteListenPause(oldKey);
+  saveProgress(true);
+  stopEndTimer();
   pendingSeek = startAt > 0 ? startAt : null;
+  const entry = queue.entries.find(e => e.n === n);
   setState({
     queue,
     current: n,
     status: 'loading',
     time: startAt,
-    duration: 0,
+    duration: entry?.seconds ?? 0,
     dismissed: false,
     resume: null,
+    endCard: null,
+    away: false,
   });
   el.src = sourceFor(queue, n);
   el.defaultPlaybackRate = state.rate;
@@ -221,7 +292,6 @@ function startStory(queue: StoryQueue, n: number, startAt: number): void {
     if (audio?.paused) setState({ status: 'error' });
   });
   updateMetadata();
-  writeResume({ figureId: queue.figureId, lang: queue.lang, n, t: Math.floor(startAt) });
 }
 
 function sameQueue(a: StoryQueue | null, b: StoryQueue | null): boolean {
@@ -230,29 +300,48 @@ function sameQueue(a: StoryQueue | null, b: StoryQueue | null): boolean {
 
 // ---- the controls (call these from a click handler) ---------------------
 
-/** Play story n of this figure. The current story toggles instead. */
-export function playStory(queue: StoryQueue, n: number, startAt = 0): void {
-  if (sameQueue(state.queue, queue) && state.current === n && audio?.src && state.status !== 'error') {
+/** Play item n of this figure from its kept place or startAt. The current item toggles instead. */
+export function playStory(queue: StoryQueue, n: number, startAt?: number): void {
+  if (sameQueue(state.queue, queue) && state.current === n && audio?.src && state.status !== 'error' && startAt === undefined) {
     if (state.dismissed) setState({ dismissed: false });
     togglePlay();
     return;
   }
-  startStory(queue, n, startAt);
+  startStory(queue, n, startAt ?? keptPlace(queue, n));
+}
+
+/** Play from a given second of item n, for "listen from here". */
+export function playFrom(queue: StoryQueue, n: number, seconds: number): void {
+  if (sameQueue(state.queue, queue) && state.current === n && audio?.src && state.status !== 'error') {
+    seekTo(seconds);
+    if (audio.paused) play();
+    return;
+  }
+  startStory(queue, n, seconds);
+}
+
+export function play(): void {
+  const el = audio;
+  if (!el || state.current === null) return;
+  if (state.status === 'error' && state.queue) {
+    startStory(state.queue, state.current, state.time);
+    return;
+  }
+  if (state.endCard) stayHere();
+  if (el.ended) el.currentTime = 0;
+  if (state.dismissed) setState({ dismissed: false });
+  void el.play().catch(() => setState({ status: 'error' }));
+}
+
+export function pause(): void {
+  audio?.pause();
 }
 
 export function togglePlay(): void {
   const el = audio;
   if (!el || state.current === null) return;
-  if (el.paused) {
-    if (state.status === 'error' && state.queue) {
-      startStory(state.queue, state.current, state.time);
-      return;
-    }
-    if (el.ended) el.currentTime = 0;
-    void el.play().catch(() => setState({ status: 'error' }));
-  } else {
-    el.pause();
-  }
+  if (el.paused) play();
+  else pause();
 }
 
 export function skipBack(): void {
@@ -260,19 +349,28 @@ export function skipBack(): void {
   audio.currentTime = Math.max(0, audio.currentTime - SKIP_S);
 }
 
-function skipForward(): void {
+export function skipForward(): void {
   if (!audio || state.current === null) return;
-  const end = Number.isFinite(audio.duration) ? audio.duration : Infinity;
-  audio.currentTime = Math.min(end, audio.currentTime + SKIP_S);
+  const end = Number.isFinite(audio.duration) ? audio.duration - 0.25 : Infinity;
+  audio.currentTime = Math.max(0, Math.min(end, audio.currentTime + SKIP_S));
 }
 
 export function seekTo(seconds: number): void {
   if (!audio || state.current === null || !Number.isFinite(seconds)) return;
+  if (audio.readyState === 0) {
+    pendingSeek = Math.max(0, seconds);
+    setState({ time: pendingSeek });
+    return;
+  }
   audio.currentTime = Math.max(0, seconds);
 }
 
 export function hasNext(): boolean {
-  return !!state.queue && state.current !== null && state.current < state.queue.entries.length;
+  return !!state.queue && state.current !== null && state.current < lastN(state.queue);
+}
+
+export function hasPrevious(): boolean {
+  return !!state.queue && state.current !== null && state.current > (state.queue.entries[0]?.n ?? 0);
 }
 
 export function nextStory(): void {
@@ -280,9 +378,10 @@ export function nextStory(): void {
   startStory(state.queue, state.current + 1, 0);
 }
 
-function previousStory(): void {
+/** Within the first seconds the story before; later, the start of this one. */
+export function previousStory(): void {
   if (!state.queue || state.current === null) return;
-  if (state.time > 5 || state.current === 1) {
+  if (state.time > 5 || !hasPrevious()) {
     seekTo(0);
     return;
   }
@@ -290,27 +389,69 @@ function previousStory(): void {
 }
 
 export function setRate(rate: number): void {
-  if (!RATES.includes(rate)) return;
-  setState({ rate });
-  if (audio) {
-    audio.defaultPlaybackRate = rate;
-    audio.playbackRate = rate;
+  const next = clampRate(rate);
+  setState({ rate: next });
+  try {
+    localStorage.setItem(RATE_KEY, String(next));
+  } catch {
+    // storage blocked: the rate lasts as long as the page
   }
+  if (audio) {
+    audio.defaultPlaybackRate = next;
+    audio.playbackRate = next;
+  }
+  updatePositionState(true);
+}
+
+/** One step of 0.05 up or down, as the app's players step. */
+export function stepRate(direction: 1 | -1): void {
+  setRate(state.rate + direction * RATE_STEP);
 }
 
 export function setAutoNext(on: boolean): void {
   setState({ autoNext: on });
+  try {
+    localStorage.setItem(AFTER_KEY, on ? 'next' : 'stop');
+  } catch {
+    // storage blocked
+  }
 }
 
+export function openReader(n: number): void {
+  if (!state.queue && !readPageQueue()) return;
+  setState({ readerOpen: true, readerN: n, sheet: state.sheet === 'facts' ? state.sheet : null, away: false });
+}
+
+export function closeReader(): void {
+  setState({ readerOpen: false, readerN: null, away: false, sheet: state.sheet === 'player' ? state.sheet : null });
+}
+
+/** Kept for the islands that call it: open shows the playing item. */
 export function setReaderOpen(open: boolean): void {
-  setState({ readerOpen: open && state.current !== null });
+  if (open && state.current !== null) openReader(state.current);
+  else if (!open) closeReader();
 }
 
-/** Close the dock: the story stops, the resume point stays. */
+export function setAway(away: boolean): void {
+  if (state.away !== away) setState({ away });
+}
+
+export function openSheet(sheet: SheetKind, n?: number): void {
+  setState({ sheet, sheetN: n ?? null });
+}
+
+export function closeSheet(): void {
+  setState({ sheet: null, sheetN: null });
+}
+
+/** Stop playback: the story stops, its kept place stays. */
 export function dismiss(): void {
   audio?.pause();
-  saveResume(true);
-  setState({ dismissed: true, readerOpen: false, resume: null });
+  saveProgress(true);
+  stopEndTimer();
+  setState({ dismissed: true, readerOpen: false, readerN: null, resume: null, sheet: null, endCard: null });
+  offerResumeForPage();
+  updatePositionState();
 }
 
 /** Take up the offered resume point. Called from the offer's tap. */
@@ -326,54 +467,84 @@ export function declineResume(): void {
   setState({ resume: null });
 }
 
-// ---- resume: the story and the second, in this browser ------------------
+// ---- kept places: per story, under the app's own keys -------------------
 
 let resumeDeclined = false;
 
-function writeResume(point: ResumePoint | null): void {
-  try {
-    if (point) {
-      localStorage.setItem(RESUME_KEY, JSON.stringify({ f: point.figureId, l: point.lang, n: point.n, t: point.t }));
-    } else {
-      localStorage.removeItem(RESUME_KEY);
-    }
-  } catch {
-    // storage blocked: the player works, it just cannot offer a resume
-  }
+function progressKey(queue: { figureId: string; lang: string }, n: number): string {
+  return `storyProgress_${queue.figureId}_${n}_${queue.lang}`;
 }
 
-function saveResume(force: boolean): void {
-  const { queue, current } = state;
-  if (!queue || current === null || !audio) return;
-  const now = Date.now();
-  if (!force && now - lastResumeSave < RESUME_SAVE_MS) return;
-  lastResumeSave = now;
-  if (audio.ended) return; // the ended handler already moved the point on
-  writeResume({ figureId: queue.figureId, lang: queue.lang, n: current, t: Math.floor(audio.currentTime) });
+interface Progress {
+  t: number;
+  at: number;
 }
 
-function readResume(): ResumePoint | null {
+export function readProgress(queue: { figureId: string; lang: string }, n: number): Progress | null {
   try {
-    const raw = localStorage.getItem(RESUME_KEY);
+    const raw = localStorage.getItem(progressKey(queue, n));
     if (!raw) return null;
-    const v = JSON.parse(raw) as { f?: unknown; l?: unknown; n?: unknown; t?: unknown };
-    if (typeof v.f !== 'string' || !FIGURE_ID_RE.test(v.f)) return null;
-    if (v.l !== 'en' && v.l !== 'de') return null;
-    if (typeof v.n !== 'number' || !Number.isInteger(v.n) || v.n < 1 || v.n > 99) return null;
-    if (typeof v.t !== 'number' || !Number.isFinite(v.t) || v.t < 0) return null;
-    return { figureId: v.f, lang: v.l, n: v.n, t: Math.floor(v.t) };
+    const v = JSON.parse(raw) as { lastTimeSeconds?: unknown; updatedAt?: unknown };
+    const t = typeof v.lastTimeSeconds === 'number' && Number.isFinite(v.lastTimeSeconds) ? v.lastTimeSeconds : 0;
+    if (t <= PROGRESS_MIN_S) return null;
+    const at = typeof v.updatedAt === 'string' ? Date.parse(v.updatedAt) : 0;
+    return { t: Math.floor(t), at: Number.isFinite(at) ? at : 0 };
   } catch {
     return null;
   }
 }
 
-// ---- finished stories, in this browser ----------------------------------
+/** Where a tap on item n starts: its kept place, unless it was heard to the end. */
+function keptPlace(queue: StoryQueue, n: number): number {
+  return readProgress(queue, n)?.t ?? 0;
+}
+
+function clearProgress(queue: StoryQueue, n: number): void {
+  try {
+    localStorage.removeItem(progressKey(queue, n));
+  } catch {
+    // storage blocked
+  }
+}
+
+function saveProgress(force: boolean): void {
+  const { queue, current } = state;
+  if (!queue || current === null || current === 0 || !audio || audio.ended) return;
+  const now = Date.now();
+  if (!force && now - lastProgressSave < PROGRESS_SAVE_MS) return;
+  lastProgressSave = now;
+  const t = audio.currentTime;
+  if (!(t > 5)) return;
+  try {
+    localStorage.setItem(progressKey(queue, current), JSON.stringify({ lastTimeSeconds: t, updatedAt: new Date(now).toISOString() }));
+  } catch {
+    // storage full or blocked: the place is not kept
+  }
+}
+
+/** The plate's offer on return: the story last listened to and not finished. */
+function readResume(queue: StoryQueue): ResumePoint | null {
+  let best: ResumePoint | null = null;
+  let bestAt = -1;
+  const done = readDone(queue.figureId);
+  for (const entry of queue.entries) {
+    if (entry.n === 0 || done.includes(entry.n)) continue;
+    const p = readProgress(queue, entry.n);
+    if (p && p.at >= bestAt) {
+      best = { figureId: queue.figureId, lang: queue.lang, n: entry.n, t: p.t };
+      bestAt = p.at;
+    }
+  }
+  return best;
+}
+
+// ---- finished items, in this browser --------------------------------------
 
 function readDone(figureId: string): number[] {
   try {
     const all = JSON.parse(localStorage.getItem(DONE_KEY) ?? '{}') as Record<string, unknown>;
     const list = all[figureId];
-    return Array.isArray(list) ? list.filter((n): n is number => Number.isInteger(n) && n > 0 && n < 100) : [];
+    return Array.isArray(list) ? list.filter((n): n is number => Number.isInteger(n) && n >= 0 && n < 100) : [];
   } catch {
     return [];
   }
@@ -392,183 +563,95 @@ function markDone(figureId: string, n: number): void {
   setState({ done: list });
 }
 
-// ---- the page: its queue and its buttons --------------------------------
+/** A story read to its end counts as finished, as one heard to the end does. */
+export function markRead(n: number): void {
+  const queue = readPageQueue() ?? state.queue;
+  if (!queue || state.done.includes(n)) return;
+  markDone(queue.figureId, n);
+}
+
+// ---- saved sentences, on this device only ---------------------------------
+
+function savedKey(queue: { figureId: string; lang: string }): string {
+  return `${queue.figureId}_${queue.lang}`;
+}
+
+function readSaved(queue: { figureId: string; lang: string }): SavedSentence[] {
+  try {
+    const all = JSON.parse(localStorage.getItem(SAVED_KEY) ?? '{}') as Record<string, unknown>;
+    const list = all[savedKey(queue)];
+    if (!Array.isArray(list)) return [];
+    return list.filter((s): s is SavedSentence => {
+      const v = s as SavedSentence;
+      return !!v && Number.isInteger(v.n) && Number.isInteger(v.si) && typeof v.text === 'string';
+    });
+  } catch {
+    return [];
+  }
+}
+
+function writeSaved(queue: { figureId: string; lang: string }, list: SavedSentence[]): void {
+  try {
+    const all = JSON.parse(localStorage.getItem(SAVED_KEY) ?? '{}') as Record<string, unknown>;
+    all[savedKey(queue)] = list;
+    localStorage.setItem(SAVED_KEY, JSON.stringify(all));
+  } catch {
+    // storage blocked: kept for this page only
+  }
+  setState({ saved: list });
+}
+
+export function saveSentence(n: number, si: number, text: string): boolean {
+  const queue = readPageQueue() ?? state.queue;
+  if (!queue) return false;
+  const list = readSaved(queue);
+  if (list.some(s => s.n === n && s.si === si)) return false;
+  writeSaved(queue, [...list, { n, si, text, at: Date.now() }]);
+  return true;
+}
+
+export function removeSaved(n: number, si: number): void {
+  const queue = readPageQueue() ?? state.queue;
+  if (!queue) return;
+  writeSaved(queue, readSaved(queue).filter(s => !(s.n === n && s.si === si)));
+}
+
+// ---- the page's queue ----------------------------------------------------
+
+// One object per page text: views key their effects on the queue's identity.
+let pageQueueMemo: { text: string; queue: StoryQueue | null } | null = null;
 
 export function readPageQueue(): StoryQueue | null {
-  const node = document.querySelector('script[data-story-queue]');
-  if (!node?.textContent) return null;
+  const node = document.querySelector('script[data-story-queue]') ?? document.querySelector('script[data-story-door-queue]');
+  const text = node?.textContent ?? '';
+  if (!text) return null;
+  if (pageQueueMemo?.text === text) return pageQueueMemo.queue;
+  let queue: StoryQueue | null = null;
   try {
-    const q = JSON.parse(node.textContent) as StoryQueue;
-    if (!FIGURE_ID_RE.test(q.figureId) || (q.lang !== 'en' && q.lang !== 'de') || !Array.isArray(q.entries)) return null;
-    return q;
+    const q = JSON.parse(text) as StoryQueue;
+    if (FIGURE_ID_RE.test(q.figureId) && (q.lang === 'en' || q.lang === 'de') && Array.isArray(q.entries)) queue = q;
   } catch {
-    return null;
+    queue = null;
   }
+  pageQueueMemo = { text, queue };
+  return queue;
 }
 
-function pageLang(): PlayerLang {
-  return document.documentElement.lang.toLowerCase().startsWith('de') ? 'de' : 'en';
+/** The queue whose item the visitor acts on: the page's, else the playing one's. */
+export function activeQueue(): StoryQueue | null {
+  return readPageQueue() ?? state.queue;
 }
 
-function fmtTime(seconds: number): string {
-  const v = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
-  return `${Math.floor(v / 60)}:${String(v % 60).padStart(2, '0')}`;
-}
-
-/** Whole minutes left in the current story, at least one, rounded as the contents round a story's length. */
-function minutesLeft(): number {
-  const left = state.duration > 0 ? state.duration - state.time : 0;
-  return Math.max(1, Math.round(left / 60));
-}
-
-/** Mirror the player's state onto the page's own play buttons. */
-function syncPageButtons(): void {
-  if (typeof document === 'undefined') return;
-  const pageQueue = readPageQueue();
-  const s = playerStrings(pageLang());
-  const onThisPage = sameQueue(pageQueue, state.queue);
-  const done = state.done;
-  document.querySelectorAll<HTMLElement>('[data-story-play]').forEach(btn => {
-    const n = Number(btn.dataset.storyN);
-    const text = btn.querySelector<HTMLElement>('[data-story-play-text]');
-    if (text && btn.dataset.idleLabel === undefined) btn.dataset.idleLabel = text.textContent ?? '';
-    const isCurrent = onThisPage && state.current === n && !state.dismissed;
-    const mode = !isCurrent ? 'idle' : state.status === 'playing' ? 'playing' : state.status === 'loading' ? 'loading' : 'paused';
-    btn.dataset.state = mode;
-    btn.setAttribute('aria-pressed', String(mode === 'playing' || mode === 'loading'));
-    const row = btn.closest('.sp-row');
-    if (row) {
-      const isDone = done.includes(n) && !isCurrent;
-      row.classList.toggle('is-current', isCurrent);
-      row.classList.toggle('is-done', isDone);
-      const base = btn.dataset.ariaBase ?? btn.getAttribute('aria-label') ?? '';
-      btn.dataset.ariaBase = base;
-      const word = mode === 'playing' || mode === 'loading' ? s.playingWord : mode === 'paused' ? s.pausedWord : isDone ? s.finishedWord : '';
-      btn.setAttribute('aria-label', word ? `${base}, ${word}` : base);
-    }
-    if (text) {
-      text.textContent =
-        mode === 'playing' ? s.pause : mode === 'loading' ? s.loading : mode === 'paused' ? s.resume : btn.dataset.idleLabel ?? '';
-    }
-    if (!isCurrent) {
-      // A story that stopped being current gets its minutes and an empty ring back.
-      const m = Number(btn.dataset.storyMinutes);
-      if (m > 0) btn.querySelectorAll<HTMLElement>('[data-story-min]').forEach(min => { min.textContent = s.minutes(m); });
-      btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => ring.style.removeProperty('stroke-dashoffset'));
-    }
-  });
-  document.querySelectorAll<HTMLElement>('[data-story-autonext]').forEach(btn => {
-    btn.setAttribute('aria-pressed', String(state.autoNext));
-  });
-  syncHero(pageQueue, onThisPage);
-  syncProgress();
-}
-
-/** The hero plate: story 1 in place, or the kept point offered on return. */
-function syncHero(pageQueue: StoryQueue | null, onThisPage: boolean): void {
-  const plate = document.querySelector<HTMLElement>('[data-story-hero-plate]');
-  if (!plate || !pageQueue) return;
-  const s = playerStrings(pageQueue.lang);
-  const doEl = plate.querySelector<HTMLElement>('[data-story-hero-do]');
-  const whatEl = plate.querySelector<HTMLElement>('[data-story-hero-what]');
-  const startOver = document.querySelector<HTMLElement>('[data-story-startover]');
-  const first = pageQueue.entries[0];
-  const point = state.resume;
-  const offer = !!point && state.current === null && point.figureId === pageQueue.figureId && point.lang === pageQueue.lang;
-  plate.toggleAttribute('data-resume', offer);
-  if (startOver) startOver.hidden = !offer;
-  let doText = s.playFirst;
-  let whatText = [first?.title, first?.minutes ? s.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
-  if (offer && point) {
-    const entry = pageQueue.entries.find(e => e.n === point.n);
-    doText = s.continueStory(point.n);
-    whatText = [entry?.title, point.t > 0 ? s.fromTime(fmtTime(point.t)) : ''].filter(Boolean).join(' · ');
-  } else if (onThisPage && state.current === 1 && !state.dismissed) {
-    // While loading the plate names its action; its own "loading" word fades in only on a slow load (CSS).
-    doText = state.status === 'playing' || state.status === 'loading' ? s.pause : s.resume;
-    whatText = [first?.title, state.duration > 0 ? s.minutesLeft(minutesLeft()) : first?.minutes ? s.minutes(first.minutes) : '']
-      .filter(Boolean).join(' · ');
-  }
-  if (doEl && doEl.textContent !== doText) doEl.textContent = doText;
-  if (whatEl && whatEl.textContent !== whatText) whatEl.textContent = whatText;
-}
-
-/** The current story's ring and minutes left, on every button that plays it. */
-function syncProgress(): void {
-  if (typeof document === 'undefined') return;
-  const pageQueue = readPageQueue();
-  if (!sameQueue(pageQueue, state.queue) || state.current === null) return;
-  const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
-  const s = playerStrings(pageQueue!.lang);
-  document.querySelectorAll<HTMLElement>(`[data-story-play][data-story-n="${state.current}"]`).forEach(btn => {
-    btn.querySelectorAll<SVGCircleElement>('[data-story-ring]').forEach(ring => {
-      // CSSOM: the stylesheet's offset outranks an SVG attribute.
-      ring.style.setProperty('stroke-dashoffset', (100 - pct).toFixed(2));
-    });
-    if (state.duration > 0) {
-      const text = s.minutesLeft(minutesLeft());
-      btn.querySelectorAll<HTMLElement>('[data-story-min]').forEach(min => {
-        if (min.textContent !== text) min.textContent = text;
-      });
-    }
-  });
-  const whatEl = document.querySelector<HTMLElement>('[data-story-hero-plate] [data-story-hero-what]');
-  if (whatEl && state.current === 1 && state.duration > 0 && !state.dismissed) {
-    const first = pageQueue!.entries[0];
-    const text = [first?.title, s.minutesLeft(minutesLeft())].filter(Boolean).join(' · ');
-    if (whatEl.textContent !== text) whatEl.textContent = text;
-  }
-}
-
-function offerResumeForPage(): void {
-  if (state.current !== null || resumeDeclined) return;
-  const point = readResume();
+export function offerResumeForPage(): void {
+  if (state.current !== null && !state.dismissed) return;
   const queue = readPageQueue();
-  const fits = !!point && !!queue && point.figureId === queue.figureId && point.lang === queue.lang
-    && queue.entries.some(e => e.n === point.n);
-  // A point at the very start of story 1 is nothing to resume.
-  const worth = fits && !(point.n === 1 && point.t < 5);
-  setState({ resume: worth ? point : null });
+  const point = queue && !resumeDeclined ? readResume(queue) : null;
+  setState({ resume: point });
 }
 
-function onPageClick(e: MouseEvent): void {
-  const target = e.target instanceof Element ? e.target : null;
-  if (!target) return;
-  const play = target.closest<HTMLElement>('[data-story-play]');
-  if (play) {
-    const queue = readPageQueue();
-    const n = Number(play.dataset.storyN);
-    if (!queue || !queue.entries.some(entry => entry.n === n)) return;
-    e.preventDefault();
-    const dockWasUp = state.current !== null && !state.dismissed;
-    if (play.hasAttribute('data-resume') && state.resume) acceptResume();
-    else playStory(queue, n);
-    if (!dockWasUp) keepPressedInView(play);
-    return;
-  }
-  const auto = target.closest<HTMLElement>('[data-story-autonext]');
-  if (auto) {
-    e.preventDefault();
-    setAutoNext(!state.autoNext);
-  }
-}
-
-/** The dock rises under the thumb: the control just pressed moves up out of its way. */
-function keepPressedInView(el: HTMLElement): void {
-  let frames = 0;
-  const check = () => {
-    const dock = document.querySelector<HTMLElement>('.story-dock');
-    if (!dock) {
-      if (++frames < 30) requestAnimationFrame(check);
-      return;
-    }
-    const over = el.getBoundingClientRect().bottom + 12 - dock.getBoundingClientRect().top;
-    if (over > 0) {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollBy({ top: over, behavior: reduce ? 'auto' : 'smooth' });
-    }
-  };
-  requestAnimationFrame(check);
+function loadForPage(): void {
+  const queue = readPageQueue() ?? state.queue;
+  setState({ done: queue ? readDone(queue.figureId) : [], saved: queue ? readSaved(queue) : [] });
 }
 
 // ---- the lock screen ----------------------------------------------------
@@ -589,20 +672,22 @@ function updateMetadata(): void {
   if (!queue || current === null) return;
   if (!sessionReady) {
     sessionReady = true;
-    setHandler('play', () => togglePlay());
-    setHandler('pause', () => togglePlay());
+    // Play and pause as named: after an interruption the page and the system
+    // can disagree for a moment, and a toggle would invert the listener's intent.
+    setHandler('play', () => play());
+    setHandler('pause', () => pause());
     setHandler('seekbackward', () => skipBack());
     setHandler('seekforward', () => skipForward());
     setHandler('seekto', details => {
       if (typeof details.seekTime === 'number') seekTo(details.seekTime);
     });
-    setHandler('previoustrack', () => previousStory());
-    setHandler('nexttrack', () => nextStory());
   }
+  setHandler('previoustrack', hasPrevious() ? () => previousStory() : null);
+  setHandler('nexttrack', hasNext() ? () => nextStory() : null);
   const entry = queue.entries.find(e => e.n === current);
   const s = playerStrings(queue.lang);
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: entry ? `${s.storyN(current)}: ${entry.title}` : s.storyN(current),
+    title: current === 0 ? s.introTitle : entry ? `${s.storyN(current)}: ${entry.title}` : s.storyN(current),
     // The lock screen travels without the page, so the label rides along.
     artist: `${queue.name} · ${lockScreenLabel[queue.lang]}`,
     album: 'Agora Cosmica',
@@ -611,11 +696,11 @@ function updateMetadata(): void {
 }
 
 let lastPosition = 0;
-function updatePositionState(): void {
+function updatePositionState(force = false): void {
   if (!('mediaSession' in navigator) || !audio) return;
   navigator.mediaSession.playbackState = audio.paused ? 'paused' : 'playing';
   const now = Date.now();
-  if (now - lastPosition < 1000) return;
+  if (!force && now - lastPosition < 1000) return;
   lastPosition = now;
   const duration = audio.duration;
   if (!(duration > 0) || !Number.isFinite(duration) || !('setPositionState' in navigator.mediaSession)) return;
@@ -636,27 +721,27 @@ let lockScreenLabel: Record<PlayerLang, string> = { en: '', de: '' };
 
 let installed = false;
 
-function loadDoneForPage(): void {
-  const queue = readPageQueue() ?? state.queue;
-  setState({ done: queue ? readDone(queue.figureId) : [] });
-}
-
 /** Wire the page once per document. The dock island calls this on mount. */
 export function installPlayer(label: Record<PlayerLang, string>): void {
   if (installed) return;
   installed = true;
   lockScreenLabel = label;
-  document.addEventListener('click', onPageClick);
+  const rate = readNumber(RATE_KEY);
+  let after: string | null = null;
+  try {
+    after = localStorage.getItem(AFTER_KEY);
+  } catch {
+    // storage blocked
+  }
+  setState({ rate: rate ? clampRate(rate) : 1, autoNext: after !== 'stop' });
   document.addEventListener('astro:page-load', () => {
-    loadDoneForPage();
+    loadForPage();
     offerResumeForPage();
-    syncPageButtons();
   });
   document.addEventListener('astro:after-swap', applyStoredTheme);
   applyStoredTheme();
-  loadDoneForPage();
-  window.addEventListener('pagehide', () => saveResume(true));
+  loadForPage();
+  window.addEventListener('pagehide', () => saveProgress(true));
   installRouterGlue(() => state.current !== null && !state.dismissed);
   offerResumeForPage();
-  syncPageButtons();
 }
