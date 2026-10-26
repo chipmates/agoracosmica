@@ -1,0 +1,17 @@
+---
+// The dock's mount point. The router keeps this element, and the island in it,
+// across page changes, so it must render with the same id on every player page.
+import StoryDock from '../../islands/StoryDock';
+import { storyLabel } from '../../player/label';
+import type { PlayerLang } from '../../player/strings';
+
+interface Props {
+  lang: PlayerLang;
+}
+
+const { lang } = Astro.props;
+const labels = { en: storyLabel('en'), de: storyLabel('de') };
+---
+<div class="story-dock-mount" transition:persist="story-dock">
+  <StoryDock client:load lang={lang} labels={labels} />
+</div>

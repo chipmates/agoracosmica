@@ -61,14 +61,19 @@ import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../lib/dickinsonPoemsFaq';
+import { buildStoryQueue } from '../player/queue';
+import { playerStrings } from '../player/strings';
 
 interface Props {
   figureId: string;
   slug: string;
   lang: Lang;
+  /** Story player pages (player/pages.ts): the stories play here, the doors into
+   *  the app and the sections about removed features stay out. */
+  player?: boolean;
 }
 
-const { figureId, slug, lang } = Astro.props;
+const { figureId, slug, lang, player = false } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const figure = getFigureById(figureId, lang);
@@ -208,6 +213,11 @@ const S = de
       beginLead: 'You choose where it starts. The story, or your own question.',
     };
 
+// What the player reads from the page: the titles and minutes the list shows.
+const storyQueue = player
+  ? JSON.stringify(buildStoryQueue(figureId, slug, figure.name, lang)).replace(/</g, '\\u003c')
+  : '';
+
 // German needs a pronoun where English does not, and thirty figures are of
 // mixed gender, so the themes heading drops the possessive in German too.
 const themesHeading = S.themes;
@@ -232,7 +242,9 @@ if (figure.essence) {
     ]}
   />
 
-  <FigureHero figure={figure} slug={slug} lang={lang} answer={leadAnswer} />
+  {player && <script is:inline type="application/json" data-story-queue set:html={storyQueue} />}
+
+  <FigureHero figure={figure} slug={slug} lang={lang} answer={leadAnswer} player={player} />
 
   <FigureDeepLinks links={deepLinks} lead={deepLinksLead} />
 
@@ -248,9 +260,9 @@ if (figure.essence) {
     <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
   </p>
 
-  <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
+  {!player && <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />}
 
-  <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} />
+  <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player={player} />
 
   {poemsFaq && (
     <section class="pub-section pub-figure__poems">
@@ -273,9 +285,10 @@ if (figure.essence) {
     slug={slug}
     figureName={figure.name}
     lang={lang}
+    player={player}
   />
 
-  <FigureCouncils figureId={figureId} slug={slug} figureName={figure.name} lang={lang} />
+  {!player && <FigureCouncils figureId={figureId} slug={slug} figureName={figure.name} lang={lang} />}
 
   <FigureLattice figureId={figureId} figureName={figure.name} lang={lang}>
     {relatedFigureIds.length > 0 && (
@@ -333,7 +346,7 @@ if (figure.essence) {
 
   <SourcesBlock figureId={figureId} lang={lang} />
 
-  {essenceParas.length > 0 && (
+  {!player && essenceParas.length > 0 && (
     <section class="pub-section fig-voice">
       <h2 class="pub-section__title">{S.voice}</h2>
       {essenceParas.map(p => <p class="pub-section__text">{p}</p>)}
@@ -342,6 +355,7 @@ if (figure.essence) {
 
   <EchoNote variant="figure" name={figure.name} lang={lang} />
 
+  {!player && (
   <section class="pub-section fig-close">
     <p class="fig-close__lead">{S.beginLead}</p>
     <a
@@ -354,10 +368,33 @@ if (figure.essence) {
     <p class="fig-close__free">{t('cta.freeNote')}</p>
     <p class="fig-close__trust">{t('cta.trust')}</p>
   </section>
+  )}
 
   {/* The rail only shows on phones and small tablets. Its trust line wrapped
       to two lines in German and the bar took a third of the first screen, so
       it keeps the free note and the door; the footer carries the trust line. */}
+  {/* On player pages the phone's rail plays story 1 in place, with the
+      retelling note where the free note stood. The dock replaces it once a
+      story is loaded. */}
+  {player && (
+    <div class="pub-cta pub-cta--sticky fig-rail story-rail">
+      <div class="pub-cta__inner">
+        <p class="pub-cta__trust">{playerStrings(lang).retellingNote}</p>
+        <button
+          type="button"
+          class="pub-cta__button story-play story-play--rail"
+          data-story-play
+          data-story-n="1"
+          aria-pressed="false"
+        >
+          <span class="story-play__icon story-play__icon--play" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l10 5.5-10 5.5z" /></svg></span>
+          <span class="story-play__icon story-play__icon--pause" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg></span>
+          <span data-story-play-text>{playerStrings(lang).playFirst}</span>
+        </button>
+      </div>
+    </div>
+  )}
+  {!player && (
   <div class="pub-cta pub-cta--sticky fig-rail">
     <div class="pub-cta__inner">
       <p class="pub-cta__trust">{t('cta.freeNote')}</p>
@@ -370,6 +407,7 @@ if (figure.essence) {
       >{beginLabel}</a>
     </div>
   </div>
+  )}
 </div>
 
 <style is:global>

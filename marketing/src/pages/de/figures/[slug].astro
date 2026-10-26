@@ -13,9 +13,11 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { getFigureSeo } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
+import { hasStoryPlayer } from '../../../player/pages';
 
+// Figures on the story player build from [figure].astro instead.
 export async function getStaticPaths() {
-  return Object.entries(figureSlugToId).map(([slug, figureId]) => ({
+  return Object.entries(figureSlugToId).filter(([slug]) => !hasStoryPlayer(slug)).map(([slug, figureId]) => ({
     params: { slug },
     props: { figureId },
   }));

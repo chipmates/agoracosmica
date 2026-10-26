@@ -10,6 +10,9 @@
 // validate-seo allowlist is a shared file this build does not touch).
 
 import Public from '../../../layouts/Public.astro';
+import PlayerHead from '../../../components/player/PlayerHead.astro';
+import PlayerDock from '../../../components/player/PlayerDock.astro';
+import { isStoryCompanionPath } from '../../../player/pages';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import PoemDoor from '../../../components/PoemDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
@@ -127,6 +130,8 @@ const schemas = [
     { name: 'Meditations', url: PAGE_URL },
   ]),
 ];
+// A companion page of a story player figure: the dock keeps playing here.
+const storyDock = isStoryCompanionPath(Astro.url.pathname);
 ---
 <Public
   title={metaTitle}
@@ -145,6 +150,8 @@ const schemas = [
   reading={true}
   schemas={schemas}
 >
+  {storyDock && <PlayerHead slot="head" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" />}
   <div class="pub-content med">
     <Breadcrumbs
       lang={lang}

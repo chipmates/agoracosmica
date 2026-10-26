@@ -70,6 +70,7 @@ const revealSticky = isHome || props.heroReveal === true;
 <html lang={props.lang}>
   <head>
     <BaseHead {...props} />
+    <slot name="head" />
   </head>
   <body class={revealSticky ? 'pub-home-page' : undefined}>
     <a href="#main-content" class="pub-skip-link">
@@ -99,6 +100,7 @@ const revealSticky = isHome || props.heroReveal === true;
         </div>
       </div>
     )}
+    <slot name="dock" />
     <PublicScript />
     {/* Ad-measurement consent prompt, shown only to Google ad-grant arrivals
         (a gclid in the URL, not the paid ?p=1 split). Non-blocking, decides

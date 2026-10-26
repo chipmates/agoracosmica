@@ -23,9 +23,11 @@ interface Props {
   lang: Lang;
   /** Deep pages that explain one concept, placed under the heading named in `under`. */
   links?: { href: string; label: string; under?: string }[];
+  /** Story player pages: the chapter plays in place instead of opening the app. */
+  player?: boolean;
 }
 
-const { figureId, slug, lang, links = [] } = Astro.props;
+const { figureId, slug, lang, links = [], player = false } = Astro.props;
 const de = lang === 'de';
 const authored = getFigurePageContent(figureId, lang);
 const qa = getFigureQA(figureId, lang);
@@ -89,7 +91,16 @@ const anchored = blocks.map(b => ({
             <a class="pub-textlink" href={link.href}>{link.label}</a>
           </p>
         ))}
-        {b.chapter && (
+        {b.chapter && player && (
+          <p class="fig-concept__link">
+            <button type="button" class="story-play story-play--row" data-story-play data-story-n={b.chapter} aria-pressed="false">
+              <span class="story-play__icon story-play__icon--play" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l10 5.5-10 5.5z" /></svg></span>
+              <span class="story-play__icon story-play__icon--pause" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg></span>
+              <span data-story-play-text>{`${S.chapterLink} (${S.chapterAria} ${b.chapter})`}</span>
+            </button>
+          </p>
+        )}
+        {b.chapter && !player && (
           <p class="fig-concept__link">
             <a
               class="pub-textlink"

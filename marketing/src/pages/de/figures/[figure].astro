@@ -1,0 +1,29 @@
+---
+// Figure pages on the story player (player/pages.ts). A route of their own,
+// so the player's router, stylesheet and dock never enter the build of the
+// figure pages that still use [slug].astro.
+import Public from '../../../layouts/Public.astro';
+import FigureDetailContent from '../../../components/FigureDetailContent.astro';
+import PlayerHead from '../../../components/player/PlayerHead.astro';
+import PlayerDock from '../../../components/player/PlayerDock.astro';
+import { figurePageHead } from '../../../player/figurePage';
+import { STORY_PLAYER_SLUGS } from '../../../player/pages';
+import { figureSlugToId } from '@client/data/public/slugMap';
+
+export async function getStaticPaths() {
+  return STORY_PLAYER_SLUGS.filter(slug => figureSlugToId[slug]).map(slug => ({
+    params: { figure: slug },
+    props: { figureId: figureSlugToId[slug] },
+  }));
+}
+
+const lang = 'de' as const;
+const slug = Astro.params.figure as string;
+const { figureId } = Astro.props as { figureId: string };
+const { layout } = figurePageHead(figureId, slug, lang);
+---
+<Public {...layout}>
+  <PlayerHead slot="head" />
+  <FigureDetailContent figureId={figureId} slug={slug} lang={lang} player />
+  <PlayerDock slot="dock" lang={lang} />
+</Public>

@@ -1,0 +1,333 @@
+/* The story player: plain and functional inside the site's tokens. Loaded only
+   by player pages, so the other figure pages keep their stylesheet unchanged.
+   The look is the design rounds' to decide; this sheet keeps every control
+   44 px, the gutter 16 px, and nothing over the consent card. */
+
+/* ---- the page: the first screen's play block -------------------------- */
+.story-start { margin: 1.2rem 0 0; }
+.story-start__note {
+  margin: 0 0 0.5rem;
+  max-width: 62ch;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+button.story-play--hero,
+button.story-play--rail { gap: 0.6rem; border: none; cursor: pointer; }
+/* The phone rail steps aside once the dock is up. */
+body:has(.story-dock) .story-rail { display: none; }
+.story-start__meta {
+  margin: 0.55rem 0 0;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.82rem;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+/* The label, the expanded line one tap away. */
+.story-label { margin: 0; max-width: 62ch; }
+.story-label > summary {
+  display: inline-block;
+  padding: 0.75rem 0;
+  line-height: 1.4;
+  cursor: pointer;
+  list-style: none;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.78rem;
+  letter-spacing: 0.06em;
+  color: var(--gold-deep);
+}
+.story-label > summary::-webkit-details-marker { display: none; }
+.story-label > summary::after { content: "+"; margin-left: 0.5rem; }
+.story-label[open] > summary::after { content: "−"; }
+.story-label > p {
+  margin: 0 0 0.6rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-tertiary);
+}
+
+/* Play buttons on the page: the hero's gold plate keeps the page's own door
+   style; the list rows are quiet text buttons. */
+.story-play__icon { display: inline-flex; }
+.story-play__icon svg { width: 0.9em; height: 0.9em; }
+.story-play[data-state="playing"] .story-play__icon--play,
+.story-play[data-state="loading"] .story-play__icon--play { display: none; }
+.story-play .story-play__icon--pause { display: none; }
+.story-play[data-state="playing"] .story-play__icon--pause,
+.story-play[data-state="loading"] .story-play__icon--pause { display: inline-flex; }
+
+.story-play--row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0 0.2rem;
+  margin: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.92rem;
+  letter-spacing: 0.04em;
+  color: var(--gold-primary);
+}
+.story-play--row:hover,
+.story-play--row:focus-visible { color: var(--gold-light, var(--gold-primary)); }
+.story-play--row[data-state="playing"],
+.story-play--row[data-state="paused"],
+.story-play--row[data-state="loading"] { color: var(--text-primary); }
+
+.fig-chapter.is-current .fig-chapter__n {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-25, 25%), transparent);
+}
+
+/* The switch for the next story. */
+.story-autonext {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  min-height: 44px;
+  margin: 0.4rem 0 0.6rem;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  text-align: left;
+}
+.story-autonext__box {
+  flex: none;
+  width: 2.1rem;
+  height: 1.2rem;
+  border-radius: var(--radius-full, 999px);
+  border: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-45, 45%), transparent);
+  position: relative;
+}
+.story-autonext__box::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 0.18rem;
+  width: 0.8rem;
+  height: 0.8rem;
+  margin-top: -0.4rem;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  transition: transform var(--transition-fast, 150ms ease);
+}
+.story-autonext[aria-pressed="true"] .story-autonext__box {
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-25, 25%), transparent);
+}
+.story-autonext[aria-pressed="true"] .story-autonext__box::after {
+  transform: translateX(0.85rem);
+  background: var(--gold-primary);
+}
+
+.story-applink { margin: 1rem 0 0; font-size: 0.88rem; }
+.story-applink a { color: var(--text-tertiary); border-bottom-color: color-mix(in srgb, var(--text-tertiary) 40%, transparent); }
+
+/* ---- the dock -------------------------------------------------------- */
+.story-dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 120;
+  padding: 0.35rem 1rem;
+  padding-bottom: max(0.35rem, env(safe-area-inset-bottom));
+  background: var(--bg-void);
+  border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  color: var(--text-primary);
+}
+/* The open phone menu sits over the page, so the dock steps back for it. */
+body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
+.story-dock__progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -1px;
+  height: 2px;
+  background: transparent;
+}
+.story-dock__fill { height: 100%; width: 0; background: var(--gold-primary); }
+.story-dock__inner {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: auto auto minmax(0, 1fr) auto auto auto auto;
+  grid-template-areas: "play back text time next read close";
+  align-items: center;
+  column-gap: 0.25rem;
+}
+.story-dock--offer .story-dock__inner {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.25rem 0.5rem;
+}
+.story-dock__play { grid-area: play; }
+.story-dock__back { grid-area: back; }
+.story-dock__text { grid-area: text; min-width: 0; padding: 0 0.4rem; }
+.story-dock__time { grid-area: time; font-size: 0.75rem; color: var(--text-tertiary); white-space: nowrap; padding: 0 0.4rem; }
+.story-dock__next { grid-area: next; }
+.story-dock__read { grid-area: read; }
+.story-dock__close { grid-area: close; }
+.story-dock__title,
+.story-dock__sub {
+  margin: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.story-dock__title { font-size: 0.85rem; line-height: 1.35; }
+.story-dock__sub { font-size: 0.7rem; line-height: 1.4; color: var(--text-tertiary); }
+.story-dock[data-status="error"] .story-dock__sub { color: var(--color-warning, var(--gold-primary)); }
+
+/* Phones: two rows, the words over the controls. */
+@media (max-width: 719.98px) {
+  .story-dock__inner {
+    grid-template-columns: auto auto minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      "text text text text close"
+      "play back time next read";
+  }
+  .story-dock__text { padding: 0.15rem 0 0; }
+  .story-dock__time { justify-self: center; }
+}
+
+.story-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0 0.5rem;
+  background: none;
+  border: none;
+  border-radius: var(--radius-sm, 4px);
+  cursor: pointer;
+  font: inherit;
+  font-size: 0.85rem;
+  color: var(--gold-primary);
+}
+.story-btn:hover { background: color-mix(in srgb, var(--gold-subtle) var(--a-10, 10%), transparent); }
+.story-btn:focus-visible { outline: 2px solid var(--gold-primary); outline-offset: 1px; }
+.story-btn:disabled { opacity: 0.4; cursor: default; background: none; }
+.story-btn--text { letter-spacing: 0.04em; }
+.story-btn--text[aria-pressed="true"] {
+  color: var(--bg-void);
+  background: var(--gold-subtle);
+}
+.story-btn--wide { padding: 0 0.75rem; text-align: left; }
+.story-dock__play { color: var(--bg-void); background: var(--gold-subtle); border-radius: 50%; }
+.story-dock__play:hover { background: var(--gold-primary); }
+
+/* Room at the page's end, so the dock never hides the footer. */
+body:has(.story-dock) .public-page { padding-bottom: 6.5rem; }
+
+/* ---- the reading view -------------------------------------------------- */
+.story-reader {
+  position: fixed;
+  left: 0;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 6.5rem;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+}
+html:has(.story-reader) { overflow: hidden; }
+.story-reader__head,
+.story-reader__tools {
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+.story-reader__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding-top: max(0.75rem, env(safe-area-inset-top));
+}
+.story-reader__kicker {
+  margin: 0.5rem 0 0.2rem;
+  font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gold-deep);
+}
+.story-reader__title {
+  margin: 0;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-weight: var(--weight-regular, 400);
+  font-size: 1.35rem;
+  line-height: 1.3;
+  color: var(--gold-subtle);
+}
+.story-reader__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.25rem 1rem;
+  padding-top: 0.4rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 15%, transparent);
+}
+.story-reader__group { display: inline-flex; align-items: center; gap: 0.15rem; }
+.story-reader__toolname { font-family: var(--font-ui, 'Space Grotesk', sans-serif); font-size: 0.75rem; color: var(--text-tertiary); margin-right: 0.3rem; }
+.story-reader__seek {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1 1 14rem;
+  min-height: 44px;
+}
+.story-reader__seek input { flex: 1; min-width: 0; accent-color: var(--gold-primary); }
+.story-reader__time { font-family: var(--font-ui, 'Space Grotesk', sans-serif); font-size: 0.75rem; color: var(--text-tertiary); }
+.story-reader__body {
+  flex: 1;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  width: 100%;
+  max-width: 46rem;
+  margin: 0 auto;
+  padding: 1rem 1rem 2rem;
+  box-sizing: border-box;
+  font-family: var(--font-content, 'Libre Caslon Text', serif);
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+.story-reader[data-size="s"] .story-reader__body { font-size: 0.96rem; }
+.story-reader[data-size="l"] .story-reader__body { font-size: 1.22rem; }
+.story-reader[data-size="xl"] .story-reader__body { font-size: 1.4rem; }
+.story-reader__note { margin: 0; font-size: 0.9em; color: var(--text-secondary); }
+.story-reader__status { color: var(--text-tertiary); }
+.story-reader__p {
+  margin: 0 0 1em;
+  padding: 0.15em 0.5em;
+  margin-left: -0.5em;
+  border-left: 2px solid transparent;
+  color: var(--text-secondary);
+  transition: color var(--transition-base, 200ms ease), border-color var(--transition-base, 200ms ease);
+}
+.story-reader__p.is-active {
+  color: var(--text-primary);
+  border-left-color: var(--gold-primary);
+  background: color-mix(in srgb, var(--gold-subtle) var(--a-08, 8%), transparent);
+}
+@media (prefers-reduced-motion: reduce) {
+  .story-reader__p, .story-autonext__box::after { transition: none; }
+}

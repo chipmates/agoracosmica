@@ -19,6 +19,8 @@ import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
 import { getSeedsFor } from '../lib/seeds';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
 import { getFigureWorld, numberWord, capitalize, cleanDisplayText } from '../lib/figureWorld';
+import { playerStrings } from '../player/strings';
+import { storyLabel } from '../player/label';
 
 interface Figure {
   id: string;
@@ -35,9 +37,11 @@ interface Props {
   lang: Lang;
   /** The lead answer. Pages in the running search test render it below the hero instead. */
   answer?: string;
+  /** Story player pages: story 1 plays here instead of the doors into the app. */
+  player?: boolean;
 }
 
-const { figure, slug, lang, answer } = Astro.props;
+const { figure, slug, lang, answer, player = false } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const heroAnswer = answer ?? '';
@@ -87,9 +91,18 @@ if (chapterMinutes) chapterBeat += ` · ${chapterMinutes} ${S.min}`;
 const world = getFigureWorld(figure.id, lang);
 const worldLine = [
   `${capitalize(numberWord(world.chapters, lang))} ${S.worldChapters}.`,
-  world.councils > 0 ? `${capitalize(numberWord(world.councils, lang))} ${S.worldCouncils}.` : '',
+  world.councils > 0 && !player ? `${capitalize(numberWord(world.councils, lang))} ${S.worldCouncils}.` : '',
   world.connections > 0 ? `${capitalize(numberWord(world.connections, lang))} ${S.worldEdges}.` : '',
 ].filter(Boolean).join(' ');
+
+// The player's first screen: the retelling note, the app's own label with its
+// longer line one tap away, and story 1 played in place by the tap.
+const P = playerStrings(lang);
+const label = storyLabel(lang);
+const chapterOneMeta = [
+  `${P.storyN(1)}${chapterTitle ? `: ${chapterTitle}` : ''}`,
+  chapterMinutes ? P.minutes(chapterMinutes) : '',
+].filter(Boolean).join(' · ');
 ---
 <section class="pub-fig-hero pub-fig-hero--answer">
   <figure class="pub-fig-hero__figure">
@@ -99,38 +112,66 @@ const worldLine = [
     <figcaption class="pub-fig-hero__caption">{t('figures.echoGloss')}</figcaption>
   </figure>
   <div class="pub-fig-hero__text">
-    <p class="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>
+    {!player && <p class="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>}
     <h1 class="pub-fig-hero__name">{figure.name}</h1>
     {metaLine && <p class="pub-fig-hero__meta">{metaLine}</p>}
 
     {heroAnswer && <p class="pub-fig-answer pub-fig-hero__answer">{heroAnswer}</p>}
 
-    <p class="fig-begin">
-      <a
-        class="fig-begin__button pub-cta__button"
-        href={beginHref}
-        data-agc-cta="start-exploring"
-        data-agc-figure={figure.id}
-        data-agc-door="fig_begin"
-      >{S.begin}</a>
-    </p>
+    {player ? (
+      <div class="story-start">
+        <p class="story-start__note">{P.retellingNote}</p>
+        <details class="story-label">
+          <summary>{label.brief}</summary>
+          <p>{label.expanded}</p>
+        </details>
+        <p class="fig-begin">
+          <button
+            type="button"
+            class="fig-begin__button pub-cta__button story-play story-play--hero"
+            data-story-play
+            data-story-n="1"
+            aria-pressed="false"
+          >
+            <span class="story-play__icon story-play__icon--play" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5l10 5.5-10 5.5z" /></svg></span>
+            <span class="story-play__icon story-play__icon--pause" aria-hidden="true"><svg viewBox="0 0 16 16" fill="currentColor"><path d="M4 2.5h3v11H4zM9 2.5h3v11H9z" /></svg></span>
+            <span data-story-play-text>{P.playFirst}</span>
+          </button>
+        </p>
+        <p class="story-start__meta">{chapterOneMeta}</p>
+      </div>
+    ) : (
+      <p class="fig-begin">
+        <a
+          class="fig-begin__button pub-cta__button"
+          href={beginHref}
+          data-agc-cta="start-exploring"
+          data-agc-figure={figure.id}
+          data-agc-door="fig_begin"
+        >{S.begin}</a>
+      </p>
+    )}
 
-    <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />
-    <noscript>
-      <a class="pub-textlink" href={trailerMp3}>{S.noscript}</a>
-    </noscript>
+    {!player && <FigureTrailer client:visible figureId={figure.id} lang={lang} chapterHref={chapterHref} />}
+    {!player && (
+      <noscript>
+        <a class="pub-textlink" href={trailerMp3}>{S.noscript}</a>
+      </noscript>
+    )}
 
     {learnLine && <p class="pub-fig-hero__learn">{learnLine}</p>}
 
-    <p class="fig-hero-chapter">
-      <a
-        class="fig-hero-chapter__link"
-        href={chapterHref}
-        data-agc-cta="start-exploring"
-        data-agc-figure={figure.id}
-        data-agc-door="fig_hero_chapter"
-      >{chapterBeat}<span class="fig-hero-chapter__go" aria-hidden="true"> →</span></a>
-    </p>
+    {!player && (
+      <p class="fig-hero-chapter">
+        <a
+          class="fig-hero-chapter__link"
+          href={chapterHref}
+          data-agc-cta="start-exploring"
+          data-agc-figure={figure.id}
+          data-agc-door="fig_hero_chapter"
+        >{chapterBeat}<span class="fig-hero-chapter__go" aria-hidden="true"> →</span></a>
+      </p>
+    )}
 
     <p class="pub-fig-hero__world">{worldLine}</p>
     <p class="pub-fig-hero__caption pub-fig-hero__caption--end">{t('figures.echoGloss')}</p>
