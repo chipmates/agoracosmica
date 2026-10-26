@@ -4,23 +4,20 @@
 // blocked chunk takes every importing island down with it, unhydrated.
 //
 // Listened conversion for the marketing pages: 30 seconds of audio actually
-// played, summed across every play surface (figure trailers, the homepage
-// voice hero, the observatory voice chip, the council preview, the sample
-// players) and across page loads inside the same tab. One accumulator, one
-// fire.
+// played, summed across every play surface (the story player, figure
+// trailers, the homepage voice hero, the observatory voice chip, the council
+// preview, the sample players). One accumulator, one fire.
 //
-// Same consent posture as every other conversion: a gclid must be present,
+// Same consent posture as every other conversion: a click ID must be present,
 // the page must not be on the paid ?p=1 split, ad-measurement consent must be
 // granted, and the browser must not be one of our own marked test browsers.
-// Nothing here decides any of that, it only asks. The gate
-// sits on the accumulator, not just on the send, so a visitor this could
-// never be sent for gets no seconds counted, nothing written and nothing read.
+// Nothing here decides any of that, it only asks.
 //
-// The deferred ask (ASK_ON_INTERACTION in ArrivalChoice) adds one state to
-// that: while the prompt is armed and still unanswered, seconds accrue but
-// nothing may be sent, so a crossing is held with the moment it happened. An
-// accept flushes it, a decline drops it. Only the prompt arms this, so with
-// that flag off the gate below is the granted-only one.
+// Before the answer everything lives in page memory: the click ID the card
+// holds, the seconds heard and at most one crossing with the moment it
+// happened. Nothing is read from or written to the browser's storage until a
+// yes; a full page load starts from nothing. A yes sends the held crossing
+// with its own time, a no or a close drops all of it.
 //
 // The worker URL is absolute on purpose: agoracosmica.org has no /api/* route,
 // so a relative path falls through the SPA fallback (/* -> index.html 200),
@@ -33,13 +30,14 @@ import {
   getGclid,
   isPaidVisitor,
   LISTENED_THRESHOLD_S,
+  revokeAdConsent as revokeStoredConsent,
 } from '@client/utils/public/gclidCapture';
 import { isProbeSessionNow } from '@client/utils/probeSession';
 
 // For the footer switch. Every island that reaches gclidCapture must also reach
 // this module, so the two share one chunk named after this file: a chunk named
 // after gclidCapture would be blocked (client/scripts/check-asset-names.mjs).
-export { adConsentGranted, revokeAdConsent } from '@client/utils/public/gclidCapture';
+export { adConsentGranted } from '@client/utils/public/gclidCapture';
 
 const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
 
@@ -56,24 +54,19 @@ export function onProductionHost(): boolean {
   }
 }
 
-// sessionStorage on purpose: the marketing site is a multi-page app, so the
-// seconds have to survive a navigation to keep counting across a visit. Tab
-// scoped, never localStorage, and it holds a number of seconds and nothing else.
+// The same key gclidCapture stores the click ID under after a yes.
+const SS_CLICK = 'agc_gclid';
+
+// sessionStorage, written only after a yes: the seconds carry across the pages
+// of a consenting visit. Tab scoped, never localStorage, a number and nothing
+// else.
 const SS_HEARD = 'agc_listened_seconds';
 
 // The agc_conv_fired_* namespace is what revokeAdConsent() clears, so the key
 // has to stay in it.
 const SS_FIRED = 'agc_conv_fired_listened';
 
-// sessionStorage key: at most one crossing that happened while the consent
-// prompt was up and unanswered. It holds the event, the moment it happened and
-// the figure, never the click ID (a flush reads that through getGclid() at send
-// time). Deliberately outside the agc_conv_fired_* namespace: this is a
-// not-sent marker, and the prompt's answer handlers own its lifecycle.
-const SS_PENDING = 'agc_listened_pending';
-
 interface PendingListened {
-  event: 'listened';
   timestamp: number;
   figureId?: string;
 }
@@ -94,6 +87,45 @@ const TICK_MS = 1000;
 // never count more than one clip's worth.
 const MAX_ACTIVATION_S = 60;
 
+// ---- the click ID until the answer --------------------------------------
+
+// The card's copy of the landing's click ID. gclidCapture keeps its own, but
+// the player's router drops that one on a page change it handles in place,
+// while the visit, and with it the question, goes on.
+let heldClick: string | null = null;
+
+export function holdClick(id: string | null): void {
+  heldClick = id;
+}
+
+/** The click ID this page may still use: the stored or captured one, else the held one. */
+export function clickId(): string | null {
+  return getGclid() ?? heldClick;
+}
+
+/**
+ * After grantAdConsent(): if gclidCapture no longer has the click ID (a page
+ * change in place dropped it), store the held one under its key, as the
+ * reviewed text promises for a yes.
+ */
+export function keepClickAfterYes(): void {
+  if (getGclid() !== null || heldClick === null || isPaidVisitor() || !adConsentGranted()) return;
+  try {
+    sessionStorage.setItem(SS_CLICK, heldClick);
+  } catch {
+    // storage blocked: the steps on this page still find it in memory
+  }
+}
+
+// ---- the seconds ----------------------------------------------------------
+
+let heardSeconds = 0;
+let fired = false;
+let restored = false;
+// Armed while the card waits for its answer: seconds may accrue, in memory.
+let preDecisionArmed = false;
+let pending: PendingListened | null = null;
+
 function readStoredSeconds(): number {
   try {
     const stored = parseFloat(sessionStorage.getItem(SS_HEARD) ?? '');
@@ -112,49 +144,33 @@ function readFiredFlag(): boolean {
   }
 }
 
-// Seconds heard so far in this tab, seeded from the earlier pages of the
-// visit. Kept in memory as well as in storage so the count still adds up on a
-// browser that blocks sessionStorage (it just stops carrying across pages).
-// Seeded only once counting is allowed: the keys exist only after a yes, so
-// nothing is looked up for anyone else.
-let heardSeconds = 0;
-let fired = false;
-let restored = false;
-
+// Only ever called with a yes on record: the seconds of earlier pages of a
+// consenting visit join the ones heard here.
 function restoreOnce(): void {
   if (restored) return;
   restored = true;
-  heardSeconds = readStoredSeconds();
-  fired = readFiredFlag();
+  heardSeconds = Math.max(heardSeconds, readStoredSeconds());
+  fired = fired || readFiredFlag();
 }
 
-// Pre-decision state. Both stay at their initial value unless the consent
-// prompt arms them, which only the deferred ask does, so nothing below this
-// line moves while ASK_ON_INTERACTION is off.
-let preDecisionArmed = false;
-let pending: PendingListened | null = null;
-let onFirstPlayback: (() => void) | null = null;
-
 // The seconds are only ever counted for a visitor this conversion could
-// actually be sent for. Everyone else gets no accumulator and no storage
-// write at all: seconds we could never use would be storage without a purpose
-// (§ 25 Abs. 1 TDDDG), which is the same reason a dismissed prompt drops the
-// click ID. Armed is the one case where seconds may be counted before the
-// answer, because the answer is still coming and an accept may still use them.
+// actually be sent for: seconds we could never use would be data without a
+// purpose (§ 25 Abs. 1 TDDDG). Armed is the one case where seconds count
+// before the answer, in memory, because an accept may still use them.
 function canCount(): boolean {
-  if (isPaidVisitor() || getGclid() === null || isProbeSessionNow()) return false;
+  if (isPaidVisitor() || clickId() === null || isProbeSessionNow()) return false;
   return adConsentGranted() || preDecisionArmed;
 }
 
 function fireListened(figureId?: string, timestamp: number = Date.now()): void {
   if (!onProductionHost()) return;
-  restoreOnce();
-  if (fired) return;
   if (isPaidVisitor()) return; // paid arrivals run on clicks only
-  const gclid = getGclid();
+  const gclid = clickId();
   if (!gclid) return;
   if (isProbeSessionNow()) return; // our own test browsers send Google nothing
-  if (!adConsentGranted()) return; // no opt-in, no send
+  if (!adConsentGranted()) return; // no opt-in, no send, nothing read
+  restoreOnce();
+  if (fired) return;
   fired = true;
   try {
     if (sessionStorage.getItem(SS_FIRED)) return;
@@ -181,53 +197,6 @@ function fireListened(figureId?: string, timestamp: number = Date.now()): void {
   }
 }
 
-function readPending(): PendingListened | null {
-  try {
-    const raw = sessionStorage.getItem(SS_PENDING);
-    if (!raw) return null;
-    const entry = JSON.parse(raw) as Partial<PendingListened>;
-    if (entry.event !== 'listened' || typeof entry.timestamp !== 'number') return null;
-    if (!Number.isFinite(entry.timestamp)) return null;
-    return {
-      event: 'listened',
-      timestamp: entry.timestamp,
-      // Same length cap the intent keys in agc-public.js hold ids to.
-      ...(typeof entry.figureId === 'string' && entry.figureId.length < 64
-        ? { figureId: entry.figureId }
-        : {}),
-    };
-  } catch {
-    return null;
-  }
-}
-
-function clearPending(): void {
-  pending = null;
-  try {
-    sessionStorage.removeItem(SS_PENDING);
-  } catch {
-    // no-op
-  }
-}
-
-// Hold the crossing instead of sending it, with the moment it happened, so an
-// accept can report when the visitor actually listened rather than when they
-// answered. One entry, never a click ID.
-function bufferListened(figureId?: string): void {
-  const entry: PendingListened = {
-    event: 'listened',
-    timestamp: Date.now(),
-    ...(figureId ? { figureId } : {}),
-  };
-  pending = entry;
-  try {
-    sessionStorage.setItem(SS_PENDING, JSON.stringify(entry));
-  } catch {
-    // storage blocked: the crossing still flushes if the answer comes on this
-    // page, it just does not carry across a navigation
-  }
-}
-
 /**
  * Add a slice of playback to the shared total and fire once it crosses the
  * threshold. Slices outside (0, MAX_TICK_S] are dropped, which is what keeps
@@ -236,70 +205,58 @@ function bufferListened(figureId?: string): void {
 export function addHeardSeconds(seconds: number, figureId?: string): void {
   if (!(seconds > 0) || seconds > MAX_TICK_S) return;
   if (!canCount()) return;
-  restoreOnce();
+  const granted = adConsentGranted();
+  if (granted) restoreOnce();
   if (fired || pending) return;
-  if (onFirstPlayback) {
-    // The marketing players use detached Audio elements, whose play events
-    // never reach the document, so this is the only place that sees playback
-    // on every surface. Once, then never again.
-    const notify = onFirstPlayback;
-    onFirstPlayback = null;
-    notify();
-  }
   heardSeconds += seconds;
-  try {
-    sessionStorage.setItem(SS_HEARD, heardSeconds.toFixed(2));
-  } catch {
-    // storage blocked: the seconds still add up on this page, they just do
-    // not carry across a navigation
+  if (granted) {
+    try {
+      sessionStorage.setItem(SS_HEARD, heardSeconds.toFixed(2));
+    } catch {
+      // storage blocked: the seconds still add up on this page
+    }
   }
   if (heardSeconds < LISTENED_THRESHOLD_S) return;
-  // Armed and unanswered: the crossing is held, not sent. Everything else is
-  // a granted visitor, so it sends now.
-  if (preDecisionArmed && !adConsentGranted()) bufferListened(figureId);
-  else fireListened(figureId);
+  if (granted) {
+    fireListened(figureId);
+    return;
+  }
+  // Unanswered: the crossing is held in memory with the moment it happened,
+  // so a yes reports when the visitor listened, not when they answered.
+  pending = { timestamp: Date.now(), ...(figureId ? { figureId } : {}) };
 }
 
-/**
- * Arm the pre-decision buffer: a consent surface is live this session and
- * unanswered, so seconds may accrue and nothing may be sent. `onPlayback` runs
- * once, on the first slice counted while armed. Only the consent prompt calls
- * this, and only behind ASK_ON_INTERACTION.
- */
-export function armPreDecisionListening(onPlayback?: () => void): void {
+/** The card is waiting for its answer: seconds may accrue, in memory only. */
+export function armPreDecisionListening(): void {
   preDecisionArmed = true;
-  pending = readPending();
-  onFirstPlayback = onPlayback ?? null;
 }
 
-/**
- * Consent granted: send a crossing that happened before the answer, dated when
- * it happened. The click ID is read here, at send time, through the same getter
- * every other send uses, and the agc_conv_fired_listened flag still applies.
- */
+/** A yes: send a crossing held before it, dated when it happened. */
 export function flushPreDecisionListening(): void {
   preDecisionArmed = false;
-  onFirstPlayback = null;
-  const entry = pending ?? readPending();
-  clearPending();
-  if (!entry) return; // answered before the threshold: normal accrual continues
+  const entry = pending;
+  pending = null;
+  if (!entry) return; // answered before the threshold: counting goes on
   fireListened(entry.figureId, entry.timestamp);
 }
 
-/**
- * Declined: nothing may ever be sent for this visit, so the held crossing and
- * the seconds behind it go the way of the click ID.
- */
+/** A no or a close: the held crossing and the seconds behind it go. */
 export function dropPreDecisionListening(): void {
   preDecisionArmed = false;
-  onFirstPlayback = null;
   heardSeconds = 0;
-  clearPending();
-  try {
-    sessionStorage.removeItem(SS_HEARD);
-  } catch {
-    // no-op
-  }
+  pending = null;
+}
+
+/**
+ * The footer's withdrawal and the card's no: the stored answer, click ID and
+ * flags (gclidCapture), and everything this page holds in memory.
+ */
+export function revokeAdConsent(): void {
+  revokeStoredConsent();
+  heldClick = null;
+  dropPreDecisionListening();
+  fired = false;
+  restored = false;
 }
 
 /**

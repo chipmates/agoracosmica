@@ -1,16 +1,36 @@
 /* Ad-measurement consent prompt (ArrivalChoice island). A non-blocking plate
    pinned to the bottom of the viewport, so the figure/theme content stays fully
    readable behind it (no wall). Tokens come from the page (Public.astro loads
-   index.css); hex fallbacks keep it sane if a token is ever missing. */
+   index.css). */
+
+/* The card is a night plate on every page. Its colours are taken from the
+   root, so a scope below it that redefines the site's tokens (a day view)
+   changes nothing here. WebKit crashed when this card mixed tokens that such a
+   scope had turned into mixes, so no colour here mixes two mixed values. */
+:root {
+  --agc-n-page: var(--bg-primary);
+  --agc-n-void: var(--bg-cosmic-void);
+  --agc-n-ink: var(--text-primary);
+  --agc-n-ink-2: var(--text-secondary);
+  --agc-n-ink-3: var(--text-tertiary);
+  --agc-n-dim: var(--text-dim);
+  --agc-n-gold: var(--gold-primary);
+  --agc-n-gold-subtle: var(--gold-subtle);
+  --agc-n-gold-hover: var(--gold-hover);
+  --agc-n-gold-deep: var(--gold-deep);
+  --agc-n-black: var(--utility-pure-black);
+}
 
 .agc-consent {
   /* Plate mix and the two ink registers, so the values below stay readable */
-  --agc-plate-a: color-mix(in srgb, var(--bg-primary, #0C1133) 91%, var(--gold-deep, #B38B30));
-  --agc-plate-b: color-mix(in srgb, var(--bg-cosmic-void, #080B20) 88%, #000);
-  --agc-keyline: color-mix(in srgb, var(--gold-deep, #B38B30) 44%, transparent);
-  --agc-keyline-in: color-mix(in srgb, var(--gold-deep, #B38B30) 19%, transparent);
-  --agc-ink-value: color-mix(in srgb, var(--text-primary, #E8E2D4) 70%, var(--text-secondary, #CEC8B9));
-  --agc-ink-fine: color-mix(in srgb, var(--text-dim, #8C8677) 67%, var(--text-secondary, #CEC8B9));
+  --agc-plate-a: color-mix(in srgb, var(--agc-n-page) 91%, var(--agc-n-gold-deep));
+  --agc-plate-b: color-mix(in srgb, var(--agc-n-void) 88%, var(--agc-n-black));
+  --agc-keyline: color-mix(in srgb, var(--agc-n-gold-deep) 44%, transparent);
+  --agc-keyline-in: color-mix(in srgb, var(--agc-n-gold-deep) 19%, transparent);
+  /* Between the first and second text colours, as one colour over the plate */
+  --agc-ink-value: color-mix(in srgb, var(--agc-n-ink) 96%, transparent);
+  /* The tertiary text colour is the old dim and secondary mix, to the unit */
+  --agc-ink-fine: var(--agc-n-ink-3);
 
   position: fixed;
   left: 50%;
@@ -30,9 +50,9 @@
   -webkit-backdrop-filter: blur(16px) saturate(112%);
   backdrop-filter: blur(16px) saturate(112%);
   box-shadow:
-    0 24px 60px color-mix(in srgb, #000 68%, transparent),
-    inset 0 1px 0 color-mix(in srgb, var(--gold-primary, #E6BC5C) 14%, transparent);
-  color: var(--text-primary, #E8E2D4);
+    0 24px 60px color-mix(in srgb, var(--agc-n-black) 68%, transparent),
+    inset 0 1px 0 color-mix(in srgb, var(--agc-n-gold) 14%, transparent);
+  color: var(--agc-n-ink);
   font-family: var(--font-ui, system-ui, -apple-system, 'Segoe UI', sans-serif);
   animation: agc-consent-rise-c 0.34s cubic-bezier(0.16, 1, 0.3, 1);
   /* At most about half the screen: past this the words scroll inside the
@@ -100,7 +120,7 @@
   height: 13px;
   display: block;
 }
-.agc-consent__x:hover { color: var(--text-primary, #E8E2D4); }
+.agc-consent__x:hover { color: var(--agc-n-ink); }
 
 /* ---- the ask --------------------------------------------------------- */
 .agc-consent__kicker {
@@ -109,7 +129,7 @@
   font-weight: 500;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: color-mix(in srgb, var(--gold-primary, #E6BC5C) 76%, var(--text-dim, #8C8677));
+  color: color-mix(in srgb, var(--agc-n-gold) 76%, var(--agc-n-dim));
 }
 .agc-consent__q {
   margin: 0 2.4rem 0.5rem 0;
@@ -118,7 +138,7 @@
   font-size: 1.32rem;
   line-height: 1.22;
   letter-spacing: 0.005em;
-  color: var(--text-primary, #E8E2D4);
+  color: var(--agc-n-ink);
   text-wrap: balance;
 }
 .agc-consent__why {
@@ -146,11 +166,11 @@
   overflow-y: auto;
   overscroll-behavior: contain;
   scrollbar-width: thin;
-  scrollbar-color: color-mix(in srgb, var(--gold-deep, #B38B30) 55%, transparent) transparent;
+  scrollbar-color: color-mix(in srgb, var(--agc-n-gold-deep) 55%, transparent) transparent;
 }
 .agc-consent__words--more {
-  -webkit-mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.6rem), transparent);
-  mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.6rem), transparent);
+  -webkit-mask-image: linear-gradient(to bottom, var(--agc-n-page) calc(100% - 1.6rem), transparent);
+  mask-image: linear-gradient(to bottom, var(--agc-n-page) calc(100% - 1.6rem), transparent);
 }
 .agc-consent__age {
   margin: 0 0 0.66rem;
@@ -177,14 +197,14 @@
   font-weight: 600;
   line-height: 1.2;
   border-radius: 2px;
-  color: var(--gold-primary, #E6BC5C);
-  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 15%, transparent);
-  border: 1px solid color-mix(in srgb, var(--gold-primary, #E6BC5C) 52%, transparent);
+  color: var(--agc-n-gold);
+  background: color-mix(in srgb, var(--agc-n-gold) 15%, transparent);
+  border: 1px solid color-mix(in srgb, var(--agc-n-gold) 52%, transparent);
   transition: background 0.16s ease, border-color 0.16s ease;
 }
 .agc-consent__btn:hover {
-  background: color-mix(in srgb, var(--gold-primary, #E6BC5C) 24%, transparent);
-  border-color: color-mix(in srgb, var(--gold-primary, #E6BC5C) 72%, transparent);
+  background: color-mix(in srgb, var(--agc-n-gold) 24%, transparent);
+  border-color: color-mix(in srgb, var(--agc-n-gold) 72%, transparent);
 }
 .agc-consent__btn:active { transform: translateY(1px); }
 
@@ -193,13 +213,13 @@
 .agc-consent__imprint {
   margin: 0.7rem 0 0;
   padding-top: 0.58rem;
-  border-top: 1px solid color-mix(in srgb, var(--gold-deep, #B38B30) 26%, transparent);
+  border-top: 1px solid color-mix(in srgb, var(--agc-n-gold-deep) 26%, transparent);
   font-size: 0.665rem;
   line-height: 1.55;
   letter-spacing: 0.01em;
   color: var(--agc-ink-fine);
 }
-.agc-consent__sep { color: color-mix(in srgb, var(--agc-ink-fine) 55%, transparent); }
+.agc-consent__sep { color: color-mix(in srgb, var(--agc-n-ink-3) 55%, transparent); }
 @media (min-width: 481px) {
   .agc-consent__imprint {
     display: flex;
@@ -213,7 +233,7 @@
   .agc-consent__links { display: block; white-space: nowrap; }
 }
 .agc-consent__link {
-  color: var(--gold-primary, #E6BC5C);
+  color: var(--agc-n-gold);
   text-decoration: underline;
   text-underline-offset: 2px;
   text-decoration-thickness: 1px;
@@ -222,10 +242,10 @@
      line box, so the imprint stays one row tall and clear of the buttons */
   padding-block: 9px;
 }
-.agc-consent__link:hover { color: var(--gold-hover, #F6D55C); }
+.agc-consent__link:hover { color: var(--agc-n-gold-hover); }
 
 .agc-consent :focus-visible {
-  outline: 2px solid var(--gold-hover, #F6D55C);
+  outline: 2px solid var(--agc-n-gold-hover);
   outline-offset: 2px;
   border-radius: 2px;
 }
@@ -299,8 +319,8 @@
   .agc-consent__fine { line-height: 1.36; }
   .agc-consent__words { margin-bottom: 0.38rem; }
   .agc-consent__words--more {
-    -webkit-mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.1rem), transparent);
-    mask-image: linear-gradient(to bottom, var(--bg-primary) calc(100% - 1.1rem), transparent);
+    -webkit-mask-image: linear-gradient(to bottom, var(--agc-n-page) calc(100% - 1.1rem), transparent);
+    mask-image: linear-gradient(to bottom, var(--agc-n-page) calc(100% - 1.1rem), transparent);
   }
   .agc-consent__age { margin-bottom: 0.42rem; }
   .agc-consent__imprint { margin-top: 0.42rem; padding-top: 0.34rem; }
@@ -329,6 +349,28 @@
   .agc-consent__x { top: 0; right: 0; }
 }
 
+/* ---- due, but held back until its place is clear: laid out, unseen ---- */
+.agc-consent--held {
+  visibility: hidden;
+  animation: none;
+}
+
+/* ---- pages with the story player: the card stands on the dock, never over
+   it. The dock publishes its measured height as --story-dock-space. */
+body:has(.story-dock) .agc-consent { bottom: calc(var(--story-dock-space) + 1rem); }
+@media (min-width: 960px) {
+  body:has(.story-dock) .agc-consent { bottom: calc(var(--story-dock-space) + 1.5rem); }
+}
+@media (max-width: 480px) {
+  body:has(.story-dock) .agc-consent {
+    bottom: var(--story-dock-space);
+    padding-bottom: 0.7rem;
+  }
+}
+@media (max-width: 360px) {
+  body:has(.story-dock) .agc-consent { padding-bottom: 0.5rem; }
+}
+
 /* ---- accessibility posture ------------------------------------------- */
 @media (prefers-reduced-motion: reduce) {
   .agc-consent { animation: none; }
@@ -344,13 +386,13 @@
 }
 @media (prefers-contrast: more) {
   .agc-consent {
-    background: color-mix(in srgb, var(--bg-cosmic-void, #080B20) 66%, #000);
-    border-color: var(--gold-subtle, #D4A539);
+    background: color-mix(in srgb, var(--agc-n-void) 66%, var(--agc-n-black));
+    border-color: var(--agc-n-gold-subtle);
   }
   .agc-consent::before { display: none; }
   .agc-consent__fine,
-  .agc-consent__imprint { color: var(--text-secondary, #CEC8B9); }
-  .agc-consent__btn { border-color: var(--gold-primary, #E6BC5C); }
+  .agc-consent__imprint { color: var(--agc-n-ink-2); }
+  .agc-consent__btn { border-color: var(--agc-n-gold); }
 }
 
 /* Accept and decline sit side by side at identical width, weight and colour,

@@ -2,25 +2,23 @@
 // NAMING CONSTRAINT: the file name becomes a public chunk URL and must stay
 // free of ad-tech-looking words (ad, consent+ad, conversion, track): content
 // blockers match those in URLs and would keep the card from ever loading.
-// Shown only when this page's address carries a gclid, it is NOT the paid ?p=1
-// split, and no answer is on record. Non-blocking: the figure or
-// theme content stays fully readable behind it (no wall, no scroll lock, no
-// focus trap), which is what keeps the consent lawful (EDPB cookie-wall rule).
+// Non-blocking: the page stays fully readable and usable behind it (no wall,
+// no scroll lock, no focus trap), which is what keeps the consent lawful
+// (EDPB cookie-wall rule).
 //
-//   Accept  -> grantAdConsent() + fire start_exploring (the early grant signal,
-//              the same conversion the old marketing CTA fired, now gated on a
-//              real opt-in instead of the bare gclid).
-//   Decline -> revokeAdConsent() (records the choice, clears the gclid, sends
-//              nothing). Remembered, so the visitor is not asked again.
-//   Close   -> a no for this visit: clearGclid() drops the click ID from
-//              page memory, nothing is stored, nothing goes to Google. Not
-//              remembered, so the next ad arrival is asked again. Safe since
-//              the click ID lives in page memory until a yes (gclidCapture.ts).
+// It asks later, never on arrival: on a page with the story player once a
+// minute of story audio has been heard, on a page with poems once a poem's
+// last line has been in view for its reading time (utils/cardMoment.ts). No
+// other page asks. Until the answer the click ID lives in page memory only:
+// it leaves the address bar when this module loads, nothing about the ad is
+// stored, and a full page load forgets it (a reload no longer asks).
 //
-// Until the answer the click ID stays in page memory and nothing is stored;
-// only a yes stores it. After any answer it also leaves the address, so a
-// reload does not ask again. The next page has no click ID in its address, so
-// the card asks on the landing page only.
+//   Accept  -> grantAdConsent() stores the yes and the click ID, then
+//              start_exploring and a Listened crossing held since it happened.
+//   Decline -> the no is recorded, the click ID and the seconds dropped,
+//              nothing sent. Remembered, so the visitor is not asked again.
+//   Close   -> a no for this visit: the click ID and the seconds dropped,
+//              nothing stored, nothing sent. The next ad arrival asks again.
 //
 // Copy is legally reviewed: the withdrawal notice, the privacy and Google
 // links, the click-ID scope sentence, the account and USA sentence and the
@@ -33,7 +31,7 @@
 // asked again (an earlier no stays a no). Lift into publicI18n if it ever
 // needs more languages.
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
   captureGclid,
   clearGclid,
@@ -41,24 +39,26 @@ import {
   isPaidVisitor,
   adConsentDecided,
   grantAdConsent,
-  revokeAdConsent,
 } from '@client/utils/public/gclidCapture';
 import { isProbeSessionNow, probeField } from '@client/utils/probeSession';
 import {
   armPreDecisionListening,
+  clickId,
   dropPreDecisionListening,
   flushPreDecisionListening,
+  holdClick,
+  keepClickAfterYes,
   onProductionHost,
+  revokeAdConsent,
 } from '../utils/heardSeconds';
+import {
+  boxesOverlap,
+  findPoemEnds,
+  watchPoemEnd,
+  watchStorySeconds,
+} from '../utils/cardMoment';
+import type { StorySource } from '../utils/cardMoment';
 import './ArrivalChoice.css';
-
-// Deferred ask. False is the shipping behavior: the card comes up on mount,
-// exactly as reviewed. True holds it back until the visitor does something
-// (audio, half the page, twenty seconds, an entry CTA under the pointer) and
-// lets audio seconds accrue unsent until they answer. Nothing but this line
-// changes between the two, and flipping it is the owner's call after a legal
-// look at the new timing (scope and copy are unchanged either way).
-export const ASK_ON_INTERACTION: boolean = false;
 
 interface Props {
   lang: 'en' | 'de';
@@ -135,6 +135,21 @@ const SEEN_RATIO = 0.5;
 // row as the step itself, so it adds no user dimension.
 const ANSWER_BUCKETS_S: readonly number[] = [1, 3, 10];
 
+// The card arrives while the visitor is busy with the page: a tap this soon
+// after it appears was aimed at what stood there before (the rise takes 340 ms,
+// a reaction to it about as long again), so it is ignored, not taken as an answer.
+export const TAP_GUARD_MS = 700;
+
+// How often a card that is due re-checks whether it can appear without
+// covering what the visitor uses (the player's controls, the line just read).
+const CLEAR_CHECK_MS = 400;
+
+// The player's mount, the same on every page that carries the dock.
+const PLAYER_SELECTOR = '[data-astro-transition-persist="story-dock"], script[data-story-queue]';
+// What the card must not cover when it appears, beside the dock it sits above.
+const DOCK_SELECTOR = '.story-dock';
+const LIVE_PLAY_SELECTOR = '[data-story-play][data-state]:not([data-state="idle"])';
+
 function answerBucket(elapsedMs: number): number {
   const seconds = elapsedMs / 1000;
   const crossed = ANSWER_BUCKETS_S.findIndex((edge) => seconds < edge);
@@ -195,26 +210,31 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
 }
 
 /**
- * After an answer the click ID leaves the address bar, so a reload or a
- * shared link carries none and the card does not ask again. The key stays,
- * empty: the landing's source class reads an ad arrival from it
- * (agc-public.js), and a reload must still count as one. Every other part of
- * the address is kept as it was.
+ * The click ID leaves the address bar, so a reload or a shared link carries
+ * none. The key stays, empty: the landing's source class reads an ad arrival
+ * from it (agc-public.js), and a reload must still count as one. Every other
+ * part of the address is kept as it was.
  */
 export function dropClickIdFromAddress(): void {
   try {
     const { pathname, search, hash } = window.location;
+    let carried = false;
     let found = false;
     const kept: string[] = [];
     for (const part of search.replace(/^\?/, '').split('&')) {
       if (!part) continue;
-      if (part.split('=')[0] !== 'gclid') kept.push(part);
-      else if (!found) {
+      const cut = part.indexOf('=');
+      if ((cut < 0 ? part : part.slice(0, cut)) !== 'gclid') {
+        kept.push(part);
+        continue;
+      }
+      if (cut >= 0 && part.length > cut + 1) carried = true;
+      if (!found) {
         found = true;
         kept.push('gclid=');
       }
     }
-    if (!found) return;
+    if (!carried) return;
     window.history.replaceState(window.history.state, '', `${pathname}?${kept.join('&')}${hash}`);
   } catch {
     // history unavailable: the address keeps it, and this page never reads it again
@@ -223,7 +243,7 @@ export function dropClickIdFromAddress(): void {
 
 function fireStartExploring(): void {
   if (!onProductionHost()) return;
-  const gclid = getGclid();
+  const gclid = clickId();
   if (!gclid) return;
   if (isProbeSessionNow()) return; // our own test browsers send Google nothing
   try {
@@ -246,64 +266,126 @@ function fireStartExploring(): void {
   }
 }
 
-// Deferred ask: how long a visitor may sit on the page before the card comes
-// up on its own, and how far down the page counts as having read it.
-const DWELL_MS = 20000;
-const SCROLL_FRACTION = 0.5;
+// ---- the visit, in module memory ------------------------------------------
+// The island mounts again after each page change the player's router makes in
+// place; the module, and with it the question's state, stays.
 
-/**
- * Wire the deferred-ask triggers. The first sign of engagement wins and takes
- * every other listener down with it, so the card can never be raised twice and
- * nothing outlives the island. Returns the detach for unmount.
- */
-function armDeferredShow(fire: () => void): () => void {
-  let armed = true;
-  let dwell = 0;
+type Phase = 'off' | 'waiting' | 'due' | 'done';
 
-  function detach(): void {
-    if (!armed) return;
-    armed = false;
-    window.clearTimeout(dwell);
-    document.removeEventListener('play', trip, true);
-    window.removeEventListener('scroll', onScroll);
-    document.removeEventListener('pointerover', onCtaIntent);
-    document.removeEventListener('focusin', onCtaIntent);
-  }
-
-  function trip(): void {
-    if (!armed) return;
-    detach();
-    fire();
-  }
-
-  function onScroll(): void {
-    const scrollable = document.documentElement.scrollHeight - window.innerHeight;
-    if (scrollable <= 0) return; // page fits the viewport, there is nothing to read down to
-    if (window.scrollY / scrollable >= SCROLL_FRACTION) trip();
-  }
-
-  // Same convention the cta_click handler in agc-public.js uses: every
-  // into-the-app CTA is [data-agc-cta="start-exploring"], navbar to sticky bar.
-  function onCtaIntent(event: Event): void {
-    const el = event.target instanceof Element ? event.target.closest('[data-agc-cta]') : null;
-    if (el?.getAttribute('data-agc-cta') === 'start-exploring') trip();
-  }
-
-  dwell = window.setTimeout(trip, DWELL_MS);
-  // Audio: play events do not bubble, so the in-page players need the capture
-  // phase, and the island players need the accumulator (they use detached
-  // Audio elements, whose events never reach the document at all). The
-  // accumulator callback is one-shot and any answer clears it.
-  document.addEventListener('play', trip, true);
-  armPreDecisionListening(trip);
-  window.addEventListener('scroll', onScroll, { passive: true });
-  document.addEventListener('pointerover', onCtaIntent);
-  document.addEventListener('focusin', onCtaIntent);
-  return detach;
+interface KeepClear {
+  /** True while something covers the page the card would sit on (the reader). */
+  blocked(): boolean;
+  /** Boxes the card must not cover when it appears. */
+  boxes(): DOMRect[];
+  subscribe?(listener: () => void): () => void;
 }
 
+let phase: Phase = 'off';
+let keepClear: KeepClear | null = null;
+let stopMoment: (() => void) | null = null;
+let arrived = false;
+let momentArmed = false;
+const phaseListeners = new Set<() => void>();
+
+function setPhase(next: Phase): void {
+  phase = next;
+  phaseListeners.forEach((listener) => listener());
+}
+
+function subscribePhase(listener: () => void): () => void {
+  phaseListeners.add(listener);
+  return () => {
+    phaseListeners.delete(listener);
+  };
+}
+
+const getPhase = (): Phase => phase;
+const serverPhase = (): Phase => 'off';
+
+/**
+ * Once per page load, when this module first runs: the click ID goes into
+ * page memory and out of the address. A grant arrival with no answer on
+ * record starts waiting for its moment.
+ */
+function arrive(): void {
+  if (arrived || typeof window === 'undefined') return;
+  arrived = true;
+  captureGclid({ holdUntilAnswer: true }); // ?gclid into page memory, ?p=1 drops it
+  const id = getGclid();
+  holdClick(id);
+  dropClickIdFromAddress();
+  if (id === null || isPaidVisitor() || adConsentDecided()) return;
+  phase = 'waiting';
+  armPreDecisionListening();
+}
+
+function boxesOf(selector: string): DOMRect[] {
+  return Array.from(document.querySelectorAll(selector))
+    .map((el) => el.getBoundingClientRect())
+    .filter((box) => box.width > 0 && box.height > 0);
+}
+
+/** No question can come on this page: the held click ID goes now. */
+function standDown(): void {
+  clearGclid();
+  holdClick(null);
+  dropPreDecisionListening();
+  setPhase('done');
+}
+
+/** Once per page load, on the first mount, when the page's content is in place. */
+function armMoment(): void {
+  if (momentArmed || phase !== 'waiting') return;
+  momentArmed = true;
+  if (document.querySelector(PLAYER_SELECTOR)) {
+    import('../player/controller')
+      .then((player) => {
+        if (phase !== 'waiting') return;
+        const source: StorySource = player;
+        stopMoment = watchStorySeconds(source, () => {
+          keepClear = {
+            blocked: () => player.getState().readerOpen,
+            boxes: () => [...boxesOf(DOCK_SELECTOR), ...boxesOf(LIVE_PLAY_SELECTOR)],
+            subscribe: player.subscribe,
+          };
+          setPhase('due');
+        });
+      })
+      .catch(() => standDown());
+    return;
+  }
+  const ends = findPoemEnds(document);
+  if (ends.length) {
+    stopMoment = watchPoemEnd(window, ends, (line) => {
+      keepClear = {
+        blocked: () => false,
+        boxes: () => {
+          const box = line();
+          return box ? [box] : [];
+        },
+      };
+      setPhase('due');
+    });
+    return;
+  }
+  standDown();
+}
+
+/** The answer is in: the card never comes back on this visit. */
+function finish(): void {
+  stopMoment?.();
+  stopMoment = null;
+  keepClear = null;
+  setPhase('done');
+}
+
+arrive();
+
 export default function ArrivalChoice({ lang }: Props) {
-  const [show, setShow] = useState(false);
+  const current = useSyncExternalStore(subscribePhase, getPhase, serverPhase);
+  // Due but held back: rendered invisible until it covers nothing in use.
+  const [shown, setShown] = useState(false);
+  const shownAtRef = useRef(0);
   const cardRef = useRef<HTMLElement | null>(null);
   const wordsRef = useRef<HTMLDivElement | null>(null);
   // Whether the words overflow their box (keyboard reach) and whether more
@@ -316,23 +398,51 @@ export default function ArrivalChoice({ lang }: Props) {
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
-    captureGclid({ holdUntilAnswer: true }); // ?gclid into page memory, ?p=1 drops it
-    if (!getGclid() || isPaidVisitor() || adConsentDecided()) return;
-    if (!ASK_ON_INTERACTION) {
-      setShow(true);
-      return;
-    }
-    // Deferred ask: eligible, so arm instead of showing. Nothing renders until
-    // a trigger lands, and audio meanwhile counts toward Listened without ever
-    // being sent (see heardSeconds' pre-decision buffer).
-    return armDeferredShow(() => setShow(true));
+    armMoment();
   }, []);
+
+  // The moment has come: appear as soon as the card's place is clear of the
+  // dock, the playing story's buttons and the line just read, and step back
+  // while the reading view covers the page.
+  useEffect(() => {
+    if (current !== 'due') return;
+    let showing = false;
+    const check = (): void => {
+      const card = cardRef.current;
+      if (!card) return;
+      const rule = keepClear;
+      if (rule?.blocked()) {
+        if (showing) {
+          showing = false;
+          setShown(false);
+        }
+        return;
+      }
+      if (showing) return;
+      const box = card.getBoundingClientRect();
+      if (rule && rule.boxes().some((other) => boxesOverlap(box, other))) return;
+      showing = true;
+      shownAtRef.current = nowMs();
+      setShown(true);
+    };
+    check();
+    const timer = window.setInterval(check, CLEAR_CHECK_MS);
+    window.addEventListener('scroll', check, { passive: true });
+    window.addEventListener('resize', check);
+    const unsubscribe = keepClear?.subscribe?.(check);
+    return () => {
+      window.clearInterval(timer);
+      window.removeEventListener('scroll', check);
+      window.removeEventListener('resize', check);
+      unsubscribe?.();
+    };
+  }, [current]);
 
   // "Shown" means plausibly seen: half the card in view for a full second.
   // Without an IntersectionObserver there is nothing better than the commit,
   // so those browsers keep counting on render.
   useEffect(() => {
-    if (!show) return;
+    if (!shown) return;
     // The commit is the fallback start of the answer window. The observer
     // below moves it to the moment the card actually reached the viewport
     // wherever the browser can tell us.
@@ -369,13 +479,13 @@ export default function ArrivalChoice({ lang }: Props) {
       window.clearTimeout(timer);
       observer.disconnect();
     };
-  }, [show, lang]);
+  }, [shown, lang]);
 
   // A short screen caps the card's height and the words scroll inside it.
   // Content size moves with the font load and the width, so the children are
   // observed too, not only the box.
   useEffect(() => {
-    if (!show) return;
+    if (current !== 'due') return;
     const node = wordsRef.current;
     if (!node) return;
     const measure = (): void => {
@@ -398,54 +508,59 @@ export default function ArrivalChoice({ lang }: Props) {
       window.removeEventListener('resize', measure);
       observer?.disconnect();
     };
-  }, [show]);
+  }, [current]);
 
-  if (!show) return null;
+  if (current !== 'due') return null;
 
   // Coarse time-to-answer for the step about to be counted.
   const answered = (): number | undefined => {
     const seenAt = seenAtRef.current;
     return seenAt === null ? undefined : answerBucket(nowMs() - seenAt);
   };
+  const tooSoon = (): boolean => !shown || nowMs() - shownAtRef.current < TAP_GUARD_MS;
 
   const onAccept = (): void => {
+    if (tooSoon()) return;
     grantAdConsent();
+    keepClickAfterYes();
     countConsentStep('ad_consent_accepted', lang, answered());
     fireStartExploring();
-    dropClickIdFromAddress();
     // Consent is recorded first, so a crossing held while they were deciding
     // goes out now, dated when it actually happened.
-    if (ASK_ON_INTERACTION) flushPreDecisionListening();
-    setShow(false);
+    flushPreDecisionListening();
+    finish();
   };
   const onDecline = (): void => {
+    if (tooSoon()) return;
     revokeAdConsent();
     countConsentStep('ad_consent_declined', lang, answered());
-    dropClickIdFromAddress();
-    if (ASK_ON_INTERACTION) dropPreDecisionListening();
-    setShow(false);
+    finish();
   };
   // A no for this visit: nothing is recorded, so the next ad arrival asks
   // again.
   const onDismiss = (): void => {
+    if (tooSoon()) return;
     clearGclid();
+    holdClick(null);
+    dropPreDecisionListening();
     countConsentStep('ad_consent_dismissed', lang, answered());
-    dropClickIdFromAddress();
-    if (ASK_ON_INTERACTION) dropPreDecisionListening();
-    setShow(false);
+    finish();
+  };
+  const onLink = (event: { preventDefault(): void }): void => {
+    if (tooSoon()) event.preventDefault();
   };
   return (
     <aside
-      className="agc-consent"
+      className={`agc-consent${shown ? '' : ' agc-consent--held'}`}
       // Kicker plus question: the region announces the size of the ask and the
       // ask itself. The kicker is hidden below 360px but stays part of the
       // name, since a directly referenced node counts either way.
       aria-labelledby="agc-consent-kicker agc-consent-q"
-      // Deferred ask only: the card can arrive mid-visit, so its arrival is
-      // announced without moving focus. Undefined renders no attribute, so the
-      // markup that ships today is untouched. Never a dialog: it must not trap
-      // focus or stand between the visitor and the page.
-      aria-live={ASK_ON_INTERACTION ? 'polite' : undefined}
+      // The card arrives mid-visit, so its arrival is announced without
+      // moving focus. Never a dialog: it must not trap focus or stand between
+      // the visitor and the page.
+      aria-live="polite"
+      aria-hidden={shown ? undefined : true}
       ref={cardRef}
     >
       <p className="agc-consent__kicker" id="agc-consent-kicker">
@@ -458,7 +573,7 @@ export default function ArrivalChoice({ lang }: Props) {
         className={`agc-consent__words${overflow.more ? ' agc-consent__words--more' : ''}`}
         ref={wordsRef}
         // A scroller must be reachable by keyboard, but only while it scrolls.
-        tabIndex={overflow.scrolls ? 0 : undefined}
+        tabIndex={overflow.scrolls && shown ? 0 : undefined}
       >
         <p className="agc-consent__why">{t.lead}</p>
         <p className="agc-consent__fine">{t.fine}</p>
@@ -479,24 +594,26 @@ export default function ArrivalChoice({ lang }: Props) {
             href={CODE_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={onLink}
           >
             {t.link}
           </a>
           {/* The dot holds to the link before it, so no line starts with one. */}
           <span className="agc-consent__sep" aria-hidden="true">
-            {'\u00a0· '}
+            {' · '}
           </span>
-          <a className="agc-consent__link" href={t.privacyHref}>
+          <a className="agc-consent__link" href={t.privacyHref} onClick={onLink}>
             {t.privacy}
           </a>
           <span className="agc-consent__sep" aria-hidden="true">
-            {'\u00a0· '}
+            {' · '}
           </span>
           <a
             className="agc-consent__link"
             href={GOOGLE_PARTNER_URL}
             target="_blank"
             rel="noopener noreferrer"
+            onClick={onLink}
           >
             {t.google}
           </a>

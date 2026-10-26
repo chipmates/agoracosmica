@@ -93,8 +93,8 @@
     return true;
   }
 
-  // The click ID is stored only after a yes. Without one on record it stays in
-  // the address, where the consent card reads it into page memory. Paid
+  // The click ID is stored only after a yes. Without one on record the consent
+  // card reads it into page memory and takes it out of the address. Paid
   // arrivals (?p=1) run on clicks only: any stored click ID is dropped, even
   // one kept after an earlier yes, so nothing is ever sent for a paid visit.
   function captureGclidFromUrl() {
