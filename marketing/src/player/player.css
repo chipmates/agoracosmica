@@ -188,6 +188,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   text-overflow: ellipsis;
 }
 .story-dock__title { font-size: 0.85rem; line-height: 1.35; }
+/* The label is the stories' disclosure: it wraps rather than lose a word. */
+.story-dock .story-dock__sub { white-space: normal; }
 .story-dock__sub { font-size: 0.7rem; line-height: 1.4; color: var(--text-tertiary); }
 .story-dock[data-status="error"] .story-dock__sub { color: var(--color-warning, var(--gold-primary)); }
 

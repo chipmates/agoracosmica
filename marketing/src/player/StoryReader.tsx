@@ -3,15 +3,19 @@
 // playing marked from the story's per-paragraph timestamps.
 
 import { useEffect, useRef, useState } from 'react';
-import type { StoryTimestamps } from '@client/services/StoryService';
 import { getPublicAudioUrl } from '@client/utils/public/publicMediaUrl';
 import { RATES, seekTo, setRate } from './controller';
 import type { PlayerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
+// The shape of a story's .timestamps.json, as the app's StoryService reads it.
+interface StoryTimestamps {
+  paragraphs: { index: number; start: number; end: number }[];
+}
+
 interface StoryText {
   paragraphs: string[];
-  timestamps?: StoryTimestamps;
+  timestamps: StoryTimestamps | undefined;
 }
 
 const cache = new Map<string, StoryText>();
@@ -51,16 +55,17 @@ async function loadStoryText(queue: StoryQueue, n: number, signal: AbortSignal):
 
 /** The paragraph the voice is in: the last one that started at or before t. */
 function activeParagraph(stamps: StoryTimestamps | undefined, t: number): number | null {
-  const list = stamps?.paragraphs;
-  if (!list || list.length === 0 || t < list[0].start) return null;
+  const list = stamps?.paragraphs ?? [];
+  const first = list[0];
+  if (!first || t < first.start) return null;
   let lo = 0;
   let hi = list.length - 1;
   while (lo < hi) {
     const mid = Math.ceil((lo + hi) / 2);
-    if (list[mid].start <= t) lo = mid;
+    if ((list[mid]?.start ?? Infinity) <= t) lo = mid;
     else hi = mid - 1;
   }
-  return list[lo].index;
+  return list[lo]?.index ?? null;
 }
 
 function fmt(seconds: number): string {

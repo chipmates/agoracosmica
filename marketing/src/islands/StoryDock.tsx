@@ -78,6 +78,23 @@ export default function StoryDock({ lang, labels }: Props) {
     if (fillRef.current) fillRef.current.style.width = `${pct}%`;
   }, [pct]);
 
+  // The page keeps room for the dock's real height: the label may wrap.
+  const observer = useRef<ResizeObserver | null>(null);
+  const measureRef = useCallback((el: HTMLDivElement | null) => {
+    observer.current?.disconnect();
+    observer.current = null;
+    const root = document.documentElement.style;
+    if (!el) {
+      root.removeProperty('--story-dock-space');
+      return;
+    }
+    if (typeof ResizeObserver === 'undefined') return;
+    observer.current = new ResizeObserver(() => {
+      root.setProperty('--story-dock-space', `${Math.ceil(el.getBoundingClientRect().height)}px`);
+    });
+    observer.current.observe(el);
+  }, []);
+
   const closeReader = useCallback(() => {
     setReaderOpen(false);
     readRef.current?.focus();
@@ -96,7 +113,7 @@ export default function StoryDock({ lang, labels }: Props) {
     const text = point.t > 0 ? s.continueAt(point.n, fmt(point.t)) : s.continueNext(point.n);
     return (
       <div className="story-dock-slot">
-        <div className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
+        <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
           <div className="story-dock__inner">
             <button type="button" className="story-btn story-btn--wide" onClick={acceptResume}>
               {Icon.play}
@@ -121,7 +138,7 @@ export default function StoryDock({ lang, labels }: Props) {
       {state.readerOpen && (
         <StoryReader state={state} s={s} label={label} note={s.retellingNote} onClose={closeReader} />
       )}
-      <div className="story-dock" role="region" aria-label={s.dockLabel} data-status={state.status}>
+      <div ref={measureRef} className="story-dock" role="region" aria-label={s.dockLabel} data-status={state.status}>
         <div className="story-dock__progress" aria-hidden="true">
           <div ref={fillRef} className="story-dock__fill" />
         </div>
