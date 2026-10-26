@@ -44,6 +44,8 @@ const PAD_X = 70;
 // Room above the top row for a number with its "next" mark over it.
 const PAD_TOP = 84;
 const PAD_BOTTOM = 70;
+// A star's touch circle: the drawing shows at about half scale on a 360 px phone, so 46 makes 48 px there.
+const HIT_R = 46;
 const x0 = Math.min(...xs) - PAD_X;
 const y0 = Math.min(...ys) - PAD_TOP;
 const w = Math.max(...xs) - x0 + PAD_X;
@@ -105,7 +107,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
         {intro && (
           <g class="sp-star sp-star--intro" data-story-star="0" role="button" tabindex="0"
             aria-label={P.rowAria(0, P.introTitle, [])}>
-            <circle class="sp-star__hit" cx={at(intro)[0]} cy={at(intro)[1]} r="40" />
+            <circle class="sp-star__hit" cx={at(intro)[0]} cy={at(intro)[1]} r={HIT_R} />
             <circle class="sp-star__halo" cx={at(intro)[0]} cy={at(intro)[1]} r="25" />
             <circle class="sp-star__arc" cx={at(intro)[0]} cy={at(intro)[1]} r="18" pathLength="100" data-star-arc transform={`rotate(-90 ${at(intro)[0]} ${at(intro)[1]})`} />
             <rect class="sp-star__core" x={at(intro)[0] - 8} y={at(intro)[1] - 8} width="16" height="16" transform={`rotate(45 ${at(intro)[0]} ${at(intro)[1]})`} />
@@ -120,7 +122,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
           return (
             <g class="sp-star" data-story-star={n} role="button" tabindex="0"
               aria-label={P.rowAria(n, title(n), [])}>
-              <circle class="sp-star__hit" cx={cx} cy={cy} r="40" />
+              <circle class="sp-star__hit" cx={cx} cy={cy} r={HIT_R} />
               <circle class="sp-star__halo" cx={cx} cy={cy} r="25" />
               <circle class="sp-star__arc" cx={cx} cy={cy} r="18" pathLength="100" data-star-arc transform={`rotate(-90 ${cx} ${cy})`} />
               <circle class="sp-star__core" cx={cx} cy={cy} r="9" />

@@ -250,6 +250,8 @@ html[data-story-theme="vellum"]:has(.story-page) { background: var(--sp-vellum);
 body:has(.story-page) .pub-main { padding-top: 0.25rem; padding-left: var(--sp-gutter); padding-right: var(--sp-gutter); }
 @media (min-width: 1024px) { body:has(.story-page) .pub-main { padding-top: 0.75rem; } }
 .story-page { color: var(--sp-ink); }
+/* no browser tap flash over the player's controls, as on the app's story list */
+.story-page, .story-dock, .story-reader, .sp-sheet, .sp-door { -webkit-tap-highlight-color: transparent; }
 .story-page :focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 3px; border-radius: 2px; }
 .story-page .pub-breadcrumbs { margin: 0; }
 .story-page .pub-breadcrumbs li { font-size: 0.8125rem; }
@@ -1452,7 +1454,7 @@ html:has(.story-reader) { overflow: hidden; }
 .story-reader__rule { width: 54px; height: 1px; margin: 1.2em auto; border: 0; background: var(--sp-hair-strong); }
 /* Read-along: the spoken sentence in a wash, the spoken word marked. */
 .story-reader__body .s { border-radius: 0.2em; -webkit-box-decoration-break: clone; box-decoration-break: clone; cursor: pointer; transition: background-color 250ms ease; }
-.story-reader__body .w { border-radius: 0.16em; transition: background-color 120ms ease, color 120ms ease; }
+.story-reader__body .w { border-radius: 0.16em; transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease; }
 .story-reader:not([data-hl="off"]) .story-reader__body .s.on { background: var(--sp-wash); box-shadow: 0 0 0 0.12em var(--sp-wash); }
 .story-reader[data-hl="word"] .story-reader__body .w.on { background: var(--sp-word); color: var(--sp-word-ink); box-shadow: 0 0 0 0.08em var(--sp-word); }
 .story-reader:not([data-hl="off"]) .story-reader__body p.on { background: var(--sp-wash); box-shadow: -10px 0 0 var(--sp-wash), 10px 0 0 var(--sp-wash); border-radius: 2px; }
