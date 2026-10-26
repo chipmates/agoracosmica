@@ -112,9 +112,9 @@ To save you time, these are the recurring ones:
 
 ## Recognition
 
-We credit reporters in release notes and in the acknowledgments below, unless you would rather stay anonymous.
+Each report we confirm gets credit in the published security advisory, in the release notes and in the acknowledgments below, unless you would rather stay anonymous. On request we also send a signed letter of acknowledgment for your portfolio.
 
-As a nonprofit we run no paid bug bounty. What we can offer is public credit if you want it, a signed letter of acknowledgment for your portfolio, and a small thank-you in the post.
+As a nonprofit we pay no bug bounties.
 
 ---
 
