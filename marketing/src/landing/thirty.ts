@@ -13,6 +13,7 @@ import { portraitAlt } from '../lib/portraitCredit';
 import { buildStoryQueue } from '../player/queue';
 import { isShe } from '../player/figureCopy';
 import { landingWords } from './words';
+import { MAIN_EYES } from './eyes';
 import type { PlayerLang } from '../player/strings';
 import type { StoryQueue } from '../player/types';
 
@@ -61,6 +62,23 @@ const FOCAL: Record<string, number> = {
   laozi: 27, campbell: 36, zenji: 40, goethe: 40, jung: 40, eckhart: 42, kahlo: 42, angelou: 43, einstein: 44,
   gandhi: 46, shakespeare: 53, blake: 55, vinci: 55, austen: 57, galilei: 58, king: 58, bingen: 64, nietzsche: 64,
   rumi: 68, mozart: 85,
+};
+
+// Each face measured on its 1200 px painting by a face-landmark detector (Mozart's closed eyes, which it cannot find,
+// read on a grid): [the phone hero's vertical object-position %, the desktop hero's %, the eyes' centre x and y as
+// fractions]. The positions put the eyes in the upper third of the lit face and the chin above the tagline.
+const CROP: Record<string, [number, number, number, number]> = {
+  angelou: [66.1, 100.0, 0.511, 0.441], aurelius: [23.4, 40.6, 0.53, 0.273], austen: [9.4, 18.9, 0.622, 0.218],
+  beauvoir: [18.8, 29.5, 0.547, 0.249], bingen: [16.2, 29.4, 0.626, 0.244], blake: [46.0, 75.5, 0.595, 0.362],
+  campbell: [22.3, 34.3, 0.511, 0.265], dickinson: [29.2, 50.3, 0.487, 0.296], eckhart: [26.0, 44.6, 0.593, 0.283],
+  einstein: [44.8, 73.7, 0.603, 0.357], galilei: [52.8, 86.1, 0.619, 0.389], gandhi: [41.2, 60.7, 0.504, 0.349],
+  gautama: [23.3, 35.7, 0.49, 0.269], goethe: [13.5, 22.0, 0.523, 0.225], jung: [42.4, 70.0, 0.52, 0.348],
+  kahlo: [35.0, 58.5, 0.489, 0.318], king: [12.4, 23.6, 0.579, 0.23], laozi: [0.0, 0.0, 0.485, 0.151],
+  lovelace: [30.2, 51.2, 0.591, 0.3], mandela: [30.6, 51.8, 0.533, 0.301], mozart: [40.9, 60.2, 0.65, 0.348],
+  nietzsche: [46.1, 75.7, 0.566, 0.362], plato: [30.6, 51.8, 0.561, 0.301], rumi: [40.3, 66.7, 0.625, 0.339],
+  schopenhauer: [60.1, 97.4, 0.589, 0.417], shakespeare: [31.3, 52.7, 0.615, 0.304],
+  tubman: [61.9, 100.0, 0.495, 0.424], vinci: [30.9, 52.2, 0.625, 0.302], woolf: [32.8, 55.1, 0.511, 0.31],
+  zenji: [0.0, 2.3, 0.495, 0.164],
 };
 
 /** Longer catalog periods ("Late Eastern Zhou, roughly ...") give way to the shortened years. */
@@ -186,6 +204,9 @@ export interface StageFigure {
   era: string;
   href: string;
   focal: number;
+  /** The heroes' vertical crop (object-position %, phone and desktop) and the eyes, from the measured face. */
+  crop: { py: number; pyd: number };
+  eyes: { x: number; y: number };
   main: { src: string; srcset: string };
   thumb: { src: string; srcset: string };
   queue: StoryQueue;
@@ -211,6 +232,8 @@ export function stageFigure(id: string, lang: LandingLang): StageFigure {
     era: f.era.id,
     href: f.href[lang],
     focal: f.focal,
+    crop: { py: CROP[id]?.[0] ?? 12, pyd: CROP[id]?.[1] ?? 16 },
+    eyes: { x: CROP[id]?.[2] ?? MAIN_EYES.x, y: CROP[id]?.[3] ?? MAIN_EYES.y },
     main: { src: mainUrl(id, 900), srcset: mainSrcset(id) },
     thumb: { src: thumbUrl(id, 160), srcset: thumbSrcset(id) },
     queue: queueFor(id, lang),

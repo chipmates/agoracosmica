@@ -27,12 +27,14 @@ function runOnHero(freeze: number | null, beats: Beats = 'face+line'): void {
   const image = root?.querySelector<HTMLImageElement>('[data-stage-img]');
   if (!root || !image) return;
   const keep = Array.from(root.querySelectorAll<HTMLElement>('[data-c2-keep], [data-stage-name], [data-stage-meta], .ls-card__credit'));
+  // the dust leads from this painting's own measured eyes
+  const shown = stageFigures().find(f => f.id === stageFigureId());
   runMoment({
     image,
     line: root.querySelector<HTMLElement>('[data-stage-line]'),
     end: root.querySelector('[data-stage-disc]'),
     keep,
-    eyes: MAIN_EYES,
+    eyes: shown?.eyes ?? MAIN_EYES,
     beats,
     freezeAt: freeze,
   });

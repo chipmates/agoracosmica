@@ -174,11 +174,17 @@ function markPicks(id: string): void {
   });
 }
 
+function setCrop(img: HTMLImageElement, f: StageFigure): void {
+  img.style.setProperty('--ls-fx', `${f.focal}%`);
+  img.style.setProperty('--ls-py', `${f.crop.py}%`);
+  img.style.setProperty('--ls-pyd', `${f.crop.pyd}%`);
+}
+
 function setPortrait(v: StageView, f: StageFigure): void {
   v.img.srcset = f.main.srcset;
   v.img.src = f.main.src;
   v.img.alt = f.alt;
-  v.img.style.setProperty('--ls-fx', `${f.focal}%`);
+  setCrop(v.img, f);
 }
 
 function showPortrait(v: StageView, f: StageFigure, withMoment: boolean): void {
@@ -345,7 +351,7 @@ function attach(): void {
   current = v.root.dataset.figure ?? v.payload.first;
   pageTitle = document.title;
   const shown = v.byId.get(current);
-  if (shown) v.img.style.setProperty('--ls-fx', `${shown.focal}%`);
+  if (shown) setCrop(v.img, shown);
   markPicks(current);
   const want = requested(v);
   if (want && want.id !== current) {
