@@ -28,12 +28,14 @@ import {
   RATE_MAX,
   RATE_MIN,
   setSleep,
+  audioTime,
 } from './controller';
 import { cleanFact, loadFacts, loadText, loadTiming } from './content';
 import type { FactEntry } from './content';
-import { buildModel, sentenceStart } from './readalong';
+import { buildModel, paragraphStep, sentenceStart } from './readalong';
+import type { ReaderModel } from './readalong';
 import { focusSentence } from './focus';
-import { TextMap, useTextMap } from './textmap';
+import { TextMap, sentenceAtTime, useTextMap } from './textmap';
 import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZE_MIN } from './theme';
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
@@ -129,8 +131,10 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
   const rate = rateLabel(state.rate, queue.lang);
   const nextEntry = queue.entries.find(e => e.n === current + 1);
   const sleepText = sleepWords(state, s);
+  // Steps by sentence where the words are timed; 15 s where they are not (and on the lock screen).
   // The map of the text once the story's text and timing are in; the plain range until then.
   const map = useTextMap(queue, current, state.duration);
+  const steps = map && map.model.mode === 'word' ? map.model : null;
   return (
     <>
       <Head title={title} kicker={kicker} s={s} titleRef={titleRef} />
@@ -146,12 +150,17 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
         </div>
         <div className="sp-fp__transport">
           <button type="button" className="story-btn" onClick={previousStory} disabled={!hasPrevious() && state.time < 1} aria-label={s.prevAria} aria-describedby={VOICE_DESC_ID}>{Icon.prev}</button>
-          <button type="button" className="story-btn" onClick={skipBack} aria-label={s.back15Aria}>{Icon.back15}</button>
+          {steps
+            ? <StepButton dir={-1} model={steps} s={s} />
+            : <button type="button" className="story-btn" onClick={skipBack} aria-label={s.back15Aria}>{Icon.back15}</button>}
           <button type="button" className="story-btn sp-fp__play" onClick={togglePlay} aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
             {Icon.dots}
             {playing ? Icon.pause : Icon.play}
           </button>
-          <button type="button" className="story-btn" onClick={skipForward} aria-label={s.fwd15Aria}>{Icon.fwd15}</button>
+          {steps
+            ? <StepButton dir={1} model={steps} s={s} />
+            : <button type="button" className="story-btn" onClick={skipForward} aria-label={s.fwd15Aria}>{Icon.fwd15}</button>}
+          {steps && <span id="sp-step-hold" hidden>{s.stepHold}</span>}
           <button type="button" className="story-btn" onClick={nextStory} disabled={!hasNext()} aria-label={s.nextAria} aria-describedby={VOICE_DESC_ID}>{Icon.next}</button>
         </div>
         <div className="sp-field sp-fp__speed">
@@ -190,6 +199,52 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
         </div>
       </div>
     </>
+  );
+}
+
+/** A step by sentence; held half a second, by paragraph (once per press). Back from inside a sentence goes to its start. */
+function StepButton({ dir, model, s }: { dir: 1 | -1; model: ReaderModel; s: PlayerStrings }) {
+  const held = useRef(false);
+  const timer = useRef<number | undefined>(undefined);
+  const clear = () => {
+    window.clearTimeout(timer.current);
+    timer.current = undefined;
+  };
+  useEffect(() => clear, []);
+  const go = (paragraph: boolean) => {
+    const now = audioTime();
+    const at = sentenceAtTime(model, now);
+    if (!at) return;
+    let si = at.si;
+    if (paragraph) si = paragraphStep(model, si, dir);
+    else if (dir > 0) si = Math.min(model.sentences.length - 1, si + 1);
+    else if (now - at.start < 1.5) si = Math.max(0, si - 1);
+    seekTo(sentenceStart(model, si) + 0.01);
+  };
+  return (
+    <button type="button" className="story-btn sp-fp__step" aria-label={dir < 0 ? s.sentenceBack : s.sentenceOn} aria-describedby="sp-step-hold"
+      onPointerDown={e => {
+        if (e.button !== 0) return;
+        held.current = false;
+        clear();
+        timer.current = window.setTimeout(() => {
+          held.current = true;
+          go(true);
+        }, 500);
+      }}
+      onPointerUp={clear}
+      onPointerLeave={clear}
+      onPointerCancel={clear}
+      onContextMenu={e => e.preventDefault()}
+      onClick={e => {
+        if (held.current) {
+          held.current = false;
+          return;
+        }
+        go(e.shiftKey);
+      }}>
+      {dir < 0 ? Icon.sentenceBack : Icon.sentenceOn}
+    </button>
   );
 }
 

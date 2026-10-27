@@ -78,6 +78,10 @@ export interface PlayerStrings {
   pauseAria: string;
   back15Aria: string;
   fwd15Aria: string;
+  /** The open player's steps once the story's timing is in: by sentence, held for a paragraph. */
+  sentenceBack: string;
+  sentenceOn: string;
+  stepHold: string;
   nextAria: string;
   prevAria: string;
   readAlong: string;
@@ -216,6 +220,9 @@ const en: PlayerStrings = {
   pauseAria: 'Pause',
   back15Aria: 'Back 15 seconds',
   fwd15Aria: 'Forward 15 seconds',
+  sentenceBack: 'Previous sentence',
+  sentenceOn: 'Next sentence',
+  stepHold: 'Hold for a paragraph',
   nextAria: 'Next story',
   prevAria: 'Previous story',
   readAlong: 'Read',
@@ -343,6 +350,9 @@ const de: PlayerStrings = {
   pauseAria: 'Pause',
   back15Aria: '15 Sekunden zurück',
   fwd15Aria: '15 Sekunden vor',
+  sentenceBack: 'Satz zurück',
+  sentenceOn: 'Nächster Satz',
+  stepHold: 'Halten für einen Absatz',
   nextAria: 'Nächste Geschichte',
   prevAria: 'Vorherige Geschichte',
   readAlong: 'Lesen',

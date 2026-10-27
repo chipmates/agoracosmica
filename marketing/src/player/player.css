@@ -1496,6 +1496,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-fp__seek { margin-top: 8px; }
 .sp-fp__after { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .sp-fp__sleep .sp-fp__after { margin-bottom: 8px; }
+/* a held step must not open the phone's text menu */
+.sp-fp__step { -webkit-touch-callout: none; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
 .sp-fp__sleep .sp-field__label { margin: 0; }
 .sp-fp__sleep .sp-seg { display: grid; width: 100%; }
 .sp-fp__sleep .sp-seg button { min-width: 0; padding: 0 4px; }
