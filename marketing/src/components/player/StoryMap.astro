@@ -85,12 +85,14 @@ const grat = [
 ];
 const via = `M${r1(-W * 0.05)} ${r1(VIA_Y + 10)}Q${W / 2} ${r1(VIA_Y - 18)} ${r1(W * 1.05)} ${r1(VIA_Y + 10)}`;
 
-// Labels beside the stars, placed at build time: the plate number (and the introduction's name) on the side that
-// stays clear of the other stars and inside the plate; the "next" mark on the app's upper diagonal where it is clear.
+// Labels beside the stars, placed at build time: the plate numbers at one place over their stars, the introduction's
+// name beside its star, then each star's "next" mark where it stands clear of every other star's label.
 type Box = { l: number; t: number; r: number; b: number };
 const STAR_R = 16;
 const starBoxes: Box[] = at.map(([x, y]) => ({ l: x - STAR_R, t: y - STAR_R, r: x + STAR_R, b: y + STAR_R }));
 const overlap = (a: Box, c: Box) => Math.max(0, Math.min(a.r, c.r) - Math.max(a.l, c.l)) * Math.max(0, Math.min(a.b, c.b) - Math.max(a.t, c.t));
+const gap = (a: Box, c: Box) => Math.hypot(Math.max(0, a.l - c.r, c.l - a.r), Math.max(0, a.t - c.b, c.t - a.b));
+const grow = (a: Box, x: number, y: number): Box => ({ l: a.l - x, t: a.t - y, r: a.r + x, b: a.b + y });
 // a label keeps SIDE units from the plate's sides: a desktop's frame line stands 13 px in (about 10 units there)
 const outside = (a: Box) => Math.max(0, SIDE - a.l) + Math.max(0, a.r - (W - SIDE)) + Math.max(0, 4 - a.t) + Math.max(0, a.b - (VIA_Y - 6));
 const segBoxes: Box[] = segments.flatMap(s => {
@@ -116,21 +118,49 @@ function boxOf(i: number, c: Cand): Box[] {
   }
   return out;
 }
-function place(i: number, cands: Cand[], hard: Box[], soft: Box[]): { c: Cand; boxes: Box[] } {
-  let best: { c: Cand; boxes: Box[] } | null = null; let bestScore = Infinity;
+// The "next" mark's margins round another star's label: a line (13 units) above and below, half a figure (4) beside.
+const KEEP_X = 4;
+const KEEP_Y = 13;
+const NEXT_W = 9.4 * P.nextTag.length;
+// the tag's ink at its larger size (11 units at 380 px and under), wide enough for either engine's anchoring
+const CLEAR_W = 9.8 * P.nextTag.length;
+function clearBox(i: number, c: Cand): Box {
+  const [x, y] = at[i]!;
+  const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - CLEAR_W : x + c.dx - CLEAR_W / 2;
+  return { l: l - 1.5, t: y + c.dy - 10, r: l + CLEAR_W + 1.5, b: y + c.dy + 0.5 };
+}
+type Pick = { c: Cand; boxes: Box[]; score: number };
+function place(i: number, cands: Cand[], hard: Box[], soft: Box[], keep?: Box[]): Pick {
+  let best: Pick | null = null;
   for (const c of cands) {
     const boxes = boxOf(i, c);
-    const score = boxes.reduce((sum, box) => sum
+    let score = boxes.reduce((sum, box) => sum
       + starBoxes.reduce((s2, sb, j) => s2 + (j === i ? 0 : overlap(box, sb)), 0) * 4
       + hard.reduce((s2, pb) => s2 + overlap(box, pb), 0) * 8
       + soft.reduce((s2, pb) => s2 + overlap(box, pb), 0)
       + segBoxes.reduce((s2, sb) => s2 + overlap(box, sb), 0) + outside(box) * 400, 0);
-    if (score < bestScore) { bestScore = score; best = { c, boxes }; }
+    if (keep) {
+      // a "next" mark: never through another star, over the plate's edge or on its own ring or number; clear of the
+      // other labels by the margins; and nearer its own ring than to any of them
+      const [x, y] = at[i]!; const L = clearBox(i, c); const star = { l: x, t: y, r: x, b: y };
+      // the gap to its own ring from the tag's smaller size, the gaps to the others from its larger one
+      const ring = Math.max(0, gap(grow(L, -5, -2), star) - 24);
+      const own = numberBox[i];
+      if (starBoxes.some((sb, j) => j !== i && overlap(L, sb) > 40) || outside(L) > 0.5 || gap(L, star) < 26 || (own && overlap(L, grow(own, 2, 2)) > 0)) score += 1e7;
+      let near = Infinity;
+      for (const k of keep) {
+        const o = overlap(L, grow(k, KEEP_X, KEEP_Y));
+        if (o > 0) score += 1e6 + o * 1000;
+        near = Math.min(near, gap(L, k));
+      }
+      if (near <= ring + 2) score += 1e5 + (ring + 2 - near) * 100;
+    }
+    if (!best || score < best.score) best = { c, boxes, score };
   }
   return best!;
 }
 // The plate numbers first: one fixed place for every star, centred above it and over a "next" ring's top (r 24), so a
-// number never reads as its neighbour's. The introduction's name is placed last, beside its star.
+// number never reads as its neighbour's.
 const NUM_DY = -27;
 const numberBox: (Box | null)[] = at.map(([x, y], i) => {
   if (numbers[i] === 0) return null;
@@ -138,32 +168,54 @@ const numberBox: (Box | null)[] = at.map(([x, y], i) => {
   return { l: x - w / 2, t: y + NUM_DY - 10 * 0.8, r: x + w / 2, b: y + NUM_DY + 10 * 0.25 };
 });
 const numbersBut = (i: number): Box[] => numberBox.filter((b, j): b is Box => b !== null && j !== i);
-// First the "next" mark (the app's element, one star at a time): the app's rule first, the label to the left when
-// the star stands right of 62 % of the plate, on the upper diagonal; under the star where that is clearer.
-const NEXT_W = 9.4 * P.nextTag.length;
-const nextPick = at.map(([x], i) => {
-  const first = x / W > 0.62 ? -1 : 1;
-  const sides = [first, -first];
-  // a step higher (-46) where the plate numbers over the stars take the first line
-  const cands: Cand[] = [-38, -46, 46, 62].flatMap(dy => sides.map(side => ({ dx: side * 38, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10, leader: true })));
-  return place(i, cands, numbersBut(i), []);
-});
-const nextAt = nextPick.map(p => p.c);
-const numberAt = at.map((_, i) => {
-  if (numbers[i] !== 0) return { dx: 0, dy: NUM_DY, anchor: 'middle', w: 0, h: 10 } as Cand;
+// Then the introduction's name, beside its star where that is clear, under it otherwise; it keeps off the star's own
+// "next" ring, so it stays put whichever star is next.
+const introAt = numbers.indexOf(0);
+const introPick = introAt < 0 ? null : (() => {
+  const [x, y] = at[introAt]!;
   const w = 7.4 * P.introTitle.length;
   const h = 13;
   const dy = 37; // under a "next" ring's foot (r 24)
   const cands: Cand[] = [
+    { dx: 27, dy: 4, anchor: 'start', w, h }, { dx: -27, dy: 4, anchor: 'end', w, h },
     { dx: 0, dy, anchor: 'middle', w, h }, { dx: -12, dy, anchor: 'start', w, h }, { dx: 12, dy, anchor: 'end', w, h },
-    { dx: 27, dy: 4, anchor: 'start', w, h }, { dx: -27, dy: 4, anchor: 'end', w, h }, { dx: 0, dy: -29, anchor: 'middle', w, h },
+    { dx: 0, dy: -29, anchor: 'middle', w, h },
     { dx: 20, dy: 30, anchor: 'start', w, h }, { dx: -20, dy: 30, anchor: 'end', w, h },
     { dx: -12, dy: -29, anchor: 'start', w, h }, { dx: 12, dy: -29, anchor: 'end', w, h },
   ];
-  const others = nextPick.flatMap((p, j) => (j === i ? [] : p.boxes));
-  const mine = numbersBut(i).map(x => ({ l: x.l - 9, t: x.t - 6, r: x.r + 9, b: x.b + 6 }));
-  return place(i, cands, [...mine, ...nextPick[i]!.boxes], others).c;
+  const mine = numbersBut(introAt).map(b => grow(b, 9, 6));
+  return place(introAt, cands, [...mine, { l: x - 26, t: y - 26, r: x + 26, b: y + 26 }], []);
+})();
+const introBox = introPick?.boxes[0] ?? null;
+// Last the "next" mark (the app's element, one star at a time): the app's rule first, the label to the left when the
+// star stands right of 62 % of the plate, on the upper diagonal; then beside the ring, under it or over the star's
+// number, a step further out last.
+function nextCands(i: number): Cand[] {
+  const first = at[i]![0] / W > 0.62 ? -1 : 1;
+  const sides = [first, -first];
+  const diag = (dys: number[]): Cand[] => dys.flatMap(dy => sides.map(side => ({ dx: side * 38, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10, leader: true })));
+  const q = Math.round(NEXT_W / 5);
+  return [
+    ...diag([-38, -46, 46, 62]),
+    ...[4, 24, -16].flatMap(dy => sides.map(side => ({ dx: side * 30, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10 }))),
+    ...[0, q, -q].flatMap(dx => [{ dx, dy: 36, anchor: 'middle' as const, w: NEXT_W, h: 10 }, { dx, dy: -40, anchor: 'middle' as const, w: NEXT_W, h: 10 }]),
+    ...diag([-54, 70]),
+  ];
+}
+// Where no spot clears the margins (a long tag among close stars), the earlier rule's spot stays.
+function earlierPick(i: number): Pick {
+  const first = at[i]![0] / W > 0.62 ? -1 : 1;
+  const cands: Cand[] = [-38, -46, 46, 62].flatMap(dy => [first, -first].map(side => ({ dx: side * 38, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10, leader: true })));
+  return place(i, cands, numbersBut(i), []);
+}
+const nextPick = at.map((_, i) => {
+  const p = i === introAt
+    ? place(i, nextCands(i), introBox ? [grow(introBox, 3, 3)] : [], [], numbersBut(i))
+    : place(i, nextCands(i), [], [], [...numbersBut(i), ...(introBox ? [grow(introBox, 2, 2)] : [])]);
+  return p.score < 1e6 ? p : earlierPick(i);
 });
+const nextAt = nextPick.map(p => p.c);
+const numberAt = at.map((_, i) => (i === introAt && introPick ? introPick.c : { dx: 0, dy: NUM_DY, anchor: 'middle', w: 0, h: 10 } as Cand));
 
 const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
 ---
@@ -205,7 +257,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
                 </g>
                 <g class="sp-star__nextmark">
                   <circle class="sp-star__nextring" r="24" />
-                  <line class="sp-star__leader" x1={18 * Math.sign(nx.dx)} y1={18 * Math.sign(nx.dy)} x2={34 * Math.sign(nx.dx)} y2={nx.dy < 0 ? nx.dy + 4 : nx.dy - 12} />
+                  {nx.leader && <line class="sp-star__leader" x1={18 * Math.sign(nx.dx)} y1={18 * Math.sign(nx.dy)} x2={34 * Math.sign(nx.dx)} y2={nx.dy < 0 ? nx.dy + 4 : nx.dy - 12} />}
                 </g>
               </g>
               {n === 0
