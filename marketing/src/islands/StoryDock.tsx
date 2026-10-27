@@ -33,7 +33,7 @@ import { installPage } from '../player/page';
 import StoryReader from '../player/StoryReader';
 import Sheets from '../player/sheets';
 import { Icon } from '../player/icons';
-import { clockLabel, playerStrings, rateLabel } from '../player/strings';
+import { clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -237,7 +237,11 @@ export default function StoryDock({ lang, labels, facts }: Props) {
               <span className="story-dock__wait">{s.loading}</span>
               {Icon.up}
             </span>
-            <span className="story-dock__sub">{state.status === 'error' ? s.error : label.brief}</span>
+            <span className="story-dock__sub">
+              {state.status === 'error' ? s.error : labelHalves(label.brief).map((half, i) => (
+                <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
+              ))}
+            </span>
           </button>
           <div className="story-dock__ctrls">
             {wide && (

@@ -6,7 +6,7 @@
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { numberWord } from '../../lib/figureWorld';
 import { publicUrl } from '../../lib/urls';
-import { playerStrings } from '../../player/strings';
+import { labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
 import { buildStoryQueue } from '../../player/queue';
 import type { PlayerLang } from '../../player/strings';
@@ -28,7 +28,7 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
 const countWord = numberWord(storyCount, lang);
 const idleWhat = intro?.minutes && first ? P.beginSubWith(intro.minutes, first.title) : first?.title ?? '';
 const label = storyLabel(lang);
-const labelHalves = label.brief.split(' · ');
+const halves = labelHalves(label.brief);
 ---
 <aside class="sp-door" aria-labelledby="sp-door-title" data-nosnippet>
   <script is:inline type="application/json" data-story-door-queue set:html={queueJson} />
@@ -37,8 +37,8 @@ const labelHalves = label.brief.split(' · ');
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>
-      <span class="sp-label__brief">{labelHalves.map((half, i) => (
-        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{i < labelHalves.length - 1 ? `${half} ·` : half}</span></Fragment>
+      <span class="sp-label__brief">{halves.map((half, i) => (
+        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{half}</span></Fragment>
       ))}</span>
     </summary>
     <p>{label.expanded}</p>

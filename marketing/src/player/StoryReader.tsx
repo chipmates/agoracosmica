@@ -29,7 +29,7 @@ import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
 import { Icon } from './icons';
 import { shareStory } from './page';
 import { showToast } from './toast';
-import { LIST_SEP, clockLabel, playerStrings } from './strings';
+import { LIST_SEP, clockLabel, labelHalves, playerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
 interface Props {
@@ -385,16 +385,18 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
           </button>
           <span className="story-reader__bartitle">{title}</span>
           <span className="story-reader__sp" />
-          <button type="button" className="story-btn story-reader__facts" onClick={() => openSheet('facts', n)} aria-haspopup="dialog">
-            {Icon.checkCircle}
-            <span>{factsWord}</span>
-          </button>
-          <button type="button" className="story-btn story-reader__mark" onClick={keepCurrent} aria-label={s.bookmark}>
-            {Icon.mark}
-          </button>
-          <button type="button" className="story-btn story-reader__aa" onClick={() => openSheet('display')} aria-label={s.display} aria-haspopup="dialog">
-            Aa
-          </button>
+          <span className="story-reader__tools">
+            <button type="button" className="story-btn story-reader__facts" onClick={() => openSheet('facts', n)} aria-haspopup="dialog">
+              {Icon.checkCircle}
+              <span>{factsWord}</span>
+            </button>
+            <button type="button" className="story-btn story-reader__mark" onClick={keepCurrent} aria-label={s.bookmark}>
+              {Icon.mark}
+            </button>
+            <button type="button" className="story-btn story-reader__aa" onClick={() => openSheet('display')} aria-label={s.display} aria-haspopup="dialog">
+              Aa
+            </button>
+          </span>
         </div>
         <div className="story-reader__prog" aria-hidden="true"><i ref={progRef} /></div>
       </div>
@@ -416,8 +418,8 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
               <summary>
                 <span className="sp-label__i" aria-hidden="true">i</span>
                 <span className="sp-label__brief">
-                  {label.brief.split(' · ').map((half, i, all) => (
-                    <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{i < all.length - 1 ? `${half} ·` : half}</span></span>
+                  {labelHalves(label.brief).map((half, i) => (
+                    <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
                   ))}
                 </span>
               </summary>

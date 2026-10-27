@@ -499,7 +499,7 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   color: var(--sp-accent);
 }
 .sp-label[open] .sp-label__i { background: var(--sp-disc); color: var(--sp-disc-ink); box-shadow: none; }
-.sp-label__half { white-space: nowrap; }
+.sp-label__half { display: inline-block; max-width: 100%; }
 .sp-label > p {
   margin: 0 0 8px 30px;
   font-family: var(--font-ui);
@@ -973,6 +973,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   text-align: left;
   color: var(--sp-ink);
 }
+/* The one text in the dock that may truncate, with an ellipsis, also where one word outgrows its line (200 %). */
 .story-dock__title {
   min-width: 0;
   font-family: var(--font-content);
@@ -982,6 +983,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 .story-dock__time {
   display: inline-grid;
@@ -1002,7 +1004,9 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
 .story-dock__sub { grid-column: 1 / -1; font-size: 0.75rem; line-height: 1.35; color: var(--sp-ink-3); }
 .story-dock[data-status="error"] .story-dock__sub { color: var(--color-warning, var(--sp-accent)); }
-.story-dock__ctrls { display: flex; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 6px; }
+/* The row rule: discs and buttons keep their size, and the row wraps to a second line before anything is cut. */
+.story-dock__ctrls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 6px; }
+.story-dock__ctrls > * { flex: none; }
 .story-dock .story-btn { color: var(--sp-ink); }
 .story-dock .story-dock__play { width: 52px; height: 52px; border-radius: 50%; background: var(--sp-disc); color: var(--sp-disc-ink); }
 .story-dock .story-dock__play:hover { background: var(--sp-disc-hover); }
@@ -1033,30 +1037,34 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock__read[aria-pressed="true"] { background: var(--sp-raise); border-color: var(--sp-accent); }
 .story-dock__read:hover { border-color: var(--sp-accent); }
 .story-dock__read--voice { background: var(--sp-raise); border-color: var(--sp-accent); }
+/* 360 px holds the row on one line in both languages ("Read along" beside the speed) with the disc at its size. */
 @media (max-width: 379.98px) {
   .story-dock__ctrls { gap: 2px; }
-  .story-dock .story-dock__speed { min-width: 56px; padding: 0 6px; }
-  .story-dock__read { gap: 6px; padding: 0 10px; }
+  .story-dock .story-dock__speed { min-width: 52px; padding: 0 4px; }
+  .story-dock__read { gap: 4px; padding: 0 8px; }
 }
-/* The one-row dock needs the width of a laptop; tablets keep the phone's rows. */
+/* The one-row dock needs the width of a laptop; tablets keep the phone's rows. The row wraps before anything is cut:
+   the title truncates, the label below it wraps, the controls keep their size. */
 @media (min-width: 1024px) {
   .story-dock__progress { display: none; }
   .story-dock__inner {
-    display: grid;
-    grid-template-columns: auto minmax(240px, 1fr) minmax(150px, 230px) auto auto auto;
+    display: flex;
+    flex-wrap: wrap;
     align-items: center;
     column-gap: 16px;
+    row-gap: 4px;
     min-height: 5rem;
   }
-  .story-dock__inner:has(.story-dock__home) { grid-template-columns: auto auto minmax(240px, 1fr) minmax(150px, 230px) auto auto auto; }
+  .story-dock__inner > * { flex: none; }
   .story-dock__home { margin: 0; padding-right: 14px; border-right: 1px solid var(--sp-hair-strong); }
-  .story-dock__ctrls { order: -1; padding: 0; justify-content: flex-start; }
+  .story-dock__ctrls { order: -1; padding: 0; justify-content: flex-start; flex-wrap: nowrap; }
   .story-dock__inner:has(.story-dock__home) .story-dock__ctrls { order: 0; }
   .story-dock__inner:has(.story-dock__home) .story-dock__home { order: -1; }
-  .story-dock__open { padding: 0; min-height: 44px; }
+  .story-dock__inner > .story-dock__open { flex: 1 1 12rem; min-width: 0; padding: 0; min-height: 44px; }
+  /* the scrubber fills to its 230 px first, then the title's column takes the rest */
+  .story-dock__inner > .story-dock__seek { flex: 100 0 150px; max-width: 230px; }
   .story-dock__title { -webkit-line-clamp: 1; }
   .story-dock__time { display: none; }
-  .story-dock__sub { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 }
 .story-dock__seek {
   display: grid;
@@ -1229,7 +1237,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-sheet__kicker { display: block; margin-bottom: 2px; font-family: var(--font-ui); font-size: 0.8125rem; color: var(--sp-ink-3); }
 .sp-sheet__x svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
 .sp-sheet__x { border-radius: 50%; color: var(--sp-ink-2); }
-.sp-sheet__body { overflow-y: auto; overscroll-behavior: contain; padding: 4px var(--sp-gutter) calc(18px + env(safe-area-inset-bottom, 0px)); }
+.sp-sheet__body { overflow-y: auto; overscroll-behavior: contain; overflow-wrap: break-word; padding: 4px var(--sp-gutter) calc(18px + env(safe-area-inset-bottom, 0px)); }
 .sp-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sp-hair); }
 .sp-field--stack { display: block; }
 .sp-field__label { display: block; margin: 0 0 8px; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.01em; color: var(--sp-ink-2); }
@@ -1414,7 +1422,11 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 }
 html:has(.story-reader) { overflow: hidden; }
 .story-reader__bar { position: relative; flex: none; padding-top: env(safe-area-inset-top, 0px); background: var(--sp-page); border-bottom: 1px solid var(--sp-hair); }
-.story-reader__bar-in { display: flex; align-items: center; gap: 2px; height: 56px; padding: 0 8px; }
+/* The top line wraps to a second line before a control overlaps another (text at 200 %); the controls keep their size. */
+.story-reader__bar-in { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-height: 56px; padding: 0 8px; }
+.story-reader__bar-in > .story-btn { flex: none; }
+/* Facts, the bookmark and "Aa" move as one group, to the right of a second line when the first is full. */
+.story-reader__tools { flex: none; display: flex; align-items: center; gap: 2px; margin-left: auto; }
 .story-reader .story-btn { color: var(--sp-ink); }
 .story-reader .story-btn svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .story-reader__back { gap: 2px; padding-right: 8px; font-family: var(--font-ui); font-size: 0.9375rem; white-space: nowrap; }
@@ -1430,8 +1442,11 @@ html:has(.story-reader) { overflow: hidden; }
 @media (max-width: 359.98px) { .story-reader__back span { display: none; } }
 @media (min-width: 1024px) {
   .story-reader__bar-in { padding: 0 max(24px, calc((100vw - 1136px) / 2)); }
+  .story-reader__sp { display: none; }
+  /* the one text here that may truncate: it takes the line's free width and wraps the row only below 8em */
   .story-reader__bartitle {
     display: block;
+    flex: 1 1 8em;
     min-width: 0;
     margin-left: 16px;
     padding-left: 16px;
@@ -1447,7 +1462,8 @@ html:has(.story-reader) { overflow: hidden; }
 }
 .story-reader__scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding: 80px 0; }
 .story-reader__scroll:focus { outline: none; }
-.story-reader__page { position: relative; max-width: 44rem; margin: 0 auto; padding: 24px var(--sp-gutter) 40px; }
+/* A word longer than the line (text at 200 %: "Zypressen-/Gartenszene") breaks instead of scrolling the reader sideways. */
+.story-reader__page { position: relative; max-width: 44rem; margin: 0 auto; padding: 24px var(--sp-gutter) 40px; overflow-wrap: break-word; }
 /* A panel beside the text: the column centres in the width the panel leaves. */
 @media (min-width: 1024px) {
   .story-reader.has-side .story-reader__scroll { padding-right: 420px; }

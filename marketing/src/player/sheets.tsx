@@ -36,7 +36,7 @@ import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZ
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
 import { hideToast } from './toast';
-import { clockLabel, playerStrings, rateLabel } from './strings';
+import { clockLabel, labelHalves, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
 import type { PlayerState, StoryQueue } from './types';
@@ -54,14 +54,14 @@ interface Props {
 }
 
 function LabelLine({ label }: { label: Label }) {
-  const halves = label.brief.split(' · ');
+  const halves = labelHalves(label.brief);
   return (
     <details className="story-label sp-label">
       <summary>
         <span className="sp-label__i" aria-hidden="true">i</span>
         <span className="sp-label__brief">
           {halves.map((half, i) => (
-            <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{i < halves.length - 1 ? `${half} ·` : half}</span></span>
+            <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
           ))}
         </span>
       </summary>

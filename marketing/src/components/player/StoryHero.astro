@@ -7,7 +7,7 @@
 import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
 import { getT } from '../../i18n';
 import { numberWord } from '../../lib/figureWorld';
-import { playerStrings } from '../../player/strings';
+import { labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
@@ -34,7 +34,7 @@ const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
 // The label breaks only at its middle dot.
-const labelHalves = label.brief.split(' · ');
+const halves = labelHalves(label.brief);
 ---
 <section class="sp-hero" aria-labelledby="sp-name" data-story-hero>
   <div class="sp-hero__id">
@@ -63,8 +63,8 @@ const labelHalves = label.brief.split(' · ');
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>
-      <span class="sp-label__brief">{labelHalves.map((half, i) => (
-        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{i < labelHalves.length - 1 ? `${half} ·` : half}</span></Fragment>
+      <span class="sp-label__brief">{halves.map((half, i) => (
+        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{half}</span></Fragment>
       ))}</span>
     </summary>
     <p>{label.expanded}</p>

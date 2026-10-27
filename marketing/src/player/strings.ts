@@ -390,6 +390,12 @@ export function rateLabel(rate: number, lang: PlayerLang): string {
 /** A list's separator: the no-break space keeps the dot at the end of a line when a list wraps. */
 export const LIST_SEP = '\u00a0· ';
 
+/** The label's halves as shown, each kept whole where it fits: its dot stays at the end of the first half. */
+export function labelHalves(brief: string): string[] {
+  const halves = brief.split(' · ');
+  return halves.map((half, i) => (i < halves.length - 1 ? `${half}\u00a0·` : half));
+}
+
 /** A clock: 2:05. */
 export function clockLabel(seconds: number): string {
   const v = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
