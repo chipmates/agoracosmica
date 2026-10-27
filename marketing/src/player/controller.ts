@@ -698,6 +698,12 @@ function loadForPage(): void {
   setState({ done: queue ? readDone(queue.figureId) : [], saved: queue ? readSaved(queue) : [] });
 }
 
+/** A page that swaps its queue in place (the landing's stage): the marks and the kept place follow the new figure. */
+export function refreshPageQueue(): void {
+  loadForPage();
+  offerResumeForPage();
+}
+
 // ---- the lock screen ----------------------------------------------------
 
 let sessionReady = false;
