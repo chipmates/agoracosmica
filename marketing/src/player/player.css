@@ -14,6 +14,46 @@
     U+2013-2014, U+2018-201E, U+2022, U+2026, U+202F, U+2039-203A, U+20AC, U+2212, U+FB00-FB06;
 }
 
+/* The reader's faces, OFL 1.1 (fonts/literata/OFL.txt, fonts/atkinson-hyperlegible-next/OFL.txt), Latin subsets kept
+   with their small capitals and figures; fetched only where the reader sets them (Literata the book face at 400,
+   opsz 18; Atkinson Hyperlegible Next the clear face at 400). */
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/literata/literata-400-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Literata';
+  src: url('/fonts/literata/literata-400i-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/atkinson-hyperlegible-next/atkinson-hyperlegible-next-400-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: 'Atkinson Hyperlegible Next';
+  src: url('/fonts/atkinson-hyperlegible-next/atkinson-hyperlegible-next-400i-latin.woff2') format('woff2');
+  font-weight: 400;
+  font-style: italic;
+  font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
 /* ---- the lights --------------------------------------------------------- */
 /* Custom properties inherit their computed value, so these night copies, made
    on the root, stay night inside a day scope that redefines the tokens. */
@@ -21,6 +61,8 @@
   --story-dock-space: 0px;
   --sp-dock-h: 0px;
   --sp-display: 'Libre Caslon Display', var(--font-content, 'Libre Caslon Text'), Georgia, serif;
+  /* the page's own text face, kept where the reader sets another (its small "i" needs no second italic file) */
+  --sp-page-face: var(--font-content, 'Libre Caslon Text'), Georgia, serif;
   --sp-gutter: 16px;
   /* A load shorter than this shows no loading word or arc. */
   --sp-wait-delay: 900ms;
@@ -527,7 +569,7 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   height: 22px;
   border-radius: 50%;
   box-shadow: inset 0 0 0 1px var(--sp-hair-strong);
-  font-family: var(--font-content);
+  font-family: var(--sp-page-face);
   font-style: italic;
   font-size: 0.8125rem;
   line-height: 1;
@@ -1596,6 +1638,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 
 /* ---- the reading view ---------------------------------------------------- */
 .story-reader {
+  --font-content: 'Literata', 'Libre Caslon Text', Georgia, serif;
+  --sp-clear: 'Atkinson Hyperlegible Next', var(--font-ui);
   position: fixed;
   left: 0;
   right: 0;
@@ -1673,14 +1717,16 @@ html:has(.story-reader) { overflow: hidden; }
   hyphenate-limit-chars: 7 3 3;
   text-wrap: pretty;
 }
-.story-reader[data-face="clear"] .story-reader__body { font-family: var(--font-ui); letter-spacing: 0.005em; }
+.story-reader[data-face="clear"] .story-reader__body { font-family: var(--sp-clear); }
 .story-reader__status { color: var(--sp-ink-3); }
 .story-reader__body p { margin: 0; text-indent: 1.4em; transition: color var(--transition-slow, 300ms ease); }
 .story-reader__body p.is-first,
 .story-reader__body .story-reader__rule + p { text-indent: 0; }
 /* The opening: a raised initial and the first line in small capitals that
-   keep their capitals (small-caps, not all-small-caps). */
+   keep their capitals (small-caps, not all-small-caps; the book face's own). ::first-line takes no hyphens, so the
+   opening's first two sentences carry it: no word of the first line breaks into the second. */
 .story-reader__body p.is-first::first-line { font-variant-caps: small-caps; letter-spacing: 0.045em; }
+.story-reader__body p.is-first > span:nth-child(-n+2) { -webkit-hyphens: manual; hyphens: manual; }
 .story-reader__body p.is-first::first-letter {
   font-family: var(--sp-display);
   font-size: 2.9em;
@@ -1690,7 +1736,7 @@ html:has(.story-reader) { overflow: hidden; }
   font-variant-caps: normal;
   letter-spacing: 0;
 }
-.story-reader[data-face="clear"] .story-reader__body p.is-first::first-letter { font-family: var(--font-ui); font-size: 2.2em; }
+.story-reader[data-face="clear"] .story-reader__body p.is-first::first-letter { font-family: var(--sp-clear); font-size: 2.2em; }
 .story-reader__rule { width: 54px; height: 1px; margin: 1.2em auto; border: 0; background: var(--sp-hair-strong); }
 /* Read-along: the spoken sentence in a wash, the spoken word marked. */
 .story-reader__body .s { border-radius: 0.2em; -webkit-box-decoration-break: clone; box-decoration-break: clone; cursor: pointer; transition: background-color 250ms ease; }
