@@ -1160,8 +1160,9 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock .story-dock__open { color: var(--sp-ink-2); }
 .story-dock .story-dock__back svg text { fill: currentColor; stroke: none; }
 
-/* the line: its words sit on the band's foot, close over the pages */
+/* the line: its words sit on the band's foot, 6 px over the pages (the playhead's head stands in that gap) */
 .story-dock__line { position: relative; display: flex; align-items: flex-end; gap: 10px; min-width: 0; height: 44px; }
+.story-dock__left { position: relative; flex: 1 1 0; min-width: 0; display: flex; align-items: flex-end; height: 44px; }
 .story-dock__lead {
   flex: 1 1 0;
   min-width: 0;
@@ -1182,7 +1183,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   gap: 7px;
   height: 44px;
   margin: 0;
-  padding: 0 2px 4px 0;
+  padding: 0 2px 6px 0;
   background: none;
   border: 0;
   border-radius: 4px;
@@ -1210,7 +1211,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   display: flex;
   align-items: flex-end;
   height: 44px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   font-family: var(--font-content);
   font-size: 1rem;
   line-height: 20px;
@@ -1223,7 +1224,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding-bottom: 4px;
+  padding-bottom: 6px;
   font-size: 0.8125rem;
   line-height: 20px;
   color: var(--sp-ink-2);
@@ -1231,9 +1232,9 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   white-space: nowrap;
 }
 /* the loading word stands over the clock's place, so the cell keeps the clock's width */
-.story-dock__wait { position: absolute; right: 0; bottom: 4px; visibility: hidden; opacity: 0; }
+.story-dock__wait { position: absolute; right: 0; bottom: 6px; visibility: hidden; opacity: 0; }
 /* the whole clock, unseen, measured by the name's fit */
-.story-dock__probe { position: absolute; right: 0; bottom: 4px; visibility: hidden; pointer-events: none; }
+.story-dock__probe { position: absolute; right: 0; bottom: 6px; visibility: hidden; pointer-events: none; }
 .story-dock[data-status="loading"] .story-dock__clock { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
 .story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
 /* a slow start, while the voice's name holds the line: the coin's ring breathes */
@@ -1242,13 +1243,13 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .story-dock[data-status="loading"] .story-dock__play .sp-dots { animation: none; opacity: 0.25; } }
 .story-dock__moon { display: inline-flex; color: var(--sp-accent); }
 .story-dock__moon svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-/* At a story's start the voice takes the whole line, in the label's face; then the name, the story and the clock. A
-   fade, never a jump: the voice stands over the line, the rest keeps its place underneath. */
+/* At a story's start the voice takes the line's left, in the label's face, the clock beside it; then the name and the
+   story. The voice stands over the name's place, which keeps its width underneath. */
 .story-dock__voice {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 4px;
+  bottom: 6px;
   font-size: 0.875rem;
   line-height: 20px;
   color: var(--sp-ink-2);
@@ -1257,10 +1258,11 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   font-feature-settings: "ss05" 1;
   pointer-events: none;
 }
-.story-dock__voice, .story-dock__lead, .story-dock__time { transition: opacity 400ms ease, visibility 0s linear 0s; }
+.story-dock__voice, .story-dock__lead { transition: opacity 200ms ease 200ms, visibility 0s linear 200ms; }
+/* the leaving one fades in the first 200 ms, the coming one in the next 200 ms: never both on screen */
 .story-dock[data-voice="on"] .story-dock__lead,
-.story-dock[data-voice="on"] .story-dock__time,
-.story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s linear 400ms; }
+.story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 0s linear 200ms; }
+@media (prefers-reduced-motion: reduce) { .story-dock__voice, .story-dock__lead { transition-duration: 0s, 0s; } }
 .story-dock__error { align-self: flex-end; padding-bottom: 2px; font-size: 0.75rem; line-height: 1.3; color: var(--color-warning, var(--sp-accent)); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 /* in the reading view, scrolled away from the voice: the way back takes the line */
 .story-dock__follow {
@@ -1269,7 +1271,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   gap: 6px;
   height: 44px;
   margin: 0;
-  padding: 0 4px 4px 0;
+  padding: 0 4px 6px 0;
   background: none;
   border: 0;
   cursor: pointer;
@@ -1515,7 +1517,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-tmap__draw { flex: 1 1 auto; }
 /* a page: lines 2 px every 6 px, the last one short (its share set per page); time runs straight across the width */
 /* the inks are set here, not on the root, so each light's own text ink is mixed */
-.sp-pages { --sp-map-line: color-mix(in srgb, var(--sp-ink) 22%, transparent); --sp-map-heard: var(--sp-ink); position: relative; display: block; width: 100%; height: 20px; }
+.sp-pages { --sp-map-line: color-mix(in srgb, var(--sp-ink) 38%, transparent); --sp-map-heard: var(--sp-ink); position: relative; display: block; width: 100%; height: 20px; }
 .sp-pages__layer { position: absolute; inset: 0; }
 .sp-page { position: absolute; top: 0; height: 20px; background: repeating-linear-gradient(to bottom, var(--sp-map-line) 0 2px, transparent 2px 6px) 0 0 / 100% 14px no-repeat; }
 .sp-page::after { content: ""; position: absolute; left: 0; top: 18px; width: var(--sp-last, 60%); height: 2px; background: var(--sp-map-line); }
@@ -1534,7 +1536,10 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-tmap:has(.sp-tmap__range:focus-visible) .sp-tmap__box { outline: 2px solid var(--sp-focus); outline-offset: 2px; border-radius: 3px; }
 /* the bar's pages: the drawing at the top of its 44 px band, close under the line */
 .sp-tmap--bar .sp-tmap__box { height: 44px; align-items: flex-start; padding-top: 4px; box-sizing: border-box; }
-.sp-tmap--bar .sp-tmap__head { top: 14px; }
+/* the bar's playhead: its head in the gap under the line's words (never on them), its stem down over the pages */
+.sp-tmap--bar .sp-tmap__head { top: 2px; height: 26px; margin-top: 0; }
+.sp-tmap--bar.is-dragging .sp-tmap__head { height: 34px; margin-top: 0; }
+.sp-tmap--bar .sp-tmap__head::before { top: -2px; }
 .sp-tmap--bar .sp-tmap__dot { bottom: 12px; }
 .sp-tmap--bar:has(.sp-tmap__range:focus-visible) .sp-tmap__box { outline-offset: -2px; }
 /* the open player's pages: a step larger */
@@ -1560,6 +1565,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 }
 /* in the bar the bubble rises over the line, above the bar */
 .sp-tmap--bar .sp-tmap__bubble { bottom: calc(100% + 44px + 8px); }
+@media (max-width: 1023.98px) { .sp-tmap--bar .sp-tmap__bubble { max-width: none; } }
 /* in the open player the bubble opens downward, over the clock and the buttons, inside the sheet's scroll box */
 .sp-tmap--player .sp-tmap__bubble { top: calc(100% - 6px); bottom: auto; max-width: 100%; }
 .sp-tmap__when { display: flex; align-items: baseline; gap: 10px; font-size: 0.8125rem; font-weight: 600; color: var(--sp-accent); font-variant-numeric: tabular-nums; }

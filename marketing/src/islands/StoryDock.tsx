@@ -251,7 +251,10 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const nameRef = useRef<HTMLSpanElement | null>(null);
   const clockRef = useRef<HTMLSpanElement | null>(null);
   const probeRef = useRef<HTMLSpanElement | null>(null);
+  const voiceRef = useRef<HTMLSpanElement | null>(null);
   const [fitted, setFitted] = useState<'full' | 'short' | 'bare'>('full');
+  // The voice note's seconds: the clock beside it, the time heard alone where the note and the whole clock do not fit.
+  const [voiceBare, setVoiceBare] = useState(false);
   const fit = useCallback(() => {
     const lead = leadEl.current;
     const who = whoRef.current;
@@ -264,6 +267,13 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     // now, so the choice never flips back and forth.
     const room = lead.clientWidth - 1 - (probe.getBoundingClientRect().width - clockEl.getBoundingClientRect().width);
     setFitted(textWidth(fullName, name) + extra <= room ? 'full' : textWidth(shortName, name) + extra <= room ? 'short' : 'bare');
+    const voice = voiceRef.current;
+    if (voice) {
+      // the note's own text box (the span is stretched over the line, so its box is not the text's)
+      const r = document.createRange();
+      r.selectNodeContents(voice);
+      setVoiceBare(r.getBoundingClientRect().width > room);
+    }
   }, [fullName, shortName]);
   const leadObserver = useRef<ResizeObserver | null>(null);
   const leadRef = useCallback((el: HTMLDivElement | null) => {
@@ -274,7 +284,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     leadObserver.current = new ResizeObserver(fit);
     leadObserver.current.observe(el);
   }, [fit]);
-  useBeforePaint(fit, [fit, wholeClock.length]);
+  useBeforePaint(fit, [fit, wholeClock.length, voiceWord]);
   useEffect(() => {
     void document.fonts?.ready.then(fit);
   }, [fit]);
@@ -351,7 +361,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const inReader = state.readerOpen && state.readerN === current;
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
-  const clock = fitted === 'bare' ? clockLabel(state.time) : wholeClock;
+  const clock = (voiceOn ? voiceBare : fitted === 'bare') ? clockLabel(state.time) : wholeClock;
 
   // While the sleep timer runs, a small moon by the clock; its words go with the caret's name.
   const sleepOn = typeof state.sleep === 'number' ? s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft))) : state.sleep === 'end' ? s.sleepToEnd : '';
@@ -367,7 +377,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
       aria-label={s.sentenceBack}>{Icon.again}</button>
   );
 
-  // The line: the voice for its seconds, then who is playing (the name and its "i"), the story where it fits, the clock.
+  // The line: the voice for its seconds, then who is playing (the name and its "i"), the story where it fits; the clock
+  // from the first frame.
   // In the reading view, scrolled away from the voice, the way back takes the line.
   const line = inReader && state.away ? (
     <button type="button" className="story-dock__follow" onClick={() => setAway(false)} data-dir={state.awayDir}>
@@ -378,14 +389,17 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     <span className="story-dock__error" role="status">{s.error}</span>
   ) : (
     <>
-      <span className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
-      <div ref={leadRef} className="story-dock__lead">
-        <button ref={whoRef} type="button" className="story-dock__who" aria-expanded={noteOpen} aria-controls="story-dock-note"
-          aria-label={`${fullName}, ${label.title}`} onClick={() => setNoteOpen(v => !v)}>
-          <span ref={nameRef} className="story-dock__name">{shownName}</span>
-          <span className="sp-label__i" aria-hidden="true">i</span>
-        </button>
-        <span className="story-dock__title">{title}</span>
+      {/* the voice note and the name share the clock's left: one leaves before the other comes */}
+      <div className="story-dock__left">
+        <span ref={voiceRef} className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
+        <div ref={leadRef} className="story-dock__lead">
+          <button ref={whoRef} type="button" className="story-dock__who" aria-expanded={noteOpen} aria-controls="story-dock-note"
+            aria-label={`${fullName}, ${label.title}`} onClick={() => setNoteOpen(v => !v)}>
+            <span ref={nameRef} className="story-dock__name">{shownName}</span>
+            <span className="sp-label__i" aria-hidden="true">i</span>
+          </button>
+          <span className="story-dock__title">{title}</span>
+        </div>
       </div>
       {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
       <span className="story-dock__time">

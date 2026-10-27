@@ -292,15 +292,22 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
   const target = drag && map ? sentenceAtTime(map.model, drag.t) : null;
   const seg = drag && map ? segmentAt(map, drag.t) : undefined;
 
-  // The bubble stands over the finger, kept inside the open player's width or, in the bar, inside the screen.
+  // The bubble stands over the finger, kept inside the open player's width or, in the bar, inside the screen. On a phone
+  // the bar's bubble spans the screen less 8 px a side: a narrower one let a letter of the page peek beside it.
   useEffect(() => {
     const bubble = bubbleRef.current;
     const root = rootRef.current?.getBoundingClientRect();
     const box = boxRef.current?.getBoundingClientRect();
     if (!bubble || !root || !box || !drag) return;
+    const screen = document.documentElement.clientWidth;
+    if (where === 'bar' && screen < 1024) {
+      bubble.style.setProperty('width', `${screen - 16}px`);
+      bubble.style.setProperty('left', `${8 - root.left}px`);
+      return;
+    }
     const w = bubble.getBoundingClientRect().width;
     const lo = where === 'player' ? root.left : 8;
-    const hi = where === 'player' ? root.right : document.documentElement.clientWidth - 8;
+    const hi = where === 'player' ? root.right : screen - 8;
     const x = Math.min(hi - w, Math.max(lo, box.left + drag.at - w / 2));
     bubble.style.setProperty('left', `${x - root.left}px`);
   }, [drag, where, target?.si]);
