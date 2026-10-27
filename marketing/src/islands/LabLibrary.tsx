@@ -26,9 +26,11 @@ interface Props {
   figureName: string;
   figureId: string;
   labels: Labels;
+  /** The AI image credit, beside the faces and in their alts. */
+  credit: string;
 }
 
-export default function LabLibrary({ modes, portrait, figureName, figureId, labels }: Props) {
+export default function LabLibrary({ modes, portrait, figureName, figureId, labels, credit }: Props) {
   const [active, setActive] = useState(modes[0]?.id);
 
   const arc = modes.filter(m => m.group !== 'more');
@@ -79,15 +81,16 @@ export default function LabLibrary({ modes, portrait, figureName, figureId, labe
       aria-labelledby={`lib-tab-${m.id}`}
       hidden={m.id !== active}
     >
-      <div className="lib__figure">
-        <img className="lib__portrait" src={portrait} alt="" width="72" height="72" loading="lazy" decoding="async" />
+      <div className="lib__figure" data-credit-group>
+        <img className="lib__portrait" src={portrait} alt={`${figureName}, ${credit}`} width="72" height="72" loading="lazy" decoding="async" />
         {m.cast && (
           <div className="lib__cast">
             {m.cast.map(c => (
-              <img key={c.name} src={c.src} alt={c.name} title={c.name} width="34" height="34" loading="lazy" decoding="async" />
+              <img key={c.name} src={c.src} alt={`${c.name}, ${credit}`} title={c.name} width="34" height="34" loading="lazy" decoding="async" />
             ))}
           </div>
         )}
+        <span className="ai-credit lib__credit" aria-hidden="true">{credit}</span>
       </div>
 
       <div className="lib__body">

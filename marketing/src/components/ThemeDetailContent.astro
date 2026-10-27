@@ -10,6 +10,8 @@ import Breadcrumbs from './Breadcrumbs.astro';
 import ThemeHero from './ThemeHero.astro';
 import EchoNote from './EchoNote.astro';
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
 import CouncilHero from './CouncilHero.astro';
 import QuestionDoors from './QuestionDoors.astro';
 import type { DoorItem } from './QuestionDoors.astro';
@@ -253,12 +255,13 @@ const heroFacts = [
                 <StaticImage
                   figureId={voice.figureId}
                   type="thumbnail"
-                  alt=""
+                  alt={portraitAlt(figure?.name ?? getShortDisplayName(voice.figureId), lang)}
                   loading="lazy"
                   width={72}
                   height={72}
                   sizes="72px"
                 />
+                <PortraitCredit lang={lang} />
               </a>
               <div class="tq-voice__body">
                 <h3 class="tq-voice__head">
@@ -446,15 +449,18 @@ const heroFacts = [
             return (
               <li class="tq-grid__item">
                 <a class="tq-grid__link" href={publicUrl(lang, `/figures/${slug}`)}>
-                  <StaticImage
-                    figureId={voice.figureId}
-                    type="thumbnail"
-                    alt=""
-                    loading="lazy"
-                    width={56}
-                    height={56}
-                    sizes="56px"
-                  />
+                  <span class="ai-portrait tq-grid__portrait">
+                    <StaticImage
+                      figureId={voice.figureId}
+                      type="thumbnail"
+                      alt={portraitAlt(figure?.name ?? getShortDisplayName(voice.figureId), lang)}
+                      loading="lazy"
+                      width={56}
+                      height={56}
+                      sizes="56px"
+                    />
+                    <PortraitCredit lang={lang} />
+                  </span>
                   <span class="tq-grid__name">{figure?.name ?? getShortDisplayName(voice.figureId)}</span>
                   <span class="tq-grid__stance">{lang === 'de' ? voice.stanceDe : voice.stance}</span>
                 </a>
@@ -510,7 +516,7 @@ const heroFacts = [
   .tq-voice + .tq-voice {
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) var(--a-12), transparent);
   }
-  .tq-voice__portrait { flex: 0 0 auto; display: block; }
+  .tq-voice__portrait { flex: 0 0 auto; display: block; width: fit-content; text-decoration: none; }
   .tq-voice__portrait img {
     display: block;
     width: 72px;
@@ -751,6 +757,7 @@ const heroFacts = [
     gap: 0.35rem;
     text-decoration: none;
   }
+  .tq-grid__portrait { align-self: flex-start; }
   .tq-grid__link img {
     width: 56px;
     height: 56px;

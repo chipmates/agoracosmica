@@ -20,6 +20,8 @@ import EchoNote from '../EchoNote.astro';
 import { getIndexAnswer } from '../figureStrata';
 import './v2-observatory.css';
 import './figure-orbit.css';
+import { portraitAlt } from '../../lib/portraitCredit';
+import PortraitCredit from '../PortraitCredit.astro';
 
 interface Props { lang: Lang; }
 const { lang } = Astro.props;
@@ -99,7 +101,7 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
     </div>
 
     <!-- the living orbital system -->
-    <div class="v2-system">
+    <div class="v2-system" data-credit-group>
       <!-- role=group, not role=img: an img role would collapse the whole orbit
            into one graphic and hide the fifteen portrait links from assistive
            tech. The rings and the core stay decorative. -->
@@ -134,7 +136,7 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
                             src={p.src}
                             srcset={p.srcset}
                             sizes={p.sizes}
-                            alt={t('aiDisclosure.imageAlt').replace('{name}', p.name)}
+                            alt={portraitAlt(p.name, lang)}
                             width="96"
                             height="96"
                             loading={p.eager ? 'eager' : 'lazy'}
@@ -155,6 +157,7 @@ const lcpFigure = byId.get(ringPlan[0].ids[0]);
       <!-- spotlight plaque: server-prefilled with the LCP figure, cycled by the island -->
       <div class="v2-plaque" id="v2-plaque">
         <div class="v2-plaque__text">
+          <PortraitCredit lang={lang} class="v2-plaque__credit" heard />
           <p class="v2-plaque__name" id="v2-plaque-name">{lcpFigure ? lcpFigure.name : ''}</p>
           <p class="v2-plaque__learn" id="v2-plaque-learn">{lcpFigure ? lcpFigure.learn : ''}</p>
         </div>

@@ -6,6 +6,9 @@
 // on every other marketing surface.
 
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt as creditAlt } from '../lib/portraitCredit';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import type { Lang } from '../i18n';
 
 interface Props {
@@ -22,7 +25,9 @@ interface Props {
   moreLinks?: { label: string; href: string }[];
 }
 
-const { lang, line, href, buttonLabel, figureId, portraitAlt, moreLinks = [] } = Astro.props;
+const { lang, line, href, buttonLabel, figureId, moreLinks = [] } = Astro.props;
+// The alt is the name and the credit, as on every AI portrait; a page's own alt text is no longer used.
+const alt = figureId ? creditAlt(getFigureById(figureId, lang)?.name ?? figureId, lang) : '';
 
 const eyebrow =
   lang === 'de' ? 'Eine lebendige Bibliothek, mit der du sprechen kannst' : 'A Living Library You Can Talk To';
@@ -38,7 +43,8 @@ const freeNote =
 <aside class="esy-invite">
   {figureId && (
     <div class="esy-invite__portrait">
-      <StaticImage figureId={figureId} type="thumbnail" alt={portraitAlt ?? ''} loading="lazy" width={96} height={96} />
+      <StaticImage figureId={figureId} type="thumbnail" alt={alt} loading="lazy" width={96} height={96} />
+      <PortraitCredit lang={lang} />
     </div>
   )}
   <p class="esy-invite__eyebrow">{eyebrow}</p>

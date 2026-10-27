@@ -1,0 +1,41 @@
+/* The AI image credit beside a portrait (PortraitCredit.astro and the library island). */
+.ai-credit {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-ui);
+  font-size: 0.625rem;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.43;
+  letter-spacing: 0.02em;
+  text-transform: none;
+  white-space: nowrap;
+  text-align: center;
+  color: var(--text-tertiary);
+}
+/* On a figure card the credit sits on the mat's foot on a dark chip (a bright painting stays behind it), so the card
+   keeps its layout in every grid. */
+.pub-figure-card__image { position: relative; }
+.pub-figure-card__image .ai-credit {
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  z-index: 1;
+  margin: 0;
+  padding: 0 0.3rem;
+  transform: translateX(-50%);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--bg-void) 76%, transparent);
+  color: var(--text-secondary);
+}
+/* The council's cast: under each face, above its name. */
+.pub-council-hero__credit { margin-top: -0.2rem; margin-bottom: -0.25rem; }
+/* The library: under its face on a desktop, beside it on a phone. */
+.lib__credit { margin-top: 0; }
+/* A picture and its credit as one column, so a row layout keeps them together. */
+.ai-portrait {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: none;
+}

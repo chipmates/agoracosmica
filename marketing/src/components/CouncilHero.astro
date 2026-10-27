@@ -4,6 +4,9 @@
 // only interactive island is the council preview audio button.
 
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import CouncilPreviewButton from '../islands/CouncilPreviewButton';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
@@ -103,7 +106,7 @@ const cast = [council.moderator, ...council.participants];
           <StaticImage
             figureId={figure.id}
             type="thumbnail"
-            alt=""
+            alt={portraitAlt(getFigureById(figure.id, lang)?.name ?? getShortDisplayName(figure.id), lang)}
             loading="lazy"
             width={96}
             height={96}
@@ -122,6 +125,7 @@ const cast = [council.moderator, ...council.participants];
             </span>
           )}
         </div>
+        <PortraitCredit lang={lang} class="pub-council-hero__credit" />
         <span class="pub-council-hero__cast-name">
           {getShortDisplayName(figure.id)}
         </span>

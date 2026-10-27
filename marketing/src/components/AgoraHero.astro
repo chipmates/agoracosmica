@@ -12,6 +12,8 @@ import { getSeedsFor } from '../lib/seeds';
 import { getStoryChapter } from '../lib/stories';
 import { cleanDisplayText } from '../lib/figureWorld';
 import type { Lang } from '../i18n';
+import { PORTRAIT_CREDIT, portraitAlt } from '../lib/portraitCredit';
+import PortraitCredit from './PortraitCredit.astro';
 import '../styles/night-hero.css';
 
 interface Props {
@@ -151,7 +153,7 @@ const S = de
   })();
 </script>
 
-<div class="mh" data-figrev={figuresRev} data-chapters={JSON.stringify(chapterBeats)}>
+<div class="mh" data-figrev={figuresRev} data-chapters={JSON.stringify(chapterBeats)} data-credit-en={PORTRAIT_CREDIT.en} data-credit-de={PORTRAIT_CREDIT.de}>
   <section class="hero" aria-labelledby="h1">
     <canvas class="dustlayer" id="dust" aria-hidden="true"></canvas>
     <div class="wrap">
@@ -162,12 +164,12 @@ const S = de
       </div>
 
       <div class="artcol">
-        <figure class="pplate">
+        <figure class="pplate" data-credit-group>
           <div class="mat">
             <img
               class="shot"
               id="shot"
-              alt=""
+              alt={portraitAlt(S.name, lang)}
               crossorigin="anonymous"
               fetchpriority="high"
               decoding="async"
@@ -182,6 +184,7 @@ const S = de
           <figcaption class="pcap">
             <span class="pcap__nm"><span class="pcap__echo">{de ? 'Echo von' : 'Echo of'}</span> <span id="nm">{S.name}</span></span>
             <span class="pcap__tr caps" id="tr">{S.trad}</span>
+            <PortraitCredit lang={lang} class="pcap__credit" />
           </figcaption>
         </figure>
       </div>
@@ -238,7 +241,7 @@ const S = de
         </div>
       </div>
 
-      <div class="shelf shelfcol">
+      <div class="shelf shelfcol" data-credit-group>
         <p class="caps shelfcap">
           <span class="shelfcap__t" id="shelfLbl">{S.shelf}</span>
           <a class="entryA" id="entryA" href={figuresBase}>
@@ -255,10 +258,11 @@ const S = de
               title={f.name}
               aria-current={f.id === 'aurelius' ? 'true' : undefined}
             >
-              <img src={figureImage(f.id, 'thumbnail', 160)} alt="" loading="lazy" decoding="async" />
+              <img src={figureImage(f.id, 'thumbnail', 160)} alt={portraitAlt(f.name, lang)} loading="lazy" decoding="async" />
             </a>
           ))}
         </div>
+        <PortraitCredit lang={lang} class="shelf__credit" heard />
       </div>
     </div>
 
@@ -269,6 +273,10 @@ const S = de
 <script src="../scripts/agora-hero.js"></script>
 
 <style is:global>
+  /* The plate's credit under its caption's right end, the shelf's one line under the faces. */
+  .pcap { flex-wrap: wrap; row-gap: 0; }
+  .pcap .pcap__credit { flex-basis: 100%; margin-top: 0; text-align: right; }
+  .shelf .shelf__credit { margin-top: 0.4rem; text-align: left; }
   /* The one gold door. It is the site's primary /app button (.pub-cta__button),
      re-fitted to the hero's spine: the plate radius of the surrounding skin, a
      width that follows its own label, and the ignition's cool state. */

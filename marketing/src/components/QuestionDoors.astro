@@ -6,6 +6,9 @@
 // who answers is the person the card promises.
 
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import type { Lang } from '../i18n';
 import { getT } from '../i18n';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -47,12 +50,13 @@ function href(item: DoorItem): string {
           <StaticImage
             figureId={item.figureId}
             type="thumbnail"
-            alt=""
+            alt={portraitAlt(getFigureById(item.figureId, lang)?.name ?? localizedShortName(item.figureId, lang), lang)}
             loading="lazy"
             width={48}
             height={48}
             sizes="48px"
           />
+          <PortraitCredit lang={lang} />
         </span>
         <span class="tq-door__body">
           <span class="tq-door__q">{item.question}</span>

@@ -31,6 +31,8 @@ var mhRoot = document.querySelector('.mh');
 if (!mhRoot) return;
 /* the figure-set revision, stamped by the component from the app manifest */
 var REV = mhRoot.dataset.figrev ? '-' + mhRoot.dataset.figrev : '';
+/* the AI image credit, stamped by the component from the one credit string */
+var CREDIT = (DE ? mhRoot.dataset.creditDe : mhRoot.dataset.creditEn) || '';
 var main  = function (id, w) { return CDN + '/images/figures/' + id + '/main' + REV + '/' + w + '.webp'; };
 var trail = function (id) {
   return CDN + '/trailers/figures/' + id + '/' + LANG + '/' + id + '_trailer_' + LANG + '.mp3';
@@ -182,6 +184,7 @@ if (DE) {
   txt('discl', T.disc);
   txt('trust', T.trust);
   txt('shelfLbl', T.shelf);
+  [].forEach.call(document.querySelectorAll('.pcap__credit, .shelf__credit'), function (el) { el.textContent = CREDIT; });
   txt('belowP', T.below);
   T.beats.forEach(function (b, i) { txt('b' + (i + 1), b); });
 }
@@ -203,6 +206,8 @@ var rail = $('rail');
   a.href = (DE ? '/de/figures/' : '/figures/') + f.slug + '/';
   a.setAttribute('aria-label', f.name);
   a.title = f.name;
+  var face = a.querySelector('img');
+  if (face) face.alt = f.name + ', ' + CREDIT;
   a.addEventListener('click', function (e) {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
     e.preventDefault();
@@ -227,7 +232,7 @@ function paint(id) {
   chapEl.setAttribute('data-agc-figure', id);
   $('promise').innerHTML = '<em>' + f.promise + '</em>';
   words($('beginLbl'), T.begin(f.name));
-  shot.alt = '';
+  shot.alt = f.name + ', ' + CREDIT;
   shot.style.setProperty('--focal', (FOCAL[id] || 50) + '%');
   [].forEach.call(rail.children, function (a) {
     if (a.dataset.id === id) a.setAttribute('aria-current', 'true');

@@ -15,6 +15,8 @@ import { figureIdToSlug } from '@client/data/public/slugMap';
 import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
 import { figureImage, figureSrcset } from '../lib/figureImages';
 import { publicUrl } from '../lib/urls';
+import { portraitAlt } from '../lib/portraitCredit';
+import PortraitCredit from './PortraitCredit.astro';
 import { STRATA, LIFE_YEARS, getStrataUi } from './figureStrata';
 import type { Lang } from '../i18n';
 import './figures-index.css';
@@ -119,17 +121,20 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
             {b.people.map(p => (
               <li>
                 <a class="fx-voice" href={p.href}>
-                  <span class="fx-voice__face">
-                    <img
-                      src={p.src}
-                      srcset={p.srcset}
-                      sizes="56px"
-                      alt=""
-                      width="160"
-                      height="160"
-                      loading="lazy"
-                      decoding="async"
-                    />
+                  <span class="ai-portrait">
+                    <span class="fx-voice__face">
+                      <img
+                        src={p.src}
+                        srcset={p.srcset}
+                        sizes="56px"
+                        alt={portraitAlt(p.name, lang)}
+                        width="160"
+                        height="160"
+                        loading="lazy"
+                        decoding="async"
+                      />
+                    </span>
+                    <PortraitCredit lang={lang} />
                   </span>
                   <span>
                     <span class="fx-voice__name">{p.name}</span>

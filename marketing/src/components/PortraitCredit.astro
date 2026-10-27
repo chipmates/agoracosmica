@@ -1,0 +1,16 @@
+---
+// The AI image credit under a portrait, centred on the picture's width. The picture's alt carries the same words, so
+// screen readers hear them once, from the alt; `heard` keeps a line for a group whose pictures sit in named links.
+import { PORTRAIT_CREDIT } from '../lib/portraitCredit';
+import type { Lang } from '../i18n';
+import './portrait-credit.css';
+
+interface Props {
+  lang: Lang;
+  class?: string;
+  heard?: boolean;
+}
+
+const { lang, class: cls, heard = false } = Astro.props;
+---
+<span class:list={['ai-credit', cls]} aria-hidden={heard ? undefined : 'true'}>{PORTRAIT_CREDIT[lang]}</span>

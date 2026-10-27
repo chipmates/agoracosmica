@@ -9,6 +9,8 @@
 // the crawlable feature list AND the playable demo. Island is client:visible
 // (no LCP cost); the band + labels are bilingual, German reviewed twice.
 import LabLibrary from '../islands/LabLibrary';
+import { PORTRAIT_CREDIT } from '../lib/portraitCredit';
+import './portrait-credit.css';
 import { figureImage } from '../lib/figureImages';
 import { getFigureLibraryModes } from './landing-lab/figure-library';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
@@ -171,6 +173,7 @@ const LABELS = {
     figureName={figureName}
     figureId={FEATURED_ID}
     labels={LABELS}
+    credit={PORTRAIT_CREDIT[lang]}
   />
 </section>
 

@@ -13,6 +13,8 @@
 // figure's entry question from heroEntry, linked as ?ask=f:{id}:1 so what you
 // click is what the app stages.
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
 import { publicUrl } from '../lib/urls';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
@@ -188,12 +190,13 @@ const c = lang === 'de' ? de : en;
               <StaticImage
                 figureId={row.id}
                 type="thumbnail"
-                alt=""
+                alt={portraitAlt(row.name, lang)}
                 loading="lazy"
                 width={48}
                 height={48}
                 sizes="48px"
               />
+              <PortraitCredit lang={lang} />
             </span>
             <span class="tut-row__body">
               <span class="tut-row__want">{row.want}</span>
@@ -219,7 +222,8 @@ const c = lang === 'de' ? de : en;
           data-agc-figure={figure.id}
         >
           <div class="pub-figure-card__image">
-            <StaticImage figureId={figure.id} type="thumbnail" alt="" loading="lazy" />
+            <StaticImage figureId={figure.id} type="thumbnail" alt={portraitAlt(figure.name, lang)} loading="lazy" />
+            <PortraitCredit lang={lang} />
           </div>
           <div class="pub-figure-card__body">
             <h3 class="pub-figure-card__name">{figure.name}</h3>
@@ -265,12 +269,13 @@ const c = lang === 'de' ? de : en;
               <StaticImage
                 figureId={row.id}
                 type="thumbnail"
-                alt=""
+                alt={portraitAlt(row.name, lang)}
                 loading="lazy"
                 width={48}
                 height={48}
                 sizes="48px"
               />
+              <PortraitCredit lang={lang} />
             </span>
             <span class="tut-row__body">
               <span class="tut-row__q">{row.question}</span>

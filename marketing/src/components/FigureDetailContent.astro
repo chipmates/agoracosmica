@@ -47,6 +47,8 @@ import FigureShadow from './FigureShadow.astro';
 import FigureQA from './FigureQA.astro';
 import EchoNote from './EchoNote.astro';
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
 import SourcesBlock from './SourcesBlock.astro';
 import FigureDeepLinks from './FigureDeepLinks.astro';
 
@@ -291,15 +293,18 @@ if (figure.essence) {
                 href={publicUrl(lang, `/figures/${relSlug}`)}
                 class="pub-figure-card pub-figure-card--row"
               >
-                <StaticImage
-                  figureId={relId}
-                  type="thumbnail"
-                  alt=""
-                  loading="lazy"
-                  width={64}
-                  height={64}
-                  sizes="64px"
-                />
+                <span class="ai-portrait">
+                  <StaticImage
+                    figureId={relId}
+                    type="thumbnail"
+                    alt={portraitAlt(relFigure.name, lang)}
+                    loading="lazy"
+                    width={64}
+                    height={64}
+                    sizes="64px"
+                  />
+                  <PortraitCredit lang={lang} />
+                </span>
                 <div>
                   <div class="pub-figure-card__name">{relFigure.name}</div>
                   <div class="pub-figure-card__tradition">{relFigure.tradition}</div>

@@ -9,6 +9,8 @@
 // now, because a feature menu is not what a searcher came for.
 
 import LabLibrary from '../islands/LabLibrary';
+import { PORTRAIT_CREDIT } from '../lib/portraitCredit';
+import './portrait-credit.css';
 import { figureImage } from '../lib/figureImages';
 import { getFigureLibraryModes } from './landing-lab/figure-library';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -89,6 +91,7 @@ const { heading, intro, ...labels } = S;
     figureName={figureName}
     figureId={figureId}
     labels={labels}
+    credit={PORTRAIT_CREDIT[lang]}
   />
 </section>
 

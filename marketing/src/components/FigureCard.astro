@@ -1,5 +1,7 @@
 ---
 import StaticImage from './StaticImage.astro';
+import PortraitCredit from './PortraitCredit.astro';
+import { portraitAlt } from '../lib/portraitCredit';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -21,7 +23,8 @@ const fallback = figure.about.split('\n')[0].slice(0, 110);
 ---
 <a href={publicUrl(lang, `/figures/${slug}`)} class="pub-figure-card">
   <div class="pub-figure-card__image">
-    <StaticImage figureId={figure.id} type="thumbnail" alt="" loading="lazy" />
+    <StaticImage figureId={figure.id} type="thumbnail" alt={portraitAlt(figure.name, lang)} loading="lazy" />
+    <PortraitCredit lang={lang} />
   </div>
   <div class="pub-figure-card__body">
     <Heading class="pub-figure-card__name">{figure.name}</Heading>
