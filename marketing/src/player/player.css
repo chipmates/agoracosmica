@@ -1202,7 +1202,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 }
 .story-dock__who .sp-label__i { width: 20px; height: 20px; margin-bottom: 0; font-size: 0.75rem; }
 .story-dock__who[aria-expanded="true"] .sp-label__i { background: var(--sp-disc); color: var(--sp-disc-ink); box-shadow: none; }
-.story-dock__who:hover .story-dock__name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--sp-hair-strong); }
+@media (hover: hover) { .story-dock__who:hover .story-dock__name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--sp-hair-strong); } }
 /* the band clips: the focus ring goes inside the button */
 .story-dock .story-dock__who:focus-visible { outline-offset: -2px; }
 .story-dock__title {

@@ -46,6 +46,9 @@ export const Icon = {
   pin: svg(<><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></>),
   /** Back one sentence in the bar: a curved arrow that turns back. */
   again: svg(<><path d="M4 8.5h10.5a5.75 5.75 0 0 1 0 11.5H8.5" /><path d="M8 4.5l-4 4 4 4" /></>),
+  /** The way back to the voice, above or below the view: an arrow with a stem, apart from the caret. */
+  toUp: svg(<path d="M12 19V5.5M6.5 11l5.5-5.5 5.5 5.5" />),
+  toDown: svg(<path d="M12 5v13.5M6.5 13l5.5 5.5 5.5-5.5" />),
   /** A step of text: a chevron and three short lines. */
   sentenceBack: svg(<path d="M9 7l-5 5 5 5M13 8.5h7M13 12h7M13 15.5h4.5" />),
   sentenceOn: svg(<path d="M15 7l5 5-5 5M4 8.5h7M4 12h7M4 15.5h4.5" />),

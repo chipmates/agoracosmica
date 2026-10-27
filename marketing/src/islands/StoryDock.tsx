@@ -362,7 +362,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   // In the reading view, scrolled away from the voice, the way back takes the line.
   const line = inReader && state.away ? (
     <button type="button" className="story-dock__follow" onClick={() => setAway(false)} data-dir={state.awayDir}>
-      {state.awayDir === 'down' ? Icon.down : Icon.up}
+      {state.awayDir === 'down' ? Icon.toDown : Icon.toUp}
       <span>{s.follow}</span>
     </button>
   ) : state.status === 'error' ? (
