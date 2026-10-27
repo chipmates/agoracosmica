@@ -32,6 +32,7 @@ import { cleanFact, loadFacts, loadText, loadTiming } from './content';
 import type { FactEntry } from './content';
 import { buildModel, sentenceStart } from './readalong';
 import { focusSentence } from './StoryReader';
+import { TextMap, useTextMap } from './textmap';
 import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZE_MIN } from './theme';
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
@@ -124,15 +125,19 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
     seekRef.current?.style.setProperty('--story-seek', `${pct}%`);
   }, [pct]);
   const rate = rateLabel(state.rate, queue.lang);
+  // The map of the text once the story's text and timing are in; the plain range until then.
+  const map = useTextMap(queue, current, state.duration);
   return (
     <>
       <Head title={title} kicker={kicker} s={s} titleRef={titleRef} />
       <div className="sp-sheet__body">
         <div className="sp-fp__seek">
-          <input ref={seekRef} type="range" min={0} max={state.duration > 0 ? Math.floor(state.duration) : 0} step={1}
-            value={Math.floor(state.time)} aria-label={s.seekAria}
-            aria-valuetext={`${clockLabel(state.time)} / ${clockLabel(state.duration)}`}
-            onChange={e => seekTo(Number(e.currentTarget.value))} />
+          {map ? <TextMap state={state} queue={queue} map={map} where="player" seekTo={seekTo} /> : (
+            <input ref={seekRef} type="range" min={0} max={state.duration > 0 ? Math.floor(state.duration) : 0} step={1}
+              value={Math.floor(state.time)} aria-label={s.seekAria}
+              aria-valuetext={`${clockLabel(state.time)} / ${clockLabel(state.duration)}`}
+              onChange={e => seekTo(Number(e.currentTarget.value))} />
+          )}
           <div className="sp-fp__times"><span>{clockLabel(state.time)}</span><span>{clockLabel(state.duration)}</span></div>
         </div>
         <div className="sp-fp__transport">

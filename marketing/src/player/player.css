@@ -1494,6 +1494,58 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 
 /* the full player */
 .sp-fp__seek { margin-top: 8px; }
+
+/* ---- the map of the text: scenes as small blocks of lines, filled as heard ------------------------------- */
+.sp-tmap { position: relative; min-width: 0; }
+.sp-tmap__box { position: relative; display: flex; align-items: center; height: 48px; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; }
+.sp-tmap__draw { display: block; width: 100%; height: 17px; }
+.sp-tmap--dock .sp-tmap__box { height: 44px; }
+.sp-tmap--dock .sp-tmap__draw { height: 13px; }
+/* the sheets' and the dock's icon rules give every svg a stroke: the map's lines take none */
+.sp-tmap__lines rect, .story-dock__tmap .sp-tmap__lines rect { fill: var(--sp-hair-strong); stroke: none; }
+.sp-tmap__heard rect, .story-dock__tmap .sp-tmap__heard rect { fill: var(--sp-accent); stroke: none; }
+.sp-tmap__head { position: absolute; top: 9px; bottom: 9px; left: 0; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--sp-accent); pointer-events: none; }
+.sp-tmap__head::before { content: ""; position: absolute; top: -3px; left: -4px; width: 10px; height: 10px; border: 2px solid var(--sp-page); border-radius: 50%; background: var(--sp-accent); box-sizing: border-box; }
+.sp-tmap--dock .sp-tmap__head { top: 12px; bottom: 12px; }
+.sp-tmap__dot { position: absolute; bottom: 4px; left: 0; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--sp-accent); pointer-events: none; }
+.sp-tmap--dock .sp-tmap__dot { bottom: 6px; }
+/* keys and screen readers keep the native range; its focus shows on the drawing */
+.sp-tmap__range { position: absolute; left: 0; bottom: 0; width: 100%; height: 44px; margin: 0; opacity: 0; pointer-events: none; }
+.sp-tmap:has(.sp-tmap__range:focus-visible) .sp-tmap__box { outline: 2px solid var(--sp-focus); outline-offset: 2px; border-radius: 3px; }
+.sp-tmap__bubble {
+  position: absolute;
+  bottom: calc(100% - 2px);
+  left: 0;
+  z-index: 6;
+  width: max-content;
+  max-width: min(340px, calc(100vw - 32px));
+  padding: 8px 11px 9px;
+  background: var(--sp-page);
+  border: 1px solid var(--sp-hair-strong);
+  border-radius: 6px;
+  box-shadow: 0 10px 28px var(--sp-shadow);
+  font-family: var(--font-ui);
+  pointer-events: none;
+}
+/* in the open player the bubble opens downward, over the clock and the buttons, inside the sheet's scroll box */
+.sp-tmap--player .sp-tmap__bubble { top: calc(100% - 6px); bottom: auto; max-width: 100%; }
+.sp-tmap__when { display: flex; align-items: baseline; gap: 10px; font-size: 0.8125rem; font-weight: 600; color: var(--sp-accent); font-variant-numeric: tabular-nums; }
+.sp-tmap__scene { font-weight: 400; color: var(--sp-ink-3); }
+.sp-tmap__line {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  margin-top: 3px;
+  font-family: var(--font-content);
+  font-size: 0.9375rem;
+  line-height: 1.35;
+  color: var(--sp-ink);
+}
+.sp-tmap.is-dragging .sp-tmap__head::before { width: 14px; height: 14px; top: -5px; left: -6px; }
+/* the phone dock draws the map where its progress line was, display only; the dock keeps its height */
+.story-dock__progress.has-map { top: 3px; left: var(--sp-gutter); right: var(--sp-gutter); height: 5px; pointer-events: none; }
+.story-dock__tmap { display: block; width: 100%; height: 100%; }
 .sp-fp__times { display: flex; justify-content: space-between; margin-top: -6px; font-size: 0.8125rem; color: var(--sp-ink-2); font-variant-numeric: tabular-nums; }
 .sp-fp__transport { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 6px; }
 .sp-fp__transport .story-btn svg { width: 26px; height: 26px; }

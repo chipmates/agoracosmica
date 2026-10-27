@@ -119,6 +119,9 @@ export interface PlayerStrings {
   textLoading: string;
   textError: string;
   seekAria: string;
+  /** The map of the text: a scene's name in the drag bubble, and the range's value for screen readers. */
+  mapScene: (n: number) => string;
+  mapValue: (time: string, total: string, scene: number | null) => string;
   /** The display sheet. */
   light: string;
   lights: [string, string, string, string];
@@ -238,6 +241,8 @@ const en: PlayerStrings = {
   textLoading: 'Loading the text',
   textError: 'The text could not be loaded.',
   seekAria: 'Position in the story',
+  mapScene: n => `Scene ${n}`,
+  mapValue: (time, total, scene) => `${time} of ${total}${scene ? `, scene ${scene}` : ''}`,
   light: 'Light',
   lights: ['Auto', 'Day', 'Vellum', 'Night'],
   textSize: 'Text size',
@@ -354,6 +359,8 @@ const de: PlayerStrings = {
   textLoading: 'Text wird geladen',
   textError: 'Der Text konnte nicht geladen werden.',
   seekAria: 'Stelle in der Geschichte',
+  mapScene: n => `Szene ${n}`,
+  mapValue: (time, total, scene) => `${time} von ${total}${scene ? `, Szene ${scene}` : ''}`,
   light: 'Licht',
   lights: ['Auto', 'Tag', 'Pergament', 'Nacht'],
   textSize: 'Schriftgröße',
