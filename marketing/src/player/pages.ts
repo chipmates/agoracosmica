@@ -3,11 +3,12 @@
 // A figure's companion pages (its own deeper pages) carry the router and the
 // dock too, so a listener can open them without the story stopping.
 
-export const STORY_PLAYER_SLUGS: readonly string[] = ['marcus-aurelius'];
+export const STORY_PLAYER_SLUGS: readonly string[] = ['marcus-aurelius', 'joseph-campbell'];
 
 /** Pages outside the figure template that keep the dock alive, by path. */
 export const STORY_PLAYER_COMPANIONS: Readonly<Record<string, readonly string[]>> = {
   'marcus-aurelius': ['/figures/marcus-aurelius/meditations/', '/stoicism/', '/de/stoizismus/'],
+  'joseph-campbell': ['/the-heros-journey/', '/de/heldenreise/'],
 };
 
 export function hasStoryPlayer(slug: string): boolean {

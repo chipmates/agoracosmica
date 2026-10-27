@@ -6,6 +6,9 @@
 // EN/DE cross-slug pair: /the-heros-journey <-> /de/heldenreise (altEn/altDe).
 
 import Public from '../layouts/Public.astro';
+import PlayerHead from '../components/player/PlayerHead.astro';
+import PlayerDock from '../components/player/PlayerDock.astro';
+import { isStoryCompanionPath } from '../player/pages';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
 import EssayStyles from '../components/EssayStyles.astro';
 import EssayInvite from '../components/EssayInvite.astro';
@@ -127,6 +130,8 @@ const schemas = [
   ]),
   faqSchema(faq, PAGE_URL),
 ];
+// A companion page of a story player figure: the dock keeps playing here.
+const storyDock = isStoryCompanionPath(Astro.url.pathname);
 ---
 <Public
   title={metaTitle}
@@ -144,6 +149,8 @@ const schemas = [
   reading={true}
   schemas={schemas}
 >
+  {storyDock && <PlayerHead slot="head" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" />}
   <EssayStyles />
   <div class="pub-content esy">
     <Breadcrumbs lang={lang} items={[{ label: "The Hero's Journey" }]} />

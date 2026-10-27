@@ -17,6 +17,10 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
     en: 'Roman emperor and Stoic. He wrote the Meditations as notes to himself.',
     de: 'Römischer Kaiser und Stoiker. Die Selbstbetrachtungen schrieb er als Notizen an sich selbst.',
   },
+  campbell: {
+    en: "American scholar of myth. He found one shape under the world's myths, the hero's journey.",
+    de: 'Amerikanischer Mythenforscher. Unter den Mythen der Welt fand er eine Form, die Heldenreise.',
+  },
 };
 
 // The same links the figure template gives, plus the Meditations for German
@@ -32,6 +36,10 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
       { href: '/figures/marcus-aurelius/meditations/', label: 'Die Selbstbetrachtungen auf Englisch lesen, übersetzt von George Long →' },
       { href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' },
     ],
+  },
+  campbell: {
+    en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
+    de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
   },
 };
 
@@ -60,6 +68,10 @@ const STORY_NOTES: Record<string, Record<PlayerLang, (name: string) => string>> 
   aurelius: {
     en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written with AI from his writings and the sources and read by a synthetic voice. Not a recording. Never his own words.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie mit KI nach seinen Schriften und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte.`,
+  },
+  campbell: {
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written with AI from his books and the sources and read by a synthetic voice. Not a recording. Never his own words.`,
+    de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie mit KI nach seinen Büchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte.`,
   },
 };
 
