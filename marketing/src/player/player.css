@@ -662,9 +662,13 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .sp-act__words { display: flex; flex-direction: column; min-width: 0; text-align: left; }
 .sp-act__t { font-size: 0.9375rem; font-weight: 600; line-height: 1.15; }
 .sp-act__s { font-size: 0.75rem; color: var(--sp-ink-3); white-space: nowrap; }
+/* A phone gives the main button the whole first line: its state words ("Weiterhören · ab 12:05") outgrow a quarter. */
+@media (max-width: 1023.98px) {
+  .sp-acts:not(.sp-acts--two) { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .sp-acts:not(.sp-acts--two) .sp-act--main { grid-column: 1 / -1; min-height: 52px; }
+}
 @media (max-width: 380px) {
-  .sp-acts { grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 5px; }
-  .sp-act--main { gap: 8px; padding: 6px 6px 6px 6px; }
+  .sp-acts { gap: 5px; }
   .sp-act__disc { width: 36px; height: 36px; }
 }
 @media (min-width: 1024px) {
@@ -672,6 +676,7 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   .sp-row.is-current .sp-row__btn { padding-left: 18px; }
   .sp-row__panel { padding-left: 78px; padding-right: 6px; }
   .sp-acts { max-width: 470px; }
+  .sp-acts:not(.sp-acts--two) { grid-template-columns: 2fr 1fr 1fr 1fr; }
   .sp-toc__title { font-size: 2.1rem; }
   .sp-toc__tools .sp-viewswitch { display: none; }
   .sp-toc__tools { min-height: 0; padding-bottom: 0; border-bottom: 0; }
@@ -1113,6 +1118,39 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 @media (min-width: 1024px) {
   .story-dock__end { grid-template-columns: auto minmax(0, 1fr) auto; }
   .story-dock__endacts { grid-column: auto; }
+}
+/* The card takes the dock's own place for its seconds, so it never rises over the page. */
+.story-dock--end .story-dock__inner { visibility: hidden; }
+.story-dock--end .story-dock__end {
+  position: absolute;
+  left: var(--sp-gutter);
+  right: var(--sp-gutter);
+  bottom: env(safe-area-inset-bottom, 0px);
+  min-height: calc(100% - env(safe-area-inset-bottom, 0px));
+  grid-template-areas: "text text" "count acts";
+  align-content: center;
+  padding: 8px 0;
+  border-bottom: 0;
+  background: var(--sp-void);
+}
+.story-dock--end .story-dock__count { grid-area: count; width: 44px; height: 44px; }
+.story-dock--end .story-dock__endtext { grid-area: text; }
+.story-dock--end .story-dock__endacts { grid-area: acts; grid-column: auto; }
+/* A phone's dock holds two lines and the buttons: the "has ended" line stays for screen readers only. */
+@media (max-width: 1023.98px) {
+  .story-dock--end .story-dock__end { row-gap: 4px; padding: 6px 0; }
+  .story-dock--end .story-dock__endt { margin: 0; font-size: 1rem; }
+  .story-dock--end .story-dock__endk {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+@media (min-width: 1024px) {
+  .story-dock--end .story-dock__end { grid-template-areas: "count text acts"; }
 }
 
 /* The resume offer, in the dock's place, where the page has no plate. */

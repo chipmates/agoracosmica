@@ -203,7 +203,8 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   return (
     <div className="story-dock-slot">
       {overlays}
-      <div ref={measureRef} className="story-dock" role="region" aria-label={s.dockLabel} data-status={state.status}>
+      <div ref={measureRef} className={card && nextEntry ? 'story-dock story-dock--end' : 'story-dock'} role="region"
+        aria-label={s.dockLabel} data-status={state.status}>
         {card && nextEntry && (
           <div className="story-dock__end" role="status">
             <span className="story-dock__count" aria-hidden="true">{card.left}</span>
