@@ -1074,10 +1074,11 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   .story-dock__inner:has(.story-dock__home) .story-dock__ctrls { order: 0; }
   .story-dock__inner:has(.story-dock__home) .story-dock__home { order: -1; }
   .story-dock__inner > .story-dock__head { flex: 1 1 12rem; min-width: 0; }
-  .story-dock__inner .story-dock__head > .story-dock__open { padding: 0; min-height: 44px; }
+  /* no clock on this row, so the title's button keeps to its words and the "i" stands right after them */
+  .story-dock__inner .story-dock__head > .story-dock__open { flex: 0 1 auto; padding: 0; min-height: 44px; }
   /* the scrubber fills to its 230 px first, then the title's column takes the rest */
   .story-dock__inner > .story-dock__seek { flex: 100 0 150px; max-width: 230px; }
-  .story-dock__title { -webkit-line-clamp: 1; }
+  /* the "i" takes 50 px of the title's column: a title wraps to a second line before it is cut */
   .story-dock__time { display: none; }
 }
 .story-dock__seek {
