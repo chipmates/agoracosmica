@@ -31,7 +31,7 @@ import {
 import { cleanFact, loadFacts, loadText, loadTiming } from './content';
 import type { FactEntry } from './content';
 import { buildModel, sentenceStart } from './readalong';
-import { focusSentence } from './StoryReader';
+import { focusSentence } from './focus';
 import { TextMap, useTextMap } from './textmap';
 import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZE_MIN } from './theme';
 import type { DisplaySettings } from './theme';

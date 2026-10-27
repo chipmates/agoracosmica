@@ -32,6 +32,7 @@ import type { ReaderModel } from './readalong';
 import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
 import { Icon } from './icons';
 import { shareStory } from './page';
+import { takeFocus } from './focus';
 import { showToast } from './toast';
 import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
@@ -47,12 +48,6 @@ interface Props {
 }
 
 const LINE_HEIGHT = { tight: 1.45, normal: 1.62, airy: 1.85 } as const;
-
-// "Show in the text" from the saved sheet: the reader scrolls there once its text is in.
-let pendingFocus: { n: number; si: number } | null = null;
-export function focusSentence(n: number, si: number): void {
-  pendingFocus = { n, si };
-}
 
 function useWide(): boolean {
   const [wide, setWide] = useState(false);
@@ -324,9 +319,9 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
 
   // ---- a saved sentence to show ----
   useEffect(() => {
-    if (!model || !pendingFocus || pendingFocus.n !== n) return;
-    const si = pendingFocus.si;
-    pendingFocus = null;
+    if (!model) return;
+    const si = takeFocus(n);
+    if (si === null) return;
     const el = bodyRef.current?.querySelector<HTMLElement>(`.s[data-si="${si}"]`);
     el?.scrollIntoView({ block: 'center' });
     el?.classList.add('is-picked');

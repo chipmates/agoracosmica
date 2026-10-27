@@ -4,7 +4,7 @@
 // starts there. The native range stays underneath for keys and screen readers. The phone dock shows the drawing only.
 
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
 import { loadText, loadTiming } from './content';
 import { blockAt, buildModel, sentenceStart, wordAt } from './readalong';
 import type { ReaderModel } from './readalong';
@@ -189,6 +189,33 @@ export function TextMapDrawing({ map, duration, rows, className }: DrawProps) {
 /** Set the drawing's heard share: an attribute, so the strict style policy allows it. */
 export function setHeard(root: Element | null, share: number): void {
   root?.querySelectorAll('[data-tmap-clip]').forEach(r => r.setAttribute('width', String(Math.round(Math.max(0, Math.min(1, share)) * 1000))));
+}
+
+interface DockMapProps {
+  state: PlayerState;
+  queue: StoryQueue;
+  /** "phone": the drawing in the progress line, display only; "desk": the dock's scrubber. */
+  kind: 'phone' | 'desk';
+  seekTo: (t: number) => void;
+  /** What the dock shows until the story's text and timing are in. */
+  plain: ReactNode;
+}
+
+/** The dock's map, loaded after the first screen: the plain line or range until the map is ready. */
+export function DockMap({ state, queue, kind, seekTo, plain }: DockMapProps) {
+  const map = useTextMap(queue, state.current, state.duration);
+  const progRef = useRef<HTMLDivElement | null>(null);
+  const share = state.duration > 0 ? Math.min(1, state.time / state.duration) : 0;
+  useEffect(() => {
+    setHeard(progRef.current, share);
+  }, [share, map]);
+  if (!map) return <>{plain}</>;
+  if (kind === 'desk') return <TextMap state={state} queue={queue} map={map} where="dock" seekTo={seekTo} />;
+  return (
+    <div ref={progRef} className="story-dock__progress has-map" aria-hidden="true">
+      <TextMapDrawing map={map} duration={state.duration > 0 ? state.duration : 1} rows={3} className="story-dock__tmap" />
+    </div>
+  );
 }
 
 interface MapProps {

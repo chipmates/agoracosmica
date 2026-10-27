@@ -3,7 +3,7 @@
 // the client router persists, so it keeps playing while the visitor moves
 // between player pages. The page's own controls are plain HTML (page.ts).
 
-import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
 import {
   acceptResume,
   declineResume,
@@ -30,9 +30,21 @@ import {
   RATE_MIN,
 } from '../player/controller';
 import { installPage } from '../player/page';
-import StoryReader from '../player/StoryReader';
-import Sheets from '../player/sheets';
-import { TextMap, TextMapDrawing, setHeard, useTextMap } from '../player/textmap';
+// The reader, the sheets and the map load after the first screen: on first use, warmed on intent.
+const loadReader = () => import('../player/StoryReader');
+const loadSheets = () => import('../player/sheets');
+const loadMap = () => import('../player/textmap');
+const StoryReader = lazy(loadReader);
+const Sheets = lazy(loadSheets);
+const DockMap = lazy(() => loadMap().then(m => ({ default: m.DockMap })));
+let warmed = false;
+function warm(): void {
+  if (warmed) return;
+  warmed = true;
+  void loadReader().catch(() => undefined);
+  void loadSheets().catch(() => undefined);
+  void loadMap().catch(() => undefined);
+}
 import { Icon } from '../player/icons';
 import { VOICE_DESC_ID, clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
 import type { FactWords } from '../player/factWords';
@@ -94,18 +106,29 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     return () => document.removeEventListener('astro:page-load', update);
   }, []);
 
-  // The map of the text, once the playing story's text and timing are in: the phone dock draws it, the desktop's drags.
-  const loadedNow = state.current !== null && !state.dismissed;
-  const textMap = useTextMap(loadedNow ? state.queue : null, loadedNow ? state.current : null, state.duration);
-  const progRef = useRef<HTMLDivElement | null>(null);
+  // A press or a focus on a story control, or a story playing, fetches the reader's parts ahead of their first use.
+  useEffect(() => {
+    const intent = (e: Event) => {
+      if (e.target instanceof Element && e.target.closest('[data-story-read], [data-story-saved-open], [data-story-hero-plate], .sp-act, .story-dock')) warm();
+    };
+    document.addEventListener('pointerdown', intent, true);
+    document.addEventListener('focusin', intent, true);
+    return () => {
+      document.removeEventListener('pointerdown', intent, true);
+      document.removeEventListener('focusin', intent, true);
+    };
+  }, []);
+  const storyOn = state.current !== null;
+  useEffect(() => {
+    if (storyOn) warm();
+  }, [storyOn]);
 
   // CSSOM, not a style attribute: the strict style-src blocks attributes.
   const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
   useEffect(() => {
     if (fillRef.current) fillRef.current.style.width = `${pct}%`;
     if (seekRef.current) seekRef.current.style.setProperty('--story-seek', `${pct}%`);
-    setHeard(progRef.current, pct / 100);
-  }, [pct, textMap]);
+  });
 
   // The page and the reader keep room for the dock's real height: the title may wrap.
   const observer = useRef<ResizeObserver | null>(null);
@@ -195,12 +218,16 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const overlays = (
     <>
       {state.readerOpen && readerQueue && state.readerN !== null && (
-        <StoryReader state={state} queue={readerQueue} n={state.readerN} label={labels[readerQueue.lang]}
-          factsWord={facts[readerQueue.lang].facts} documentedWord={facts[readerQueue.lang].documented}
-          recreatedWord={facts[readerQueue.lang].recreated} />
+        <Suspense fallback={null}>
+          <StoryReader state={state} queue={readerQueue} n={state.readerN} label={labels[readerQueue.lang]}
+            factsWord={facts[readerQueue.lang].facts} documentedWord={facts[readerQueue.lang].documented}
+            recreatedWord={facts[readerQueue.lang].recreated} />
+        </Suspense>
       )}
       {state.sheet && (
-        <Sheets state={state} facts={facts} wide={wide} />
+        <Suspense fallback={null}>
+          <Sheets state={state} facts={facts} wide={wide} />
+        </Suspense>
       )}
     </>
   );
@@ -246,6 +273,25 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const clock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
   const rate = rateLabel(state.rate, storyLang);
 
+  const plainProgress = (
+    <div className="story-dock__progress" aria-hidden="true">
+      <div ref={fillRef} className="story-dock__fill" />
+    </div>
+  );
+  const plainSeek = (
+    <input
+      ref={seekRef}
+      type="range"
+      min={0}
+      max={state.duration > 0 ? Math.floor(state.duration) : 0}
+      step={1}
+      value={Math.floor(state.time)}
+      aria-label={s.seekAria}
+      aria-valuetext={clock}
+      onChange={e => seekTo(Number(e.currentTarget.value))}
+    />
+  );
+
   const readSlot = inReader && state.away ? (
     <button type="button" className="story-dock__read story-dock__read--voice" onClick={() => setAway(false)} data-dir={state.awayDir}>
       {state.awayDir === 'down' ? Icon.down : Icon.up}
@@ -278,11 +324,11 @@ export default function StoryDock({ lang, labels, facts }: Props) {
             </div>
           </div>
         )}
-        <div ref={progRef} className={`story-dock__progress${textMap && !wide ? ' has-map' : ''}`} aria-hidden="true">
-          {textMap && !wide
-            ? <TextMapDrawing map={textMap} duration={state.duration > 0 ? state.duration : 1} rows={3} className="story-dock__tmap" />
-            : <div ref={fillRef} className="story-dock__fill" />}
-        </div>
+        {wide ? plainProgress : (
+          <Suspense fallback={plainProgress}>
+            <DockMap state={state} queue={queue} kind="phone" seekTo={seekTo} plain={plainProgress} />
+          </Suspense>
+        )}
         <div className="story-dock__inner">
           {away && (
             <a className="story-dock__home" href={home} aria-label={s.backToAria(queue.name)}>
@@ -348,19 +394,9 @@ export default function StoryDock({ lang, labels, facts }: Props) {
             <>
               <div className="story-dock__seek">
                 <span className="story-dock__t0">{clockLabel(state.time)}</span>
-                {textMap ? <TextMap state={state} queue={queue} map={textMap} where="dock" seekTo={seekTo} /> : (
-                  <input
-                    ref={seekRef}
-                    type="range"
-                    min={0}
-                    max={state.duration > 0 ? Math.floor(state.duration) : 0}
-                    step={1}
-                    value={Math.floor(state.time)}
-                    aria-label={s.seekAria}
-                    aria-valuetext={clock}
-                    onChange={e => seekTo(Number(e.currentTarget.value))}
-                  />
-                )}
+                <Suspense fallback={plainSeek}>
+                  <DockMap state={state} queue={queue} kind="desk" seekTo={seekTo} plain={plainSeek} />
+                </Suspense>
                 <span className="story-dock__t1">{clockLabel(state.duration)}</span>
               </div>
               <div className="story-dock__rate" role="group" aria-label={s.speed}>
