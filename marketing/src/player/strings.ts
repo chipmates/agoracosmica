@@ -11,7 +11,7 @@ export interface PlayerStrings {
   heroNote: (countWord: string, she: boolean) => string;
   /** The reading view's note under the title. Keeps the word "retelling". */
   retellingNote: (she: boolean) => string;
-  /** The story door under a poem: its heading and the link to the figure page. */
+  /** The story door under a poem: its heading and the link to the figure page. English takes 's after a final s too (the site's "Aurelius's"). */
   doorTitle: (name: string, countWord: string) => string;
   allStories: (countWord: string) => string;
   /** Under the hero portrait. */
@@ -81,7 +81,6 @@ export interface PlayerStrings {
   nextAria: string;
   prevAria: string;
   readAlong: string;
-  closeAria: string;
   backToAria: (name: string) => string;
   speedAria: (rate: string) => string;
   openPlayer: string;
@@ -106,7 +105,6 @@ export interface PlayerStrings {
   listenNow: string;
   /** The reading view. */
   readerAria: string;
-  readerClose: string;
   bookmark: string;
   display: string;
   follow: string;
@@ -173,9 +171,9 @@ const en: PlayerStrings = {
   tocTitle: word => `The ${word} stories`,
   tocLead: (a, b, total, she) =>
     `In the order of ${she ? 'her' : 'his'} life${a && b ? `, from age ${a} to ${b}` : ''}.${total ? ` About ${total} in all.` : ''}`,
-  totalTime: m => (m >= 60 ? `${Math.floor(m / 60)} h ${m % 60} min` : `${m} min`),
+  totalTime: m => (m >= 60 ? `${Math.floor(m / 60)} h${m % 60 ? ` ${m % 60} min` : ''}` : `${m} min`),
   ageAt: age => `age ${age}`,
-  rowAria: (n, title, details) => `${n === 0 ? 'Introduction' : `Story ${n}`}: ${[title, ...details].join(', ')}`,
+  rowAria: (n, title, details) => (n === 0 ? ['Introduction', ...details] : [`Story ${n}: ${title}`, ...details]).join(', '),
   approxYear: year => year.replace(/^~\s*/, 'c. '),
   listView: 'List',
   mapView: 'Map',
@@ -204,7 +202,6 @@ const en: PlayerStrings = {
   nextAria: 'Next story',
   prevAria: 'Previous story',
   readAlong: 'Read',
-  closeAria: 'Close the player',
   backToAria: name => `Back to ${name}`,
   speedAria: rate => `Speed ${rate}, open the player`,
   openPlayer: 'Open the player',
@@ -226,7 +223,6 @@ const en: PlayerStrings = {
   stay: 'Stay here',
   listenNow: 'Listen now',
   readerAria: 'Story text',
-  readerClose: 'Back',
   bookmark: 'Save this sentence',
   display: 'Display',
   follow: 'Read along',
@@ -291,9 +287,9 @@ const de: PlayerStrings = {
   tocTitle: word => `Die ${word} Geschichten`,
   tocLead: (a, b, total, she) =>
     `In der Reihenfolge ${she ? 'ihres' : 'seines'} Lebens${a && b ? `, im Alter von ${a} bis ${b} Jahren` : ''}.${total ? ` Zusammen etwa ${total}` : ''}`,
-  totalTime: m => (m >= 60 ? `${Math.floor(m / 60)} Std. ${m % 60} Min.` : `${m} Min.`),
+  totalTime: m => (m >= 60 ? `${Math.floor(m / 60)} Std.${m % 60 ? ` ${m % 60} Min.` : ''}` : `${m} Min.`),
   ageAt: age => `mit ${age} Jahren`,
-  rowAria: (n, title, details) => `${n === 0 ? 'Einführung' : `Geschichte ${n}`}: ${[title, ...details].join(', ')}`,
+  rowAria: (n, title, details) => (n === 0 ? ['Einführung', ...details] : [`Geschichte ${n}: ${title}`, ...details]).join(', '),
   approxYear: year => year.replace(/^~\s*/, 'um '),
   listView: 'Liste',
   mapView: 'Karte',
@@ -322,7 +318,6 @@ const de: PlayerStrings = {
   nextAria: 'Nächste Geschichte',
   prevAria: 'Vorherige Geschichte',
   readAlong: 'Lesen',
-  closeAria: 'Player schließen',
   backToAria: name => `Zurück zu ${name}`,
   speedAria: rate => `Tempo ${rate}, Player öffnen`,
   openPlayer: 'Player öffnen',
@@ -344,7 +339,6 @@ const de: PlayerStrings = {
   stay: 'Hierbleiben',
   listenNow: 'Jetzt hören',
   readerAria: 'Text der Geschichte',
-  readerClose: 'Zurück',
   bookmark: 'Diesen Satz merken',
   display: 'Darstellung',
   follow: 'Mitlesen',
