@@ -1809,7 +1809,8 @@ html:has(.story-reader) { overflow: hidden; }
   font-family: var(--sp-display);
   font-size: 2.9em;
   line-height: 0.8;
-  padding-right: 0.06em;
+  /* joined to its word: the ink gap to the next letter near the line's own letter gaps, well under a word space */
+  margin-right: -0.015em;
   color: var(--sp-accent);
   font-variant-caps: normal;
   letter-spacing: 0;
