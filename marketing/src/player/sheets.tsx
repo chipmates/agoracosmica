@@ -30,7 +30,7 @@ import {
   setSleep,
   audioTime,
 } from './controller';
-import { cleanFact, loadFacts, loadText, loadTiming } from './content';
+import { loadFacts, loadText, loadTiming, shownFact } from './content';
 import type { FactEntry } from './content';
 import { buildModel, paragraphStep, sentenceStart } from './readalong';
 import type { ReaderModel } from './readalong';
@@ -290,30 +290,30 @@ function FactsSheet({ queue, n, s, w, titleRef }: { queue: StoryQueue; n: number
           <>
             {(entry.year || entry.age || entry.setting) && (
               <dl className="sp-facts__meta">
-                {entry.year && <div><dt>{Icon.calendar}<span>{w.year}</span></dt><dd>{s.approxYear(cleanFact(entry.year))}</dd></div>}
-                {entry.age && <div><dt>{Icon.user}<span>{w.age}</span></dt><dd>{cleanFact(entry.age)}</dd></div>}
-                {entry.setting && <div><dt>{Icon.pin}<span>{w.setting}</span></dt><dd>{cleanFact(entry.setting)}</dd></div>}
+                {entry.year && <div><dt>{Icon.calendar}<span>{w.year}</span></dt><dd>{s.approxYear(shownFact(entry.year, queue.lang))}</dd></div>}
+                {entry.age && <div><dt>{Icon.user}<span>{w.age}</span></dt><dd>{shownFact(entry.age, queue.lang)}</dd></div>}
+                {entry.setting && <div><dt>{Icon.pin}<span>{w.setting}</span></dt><dd>{shownFact(entry.setting, queue.lang)}</dd></div>}
               </dl>
             )}
             {entry.documented.length > 0 && (
               <section className="sp-facts__list sp-facts__list--doc">
                 <h3>{Icon.checkCircle}<span>{w.documented}</span></h3>
-                <ul>{entry.documented.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                <ul>{entry.documented.map((x, i) => <li key={i}>{shownFact(x, queue.lang)}</li>)}</ul>
               </section>
             )}
             {entry.recreated.length > 0 && (
               <section className="sp-facts__list sp-facts__list--rec">
                 <h3>{Icon.pencil}<span>{w.recreated}</span></h3>
-                <ul>{entry.recreated.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                <ul>{entry.recreated.map((x, i) => <li key={i}>{shownFact(x, queue.lang)}</li>)}</ul>
               </section>
             )}
             {entry.note && (
-              <p className="sp-facts__note">{Icon.info}<span><span className="sp-sr">{w.note}: </span>{cleanFact(entry.note)}</span></p>
+              <p className="sp-facts__note">{Icon.info}<span><span className="sp-sr">{w.note}: </span>{shownFact(entry.note, queue.lang)}</span></p>
             )}
             {entry.notes.length > 0 && (
               <section className="sp-facts__list sp-facts__list--notes">
                 <h3>{Icon.info}<span>{w.notes}</span></h3>
-                <ul>{entry.notes.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                <ul>{entry.notes.map((x, i) => <li key={i}>{shownFact(x, queue.lang)}</li>)}</ul>
               </section>
             )}
           </>

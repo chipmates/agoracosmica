@@ -2,6 +2,7 @@
 // timing for the read-along, and the figure's facts. None of it is in the
 // page's HTML. Each fetch is made once per page life.
 
+import { closeGermanQuotes } from './quotes';
 import type { StoryQueue } from './types';
 
 const MEDIA = 'https://media.agoracosmica.org';
@@ -197,4 +198,9 @@ export function cleanFact(s: string | undefined): string {
     .replace(/\s*;\s*/g, ', ')
     .replace(/\s+/g, ' ')
     .trim();
+}
+
+/** A fact as shown: German closers first (on the source's own context, see quotes.ts), then the cleaning above. */
+export function shownFact(s: string | undefined, lang: string): string {
+  return cleanFact(lang === 'de' && s ? closeGermanQuotes(s) : s);
 }

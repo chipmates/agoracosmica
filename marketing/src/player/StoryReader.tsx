@@ -25,7 +25,8 @@ import {
   stepRate,
   togglePlay,
 } from './controller';
-import { cleanFact, loadFacts, loadText, loadTiming } from './content';
+import { loadFacts, loadText, loadTiming, shownFact } from './content';
+import { shownWords } from './quotes';
 import type { FactEntry, StoryTiming, TextBlock } from './content';
 import { blockAt, buildModel, paragraphStep, sentenceStart, wordAt } from './readalong';
 import type { ReaderModel } from './readalong';
@@ -122,6 +123,13 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const model: ReaderModel | null = useMemo(
     () => (blocks ? buildModel(blocks, timing ?? {}, n === 0) : null),
     [blocks, timing, n],
+  );
+  // the words as shown: German closers in their German form, each word the model's own length
+  const shown = useMemo(
+    () => (blocks && model && queue.lang === 'de'
+      ? shownWords(blocks.map(b => b.text), model.words.map(w => ({ text: w.text, block: model.sentences[w.si]!.bi })))
+      : null),
+    [blocks, model, queue.lang],
   );
 
   useEffect(() => {
@@ -465,7 +473,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
           const sent = model!.sentences[si]!;
           const words = [];
           for (let w = sent.first; w <= sent.last; w += 1) {
-            words.push(<span key={w} className="w" data-wi={w}>{model!.words[w]!.text}</span>);
+            words.push(<span key={w} className="w" data-wi={w}>{shown?.[w] ?? model!.words[w]!.text}</span>);
             if (w < sent.last) words.push(' ');
           }
           return (
@@ -584,13 +592,13 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                   {facts.documented.length > 0 && (
                     <div className="sp-facts__list sp-facts__list--doc">
                       <h4>{Icon.checkCircle}<span>{documentedWord}</span></h4>
-                      <ul>{facts.documented.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                      <ul>{facts.documented.map((x, i) => <li key={i}>{shownFact(x, queue.lang)}</li>)}</ul>
                     </div>
                   )}
                   {facts.recreated.length > 0 && (
                     <div className="sp-facts__list sp-facts__list--rec">
                       <h4>{Icon.pencil}<span>{recreatedWord}</span></h4>
-                      <ul>{facts.recreated.map((x, i) => <li key={i}>{cleanFact(x)}</li>)}</ul>
+                      <ul>{facts.recreated.map((x, i) => <li key={i}>{shownFact(x, queue.lang)}</li>)}</ul>
                     </div>
                   )}
                 </section>
