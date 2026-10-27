@@ -6,7 +6,7 @@ export interface LandingWords {
   tagline: string;
   /** The one sentence under the tagline on the hero: who the stories are about and how they are told. */
   lead: string;
-  /** W2: how they are told. */
+  /** W2: what each story holds (it never opens with the tagline's words, and the lead already says how they are told). */
   intro: string;
   /** The line that invites a choice among the thirty. */
   choose: string;

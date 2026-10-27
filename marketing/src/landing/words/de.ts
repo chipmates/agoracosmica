@@ -5,7 +5,7 @@ const words: LandingWords = {
   tagline: 'Kurze Geschichten übers Leben',
   lead: 'Dreißig echte Leben, in der Ich-Form nacherzählt.',
   intro:
-    'Kurze Geschichten aus dreißig echten Leben, von Platon bis Frida Kahlo. Jede zeigt einen Moment, in dem jemand etwas fürs Leben lernt. In der Ich-Form nacherzählt.',
+    'Von Platon bis Frida Kahlo: Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt.',
   choose: 'Wähl jemanden, der dich neugierig macht.',
   lines: {
     laozi: 'Du lernst, ohne Zwang zu handeln.',
