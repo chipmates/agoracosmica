@@ -1,0 +1,19 @@
+---
+// Concept 5's layout slot, empty: replace everything below with the concept, using the base parts:
+// Stage.astro (the stage), thirty.ts (the thirty, build time), words/ (placeholder words), stage.ts (swapStage,
+// onStageSwap, stageFigures, stageMoment, in a <script>), dust.ts (runMoment on any image), landing.css.
+import Stage from '../../Stage.astro';
+import { landingWords } from '../../words';
+import type { LandingLang } from '../../thirty';
+
+interface Props {
+  lang: LandingLang;
+}
+
+const { lang } = Astro.props;
+const W = landingWords(lang);
+---
+<h1 class="landing-lab__h1">{W.tagline}</h1>
+<p class="landing-lab__intro">{W.intro}</p>
+<Stage lang={lang} />
+<p class="landing-lab__note">{W.lab.slotEmpty(5)}</p>

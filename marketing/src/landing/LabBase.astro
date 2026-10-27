@@ -1,0 +1,83 @@
+---
+// The lab's own page: the base parts on a plain page. The stage, the thirty as a plain row of picks, the moment on
+// the stage and on a small face, and the five layout slots.
+import Stage from './Stage.astro';
+import PortraitCredit from '../components/PortraitCredit.astro';
+import { landingWords } from './words';
+import { byEra, figure, thumbSrcset, thumbUrl } from './thirty';
+import { portraitAlt } from '../lib/portraitCredit';
+import type { LandingLang } from './thirty';
+
+interface Props {
+  lang: LandingLang;
+}
+
+const { lang } = Astro.props;
+const W = landingWords(lang);
+const prefix = lang === 'de' ? '/de' : '';
+const slots = [1, 2, 3, 4, 5];
+const demoId = 'laozi';
+---
+<div class="landing-lab__top">
+  <div>
+    <h1 class="landing-lab__h1">{W.tagline}</h1>
+    <p class="landing-lab__intro">{W.intro}</p>
+    <p class="landing-lab__note">{W.lab.note}</p>
+  </div>
+  <Stage lang={lang} />
+</div>
+
+<section class="ls-thirty" aria-labelledby="ls-thirty-h">
+  <h2 class="landing-lab__h2" id="ls-thirty-h">{W.lab.thirty}</h2>
+  <p class="ls-thirty__lead">{W.choose}</p>
+  {byEra().map(({ era, figures }) => (
+    <Fragment>
+      <h3 class="ls-thirty__era">{era.name[lang]} · {era.span[lang]}</h3>
+      <ul class="ls-thirty__list" aria-label={era.name[lang]}>
+        {figures.map(f => (
+          <li>
+            <a class="ls-pick" href={f.href[lang]} data-landing-pick={f.id}>
+              <img src={thumbUrl(f.id, 160)} srcset={thumbSrcset(f.id)} sizes="60px" alt="" width="60" height="60" loading="lazy" decoding="async" crossorigin="anonymous" />
+              <span>{f.name[lang]}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </Fragment>
+  ))}
+  <PortraitCredit lang={lang} heard class="landing-lab__note" />
+</section>
+
+<section aria-labelledby="ls-moment-h">
+  <h2 class="landing-lab__h2" id="ls-moment-h">{W.lab.moment}</h2>
+  <p><button type="button" class="sp-textlink" data-lab-replay>{W.lab.momentAgain}</button></p>
+  <div class="landing-lab__demo">
+    <img src={thumbUrl(demoId, 320)} alt={portraitAlt(figure(demoId).name[lang], lang)} width="96" height="96" crossorigin="anonymous" decoding="async" data-lab-demo-img />
+    <p data-lab-demo-line>{W.lines[demoId]}</p>
+  </div>
+  <PortraitCredit lang={lang} class="landing-lab__note" />
+  <p><button type="button" class="sp-textlink" data-lab-demo>{W.lab.momentSmall}</button></p>
+</section>
+
+<section aria-labelledby="ls-slots-h">
+  <h2 class="landing-lab__h2" id="ls-slots-h">{W.lab.slots}</h2>
+  <ul class="landing-lab__slots">
+    {slots.map(n => <li><a class="sp-textlink" href={`${prefix}/landing-lab/c${n}/`}>{W.lab.slotLink(n)}</a></li>)}
+  </ul>
+</section>
+
+<script>
+  import { replayMoment } from './stage';
+  import { runMoment } from './dust';
+  import { THUMB_EYES } from './eyes';
+
+  document.addEventListener('click', e => {
+    const t = e.target instanceof Element ? e.target : null;
+    if (t?.closest('[data-lab-replay]')) replayMoment();
+    if (t?.closest('[data-lab-demo]')) {
+      const image = document.querySelector<HTMLImageElement>('[data-lab-demo-img]');
+      const line = document.querySelector<HTMLElement>('[data-lab-demo-line]');
+      if (image) runMoment({ image, line, eyes: THUMB_EYES });
+    }
+  });
+</script>
