@@ -545,14 +545,15 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 [data-story-play][data-state="playing"] .story-play__icon--pause,
 [data-story-play][data-state="loading"] .story-play__icon--pause { display: block; }
 
-/* The label, word for word, its longer line one tap away. */
-.sp-label { margin: 0.125rem 0 0; max-width: 460px; }
+/* The label, word for word, its longer line one tap away; the UI face's serifed capital I, so "KI" and "AI" never
+   read as "Kl" and "Al" (as in the credit). */
+.sp-label { margin: 0.125rem 0 0; max-width: 460px; font-feature-settings: "ss05" 1; }
 .sp-label > summary {
   display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 7px;
   min-height: 44px;
-  padding-right: 4px;
+  padding-right: 2px;
   cursor: pointer;
   list-style: none;
   font-family: var(--font-ui);
@@ -1221,7 +1222,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock__voice, .story-dock__who { grid-area: 1 / 1; min-width: 0; transition: opacity 400ms ease, visibility 0s linear 0s; }
 .story-dock[data-voice="on"] .story-dock__who,
 .story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s linear 400ms; }
-.story-dock__note { max-width: 1136px; margin: 0 auto; padding: 2px 0 10px; font-size: 0.8125rem; line-height: 1.45; color: var(--sp-ink-2); }
+.story-dock__note { max-width: 1136px; margin: 0 auto; padding: 2px 0 10px; font-size: 0.8125rem; line-height: 1.45; color: var(--sp-ink-2); font-feature-settings: "ss05" 1; }
 .story-dock__note[hidden], .story-dock--end .story-dock__note { display: none; }
 .story-dock__note p { margin: 0 0 4px; }
 .story-dock__note .story-dock__notek { color: var(--sp-ink); }
