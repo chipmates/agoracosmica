@@ -140,6 +140,13 @@ export interface PlayerStrings {
   followVoice: string;
   followHelp: string;
   sizeValue: (px: number) => string;
+  /** The keys, listed in the display sheet on a device with a mouse: a heading, then each key and what it does. */
+  keysTitle: string;
+  keys: [string, string][];
+  /** Under "after this story" in the open player: the story that comes next. */
+  afterNextTitle: (n: number, title: string) => string;
+  /** The save toast's second button: the saved list. */
+  showSaved: string;
   /** The facts and saved sheets. */
   factsLoading: string;
   factsError: string;
@@ -259,6 +266,10 @@ const en: PlayerStrings = {
   followVoice: 'Follow the voice',
   followHelp: 'The text scrolls with the voice. Scroll yourself to read freely.',
   sizeValue: px => `${px} px`,
+  keysTitle: 'Keys',
+  keys: [['Space', 'Play or pause'], ['← →', 'Sentence back or on'], ['Shift ← →', 'Paragraph back or on'], ['+ −', 'Faster or slower'], ['M', 'Save the sentence'], ['Esc', 'Close the text']],
+  afterNextTitle: (n, title) => `Next: ${n}. ${title}`,
+  showSaved: 'See all',
   factsLoading: 'Loading the facts',
   factsError: 'The facts could not be loaded.',
   savedTitle: 'Saved',
@@ -377,6 +388,10 @@ const de: PlayerStrings = {
   followVoice: 'Der Stimme folgen',
   followHelp: 'Der Text scrollt mit der Stimme. Scrollst du selbst, liest du frei.',
   sizeValue: px => `${px} px`,
+  keysTitle: 'Tasten',
+  keys: [['Leertaste', 'Abspielen oder anhalten'], ['← →', 'Satz zurück oder weiter'], ['Umschalt ← →', 'Absatz zurück oder weiter'], ['+ −', 'Schneller oder langsamer'], ['M', 'Satz merken'], ['Esc', 'Text schließen']],
+  afterNextTitle: (n, title) => `Danach: ${n}. ${title}`,
+  showSaved: 'Alle ansehen',
   factsLoading: 'Fakten werden geladen',
   factsError: 'Die Fakten konnten nicht geladen werden.',
   savedTitle: 'Gemerkt',

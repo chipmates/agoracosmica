@@ -125,6 +125,7 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
     seekRef.current?.style.setProperty('--story-seek', `${pct}%`);
   }, [pct]);
   const rate = rateLabel(state.rate, queue.lang);
+  const nextEntry = queue.entries.find(e => e.n === current + 1);
   // The map of the text once the story's text and timing are in; the plain range until then.
   const map = useTextMap(queue, current, state.duration);
   return (
@@ -158,8 +159,11 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
           </div>
         </div>
         <div className="sp-field">
-          <span className="sp-field__label" id="sp-after-l">{s.after}</span>
-          <div className="sp-seg" role="radiogroup" aria-labelledby="sp-after-l">
+          <span className="sp-fp__after">
+            <span className="sp-field__label" id="sp-after-l">{s.after}</span>
+            {nextEntry && <span className="sp-fp__next" id="sp-after-next">{s.afterNextTitle(nextEntry.n, nextEntry.title)}</span>}
+          </span>
+          <div className="sp-seg" role="radiogroup" aria-labelledby="sp-after-l" aria-describedby={nextEntry ? 'sp-after-next' : undefined}>
             <button type="button" role="radio" aria-checked={state.autoNext} onClick={() => setAutoNext(true)}>{s.afterNext}</button>
             <button type="button" role="radio" aria-checked={!state.autoNext} onClick={() => setAutoNext(false)}>{s.afterStop}</button>
           </div>
@@ -314,6 +318,14 @@ function DisplaySheet({ s, titleRef }: { s: PlayerStrings; titleRef: RefObject<H
           </span>
           <span className="sp-switch__knob" aria-hidden="true" />
         </button>
+        <div className="sp-keys">
+          <span className="sp-field__label" id="sp-keys-l">{s.keysTitle}</span>
+          <dl aria-labelledby="sp-keys-l">
+            {s.keys.map(([key, what]) => (
+              <div key={key}><dt><kbd>{key}</kbd></dt><dd>{what}</dd></div>
+            ))}
+          </dl>
+        </div>
       </div>
     </>
   );

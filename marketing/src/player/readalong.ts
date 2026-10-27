@@ -182,6 +182,19 @@ export function blockAt(model: ReaderModel, t: number): number | null {
   return found;
 }
 
+/** The sentence a step by paragraph lands on: the next paragraph's first; back, this paragraph's first unless already
+ * there, then the one before (rules and the introduction's title skipped). */
+export function paragraphStep(model: ReaderModel, si: number, dir: 1 | -1): number {
+  const cur = model.sentences[si]?.bi ?? 0;
+  const first = model.blocks[cur]?.sentences[0];
+  if (dir < 0 && first !== undefined && first < si) return first;
+  for (let b = cur + dir; b >= 0 && b < model.blocks.length; b += dir) {
+    const block = model.blocks[b]!;
+    if (!block.rule && !block.heading && block.sentences.length) return block.sentences[0]!;
+  }
+  return si;
+}
+
 /** Where the voice says this sentence, for "listen from here" and a tap while playing. */
 export function sentenceStart(model: ReaderModel, si: number): number {
   const s = model.sentences[si];

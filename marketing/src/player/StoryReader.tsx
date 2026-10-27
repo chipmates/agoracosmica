@@ -22,11 +22,12 @@ import {
   removeSaved,
   seekTo,
   setAway,
+  stepRate,
   togglePlay,
 } from './controller';
 import { cleanFact, loadFacts, loadText, loadTiming } from './content';
 import type { FactEntry, StoryTiming, TextBlock } from './content';
-import { blockAt, buildModel, sentenceStart, wordAt } from './readalong';
+import { blockAt, buildModel, paragraphStep, sentenceStart, wordAt } from './readalong';
 import type { ReaderModel } from './readalong';
 import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
 import { Icon } from './icons';
@@ -350,8 +351,14 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
       if ((e.key === 'ArrowRight' || e.key === 'ArrowLeft') && here && model && model.mode !== 'none' && !target?.closest('button, a')) {
         e.preventDefault();
         const cur = Math.max(0, lit.current.si);
-        const next = Math.max(0, Math.min(model.sentences.length - 1, cur + (e.key === 'ArrowRight' ? 1 : -1)));
+        const dir = e.key === 'ArrowRight' ? 1 : -1;
+        const next = e.shiftKey ? paragraphStep(model, cur, dir) : Math.max(0, Math.min(model.sentences.length - 1, cur + dir));
         seekTo(sentenceStart(model, next) + 0.01);
+        return;
+      }
+      if ((e.key === '+' || e.key === '=' || e.key === '-' || e.key === '−') && here && !e.metaKey && !e.ctrlKey && !e.altKey) {
+        e.preventDefault();
+        stepRate(e.key === '-' || e.key === '−' ? -1 : 1);
         return;
       }
       if ((e.key === 'm' || e.key === 'M') && !e.metaKey && !e.ctrlKey && !e.altKey) keepCurrent();
@@ -374,7 +381,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     const text = model?.sentences[si]?.text;
     if (!text) return;
     const added = saveSentence(n, si, text);
-    showToast(s.kept, added ? { label: s.undo, run: () => removeSaved(n, si) } : undefined);
+    showToast(s.kept, added ? { label: s.undo, run: () => removeSaved(n, si) } : undefined, { label: s.showSaved, run: () => openSheet('saved') });
   };
   const keepCurrent = () => keep(sentenceInView());
 

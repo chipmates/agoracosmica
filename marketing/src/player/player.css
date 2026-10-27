@@ -1494,6 +1494,16 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 
 /* the full player */
 .sp-fp__seek { margin-top: 8px; }
+.sp-fp__after { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sp-fp__next { font-size: 0.8125rem; line-height: 1.35; color: var(--sp-ink-3); overflow-wrap: anywhere; }
+/* the keys: only where there is a mouse and a keyboard to use them */
+.sp-keys { padding: 14px 0 4px; }
+.sp-keys dl { display: grid; gap: 6px; margin: 0; }
+.sp-keys dl > div { display: grid; grid-template-columns: minmax(7.5em, auto) 1fr; gap: 12px; align-items: baseline; }
+.sp-keys dt, .sp-keys dd { margin: 0; font-size: 0.8125rem; }
+.sp-keys dd { color: var(--sp-ink-2); }
+.sp-keys kbd { font-family: var(--font-ui); font-size: 0.75rem; padding: 1px 6px; border: 1px solid var(--sp-hair-strong); border-radius: 4px; color: var(--sp-ink); white-space: nowrap; }
+@media (hover: none), (pointer: coarse) { .sp-keys { display: none; } }
 
 /* ---- the map of the text: scenes as small blocks of lines, filled as heard ------------------------------- */
 .sp-tmap { position: relative; min-width: 0; }
@@ -1888,7 +1898,7 @@ html:has(.story-reader) { overflow: hidden; }
   color: var(--sp-ink);
 }
 .sp-toast[hidden] { display: none; }
-.sp-toast button { min-height: 44px; padding: 0 10px; background: none; border: 0; cursor: pointer; font: inherit; color: var(--sp-accent); }
+.sp-toast button { min-height: 44px; padding: 0 8px; background: none; border: 0; cursor: pointer; font: inherit; color: var(--sp-accent); white-space: nowrap; }
 
 @media (prefers-reduced-motion: reduce) {
   .sp-plate, .sp-disc__core, .sp-row__chev, .story-reader__body p, .story-reader__body .s, .story-reader__body .w,
