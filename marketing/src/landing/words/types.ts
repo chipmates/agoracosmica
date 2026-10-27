@@ -18,6 +18,9 @@ export interface LandingWords {
   stageTitle: (name: string) => string;
   /** The row of thirty's accessible name. */
   rowLabel: string;
+  /** The two buttons that turn the stage to the next or previous figure, with the name they lead to. */
+  turnNext: (name: string) => string;
+  turnPrevious: (name: string) => string;
   lab: {
     title: string;
     note: string;

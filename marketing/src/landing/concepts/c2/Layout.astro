@@ -5,7 +5,7 @@
 import Stage from '../../Stage.astro';
 import PortraitCredit from '../../../components/PortraitCredit.astro';
 import { landingWords } from '../../words';
-import { byEra, DEFAULT_FIGURE, thumbSrcset, thumbUrl } from '../../thirty';
+import { byEra, DEFAULT_FIGURE, THIRTY, thumbSrcset, thumbUrl } from '../../thirty';
 import type { LandingLang } from '../../thirty';
 import './c2.css';
 
@@ -24,6 +24,10 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
   if (!full.includes(' ')) return full;
   return short.length > 12 ? short.split(' ')[0] ?? short : short;
 };
+// The arrows' names for the figure the markup ships with; c2's script renames them after each turn.
+const at = THIRTY.findIndex(f => f.id === DEFAULT_FIGURE);
+const nextName = THIRTY[(at + 1) % THIRTY.length]?.name[lang] ?? '';
+const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ?? '';
 ---
 <div class="c2">
   <section class="c2-hero" data-c2-hero aria-labelledby="c2-h1">
@@ -38,6 +42,14 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
         sizes="(min-width: 1024px) 62vw, (min-resolution: 2.5dppx) 300px, 100vw"
         class="c2-stage"
       />
+      <div class="c2-turn" data-c2-turn data-next={W.turnNext('{name}')} data-prev={W.turnPrevious('{name}')} hidden>
+        <button type="button" class="c2-turn__btn c2-turn__btn--prev" data-c2-dir="prev" aria-label={W.turnPrevious(prevName)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M14.5 5.5 8 12l6.5 6.5" /></svg>
+        </button>
+        <button type="button" class="c2-turn__btn c2-turn__btn--next" data-c2-dir="next" aria-label={W.turnNext(nextName)}>
+          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M9.5 5.5 16 12l-6.5 6.5" /></svg>
+        </button>
+      </div>
       <nav class="c2-rail" aria-label={W.rowLabel}>
         <p class="c2-rail__lead" aria-hidden="true">{W.choose}</p>
         <div class="c2-rail__scroll" data-c2-rail>

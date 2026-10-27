@@ -38,6 +38,8 @@
   display: flex;
   flex-direction: column;
   padding: var(--c2-face) 16px 2rem;
+  /* a sideways swipe turns the stage (swipe.ts); the browser keeps the vertical pan and the zoom */
+  touch-action: pan-y pinch-zoom;
 }
 .c2-h1 { order: 1; }
 .c2-stage { order: 2; }
@@ -86,6 +88,48 @@
   /* a bright painting (Mozart's, Austen's) stays behind a darker chip than the card's */
   background: color-mix(in srgb, var(--sp-n-void) 84%, transparent);
 }
+
+/* ---- the two arrows: the same turn as a swipe, for a mouse and for anyone who does not know to swipe ---------- */
+.c2-turn {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--c2-face);
+  pointer-events: none;
+}
+.c2-turn[hidden] { display: none; }
+.c2-turn__btn {
+  position: absolute;
+  top: 50%;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  margin-top: -22px;
+  padding: 0;
+  border: 1px solid var(--sp-hair-strong);
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--sp-n-void) 66%, transparent);
+  color: var(--sp-n-ink);
+  cursor: pointer;
+  pointer-events: auto;
+  -webkit-tap-highlight-color: transparent;
+}
+.c2-turn__btn--prev { left: 8px; }
+.c2-turn__btn--next { right: 8px; }
+.c2-turn__btn svg {
+  width: 22px;
+  height: 22px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.c2-turn__btn:hover { border-color: var(--sp-n-gold); color: var(--sp-n-gold-hover); }
+.c2-turn__btn:focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 2px; }
 
 /* ---- the words on the dark foot --------------------------------------------------------------------------- */
 .c2-h1 {
@@ -280,6 +324,8 @@
     mask-composite: intersect;
   }
   .c2-hero .ls-card__img { object-position: var(--ls-fx, 50%) 16%; }
+  /* the arrows sit on the painting's lit part, at the face's height */
+  .c2-turn { left: 50%; right: max(16px, calc(50vw - 600px)); top: 0; height: 74%; }
   .c2-hero .ls-name { font-size: 3rem; }
   .c2-hero .ls-name[data-long] { font-size: 2.5rem; }
   .c2-hero .ls-line { font-size: 1.25rem; }

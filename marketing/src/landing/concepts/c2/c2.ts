@@ -4,10 +4,13 @@
 
 import { onStageSwap, stageFigureId, stageFigures, swapStage } from '../../stage';
 import { momentStill, runMoment } from '../../dust';
+import type { Beats } from '../../dust';
 import { MAIN_EYES } from '../../eyes';
+import { afterSwap, installSwipe } from './swipe';
 
 let observed: HTMLImageElement | null = null;
-const watcher = typeof MutationObserver === 'undefined' ? null : new MutationObserver(() => runOnHero(null));
+// a swap's new face arrives through the short moment (the face alone); the arrival keeps the face and the line
+const watcher = typeof MutationObserver === 'undefined' ? null : new MutationObserver(() => runOnHero(null, 'face'));
 
 function hero(): HTMLElement | null {
   return document.querySelector<HTMLElement>('[data-c2-hero]');
@@ -19,7 +22,7 @@ function freezeAt(): number | null {
 }
 
 /** The face condenses, the stream writes the figure's line and runs into the plate's disc. */
-function runOnHero(freeze: number | null): void {
+function runOnHero(freeze: number | null, beats: Beats = 'face+line'): void {
   const root = hero();
   const image = root?.querySelector<HTMLImageElement>('[data-stage-img]');
   if (!root || !image) return;
@@ -30,6 +33,7 @@ function runOnHero(freeze: number | null): void {
     end: root.querySelector('[data-stage-disc]'),
     keep,
     eyes: MAIN_EYES,
+    beats,
     freezeAt: freeze,
   });
 }
@@ -79,13 +83,16 @@ function onPick(e: MouseEvent): void {
   bringStage(from);
 }
 
-/** A page opened on a later figure (an address with ?figure=) shows its face in the row. */
-function centreRail(): void {
+/** The face on the stage stays in the row's view (an address with ?figure=, a swipe, an arrow); only the row moves. */
+function centreRail(smooth: boolean): void {
   const rail = document.querySelector<HTMLElement>('[data-c2-rail]');
   const on = rail?.querySelector<HTMLElement>('[aria-current="true"]');
-  if (!rail || !on) return;
-  if (on.offsetLeft + on.offsetWidth <= rail.scrollLeft + rail.clientWidth) return;
-  rail.scrollLeft = Math.max(0, on.offsetLeft - rail.clientWidth / 2 + on.offsetWidth / 2);
+  if (!rail || !on || rail.scrollWidth <= rail.clientWidth) return;
+  const li = on.closest('li') ?? on;
+  const left = (li as HTMLElement).offsetLeft;
+  if (left >= rail.scrollLeft && left + on.offsetWidth <= rail.scrollLeft + rail.clientWidth) return;
+  const to = Math.max(0, left - rail.clientWidth / 2 + on.offsetWidth / 2);
+  rail.scrollTo({ left: to, behavior: smooth && !reduced() ? 'smooth' : 'auto' });
 }
 
 let installed = false;
@@ -94,14 +101,17 @@ export function installC2(): void {
   if (installed) return;
   installed = true;
   window.addEventListener('click', onPick, true);
+  installSwipe();
   onStageSwap(d => {
     attach(d.previous === '');
-    if (d.previous === '') centreRail();
+    centreRail(d.previous !== '');
+    afterSwap();
   });
   // the stage may have attached before this script ran (the opening swap event is then past)
   if (stageFigureId()) {
     attach(true);
-    centreRail();
+    centreRail(false);
+    afterSwap();
   }
   document.addEventListener('astro:before-swap', () => {
     watcher?.disconnect();

@@ -42,6 +42,8 @@ const words: LandingWords = {
   nowShowing: name => `Jetzt: ${name}`,
   stageTitle: name => `${name} · Agora Cosmica`,
   rowLabel: 'Die dreißig',
+  turnNext: name => `Weiter zu ${name}`,
+  turnPrevious: name => `Zurück zu ${name}`,
   lab: {
     title: 'Landing-Labor',
     note: 'Die gemeinsamen Teile der Landing-Entwürfe, auf einer schlichten Seite. Nicht indexiert.',
