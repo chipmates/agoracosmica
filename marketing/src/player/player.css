@@ -949,7 +949,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   align-items: center;
   gap: 2px;
   min-height: 44px;
-  margin: 2px 0 -6px;
+  margin: 2px 0 0;
   font-size: 0.8125rem;
   color: var(--sp-accent);
   text-decoration: none;
@@ -973,6 +973,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   text-align: left;
   color: var(--sp-ink);
 }
+/* Under the way back the title keeps its place, and the two targets do not overlap. */
+.story-dock__home + .story-dock__open { min-height: 46px; padding-top: 2px; }
 /* The one text in the dock that may truncate, with an ellipsis, also where one word outgrows its line (200 %). */
 .story-dock__title {
   min-width: 0;

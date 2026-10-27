@@ -33,7 +33,7 @@ const whatText = intro?.minutes ? P.beginSub(intro.minutes) : [first?.title, fir
 const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
-// The label breaks only at its middle dot.
+// The label breaks at its middle dot; a half wider than the line (200 % text) at its hyphens.
 const halves = labelHalves(label.brief);
 ---
 <section class="sp-hero" aria-labelledby="sp-name" data-story-hero>
