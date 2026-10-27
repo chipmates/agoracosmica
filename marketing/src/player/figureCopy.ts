@@ -54,6 +54,19 @@ export function ownWords(figureId: string, lang: PlayerLang): OwnWords | null {
   return OWN_WORDS[figureId]?.[lang] ?? null;
 }
 
+// The note at a player page's end: what the portrait and the stories are. Per
+// figure, because "from his writings" holds only for one who left writings.
+const STORY_NOTES: Record<string, Record<PlayerLang, (name: string) => string>> = {
+  aurelius: {
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written with AI from his writings and the sources and read by a synthetic voice. Not a recording. Never his own words.`,
+    de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie mit KI nach seinen Schriften und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte.`,
+  },
+};
+
+export function storyNote(figureId: string, lang: PlayerLang, name: string): string | null {
+  return STORY_NOTES[figureId]?.[lang]?.(name) ?? null;
+}
+
 function firstSentence(text: string): string {
   const m = text.match(/^.+?[.!?](?=\s|$)/);
   return (m ? m[0] : text).trim();

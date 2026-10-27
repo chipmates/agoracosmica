@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Marcus Aurelius speaking?',
-        a: "No. This is an Echo of Marcus Aurelius. It is an AI voice built from what he actually wrote, and it stays an interpretation, not a recording. The real man lived from 121 to 180 AD and no recording of him exists. Use it as a way into his Stoic ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from the Meditations and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Marcus Aurelius lived from 121 to 180 AD. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Mark Aurel?',
-        a: "Nein. Das hier ist ein Echo von Mark Aurel. Es ist eine KI-Stimme, gebaut aus dem, was er wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 121 bis 180 n. Chr., und Aufnahmen von ihm gibt es nicht. Nimm es als Weg in seine stoischen Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Selbstbetrachtungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Mark Aurel lebte von 121 bis 180 n. Chr. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

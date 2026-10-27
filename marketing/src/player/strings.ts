@@ -63,7 +63,7 @@ export interface PlayerStrings {
   finishedWord: string;
   /** The reader's end: the figure template's existing heading. */
   ledgerTitle: string;
-  /** The quiet link into the app, kept as a read-along backup. */
+  /** The quiet link into the app's story mode. */
   appLink: string;
   /** The facts part. */
   aboutTitle: (she: boolean) => string;
@@ -188,7 +188,7 @@ const en: PlayerStrings = {
   startedWord: 'started',
   finishedWord: 'finished',
   ledgerTitle: 'The facts',
-  appLink: 'Read along in the app',
+  appLink: 'The stories in the app →',
   aboutTitle: she => (she ? 'Who she was' : 'Who he was'),
   hearStory: title => `Listen to the story “${title}”`,
   mapBy: name => `for ${name}`,
@@ -304,7 +304,7 @@ const de: PlayerStrings = {
   startedWord: 'angefangen',
   finishedWord: 'zu Ende gehört',
   ledgerTitle: 'Die Fakten',
-  appLink: 'In der App mitlesen',
+  appLink: 'Die Geschichten in der App →',
   aboutTitle: she => (she ? 'Wer sie war' : 'Wer er war'),
   hearStory: title => `Die Geschichte „${title}“ hören`,
   mapBy: name => `für ${name}`,

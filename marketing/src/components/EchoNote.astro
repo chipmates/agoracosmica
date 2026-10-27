@@ -7,19 +7,24 @@ interface Props {
   variant: 'figure' | 'theme';
   name?: string;
   lang: Lang;
+  /** A page's own note and link in place of the shared ones (the story pages). */
+  note?: string;
+  link?: { href: string; label: string };
 }
 
-const { variant, name, lang } = Astro.props;
+const { variant, name, lang, note, link } = Astro.props;
 const t = getT(lang);
 const text =
-  variant === 'figure'
+  note ?? (variant === 'figure'
     ? t('echo.figureNote').replace('{name}', name ?? '')
-    : t('echo.themeNote');
+    : t('echo.themeNote'));
+const href = link?.href ?? publicUrl(lang, '/echoes');
+const label = link?.label ?? t('echo.whyLink');
 ---
 <section class="pub-section">
   <p class="pub-section__text pub-echo-note">
     {text}
-    {' '}<a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{t('echo.whyLink')}</a>
+    {' '}<a class="pub-textlink" href={href}>{label}</a>
   </p>
 </section>
 

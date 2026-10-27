@@ -29,7 +29,7 @@ import { getFigureQA } from '@client/data/public/figureQA';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { buildStoryQueue } from '../../player/queue';
 import { playerStrings } from '../../player/strings';
-import { deepLinks } from '../../player/figureCopy';
+import { deepLinks, storyNote } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
 
 interface Props {
@@ -65,15 +65,13 @@ const aboutLinks = links.filter(link => !sectionLinks.includes(link));
 const S = de
   ? {
       deeper: 'Zu einem Thema tiefer:',
-      method: 'Wie wir diese Echos bauen und prüfen',
-      hubLead: 'Weiter erkunden: ',
+      method: 'Wie wir die Fakten prüfen',
       related: 'Menschen, die hier immer wieder auftauchen',
       themes: 'Große Fragen, die dieses Werk berührt',
     }
   : {
       deeper: 'Go deeper on one thing:',
-      method: 'How we build and fact-check these Echoes',
-      hubLead: 'Keep exploring: ',
+      method: 'How we check the facts',
       related: 'People who keep coming up here',
       themes: 'The big questions this work touches',
     };
@@ -100,15 +98,9 @@ const relatedLives = relatedFigureIds.slice(0, 2).flatMap(relId => {
 const queue = buildStoryQueue(figureId, slug, figure.name, lang, relatedLives);
 const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
 const themesForFigure = figureThemes[figureId] ?? [];
-const PHILO_FIGURES = new Set([
-  'laozi', 'aurelius', 'plato', 'nietzsche', 'schopenhauer', 'beauvoir',
-  'gautama', 'zenji', 'eckhart', 'bingen', 'rumi', 'jung', 'campbell',
-]);
-const isPhilo = PHILO_FIGURES.has(figureId);
-const hubHref = de ? (isPhilo ? '/de/philosophie-lernen/' : '/de/figures/') : (isPhilo ? '/ai-philosophy-tutor/' : '/figures/');
-const hubLinkLabel = isPhilo
-  ? (de ? 'Philosophie lernen mit einem KI-Tutor' : 'Learn philosophy with an AI tutor')
-  : (de ? 'Von historischen Persönlichkeiten lernen' : 'Learn from historical figures');
+// The figure template's hub line stays off: its target still promises the chat.
+const methodHref = de ? '/de/methodik/' : '/methodology/';
+const note = storyNote(figureId, lang, figure.name);
 ---
 <div class="pub-figure story-page">
   <Breadcrumbs
@@ -143,7 +135,7 @@ const hubLinkLabel = isPhilo
   <div class="sp-more">
     <FigureQA figureId={figureId} lang={lang} />
     <p class="pub-section__text pub-figure__methodlink">
-      <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
+      <a class="pub-textlink" href={methodHref}>{S.method}</a>
     </p>
 
     <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player />
@@ -183,15 +175,14 @@ const hubLinkLabel = isPhilo
             </a>
           ))}
         </div>
-        <p class="pub-section__text pub-figure__hublink">
-          {S.hubLead}<a class="pub-textlink" href={hubHref}>{hubLinkLabel}</a>
-        </p>
       </section>
     )}
 
     <FigureShadow figureId={figureId} lang={lang} />
     <SourcesBlock figureId={figureId} lang={lang} />
-    <EchoNote variant="figure" name={figure.name} lang={lang} />
+    {note
+      ? <EchoNote variant="figure" name={figure.name} lang={lang} note={note} link={{ href: methodHref, label: `${S.method} →` }} />
+      : <EchoNote variant="figure" name={figure.name} lang={lang} />}
   </div>
   {/* Never rendered: the reference keeps the shared figure components' styles in
       the chunk the other figure pages load, so their build stays as on main. */}
