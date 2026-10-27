@@ -18,6 +18,8 @@ export interface LandingWords {
   nowShowing: (name: string) => string;
   /** The document's title while a figure is on the stage. */
   stageTitle: (name: string) => string;
+  /** One name per era, by the era's id, oldest age first in a compound name; the same in the row and the list. */
+  eras: Record<string, string>;
   /** The row of thirty's accessible name. */
   rowLabel: string;
   /** The two buttons that turn the stage to the next or previous figure, with the name they lead to. */

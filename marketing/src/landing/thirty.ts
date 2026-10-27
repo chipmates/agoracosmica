@@ -66,13 +66,14 @@ const FOCAL: Record<string, number> = {
 /** Longer catalog periods ("Late Eastern Zhou, roughly ...") give way to the shortened years. */
 const DATES_MAX = 24;
 
-const ERAS: Era[] = STRATA.map(s => ({
-  id: s.id,
-  num: s.num,
-  name: { en: s.en.name, de: s.de.name },
-  short: { en: s.en.short, de: s.de.short },
-  span: { en: s.en.span, de: s.de.span },
-}));
+// The landing names each era once, in its own words (the figures index keeps its own names).
+const ERAS: Era[] = STRATA.map(s => {
+  const name = {
+    en: landingWords('en').eras[s.id] ?? s.en.name,
+    de: landingWords('de').eras[s.id] ?? s.de.name,
+  };
+  return { id: s.id, num: s.num, name, short: name, span: { en: s.en.span, de: s.de.span } };
+});
 
 // STRATA lists the bands newest first and each band newest first: reversed twice, oldest first.
 const ORDER: string[] = [...STRATA].reverse().flatMap(s => [...s.figures].reverse());

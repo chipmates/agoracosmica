@@ -42,6 +42,13 @@ const words: LandingWords = {
   allStories: n => `Alle ${n} Geschichten`,
   nowShowing: name => `Jetzt: ${name}`,
   stageTitle: name => `${name} · Agora Cosmica`,
+  eras: {
+    antiquity: 'Antike',
+    mystics: 'Mystiker',
+    enlightenment: 'Renaissance und Aufklärung',
+    steam: 'Dampf und Tinte',
+    modern: 'Moderne Stimmen',
+  },
   rowLabel: 'Die dreißig',
   turnNext: name => `Weiter zu ${name}`,
   turnPrevious: name => `Zurück zu ${name}`,

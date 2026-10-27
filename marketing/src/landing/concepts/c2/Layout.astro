@@ -96,7 +96,7 @@ const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ??
     <h2 class="c2-index__h" id="c2-index-h">{W.lab.thirty}</h2>
     {eras.map(({ era, figures }) => (
       <div class="c2-index__era">
-        <h3 class="c2-index__eraname">{era.name[lang]} <span>{era.span[lang]}</span></h3>
+        <h3 class="c2-index__eraname">{era.name[lang]}, <span>{era.span[lang]}</span></h3>
         <ul class="c2-index__list">
           {figures.map(f => (
             <li>

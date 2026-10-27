@@ -275,7 +275,7 @@
   line-height: 1.35;
   color: var(--sp-ink-2);
 }
-.c2-index__eraname span { margin-left: 0.35em; font-weight: 400; color: var(--sp-ink-3); }
+.c2-index__eraname span { font-weight: 400; color: var(--sp-ink-3); }
 .c2-index__list { display: flex; flex-wrap: wrap; column-gap: 20px; margin: 0; padding: 0; list-style: none; }
 .c2-index__link {
   display: inline-flex;
