@@ -688,8 +688,8 @@ function updateMetadata(): void {
   const s = playerStrings(queue.lang);
   navigator.mediaSession.metadata = new MediaMetadata({
     title: current === 0 ? s.introTitle : entry ? `${s.storyN(current)}: ${entry.title}` : s.storyN(current),
-    // The lock screen travels without the page, so the label rides along.
-    artist: `${queue.name} · ${lockScreenLabel[queue.lang]}`,
+    // The lock screen travels without the page, so the label rides along, voice first: a cut line drops the name.
+    artist: [...lockScreenLabel[queue.lang].split(' · ').reverse(), queue.name].join(' · '),
     album: 'Agora Cosmica',
     artwork: [{ src: queue.artwork, sizes: '640x640', type: 'image/webp' }],
   });
