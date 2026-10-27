@@ -46,7 +46,7 @@ function warm(): void {
   void loadMap().catch(() => undefined);
 }
 import { Icon } from '../player/icons';
-import { VOICE_DESC_ID, clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
+import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -273,6 +273,9 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const clock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
   const rate = rateLabel(state.rate, storyLang);
 
+  // While the sleep timer runs, a small moon by the clock; its words go with the player button's name.
+  const sleepOn = typeof state.sleep === 'number' ? s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft))) : state.sleep === 'end' ? s.sleepToEnd : '';
+  const moon = sleepOn ? <span className="story-dock__moon" aria-hidden="true">{Icon.moon}</span> : null;
   const plainProgress = (
     <div className="story-dock__progress" aria-hidden="true">
       <div ref={fillRef} className="story-dock__fill" />
@@ -338,10 +341,11 @@ export default function StoryDock({ lang, labels, facts }: Props) {
           )}
           <div className="story-dock__head">
             <button type="button" className="story-dock__open" onClick={() => openSheet('player')}
-              aria-label={`${s.openPlayer}: ${title}`}>
+              aria-label={`${s.openPlayer}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
               <span className="story-dock__title">{title}</span>
               {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
               <span className="story-dock__time">
+                {moon}
                 <span className="story-dock__clock">{clock}</span>
                 <span className="story-dock__wait">{s.loading}</span>
                 {Icon.up}
@@ -398,7 +402,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
                 <Suspense fallback={plainSeek}>
                   <DockMap state={state} queue={queue} kind="desk" seekTo={seekTo} plain={plainSeek} />
                 </Suspense>
-                <span className="story-dock__t1">{clockLabel(state.duration)}</span>
+                <span className="story-dock__t1">{clockLabel(state.duration)}{moon}</span>
               </div>
               <div className="story-dock__rate" role="group" aria-label={s.speed}>
                 <button type="button" className="story-btn" onClick={() => stepRate(-1)} disabled={state.rate <= RATE_MIN}

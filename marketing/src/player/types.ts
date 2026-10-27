@@ -46,6 +46,10 @@ export interface ResumePoint {
 
 export type SheetKind = 'player' | 'facts' | 'display' | 'saved';
 
+/** The sleep timer: off, minutes of playing time, or the end of the story that is playing. */
+export type SleepChoice = 'off' | 10 | 20 | 30 | 'end';
+export const SLEEP_CHOICES: readonly SleepChoice[] = ['off', 10, 20, 30, 'end'];
+
 /** A sentence the visitor kept, on this device only. */
 export interface SavedSentence {
   n: number;
@@ -92,4 +96,7 @@ export interface PlayerState {
   /** Where the voice is from the view while away: above it or below it. */
   awayDir: 'up' | 'down';
   saved: SavedSentence[];
+  sleep: SleepChoice;
+  /** Seconds of playing left on a minutes timer. */
+  sleepLeft: number;
 }

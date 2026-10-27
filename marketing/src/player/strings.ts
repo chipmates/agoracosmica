@@ -96,6 +96,12 @@ export interface PlayerStrings {
   afterNext: string;
   afterStop: string;
   stopAll: string;
+  /** The sleep timer in the open player: its name, the five choices, what is left; the dock's moon says it too. */
+  sleepTitle: string;
+  sleepChoices: [string, string, string, string, string];
+  sleepLeft: (clock: string) => string;
+  sleepToEnd: string;
+  sleepAria: (what: string) => string;
   close: string;
   /** The end card. */
   ended: (n: number) => string;
@@ -227,6 +233,11 @@ const en: PlayerStrings = {
   afterNext: 'Next',
   afterStop: 'Stop',
   stopAll: 'Stop playing',
+  sleepTitle: 'Sleep timer',
+  sleepChoices: ['Off', '10 min', '20 min', '30 min', 'End'],
+  sleepLeft: clock => `${clock} left`,
+  sleepToEnd: 'Stops when this story ends',
+  sleepAria: what => `Sleep timer: ${what}`,
   close: 'Close',
   ended: n => `Story ${n} has ended.`,
   endedIntro: 'The introduction has ended.',
@@ -349,6 +360,11 @@ const de: PlayerStrings = {
   afterNext: 'Weiter',
   afterStop: 'Stopp',
   stopAll: 'Beenden',
+  sleepTitle: 'Schlaftimer',
+  sleepChoices: ['Aus', '10 Min.', '20 Min.', '30 Min.', 'Ende'],
+  sleepLeft: clock => `noch ${clock}`,
+  sleepToEnd: 'Hält am Ende dieser Geschichte an',
+  sleepAria: what => `Schlaftimer: ${what}`,
   close: 'Schließen',
   ended: n => `Geschichte ${n} ist zu Ende.`,
   endedIntro: 'Die Einführung ist zu Ende.',

@@ -27,6 +27,7 @@ import {
   togglePlay,
   RATE_MAX,
   RATE_MIN,
+  setSleep,
 } from './controller';
 import { cleanFact, loadFacts, loadText, loadTiming } from './content';
 import type { FactEntry } from './content';
@@ -40,6 +41,7 @@ import { hideToast } from './toast';
 import { VOICE_DESC_ID, clockLabel, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
+import { SLEEP_CHOICES } from './types';
 import type { PlayerState, StoryQueue } from './types';
 
 interface Props {
@@ -126,6 +128,7 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
   }, [pct]);
   const rate = rateLabel(state.rate, queue.lang);
   const nextEntry = queue.entries.find(e => e.n === current + 1);
+  const sleepText = sleepWords(state, s);
   // The map of the text once the story's text and timing are in; the plain range until then.
   const map = useTextMap(queue, current, state.duration);
   return (
@@ -169,6 +172,17 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
             <button type="button" role="radio" aria-checked={!state.autoNext} onClick={() => setAutoNext(false)}>{s.afterStop}</button>
           </div>
         </div>
+        <div className="sp-field sp-field--stack sp-fp__sleep">
+          <span className="sp-fp__after">
+            <span className="sp-field__label" id="sp-sleep-l">{s.sleepTitle}</span>
+            {sleepText && <span className="sp-fp__next" id="sp-sleep-left">{sleepText}</span>}
+          </span>
+          <div className="sp-seg" role="radiogroup" aria-labelledby="sp-sleep-l" aria-describedby={sleepText ? 'sp-sleep-left' : undefined}>
+            {SLEEP_CHOICES.map((c, i) => (
+              <button key={String(c)} type="button" role="radio" aria-checked={state.sleep === c} onClick={() => setSleep(c)}>{s.sleepChoices[i]}</button>
+            ))}
+          </div>
+        </div>
         <div className="sp-fp__links">
           <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); openReader(current); }}>{Icon.book}<span>{s.read}</span></button>
           <button type="button" className="sp-linkbtn" onClick={() => openSheet('facts', current)}>{Icon.checkCircle}<span>{w.facts}</span></button>
@@ -177,6 +191,12 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
       </div>
     </>
   );
+}
+
+/** What the sleep timer has left, in words; empty when it is off. */
+export function sleepWords(state: PlayerState, s: PlayerStrings): string {
+  if (typeof state.sleep === 'number') return s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft)));
+  return state.sleep === 'end' ? s.sleepToEnd : '';
 }
 
 // ---- facts ------------------------------------------------------------------------

@@ -1495,6 +1495,20 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 /* the full player */
 .sp-fp__seek { margin-top: 8px; }
 .sp-fp__after { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.sp-fp__sleep .sp-fp__after { margin-bottom: 8px; }
+.sp-fp__sleep .sp-field__label { margin: 0; }
+.sp-fp__sleep .sp-seg { display: grid; width: 100%; }
+.sp-fp__sleep .sp-seg button { min-width: 0; padding: 0 4px; }
+.story-dock__moon { display: inline-flex; color: var(--sp-accent); }
+.story-dock__moon svg { width: 15px; height: 15px; }
+/* the phone's clock cell: the moon takes a column before the clock, the chevron stays last */
+.story-dock__time:has(.story-dock__moon) { grid-template-columns: auto auto auto; }
+.story-dock__time .story-dock__moon { grid-column: 1; grid-row: 1; margin-right: 2px; }
+.story-dock__time:has(.story-dock__moon) .story-dock__clock,
+.story-dock__time:has(.story-dock__moon) .story-dock__wait { grid-column: 2; }
+.story-dock__time:has(.story-dock__moon) > svg { grid-column: 3; }
+.story-dock__time .story-dock__moon svg { width: 14px; height: 14px; stroke: var(--sp-accent); }
+.story-dock__t1 .story-dock__moon { margin-left: 6px; vertical-align: -2px; }
 .sp-fp__next { font-size: 0.8125rem; line-height: 1.35; color: var(--sp-ink-3); overflow-wrap: anywhere; }
 /* the keys: only where there is a mouse and a keyboard to use them */
 .sp-keys { padding: 14px 0 4px; }

@@ -22,7 +22,7 @@ import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
 import { applyStoredTheme } from './theme';
 import type { PlayerLang } from './strings';
-import type { PlayerState, ResumePoint, SavedSentence, SheetKind, StoryQueue } from './types';
+import type { PlayerState, ResumePoint, SavedSentence, SheetKind, SleepChoice, StoryQueue } from './types';
 
 // The worker's mode allow-list (llm-proxy routes/playback.ts) has no
 // 'story_page' yet and would blank it, so page plays count under 'story', and
@@ -75,6 +75,8 @@ let state: PlayerState = {
   away: false,
   awayDir: 'up',
   saved: [],
+  sleep: 'off',
+  sleepLeft: 0,
 };
 
 const listeners = new Set<() => void>();
@@ -157,13 +159,20 @@ function ensureAudio(): HTMLAudioElement {
     noteListenPlay(key, ctx);
     updatePositionState();
   });
-  el.addEventListener('playing', () => setState({ status: 'playing' }));
+  el.addEventListener('playing', () => {
+    sleepMark = el.currentTime;
+    setState({ status: 'playing' });
+  });
   el.addEventListener('waiting', () => {
     if (!el.paused) setState({ status: 'loading' });
   });
   // timeupdate fires only when a seek completes: the clock shows its target from the start.
-  el.addEventListener('seeking', () => setState({ time: el.currentTime }));
+  el.addEventListener('seeking', () => {
+    sleepMark = null;
+    setState({ time: el.currentTime });
+  });
   el.addEventListener('pause', () => {
+    sleepMark = null;
     const key = currentKey();
     if (key) noteListenPause(key);
     if (!el.ended) setState({ status: 'paused' });
@@ -184,7 +193,9 @@ function ensureAudio(): HTMLAudioElement {
     if (key) noteListenProgress(key, el.currentTime, el.duration);
     // A stall can end without a 'playing' event: moving time with data in hand is playing.
     const moving = state.status === 'loading' && !el.paused && !el.seeking && el.readyState >= 3;
-    setState(moving ? { time: el.currentTime, status: 'playing' } : { time: el.currentTime });
+    const sleep = countSleep(el);
+    setState(moving ? { time: el.currentTime, status: 'playing', ...sleep } : { time: el.currentTime, ...sleep });
+    if (sleep.sleep === 'off') el.pause();
     saveProgress(false);
     updatePositionState();
   });
@@ -221,6 +232,11 @@ function onEnded(): void {
   markDone(queue.figureId, current);
   clearProgress(queue, current);
   const next = current < lastN(queue) && hasItem(queue, current + 1) ? current + 1 : null;
+  if (state.sleep === 'end') {
+    setState({ status: 'paused', time: el?.duration ?? state.time, sleep: 'off', sleepLeft: 0 });
+    updatePositionState();
+    return;
+  }
   if (next === null || !state.autoNext) {
     setState({ status: 'paused', time: el?.duration ?? state.time });
     updatePositionState();
@@ -243,6 +259,27 @@ function onEnded(): void {
     }
     setState({ endCard: { ...card, left: card.left - 1 } });
   }, 1000);
+}
+
+// ---- the sleep timer: minutes of playing (paused time does not count, a seek is no time), or the story's end ----
+let sleepMark: number | null = null;
+
+export function setSleep(choice: SleepChoice): void {
+  sleepMark = audio && !audio.paused ? audio.currentTime : null;
+  setState({ sleep: choice, sleepLeft: typeof choice === 'number' ? choice * 60 : 0 });
+}
+
+/** The timer's step at a timeupdate: the voice's advance at its rate is the playing time (true on a locked phone,
+ * where timers are slowed and timeupdate is not). At zero the timer turns off and the voice pauses. */
+function countSleep(el: HTMLAudioElement): Partial<PlayerState> {
+  if (typeof state.sleep !== 'number' || el.paused || el.seeking) return {};
+  const was = sleepMark;
+  sleepMark = el.currentTime;
+  if (was === null) return {};
+  const step = (el.currentTime - was) / (el.playbackRate || 1);
+  if (!(step > 0 && step < 5)) return {};
+  const left = state.sleepLeft - step;
+  return left > 0 ? { sleepLeft: left } : { sleep: 'off', sleepLeft: 0 };
 }
 
 let endTimer: number | null = null;
@@ -456,7 +493,7 @@ export function dismiss(): void {
   audio?.pause();
   saveProgress(true);
   stopEndTimer();
-  setState({ dismissed: true, readerOpen: false, readerN: null, resume: null, sheet: null, endCard: null });
+  setState({ dismissed: true, readerOpen: false, readerN: null, resume: null, sheet: null, endCard: null, sleep: 'off', sleepLeft: 0 });
   offerResumeForPage();
   updatePositionState();
 }

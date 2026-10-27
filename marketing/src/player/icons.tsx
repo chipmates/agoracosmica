@@ -44,6 +44,7 @@ export const Icon = {
   calendar: svg(<><rect x="4" y="5.5" width="16" height="14" rx="2" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></>),
   user: svg(<><circle cx="12" cy="8.5" r="3.5" /><path d="M5 20c1-4 3.8-6 7-6s6 2 7 6" /></>),
   pin: svg(<><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></>),
+  moon: svg(<path d="M19.4 14.7A7.6 7.6 0 0 1 9.3 4.6a7.6 7.6 0 1 0 10.1 10.1z" />),
   /** The ring of small dots inside a play disc's rim, on a 100 grid: 36 dots, round caps on dashes of no length. */
   dots: <svg className="sp-dots" viewBox="0 0 100 100" aria-hidden="true" focusable="false"><circle cx="50" cy="50" r="43" /></svg>,
   trash: svg(<><path d="M5 7h14M9.5 7V5h5v2M7 7l1 12.5h8L17 7" /></>),
