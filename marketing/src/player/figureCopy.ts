@@ -29,7 +29,7 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
       { href: '/figures/marcus-aurelius/meditations/', label: "Read the Meditations, in George Long's translation →", under: 'What is in the Meditations?' },
     ],
     de: [
-      { href: '/figures/marcus-aurelius/meditations/', label: 'Die Selbstbetrachtungen lesen, in der englischen Übersetzung von George Long →' },
+      { href: '/figures/marcus-aurelius/meditations/', label: 'Die Selbstbetrachtungen auf Englisch lesen, übersetzt von George Long →' },
       { href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' },
     ],
   },
