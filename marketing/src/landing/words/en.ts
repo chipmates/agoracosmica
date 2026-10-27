@@ -3,6 +3,7 @@ import type { LandingWords } from './types';
 
 const words: LandingWords = {
   tagline: 'Short stories about life',
+  lead: 'Thirty real lives, retold in the first person.',
   intro:
     'Short stories from thirty real lives, from Plato to Frida Kahlo. Each one is a moment that taught them something about life, retold in the first person.',
   choose: 'Pick someone who makes you curious.',

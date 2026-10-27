@@ -26,7 +26,7 @@
   --text-tertiary: var(--sp-n-ink-3);
   /* where the words begin on a phone: the face above stays lit; on a short screen (Safari's bars out) the words move
      up so the plate stays in the first view, down to a floor where the face still reads */
-  --c2-face: max(200px, min(70vw, calc(100svh - 386px)));
+  --c2-face: max(200px, min(65vw, calc(100svh - 421px)));
   color-scheme: dark;
   position: relative;
   isolation: isolate;
@@ -41,7 +41,7 @@
   /* a sideways swipe turns the stage (swipe.ts); the browser keeps the vertical pan and the zoom */
   touch-action: pan-y pinch-zoom;
 }
-.c2-h1 { order: 1; }
+.c2-h1, .c2-lead { order: 1; }
 .c2-stage { order: 2; }
 .c2-rail { order: 3; }
 .c2-intro { order: 4; }
@@ -142,9 +142,17 @@
   color: var(--sp-n-ink);
   text-wrap: balance;
 }
+.c2-lead {
+  margin: 0.125rem 0 0;
+  font-family: var(--font-content);
+  font-size: 1rem;
+  line-height: 1.35;
+  color: var(--sp-n-ink-2);
+  text-wrap: balance;
+}
 .c2-hero .ls-stage--below .ls-card__names {
-  margin-top: 14px;
-  padding: 12px 0 0;
+  margin-top: 10px;
+  padding: 8px 0 0;
   border-top: 1px solid var(--sp-hair-strong);
 }
 .c2-hero .ls-name { color: var(--sp-n-ink); font-size: clamp(2rem, 9vw, 2.5rem); }
@@ -167,6 +175,7 @@
 
 /* a short phone with Safari's bars out (an SE: about 553 px): the tagline on one line, the gaps closer */
 @media (max-width: 1023px) and (max-height: 600px) {
+  .c2-hero { --c2-face: max(150px, min(65vw, calc(100svh - 405px))); }
   .c2-h1 { font-size: 1.375rem; }
   .c2-hero .ls-stage--below .ls-card__names { margin-top: 8px; padding-top: 6px; }
   .c2-hero .ls-line { font-size: 1.0625rem; }
@@ -291,13 +300,14 @@
   .c2-hero__in {
     display: grid;
     grid-template-columns: minmax(0, 33rem) minmax(0, 1fr);
-    grid-template-areas: "h1 ." "intro ." "stage ." "rail rail";
+    grid-template-areas: "h1 ." "lead ." "intro ." "stage ." "rail rail";
     align-content: start;
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 16px 1.5rem;
   }
   .c2-h1 { grid-area: h1; font-size: 3rem; line-height: 1.05; }
+  .c2-lead { grid-area: lead; margin-top: 0.75rem; font-size: 1.375rem; line-height: 1.3; color: var(--sp-n-ink); }
   .c2-intro { grid-area: intro; margin-top: 0.75rem; font-size: 1.125rem; }
   .c2-stage { grid-area: stage; }
   .c2-rail { grid-area: rail; position: relative; margin: 18px 0 0; }

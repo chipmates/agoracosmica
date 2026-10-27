@@ -4,6 +4,8 @@
 export interface LandingWords {
   /** W1, the h1: what the stories are (the platform tagline). */
   tagline: string;
+  /** The one sentence under the tagline on the hero: who the stories are about and how they are told. */
+  lead: string;
   /** W2: how they are told. */
   intro: string;
   /** The line that invites a choice among the thirty. */
