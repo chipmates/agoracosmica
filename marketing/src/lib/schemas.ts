@@ -118,7 +118,7 @@ export function organizationSchema(): Record<string, unknown> {
     sameAs: ['https://github.com/chipmates/agoracosmica'],
     description:
       'A small German nonprofit building Agora Cosmica, an open source education platform with 30 historical figures.',
-    slogan: 'A Living Library You Can Talk To',
+    slogan: 'Short stories about life',
     knowsAbout: ['philosophy', 'history', 'historical figures', 'wisdom traditions'],
     address: {
       '@type': 'PostalAddress',
@@ -147,7 +147,7 @@ export function agoraCosmicaSchema(): Record<string, unknown> {
     logo: ORG_LOGO,
     description:
       'A nonprofit, open source education platform. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
-    slogan: 'A Living Library You Can Talk To',
+    slogan: 'Short stories about life',
     sameAs: [
       'https://github.com/chipmates/agoracosmica',
     ],

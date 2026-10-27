@@ -29,8 +29,7 @@ const { lang, line, href, buttonLabel, figureId, moreLinks = [] } = Astro.props;
 // The alt is the name and the credit, as on every AI portrait; a page's own alt text is no longer used.
 const alt = figureId ? creditAlt(getFigureById(figureId, lang)?.name ?? figureId, lang) : '';
 
-const eyebrow =
-  lang === 'de' ? 'Eine lebendige Bibliothek, mit der du sprechen kannst' : 'A Living Library You Can Talk To';
+const eyebrow = lang === 'de' ? 'Kurze Geschichten übers Leben' : 'Short stories about life';
 const trust =
   lang === 'de'
     ? 'Non-Profit · Open Source · Keine Tracking-Cookies, kein Profiling'
