@@ -1565,7 +1565,11 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 }
 /* in the bar the bubble rises over the line, above the bar */
 .sp-tmap--bar .sp-tmap__bubble { bottom: calc(100% + 44px + 8px); }
-@media (max-width: 1023.98px) { .sp-tmap--bar .sp-tmap__bubble { max-width: none; } }
+/* on a phone it spans the screen less 8 px a side (textmap.tsx), ringed in the bar's ground down to the bar and faded
+   above, so no cut line of the page shows around it */
+@media (max-width: 1023.98px) {
+  .sp-tmap--bar .sp-tmap__bubble { max-width: none; box-shadow: 0 0 0 8px var(--sp-void), 0 -14px 18px 8px var(--sp-void); }
+}
 /* in the open player the bubble opens downward, over the clock and the buttons, inside the sheet's scroll box */
 .sp-tmap--player .sp-tmap__bubble { top: calc(100% - 6px); bottom: auto; max-width: 100%; }
 .sp-tmap__when { display: flex; align-items: baseline; gap: 10px; font-size: 0.8125rem; font-weight: 600; color: var(--sp-accent); font-variant-numeric: tabular-nums; }
