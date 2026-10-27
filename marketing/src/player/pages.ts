@@ -5,7 +5,7 @@
 
 import { poemsByPoet } from '../data/poems/index.mjs';
 
-export const STORY_PLAYER_SLUGS: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson'];
+export const STORY_PLAYER_SLUGS: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart'];
 
 /** Pages outside the figure template that keep the dock alive, by path. */
 export const STORY_PLAYER_COMPANIONS: Readonly<Record<string, readonly string[]>> = {

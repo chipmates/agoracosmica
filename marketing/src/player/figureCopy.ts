@@ -25,6 +25,10 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
     en: "American scholar of myth. He found one shape under the world's myths, the hero's journey.",
     de: 'Amerikanischer Mythenforscher. Unter den Mythen der Welt fand er eine Form, die Heldenreise.',
   },
+  eckhart: {
+    en: "German Dominican and mystic. He preached in German that the soul's ground and God's ground are one.",
+    de: 'Deutscher Dominikaner und Mystiker. Er predigte auf Deutsch, dass der Grund der Seele und der Grund Gottes eins sind.',
+  },
 };
 
 // The same links the figure template gives, plus the Meditations for German
@@ -84,6 +88,10 @@ const STORY_NOTES: Record<string, Record<PlayerLang, (name: string) => string>> 
   campbell: {
     en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written with AI from his books and the sources and read by a synthetic voice. Not a recording. Never his own words.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie mit KI nach seinen Büchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte.`,
+  },
+  eckhart: {
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written with AI from his sermons and treatises and the sources and read by a synthetic voice. Not a recording. Never his own words.`,
+    de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie mit KI nach seinen Predigten und Traktaten und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte.`,
   },
 };
 
