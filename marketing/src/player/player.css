@@ -953,6 +953,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   color: var(--sp-ink-3);
 }
 .story-page .pub-figure-card.pub-figure-card--row { flex-direction: row; gap: 0.75rem; align-items: center; padding: 0.75rem; }
+/* The related cards' credit in the page's own ink, as the portrait's credit, in both lights. */
+.story-page .ai-credit { color: var(--sp-ink-3); }
 .story-page .pub-echo-note { font-style: normal; opacity: 1; color: var(--sp-ink-3); border-left-color: var(--sp-hair-strong); }
 
 /* "Listen to the story" under a concept answer: a small disc and its name. */

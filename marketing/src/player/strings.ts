@@ -4,6 +4,8 @@
 // translations (label.ts, factWords.ts). Story titles, years and places come
 // from the catalogs.
 
+import { PORTRAIT_CREDIT } from '../lib/portraitCredit';
+
 export type PlayerLang = 'en' | 'de';
 
 export interface PlayerStrings {
@@ -146,7 +148,7 @@ const en: PlayerStrings = {
   retellingNote: she => `A retelling in the first person. Never ${she ? 'her' : 'his'} own words.`,
   doorTitle: (name, word) => `${name}'s life, told in ${word} stories`,
   allStories: word => `All ${word} stories`,
-  portraitNote: 'AI image',
+  portraitNote: PORTRAIT_CREDIT.en,
   begin: 'Begin',
   beginSub: m => `Introduction, ${m} min · then story 1`,
   beginSubWith: (m, title) => `Introduction, ${m} min · then story 1, ${title}`,
@@ -260,7 +262,7 @@ const de: PlayerStrings = {
   retellingNote: she => `Eine Nacherzählung in der Ich-Form. Nie ${she ? 'ihre' : 'seine'} eigenen Worte.`,
   doorTitle: (name, word) => `Das Leben von ${name} in ${word} Geschichten`,
   allStories: word => `Alle ${word} Geschichten`,
-  portraitNote: 'KI-Bild',
+  portraitNote: PORTRAIT_CREDIT.de,
   begin: 'Beginnen',
   beginSub: m => `Einführung, ${m} Min. · dann Geschichte 1`,
   beginSubWith: (m, title) => `Einführung, ${m} Min. · dann Geschichte 1, ${title}`,
