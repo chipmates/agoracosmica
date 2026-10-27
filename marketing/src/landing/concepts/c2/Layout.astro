@@ -1,6 +1,7 @@
 ---
 // Concept 2, the full face: the painting fills the first screen, the tagline, the name block, the label and the plate
-// sit on its dark foot, the thirty run under it. Below: the words, then the thirty by era as plain links.
+// sit on its dark foot, the thirty run under it. The stage is the base's (moment off: c2.ts runs it, so the tagline
+// over the painting stays as clear as the name). Below: the words, then the thirty by era as plain links.
 import Stage from '../../Stage.astro';
 import PortraitCredit from '../../../components/PortraitCredit.astro';
 import { landingWords } from '../../words';
@@ -32,6 +33,7 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
       <Stage
         lang={lang}
         variant="below"
+        moment={false}
         sizes="(min-width: 1024px) 62vw, 100vw"
         class="c2-stage"
       />
@@ -92,3 +94,8 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
     ))}
   </section>
 </div>
+
+<script>
+  import { installC2 } from './c2';
+  installC2();
+</script>
