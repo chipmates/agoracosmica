@@ -1566,6 +1566,11 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-sheet .sp-fp__transport svg text { fill: currentColor; stroke: none; }
 .sp-fp__play { width: 66px; height: 66px; border-radius: 50%; background: var(--sp-disc); color: var(--sp-disc-ink); }
 .sp-fp__play:hover { background: var(--sp-disc-hover); }
+/* the ring of small dots inside the rim, the open player's disc and the dock's, in the disc's own ink */
+.sp-fp__play, .story-dock .story-dock__play { position: relative; }
+.sp-fp__transport .sp-fp__play svg.sp-dots,
+.story-dock .story-dock__play svg.sp-dots { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+.sp-dots circle { fill: none; stroke: currentColor; stroke-width: 3.4; stroke-linecap: round; stroke-dasharray: 0 7.505; opacity: 0.5; }
 .sp-stepper { display: flex; align-items: center; gap: 6px; }
 .sp-stepper__val { min-width: 4.2em; text-align: center; font-size: 1.125rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .sp-stepper .story-btn { width: 48px; border: 1px solid var(--sp-hair-strong); }

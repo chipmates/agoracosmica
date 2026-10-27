@@ -371,6 +371,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
             </button>
             <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
               aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
+              {Icon.dots}
               {playing ? Icon.pause : Icon.play}
             </button>
             {wide && (

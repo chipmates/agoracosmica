@@ -145,6 +145,7 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
           <button type="button" className="story-btn" onClick={previousStory} disabled={!hasPrevious() && state.time < 1} aria-label={s.prevAria} aria-describedby={VOICE_DESC_ID}>{Icon.prev}</button>
           <button type="button" className="story-btn" onClick={skipBack} aria-label={s.back15Aria}>{Icon.back15}</button>
           <button type="button" className="story-btn sp-fp__play" onClick={togglePlay} aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
+            {Icon.dots}
             {playing ? Icon.pause : Icon.play}
           </button>
           <button type="button" className="story-btn" onClick={skipForward} aria-label={s.fwd15Aria}>{Icon.fwd15}</button>
