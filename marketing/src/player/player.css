@@ -338,11 +338,13 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   box-shadow: 0 0 0 1px var(--sp-hair-strong);
   background: var(--sp-n-astral);
 }
+/* A credit one step under the rest of the player's type (11 px and up): the small portrait must outweigh it.
+   Its line box stays the old one (14.3 px at 100 %), so nothing under the hero moves. */
 .sp-hero__portrait figcaption {
   margin-top: 4px;
   font-family: var(--font-ui);
-  font-size: 0.6875rem;
-  line-height: 1.3;
+  font-size: 0.625rem;
+  line-height: 1.43;
   color: var(--sp-ink-3);
 }
 .sp-hero__line {

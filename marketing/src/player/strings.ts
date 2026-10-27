@@ -14,7 +14,7 @@ export interface PlayerStrings {
   /** The story door under a poem: its heading and the link to the figure page. English takes 's after a final s too (the site's "Aurelius's"). */
   doorTitle: (name: string, countWord: string) => string;
   allStories: (countWord: string) => string;
-  /** Under the hero portrait. */
+  /** The credit under the hero portrait: short, so it never outweighs the picture. */
   portraitNote: string;
   /** The plate: what a tap does, then what plays. */
   begin: string;
@@ -148,7 +148,7 @@ const en: PlayerStrings = {
   retellingNote: she => `A retelling in the first person. Never ${she ? 'her' : 'his'} own words.`,
   doorTitle: (name, word) => `${name}'s life, told in ${word} stories`,
   allStories: word => `All ${word} stories`,
-  portraitNote: 'Painted by AI',
+  portraitNote: 'AI image',
   begin: 'Begin',
   beginSub: m => `Introduction, ${m} min · then story 1`,
   beginSubWith: (m, title) => `Introduction, ${m} min · then story 1, ${title}`,
@@ -264,7 +264,7 @@ const de: PlayerStrings = {
   retellingNote: she => `Eine Nacherzählung in der Ich-Form. Nie ${she ? 'ihre' : 'seine'} eigenen Worte.`,
   doorTitle: (name, word) => `Das Leben von ${name} in ${word} Geschichten`,
   allStories: word => `Alle ${word} Geschichten`,
-  portraitNote: 'Von KI gemalt',
+  portraitNote: 'KI-Bild',
   begin: 'Beginnen',
   beginSub: m => `Einführung, ${m} Min. · dann Geschichte 1`,
   beginSubWith: (m, title) => `Einführung, ${m} Min. · dann Geschichte 1, ${title}`,
