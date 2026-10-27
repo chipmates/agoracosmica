@@ -13,6 +13,7 @@ import constellationsDe from '@client/assets/translations/constellations/de.json
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { cleanDisplayText } from '../../lib/figureWorld';
 import { playerStrings } from '../../player/strings';
+import { inLifeOrder } from '../../player/queue';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
 
@@ -40,34 +41,50 @@ const mapName = constellation ? cleanDisplayText(lang === 'de' ? deNames[nameKey
 type Pt = [number, number];
 const pattern = (constellation?.pattern ?? []).slice(0, stories.length) as Pt[];
 
-// The introduction: a step before story 1, against the path's direction (story 2 to story 1), as long as the path's
-// usual step; turned in 15 degree steps until it stands clear of every star.
-function introPoint(): Pt | null {
-  const [p1, p2] = pattern;
-  if (!p1 || !p2) return null;
-  const steps = pattern.slice(1).map((p, i) => Math.hypot(p[0] - pattern[i]![0], p[1] - pattern[i]![1])).sort((a, b) => a - b);
-  const len = (steps[Math.floor(steps.length / 2)] ?? 10) * 0.85;
-  const base = Math.atan2(p1[1] - p2[1], p1[0] - p2[0]);
-  for (let k = 0; k < 24; k++) {
-    const a = base + Math.ceil(k / 2) * (Math.PI / 12) * (k % 2 ? 1 : -1);
-    const q: Pt = [p1[0] + Math.cos(a) * len, p1[1] + Math.sin(a) * len];
-    if (pattern.every(p => Math.hypot(p[0] - q[0], p[1] - q[1]) >= len * 0.8)) return q;
-  }
-  return null;
-}
-const intro = hasIntro ? introPoint() : null;
-const points: Pt[] = intro ? [intro, ...pattern] : pattern;
-const numbers = intro ? [0, ...stories.map(s => s.n)] : stories.map(s => s.n);
-
 // The plate in viewBox units, one unit a CSS pixel on a 390 px phone (the plate is 358 px there).
 const W = 360;
 const TOP = 34; // room for a "next" label over the top row
 const FIT_H = 330; // the box the app's layout fits the figure into
 const VIA_Y = TOP + FIT_H + 18;
 const H = VIA_Y + 116; // the cartouche's band under the via
-const seeds = points.map((_, i) => ({ id: String(numbers[i]), gathered: false }));
 const SIDE = 14; // the fit's box stands in from the plate's sides, so a "next" ring keeps clear of the frame
 const FIT_W = W - 2 * SIDE;
+const NUM_DY = -27; // a story's number, centred this far over its star
+
+// The introduction: a step before story 1, against the path's direction (story 2 to story 1), as long as the path's
+// usual step; turned in 15 degree steps until it stands clear of every star, and its "next" ring (r 24) on the
+// plate clear of every story's number (else the first spot clear of the stars).
+function introPoints(): Pt[] {
+  const [p1, p2] = pattern;
+  if (!p1 || !p2) return [];
+  const steps = pattern.slice(1).map((p, i) => Math.hypot(p[0] - pattern[i]![0], p[1] - pattern[i]![1])).sort((a, b) => a - b);
+  const len = (steps[Math.floor(steps.length / 2)] ?? 10) * 0.85;
+  const base = Math.atan2(p1[1] - p2[1], p1[0] - p2[0]);
+  const out: Pt[] = [];
+  for (let k = 0; k < 24; k++) {
+    const a = base + Math.ceil(k / 2) * (Math.PI / 12) * (k % 2 ? 1 : -1);
+    const q: Pt = [p1[0] + Math.cos(a) * len, p1[1] + Math.sin(a) * len];
+    if (pattern.every(p => Math.hypot(p[0] - q[0], p[1] - q[1]) >= len * 0.8)) out.push(q);
+  }
+  return out;
+}
+function ringClearOfNumbers(q: Pt): boolean {
+  const pts = [q, ...pattern];
+  const f = calculateConstellationPositions(pts.map((_, i) => ({ id: String(i), gathered: false })), { name: '', description: '', pattern: pts }, { width: FIT_W, height: FIT_H }, { marginFactor: 0.86 });
+  const xy = f.seedPositions.map(p => [(p.coordX / 100) * FIT_W + SIDE, (p.coordY / 100) * FIT_H + TOP] as Pt);
+  const [ix, iy] = xy[0]!;
+  return xy.slice(1).every(([x, y], j) => {
+    const w = j + 1 >= 10 ? 13 : 7;
+    const dx = Math.max(x - w / 2 - ix, 0, ix - x - w / 2);
+    const dy = Math.max(y + NUM_DY - 8 - iy, 0, iy - y - NUM_DY - 2.5);
+    return Math.hypot(dx, dy) >= 27;
+  });
+}
+const introCands = hasIntro ? introPoints() : [];
+const intro = introCands.find(ringClearOfNumbers) ?? introCands[0] ?? null;
+const points: Pt[] = intro ? [intro, ...pattern] : pattern;
+const numbers = intro ? [0, ...stories.map(s => s.n)] : stories.map(s => s.n);
+const seeds = points.map((_, i) => ({ id: String(numbers[i]), gathered: false }));
 const fit = points.length > 1
   ? calculateConstellationPositions(seeds, { name: constellation?.name ?? '', description: '', pattern: points }, { width: FIT_W, height: FIT_H }, { marginFactor: 0.86 })
   : null;
@@ -118,7 +135,6 @@ function place(i: number, cands: Spot[], boxOf: (i: number, c: Spot) => Box, sco
 }
 // The plate numbers first: one fixed place for every star, centred above it and over a "next" ring's top (r 24), so a
 // number never reads as its neighbour's.
-const NUM_DY = -27;
 const numberBox: (Box | null)[] = at.map(([x, y], i) => {
   if (numbers[i] === 0) return null;
   const w = numbers[i]! >= 10 ? 13 : 7;
@@ -205,6 +221,10 @@ const nextAt = at.map((_, i) => {
 const numberAt = at.map((_, i) => (i === introAt && introPick ? introPick.c : { dx: 0, dy: NUM_DY, anchor: 'middle' } as Spot));
 
 const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
+// The map's note where the stories' years do not follow the life's order (a placeholder for the writer).
+const mapNoteLoose = lang === 'de'
+  ? 'Jeder Stern ist eine Geschichte. Wähle einen Stern, und die Geschichte öffnet sich.'
+  : 'Each star is one story. Choose a star and the story opens.';
 ---
 {constellation && at.length > 1 && (
   <section class="sp-mapwrap" aria-labelledby="sp-map-title" data-nosnippet>
@@ -259,7 +279,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
         <p class="sp-atlas__epithet">{P.mapBy(queue.name)}</p>
       </div>
     </div>
-    <p class="sp-mapnote">{P.mapNote(!!queue.she)}</p>
+    <p class="sp-mapnote">{inLifeOrder(queue) ? P.mapNote(!!queue.she) : mapNoteLoose}</p>
     <div class="sp-mapsel" data-story-mapsel hidden></div>
   </section>
 )}

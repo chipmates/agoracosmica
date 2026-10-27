@@ -69,6 +69,12 @@ function contentVersions(): { factchecks?: string; stories?: string } {
   return versionsMemo;
 }
 
+/** Whether the stories' years follow the life's order (each story's first year at or after the one before). */
+export function inLifeOrder(queue: StoryQueue): boolean {
+  const years = queue.entries.filter(e => e.n > 0).map(e => Number((e.year ?? '').match(/\d{3,4}/)?.[0] ?? NaN));
+  return years.every((y, i) => i === 0 || Number.isNaN(y) || Number.isNaN(years[i - 1]!) || y >= years[i - 1]!);
+}
+
 export function buildStoryQueue(
   figureId: string,
   slug: string,

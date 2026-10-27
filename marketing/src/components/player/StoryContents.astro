@@ -8,6 +8,7 @@ import { numberWord } from '../../lib/figureWorld';
 import { figureMinutes } from '../../lib/storyRuntime';
 import { LIST_SEP, VOICE_DESC_ID, playerStrings } from '../../player/strings';
 import { factWords } from '../../player/factWords';
+import { inLifeOrder } from '../../player/queue';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
 
@@ -28,9 +29,40 @@ const stories = queue.entries.filter(e => e.n > 0);
 const ERAS = [' AD', ' n. Chr.'];
 const era = ERAS.find(e => stories.length > 0 && stories.every(r => (r.year ?? '').endsWith(e)));
 const yearShown = (year: string | undefined) => (year ? (era ? year.slice(0, -era.length) : year) : '');
+const de = lang === 'de';
+// Build-time words of the contents (placeholders for the writer, kept out of strings.ts: a change there renames a
+// chunk every page of the site loads). Where the stories' years do not follow the life's order, the lead names none.
+const W2 = {
+  yearTo: (year: string) => (de ? `bis ${year}` : `to ${year}`),
+  tocLeadLoose: (a: string, b: string, total: string, she: boolean) => (de
+    ? `Momente aus ${she ? 'ihrem' : 'seinem'} Leben${a && b ? `, im Alter von ${a} bis ${b} Jahren` : ''}.${total ? ` Zusammen etwa ${total}` : ''}`
+    : `Moments from ${she ? 'her' : 'his'} life${a && b ? `, from age ${a} to ${b}` : ''}.${total ? ` About ${total} in all.` : ''}`),
+};
+// An age as the facts give it: "~42" in words; "Anfang 20" carries its own measure.
+const ageAt = (age: string) => {
+  const a = age.replace(/^~\s*/, de ? 'etwa ' : 'about ');
+  return de && /^(Anfang|Mitte|Ende)\b/.test(a) ? `mit ${a}` : P.ageAt(a);
+};
+// A year the column cannot hold at its size ("Autumn 1934", "c. 1302-1303", "c. 1910s (boyhood)") stands as its
+// first year, the words before it on a small line above, a span's end or a remark on a small line below.
+function yearParts(shown: string): { pre: string; main: string; post: string; decade: boolean } | null {
+  if (/^~?\s*\d{1,4}$/.test(shown)) return null;
+  const m = shown.match(/^(.*?)(\d{3,4})(s|er)?(.*)$/);
+  if (!m) return null;
+  const pre = m[1]!.trim();
+  const rest = m[4]!.trim();
+  const to = rest.match(/^[-–]\s*(\d{2,4})$/);
+  return {
+    pre: pre === '~' ? P.approxYear('~').trim() : pre,
+    main: m[2]! + (m[3] ?? ''),
+    post: to ? W2.yearTo(to[1]!) : rest.replace(/^\((.*)\)$/, '$1'),
+    decade: !!m[3],
+  };
+}
 
 const total = figureMinutes(figureId, lang);
-const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?? '', total ? P.totalTime(total) : '', !!queue.she);
+const tocLead = inLifeOrder(queue) ? P.tocLead : W2.tocLeadLoose;
+const lead = tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?? '', total ? P.totalTime(total) : '', !!queue.she);
 ---
 <section class="sp-toc" id="stories" aria-labelledby="sp-toc-title">
   <h2 class="sp-toc__title" id="sp-toc-title">{P.tocTitle(numberWord(stories.length, lang))}</h2>
@@ -49,13 +81,14 @@ const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?
     {queue.entries.map(r => {
       const intro = r.n === 0;
       const shown = yearShown(r.year);
+      const parts = intro ? null : yearParts(shown);
       const approx = shown.startsWith('~');
       const details = intro
         ? [r.minutes ? P.minutes(r.minutes) : '']
-        : [r.year ? P.approxYear(r.year) : '', r.place ?? '', r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''];
+        : [r.year ? P.approxYear(r.year) : '', r.place ?? '', r.age ? ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''];
       const sub = intro
         ? (r.minutes ? P.introRowSub(r.minutes) : '')
-        : [r.place, r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''].filter(Boolean).join(LIST_SEP);
+        : [r.place, r.age ? ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''].filter(Boolean).join(LIST_SEP);
       return (
         <li class:list={['sp-row', intro && 'sp-row--intro']} id={`idea-${r.n}`} data-n={r.n}>
           <button
@@ -70,6 +103,8 @@ const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?
             <span class="sp-row__year" aria-hidden="true">
               {intro ? (
                 <svg class="sp-row__scroll" viewBox="0 0 24 24" focusable="false"><path d="M7 4h11v13a3 3 0 0 1-3 3H6" /><path d="M7 4a2.5 2.5 0 0 0-2.5 2.5V8H7" /><path d="M6 20a3 3 0 0 0 3-3v-1H3v1a3 3 0 0 0 3 3z" /><path d="M10 8.5h5M10 12h5" /></svg>
+              ) : parts ? (
+                <>{parts.pre && <span class="sp-row__approx">{parts.pre}</span>}<span class:list={[parts.decade && 'sp-row__decade']}>{parts.main}</span>{parts.post && <span class="sp-row__yearto">{parts.post}</span>}</>
               ) : approx ? (
                 <><span class="sp-row__approx">{P.approxYear('~').trim()}</span>{shown.slice(1).trim()}</>
               ) : shown}

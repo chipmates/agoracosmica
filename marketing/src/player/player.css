@@ -676,6 +676,9 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   white-space: nowrap;
 }
 .sp-row__approx { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-bottom: 2px; }
+/* a decade ("1910s", "1970er") at the year's size is wider than the column */
+.sp-row__decade { font-size: 0.7em; }
+.sp-row__yearto { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-top: 3px; }
 .sp-row__scroll { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .sp-row__body { min-width: 0; }
 .sp-row__title { display: block; font-family: var(--font-content); font-size: 1.1875rem; line-height: 1.22; color: var(--sp-ink); text-wrap: pretty; }
