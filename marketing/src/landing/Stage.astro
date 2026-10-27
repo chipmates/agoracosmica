@@ -102,8 +102,9 @@ const templates = {
   <details class="story-label sp-label ls-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>
-      <span class="sp-label__brief">{halves.map((half, i) => (
-        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{half}</span></Fragment>
+      {/* the dot between the halves is drawn by landing.css, so it never ends a line */}
+      <span class="sp-label__brief ls-label__brief">{halves.map(half => (
+        <span class="sp-label__half ls-label__half">{half.replace(/\u00a0·$/, '')}</span>
       ))}</span>
     </summary>
     <p>{label.expanded}</p>
