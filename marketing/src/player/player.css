@@ -1232,6 +1232,8 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 }
 /* the loading word stands over the clock's place, so the cell keeps the clock's width */
 .story-dock__wait { position: absolute; right: 0; bottom: 4px; visibility: hidden; opacity: 0; }
+/* the whole clock, unseen, measured by the name's fit */
+.story-dock__probe { position: absolute; right: 0; bottom: 4px; visibility: hidden; pointer-events: none; }
 .story-dock[data-status="loading"] .story-dock__clock { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
 .story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
 /* a slow start, while the voice's name holds the line: the coin's ring breathes */
@@ -1472,6 +1474,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   }
   .sp-sheet__head::before { display: none; }
   .sp-sheet__head { min-height: 56px; padding-top: 6px; }
+  /* the open player stands over the bar's own right end, where its caret is */
+  .sp-sheet--player { right: max(var(--sp-gutter), calc((100vw - 880px) / 2)); }
   /* Beside the text: the panel takes the right edge from the bar to the dock. */
   html:has(.story-reader) { --sp-side-top: 57px; }
   .sp-sheet--side {

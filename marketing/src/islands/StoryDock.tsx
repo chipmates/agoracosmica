@@ -241,21 +241,30 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     return () => document.removeEventListener('keydown', close);
   }, [noteOpen]);
 
-  // The name on the line: the full one where it fits whole beside the "i" and the clock, else the short one.
+  // The name on the line: the full one where it fits whole beside the "i" and the clock, else the short one; where even
+  // that is cut (a long name past minute ten at 360 px), the clock keeps only the time heard (the open player has both).
   const fullName = state.queue?.name ?? '';
   const shortName = (state.queue && readShort(shortNames, state.queue.figureId, storyLang)) || fullName;
+  const wholeClock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
   const leadEl = useRef<HTMLDivElement | null>(null);
   const whoRef = useRef<HTMLButtonElement | null>(null);
   const nameRef = useRef<HTMLSpanElement | null>(null);
-  const [useShort, setUseShort] = useState(false);
+  const clockRef = useRef<HTMLSpanElement | null>(null);
+  const probeRef = useRef<HTMLSpanElement | null>(null);
+  const [fitted, setFitted] = useState<'full' | 'short' | 'bare'>('full');
   const fit = useCallback(() => {
     const lead = leadEl.current;
     const who = whoRef.current;
     const name = nameRef.current;
-    if (!lead || !who || !name || !fullName) return;
+    const clockEl = clockRef.current;
+    const probe = probeRef.current;
+    if (!lead || !who || !name || !clockEl || !probe || !fullName) return;
     const extra = who.getBoundingClientRect().width - name.getBoundingClientRect().width;
-    setUseShort(textWidth(fullName, name) + extra > lead.clientWidth - 1);
-  }, [fullName]);
+    // The room as if the whole clock stood there (a hidden copy, in the clock's tabular digits), whichever clock stands
+    // now, so the choice never flips back and forth.
+    const room = lead.clientWidth - 1 - (probe.getBoundingClientRect().width - clockEl.getBoundingClientRect().width);
+    setFitted(textWidth(fullName, name) + extra <= room ? 'full' : textWidth(shortName, name) + extra <= room ? 'short' : 'bare');
+  }, [fullName, shortName]);
   const leadObserver = useRef<ResizeObserver | null>(null);
   const leadRef = useCallback((el: HTMLDivElement | null) => {
     leadObserver.current?.disconnect();
@@ -265,11 +274,11 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     leadObserver.current = new ResizeObserver(fit);
     leadObserver.current.observe(el);
   }, [fit]);
-  useBeforePaint(fit, [fit]);
+  useBeforePaint(fit, [fit, wholeClock.length]);
   useEffect(() => {
     void document.fonts?.ready.then(fit);
   }, [fit]);
-  const shownName = useShort ? shortName : fullName;
+  const shownName = fitted === 'full' ? fullName : shortName;
 
   const gesture = useOpenGesture(() => openSheet('player'));
 
@@ -342,7 +351,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const inReader = state.readerOpen && state.readerN === current;
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
-  const clock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
+  const clock = fitted === 'bare' ? clockLabel(state.time) : wholeClock;
 
   // While the sleep timer runs, a small moon by the clock; its words go with the caret's name.
   const sleepOn = typeof state.sleep === 'number' ? s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft))) : state.sleep === 'end' ? s.sleepToEnd : '';
@@ -381,7 +390,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
       {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
       <span className="story-dock__time">
         {moon}
-        <span className="story-dock__clock">{clock}</span>
+        <span ref={clockRef} className="story-dock__clock">{clock}</span>
+        <span ref={probeRef} className="story-dock__probe" aria-hidden="true">{wholeClock}</span>
         <span className="story-dock__wait">{s.loading}</span>
       </span>
     </>
