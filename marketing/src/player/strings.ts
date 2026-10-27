@@ -53,8 +53,6 @@ export interface PlayerStrings {
   mapView: string;
   viewAria: string;
   savedCount: (n: number) => string;
-  opens: string;
-  opensIntro: string;
   read: string;
   share: string;
   playingWord: string;
@@ -179,8 +177,6 @@ const en: PlayerStrings = {
   mapView: 'Map',
   viewAria: 'List or map',
   savedCount: n => `Saved (${n})`,
-  opens: 'How the story begins',
-  opensIntro: 'How the introduction begins',
   read: 'Read',
   share: 'Share',
   playingWord: 'playing',
@@ -295,8 +291,6 @@ const de: PlayerStrings = {
   mapView: 'Karte',
   viewAria: 'Liste oder Karte',
   savedCount: n => `Gemerkt (${n})`,
-  opens: 'So beginnt die Geschichte',
-  opensIntro: 'So beginnt die Einführung',
   read: 'Lesen',
   share: 'Teilen',
   playingWord: 'läuft',

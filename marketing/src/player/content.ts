@@ -187,15 +187,6 @@ export function loadFacts(queue: StoryQueue): Promise<FactSheet> {
   return promise;
 }
 
-/** The first sentence of a story, for its unfolded row. */
-export async function firstSentence(queue: StoryQueue, n: number): Promise<string> {
-  const blocks = await loadText(queue, n);
-  const body = n === 0 ? blocks.slice(1) : blocks;
-  const first = body.find(b => !b.rule)?.text ?? '';
-  const m = first.match(/^.+?[.!?…]["“”»«’]?(?=\s|$)/);
-  return (m ? m[0] : first).trim();
-}
-
 // The same laundering as the build's cleanFactText (lib/figureWorld.ts), kept
 // here without that module's build-time imports: the house style has no dash
 // between words and no semicolon in displayed text.

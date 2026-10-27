@@ -1,8 +1,8 @@
 // The figure page's own controls, plain HTML from the build: the plate, the
 // rows that unfold, the map, the saved count and the "hear" buttons in the
 // facts below. This module mirrors the player's state onto them and turns
-// their taps into the player's calls. The story's first line, shown in an
-// unfolded row, is fetched on unfold and never part of the indexed HTML.
+// their taps into the player's calls. An unfolded row holds only its four
+// actions: nothing of the story's text is fetched before Read or Listen.
 
 import {
   activeQueue,
@@ -18,7 +18,6 @@ import {
   readProgress,
   subscribe,
 } from './controller';
-import { firstSentence } from './content';
 import { LIST_SEP, clockLabel, playerStrings } from './strings';
 import { showToast } from './toast';
 import type { PlayerState, StoryQueue } from './types';
@@ -285,28 +284,9 @@ function unfold(n: number, opts: { scroll?: boolean; toggle?: boolean } = {}): v
     btn.setAttribute('aria-expanded', String(open));
     row.classList.toggle('is-open', open);
     panel.hidden = !open;
-    if (open) {
-      const clear = opts.scroll || opts.toggle;
-      fillTeaser(queue, rn, panel, clear ? () => { if (row.classList.contains('is-open')) keepClear(row); } : undefined);
-      if (clear) keepClear(row);
-    }
+    if (open && (opts.scroll || opts.toggle)) keepClear(row);
   });
   sync();
-}
-
-function fillTeaser(queue: StoryQueue, n: number, scope: HTMLElement, filled?: () => void): void {
-  const slot = scope.querySelector<HTMLElement>('[data-story-teaser]');
-  if (!slot || slot.dataset.filled) return;
-  slot.dataset.filled = '1';
-  firstSentence(queue, n)
-    .then(text => {
-      slot.textContent = text;
-      slot.closest('.sp-teaser')?.classList.add('is-in');
-      filled?.();
-    })
-    .catch(() => {
-      delete slot.dataset.filled;
-    });
 }
 
 /**
@@ -354,7 +334,6 @@ function selectStar(n: number): void {
   if (!card || !row) return;
   const head = row.querySelector('.sp-row__btn')?.cloneNode(true) as HTMLElement | undefined;
   const acts = row.querySelector('.sp-acts')?.cloneNode(true) as HTMLElement | undefined;
-  const teaser = row.querySelector('.sp-teaser')?.cloneNode(true) as HTMLElement | undefined;
   card.replaceChildren();
   if (head) {
     const title = document.createElement('div');
@@ -362,15 +341,8 @@ function selectStar(n: number): void {
     title.append(...Array.from(head.querySelectorAll('.sp-row__year, .sp-row__body')).map(x => x.cloneNode(true)));
     card.append(title);
   }
-  if (teaser) {
-    teaser.querySelectorAll('[data-story-teaser]').forEach(t => {
-      t.removeAttribute('data-filled');
-    });
-    card.append(teaser);
-  }
   if (acts) card.append(acts);
   card.hidden = false;
-  fillTeaser(queue, n, card, () => { if (!card.hidden) keepClear(card); });
   sync();
   keepClear(card);
 }

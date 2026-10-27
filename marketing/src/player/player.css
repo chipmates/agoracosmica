@@ -631,10 +631,6 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 
 .sp-row__panel { padding: 0 0 16px; }
 .sp-row__panel[hidden] { display: none; }
-.sp-teaser { margin: 0 0 12px; }
-.sp-teaser__k { margin: 2px 0 4px; font-family: var(--font-ui); font-size: 0.75rem; letter-spacing: 0.02em; color: var(--sp-ink-3); }
-.sp-teaser__t { margin: 0; min-height: 1.4em; font-family: var(--font-content); font-style: italic; font-size: 1.125rem; line-height: 1.4; color: var(--sp-ink); }
-.sp-teaser:not(.is-in) .sp-teaser__k { visibility: hidden; }
 .sp-acts { display: grid; grid-template-columns: 1.55fr 1fr 1fr 1fr; gap: 6px; }
 .sp-acts--two { grid-template-columns: 1.55fr 1fr; max-width: 360px; }
 .sp-act {

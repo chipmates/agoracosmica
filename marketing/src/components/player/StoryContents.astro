@@ -88,10 +88,6 @@ const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?
             <svg class="sp-row__chev" viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M6 9.5l6 6 6-6" /></svg>
           </button>
           <div class="sp-row__panel" id={`sp-panel-${r.n}`} hidden data-nosnippet>
-            <div class="sp-teaser">
-              <p class="sp-teaser__k">{intro ? P.opensIntro : P.opens}</p>
-              <p class="sp-teaser__t" data-story-teaser></p>
-            </div>
             <div class="sp-acts">
               <button type="button" class="sp-act sp-act--main" data-story-play data-story-n={r.n} data-door="row_listen" data-state="idle">
                 <span class="sp-act__disc" aria-hidden="true">
