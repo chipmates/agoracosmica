@@ -10,22 +10,20 @@ import {
   getPublicImageUrl,
   getPublicImageSrcSet,
 } from '@client/utils/public/publicMediaUrl';
-import { getT } from '../i18n';
+import { playerStrings } from '../player/strings';
 import type { Lang } from '../i18n';
 
 interface Props {
   figureId: string;
-  /** Display name of the figure (localized), used for the AI-portrait alt. */
+  /** Display name of the figure (localized), used for the alt. */
   name: string;
   lang: Lang;
 }
 
 const { figureId, name, lang } = Astro.props;
-const t = getT(lang);
-// Every figure portrait is an AI-generated image of a real person: the alt
-// names that, and the hero gloss beside the portrait carries the visible
-// disclosure line for the view (one calm line per view, no badge).
-const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
+// Every figure portrait is an AI image of a real person: the alt is the name,
+// then the same credit the line under the picture shows (one string, all 30 pages).
+const alt = `${name}, ${playerStrings(lang).portraitNote}`;
 ---
 <picture>
   <source

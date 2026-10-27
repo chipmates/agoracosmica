@@ -5,7 +5,6 @@
 // words into the state (pause, minutes left, a kept place on return). Under
 // it one quiet line: the text without sound, and the figure's own writing.
 import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
-import { getT } from '../../i18n';
 import { numberWord } from '../../lib/figureWorld';
 import { labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
@@ -23,14 +22,14 @@ interface Props {
 }
 
 const { figureId, name, lang, meta, leadAnswer, queue } = Astro.props;
-const t = getT(lang);
 const P = playerStrings(lang);
 const label = storyLabel(lang);
 const first = queue.entries[0];
 const intro = queue.entries.find(e => e.n === 0);
 const doText = P.begin;
 const whatText = intro?.minutes ? P.beginSub(intro.minutes) : [first?.title, first?.minutes ? P.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
-const alt = t('aiDisclosure.imageAlt').replace('{name}', name);
+// The alt carries the credit too: the name, then the same words as the line under the picture.
+const alt = `${name}, ${P.portraitNote}`;
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
 // The label breaks at its middle dot; a half wider than the line (200 % text) at its hyphens.

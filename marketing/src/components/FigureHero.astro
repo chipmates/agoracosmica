@@ -9,12 +9,14 @@
 //
 // The disclosure sits under the portrait because that is what it describes:
 // the image and the voice. Its wording is fixed by the transparency program,
-// so it is rendered from its translation key and never restated here.
+// so it is rendered from its translation key and never restated here. Above it
+// the portrait's credit, the player's own string, stands at every width.
 
 import FigurePortrait from './FigurePortrait.astro';
 import FigureTrailer from '../islands/FigureTrailer';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
+import { playerStrings } from '../player/strings';
 import { getPublicTrailerUrl } from '@client/utils/public/publicMediaUrl';
 import { getSeedsFor } from '../lib/seeds';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
@@ -41,6 +43,7 @@ const { figure, slug, lang, answer } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const heroAnswer = answer ?? '';
+const credit = playerStrings(lang).portraitNote;
 // The promise is our line about the figure, never a quotation of them.
 const learnLine = figure.learn ?? '';
 
@@ -96,7 +99,10 @@ const worldLine = [
     <div class="pub-fig-hero__portrait">
       <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
     </div>
-    <figcaption class="pub-fig-hero__caption">{t('figures.echoGloss')}</figcaption>
+    <figcaption class="pub-fig-hero__caption">
+      <span class="pub-fig-hero__credit">{credit}</span>
+      <span class="pub-fig-hero__gloss">{t('figures.echoGloss')}</span>
+    </figcaption>
   </figure>
   <div class="pub-fig-hero__text">
     <p class="pub-fig-hero__eyebrow">{t('figures.echoOf')}</p>
@@ -156,6 +162,13 @@ const worldLine = [
     letter-spacing: 0.02em;
     color: var(--text-dim);
   }
+  /* The credit stays beside the picture at every width and is never behind a tap. */
+  .pub-fig-hero__credit {
+    display: block;
+    font-size: 0.625rem;
+    line-height: 1.43;
+  }
+  .pub-fig-hero__gloss { display: block; margin-top: 0.35rem; }
   /* Chapter one as a quiet door under the promise: it names the chapter and
      the runtime, and the click plays that chapter. */
   .fig-hero-chapter { margin: 1.2rem 0 0; }
@@ -215,12 +228,13 @@ const worldLine = [
     color: var(--gold-primary);
     border-color: color-mix(in srgb, var(--gold-primary) var(--a-45, 45%), transparent);
   }
-  /* One caption, two homes: desktop keeps it under the portrait, phones show
+  /* One gloss, two homes: desktop keeps it under the portrait, phones show
      it at the hero's end instead. Exactly one is displayed per viewport, so
-     assistive tech hears the disclosure once. */
+     assistive tech hears the disclosure once. The credit stays in the figure. */
   .pub-fig-hero__caption--end { display: none; }
   @media (max-width: 819.98px) {
-    .pub-fig-hero__figure .pub-fig-hero__caption { display: none; }
+    .pub-fig-hero__figure .pub-fig-hero__caption { margin-top: 0.6rem; text-align: center; }
+    .pub-fig-hero__figure .pub-fig-hero__gloss { display: none; }
     .pub-fig-hero__caption--end {
       display: block;
       margin: 1.1rem auto 0;
