@@ -30,11 +30,12 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
     <div class="c2-hero__in">
       <h1 class="c2-h1" id="c2-h1" data-c2-keep>{W.tagline}</h1>
       <p class="c2-intro">{W.intro}</p>
+      {/* a 3x phone takes the 900 px painting, as a 2x one does: sharp at full bleed, about 100 KB less */}
       <Stage
         lang={lang}
         variant="below"
         moment={false}
-        sizes="(min-width: 1024px) 62vw, 100vw"
+        sizes="(min-width: 1024px) 62vw, (min-resolution: 2.5dppx) 300px, 100vw"
         class="c2-stage"
       />
       <nav class="c2-rail" aria-label={W.rowLabel}>
