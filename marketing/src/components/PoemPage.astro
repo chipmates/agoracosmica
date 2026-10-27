@@ -99,6 +99,8 @@ const schemas = [
   reading={true}
   schemas={schemas}
 >
+  <slot name="head" slot="head" />
+  <slot name="dock" slot="dock" />
   <div class="pub-content pm">
     <Breadcrumbs
       lang={lang}

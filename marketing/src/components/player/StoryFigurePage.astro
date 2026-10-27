@@ -28,6 +28,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
+import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../../lib/dickinsonPoemsFaq';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { buildStoryQueue } from '../../player/queue';
 import { playerStrings } from '../../player/strings';
@@ -43,6 +44,11 @@ interface Props {
 const { figureId, slug, lang } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
+// Dickinson's poems capsule: the head's FAQ schema (player/figurePage.ts) holds these questions, so the page shows them.
+const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
+const poemsLink = de
+  ? 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift (auf Englisch) →'
+  : 'Read her poems grouped by theme, in her own hand →';
 const P = playerStrings(lang);
 const figure = getFigureById(figureId, lang);
 if (!figure) throw new Error(`Unknown figure: ${figureId}`);
@@ -141,6 +147,22 @@ const note = storyNote(figureId, lang, figure.name);
     </p>
 
     <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player />
+
+    {poemsFaq && (
+      <section class="pub-section pub-figure__poems">
+        <h2 class="pub-section__title">{poemsFaq[0]!.q}</h2>
+        <p class="pub-section__text">{poemsFaq[0]!.a}</p>
+        <p class="pub-section__text pub-figure__poems-link">
+          <a class="pub-textlink" href="/figures/emily-dickinson/poems/">{poemsLink}</a>
+        </p>
+        {poemsFaq.slice(1).map(item => (
+          <div class="pub-figure__qa">
+            <h3 class="pub-figure__qa-q">{item.q}</h3>
+            <p class="pub-section__text">{item.a}</p>
+          </div>
+        ))}
+      </section>
+    )}
 
     <FigureLattice figureId={figureId} figureName={figure.name} lang={lang}>
       {relatedFigureIds.length > 0 && (
