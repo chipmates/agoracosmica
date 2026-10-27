@@ -272,6 +272,7 @@ function sync(): void {
 
 // ---- unfolding, the view switch, the map's star ------------------------------
 
+/** A tap's unfolded row (or a star selected on the map) comes into view whole. */
 function unfold(n: number, opts: { scroll?: boolean; toggle?: boolean } = {}): void {
   const queue = readPageQueue();
   if (!queue) return;
@@ -285,17 +286,15 @@ function unfold(n: number, opts: { scroll?: boolean; toggle?: boolean } = {}): v
     row.classList.toggle('is-open', open);
     panel.hidden = !open;
     if (open) {
-      fillTeaser(queue, rn, panel);
-      if (opts.scroll) {
-        const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        row.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-      }
+      const clear = opts.scroll || opts.toggle;
+      fillTeaser(queue, rn, panel, clear ? () => { if (row.classList.contains('is-open')) keepClear(row); } : undefined);
+      if (clear) keepClear(row);
     }
   });
   sync();
 }
 
-function fillTeaser(queue: StoryQueue, n: number, scope: HTMLElement): void {
+function fillTeaser(queue: StoryQueue, n: number, scope: HTMLElement, filled?: () => void): void {
   const slot = scope.querySelector<HTMLElement>('[data-story-teaser]');
   if (!slot || slot.dataset.filled) return;
   slot.dataset.filled = '1';
@@ -303,10 +302,31 @@ function fillTeaser(queue: StoryQueue, n: number, scope: HTMLElement): void {
     .then(text => {
       slot.textContent = text;
       slot.closest('.sp-teaser')?.classList.add('is-in');
+      filled?.();
     })
     .catch(() => {
       delete slot.dataset.filled;
     });
+}
+
+/**
+ * Scrolls just enough that a block stands whole between the site bar and the resting dock (the screen's foot while
+ * no dock is up). A block taller than that space keeps its head under the bar.
+ */
+function keepClear(el: HTMLElement): void {
+  const box = el.getBoundingClientRect();
+  const dock = document.querySelector<HTMLElement>('.story-dock');
+  const dockBox = dock?.getBoundingClientRect();
+  const foot = dockBox && dockBox.height >= 20 ? dockBox.top : window.innerHeight;
+  const bar = document.querySelector<HTMLElement>('.pub-navbar');
+  const head = bar && getComputedStyle(bar).position !== 'static' ? Math.max(0, bar.getBoundingClientRect().bottom) : 0;
+  const rise = box.top - head - 8;
+  const over = box.bottom + 12 - foot;
+  // a head under the bar comes down into view; a foot under the dock comes up as far as the head allows
+  const by = rise < 0 ? rise : over > 0 ? Math.min(over, rise) : 0;
+  if (Math.abs(by) < 1) return;
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  window.scrollBy({ top: by, behavior: reduce ? 'auto' : 'smooth' });
 }
 
 function setView(kind: 'list' | 'map'): void {
@@ -350,14 +370,14 @@ function selectStar(n: number): void {
   }
   if (acts) card.append(acts);
   card.hidden = false;
-  fillTeaser(queue, n, card);
+  fillTeaser(queue, n, card, () => { if (!card.hidden) keepClear(card); });
   sync();
-  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  card.scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  keepClear(card);
 }
 
-/** The dock rises under the thumb: the control just pressed moves up out of its way. */
+/** The dock rises under the thumb: the control just pressed, with the whole row or map card around it, moves up out of its way. */
 function keepPressedInView(el: HTMLElement): void {
+  const block = el.closest<HTMLElement>('.sp-row.is-open, [data-story-mapsel]') ?? el;
   let frames = 0;
   const check = () => {
     const dock = document.querySelector<HTMLElement>('.story-dock');
@@ -365,11 +385,7 @@ function keepPressedInView(el: HTMLElement): void {
       if (++frames < 40) requestAnimationFrame(check);
       return;
     }
-    const over = el.getBoundingClientRect().bottom + 12 - dock.getBoundingClientRect().top;
-    if (over > 0) {
-      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      window.scrollBy({ top: over, behavior: reduce ? 'auto' : 'smooth' });
-    }
+    keepClear(block);
   };
   requestAnimationFrame(check);
 }
