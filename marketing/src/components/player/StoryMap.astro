@@ -108,7 +108,7 @@ function boxOf(i: number, c: Cand): Box[] {
   const out = [{ l, t: y + c.dy - c.h * 0.8, r: l + c.w, b: y + c.dy + c.h * 0.25 }];
   if (c.leader) {
     // the "next" mark's leader, from the ring to the label, as a few small boxes
-    const sx = Math.sign(c.dx); const y2 = c.dy < 0 ? -34 : c.dy - 12;
+    const sx = Math.sign(c.dx); const y2 = c.dy < 0 ? c.dy + 4 : c.dy - 12;
     for (let k = 0; k <= 4; k++) {
       const px = x + sx * (18 + 16 * k / 4); const py = y + (c.dy < 0 ? -18 : 18) + (y2 - (c.dy < 0 ? -18 : 18)) * k / 4;
       out.push({ l: px - 2, t: py - 2, r: px + 2, b: py + 2 });
@@ -129,24 +129,31 @@ function place(i: number, cands: Cand[], hard: Box[], soft: Box[]): { c: Cand; b
   }
   return best!;
 }
+// The plate numbers first: one fixed place for every star, centred above it and over a "next" ring's top (r 24), so a
+// number never reads as its neighbour's. The introduction's name is placed last, beside its star.
+const NUM_DY = -27;
+const numberBox: (Box | null)[] = at.map(([x, y], i) => {
+  if (numbers[i] === 0) return null;
+  const w = numbers[i]! >= 10 ? 13 : 7;
+  return { l: x - w / 2, t: y + NUM_DY - 10 * 0.8, r: x + w / 2, b: y + NUM_DY + 10 * 0.25 };
+});
+const numbersBut = (i: number): Box[] => numberBox.filter((b, j): b is Box => b !== null && j !== i);
 // First the "next" mark (the app's element, one star at a time): the app's rule first, the label to the left when
 // the star stands right of 62 % of the plate, on the upper diagonal; under the star where that is clearer.
 const NEXT_W = 9.4 * P.nextTag.length;
 const nextPick = at.map(([x], i) => {
   const first = x / W > 0.62 ? -1 : 1;
   const sides = [first, -first];
-  const cands: Cand[] = [-38, 46, 62].flatMap(dy => sides.map(side => ({ dx: side * 38, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10, leader: true })));
-  return place(i, cands, [], []);
+  // a step higher (-46) where the plate numbers over the stars take the first line
+  const cands: Cand[] = [-38, -46, 46, 62].flatMap(dy => sides.map(side => ({ dx: side * 38, dy, anchor: (side > 0 ? 'start' : 'end') as 'start' | 'end', w: NEXT_W, h: 10, leader: true })));
+  return place(i, cands, numbersBut(i), []);
 });
 const nextAt = nextPick.map(p => p.c);
-// Then the plate numbers (and the introduction's name): clear of their own star's "next" mark, of each other, and,
-// where room allows, of the other stars' marks.
-const numbersPlaced: Box[] = [];
 const numberAt = at.map((_, i) => {
-  const intro0 = numbers[i] === 0;
-  const w = intro0 ? 7.4 * P.introTitle.length : numbers[i]! >= 10 ? 13 : 7;
-  const h = intro0 ? 13 : 10;
-  const dy = intro0 ? 37 : 34; // under a "next" ring's foot (r 24)
+  if (numbers[i] !== 0) return { dx: 0, dy: NUM_DY, anchor: 'middle', w: 0, h: 10 } as Cand;
+  const w = 7.4 * P.introTitle.length;
+  const h = 13;
+  const dy = 37; // under a "next" ring's foot (r 24)
   const cands: Cand[] = [
     { dx: 0, dy, anchor: 'middle', w, h }, { dx: -12, dy, anchor: 'start', w, h }, { dx: 12, dy, anchor: 'end', w, h },
     { dx: 27, dy: 4, anchor: 'start', w, h }, { dx: -27, dy: 4, anchor: 'end', w, h }, { dx: 0, dy: -29, anchor: 'middle', w, h },
@@ -154,10 +161,8 @@ const numberAt = at.map((_, i) => {
     { dx: -12, dy: -29, anchor: 'start', w, h }, { dx: 12, dy: -29, anchor: 'end', w, h },
   ];
   const others = nextPick.flatMap((p, j) => (j === i ? [] : p.boxes));
-  const pick = place(i, cands, [...numbersPlaced, ...nextPick[i]!.boxes], others);
-  // kept apart by a margin, so two numbers never read as one pair
-  numbersPlaced.push(...pick.boxes.map(x => ({ l: x.l - 9, t: x.t - 6, r: x.r + 9, b: x.b + 6 })));
-  return pick.c;
+  const mine = numbersBut(i).map(x => ({ l: x.l - 9, t: x.t - 6, r: x.r + 9, b: x.b + 6 }));
+  return place(i, cands, [...mine, ...nextPick[i]!.boxes], others).c;
 });
 
 const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
@@ -187,6 +192,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
               <circle class="sp-star__hit" cx={r1(cx)} cy={r1(cy)} r="25" />
               <g class="sp-star__orn" transform={`translate(${r1(cx)} ${r1(cy)})`}>
                 <circle class="sp-star__sel" r="16" />
+                <circle class="sp-star__track" r="20" />
                 <circle class="sp-star__arc" r="20" pathLength="100" data-star-arc transform="rotate(-90)" />
                 <g class="sp-star__l0">
                   <circle class="sp-star__dots" r="8" />
@@ -199,7 +205,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
                 </g>
                 <g class="sp-star__nextmark">
                   <circle class="sp-star__nextring" r="24" />
-                  <line class="sp-star__leader" x1={18 * Math.sign(nx.dx)} y1={18 * Math.sign(nx.dy)} x2={34 * Math.sign(nx.dx)} y2={nx.dy < 0 ? -34 : nx.dy - 12} />
+                  <line class="sp-star__leader" x1={18 * Math.sign(nx.dx)} y1={18 * Math.sign(nx.dy)} x2={34 * Math.sign(nx.dx)} y2={nx.dy < 0 ? nx.dy + 4 : nx.dy - 12} />
                 </g>
               </g>
               {n === 0

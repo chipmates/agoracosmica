@@ -809,6 +809,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .sp-star__sel { fill: none; stroke: var(--sp-n-gold-hover); stroke-width: 1; stroke-dasharray: 3 4; display: none; }
 /* the fine gold circle the app inks round a star, here as far as the story has played */
 .sp-star__arc { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 85%, transparent); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
+/* the whole circle, faint, under the arc: the arc reads as progress round a ring, not as a bracket */
+.sp-star__track { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 22%, transparent); stroke-width: 1.4; opacity: 0; }
 .sp-star__nextmark { display: none; }
 .sp-star__nextring { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 75%, transparent); stroke-width: 1; stroke-dasharray: 4 7; }
 .sp-star__leader { stroke: color-mix(in srgb, var(--sp-n-gold) 50%, transparent); stroke-width: 1; }
@@ -821,20 +823,23 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   text-transform: uppercase;
   fill: var(--sp-n-gold);
 }
-.sp-star__num { font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; fill: color-mix(in srgb, var(--star-blue-light) 62%, transparent); }
+.sp-star__num { font-family: var(--font-ui); font-size: 11px; font-weight: 500; letter-spacing: 0.04em; fill: color-mix(in srgb, var(--star-blue-light) 55%, var(--sp-n-ink)); }
 .sp-star__intro { font-family: var(--font-content); font-style: italic; font-size: 13px; fill: color-mix(in srgb, var(--star-blue-light) 72%, transparent); }
 @media (max-width: 380px) {
-  .sp-star__next, .sp-star__num { font-size: 11px; }
+  .sp-star__next { font-size: 11px; }
+  .sp-star__num { font-size: 12px; }
   .sp-star__intro { font-size: 14px; }
 }
 .sp-star.is-done .sp-star__l0 { display: none; }
 .sp-star.is-done .sp-star__l1 { display: inline; }
 .sp-star.is-current .sp-star__dots { stroke: color-mix(in srgb, var(--sp-n-gold-subtle) 70%, transparent); }
 .sp-star.is-current .sp-star__ink { fill: var(--sp-n-gold-subtle); }
-.sp-star.is-current .sp-star__arc { opacity: 1; }
-.sp-star.is-started .sp-star__arc { opacity: 0.6; }
+.sp-star.is-current .sp-star__arc,
+.sp-star.is-current .sp-star__track { opacity: 1; }
+.sp-star.is-started .sp-star__arc,
+.sp-star.is-started .sp-star__track { opacity: 0.6; }
 .sp-star.is-done .sp-star__num,
-.sp-star.is-current .sp-star__num { fill: color-mix(in srgb, var(--sp-n-gold-subtle) 85%, transparent); }
+.sp-star.is-current .sp-star__num { fill: var(--sp-n-gold-subtle); }
 .sp-star.is-next .sp-star__nextmark,
 .sp-star.is-selected .sp-star__sel { display: inline; }
 .sp-star.is-next .sp-star__next { display: inline; }
