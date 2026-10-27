@@ -73,6 +73,26 @@ function labelArrows(): void {
   }
 }
 
+const warmed = new Set<string>();
+
+/** Fetches a neighbour's painting ahead of a turn (a finger on the face, a pointer or focus on an arrow), as the stage
+ * will ask for it, so the new face does not wait on the network; nothing is fetched before a visitor reaches for it. */
+function warm(dir: Dir | 0): void {
+  const img = hero()?.querySelector<HTMLImageElement>('[data-stage-img]');
+  if (!img) return;
+  const all = stageFigures();
+  for (const d of dir ? [dir] : ([1, -1] as const)) {
+    const f = all.find(x => x.id === neighbour(d));
+    if (!f || warmed.has(f.id)) continue;
+    warmed.add(f.id);
+    const pre = new Image();
+    pre.crossOrigin = 'anonymous';
+    pre.sizes = img.sizes;
+    pre.srcset = f.main.srcset;
+    pre.src = f.main.src;
+  }
+}
+
 function setMat(x: number, fade: number, ms: number): void {
   const m = mat();
   if (!m) return;
@@ -85,6 +105,7 @@ function setMat(x: number, fade: number, ms: number): void {
 export function turn(dir: Dir): boolean {
   if (turning) return false;
   const id = neighbour(dir);
+  lastDir = dir;
   if (!id || !hero()) return false;
   const m = mat();
   const still = momentStill();
@@ -121,6 +142,8 @@ function onDown(e: PointerEvent): void {
   if (!target || target.closest('[data-c2-rail]')) return;
   const el = hero();
   if (!el) return;
+  // a finger on the face, not on a control: a tap on the plate keeps the network for its story
+  if (!target.closest('a, button, summary')) warm(0);
   drag = { id: e.pointerId, el, x0: e.clientX, y0: e.clientY, t0: e.timeStamp, axis: 'none', dx: 0, dy: 0, lastX: e.clientX, lastT: e.timeStamp, speed: 0 };
 }
 
@@ -193,6 +216,12 @@ function onClick(e: MouseEvent): void {
   turn(btn.dataset.c2Dir === 'prev' ? -1 : 1);
 }
 
+function onReach(e: Event): void {
+  const target = e.target instanceof Element ? e.target : null;
+  const btn = target?.closest<HTMLElement>('[data-c2-dir]');
+  if (btn) warm(btn.dataset.c2Dir === 'prev' ? -1 : 1);
+}
+
 function onKey(e: KeyboardEvent): void {
   if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return;
   if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
@@ -222,9 +251,15 @@ export function installSwipe(): void {
   window.addEventListener('click', onClickCapture, true);
   document.addEventListener('click', onClick);
   document.addEventListener('keydown', onKey);
+  document.addEventListener('pointerover', onReach);
+  document.addEventListener('focusin', onReach);
 }
 
-/** Called after every swap: the arrows' names follow the stage. */
+let lastDir: Dir | 0 = 0;
+
+/** Called after every swap: the arrows' names follow the stage; after a turn, the next one the same way is warmed. */
 export function afterSwap(): void {
   labelArrows();
+  if (lastDir) warm(lastDir);
+  lastDir = 0;
 }
