@@ -386,6 +386,9 @@ export function rateLabel(rate: number, lang: PlayerLang): string {
 /** A list's separator: the no-break space keeps the dot at the end of a line when a list wraps. */
 export const LIST_SEP = '\u00a0· ';
 
+/** The dock's hidden "Synthetic voice": every control that starts a story is described by it. */
+export const VOICE_DESC_ID = 'story-voice-desc';
+
 /** The label's halves as shown, each kept whole where it fits: its dot stays at the end of the first half. */
 export function labelHalves(brief: string): string[] {
   const halves = brief.split(' · ');

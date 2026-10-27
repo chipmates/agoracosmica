@@ -6,7 +6,7 @@
 // it one quiet line: the text without sound, and the figure's own writing.
 import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
 import { numberWord } from '../../lib/figureWorld';
-import { labelHalves, playerStrings } from '../../player/strings';
+import { VOICE_DESC_ID, labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
@@ -79,6 +79,7 @@ const halves = labelHalves(label.brief);
       data-door="hero_plate"
       data-state="idle"
       aria-pressed="false"
+      aria-describedby={VOICE_DESC_ID}
     >
       <span class="sp-disc" aria-hidden="true">
         <svg class="sp-ring" viewBox="0 0 64 64" focusable="false">
@@ -97,7 +98,7 @@ const halves = labelHalves(label.brief);
       </span>
     </button>
     <p class="sp-startover" data-story-startover hidden>
-      <button type="button" class="sp-textlink" data-story-play data-story-n={first?.n ?? 0} data-story-from="0" data-door="hero_start_over">{P.startOver}</button>
+      <button type="button" class="sp-textlink" data-story-play data-story-n={first?.n ?? 0} data-story-from="0" data-door="hero_start_over" aria-describedby={VOICE_DESC_ID}>{P.startOver}</button>
     </p>
   </div>
   <p class="sp-hero__links">

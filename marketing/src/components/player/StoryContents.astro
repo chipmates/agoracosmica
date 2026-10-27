@@ -6,7 +6,7 @@
 // line and the facts are fetched when the visitor opens them.
 import { numberWord } from '../../lib/figureWorld';
 import { figureMinutes } from '../../lib/storyRuntime';
-import { LIST_SEP, playerStrings } from '../../player/strings';
+import { LIST_SEP, VOICE_DESC_ID, playerStrings } from '../../player/strings';
 import { factWords } from '../../player/factWords';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -89,7 +89,7 @@ const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?
           </button>
           <div class="sp-row__panel" id={`sp-panel-${r.n}`} hidden data-nosnippet>
             <div class="sp-acts">
-              <button type="button" class="sp-act sp-act--main" data-story-play data-story-n={r.n} data-door="row_listen" data-state="idle">
+              <button type="button" class="sp-act sp-act--main" data-story-play data-story-n={r.n} data-door="row_listen" data-state="idle" aria-describedby={VOICE_DESC_ID}>
                 <span class="sp-act__disc" aria-hidden="true">
                   <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
                   <svg class="story-play__icon story-play__icon--pause" viewBox="0 0 24 24" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>

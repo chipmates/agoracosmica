@@ -6,7 +6,7 @@
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { numberWord } from '../../lib/figureWorld';
 import { publicUrl } from '../../lib/urls';
-import { labelHalves, playerStrings } from '../../player/strings';
+import { VOICE_DESC_ID, labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
 import { buildStoryQueue } from '../../player/queue';
 import type { PlayerLang } from '../../player/strings';
@@ -54,6 +54,7 @@ const halves = labelHalves(label.brief);
       data-door="poem_plate"
       data-state="idle"
       aria-pressed="false"
+      aria-describedby={VOICE_DESC_ID}
     >
       <span class="sp-disc" aria-hidden="true">
         <svg class="sp-ring" viewBox="0 0 64 64" focusable="false">
@@ -72,7 +73,7 @@ const halves = labelHalves(label.brief);
       </span>
     </button>
     <p class="sp-startover" data-story-startover hidden>
-      <button type="button" class="sp-textlink" data-story-play data-story-n={intro ? 0 : 1} data-story-from="0" data-door="poem_start_over">{P.startOver}</button>
+      <button type="button" class="sp-textlink" data-story-play data-story-n={intro ? 0 : 1} data-story-from="0" data-door="poem_start_over" aria-describedby={VOICE_DESC_ID}>{P.startOver}</button>
     </p>
   </div>
   <p class="sp-hero__links">

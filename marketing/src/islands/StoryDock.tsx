@@ -33,7 +33,7 @@ import { installPage } from '../player/page';
 import StoryReader from '../player/StoryReader';
 import Sheets from '../player/sheets';
 import { Icon } from '../player/icons';
-import { clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
+import { VOICE_DESC_ID, clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -172,7 +172,14 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     document.addEventListener('keydown', close);
     return () => document.removeEventListener('keydown', close);
   }, [noteOpen]);
-  const liveRegion = <span className="sp-sr" aria-live="polite" aria-atomic="true" data-story-voice-live>{live}</span>;
+  // The live region speaks at a start; the hidden word is the description every start control points at, so the label
+  // is heard with the button, before any sound.
+  const liveRegion = (
+    <>
+      <span className="sp-sr" aria-live="polite" aria-atomic="true" data-story-voice-live>{live}</span>
+      <span id={VOICE_DESC_ID} hidden>{voiceWord}</span>
+    </>
+  );
   // One offer at a time: where the page's plate offers the kept point, the dock stays down.
   const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
   const offer = !loaded && state.resume !== null && !plateOffers;
@@ -205,7 +212,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
         {overlays}
         <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
           <div className="story-dock__offer">
-            <button type="button" className="story-dock__go" onClick={acceptResume}>
+            <button type="button" className="story-dock__go" onClick={acceptResume} aria-describedby={VOICE_DESC_ID}>
               <span className="story-dock__go-disc" aria-hidden="true">{Icon.play}</span>
               <span className="story-dock__go-text">{text}</span>
             </button>
@@ -260,7 +267,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
             </div>
             <div className="story-dock__endacts">
               <button type="button" className="story-dock__stay" onClick={stayHere}>{s.stay}</button>
-              <button type="button" className="story-dock__now" onClick={listenNow}>{s.listenNow}</button>
+              <button type="button" className="story-dock__now" onClick={listenNow} aria-describedby={VOICE_DESC_ID}>{s.listenNow}</button>
             </div>
           </div>
         )}
@@ -302,13 +309,13 @@ export default function StoryDock({ lang, labels, facts }: Props) {
           <div className="story-dock__ctrls">
             {wide && (
               <button type="button" className="story-btn story-dock__prev" onClick={previousStory} disabled={!hasPrevious() && state.time < 1}
-                aria-label={s.prevAria}>{Icon.prev}</button>
+                aria-label={s.prevAria} aria-describedby={VOICE_DESC_ID}>{Icon.prev}</button>
             )}
             <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
               {Icon.back15}
             </button>
             <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
-              aria-label={playing ? s.pauseAria : s.playAria}>
+              aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
               {playing ? Icon.pause : Icon.play}
             </button>
             {wide && (
@@ -317,7 +324,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
               </button>
             )}
             <button type="button" className="story-btn story-dock__next" onClick={nextStory} disabled={!hasNext()}
-              aria-label={s.nextAria}>
+              aria-label={s.nextAria} aria-describedby={VOICE_DESC_ID}>
               {Icon.next}
             </button>
             {!wide && (

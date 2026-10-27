@@ -16,7 +16,7 @@ import { getFigureQA } from '@client/data/public/figureQA';
 import { getSeedsFor } from '../lib/seeds';
 import { cleanDisplayText } from '../lib/figureWorld';
 import { anchorIds } from '../lib/anchors';
-import { playerStrings } from '../player/strings';
+import { VOICE_DESC_ID, playerStrings } from '../player/strings';
 
 interface Props {
   figureId: string;
@@ -96,7 +96,7 @@ const anchored = blocks.map(b => ({
         ))}
         {b.chapter && player && (
           <p class="fig-concept__link">
-            <button type="button" class="story-play story-play--hear" data-story-play data-story-n={b.chapter} aria-pressed="false">
+            <button type="button" class="story-play story-play--hear" data-story-play data-story-n={b.chapter} aria-pressed="false" aria-describedby={VOICE_DESC_ID}>
               <span class="story-play__disc" aria-hidden="true">
                 <svg class="story-play__icon story-play__icon--play" viewBox="0 0 24 24" focusable="false"><path d="M8.2 5.3v13.4c0 .5.5.8.9.5l10.3-6.7a.6.6 0 0 0 0-1L9.1 4.8c-.4-.3-.9 0-.9.5z" /></svg>
                 <svg class="story-play__icon story-play__icon--pause" viewBox="0 0 24 24" focusable="false"><rect x="6.6" y="5" width="3.8" height="14" rx="1" /><rect x="13.6" y="5" width="3.8" height="14" rx="1" /></svg>

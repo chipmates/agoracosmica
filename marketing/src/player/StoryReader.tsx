@@ -29,7 +29,7 @@ import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
 import { Icon } from './icons';
 import { shareStory } from './page';
 import { showToast } from './toast';
-import { LIST_SEP, clockLabel, labelHalves, playerStrings } from './strings';
+import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
 interface Props {
@@ -426,7 +426,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
               <p>{label.expanded}</p>
             </details>
             {!here && (
-              <button type="button" className="sp-act sp-act--main story-reader__listen" onClick={() => playStory(queue, n)}>
+              <button type="button" className="sp-act sp-act--main story-reader__listen" onClick={() => playStory(queue, n)} aria-describedby={VOICE_DESC_ID}>
                 <span className="sp-act__disc" aria-hidden="true">{Icon.play}</span>
                 <span className="sp-act__words">
                   <span className="sp-act__t">{kept ? s.continueFrom : s.listen}</span>
@@ -446,7 +446,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
               el?.style.setProperty('left', `${pop.left}px`);
               el?.style.setProperty('top', `${pop.top}px`);
             }}>
-              <button type="button" onClick={() => {
+              <button type="button" aria-describedby={VOICE_DESC_ID} onClick={() => {
                 const si = pop.si;
                 setPop(null);
                 if (model) playFrom(queue, n, sentenceStart(model, si));
@@ -482,7 +482,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                   <p className="story-reader__nextk">{s.nextUp}</p>
                   <p className="story-reader__nextt">{`${s.storyN(nextEntry.n)} · ${nextEntry.title}`}</p>
                   <div className="sp-acts sp-acts--two">
-                    <button type="button" className="sp-act sp-act--main" onClick={() => playStory(queue, nextEntry.n)}>
+                    <button type="button" className="sp-act sp-act--main" onClick={() => playStory(queue, nextEntry.n)} aria-describedby={VOICE_DESC_ID}>
                       <span className="sp-act__disc" aria-hidden="true">{Icon.play}</span>
                       <span className="sp-act__words">
                         <span className="sp-act__t">{s.listen}</span>

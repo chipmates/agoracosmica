@@ -36,7 +36,7 @@ import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZ
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
 import { hideToast } from './toast';
-import { clockLabel, playerStrings, rateLabel } from './strings';
+import { VOICE_DESC_ID, clockLabel, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
 import type { PlayerState, StoryQueue } from './types';
@@ -136,13 +136,13 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
           <div className="sp-fp__times"><span>{clockLabel(state.time)}</span><span>{clockLabel(state.duration)}</span></div>
         </div>
         <div className="sp-fp__transport">
-          <button type="button" className="story-btn" onClick={previousStory} disabled={!hasPrevious() && state.time < 1} aria-label={s.prevAria}>{Icon.prev}</button>
+          <button type="button" className="story-btn" onClick={previousStory} disabled={!hasPrevious() && state.time < 1} aria-label={s.prevAria} aria-describedby={VOICE_DESC_ID}>{Icon.prev}</button>
           <button type="button" className="story-btn" onClick={skipBack} aria-label={s.back15Aria}>{Icon.back15}</button>
-          <button type="button" className="story-btn sp-fp__play" onClick={togglePlay} aria-label={playing ? s.pauseAria : s.playAria}>
+          <button type="button" className="story-btn sp-fp__play" onClick={togglePlay} aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
             {playing ? Icon.pause : Icon.play}
           </button>
           <button type="button" className="story-btn" onClick={skipForward} aria-label={s.fwd15Aria}>{Icon.fwd15}</button>
-          <button type="button" className="story-btn" onClick={nextStory} disabled={!hasNext()} aria-label={s.nextAria}>{Icon.next}</button>
+          <button type="button" className="story-btn" onClick={nextStory} disabled={!hasNext()} aria-label={s.nextAria} aria-describedby={VOICE_DESC_ID}>{Icon.next}</button>
         </div>
         <div className="sp-field sp-fp__speed">
           <span className="sp-field__label" id="sp-speed-l">{s.speed}</span>
@@ -328,7 +328,7 @@ function SavedSheet({ state, queue, s, titleRef }: { state: PlayerState; queue: 
                 <p className="sp-saved__text">{item.text}</p>
                 <p className="sp-saved__src">{[item.n === 0 ? s.introTitle : s.storyN(item.n), item.n === 0 ? '' : entry?.title].filter(Boolean).join(' · ')}</p>
                 <div className="sp-saved__acts">
-                  <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); void from(item.n, item.si); }}>
+                  <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); void from(item.n, item.si); }} aria-describedby={VOICE_DESC_ID}>
                     {Icon.play}<span>{s.fromHere}</span>
                   </button>
                   <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); focusSentence(item.n, item.si); openReader(item.n); }}>
