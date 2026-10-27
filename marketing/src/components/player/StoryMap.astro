@@ -94,6 +94,9 @@ const segments = fit
       .map(s => ({ x1: s.x1 + SIDE, y1: s.y1 + TOP, x2: s.x2 + SIDE, y2: s.y2 + TOP }))
   : [];
 const r1 = (v: number) => Math.round(v * 10) / 10;
+// A star's tap area (r 25) stops halfway to its nearest neighbour, so where stars stand close (a ladder) each
+// star is still tapped at its own centre rather than under the next star's area.
+const hitR = at.map(([x, y], i) => Math.min(25, ...at.filter((_, j) => j !== i).map(([u, v]) => Math.floor(Math.hypot(u - x, v - y) * 5) / 10)));
 
 // The app's graticule (three arcs, two bent meridians) and its via sapientiae, for this plate.
 const grat = [
@@ -248,7 +251,7 @@ const mapNoteLoose = lang === 'de'
           return (
             <a class:list={['sp-star', n === 0 && 'sp-star--intro']} href={`#story-${n}`} data-story-star={n}
               aria-label={P.rowAria(n, n === 0 ? P.introTitle : title(n), [])}>
-              <circle class="sp-star__hit" cx={r1(cx)} cy={r1(cy)} r="25" />
+              <circle class="sp-star__hit" cx={r1(cx)} cy={r1(cy)} r={hitR[i]! >= 25 ? '25' : String(hitR[i])} />
               <g class="sp-star__orn" transform={`translate(${r1(cx)} ${r1(cy)})`}>
                 <circle class="sp-star__sel" r="16" />
                 <circle class="sp-star__track" r="20" />
