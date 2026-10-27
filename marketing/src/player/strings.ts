@@ -131,6 +131,9 @@ export interface PlayerStrings {
   spacings: [string, string, string];
   highlight: string;
   highlights: [string, string, string];
+  /** The switch that brings the wash back behind the spoken sentence, and its help line. */
+  strongMark: string;
+  strongMarkHelp: string;
   followVoice: string;
   followHelp: string;
   sizeValue: (px: number) => string;
@@ -246,6 +249,8 @@ const en: PlayerStrings = {
   spacings: ['Tight', 'Normal', 'Airy'],
   highlight: 'Highlight',
   highlights: ['Word', 'Sentence', 'Off'],
+  strongMark: 'Stronger highlight',
+  strongMarkHelp: 'A soft tint behind the spoken sentence.',
   followVoice: 'Follow the voice',
   followHelp: 'The text scrolls with the voice. Scroll yourself to read freely.',
   sizeValue: px => `${px} px`,
@@ -360,6 +365,8 @@ const de: PlayerStrings = {
   spacings: ['Eng', 'Normal', 'Weit'],
   highlight: 'Markierung',
   highlights: ['Wort', 'Satz', 'Aus'],
+  strongMark: 'Stärker markieren',
+  strongMarkHelp: 'Ein leichter Grund hinter dem gesprochenen Satz.',
   followVoice: 'Der Stimme folgen',
   followHelp: 'Der Text scrollt mit der Stimme. Scrollst du selbst, liest du frei.',
   sizeValue: px => `${px} px`,

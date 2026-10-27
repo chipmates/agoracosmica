@@ -355,6 +355,11 @@ export function skipForward(): void {
   audio.currentTime = Math.max(0, Math.min(end, audio.currentTime + SKIP_S));
 }
 
+/** The voice's position now, between two timeupdate events: the reader's marks are paced by frame from it. */
+export function audioTime(): number {
+  return audio && !audio.seeking && state.current !== null ? audio.currentTime : state.time;
+}
+
 export function seekTo(seconds: number): void {
   if (!audio || state.current === null || !Number.isFinite(seconds)) return;
   if (audio.readyState === 0) {

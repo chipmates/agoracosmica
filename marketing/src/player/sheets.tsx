@@ -294,6 +294,14 @@ function DisplaySheet({ s, titleRef }: { s: PlayerStrings; titleRef: RefObject<H
           <span className="sp-field__label" id="sp-hl-l">{s.highlight}</span>
           {seg('highlight', ['word', 'sentence', 'off'], s.highlights, 'sp-hl-l')}
         </div>
+        <button type="button" className="sp-switch" role="switch" aria-checked={d.strong} disabled={d.highlight === 'off'}
+          onClick={() => setDisplay({ strong: !d.strong })}>
+          <span className="sp-switch__text">
+            <span className="sp-switch__t">{s.strongMark}</span>
+            <span className="sp-switch__h">{s.strongMarkHelp}</span>
+          </span>
+          <span className="sp-switch__knob" aria-hidden="true" />
+        </button>
         <button type="button" className="sp-switch" role="switch" aria-checked={d.follow} onClick={() => setDisplay({ follow: !d.follow })}>
           <span className="sp-switch__text">
             <span className="sp-switch__t">{s.followVoice}</span>

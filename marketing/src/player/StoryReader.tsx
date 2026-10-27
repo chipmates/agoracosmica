@@ -1,13 +1,14 @@
 // The reading view: any story's text, or the introduction's, fetched from R2
 // only when the visitor opens it (never in the page's HTML), set like a page
-// of a book. It opens without sound. While its story plays, the spoken
-// sentence is lit and the word marked from the voice's character alignment,
-// the paragraph where the alignment does not fit, and the view follows the
-// voice until the visitor scrolls away.
+// of a book. It opens without sound. While its story plays, the spoken word is
+// inked and underlined from the voice's character alignment and a bracket in
+// the margin holds its sentence (the paragraph where the alignment does not
+// fit), paced by frame; the view follows the voice until the visitor scrolls away.
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
 import {
+  audioTime,
   closeReader,
   markRead,
   openReader,
@@ -78,6 +79,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const progRef = useRef<HTMLElement | null>(null);
   const backRef = useRef<HTMLButtonElement | null>(null);
   const endRef = useRef<HTMLElement | null>(null);
+  const bracketRef = useRef<HTMLSpanElement | null>(null);
   const programmaticUntil = useRef(0);
   const lit = useRef<{ w: number; si: number; bi: number | null }>({ w: -1, si: -1, bi: null });
 
@@ -148,20 +150,28 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     box.scrollBy({ top: r.top - (b.top + b.height * 0.3), behavior: reduce || force ? 'auto' : 'smooth' });
   }, []);
 
-  useEffect(() => {
+  // The bracket in the margin spans the lit sentence (or paragraph), measured from its line boxes.
+  const placeBracket = useCallback(() => {
+    const br = bracketRef.current;
+    const page = pageRef.current;
+    const on = bodyRef.current?.querySelector<HTMLElement>('.s.on') ?? bodyRef.current?.querySelector<HTMLElement>('p.on');
+    if (!br || !page) return;
+    const rects = on ? [...on.getClientRects()].filter(r => r.width > 0 && r.height > 0) : [];
+    br.classList.toggle('is-on', rects.length > 0);
+    if (!rects.length) return;
+    const top = Math.min(...rects.map(r => r.top));
+    const bottom = Math.max(...rects.map(r => r.bottom));
+    br.style.setProperty('top', `${top - page.getBoundingClientRect().top}px`);
+    br.style.setProperty('height', `${bottom - top}px`);
+  }, []);
+
+  /** Mark the voice's place at time t; true when the sentence or paragraph changed. */
+  const paint = useCallback((t: number): boolean => {
     const body = bodyRef.current;
-    if (!body || !model) return;
-    const clear = () => {
-      body.querySelectorAll('.on').forEach(el => el.classList.remove('on'));
-      lit.current = { w: -1, si: -1, bi: null };
-    };
-    if (!here) {
-      clear();
-      return;
-    }
+    if (!body || !model) return false;
     let changed = false;
     if (model.mode === 'word') {
-      const w = wordAt(model, state.time);
+      const w = wordAt(model, t);
       if (w !== lit.current.w) {
         body.querySelector(`.w[data-wi="${lit.current.w}"]`)?.classList.remove('on');
         if (w >= 0) body.querySelector(`.w[data-wi="${w}"]`)?.classList.add('on');
@@ -174,7 +184,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
         lit.current = { w, si, bi: null };
       }
     } else if (model.mode === 'paragraph') {
-      const bi = blockAt(model, state.time);
+      const bi = blockAt(model, t);
       if (bi !== lit.current.bi) {
         body.querySelector(`p[data-b="${lit.current.bi}"]`)?.classList.remove('on');
         if (bi !== null) body.querySelector(`p[data-b="${bi}"]`)?.classList.add('on');
@@ -182,8 +192,49 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
         changed = true;
       }
     }
-    if (changed && display.follow && !state.away) follow(false);
-  }, [state.time, here, model, display.follow, state.away, follow]);
+    if (changed) placeBracket();
+    return changed;
+  }, [model, placeBracket]);
+
+  useEffect(() => {
+    const body = bodyRef.current;
+    if (!body || !model) return;
+    if (!here) {
+      body.querySelectorAll('.on').forEach(el => el.classList.remove('on'));
+      lit.current = { w: -1, si: -1, bi: null };
+      placeBracket();
+      return;
+    }
+    if (paint(state.time) && display.follow && !state.away) follow(false);
+  }, [state.time, here, model, display.follow, state.away, follow, paint, placeBracket]);
+
+  // While the voice plays here, the marks follow it every frame: timeupdate comes about every 250 ms, and at 2x a
+  // word is shorter than that. requestAnimationFrame stops by itself in a hidden tab.
+  const followNow = useRef({ on: display.follow, away: state.away });
+  useEffect(() => {
+    followNow.current = { on: display.follow, away: state.away };
+  }, [display.follow, state.away]);
+  const framed = here && state.status === 'playing' && !!model && model.mode !== 'none';
+  useEffect(() => {
+    if (!framed) return;
+    let raf = 0;
+    const tick = () => {
+      if (paint(audioTime()) && followNow.current.on && !followNow.current.away) follow(false);
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [framed, paint, follow]);
+
+  // The bracket is measured again whenever the text reflows: size, spacing, face, a font arriving, a new width.
+  useEffect(() => {
+    const body = bodyRef.current;
+    placeBracket();
+    if (!body || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => placeBracket());
+    ro.observe(body);
+    return () => ro.disconnect();
+  }, [model, display.size, display.spacing, display.face, placeBracket]);
 
   // "To the voice" from the dock: back at once.
   const wasAway = useRef(state.away);
@@ -374,6 +425,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
       aria-modal="false"
       aria-label={s.readerAria}
       data-hl={display.highlight}
+      data-strong={display.strong ? 'on' : 'off'}
       data-face={display.face}
       data-nosnippet=""
     >
@@ -410,6 +462,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
         tabIndex={-1}
       >
         <article ref={pageRef} className="story-reader__page">
+          <span ref={bracketRef} className="story-reader__bracket" aria-hidden="true" />
           <header className="story-reader__head">
             <p className="story-reader__kicker">{kicker}</p>
             <h2 className="story-reader__title">{title}</h2>

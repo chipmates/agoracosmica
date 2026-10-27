@@ -115,8 +115,6 @@
   --sp-plate: color-mix(in srgb, var(--sp-n-gold) 4%, var(--sp-n-page));
   --sp-plate-hover: color-mix(in srgb, var(--sp-n-gold) 9%, var(--sp-n-page));
   --sp-wash: color-mix(in srgb, var(--sp-n-gold) 11%, transparent);
-  --sp-word: color-mix(in srgb, var(--sp-n-gold) 34%, transparent);
-  --sp-word-ink: var(--sp-n-ink);
   /* the sheets in the page navy, set apart by a fine warm line, an inner rule and a soft shadow, no lighter blue */
   --sp-sheet: var(--sp-n-page);
   --sp-sheet-line: color-mix(in srgb, var(--sp-n-gold-deep) 50%, transparent);
@@ -173,8 +171,6 @@
     --sp-plate: var(--utility-pure-white);
     --sp-plate-hover: var(--sp-mist-2);
     --sp-wash: color-mix(in srgb, var(--sp-n-gold) 24%, transparent);
-    --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 48%, transparent);
-    --sp-word-ink: var(--sp-n-void);
     --sp-sheet: var(--sp-surface);
     --sp-sheet-line: var(--sp-hair-strong);
     --sp-sheet-rule: transparent;
@@ -228,8 +224,6 @@ html[data-story-theme="day"]:has(.story-reader) body {
   --sp-plate: var(--utility-pure-white);
   --sp-plate-hover: var(--sp-mist-2);
   --sp-wash: color-mix(in srgb, var(--sp-n-gold) 24%, transparent);
-  --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 48%, transparent);
-  --sp-word-ink: var(--sp-n-void);
   --sp-sheet: var(--sp-surface);
   --sp-sheet-line: var(--sp-hair-strong);
   --sp-sheet-rule: transparent;
@@ -284,8 +278,6 @@ html[data-story-theme="vellum"]:has(.story-reader) body {
   --sp-plate: var(--sp-vellum-p);
   --sp-plate-hover: var(--sp-vellum-r);
   --sp-wash: color-mix(in srgb, var(--sp-n-gold-deep) 20%, transparent);
-  --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 46%, transparent);
-  --sp-word-ink: var(--sp-n-void);
   --sp-sheet: var(--sp-surface);
   --sp-sheet-line: var(--sp-hair-strong);
   --sp-sheet-rule: transparent;
@@ -1617,6 +1609,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-switch__knob::after { content: ""; position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--sp-page); transition: transform var(--transition-fast, 150ms ease); }
 .sp-switch[aria-checked="true"] .sp-switch__knob { background: var(--sp-accent); }
 .sp-switch[aria-checked="true"] .sp-switch__knob::after { transform: translateX(22px); }
+.sp-switch:disabled { cursor: default; opacity: 0.45; }
 @media (max-height: 700px) and (max-width: 1023.98px) {
   .sp-sheet--display .sp-switch__h { display: none; }
   .sp-sheet--display .sp-sheet__head { min-height: 52px; }
@@ -1739,12 +1732,35 @@ html:has(.story-reader) { overflow: hidden; }
 }
 .story-reader[data-face="clear"] .story-reader__body p.is-first::first-letter { font-family: var(--sp-clear); font-size: 2.2em; }
 .story-reader__rule { width: 54px; height: 1px; margin: 1.2em auto; border: 0; background: var(--sp-hair-strong); }
-/* Read-along: the spoken sentence in a wash, the spoken word marked. */
+/* Read-along, the quiet mark: the spoken word in the accent ink with a thin underline, its sentence held by a
+   bracket in the margin; no wash unless "Stronger" asks for it. Paused, the word keeps a dotted line. */
 .story-reader__body .s { border-radius: 0.2em; -webkit-box-decoration-break: clone; box-decoration-break: clone; cursor: pointer; transition: background-color 250ms ease; }
-.story-reader__body .w { border-radius: 0.16em; transition: background-color 120ms ease, color 120ms ease, box-shadow 120ms ease; }
-.story-reader:not([data-hl="off"]) .story-reader__body .s.on { background: var(--sp-wash); box-shadow: 0 0 0 0.12em var(--sp-wash); }
-.story-reader[data-hl="word"] .story-reader__body .w.on { background: var(--sp-word); color: var(--sp-word-ink); box-shadow: 0 0 0 0.08em var(--sp-word); }
-.story-reader:not([data-hl="off"]) .story-reader__body p.on { background: var(--sp-wash); box-shadow: -10px 0 0 var(--sp-wash), 10px 0 0 var(--sp-wash); border-radius: 2px; }
+.story-reader__body .w { transition: color 120ms ease, text-decoration-color 120ms ease; }
+.story-reader[data-hl="word"] .story-reader__body .w.on {
+  color: var(--sp-accent);
+  text-decoration: underline;
+  text-decoration-thickness: max(1px, 0.06em);
+  text-underline-offset: 0.2em;
+  text-decoration-color: color-mix(in srgb, var(--sp-accent) 70%, transparent);
+  text-decoration-skip-ink: none;
+}
+.story-reader[data-hl="word"]:not(.is-playing) .story-reader__body .w.on { color: inherit; text-decoration-style: dotted; text-decoration-color: var(--sp-accent); }
+.story-reader[data-strong="on"]:not([data-hl="off"]) .story-reader__body .s.on { background: var(--sp-wash); box-shadow: 0 0 0 0.12em var(--sp-wash); }
+.story-reader[data-strong="on"]:not([data-hl="off"]) .story-reader__body p.on { background: var(--sp-wash); box-shadow: -10px 0 0 var(--sp-wash), 10px 0 0 var(--sp-wash); border-radius: 2px; }
+.story-reader__bracket {
+  position: absolute;
+  left: calc(var(--sp-gutter) - 11px);
+  width: 5px;
+  border: 1.5px solid var(--sp-accent);
+  border-right: 0;
+  border-radius: 1px 0 0 1px;
+  opacity: 0.8;
+  pointer-events: none;
+  transition: top 220ms ease, height 220ms ease;
+}
+.story-reader__bracket:not(.is-on),
+.story-reader[data-hl="off"] .story-reader__bracket { display: none; }
+.story-reader:not(.is-playing) .story-reader__bracket { opacity: 0.45; }
 .story-reader__body .s.is-saved { box-shadow: inset 0 -0.14em 0 color-mix(in srgb, var(--sp-accent) 45%, transparent); }
 .story-reader__body .s.is-picked { background: var(--sp-wash); box-shadow: inset 0 -2px 0 var(--sp-accent); }
 .story-reader__pop {
@@ -1824,6 +1840,6 @@ html:has(.story-reader) { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   .sp-plate, .sp-disc__core, .sp-row__chev, .story-reader__body p, .story-reader__body .s, .story-reader__body .w,
-  .sp-switch__knob, .sp-switch__knob::after, .story-dock__voice, .story-dock__who { transition: none; }
+  .sp-switch__knob, .sp-switch__knob::after, .story-dock__voice, .story-dock__who, .story-reader__bracket { transition: none; }
   .sp-ring__wait { display: none; }
 }

@@ -1,6 +1,6 @@
 // The reader's display settings ("Aa"), kept on this device: the light (Auto
 // follows the device, Day, Vellum, Night), text size, typeface, line spacing,
-// what the read-along marks and whether it follows the voice. The light
+// what the read-along marks (and the stronger wash) and whether it follows the voice. The light
 // covers the figure page, the reader and the dock; CSS does the work
 // (player.css), this only sets the root's attribute.
 
@@ -19,13 +19,15 @@ export interface DisplaySettings {
   face: Face;
   spacing: Spacing;
   highlight: Highlight;
+  /** The wash behind the spoken sentence, over the quiet mark. */
+  strong: boolean;
   follow: boolean;
 }
 
 export const SIZE_MIN = 15;
 export const SIZE_MAX = 28;
 
-const DEFAULTS: DisplaySettings = { light: 'auto', size: null, face: 'book', spacing: 'normal', highlight: 'word', follow: true };
+const DEFAULTS: DisplaySettings = { light: 'auto', size: null, face: 'book', spacing: 'normal', highlight: 'word', strong: false, follow: true };
 
 const LIGHTS: readonly Light[] = ['auto', 'day', 'vellum', 'night'];
 const FACES: readonly Face[] = ['book', 'clear'];
@@ -48,6 +50,7 @@ function read(): DisplaySettings {
         face: pick(v.face, FACES, DEFAULTS.face),
         spacing: pick(v.spacing, SPACINGS, DEFAULTS.spacing),
         highlight: pick(v.highlight, HIGHLIGHTS, DEFAULTS.highlight),
+        strong: typeof v.strong === 'boolean' ? v.strong : DEFAULTS.strong,
         follow: typeof v.follow === 'boolean' ? v.follow : DEFAULTS.follow,
       };
     }
