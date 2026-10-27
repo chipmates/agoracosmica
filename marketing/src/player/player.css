@@ -1239,7 +1239,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-sheet__kicker { display: block; margin-bottom: 2px; font-family: var(--font-ui); font-size: 0.8125rem; color: var(--sp-ink-3); }
 .sp-sheet__x svg { width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; }
 .sp-sheet__x { border-radius: 50%; color: var(--sp-ink-2); }
-.sp-sheet__body { overflow-y: auto; overscroll-behavior: contain; overflow-wrap: break-word; padding: 4px var(--sp-gutter) calc(18px + env(safe-area-inset-bottom, 0px)); }
+.sp-sheet__body { overflow-y: auto; overscroll-behavior: contain; padding: 4px var(--sp-gutter) calc(18px + env(safe-area-inset-bottom, 0px)); }
 .sp-field { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--sp-hair); }
 .sp-field--stack { display: block; }
 .sp-field__label { display: block; margin: 0 0 8px; font-size: 0.8125rem; font-weight: 600; letter-spacing: 0.01em; color: var(--sp-ink-2); }
@@ -1303,6 +1303,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-facts__list h4 { display: flex; align-items: center; gap: 8px; margin: 18px 0 6px; font-family: var(--font-ui); font-size: 0.9375rem; font-weight: 600; color: var(--sp-ink); }
 .sp-facts__list h3 svg,
 .sp-facts__list h4 svg { width: 18px; height: 18px; color: var(--sp-accent); fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* A fact's word longer than the line (text at 200 %: "Zypressen-/Gartenszene") breaks instead of scrolling the reader sideways. */
+.sp-facts__list { overflow-wrap: break-word; }
 .sp-facts__list ul { margin: 0; padding: 0 0 0 1.15em; }
 .sp-facts__list li { margin: 0 0 6px; padding-left: 2px; font-family: var(--font-content); font-size: 1rem; line-height: 1.45; color: var(--sp-ink); }
 .sp-facts__list li::marker { color: var(--sp-accent); }
@@ -1464,8 +1466,7 @@ html:has(.story-reader) { overflow: hidden; }
 }
 .story-reader__scroll { position: relative; flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scroll-padding: 80px 0; }
 .story-reader__scroll:focus { outline: none; }
-/* A word longer than the line (text at 200 %: "Zypressen-/Gartenszene") breaks instead of scrolling the reader sideways. */
-.story-reader__page { position: relative; max-width: 44rem; margin: 0 auto; padding: 24px var(--sp-gutter) 40px; overflow-wrap: break-word; }
+.story-reader__page { position: relative; max-width: 44rem; margin: 0 auto; padding: 24px var(--sp-gutter) 40px; }
 /* A panel beside the text: the column centres in the width the panel leaves. */
 @media (min-width: 1024px) {
   .story-reader.has-side .story-reader__scroll { padding-right: 420px; }
