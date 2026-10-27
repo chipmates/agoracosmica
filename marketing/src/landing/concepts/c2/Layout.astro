@@ -24,6 +24,8 @@ const railName = (f: (typeof eras)[number]['figures'][number]): string => {
   if (!full.includes(' ')) return full;
   return short.length > 12 ? short.split(' ')[0] ?? short : short;
 };
+// The sentence under the tagline breaks only after a comma, never inside a phrase ("in / der").
+const leadParts = W.lead.split(/(?<=,)\s+/);
 // The arrows' names for the figure the markup ships with; c2's script renames them after each turn.
 const at = THIRTY.findIndex(f => f.id === DEFAULT_FIGURE);
 const nextName = THIRTY[(at + 1) % THIRTY.length]?.name[lang] ?? '';
@@ -33,7 +35,9 @@ const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ??
   <section class="c2-hero" data-c2-hero aria-labelledby="c2-h1">
     <div class="c2-hero__in">
       <h1 class="c2-h1" id="c2-h1" data-c2-keep>{W.tagline}</h1>
-      <p class="c2-lead" data-c2-keep>{W.lead}</p>
+      <p class="c2-lead" data-c2-keep>{leadParts.map((part, i) => (
+        <Fragment>{i > 0 ? ' ' : ''}<span class="c2-lead__part">{part}</span></Fragment>
+      ))}</p>
       <p class="c2-intro">{W.intro}</p>
       {/* a 3x phone takes the 900 px painting, as a 2x one does: sharp at full bleed, about 100 KB less */}
       <Stage
