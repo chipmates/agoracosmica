@@ -250,6 +250,11 @@
 .c2-pick[aria-current="true"] { color: var(--sp-n-ink); }
 .c2-pick[aria-current="true"] img { box-shadow: 0 0 0 2px var(--sp-n-gold), 0 0 0 5px var(--sp-n-void), 0 0 0 6px var(--sp-hair-strong); }
 .c2-pick__name { white-space: nowrap; }
+/* a narrow phone: the second era's name ends inside the first view instead of under the screen's edge */
+@media (max-width: 374px) {
+  .c2-rail__eras { gap: 8px; }
+  .c2-pick { width: 68px; }
+}
 .c2-rail__credit {
   margin: 2px 16px 0 20px;
   text-align: left;
