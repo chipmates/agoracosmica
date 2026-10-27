@@ -36,41 +36,18 @@ import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZ
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
 import { hideToast } from './toast';
-import { clockLabel, labelHalves, playerStrings, rateLabel } from './strings';
+import { clockLabel, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
 import type { PlayerState, StoryQueue } from './types';
 
-interface Label {
-  brief: string;
-  expanded: string;
-}
-
 interface Props {
   state: PlayerState;
-  labels: Record<PlayerLang, Label>;
   facts: Record<PlayerLang, FactWords>;
   wide: boolean;
 }
 
-function LabelLine({ label }: { label: Label }) {
-  const halves = labelHalves(label.brief);
-  return (
-    <details className="story-label sp-label">
-      <summary>
-        <span className="sp-label__i" aria-hidden="true">i</span>
-        <span className="sp-label__brief">
-          {halves.map((half, i) => (
-            <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
-          ))}
-        </span>
-      </summary>
-      <p>{label.expanded}</p>
-    </details>
-  );
-}
-
-export default function Sheets({ state, labels, facts, wide }: Props) {
+export default function Sheets({ state, facts, wide }: Props) {
   const queue = state.sheet === 'player' ? state.queue : readPageQueue() ?? state.queue;
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const opener = useRef<Element | null>(null);
@@ -108,7 +85,7 @@ export default function Sheets({ state, labels, facts, wide }: Props) {
       <section className={cls} role="dialog" aria-modal={scrim ? 'true' : 'false'} aria-labelledby="sp-sheet-title"
         data-nosnippet="">
         {kind === 'player' && state.queue && (
-          <PlayerSheet state={state} queue={state.queue} s={s} w={facts[state.queue.lang]} label={labels[state.queue.lang]} titleRef={titleRef} />
+          <PlayerSheet state={state} queue={state.queue} s={s} w={facts[state.queue.lang]} titleRef={titleRef} />
         )}
         {kind === 'facts' && (
           <FactsSheet queue={queue} n={state.sheetN ?? state.readerN ?? state.current ?? 1} s={s} w={facts[queue.lang]} titleRef={titleRef} />
@@ -134,7 +111,8 @@ function Head({ title, kicker, s, titleRef }: { title: string; kicker?: string; 
 
 // ---- the full player ---------------------------------------------------------
 
-function PlayerSheet({ state, queue, s, w, label, titleRef }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings; w: FactWords; label: Label; titleRef: RefObject<HTMLHeadingElement> }) {
+// No label line here: the dock says it at each story's start and the lock screen carries it.
+function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings; w: FactWords; titleRef: RefObject<HTMLHeadingElement> }) {
   const current = state.current ?? 0;
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
@@ -150,7 +128,6 @@ function PlayerSheet({ state, queue, s, w, label, titleRef }: { state: PlayerSta
     <>
       <Head title={title} kicker={kicker} s={s} titleRef={titleRef} />
       <div className="sp-sheet__body">
-        <LabelLine label={label} />
         <div className="sp-fp__seek">
           <input ref={seekRef} type="range" min={0} max={state.duration > 0 ? Math.floor(state.duration) : 0} step={1}
             value={Math.floor(state.time)} aria-label={s.seekAria}

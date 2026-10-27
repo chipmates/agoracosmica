@@ -7,6 +7,8 @@ import helpersDe from '@client/assets/translations/helpers/de.json';
 import type { PlayerLang } from './strings';
 
 export interface StoryLabel {
+  /** The section's own heading ("Notice" / "Hinweis"): the name of the dock's "i". */
+  title: string;
   brief: string;
   expanded: string;
 }
@@ -17,7 +19,7 @@ interface HelperFile {
 
 function read(file: unknown): StoryLabel {
   const t = (file as HelperFile).audioLibrary.welcome.sections.transparency;
-  return { brief: t.brief, expanded: t.expanded };
+  return { title: t.title, brief: t.brief, expanded: t.expanded };
 }
 
 const LABELS: Record<PlayerLang, StoryLabel> = { en: read(helpersEn), de: read(helpersDe) };

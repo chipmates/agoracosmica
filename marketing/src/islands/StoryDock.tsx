@@ -39,9 +39,13 @@ import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
 
 interface Label {
+  title: string;
   brief: string;
   expanded: string;
 }
+
+// How long the dock names the synthetic voice at each story's start, from its first sound; then the figure's name.
+const VOICE_MS = 6000;
 
 interface Props {
   /** The page's language, for the resume offer before any story plays. */
@@ -67,6 +71,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const seekRef = useRef<HTMLInputElement | null>(null);
   const [path, setPath] = useState(currentPath);
   const [wide, setWide] = useState(false);
+  const [noteOpen, setNoteOpen] = useState(false);
 
   useEffect(() => {
     installPlayer({ en: labels.en.brief, de: labels.de.brief });
@@ -129,6 +134,45 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const s = playerStrings(storyLang);
   const label = labels[storyLang];
   const loaded = state.current !== null && !state.dismissed;
+  // The label's last half, "Synthetic voice" / "Synthetische Stimme", read from the label itself.
+  const halves = labelHalves(label.brief);
+  const voiceWord = halves[halves.length - 1] ?? label.brief;
+
+  // Each story's start (a new item, or the same one again after the dock was closed) names the voice: in the bar from
+  // the load until VOICE_MS after the first sound, and once to a screen reader through the polite live region.
+  const storyKey = loaded && state.queue && state.current !== null ? `${state.queue.slug}/${state.queue.lang}/${state.current}` : null;
+  const [quietKey, setQuietKey] = useState<string | null>(null);
+  const [live, setLive] = useState('');
+  const timerKey = useRef<string | null>(null);
+  const timer = useRef<number | undefined>(undefined);
+  useEffect(() => {
+    if (storyKey === null) {
+      window.clearTimeout(timer.current);
+      timerKey.current = null;
+      setQuietKey(null);
+      setLive('');
+      return;
+    }
+    if (state.status !== 'playing' || timerKey.current === storyKey || quietKey === storyKey) return;
+    timerKey.current = storyKey;
+    window.clearTimeout(timer.current);
+    // emptied first, so a start right after another is announced again
+    setLive('');
+    window.setTimeout(() => setLive(voiceWord), 60);
+    timer.current = window.setTimeout(() => {
+      setQuietKey(storyKey);
+      setLive('');
+    }, VOICE_MS);
+  }, [storyKey, state.status, quietKey, voiceWord]);
+  useEffect(() => () => window.clearTimeout(timer.current), []);
+  const voiceOn = storyKey !== null && quietKey !== storyKey;
+  useEffect(() => {
+    if (!noteOpen) return;
+    const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setNoteOpen(false); };
+    document.addEventListener('keydown', close);
+    return () => document.removeEventListener('keydown', close);
+  }, [noteOpen]);
+  const liveRegion = <span className="sp-sr" aria-live="polite" aria-atomic="true" data-story-voice-live>{live}</span>;
   // One offer at a time: where the page's plate offers the kept point, the dock stays down.
   const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
   const offer = !loaded && state.resume !== null && !plateOffers;
@@ -142,13 +186,13 @@ export default function StoryDock({ lang, labels, facts }: Props) {
           recreatedWord={facts[readerQueue.lang].recreated} />
       )}
       {state.sheet && (
-        <Sheets state={state} labels={labels} facts={facts} wide={wide} />
+        <Sheets state={state} facts={facts} wide={wide} />
       )}
     </>
   );
 
   if (!loaded && !offer) {
-    return <div className="story-dock-slot">{overlays}</div>;
+    return <div className="story-dock-slot">{liveRegion}{overlays}</div>;
   }
 
   if (offer && state.resume) {
@@ -157,6 +201,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     const text = point.t > 0 ? s.continueAt(title, clockLabel(point.t)) : s.continueNext(title);
     return (
       <div className="story-dock-slot">
+        {liveRegion}
         {overlays}
         <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
           <div className="story-dock__offer">
@@ -173,7 +218,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
 
   const queue = state.queue;
   const current = state.current;
-  if (!queue || current === null) return <div className="story-dock-slot">{overlays}</div>;
+  if (!queue || current === null) return <div className="story-dock-slot">{liveRegion}{overlays}</div>;
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
@@ -202,9 +247,10 @@ export default function StoryDock({ lang, labels, facts }: Props) {
 
   return (
     <div className="story-dock-slot">
+      {liveRegion}
       {overlays}
       <div ref={measureRef} className={card && nextEntry ? 'story-dock story-dock--end' : 'story-dock'} role="region"
-        aria-label={s.dockLabel} data-status={state.status}>
+        aria-label={`${s.dockLabel}, ${voiceWord}`} data-status={state.status} data-voice={voiceOn ? 'on' : 'off'}>
         {card && nextEntry && (
           <div className="story-dock__end" role="status">
             <span className="story-dock__count" aria-hidden="true">{card.left}</span>
@@ -228,21 +274,31 @@ export default function StoryDock({ lang, labels, facts }: Props) {
               <span>{queue.name}</span>
             </a>
           )}
-          <button type="button" className="story-dock__open" onClick={() => openSheet('player')}
-            aria-label={`${s.openPlayer}: ${title}`}>
-            <span className="story-dock__title">{title}</span>
-            {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
-            <span className="story-dock__time">
-              <span className="story-dock__clock">{clock}</span>
-              <span className="story-dock__wait">{s.loading}</span>
-              {Icon.up}
-            </span>
-            <span className="story-dock__sub">
-              {state.status === 'error' ? s.error : labelHalves(label.brief).map((half, i) => (
-                <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
-              ))}
-            </span>
-          </button>
+          <div className="story-dock__head">
+            <button type="button" className="story-dock__open" onClick={() => openSheet('player')}
+              aria-label={`${s.openPlayer}: ${title}`}>
+              <span className="story-dock__title">{title}</span>
+              {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
+              <span className="story-dock__time">
+                <span className="story-dock__clock">{clock}</span>
+                <span className="story-dock__wait">{s.loading}</span>
+                {Icon.up}
+              </span>
+              {/* Both words share one cell, so the swap never moves the bar. */}
+              <span className="story-dock__sub">
+                {state.status === 'error' ? s.error : (
+                  <>
+                    <span className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
+                    <span className="story-dock__who" aria-hidden={voiceOn}>{queue.name}</span>
+                  </>
+                )}
+              </span>
+            </button>
+            <button type="button" className="story-btn story-dock__about" aria-expanded={noteOpen} aria-controls="story-dock-note"
+              aria-label={label.title} onClick={() => setNoteOpen(v => !v)}>
+              <span className="sp-label__i" aria-hidden="true">i</span>
+            </button>
+          </div>
           <div className="story-dock__ctrls">
             {wide && (
               <button type="button" className="story-btn story-dock__prev" onClick={previousStory} disabled={!hasPrevious() && state.time < 1}
@@ -301,6 +357,12 @@ export default function StoryDock({ lang, labels, facts }: Props) {
                 aria-label={s.openPlayer}>{Icon.up}</button>
             </>
           )}
+        </div>
+        <div className="story-dock__note" id="story-dock-note" hidden={!noteOpen}>
+          <p className="story-dock__notek">{halves.map((half, i) => (
+            <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
+          ))}</p>
+          <p>{label.expanded}</p>
         </div>
       </div>
     </div>
