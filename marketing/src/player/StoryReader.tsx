@@ -11,6 +11,7 @@ import { useScreenWakeLock } from '@client/hooks/useScreenWakeLock';
 import {
   audioTime,
   closeReader,
+  getState,
   markRead,
   openReader,
   openSheet,
@@ -239,12 +240,50 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     return () => ro.disconnect();
   }, [model, display.size, display.spacing, display.face, placeBracket]);
 
-  // "To the voice" from the dock: back at once.
+  // "To the voice" from the dock: back at once. A return the reader made by scrolling resumes where it stands.
   const wasAway = useRef(state.away);
+  const quietReturn = useRef(false);
   useEffect(() => {
-    if (wasAway.current && !state.away && here) follow(true);
+    if (wasAway.current && !state.away && here && !quietReturn.current) follow(true);
+    quietReturn.current = false;
     wasAway.current = state.away;
   }, [state.away, here, follow]);
+
+  // Away from the voice: which way it is, and a return once the spoken line has stood in the middle band (a quarter
+  // to three quarters of the view) for about a second, so a reader scrolling past it is not pulled back.
+  const backTimer = useRef<number | undefined>(undefined);
+  const whereVoice = useCallback(() => {
+    const box = scrollRef.current?.getBoundingClientRect();
+    const on = bodyRef.current?.querySelector<HTMLElement>('.s.on') ?? bodyRef.current?.querySelector<HTMLElement>('p.on');
+    if (!box || !on) return null;
+    const r = on.getBoundingClientRect();
+    const mid = r.top + Math.min(r.height, 60) / 2;
+    if (mid < box.top + box.height * 0.25) return r.bottom < box.top ? 'up' : 'near';
+    if (mid > box.top + box.height * 0.75) return r.top > box.bottom ? 'down' : 'near';
+    return 'middle';
+  }, []);
+  const checkAway = useCallback(() => {
+    const at = whereVoice();
+    if (at === 'up' || at === 'down') setAway(true, at);
+    if (at === 'middle') {
+      if (backTimer.current === undefined) {
+        backTimer.current = window.setTimeout(() => {
+          backTimer.current = undefined;
+          if (getState().away && whereVoice() === 'middle') {
+            quietReturn.current = true;
+            setAway(false);
+          }
+        }, 1000);
+      }
+    } else if (backTimer.current !== undefined) {
+      window.clearTimeout(backTimer.current);
+      backTimer.current = undefined;
+    }
+  }, [whereVoice]);
+  useEffect(() => () => window.clearTimeout(backTimer.current), []);
+  useEffect(() => {
+    if (state.away && here) checkAway();
+  }, [state.away, state.time, here, checkAway]);
 
   // ---- progress line: the voice while it plays here, else the scroll ----
   useEffect(() => {
@@ -258,10 +297,14 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     const bar = progRef.current;
     if (box && bar && !here) bar.style.width = `${(box.scrollTop / Math.max(1, box.scrollHeight - box.clientHeight)) * 100}%`;
     if (pop) setPop(null);
+    if (state.away && here) checkAway();
   };
   const onUserScroll = () => {
     if (Date.now() < programmaticUntil.current) return;
-    if (playingHere && display.follow && !state.away && model?.mode !== 'none') setAway(true);
+    if (playingHere && display.follow && !state.away && model?.mode !== 'none') {
+      const at = whereVoice();
+      setAway(true, at === 'down' ? 'down' : 'up');
+    }
   };
 
   // ---- read to the end counts as finished ----

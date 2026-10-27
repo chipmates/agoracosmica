@@ -240,8 +240,8 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const rate = rateLabel(state.rate, storyLang);
 
   const readSlot = inReader && state.away ? (
-    <button type="button" className="story-dock__read story-dock__read--voice" onClick={() => setAway(false)}>
-      {Icon.up}
+    <button type="button" className="story-dock__read story-dock__read--voice" onClick={() => setAway(false)} data-dir={state.awayDir}>
+      {state.awayDir === 'down' ? Icon.down : Icon.up}
       <span>{s.follow}</span>
     </button>
   ) : (

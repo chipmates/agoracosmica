@@ -89,5 +89,7 @@ export interface PlayerState {
   sheetN: number | null;
   /** The reader was scrolled away from the voice; the dock offers the way back. */
   away: boolean;
+  /** Where the voice is from the view while away: above it or below it. */
+  awayDir: 'up' | 'down';
   saved: SavedSentence[];
 }

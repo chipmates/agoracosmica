@@ -73,6 +73,7 @@ let state: PlayerState = {
   sheet: null,
   sheetN: null,
   away: false,
+  awayDir: 'up',
   saved: [],
 };
 
@@ -437,8 +438,9 @@ export function setReaderOpen(open: boolean): void {
   else if (!open) closeReader();
 }
 
-export function setAway(away: boolean): void {
-  if (state.away !== away) setState({ away });
+export function setAway(away: boolean, dir?: 'up' | 'down'): void {
+  const awayDir = dir ?? state.awayDir;
+  if (state.away !== away || state.awayDir !== awayDir) setState({ away, awayDir });
 }
 
 export function openSheet(sheet: SheetKind, n?: number): void {
