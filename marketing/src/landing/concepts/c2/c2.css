@@ -26,7 +26,7 @@
   --text-tertiary: var(--sp-n-ink-3);
   /* where the words begin on a phone: the face above stays lit; on a short screen (Safari's bars out) the words move
      up so the plate stays in the first view, down to a floor where the face still reads */
-  --c2-face: max(200px, min(64vw, calc(100svh - 414px)));
+  --c2-face: max(200px, min(70vw, calc(100svh - 386px)));
   color-scheme: dark;
   position: relative;
   isolation: isolate;
@@ -92,8 +92,8 @@
   margin: 0;
   font-family: var(--font-content);
   font-weight: 400;
-  font-size: clamp(1.625rem, 7.4vw, 2rem);
-  line-height: 1.12;
+  font-size: clamp(1.25rem, 5.6vw, 1.5rem);
+  line-height: 1.2;
   letter-spacing: -0.005em;
   color: var(--sp-n-ink);
   text-wrap: balance;
