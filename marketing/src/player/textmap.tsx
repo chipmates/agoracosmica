@@ -151,28 +151,40 @@ function segmentAt(map: TextMapModel, t: number): MapSegment | undefined {
   return map.segments.find(s => t >= s.start && t < s.end) ?? map.segments[map.segments.length - 1];
 }
 
+/** Rows per segment, a heard line's thickness and the gap between rows, in CSS px: rows x line plus the gaps is the
+ *  drawing's CSS height, so a unit of the drawing's height is a pixel. */
+export interface MapRows {
+  rows: number;
+  line: number;
+  gap: number;
+}
+// The phone dock keeps its 5 px band: two rows. Heard lines are at least 2 px, so where you are reads at a distance.
+export const ROWS_PHONE: MapRows = { rows: 2, line: 2, gap: 1 };
+export const ROWS_PLAYER: MapRows = { rows: 4, line: 2.6, gap: 2.2 };
+export const ROWS_DESK: MapRows = { rows: 4, line: 2.2, gap: 1.4 };
+// the unheard lines: one pixel, faint, centred in their row
+const UNHEARD = 1;
+
 interface DrawProps {
   map: TextMapModel;
   duration: number;
-  /** Lines per segment and their thickness: the phone dock draws three thin ones. */
-  rows: number;
+  geo: MapRows;
   className: string;
 }
 
 /** The drawing alone: segments as blocks of lines, a gap between them, heard lines in the accent (a clip). */
-export function TextMapDrawing({ map, duration, rows, className }: DrawProps) {
+export function TextMapDrawing({ map, duration, geo, className }: DrawProps) {
   const clipRef = useRef<SVGRectElement | null>(null);
   const id = useMemo(() => `sp-tmap-clip-${Math.random().toString(36).slice(2, 8)}`, []);
   const W = 1000;
-  const lineH = rows <= 3 ? 1.4 : 2.2;
-  const gapY = rows <= 3 ? 1.4 : 2.6;
-  const H = rows * lineH + (rows - 1) * gapY;
-  const rects = map.segments.flatMap((seg, i) => {
+  const { rows, line, gap } = geo;
+  const H = rows * line + (rows - 1) * gap;
+  const rects = (h: number) => map.segments.flatMap((seg, i) => {
     const x0 = (seg.start / duration) * W;
     const x1 = (seg.end / duration) * W - (i < map.segments.length - 1 ? 6 : 0);
     const shape = seg.lines.slice(-rows);
     return shape.map((share, r) => (
-      <rect key={`${i}-${r}`} x={x0.toFixed(1)} y={(r * (lineH + gapY)).toFixed(2)} width={Math.max(1, (x1 - x0) * (r < rows - 1 ? 1 : share)).toFixed(1)} height={lineH} />
+      <rect key={`${i}-${r}`} x={x0.toFixed(1)} y={(r * (line + gap) + (line - h) / 2).toFixed(2)} width={Math.max(1, (x1 - x0) * (r < rows - 1 ? 1 : share)).toFixed(1)} height={h} />
     ));
   });
   return (
@@ -180,8 +192,8 @@ export function TextMapDrawing({ map, duration, rows, className }: DrawProps) {
       <defs>
         <clipPath id={id}><rect ref={clipRef} className="sp-tmap__clip" x="0" y="0" width="0" height={H.toFixed(2)} data-tmap-clip="" /></clipPath>
       </defs>
-      <g className="sp-tmap__lines">{rects}</g>
-      <g className="sp-tmap__heard" clipPath={`url(#${id})`}>{rects}</g>
+      <g className="sp-tmap__lines">{rects(Math.min(UNHEARD, line))}</g>
+      <g className="sp-tmap__heard" clipPath={`url(#${id})`}>{rects(line)}</g>
     </svg>
   );
 }
@@ -213,7 +225,7 @@ export function DockMap({ state, queue, kind, seekTo, plain }: DockMapProps) {
   if (kind === 'desk') return <TextMap state={state} queue={queue} map={map} where="dock" seekTo={seekTo} />;
   return (
     <div ref={progRef} className="story-dock__progress has-map" aria-hidden="true">
-      <TextMapDrawing map={map} duration={state.duration > 0 ? state.duration : 1} rows={3} className="story-dock__tmap" />
+      <TextMapDrawing map={map} duration={state.duration > 0 ? state.duration : 1} geo={ROWS_PHONE} className="story-dock__tmap" />
     </div>
   );
 }
@@ -296,7 +308,7 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
   return (
     <div className={`sp-tmap sp-tmap--${where}${drag ? ' is-dragging' : ''}`} data-tmap={where}>
       <div ref={boxRef} className="sp-tmap__box" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={() => setDrag(null)}>
-        <TextMapDrawing map={map} duration={duration} rows={4} className="sp-tmap__draw" />
+        <TextMapDrawing map={map} duration={duration} geo={where === 'player' ? ROWS_PLAYER : ROWS_DESK} className="sp-tmap__draw" />
         {saved.map(x => {
           const at = (sentenceStart(map.model, x.si) / duration) * 100;
           return <span key={x.si} className="sp-tmap__dot" data-tmap-dot={x.si} ref={el => el?.style.setProperty('left', `${at}%`)} />;
