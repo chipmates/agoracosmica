@@ -1,14 +1,17 @@
 // The map of a story's text: its scenes (the writer's own breaks, else about ten stretches of equal time) drawn as
-// small blocks of lines, filled as heard, with the saved sentences as dots. In the open player and the desktop dock
-// it is dragged: the bubble names the time, the scene and the sentence the voice will start from, and letting go
-// starts there. The native range stays underneath for keys and screen readers. The phone dock shows the drawing only.
+// small pages of lines, lit as heard, with the saved sentences as dots. In the bar and the open player it is tapped or
+// dragged: the bubble names the time, the scene and the sentence the voice will start from, and letting go starts
+// there. The native range stays underneath for keys and screen readers.
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent, ReactNode } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import { loadText, loadTiming } from './content';
-import { blockAt, buildModel, sentenceStart, wordAt } from './readalong';
+import { audioTime, seekTo as seekVoice, skipBack } from './controller';
+import { blockAt, buildModel, paragraphStep, sentenceStart, wordAt } from './readalong';
 import type { ReaderModel } from './readalong';
+import { Icon } from './icons';
 import { clockLabel, playerStrings } from './strings';
+import type { PlayerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
 export interface MapSegment {
@@ -151,97 +154,109 @@ function segmentAt(map: TextMapModel, t: number): MapSegment | undefined {
   return map.segments.find(s => t >= s.start && t < s.end) ?? map.segments[map.segments.length - 1];
 }
 
-/** Rows per segment, a heard line's thickness and the gap between rows, in CSS px: rows x line plus the gaps is the
- *  drawing's CSS height, so a unit of the drawing's height is a pixel. */
-export interface MapRows {
-  rows: number;
-  line: number;
-  gap: number;
+
+/** The whole story as one page, until its text and timing are in. */
+function flatSegments(duration: number): MapSegment[] {
+  return [{ start: 0, end: duration, scene: null, lines: lineShape(3, 4) }];
 }
-// The phone dock keeps its 5 px band: two rows. Heard lines are at least 2 px, so where you are reads at a distance.
-export const ROWS_PHONE: MapRows = { rows: 2, line: 2, gap: 1 };
-export const ROWS_PLAYER: MapRows = { rows: 4, line: 2.6, gap: 2.2 };
-export const ROWS_DESK: MapRows = { rows: 4, line: 2.2, gap: 1.4 };
-// the unheard lines: one pixel, faint, centred in their row
-const UNHEARD = 1;
+
+/** Pages are 6 px apart: the gap comes out of each page's right edge, so time stays linear across the width. */
+const PAGE_GAP = 6;
+
+function placePage(el: HTMLElement | null, seg: MapSegment, last: boolean, duration: number): void {
+  if (!el) return;
+  const x0 = Math.min(100, (seg.start / duration) * 100);
+  // the last page ends at the voice's real end (the map may have been built with the catalog's rounder length)
+  const w = last ? 100 - x0 : Math.min(100 - x0, ((seg.end - seg.start) / duration) * 100);
+  // CSSOM, not style attributes: the strict style-src blocks attributes.
+  el.style.setProperty('left', `${x0.toFixed(3)}%`);
+  el.style.setProperty('width', last ? `${w.toFixed(3)}%` : `max(1px, calc(${w.toFixed(3)}% - ${PAGE_GAP}px))`);
+  el.style.setProperty('--sp-last', `${Math.round((seg.lines[seg.lines.length - 1] ?? 0.6) * 100)}%`);
+}
 
 interface DrawProps {
-  map: TextMapModel;
+  map: TextMapModel | null;
   duration: number;
-  geo: MapRows;
-  className: string;
+  className?: string;
 }
 
-/** The drawing alone: segments as blocks of lines, a gap between them, heard lines in the accent (a clip). */
-export function TextMapDrawing({ map, duration, geo, className }: DrawProps) {
-  const clipRef = useRef<SVGRectElement | null>(null);
-  const id = useMemo(() => `sp-tmap-clip-${Math.random().toString(36).slice(2, 8)}`, []);
-  const W = 1000;
-  const { rows, line, gap } = geo;
-  const H = rows * line + (rows - 1) * gap;
-  const rects = (h: number) => map.segments.flatMap((seg, i) => {
-    const x0 = (seg.start / duration) * W;
-    const x1 = (seg.end / duration) * W - (i < map.segments.length - 1 ? 6 : 0);
-    const shape = seg.lines.slice(-rows);
-    return shape.map((share, r) => (
-      <rect key={`${i}-${r}`} x={x0.toFixed(1)} y={(r * (line + gap) + (line - h) / 2).toFixed(2)} width={Math.max(1, (x1 - x0) * (r < rows - 1 ? 1 : share)).toFixed(1)} height={h} />
-    ));
-  });
+/** The drawing alone: each page four lines (2 px every 6 px, the last one short), the heard part lit, a clip. */
+export function TextMapDrawing({ map, duration, className = '' }: DrawProps) {
+  const segs = map ? map.segments : flatSegments(duration);
+  const pages = segs.map((seg, i) => (
+    <span key={i} className="sp-page" ref={el => placePage(el, seg, i === segs.length - 1, duration)} />
+  ));
   return (
-    <svg className={className} viewBox={`0 0 ${W} ${H.toFixed(2)}`} preserveAspectRatio="none" aria-hidden="true" focusable="false" data-tmap-drawing="">
-      <defs>
-        <clipPath id={id}><rect ref={clipRef} className="sp-tmap__clip" x="0" y="0" width="0" height={H.toFixed(2)} data-tmap-clip="" /></clipPath>
-      </defs>
-      <g className="sp-tmap__lines">{rects(Math.min(UNHEARD, line))}</g>
-      <g className="sp-tmap__heard" clipPath={`url(#${id})`}>{rects(line)}</g>
-    </svg>
+    <span className={`sp-pages ${className}`} aria-hidden="true" data-tmap-drawing="">
+      <span className="sp-pages__layer">{pages}</span>
+      <span className="sp-pages__layer sp-pages__layer--heard" data-tmap-heard="">{pages}</span>
+    </span>
   );
 }
 
-/** Set the drawing's heard share: an attribute, so the strict style policy allows it. */
+/** Set the drawing's heard share: a clip on the lit layer. */
 export function setHeard(root: Element | null, share: number): void {
-  root?.querySelectorAll('[data-tmap-clip]').forEach(r => r.setAttribute('width', String(Math.round(Math.max(0, Math.min(1, share)) * 1000))));
+  const right = (1 - Math.max(0, Math.min(1, share))) * 100;
+  root?.querySelectorAll<HTMLElement>('[data-tmap-heard]').forEach(el => el.style.setProperty('clip-path', `inset(0 ${right.toFixed(2)}% 0 0)`));
 }
 
-interface DockMapProps {
+/** One step by sentence (held: by paragraph); back from well inside a sentence replays it from its start. */
+export function stepSentence(model: ReaderModel, dir: 1 | -1, paragraph = false): void {
+  const now = audioTime();
+  const at = sentenceAtTime(model, now);
+  if (!at) return;
+  let si = at.si;
+  if (paragraph) si = paragraphStep(model, si, dir);
+  else if (dir > 0) si = Math.min(model.sentences.length - 1, si + 1);
+  else if (now - at.start < 1.5) si = Math.max(0, si - 1);
+  seekVoice(sentenceStart(model, si) + 0.01);
+}
+
+/** Back a few seconds: the bar's step until the story's timing is in. */
+export function backAFew(): void {
+  seekVoice(Math.max(0, audioTime() - 5));
+}
+
+interface BarProps {
   state: PlayerState;
   queue: StoryQueue;
-  /** "phone": the drawing in the progress line, display only; "desk": the dock's scrubber. */
-  kind: 'phone' | 'desk';
   seekTo: (t: number) => void;
-  /** What the dock shows until the story's text and timing are in. */
-  plain: ReactNode;
 }
 
-/** The dock's map, loaded after the first screen: the plain line or range until the map is ready. */
-export function DockMap({ state, queue, kind, seekTo, plain }: DockMapProps) {
+/** The bar's pages, loaded after the first screen: the whole story as one page until the map is in. */
+export function BarMap({ state, queue, seekTo }: BarProps) {
   const map = useTextMap(queue, state.current, state.duration);
-  const progRef = useRef<HTMLDivElement | null>(null);
-  const share = state.duration > 0 ? Math.min(1, state.time / state.duration) : 0;
-  useEffect(() => {
-    setHeard(progRef.current, share);
-  }, [share, map]);
-  if (!map) return <>{plain}</>;
-  if (kind === 'desk') return <TextMap state={state} queue={queue} map={map} where="dock" seekTo={seekTo} />;
+  return <TextMap state={state} queue={queue} map={map} where="bar" seekTo={seekTo} />;
+}
+
+/** The bar's one back control: a sentence where the words are timed, 15 s where they are not. */
+export function BarBack({ state, queue, s }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings }) {
+  const map = useTextMap(queue, state.current, state.duration);
+  const words = map && map.model.mode === 'word' ? map.model : null;
+  if (map && !words) {
+    return <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>{Icon.back15}</button>;
+  }
   return (
-    <div ref={progRef} className="story-dock__progress has-map" aria-hidden="true">
-      <TextMapDrawing map={map} duration={state.duration > 0 ? state.duration : 1} geo={ROWS_PHONE} className="story-dock__tmap" />
-    </div>
+    <button type="button" className="story-btn story-dock__back" onClick={() => (words ? stepSentence(words, -1) : backAFew())}
+      aria-label={s.sentenceBack}>{Icon.again}</button>
   );
 }
 
 interface MapProps {
   state: PlayerState;
   queue: StoryQueue;
-  map: TextMapModel;
-  /** "player" (the open player) or "dock" (the desktop dock, smaller). */
-  where: 'player' | 'dock';
+  /** Null until the story's text and timing are in: one page, the bubble names the time only. */
+  map: TextMapModel | null;
+  /** "bar" (the bar under the page) or "player" (the open player). */
+  where: 'bar' | 'player';
   seekTo: (t: number) => void;
 }
 
-/** The draggable map: the drawing, the playhead, the saved sentences, a bubble while dragging, the range under it. */
+/** The map that is tapped and dragged: the drawing, the playhead, the saved sentences, a bubble while dragging, the
+ * range under it for keys and screen readers. */
 export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
   const s = playerStrings(queue.lang);
+  const rootRef = useRef<HTMLDivElement | null>(null);
   const boxRef = useRef<HTMLDivElement | null>(null);
   const headRef = useRef<HTMLSpanElement | null>(null);
   const bubbleRef = useRef<HTMLDivElement | null>(null);
@@ -256,31 +271,34 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
     headRef.current?.style.setProperty('left', `${share * 100}%`);
     setHeard(boxRef.current, drag ? Math.min(1, state.time / duration) : share);
     rangeRef.current?.style.setProperty('--story-seek', `${share * 100}%`);
-  }, [shown, duration, drag, state.time]);
+  }, [shown, duration, drag, state.time, map]);
 
   const timeAt = useCallback((clientX: number) => {
     const b = boxRef.current?.getBoundingClientRect();
     if (!b || b.width <= 0) return 0;
     return Math.min(1, Math.max(0, (clientX - b.left) / b.width)) * duration;
   }, [duration]);
-  const target = drag ? sentenceAtTime(map.model, drag.t) : null;
-  const seg = drag ? segmentAt(map, drag.t) : undefined;
+  const target = drag && map ? sentenceAtTime(map.model, drag.t) : null;
+  const seg = drag && map ? segmentAt(map, drag.t) : undefined;
 
+  // The bubble stands over the finger, kept inside the open player's width or, in the bar, inside the screen.
   useEffect(() => {
     const bubble = bubbleRef.current;
+    const root = rootRef.current?.getBoundingClientRect();
     const box = boxRef.current?.getBoundingClientRect();
-    if (!bubble || !box || !drag) return;
+    if (!bubble || !root || !box || !drag) return;
     const w = bubble.getBoundingClientRect().width;
-    const room = where === 'player' ? box.width : Math.max(box.width, w);
-    const x = Math.min(room - w, Math.max(where === 'player' ? 0 : box.width - room, drag.at - w / 2));
-    bubble.style.setProperty('left', `${x}px`);
-  }, [drag, where]);
+    const lo = where === 'player' ? root.left : 8;
+    const hi = where === 'player' ? root.right : document.documentElement.clientWidth - 8;
+    const x = Math.min(hi - w, Math.max(lo, box.left + drag.at - w / 2));
+    bubble.style.setProperty('left', `${x - root.left}px`);
+  }, [drag, where, target?.si]);
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
     e.currentTarget.setPointerCapture(e.pointerId);
     const b = boxRef.current!.getBoundingClientRect();
-    setDrag({ t: timeAt(e.clientX), at: e.clientX - b.left });
+    setDrag({ t: timeAt(e.clientX), at: Math.min(b.width, Math.max(0, e.clientX - b.left)) });
   };
   const onMove = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (!drag) return;
@@ -289,12 +307,12 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
   };
   const onUp = () => {
     if (!drag) return;
-    const to = sentenceAtTime(map.model, drag.t);
+    const to = map ? sentenceAtTime(map.model, drag.t) : null;
     setDrag(null);
     seekTo(to ? to.start : drag.t);
   };
   const onKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (e.key !== 'PageDown' && e.key !== 'PageUp') return;
+    if (!map || (e.key !== 'PageDown' && e.key !== 'PageUp')) return;
     // Page keys step by scene, as the arrows step by second
     e.preventDefault();
     const now = state.time;
@@ -303,13 +321,14 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
     const next = list[Math.min(list.length - 1, Math.max(0, i + (e.key === 'PageDown' ? 1 : now - list[i]!.start > 2 ? 0 : -1)))];
     if (next) seekTo(next.start);
   };
-  const saved = state.saved.filter(x => x.n === state.current && map.model.sentences[x.si]);
-  const sceneNow = map.scenes ? segmentAt(map, state.time)?.scene ?? null : null;
+  const saved = map ? state.saved.filter(x => x.n === state.current && map.model.sentences[x.si]) : [];
+  const sceneNow = map?.scenes ? segmentAt(map, state.time)?.scene ?? null : null;
   return (
-    <div className={`sp-tmap sp-tmap--${where}${drag ? ' is-dragging' : ''}`} data-tmap={where}>
-      <div ref={boxRef} className="sp-tmap__box" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp} onPointerCancel={() => setDrag(null)}>
-        <TextMapDrawing map={map} duration={duration} geo={where === 'player' ? ROWS_PLAYER : ROWS_DESK} className="sp-tmap__draw" />
-        {saved.map(x => {
+    <div ref={rootRef} className={`sp-tmap sp-tmap--${where}${drag ? ' is-dragging' : ''}`} data-tmap={where}>
+      <div ref={boxRef} className="sp-tmap__box" onPointerDown={onDown} onPointerMove={onMove} onPointerUp={onUp}
+        onPointerCancel={() => setDrag(null)}>
+        <TextMapDrawing map={map} duration={duration} className="sp-tmap__draw" />
+        {map && saved.map(x => {
           const at = (sentenceStart(map.model, x.si) / duration) * 100;
           return <span key={x.si} className="sp-tmap__dot" data-tmap-dot={x.si} ref={el => el?.style.setProperty('left', `${at}%`)} />;
         })}

@@ -4,6 +4,8 @@
 import StoryDock from '../../islands/StoryDock';
 import { storyLabel } from '../../player/label';
 import { factWords } from '../../player/factWords';
+import { localizedShortName } from '../figureNames';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import type { PlayerLang } from '../../player/strings';
 
 interface Props {
@@ -16,13 +18,25 @@ const { lang, persist = true } = Astro.props;
 const labels = { en: storyLabel('en'), de: storyLabel('de') };
 // The app's own words for the facts, both languages: the dock outlives a language switch.
 const facts = { en: factWords('en'), de: factWords('de') };
+// The bar's name where the full one does not fit: the short name the rail uses, its first word when it is still long.
+const barName = (id: string, l: PlayerLang): string => {
+  const short = localizedShortName(id, l);
+  return short.length > 14 ? short.split(' ')[0] ?? short : short;
+};
+// One plain string ("id=English|German;..."), only where a short name differs: the props ride on every player page.
+const fullName = (id: string, l: PlayerLang): string => getFiguresCatalog(l).find(f => f.id === id)?.name ?? '';
+const shortNames = getFiguresCatalog('en')
+  .map(f => [f.id, barName(f.id, 'en'), barName(f.id, 'de')] as const)
+  .filter(([id, en, de]) => en !== fullName(id, 'en') || de !== fullName(id, 'de'))
+  .map(([id, en, de]) => `${id}=${en}|${de}`)
+  .join(';');
 ---
 {persist ? (
   <div class="story-dock-mount" transition:persist="story-dock">
-    <StoryDock client:load lang={lang} labels={labels} facts={facts} />
+    <StoryDock client:load lang={lang} labels={labels} facts={facts} shortNames={shortNames} />
   </div>
 ) : (
   <div class="story-dock-mount">
-    <StoryDock client:load lang={lang} labels={labels} facts={facts} />
+    <StoryDock client:load lang={lang} labels={labels} facts={facts} shortNames={shortNames} />
   </div>
 )}

@@ -28,19 +28,18 @@ import {
   RATE_MAX,
   RATE_MIN,
   setSleep,
-  audioTime,
 } from './controller';
 import { loadFacts, loadText, loadTiming, shownFact } from './content';
 import type { FactEntry } from './content';
-import { buildModel, paragraphStep, sentenceStart } from './readalong';
+import { buildModel, sentenceStart } from './readalong';
 import type { ReaderModel } from './readalong';
 import { focusSentence } from './focus';
-import { TextMap, sentenceAtTime, useTextMap } from './textmap';
+import { TextMap, stepSentence, useTextMap } from './textmap';
 import { getDisplay, setDisplay, subscribeDisplay, SERVER_DISPLAY, SIZE_MAX, SIZE_MIN } from './theme';
 import type { DisplaySettings } from './theme';
 import { Icon } from './icons';
 import { hideToast } from './toast';
-import { VOICE_DESC_ID, clockLabel, playerStrings, rateLabel } from './strings';
+import { LIST_SEP, VOICE_DESC_ID, clockLabel, playerStrings, rateLabel } from './strings';
 import type { PlayerLang, PlayerStrings } from './strings';
 import type { FactWords } from './factWords';
 import { SLEEP_CHOICES } from './types';
@@ -50,9 +49,11 @@ interface Props {
   state: PlayerState;
   facts: Record<PlayerLang, FactWords>;
   wide: boolean;
+  /** The playing figure's page, where the bar is away from it: the open player links there. */
+  home: string | null;
 }
 
-export default function Sheets({ state, facts, wide }: Props) {
+export default function Sheets({ state, facts, wide, home }: Props) {
   const queue = state.sheet === 'player' ? state.queue : readPageQueue() ?? state.queue;
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const opener = useRef<Element | null>(null);
@@ -90,7 +91,7 @@ export default function Sheets({ state, facts, wide }: Props) {
       <section className={cls} role="dialog" aria-modal={scrim ? 'true' : 'false'} aria-labelledby="sp-sheet-title"
         data-nosnippet="">
         {kind === 'player' && state.queue && (
-          <PlayerSheet state={state} queue={state.queue} s={s} w={facts[state.queue.lang]} titleRef={titleRef} />
+          <PlayerSheet state={state} queue={state.queue} s={s} w={facts[state.queue.lang]} titleRef={titleRef} home={home} />
         )}
         {kind === 'facts' && (
           <FactsSheet queue={queue} n={state.sheetN ?? state.readerN ?? state.current ?? 1} s={s} w={facts[queue.lang]} titleRef={titleRef} />
@@ -116,12 +117,14 @@ function Head({ title, kicker, s, titleRef }: { title: string; kicker?: string; 
 
 // ---- the full player ---------------------------------------------------------
 
-// No label line here: the dock says it at each story's start and the lock screen carries it.
-function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings; w: FactWords; titleRef: RefObject<HTMLHeadingElement> }) {
+// No label line here: the bar says it at each story's start and the lock screen carries it. The bar names the figure,
+// not the story: here name and story meet.
+function PlayerSheet({ state, queue, s, w, titleRef, home }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings; w: FactWords; titleRef: RefObject<HTMLHeadingElement>; home: string | null }) {
   const current = state.current ?? 0;
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
-  const kicker = current === 0 ? queue.name : [s.storyN(current), entry?.year ? s.approxYear(entry.year) : ''].filter(Boolean).join(' · ');
+  const kicker = [queue.name, current === 0 ? '' : s.storyN(current), entry?.year && current > 0 ? s.approxYear(entry.year) : ''].filter(Boolean).join(LIST_SEP);
+  const stories = queue.entries.filter(e => e.n > 0).length;
   const playing = state.status === 'playing' || state.status === 'loading';
   const seekRef = useRef<HTMLInputElement | null>(null);
   const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
@@ -195,6 +198,7 @@ function PlayerSheet({ state, queue, s, w, titleRef }: { state: PlayerState; que
         <div className="sp-fp__links">
           <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); openReader(current); }}>{Icon.book}<span>{s.read}</span></button>
           <button type="button" className="sp-linkbtn" onClick={() => openSheet('facts', current)}>{Icon.checkCircle}<span>{w.facts}</span></button>
+          {home && stories > 0 && <a className="sp-linkbtn" href={home} onClick={closeSheet}><span>{s.allStories(String(stories))}</span></a>}
           <button type="button" className="sp-linkbtn sp-linkbtn--quiet" onClick={dismiss}>{s.stopAll}</button>
         </div>
       </div>
@@ -211,16 +215,7 @@ function StepButton({ dir, model, s }: { dir: 1 | -1; model: ReaderModel; s: Pla
     timer.current = undefined;
   };
   useEffect(() => clear, []);
-  const go = (paragraph: boolean) => {
-    const now = audioTime();
-    const at = sentenceAtTime(model, now);
-    if (!at) return;
-    let si = at.si;
-    if (paragraph) si = paragraphStep(model, si, dir);
-    else if (dir > 0) si = Math.min(model.sentences.length - 1, si + 1);
-    else if (now - at.start < 1.5) si = Math.max(0, si - 1);
-    seekTo(sentenceStart(model, si) + 0.01);
-  };
+  const go = (paragraph: boolean) => stepSentence(model, dir, paragraph);
   return (
     <button type="button" className="story-btn sp-fp__step" aria-label={dir < 0 ? s.sentenceBack : s.sentenceOn} aria-describedby="sp-step-hold"
       onPointerDown={e => {

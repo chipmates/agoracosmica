@@ -1085,7 +1085,6 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .story-reader :focus-visible,
 .sp-sheet :focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 2px; }
 input[type="range"].sp-range,
-.story-dock__seek input,
 .sp-fp__seek input,
 .sp-sizer input {
   -webkit-appearance: none;
@@ -1097,14 +1096,12 @@ input[type="range"].sp-range,
   background: transparent;
   cursor: pointer;
 }
-.story-dock__seek input::-webkit-slider-runnable-track,
 .sp-fp__seek input::-webkit-slider-runnable-track,
 .sp-sizer input::-webkit-slider-runnable-track {
   height: 4px;
   border-radius: 2px;
   background: linear-gradient(to right, var(--sp-accent) var(--story-seek, 0%), var(--sp-hair-strong) var(--story-seek, 0%));
 }
-.story-dock__seek input::-webkit-slider-thumb,
 .sp-fp__seek input::-webkit-slider-thumb,
 .sp-sizer input::-webkit-slider-thumb {
   -webkit-appearance: none;
@@ -1115,190 +1112,188 @@ input[type="range"].sp-range,
   border-radius: 50%;
   background: var(--sp-accent);
 }
-.story-dock__seek input::-moz-range-track,
 .sp-fp__seek input::-moz-range-track,
 .sp-sizer input::-moz-range-track { height: 4px; border-radius: 2px; background: var(--sp-hair-strong); }
-.story-dock__seek input::-moz-range-progress,
 .sp-fp__seek input::-moz-range-progress,
 .sp-sizer input::-moz-range-progress { height: 4px; border-radius: 2px; background: var(--sp-accent); }
-.story-dock__seek input::-moz-range-thumb,
 .sp-fp__seek input::-moz-range-thumb,
 .sp-sizer input::-moz-range-thumb { width: 14px; height: 14px; border: 2px solid var(--sp-page); border-radius: 50%; background: var(--sp-accent); }
 
-/* ---- the dock ------------------------------------------------------------ */
+/* ---- the bar ------------------------------------------------------------- */
+/* One row on every screen: the coin; the middle, a line over the story's pages; back one sentence; the caret. The
+   line and the pages each have a 44 px band, so the name's button and the pages never share a pixel. */
 .story-dock {
   position: fixed;
   left: 0;
   right: 0;
   bottom: 0;
   z-index: 120;
-  padding: 0 var(--sp-gutter) env(safe-area-inset-bottom, 0px);
+  display: flex;
+  flex-direction: column;
+  padding: 0 max(4px, env(safe-area-inset-right, 0px)) env(safe-area-inset-bottom, 0px) max(12px, env(safe-area-inset-left, 0px));
   background: var(--sp-void);
   border-top: 1px solid var(--sp-hair-strong);
   font-family: var(--font-ui);
   color: var(--sp-ink);
+  /* a drag on the bar never moves the page under it; zoom stays */
+  touch-action: pinch-zoom;
 }
-/* The open phone menu sits over the page, so the dock steps back for it. */
+/* The open phone menu sits over the page, so the bar steps back for it. */
 body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
-.story-dock__progress { position: absolute; left: 0; right: 0; top: -1px; height: 2px; }
-.story-dock__fill { height: 100%; width: 0; background: var(--sp-accent); }
-.story-dock__inner { max-width: 1136px; margin: 0 auto; }
-.story-dock__home {
+.story-dock__inner { display: flex; align-items: center; width: 100%; max-width: 880px; margin: 0 auto; }
+.story-dock .story-btn { color: var(--sp-ink); }
+.story-dock .story-dock__play {
+  flex: none;
+  width: 52px;
+  height: 52px;
+  margin-right: 12px;
+  border-radius: 50%;
+  background: var(--sp-disc);
+  color: var(--sp-disc-ink);
+}
+.story-dock .story-dock__play:hover { background: var(--sp-disc-hover); }
+.story-dock .story-dock__play svg { width: 24px; height: 24px; }
+.story-dock__mid { flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: 44px 44px; }
+.story-dock__back, .story-dock__open { flex: none; border-radius: 50%; }
+.story-dock .story-dock__back svg, .story-dock .story-dock__open svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+.story-dock .story-dock__back { color: var(--sp-ink-2); }
+.story-dock .story-dock__open { color: var(--sp-ink-2); }
+.story-dock .story-dock__back svg text { fill: currentColor; stroke: none; }
+
+/* the line: its words sit on the band's foot, close over the pages */
+.story-dock__line { position: relative; display: flex; align-items: flex-end; gap: 10px; min-width: 0; height: 44px; }
+.story-dock__lead {
+  flex: 1 1 0;
+  min-width: 0;
   display: flex;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-end;
+  column-gap: 12px;
+  height: 44px;
+  /* the story's title takes the line only where it fits whole: else it wraps under the band, out of view */
+  overflow: hidden;
+}
+.story-dock__who {
+  flex: 0 1 auto;
+  min-width: 0;
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 7px;
+  height: 44px;
+  margin: 0;
+  padding: 0 2px 4px 0;
+  background: none;
+  border: 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font: inherit;
+  color: var(--sp-ink);
+  text-align: left;
+}
+.story-dock__name {
+  min-width: 0;
+  overflow: hidden;
+  font-family: var(--font-content);
+  font-size: 1rem;
+  line-height: 20px;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+.story-dock__who .sp-label__i { width: 20px; height: 20px; margin-bottom: 0; font-size: 0.75rem; }
+.story-dock__who[aria-expanded="true"] .sp-label__i { background: var(--sp-disc); color: var(--sp-disc-ink); box-shadow: none; }
+.story-dock__who:hover .story-dock__name { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; text-decoration-color: var(--sp-hair-strong); }
+/* the band clips: the focus ring goes inside the button */
+.story-dock .story-dock__who:focus-visible { outline-offset: -2px; }
+.story-dock__title {
+  flex: none;
+  display: flex;
+  align-items: flex-end;
+  height: 44px;
+  padding-bottom: 4px;
+  font-family: var(--font-content);
+  font-size: 1rem;
+  line-height: 20px;
+  white-space: nowrap;
+  color: var(--sp-ink-3);
+}
+.story-dock__time {
+  position: relative;
+  flex: none;
+  display: inline-flex;
   align-items: center;
-  gap: 2px;
-  min-height: 44px;
-  margin: 2px 0 0;
+  gap: 4px;
+  padding-bottom: 4px;
   font-size: 0.8125rem;
-  color: var(--sp-accent);
-  text-decoration: none;
+  line-height: 20px;
+  color: var(--sp-ink-2);
+  font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-.story-dock__home svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.story-dock__open {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  column-gap: 10px;
-  row-gap: 2px;
-  width: 100%;
-  min-height: 52px;
+/* the loading word stands over the clock's place, so the cell keeps the clock's width */
+.story-dock__wait { position: absolute; right: 0; bottom: 4px; visibility: hidden; opacity: 0; }
+.story-dock[data-status="loading"] .story-dock__clock { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
+.story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
+/* a slow start, while the voice's name holds the line: the coin's ring breathes */
+.story-dock[data-status="loading"] .story-dock__play .sp-dots { animation: sp-breathe 1.4s ease-in-out var(--sp-wait-delay) infinite; }
+@keyframes sp-breathe { 50% { opacity: 0.12; } }
+@media (prefers-reduced-motion: reduce) { .story-dock[data-status="loading"] .story-dock__play .sp-dots { animation: none; opacity: 0.25; } }
+.story-dock__moon { display: inline-flex; color: var(--sp-accent); }
+.story-dock__moon svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+/* At a story's start the voice takes the whole line, in the label's face; then the name, the story and the clock. A
+   fade, never a jump: the voice stands over the line, the rest keeps its place underneath. */
+.story-dock__voice {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 4px;
+  font-size: 0.875rem;
+  line-height: 20px;
+  color: var(--sp-ink-2);
+  white-space: nowrap;
+  overflow: hidden;
+  font-feature-settings: "ss05" 1;
+  pointer-events: none;
+}
+.story-dock__voice, .story-dock__lead, .story-dock__time { transition: opacity 400ms ease, visibility 0s linear 0s; }
+.story-dock[data-voice="on"] .story-dock__lead,
+.story-dock[data-voice="on"] .story-dock__time,
+.story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s linear 400ms; }
+.story-dock__error { align-self: flex-end; padding-bottom: 2px; font-size: 0.75rem; line-height: 1.3; color: var(--color-warning, var(--sp-accent)); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* in the reading view, scrolled away from the voice: the way back takes the line */
+.story-dock__follow {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 6px;
+  height: 44px;
   margin: 0;
-  padding: 8px 0 2px;
+  padding: 0 4px 4px 0;
   background: none;
   border: 0;
   cursor: pointer;
   font: inherit;
-  text-align: left;
-  color: var(--sp-ink);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 20px;
+  color: var(--sp-accent);
 }
-/* The title's button and the "i" beside it: two targets in one row, never over each other. */
-.story-dock__head { display: flex; align-items: center; gap: 6px; }
-.story-dock__head > .story-dock__open { flex: 1 1 0; width: auto; min-width: 0; }
-.story-dock__about { flex: none; }
-.story-dock__about[aria-expanded="true"] .sp-label__i { background: var(--sp-disc); color: var(--sp-disc-ink); box-shadow: none; }
-/* Under the way back the title keeps its place, and the two targets do not overlap. */
-.story-dock__home + .story-dock__head > .story-dock__open { min-height: 46px; padding-top: 2px; }
-/* The one text in the dock that may truncate, with an ellipsis, also where one word outgrows its line (200 %). */
-.story-dock__title {
-  min-width: 0;
-  font-family: var(--font-content);
-  font-size: 1.0625rem;
-  line-height: 1.2;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-.story-dock__time {
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  align-items: center;
-  justify-items: end;
-  column-gap: 4px;
-  font-size: 0.8125rem;
-  color: var(--sp-ink-2);
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-.story-dock__time svg { grid-column: 2; grid-row: 1; width: 16px; height: 16px; fill: none; stroke: var(--sp-ink-3); stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.story-dock__clock,
-.story-dock__wait { grid-column: 1; grid-row: 1; }
-.story-dock__wait { visibility: hidden; opacity: 0; }
-.story-dock[data-status="loading"] .story-dock__clock { animation: sp-fade-out 300ms ease var(--sp-wait-delay) both; }
-.story-dock[data-status="loading"] .story-dock__wait { animation: sp-fade-in 300ms ease var(--sp-wait-delay) both; }
-.story-dock__sub { grid-column: 1 / -1; display: grid; font-size: 0.75rem; line-height: 1.35; color: var(--sp-ink-3); }
-/* At a story's start the voice word, then the figure's name, in one cell: a fade, never a jump. */
-.story-dock__voice, .story-dock__who { grid-area: 1 / 1; min-width: 0; transition: opacity 400ms ease, visibility 0s linear 0s; }
-.story-dock[data-voice="on"] .story-dock__who,
-.story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 400ms ease, visibility 0s linear 400ms; }
-.story-dock__note { max-width: 1136px; margin: 0 auto; padding: 2px 0 10px; font-size: 0.8125rem; line-height: 1.45; color: var(--sp-ink-2); font-feature-settings: "ss05" 1; }
+.story-dock__follow svg { width: 18px; height: 18px; margin-bottom: 1px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+/* The note behind the "i" opens over the row, inside the bar. */
+.story-dock__note { order: -1; width: 100%; max-width: 880px; margin: 0 auto; padding: 12px 8px 2px 0; font-size: 0.8125rem; line-height: 1.45; color: var(--sp-ink-2); font-feature-settings: "ss05" 1; }
 .story-dock__note[hidden], .story-dock--end .story-dock__note { display: none; }
 .story-dock__note p { margin: 0 0 4px; }
 .story-dock__note .story-dock__notek { color: var(--sp-ink); }
-.story-dock[data-status="error"] .story-dock__sub { color: var(--color-warning, var(--sp-accent)); }
-/* The row rule: discs and buttons keep their size, and the row wraps to a second line before anything is cut. */
-.story-dock__ctrls { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 4px; padding-bottom: 6px; }
-.story-dock__ctrls > * { flex: none; }
-.story-dock .story-btn { color: var(--sp-ink); }
-.story-dock .story-dock__play { width: 52px; height: 52px; border-radius: 50%; background: var(--sp-disc); color: var(--sp-disc-ink); }
-.story-dock .story-dock__play:hover { background: var(--sp-disc-hover); }
-.story-dock .story-dock__play svg { width: 24px; height: 24px; }
-.story-dock .story-dock__speed {
-  min-width: 62px;
-  padding: 0 8px;
-  border: 1px solid var(--sp-hair-strong);
-  font-size: 0.9375rem;
-  font-variant-numeric: tabular-nums;
+
+/* A narrow phone gives the middle a little more: the coin a step smaller. */
+@media (max-width: 374.98px) {
+  .story-dock .story-dock__play { width: 48px; height: 48px; margin-right: 10px; }
 }
-.story-dock__read {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  min-height: 44px;
-  padding: 0 12px;
-  background: transparent;
-  border: 1px solid var(--sp-hair-strong);
-  border-radius: 5px;
-  cursor: pointer;
-  font: inherit;
-  font-size: 0.9375rem;
-  color: var(--sp-accent);
-  white-space: nowrap;
-}
-.story-dock__read svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.story-dock__read[aria-pressed="true"] { background: var(--sp-picked); border-color: var(--sp-accent); }
-.story-dock__read:hover { border-color: var(--sp-accent); }
-.story-dock__read--voice { background: var(--sp-picked); border-color: var(--sp-accent); }
-/* 360 px holds the row on one line in both languages ("Read along" beside the speed) with the disc at its size. */
-@media (max-width: 379.98px) {
-  .story-dock__ctrls { gap: 2px; }
-  .story-dock .story-dock__speed { min-width: 52px; padding: 0 4px; }
-  .story-dock__read { gap: 4px; padding: 0 8px; }
-}
-/* The one-row dock needs the width of a laptop; tablets keep the phone's rows. The row wraps before anything is cut:
-   the title truncates, the label below it wraps, the controls keep their size. */
 @media (min-width: 1024px) {
-  .story-dock__progress { display: none; }
-  .story-dock__inner {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    column-gap: 16px;
-    row-gap: 4px;
-    min-height: 5rem;
-  }
-  .story-dock__inner > * { flex: none; }
-  .story-dock__home { margin: 0; padding-right: 14px; border-right: 1px solid var(--sp-hair-strong); }
-  .story-dock__ctrls { order: -1; padding: 0; justify-content: flex-start; flex-wrap: nowrap; }
-  .story-dock__inner:has(.story-dock__home) .story-dock__ctrls { order: 0; }
-  .story-dock__inner:has(.story-dock__home) .story-dock__home { order: -1; }
-  .story-dock__inner > .story-dock__head { flex: 1 1 12rem; min-width: 0; }
-  /* no clock on this row, so the title's button keeps to its words and the "i" stands right after them */
-  .story-dock__inner .story-dock__head > .story-dock__open { flex: 0 1 auto; padding: 0; min-height: 44px; }
-  /* the scrubber fills to its 230 px first, then the title's column takes the rest */
-  .story-dock__inner > .story-dock__seek { flex: 100 0 150px; max-width: 230px; }
-  /* the "i" takes 50 px of the title's column: a title wraps to a second line before it is cut */
-  .story-dock__time { display: none; }
+  .story-dock { padding-left: var(--sp-gutter); padding-right: var(--sp-gutter); }
+  .story-dock .story-dock__play { margin-right: 18px; }
+  .story-dock__back { margin-left: 8px; }
 }
-.story-dock__seek {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.8125rem;
-  color: var(--sp-ink-2);
-  font-variant-numeric: tabular-nums;
-}
-.story-dock__rate { display: flex; align-items: center; gap: 2px; }
-.story-dock__rateval { min-width: 3.4em; text-align: center; font-size: 0.9375rem; font-variant-numeric: tabular-nums; }
-.story-dock__rate .story-btn { width: 44px; border: 1px solid var(--sp-hair-strong); }
-.story-dock__rate .story-btn svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; }
-.story-dock__handle svg,
-.story-dock__back svg,
-.story-dock__fwd svg { fill: none; }
-.story-dock__handle svg { stroke: var(--sp-ink-2); }
 
 /* The end of a story: what follows and when, two ways out. */
 .story-dock__end {
@@ -1500,16 +1495,6 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-fp__sleep .sp-field__label { margin: 0; }
 .sp-fp__sleep .sp-seg { display: grid; width: 100%; }
 .sp-fp__sleep .sp-seg button { min-width: 0; padding: 0 4px; }
-.story-dock__moon { display: inline-flex; color: var(--sp-accent); }
-.story-dock__moon svg { width: 15px; height: 15px; }
-/* the phone's clock cell: the moon takes a column before the clock, the chevron stays last */
-.story-dock__time:has(.story-dock__moon) { grid-template-columns: auto auto auto; }
-.story-dock__time .story-dock__moon { grid-column: 1; grid-row: 1; margin-right: 2px; }
-.story-dock__time:has(.story-dock__moon) .story-dock__clock,
-.story-dock__time:has(.story-dock__moon) .story-dock__wait { grid-column: 2; }
-.story-dock__time:has(.story-dock__moon) > svg { grid-column: 3; }
-.story-dock__time .story-dock__moon svg { width: 14px; height: 14px; stroke: var(--sp-accent); }
-.story-dock__t1 .story-dock__moon { margin-left: 6px; vertical-align: -2px; }
 .sp-fp__next { font-size: 0.8125rem; line-height: 1.35; color: var(--sp-ink-3); overflow-wrap: anywhere; }
 /* the keys: only where there is a mouse and a keyboard to use them */
 .sp-keys { padding: 14px 0 4px; }
@@ -1520,31 +1505,47 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-keys kbd { font-family: var(--font-ui); font-size: 0.75rem; padding: 1px 6px; border: 1px solid var(--sp-hair-strong); border-radius: 4px; color: var(--sp-ink); white-space: nowrap; }
 @media (hover: none), (pointer: coarse) { .sp-keys { display: none; } }
 
-/* ---- the map of the text: scenes as small blocks of lines, filled as heard ------------------------------- */
+/* ---- the map of the text: each scene a small page of lines, lit as heard (the edition's map) ----------- */
 .sp-tmap { position: relative; min-width: 0; }
 .sp-tmap__box { position: relative; display: flex; align-items: center; height: 48px; cursor: pointer; touch-action: none; -webkit-user-select: none; user-select: none; }
-/* each drawing's height is its rows in textmap.tsx (ROWS_PLAYER, ROWS_DESK, ROWS_PHONE), so its units are pixels */
-.sp-tmap__draw { display: block; width: 100%; height: 17px; }
-.sp-tmap--dock .sp-tmap__box { height: 44px; }
-.sp-tmap--dock .sp-tmap__draw { height: 13px; }
-/* the sheets' and the dock's icon rules give every svg a stroke: the map's lines take none */
-.sp-tmap__lines rect, .story-dock__tmap .sp-tmap__lines rect { fill: var(--sp-hair-strong); stroke: none; }
-.sp-tmap__heard rect, .story-dock__tmap .sp-tmap__heard rect { fill: var(--sp-accent); stroke: none; }
-.sp-tmap__head { position: absolute; top: 9px; bottom: 9px; left: 0; width: 2px; margin-left: -1px; border-radius: 1px; background: var(--sp-accent); pointer-events: none; }
-.sp-tmap__head::before { content: ""; position: absolute; top: -3px; left: -4px; width: 10px; height: 10px; border: 2px solid var(--sp-page); border-radius: 50%; background: var(--sp-accent); box-sizing: border-box; }
-.sp-tmap--dock .sp-tmap__head { top: 12px; bottom: 12px; }
+.sp-tmap__draw { flex: 1 1 auto; }
+/* a page: lines 2 px every 6 px, the last one short (its share set per page); time runs straight across the width */
+/* the inks are set here, not on the root, so each light's own text ink is mixed */
+.sp-pages { --sp-map-line: color-mix(in srgb, var(--sp-ink) 22%, transparent); --sp-map-heard: var(--sp-ink); position: relative; display: block; width: 100%; height: 20px; }
+.sp-pages__layer { position: absolute; inset: 0; }
+.sp-page { position: absolute; top: 0; height: 20px; background: repeating-linear-gradient(to bottom, var(--sp-map-line) 0 2px, transparent 2px 6px) 0 0 / 100% 14px no-repeat; }
+.sp-page::after { content: ""; position: absolute; left: 0; top: 18px; width: var(--sp-last, 60%); height: 2px; background: var(--sp-map-line); }
+.sp-pages__layer--heard .sp-page { background-image: repeating-linear-gradient(to bottom, var(--sp-map-heard) 0 2px, transparent 2px 6px); }
+.sp-pages__layer--heard .sp-page::after { background: var(--sp-map-heard); }
+.sp-pages__layer--heard { clip-path: inset(0 100% 0 0); }
+/* until the story's pages are in: one page across, unlit */
+.sp-pages--plain { background: repeating-linear-gradient(to bottom, var(--sp-map-line) 0 2px, transparent 2px 6px) 0 0 / 100% 20px no-repeat; }
+/* the playhead: a 2 px line with an 8 px head, longer while held */
+.sp-tmap__head { position: absolute; top: 50%; left: 0; width: 2px; height: 30px; margin: -15px 0 0 -1px; border-radius: 1px; background: var(--sp-accent); pointer-events: none; }
+.sp-tmap__head::before { content: ""; position: absolute; left: 50%; top: -4px; width: 8px; height: 8px; margin-left: -4px; border-radius: 50%; background: var(--sp-accent); }
+.sp-tmap.is-dragging .sp-tmap__head { height: 38px; margin-top: -19px; }
 .sp-tmap__dot { position: absolute; bottom: 4px; left: 0; width: 6px; height: 6px; margin-left: -3px; border-radius: 50%; background: var(--sp-accent); pointer-events: none; }
-.sp-tmap--dock .sp-tmap__dot { bottom: 6px; }
 /* keys and screen readers keep the native range; its focus shows on the drawing */
 .sp-tmap__range { position: absolute; left: 0; bottom: 0; width: 100%; height: 44px; margin: 0; opacity: 0; pointer-events: none; }
 .sp-tmap:has(.sp-tmap__range:focus-visible) .sp-tmap__box { outline: 2px solid var(--sp-focus); outline-offset: 2px; border-radius: 3px; }
+/* the bar's pages: the drawing at the top of its 44 px band, close under the line */
+.sp-tmap--bar .sp-tmap__box { height: 44px; align-items: flex-start; padding-top: 4px; box-sizing: border-box; }
+.sp-tmap--bar .sp-tmap__head { top: 14px; }
+.sp-tmap--bar .sp-tmap__dot { bottom: 12px; }
+.sp-tmap--bar:has(.sp-tmap__range:focus-visible) .sp-tmap__box { outline-offset: -2px; }
+/* the open player's pages: a step larger */
+.sp-tmap--player .sp-pages, .sp-tmap--player .sp-page { height: 22px; }
+.sp-tmap--player .sp-page { background-size: 100% 14px; }
+.sp-tmap--player .sp-page::after { top: 18px; }
+.sp-tmap--player .sp-tmap__head { height: 34px; margin-top: -17px; }
+.sp-tmap--player.is-dragging .sp-tmap__head { height: 40px; margin-top: -20px; }
 .sp-tmap__bubble {
   position: absolute;
   bottom: calc(100% - 2px);
   left: 0;
   z-index: 6;
   width: max-content;
-  max-width: min(340px, calc(100vw - 32px));
+  max-width: min(340px, calc(100vw - 16px));
   padding: 8px 11px 9px;
   background: var(--sp-page);
   border: 1px solid var(--sp-hair-strong);
@@ -1553,6 +1554,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   font-family: var(--font-ui);
   pointer-events: none;
 }
+/* in the bar the bubble rises over the line, above the bar */
+.sp-tmap--bar .sp-tmap__bubble { bottom: calc(100% + 44px + 8px); }
 /* in the open player the bubble opens downward, over the clock and the buttons, inside the sheet's scroll box */
 .sp-tmap--player .sp-tmap__bubble { top: calc(100% - 6px); bottom: auto; max-width: 100%; }
 .sp-tmap__when { display: flex; align-items: baseline; gap: 10px; font-size: 0.8125rem; font-weight: 600; color: var(--sp-accent); font-variant-numeric: tabular-nums; }
@@ -1568,10 +1571,6 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   line-height: 1.35;
   color: var(--sp-ink);
 }
-.sp-tmap.is-dragging .sp-tmap__head::before { width: 14px; height: 14px; top: -5px; left: -6px; }
-/* the phone dock draws the map where its progress line was, display only; the dock keeps its height */
-.story-dock__progress.has-map { top: 3px; left: var(--sp-gutter); right: var(--sp-gutter); height: 5px; pointer-events: none; }
-.story-dock__tmap { display: block; width: 100%; height: 100%; }
 .sp-fp__times { display: flex; justify-content: space-between; margin-top: -6px; font-size: 0.8125rem; color: var(--sp-ink-2); font-variant-numeric: tabular-nums; }
 .sp-fp__transport { display: flex; align-items: center; justify-content: space-between; margin: 10px 0 6px; }
 .sp-fp__transport .story-btn svg { width: 26px; height: 26px; }
@@ -1592,6 +1591,9 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-stepper .story-btn { width: 48px; border: 1px solid var(--sp-hair-strong); }
 .sp-stepper .story-btn svg { width: 20px; height: 20px; }
 .sp-fp__links { display: flex; flex-wrap: wrap; column-gap: 22px; padding-top: 6px; }
+.sp-fp__links a.sp-linkbtn { text-decoration: none; }
+/* the quiet stop stands at the row's end, also where it wraps */
+.sp-fp__links .sp-linkbtn--quiet { margin-left: auto; }
 
 /* facts */
 .sp-facts__status { margin: 14px 0; font-size: 0.9375rem; color: var(--sp-ink-3); }

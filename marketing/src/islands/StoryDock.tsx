@@ -1,33 +1,28 @@
-// React island: the story dock, its full player, the sheets (facts, display,
+// React island: the story bar, its full player, the sheets (facts, display,
 // saved) and the reading view. Mounted once per document inside an element
 // the client router persists, so it keeps playing while the visitor moves
 // between player pages. The page's own controls are plain HTML (page.ts).
+//
+// The bar is one row on every screen: the coin; a line that names the voice
+// for its first seconds, then who is playing; the pages of the story under it;
+// back one sentence; the caret to the open player, which holds everything else.
 
-import { Suspense, lazy, useCallback, useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
+import type { PointerEvent as ReactPointerEvent } from 'react';
 import {
   acceptResume,
+  audioTime,
   declineResume,
   getState,
-  hasNext,
-  hasPrevious,
   installPlayer,
   listenNow,
-  nextStory,
-  openReader,
   openSheet,
-  previousStory,
   readPageQueue,
   seekTo,
   setAway,
-  skipBack,
-  skipForward,
   stayHere,
-  stepRate,
   subscribe,
   togglePlay,
-  closeReader,
-  RATE_MAX,
-  RATE_MIN,
 } from '../player/controller';
 import { installPage } from '../player/page';
 // The reader, the sheets and the map load after the first screen: on first use, warmed on intent.
@@ -36,7 +31,8 @@ const loadSheets = () => import('../player/sheets');
 const loadMap = () => import('../player/textmap');
 const StoryReader = lazy(loadReader);
 const Sheets = lazy(loadSheets);
-const DockMap = lazy(() => loadMap().then(m => ({ default: m.DockMap })));
+const BarMap = lazy(() => loadMap().then(m => ({ default: m.BarMap })));
+const BarBack = lazy(() => loadMap().then(m => ({ default: m.BarBack })));
 let warmed = false;
 function warm(): void {
   if (warmed) return;
@@ -46,7 +42,7 @@ function warm(): void {
   void loadMap().catch(() => undefined);
 }
 import { Icon } from '../player/icons';
-import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings, rateLabel } from '../player/strings';
+import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from '../player/strings';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -57,7 +53,7 @@ interface Label {
   expanded: string;
 }
 
-// How long the dock names the synthetic voice at each story's start, from its first sound; then the figure's name.
+// How long the bar names the synthetic voice at each story's start, from its first sound; then the figure's name.
 const VOICE_MS = 6000;
 
 interface Props {
@@ -65,6 +61,8 @@ interface Props {
   lang: PlayerLang;
   labels: Record<PlayerLang, Label>;
   facts: Record<PlayerLang, FactWords>;
+  /** Short names for a bar too narrow for the full one: "id=English|German;...", only where they differ. */
+  shortNames: string;
 }
 
 const SERVER_STATE: PlayerState = getState();
@@ -78,10 +76,45 @@ function currentPath(): string {
   return typeof window === 'undefined' ? '' : window.location.pathname;
 }
 
-export default function StoryDock({ lang, labels, facts }: Props) {
+function readShort(list: string, id: string, lang: PlayerLang): string {
+  const hit = list.split(';').find(x => x.startsWith(`${id}=`));
+  const [en, de] = (hit?.slice(id.length + 1) ?? '').split('|');
+  return (lang === 'de' ? de : en) ?? '';
+}
+
+// Before paint in the browser; the server render has no layout to measure.
+const useBeforePaint = typeof window === 'undefined' ? useEffect : useLayoutEffect;
+
+let measureCtx: CanvasRenderingContext2D | null = null;
+/** A text's width in an element's face, without laying it out. */
+function textWidth(text: string, el: Element): number {
+  measureCtx ??= document.createElement('canvas').getContext('2d');
+  if (!measureCtx) return 0;
+  const cs = getComputedStyle(el);
+  measureCtx.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  return measureCtx.measureText(text).width;
+}
+
+/** A tap on the bar's empty part, or a short swipe up, opens the player (the caret stays the keyboard's way). */
+function useOpenGesture(open: () => void) {
+  const start = useRef<{ x: number; y: number } | null>(null);
+  const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
+    const t = e.target instanceof Element ? e.target : null;
+    start.current = t && !t.closest('button, a, input, .sp-tmap') ? { x: e.clientX, y: e.clientY } : null;
+  };
+  const onPointerUp = (e: ReactPointerEvent<HTMLElement>) => {
+    const s0 = start.current;
+    start.current = null;
+    if (!s0) return;
+    const dx = e.clientX - s0.x;
+    const dy = e.clientY - s0.y;
+    if ((dy < -28 && Math.abs(dy) > Math.abs(dx)) || (Math.abs(dx) < 6 && Math.abs(dy) < 6)) open();
+  };
+  return { onPointerDown, onPointerUp, onPointerCancel: () => { start.current = null; } };
+}
+
+export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const state = useSyncExternalStore(subscribe, getState, () => SERVER_STATE);
-  const fillRef = useRef<HTMLDivElement | null>(null);
-  const seekRef = useRef<HTMLInputElement | null>(null);
   const [path, setPath] = useState(currentPath);
   const [wide, setWide] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
@@ -99,7 +132,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     return () => mq.removeEventListener('change', update);
   }, []);
 
-  // The dock lives across pages: it learns where it is after each swap.
+  // The bar lives across pages: it learns where it is after each swap.
   useEffect(() => {
     const update = () => setPath(currentPath());
     document.addEventListener('astro:page-load', update);
@@ -123,14 +156,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     if (storyOn) warm();
   }, [storyOn]);
 
-  // CSSOM, not a style attribute: the strict style-src blocks attributes.
-  const pct = state.duration > 0 ? Math.min(100, (state.time / state.duration) * 100) : 0;
-  useEffect(() => {
-    if (fillRef.current) fillRef.current.style.width = `${pct}%`;
-    if (seekRef.current) seekRef.current.style.setProperty('--story-seek', `${pct}%`);
-  });
-
-  // The page and the reader keep room for the dock's real height: the title may wrap.
+  // The page and the reader keep room for the bar's real height.
   const observer = useRef<ResizeObserver | null>(null);
   const dockEl = useRef<HTMLDivElement | null>(null);
   const publish = useCallback(() => {
@@ -168,7 +194,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const halves = labelHalves(label.brief);
   const voiceWord = halves[halves.length - 1] ?? label.brief;
 
-  // Each story's start (a new item, or the same one again after the dock was closed) names the voice: in the bar from
+  // Each story's start (a new item, or the same one again after the bar was closed) names the voice: in the bar from
   // the load until VOICE_MS after the first sound, and once to a screen reader through the polite live region.
   const storyKey = loaded && state.queue && state.current !== null ? `${state.queue.slug}/${state.queue.lang}/${state.current}` : null;
   const [quietKey, setQuietKey] = useState<string | null>(null);
@@ -202,6 +228,39 @@ export default function StoryDock({ lang, labels, facts }: Props) {
     document.addEventListener('keydown', close);
     return () => document.removeEventListener('keydown', close);
   }, [noteOpen]);
+
+  // The name on the line: the full one where it fits whole beside the "i" and the clock, else the short one.
+  const fullName = state.queue?.name ?? '';
+  const shortName = (state.queue && readShort(shortNames, state.queue.figureId, storyLang)) || fullName;
+  const leadEl = useRef<HTMLDivElement | null>(null);
+  const whoRef = useRef<HTMLButtonElement | null>(null);
+  const nameRef = useRef<HTMLSpanElement | null>(null);
+  const [useShort, setUseShort] = useState(false);
+  const fit = useCallback(() => {
+    const lead = leadEl.current;
+    const who = whoRef.current;
+    const name = nameRef.current;
+    if (!lead || !who || !name || !fullName) return;
+    const extra = who.getBoundingClientRect().width - name.getBoundingClientRect().width;
+    setUseShort(textWidth(fullName, name) + extra > lead.clientWidth - 1);
+  }, [fullName]);
+  const leadObserver = useRef<ResizeObserver | null>(null);
+  const leadRef = useCallback((el: HTMLDivElement | null) => {
+    leadObserver.current?.disconnect();
+    leadObserver.current = null;
+    leadEl.current = el;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    leadObserver.current = new ResizeObserver(fit);
+    leadObserver.current.observe(el);
+  }, [fit]);
+  useBeforePaint(fit, [fit]);
+  useEffect(() => {
+    void document.fonts?.ready.then(fit);
+  }, [fit]);
+  const shownName = useShort ? shortName : fullName;
+
+  const gesture = useOpenGesture(() => openSheet('player'));
+
   // The live region speaks at a start; the hidden word is the description every start control points at, so the label
   // is heard with the button, before any sound.
   const liveRegion = (
@@ -210,10 +269,15 @@ export default function StoryDock({ lang, labels, facts }: Props) {
       <span id={VOICE_DESC_ID} hidden>{voiceWord}</span>
     </>
   );
-  // One offer at a time: where the page's plate offers the kept point, the dock stays down.
+  // One offer at a time: where the page's plate offers the kept point, the bar stays down.
   const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
   const offer = !loaded && state.resume !== null && !plateOffers;
   const readerQueue = state.readerOpen ? readPageQueue() ?? state.queue : null;
+
+  // A bar outside the router (the poem door) lives and dies with its page: a link away would stop the story.
+  const routed = typeof document !== 'undefined' && document.querySelector('[data-astro-transition-persist="story-dock"]') !== null;
+  const home = state.queue ? figurePath(state.queue.lang, state.queue.slug) : '';
+  const away = routed && path !== '' && !!home && path !== home;
 
   const overlays = (
     <>
@@ -226,7 +290,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
       )}
       {state.sheet && (
         <Suspense fallback={null}>
-          <Sheets state={state} facts={facts} wide={wide} />
+          <Sheets state={state} facts={facts} wide={wide} home={away ? home : null} />
         </Suspense>
       )}
     </>
@@ -263,49 +327,52 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
-  const home = figurePath(queue.lang, queue.slug);
-  // A dock outside the router (the poem door) lives and dies with its page: a link away would stop the story.
-  const routed = typeof document !== 'undefined' && document.querySelector('[data-astro-transition-persist="story-dock"]') !== null;
-  const away = routed && path !== '' && path !== home;
   const inReader = state.readerOpen && state.readerN === current;
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
   const clock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
-  const rate = rateLabel(state.rate, storyLang);
 
-  // While the sleep timer runs, a small moon by the clock; its words go with the player button's name.
+  // While the sleep timer runs, a small moon by the clock; its words go with the caret's name.
   const sleepOn = typeof state.sleep === 'number' ? s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft))) : state.sleep === 'end' ? s.sleepToEnd : '';
   const moon = sleepOn ? <span className="story-dock__moon" aria-hidden="true">{Icon.moon}</span> : null;
-  const plainProgress = (
-    <div className="story-dock__progress" aria-hidden="true">
-      <div ref={fillRef} className="story-dock__fill" />
+  // Until the pages are in: the whole story as one page, drawn by CSS alone, the same height.
+  const plainPages = (
+    <div className="sp-tmap sp-tmap--bar" aria-hidden="true">
+      <div className="sp-tmap__box"><span className="sp-pages sp-pages--plain sp-tmap__draw" /></div>
     </div>
   );
-  const plainSeek = (
-    <input
-      ref={seekRef}
-      type="range"
-      min={0}
-      max={state.duration > 0 ? Math.floor(state.duration) : 0}
-      step={1}
-      value={Math.floor(state.time)}
-      aria-label={s.seekAria}
-      aria-valuetext={clock}
-      onChange={e => seekTo(Number(e.currentTarget.value))}
-    />
+  const plainBack = (
+    <button type="button" className="story-btn story-dock__back" onClick={() => seekTo(Math.max(0, audioTime() - 5))}
+      aria-label={s.sentenceBack}>{Icon.again}</button>
   );
 
-  const readSlot = inReader && state.away ? (
-    <button type="button" className="story-dock__read story-dock__read--voice" onClick={() => setAway(false)} data-dir={state.awayDir}>
+  // The line: the voice for its seconds, then who is playing (the name and its "i"), the story where it fits, the clock.
+  // In the reading view, scrolled away from the voice, the way back takes the line.
+  const line = inReader && state.away ? (
+    <button type="button" className="story-dock__follow" onClick={() => setAway(false)} data-dir={state.awayDir}>
       {state.awayDir === 'down' ? Icon.down : Icon.up}
       <span>{s.follow}</span>
     </button>
+  ) : state.status === 'error' ? (
+    <span className="story-dock__error" role="status">{s.error}</span>
   ) : (
-    <button type="button" className="story-dock__read" aria-pressed={inReader}
-      onClick={() => (inReader ? closeReader() : openReader(current))}>
-      {Icon.book}
-      <span>{s.readAlong}</span>
-    </button>
+    <>
+      <span className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
+      <div ref={leadRef} className="story-dock__lead">
+        <button ref={whoRef} type="button" className="story-dock__who" aria-expanded={noteOpen} aria-controls="story-dock-note"
+          aria-label={`${fullName}, ${label.title}`} onClick={() => setNoteOpen(v => !v)}>
+          <span ref={nameRef} className="story-dock__name">{shownName}</span>
+          <span className="sp-label__i" aria-hidden="true">i</span>
+        </button>
+        <span className="story-dock__title">{title}</span>
+      </div>
+      {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
+      <span className="story-dock__time">
+        {moon}
+        <span className="story-dock__clock">{clock}</span>
+        <span className="story-dock__wait">{s.loading}</span>
+      </span>
+    </>
   );
 
   return (
@@ -313,7 +380,8 @@ export default function StoryDock({ lang, labels, facts }: Props) {
       {liveRegion}
       {overlays}
       <div ref={measureRef} className={card && nextEntry ? 'story-dock story-dock--end' : 'story-dock'} role="region"
-        aria-label={`${s.dockLabel}, ${voiceWord}`} data-status={state.status} data-voice={voiceOn ? 'on' : 'off'}>
+        aria-label={`${s.dockLabel}, ${voiceWord}`} data-status={state.status} data-voice={voiceOn ? 'on' : 'off'}
+        data-reading={inReader ? '' : undefined}>
         {card && nextEntry && (
           <div className="story-dock__end" role="status">
             <span className="story-dock__count" aria-hidden="true">{card.left}</span>
@@ -327,95 +395,25 @@ export default function StoryDock({ lang, labels, facts }: Props) {
             </div>
           </div>
         )}
-        {wide ? plainProgress : (
-          <Suspense fallback={plainProgress}>
-            <DockMap state={state} queue={queue} kind="phone" seekTo={seekTo} plain={plainProgress} />
+        <div className="story-dock__inner" {...gesture}>
+          <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
+            aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
+            {Icon.dots}
+            {playing ? Icon.pause : Icon.play}
+          </button>
+          <div className="story-dock__mid">
+            <div className="story-dock__line">{line}</div>
+            <Suspense fallback={plainPages}>
+              <BarMap state={state} queue={queue} seekTo={seekTo} />
+            </Suspense>
+          </div>
+          <Suspense fallback={plainBack}>
+            <BarBack state={state} queue={queue} s={s} />
           </Suspense>
-        )}
-        <div className="story-dock__inner">
-          {away && (
-            <a className="story-dock__home" href={home} aria-label={s.backToAria(queue.name)}>
-              {Icon.back}
-              <span>{queue.name}</span>
-            </a>
-          )}
-          <div className="story-dock__head">
-            <button type="button" className="story-dock__open" onClick={() => openSheet('player')}
-              aria-label={`${s.openPlayer}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
-              <span className="story-dock__title">{title}</span>
-              {/* The loading word takes the clock's place only on a slow load (CSS delay), never beside a stale time. */}
-              <span className="story-dock__time">
-                {moon}
-                <span className="story-dock__clock">{clock}</span>
-                <span className="story-dock__wait">{s.loading}</span>
-                {Icon.up}
-              </span>
-              {/* Both words share one cell, so the swap never moves the bar. */}
-              <span className="story-dock__sub">
-                {state.status === 'error' ? s.error : (
-                  <>
-                    <span className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
-                    <span className="story-dock__who" aria-hidden={voiceOn}>{queue.name}</span>
-                  </>
-                )}
-              </span>
-            </button>
-            <button type="button" className="story-btn story-dock__about" aria-expanded={noteOpen} aria-controls="story-dock-note"
-              aria-label={label.title} onClick={() => setNoteOpen(v => !v)}>
-              <span className="sp-label__i" aria-hidden="true">i</span>
-            </button>
-          </div>
-          <div className="story-dock__ctrls">
-            {wide && (
-              <button type="button" className="story-btn story-dock__prev" onClick={previousStory} disabled={!hasPrevious() && state.time < 1}
-                aria-label={s.prevAria} aria-describedby={VOICE_DESC_ID}>{Icon.prev}</button>
-            )}
-            <button type="button" className="story-btn story-dock__back" onClick={skipBack} aria-label={s.back15Aria}>
-              {Icon.back15}
-            </button>
-            <button type="button" className="story-btn story-dock__play" onClick={togglePlay}
-              aria-label={playing ? s.pauseAria : s.playAria} aria-describedby={VOICE_DESC_ID}>
-              {Icon.dots}
-              {playing ? Icon.pause : Icon.play}
-            </button>
-            {wide && (
-              <button type="button" className="story-btn story-dock__fwd" onClick={skipForward} aria-label={s.fwd15Aria}>
-                {Icon.fwd15}
-              </button>
-            )}
-            <button type="button" className="story-btn story-dock__next" onClick={nextStory} disabled={!hasNext()}
-              aria-label={s.nextAria} aria-describedby={VOICE_DESC_ID}>
-              {Icon.next}
-            </button>
-            {!wide && (
-              <button type="button" className="story-btn story-dock__speed" onClick={() => openSheet('player')}
-                aria-label={s.speedAria(rate)}>
-                {rate}
-              </button>
-            )}
-            {!wide && readSlot}
-          </div>
-          {wide && (
-            <>
-              <div className="story-dock__seek">
-                <span className="story-dock__t0">{clockLabel(state.time)}</span>
-                <Suspense fallback={plainSeek}>
-                  <DockMap state={state} queue={queue} kind="desk" seekTo={seekTo} plain={plainSeek} />
-                </Suspense>
-                <span className="story-dock__t1">{clockLabel(state.duration)}{moon}</span>
-              </div>
-              <div className="story-dock__rate" role="group" aria-label={s.speed}>
-                <button type="button" className="story-btn" onClick={() => stepRate(-1)} disabled={state.rate <= RATE_MIN}
-                  aria-label={s.slower}>{Icon.minus}</button>
-                <span className="story-dock__rateval" aria-live="polite">{rate}</span>
-                <button type="button" className="story-btn" onClick={() => stepRate(1)} disabled={state.rate >= RATE_MAX}
-                  aria-label={s.faster}>{Icon.plus}</button>
-              </div>
-              {readSlot}
-              <button type="button" className="story-btn story-dock__handle" onClick={() => openSheet('player')}
-                aria-label={s.openPlayer}>{Icon.up}</button>
-            </>
-          )}
+          <button type="button" className="story-btn story-dock__open" onClick={() => openSheet('player')}
+            aria-label={`${s.openPlayer}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
+            {Icon.up}
+          </button>
         </div>
         <div className="story-dock__note" id="story-dock-note" hidden={!noteOpen}>
           <p className="story-dock__notek">{halves.map((half, i) => (
