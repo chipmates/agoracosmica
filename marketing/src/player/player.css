@@ -879,7 +879,6 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .sp-star__track { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 22%, transparent); stroke-width: 1.4; opacity: 0; }
 .sp-star__nextmark { display: none; }
 .sp-star__nextring { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 75%, transparent); stroke-width: 1; stroke-dasharray: 4 7; }
-.sp-star__leader { stroke: color-mix(in srgb, var(--sp-n-gold) 50%, transparent); stroke-width: 1; }
 .sp-star__next {
   display: none;
   font-family: var(--font-ui);
