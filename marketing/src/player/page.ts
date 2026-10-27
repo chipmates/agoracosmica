@@ -456,6 +456,12 @@ function onClick(e: MouseEvent): void {
   }
 }
 
+/** A star is a link to its row for a page without script; the router claims link clicks in the bubble phase. */
+function onStarCapture(e: MouseEvent): void {
+  const target = e.target instanceof Element ? e.target : null;
+  if (target?.closest('[data-story-star]')) e.preventDefault();
+}
+
 function onKey(e: KeyboardEvent): void {
   const target = e.target instanceof Element ? e.target : null;
   if ((e.key === 'Enter' || e.key === ' ') && target?.matches('[data-story-star]')) {
@@ -481,6 +487,7 @@ let installed = false;
 export function installPage(): void {
   if (installed) return;
   installed = true;
+  document.addEventListener('click', onStarCapture, true);
   document.addEventListener('click', onClick);
   document.addEventListener('keydown', onKey);
   subscribe(sync);

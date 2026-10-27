@@ -685,7 +685,29 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .story-applink a { display: inline-flex; align-items: center; min-height: 44px; color: var(--sp-ink-3); border-bottom: 0; text-decoration: underline; text-underline-offset: 0.2em; text-decoration-color: var(--sp-hair-strong); }
 
 /* ---- the map ------------------------------------------------------------- */
+/* The app's Wisdom Map plate (client WisdomMapModal/css/Atlas.css, Star.tsx, the sky of
+   cosmos/wisdom-sky/createAtlasSky.ts) in its own colours: it stays night in every light, so its roles are
+   pinned to the night copies here, and the phone's card under it is the app's seed note. */
 .sp-mapwrap { grid-area: map; display: none; }
+.sp-atlas,
+.sp-mapsel {
+  --sp-ink: var(--sp-n-ink);
+  --sp-ink-2: var(--sp-n-ink-2);
+  --sp-ink-3: var(--sp-n-ink-3);
+  --sp-accent: var(--sp-n-gold);
+  --sp-disc: var(--sp-n-gold);
+  --sp-disc-hover: var(--sp-n-gold-hover);
+  --sp-disc-ink: var(--sp-n-void);
+  --sp-ring: var(--sp-n-gold-hover);
+  --sp-ring-track: color-mix(in srgb, var(--sp-n-gold) 20%, transparent);
+  --sp-hair: color-mix(in srgb, var(--sp-n-gold-subtle) 16%, transparent);
+  --sp-hair-strong: color-mix(in srgb, var(--sp-n-gold) 42%, transparent);
+  --sp-plate: color-mix(in srgb, var(--sp-n-gold) 5%, transparent);
+  --sp-focus: var(--sp-n-gold-hover);
+  --as-ink: color-mix(in srgb, var(--star-blue-light) 60%, transparent);
+  --as-ink-faint: color-mix(in srgb, var(--star-blue-light) 24%, transparent);
+  --as-ink-ghost: color-mix(in srgb, var(--star-blue-light) 12%, transparent);
+}
 .sp-spread[data-view="map"] .sp-mapwrap { display: block; }
 .sp-spread[data-view="map"] .sp-rows,
 .sp-spread[data-view="map"] .story-applink { display: none; }
@@ -695,69 +717,174 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   .sp-spread[data-view="map"] .story-applink { display: block; }
   .sp-mapsel { display: none; }
 }
-.sp-mapcard { margin-top: 12px; padding: 12px 12px 6px; background: var(--sp-plate); border: 1px solid var(--sp-hair); border-radius: 6px; }
-@media (min-width: 1024px) { .sp-mapcard { margin-top: 0; } }
-.sp-mapcard__head { display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-.sp-mapcard__name { margin: 0; font-family: var(--font-content); font-style: italic; font-weight: 400; font-size: 1.1875rem; line-height: 1.2; color: var(--sp-ink); }
-.sp-mapcard__by { font-family: var(--font-ui); font-size: 0.75rem; color: var(--sp-ink-3); }
-.sp-map { display: block; width: 100%; height: auto; margin-top: 4px; overflow: visible; }
-.sp-map__grat { fill: none; stroke: var(--sp-hair); stroke-width: 1; }
-.sp-map__path { stroke: var(--sp-hair-strong); stroke-width: 1.6; stroke-dasharray: 2 7; stroke-linecap: round; }
-.sp-map__link { stroke: var(--sp-hair-strong); stroke-width: 1.6; stroke-dasharray: 5 7; }
-.sp-map__link.is-lit,
-.sp-map__path.is-lit { stroke: var(--sp-accent); stroke-width: 2.6; stroke-dasharray: none; }
+
+/* the plate: the sky behind, the engraved ink over it, the cartouche in its lower band */
+.sp-atlas { position: relative; isolation: isolate; margin-top: 12px; border-radius: 3px; overflow: hidden; background: var(--sp-n-void); }
+@media (min-width: 1024px) { .sp-atlas { margin-top: 0; } }
+.sp-atlas__sky {
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  /* the app's nebula, drawn additively there: screen blends over the navy wash at the same places and sizes */
+  background:
+    radial-gradient(ellipse 42% 68% at 5% 77%, color-mix(in srgb, var(--sp-n-highlight) 24%, transparent), transparent),
+    radial-gradient(ellipse 50% 82% at 32% 50%, color-mix(in srgb, var(--sp-n-highlight) 25%, transparent), transparent),
+    radial-gradient(ellipse 52% 85% at 59% 35%, color-mix(in srgb, var(--sp-n-highlight) 25%, transparent), transparent),
+    radial-gradient(ellipse 47% 76% at 86% 20%, color-mix(in srgb, var(--sp-n-highlight) 24%, transparent), transparent),
+    radial-gradient(ellipse 25% 41% at 50% 53%, color-mix(in srgb, color-mix(in srgb, var(--sp-n-gold-deep) 35%, var(--sp-n-highlight)) 14%, transparent), transparent),
+    radial-gradient(ellipse 33% 55% at 98% 68%, color-mix(in srgb, var(--sp-n-highlight) 18%, transparent), transparent),
+    radial-gradient(ellipse 98% 75% at 50% 44%, var(--sp-n-card) 0%, var(--sp-n-page) 55%, var(--sp-n-void) 100%);
+  background-blend-mode: screen, screen, screen, screen, screen, screen, normal;
+}
+/* the field: three alpha tiles from the app's rules (sky/field-*.svg), coloured here */
+.sp-atlas__sky::before,
+.sp-atlas__sky::after,
+.sp-atlas::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  -webkit-mask-repeat: repeat;
+  mask-repeat: repeat;
+}
+.sp-atlas__sky::before {
+  background: color-mix(in srgb, var(--star-blue-light) 85%, var(--utility-pure-white));
+  -webkit-mask-image: url('./sky/field-a.svg');
+  mask-image: url('./sky/field-a.svg');
+  -webkit-mask-size: 300px 300px;
+  mask-size: 300px 300px;
+}
+.sp-atlas__sky::after {
+  background: color-mix(in srgb, var(--star-blue-light) 85%, var(--utility-pure-white));
+  -webkit-mask-image: url('./sky/field-b.svg');
+  mask-image: url('./sky/field-b.svg');
+  -webkit-mask-size: 410px 410px;
+  mask-size: 410px 410px;
+  -webkit-mask-position: 37px 91px;
+  mask-position: 37px 91px;
+}
+.sp-atlas::before {
+  z-index: -1;
+  background: color-mix(in srgb, var(--sp-n-gold) 70%, var(--sp-n-ink));
+  -webkit-mask-image: url('./sky/field-c.svg');
+  mask-image: url('./sky/field-c.svg');
+  -webkit-mask-size: 370px 370px;
+  mask-size: 370px 370px;
+}
+/* the quiet vignette: the plate is lit from its middle */
+.sp-atlas::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse 120% 90% at 50% 42%, transparent 48%, color-mix(in srgb, var(--sp-n-void) 55%, transparent) 100%);
+}
+/* a whisper of the plate frame on a desktop only, as the app has it */
+@media (min-width: 1024px) {
+  .sp-atlas__sky { outline: 1px solid color-mix(in srgb, var(--sp-n-gold-deep) 22%, transparent); outline-offset: -13px; }
+}
+.sp-map { display: block; width: 100%; height: auto; overflow: visible; }
+
+/* the engraved ink */
+.sp-atlas__grat { fill: none; stroke: var(--as-ink-ghost); stroke-width: 0.75; vector-effect: non-scaling-stroke; }
+.sp-atlas__via { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold-deep) 40%, transparent); stroke-width: 1.1; stroke-dasharray: 1 9; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.sp-atlas__vialabel { font-family: var(--font-content); font-style: italic; font-size: 14px; letter-spacing: 0.06em; fill: color-mix(in srgb, var(--sp-n-gold-deep) 66%, transparent); }
+.sp-atlas__line { fill: none; stroke: color-mix(in srgb, var(--star-blue-light) 26%, transparent); stroke-width: 1; stroke-dasharray: 2 7; stroke-linecap: round; vector-effect: non-scaling-stroke; }
+.sp-map__link { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold-subtle) 46%, transparent); stroke-width: 1.05; stroke-linecap: round; vector-effect: non-scaling-stroke; opacity: 0; }
+.sp-map__link.is-lit { opacity: 1; }
+
+/* the engraved stars: the surveyor's dotted circle with four ticks, gilded once heard */
 .sp-star { cursor: pointer; outline: none; }
 .sp-star__hit { fill: transparent; }
-.sp-star__halo { fill: none; stroke: var(--sp-accent); stroke-width: 1.2; opacity: 0; }
-.sp-star__arc { fill: none; stroke: var(--sp-accent); stroke-width: 3.6; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
-.sp-star__core { fill: var(--sp-page); stroke: var(--sp-accent); stroke-width: 2.4; }
-.sp-star__num {
-  font-family: var(--font-ui);
-  font-size: 24px;
-  font-weight: 600;
-  fill: var(--sp-ink-2);
-  paint-order: stroke;
-  stroke: var(--sp-page);
-  stroke-width: 7px;
-  stroke-linejoin: round;
-}
-.sp-star__intro {
-  font-family: var(--font-ui);
-  font-size: 20px;
-  font-weight: 500;
-  fill: var(--sp-ink-2);
-  paint-order: stroke;
-  stroke: var(--sp-page);
-  stroke-width: 7px;
-  stroke-linejoin: round;
-}
+.sp-star__orn { transition: filter 0.3s ease; }
+.sp-star__dots { fill: none; stroke: color-mix(in srgb, var(--star-blue-light) 50%, transparent); stroke-width: 1; stroke-dasharray: 2.2 4.4; }
+.sp-star__tick { stroke: color-mix(in srgb, var(--star-blue-light) 36%, transparent); stroke-width: 1; }
+.sp-star__ink { fill: color-mix(in srgb, var(--star-blue-light) 75%, transparent); }
+.sp-star__l1 { display: none; }
+.sp-star__ring { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold-deep) 55%, transparent); stroke-width: 1; }
+.sp-star__core { fill: var(--sp-n-gold-subtle); }
+.sp-star__sel { fill: none; stroke: var(--sp-n-gold-hover); stroke-width: 1; stroke-dasharray: 3 4; display: none; }
+/* the fine gold circle the app inks round a star, here as far as the story has played */
+.sp-star__arc { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 85%, transparent); stroke-width: 1.4; stroke-linecap: round; stroke-dasharray: 100; stroke-dashoffset: 100; opacity: 0; }
+.sp-star__nextmark { display: none; }
+.sp-star__nextring { fill: none; stroke: color-mix(in srgb, var(--sp-n-gold) 75%, transparent); stroke-width: 1; stroke-dasharray: 4 7; }
+.sp-star__leader { stroke: color-mix(in srgb, var(--sp-n-gold) 50%, transparent); stroke-width: 1; }
 .sp-star__next {
   display: none;
   font-family: var(--font-ui);
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.3em;
   text-transform: uppercase;
-  fill: var(--sp-accent);
-  paint-order: stroke;
-  stroke: var(--sp-page);
-  stroke-width: 7px;
-  stroke-linejoin: round;
+  fill: var(--sp-n-gold);
 }
-.sp-star.is-done .sp-star__core { fill: var(--sp-accent); }
+.sp-star__num { font-family: var(--font-ui); font-size: 10px; font-weight: 500; letter-spacing: 0.08em; fill: color-mix(in srgb, var(--star-blue-light) 62%, transparent); }
+.sp-star__intro { font-family: var(--font-content); font-style: italic; font-size: 13px; fill: color-mix(in srgb, var(--star-blue-light) 72%, transparent); }
+@media (max-width: 380px) {
+  .sp-star__next, .sp-star__num { font-size: 11px; }
+  .sp-star__intro { font-size: 14px; }
+}
+.sp-star.is-done .sp-star__l0 { display: none; }
+.sp-star.is-done .sp-star__l1 { display: inline; }
+.sp-star.is-current .sp-star__dots { stroke: color-mix(in srgb, var(--sp-n-gold-subtle) 70%, transparent); }
+.sp-star.is-current .sp-star__ink { fill: var(--sp-n-gold-subtle); }
+.sp-star.is-current .sp-star__arc { opacity: 1; }
+.sp-star.is-started .sp-star__arc { opacity: 0.6; }
 .sp-star.is-done .sp-star__num,
-.sp-star.is-current .sp-star__num { fill: var(--sp-ink); }
-.sp-star.is-current .sp-star__halo { opacity: 0.75; }
-.sp-star.is-current .sp-star__arc,
-.sp-star.is-started .sp-star__arc { opacity: 1; }
+.sp-star.is-current .sp-star__num { fill: color-mix(in srgb, var(--sp-n-gold-subtle) 85%, transparent); }
+.sp-star.is-next .sp-star__nextmark,
+.sp-star.is-selected .sp-star__sel { display: inline; }
 .sp-star.is-next .sp-star__next { display: inline; }
-.sp-star.is-selected .sp-star__core { stroke-width: 3.4; }
-.sp-star:hover .sp-star__core { stroke-width: 3.4; }
-.sp-star:focus-visible .sp-star__hit { stroke: var(--sp-focus); stroke-width: 2.5; }
-.sp-mapnote { margin: 6px 0 4px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; color: var(--sp-ink-3); }
-.sp-mapsel { margin-top: 12px; padding: 12px 0 4px; border-top: 1px solid var(--sp-hair); }
+.sp-star:hover .sp-star__orn,
+.sp-star:focus-visible .sp-star__orn { filter: brightness(1.25); }
+.sp-star:focus-visible .sp-star__hit { stroke: var(--sp-n-gold-subtle); stroke-width: 1; }
+
+/* the cartouche: the plate's name, tilted as the app's narrow plates have it */
+.sp-atlas__cartouche {
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  z-index: 1;
+  width: min(272px, 76%);
+  padding: 10px 16px 9px;
+  background: color-mix(in srgb, var(--sp-n-page) 86%, transparent);
+  border: 1px solid var(--as-ink-faint);
+  text-align: center;
+  transform: translateX(-50%) rotate(-2deg);
+  pointer-events: none;
+}
+.sp-atlas__cartouche::before { content: ''; position: absolute; inset: 5px; border: 1px solid var(--as-ink-ghost); pointer-events: none; }
+.sp-atlas__name {
+  margin: 0 0 5px;
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: 0.95rem;
+  line-height: 1.25;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--sp-n-ink);
+  overflow-wrap: break-word;
+}
+.sp-atlas__epithet { margin: 0; font-family: var(--font-content); font-style: italic; font-size: 0.85rem; line-height: 1.3; color: var(--sp-n-ink-3); }
+@media (min-width: 1024px) { .sp-atlas__name { font-size: 1.05rem; } }
+
+.sp-mapnote { margin: 8px 0 4px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; color: var(--sp-ink-3); }
+
+/* a phone's chosen star: the app's seed note under the plate, holding the story's row */
+.sp-mapsel {
+  position: relative;
+  margin-top: 12px;
+  padding: 16px 16px 10px;
+  border-radius: 3px;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--sp-n-card) 94%, var(--sp-n-gold-deep)) 0%, var(--sp-n-page) 90%);
+  border: 1px solid color-mix(in srgb, var(--sp-n-gold-deep) 42%, transparent);
+  box-shadow: 0 18px 44px color-mix(in srgb, var(--sp-n-void) 70%, transparent);
+  color: var(--sp-n-ink);
+}
+.sp-mapsel::before { content: ''; position: absolute; inset: 5px; border: 1px solid color-mix(in srgb, var(--sp-n-gold-deep) 18%, transparent); pointer-events: none; }
 .sp-mapsel[hidden] { display: none; }
-.sp-mapsel__head { display: grid; grid-template-columns: 54px minmax(0, 1fr); column-gap: 10px; align-items: center; margin-bottom: 8px; }
+.sp-mapsel__head { display: grid; grid-template-columns: 54px minmax(0, 1fr); column-gap: 10px; align-items: center; margin-bottom: 10px; }
 
 /* ---- who he was ---------------------------------------------------------- */
 .sp-about { grid-area: about; }
