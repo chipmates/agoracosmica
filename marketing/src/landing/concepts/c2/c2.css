@@ -24,8 +24,9 @@
   --sp-plate: color-mix(in srgb, var(--sp-n-gold) 4%, var(--sp-n-page));
   --sp-plate-hover: color-mix(in srgb, var(--sp-n-gold) 9%, var(--sp-n-page));
   --text-tertiary: var(--sp-n-ink-3);
-  /* where the words begin on a phone: the face above stays lit */
-  --c2-face: 64vw;
+  /* where the words begin on a phone: the face above stays lit; on a short screen (Safari's bars out) the words move
+     up so the plate stays in the first view, down to a floor where the face still reads */
+  --c2-face: max(200px, min(64vw, calc(100svh - 414px)));
   color-scheme: dark;
   position: relative;
   isolation: isolate;
@@ -118,6 +119,13 @@
   line-height: 1.45;
   color: var(--sp-n-ink-2);
   text-wrap: pretty;
+}
+
+/* a short phone with Safari's bars out (an SE: about 553 px): the tagline on one line, the gaps closer */
+@media (max-width: 1023px) and (max-height: 600px) {
+  .c2-h1 { font-size: 1.375rem; }
+  .c2-hero .ls-stage--below .ls-card__names { margin-top: 8px; padding-top: 6px; }
+  .c2-hero .ls-line { font-size: 1.0625rem; }
 }
 
 /* ---- the rail: the thirty under the face, oldest first, by era --------------------------------------------- */
