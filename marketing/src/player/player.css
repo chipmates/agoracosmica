@@ -1783,7 +1783,8 @@ html:has(.story-reader) { overflow: hidden; }
 .story-reader__orn { display: flex; justify-content: center; align-items: center; margin: 18px 0 22px; color: var(--sp-accent); }
 .story-reader__orn::before,
 .story-reader__orn::after { content: ""; width: 54px; height: 1px; background: currentColor; opacity: 0.6; }
-.story-reader__orn span { width: 5px; height: 5px; margin: 0 10px; background: currentColor; transform: rotate(45deg); }
+.story-reader__orn svg { width: 11px; height: 11px; margin: 0 10px; fill: currentColor; stroke: none; }
+.story-reader__numeral { display: block; margin: 2px 0 4px; font-family: var(--font-content); font-size: 1.375rem; line-height: 1.1; letter-spacing: 0.06em; color: var(--sp-accent); }
 .story-reader__body {
   font-family: var(--font-content);
   font-size: var(--sp-read-size, 1.1875rem);

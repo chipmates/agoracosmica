@@ -49,6 +49,20 @@ interface Props {
 
 const LINE_HEIGHT = { tight: 1.45, normal: 1.62, airy: 1.85 } as const;
 
+/** The story's number as a Roman numeral, for the chapter opening's ornament (the words keep "Story 1"). */
+function roman(n: number): string {
+  const parts: [number, string][] = [[10, 'X'], [9, 'IX'], [5, 'V'], [4, 'IV'], [1, 'I']];
+  let out = '';
+  let left = n;
+  for (const [v, r] of parts) {
+    while (left >= v) {
+      out += r;
+      left -= v;
+    }
+  }
+  return out;
+}
+
 function useWide(): boolean {
   const [wide, setWide] = useState(false);
   useEffect(() => {
@@ -513,6 +527,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
           <span ref={bracketRef} className="story-reader__bracket" aria-hidden="true" />
           <header className="story-reader__head">
             <p className="story-reader__kicker">{kicker}</p>
+            {n > 0 && <span className="story-reader__numeral" aria-hidden="true">{roman(n)}</span>}
             <h2 className="story-reader__title">{title}</h2>
             <p className="story-reader__note">{s.retellingNote(!!queue.she)}</p>
             <details className="story-label sp-label">
@@ -536,7 +551,9 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
               </button>
             )}
           </header>
-          <div className="story-reader__orn" aria-hidden="true"><span /></div>
+          <div className="story-reader__orn" aria-hidden="true">
+            <svg viewBox="0 0 12 12" focusable="false"><path d="M6 0l1.3 4.7L12 6l-4.7 1.3L6 12l-1.3-4.7L0 6l4.7-1.3z" /></svg>
+          </div>
           <div ref={bodyRef} className="story-reader__body" lang={queue.lang} onClick={onTextClick}>
             {failed && <p className="story-reader__status">{s.textError}</p>}
             {!failed && !model && <p className="story-reader__status" aria-live="polite">{s.textLoading}</p>}
