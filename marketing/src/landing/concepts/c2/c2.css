@@ -1,0 +1,268 @@
+/* Concept 2, the full face. The base's stage restyled from outside (landing.css stays as it is): the painting leaves
+   its card and fills the first screen, its foot goes dark, and the tagline, the name block, the label and the plate
+   stand on that dark. Tokens only, no colour literals. */
+
+/* ---- the hero: night in every light, the painting behind its own words ------------------------------------- */
+.c2-hero {
+  /* the figure page's night roles, so the plate and the label keep night contrast over the painting in any light */
+  --sp-page: var(--sp-n-page);
+  --sp-void: var(--sp-n-void);
+  --sp-surface: var(--sp-n-card);
+  --sp-raise: var(--sp-n-highlight);
+  --sp-ink: var(--sp-n-ink);
+  --sp-ink-2: var(--sp-n-ink-2);
+  --sp-ink-3: var(--sp-n-ink-3);
+  --sp-accent: var(--sp-n-gold);
+  --sp-disc: var(--sp-n-gold);
+  --sp-disc-hover: var(--sp-n-gold-hover);
+  --sp-disc-ink: var(--sp-n-void);
+  --sp-ring: var(--sp-n-gold-hover);
+  --sp-focus: var(--sp-n-gold-hover);
+  --sp-hair: color-mix(in srgb, var(--sp-n-gold-subtle) 16%, transparent);
+  --sp-hair-strong: color-mix(in srgb, var(--sp-n-gold) 42%, transparent);
+  --sp-ring-track: color-mix(in srgb, var(--sp-n-gold) 20%, transparent);
+  --sp-plate: color-mix(in srgb, var(--sp-n-gold) 4%, var(--sp-n-page));
+  --sp-plate-hover: color-mix(in srgb, var(--sp-n-gold) 9%, var(--sp-n-page));
+  --text-tertiary: var(--sp-n-ink-3);
+  /* where the words begin on a phone: the face above stays lit */
+  --c2-face: 64vw;
+  color-scheme: dark;
+  position: relative;
+  isolation: isolate;
+  margin: -0.25rem calc(50% - 50vw) 0;
+  background: var(--sp-n-void);
+  color: var(--sp-n-ink);
+}
+.c2-hero__in {
+  display: flex;
+  flex-direction: column;
+  padding: var(--c2-face) 16px 0;
+}
+.c2-h1 { order: 1; }
+.c2-stage { order: 2; }
+.c2-rail { order: 3; }
+.c2-intro { order: 4; }
+
+/* the painting leaves the card: it lies under the whole hero and fades into the night at its foot */
+.c2-hero .ls-stage.c2-stage { max-width: none; position: static; }
+.c2-hero .ls-card {
+  position: static;
+  overflow: visible;
+  border-radius: 0;
+  background: none;
+  box-shadow: none;
+}
+.c2-hero .ls-card__mat {
+  position: absolute;
+  z-index: -1;
+  top: 0;
+  left: 0;
+  right: 0;
+  aspect-ratio: auto;
+  height: calc(var(--c2-face) + 160px);
+  -webkit-mask-image: linear-gradient(to bottom, var(--sp-n-void) calc(var(--c2-face) - 120px), transparent calc(var(--c2-face) + 34px));
+  mask-image: linear-gradient(to bottom, var(--sp-n-void) calc(var(--c2-face) - 120px), transparent calc(var(--c2-face) + 34px));
+}
+.c2-hero .ls-card__mat { overflow: hidden; }
+/* a little larger than its box: the paintings' own thin gold border stays outside the view */
+.c2-hero .ls-card__img {
+  width: 108%;
+  height: 104%;
+  max-width: none;
+  margin: -2% 0 0 -4%;
+  object-position: var(--ls-fx, 50%) 12%;
+}
+/* Arrival: the painting waits for the moment's script, which takes it over at once; without script it shows after
+   the hold, and with reduced motion at once. */
+.c2-hero .ls-card__img { animation: c2-show 400ms ease 1200ms both; }
+@media (prefers-reduced-motion: reduce) { .c2-hero .ls-card__img { animation: none; } }
+@keyframes c2-show { from { opacity: 0; } to { opacity: 1; } }
+
+.c2-hero .ls-card__credit { top: 10px; right: 12px; z-index: 1; }
+
+/* ---- the words on the dark foot --------------------------------------------------------------------------- */
+.c2-h1 {
+  margin: 0;
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: clamp(1.625rem, 7.4vw, 2rem);
+  line-height: 1.12;
+  letter-spacing: -0.005em;
+  color: var(--sp-n-ink);
+  text-wrap: balance;
+}
+.c2-hero .ls-stage--below .ls-card__names {
+  margin-top: 14px;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--sp-hair-strong);
+}
+.c2-hero .ls-name { color: var(--sp-n-ink); font-size: clamp(2rem, 9vw, 2.5rem); }
+.c2-hero .ls-name[data-long] { font-size: clamp(1.5rem, 6.6vw, 2rem); }
+.c2-hero .ls-meta { color: var(--sp-n-ink-2); }
+.c2-hero .ls-line { color: var(--sp-n-ink); font-size: 1.125rem; margin-top: 0.35rem; }
+.c2-hero .ls-label { margin-top: 0.25rem; }
+.c2-hero .ls-plate-wrap { margin-top: 0; }
+.c2-hero .ls-links { margin-top: 0; }
+
+.c2-intro {
+  margin: 1.5rem 0 0;
+  max-width: 34rem;
+  font-family: var(--font-content);
+  font-size: 1.125rem;
+  line-height: 1.45;
+  color: var(--sp-n-ink-2);
+  text-wrap: pretty;
+}
+
+/* ---- the rail: the thirty under the face, oldest first, by era --------------------------------------------- */
+.c2-rail { margin: 12px -16px 0; }
+.c2-rail__lead {
+  margin: 0 16px 10px;
+  font-family: var(--font-content);
+  font-size: 1.0625rem;
+  line-height: 1.35;
+  color: var(--sp-n-ink-2);
+}
+.c2-rail__scroll {
+  position: relative;
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x proximity;
+  scroll-padding-inline: 16px;
+  scrollbar-width: none;
+  padding: 0 16px 4px;
+}
+.c2-rail__scroll::-webkit-scrollbar { display: none; }
+.c2-rail__eras {
+  display: flex;
+  gap: 12px;
+  width: max-content;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.c2-rail__era { display: flex; flex-direction: column; scroll-snap-align: start; }
+.c2-rail__eraname {
+  padding: 8px 0 0 4px;
+  border-top: 1px solid var(--sp-hair-strong);
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1.3;
+  letter-spacing: 0.03em;
+  color: var(--sp-n-ink-3);
+  white-space: nowrap;
+}
+.c2-rail__list { display: flex; margin: 2px 0 0; padding: 0; list-style: none; }
+.c2-pick {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 72px;
+  min-height: 44px;
+  padding: 6px 0 4px;
+  border-radius: 6px;
+  text-align: center;
+  text-decoration: none;
+  font-family: var(--font-ui);
+  font-size: 0.75rem;
+  line-height: 1.25;
+  color: var(--sp-n-ink-2);
+}
+.c2-pick img {
+  display: block;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: var(--sp-n-astral);
+  box-shadow: 0 0 0 1px var(--sp-hair-strong);
+}
+.c2-pick:hover { color: var(--sp-n-ink); }
+.c2-pick:hover img { box-shadow: 0 0 0 1px var(--sp-n-gold); }
+.c2-pick[aria-current="true"] { color: var(--sp-n-ink); }
+.c2-pick[aria-current="true"] img { box-shadow: 0 0 0 2px var(--sp-n-gold), 0 0 0 5px var(--sp-n-void), 0 0 0 6px var(--sp-hair-strong); }
+.c2-pick__name { white-space: nowrap; }
+.c2-rail__credit {
+  margin: 2px 16px 0 20px;
+  text-align: left;
+  color: var(--sp-n-ink-3);
+}
+
+/* ---- the thirty by era, as plain links ------------------------------------------------------------------- */
+.c2-index { margin: 3rem 0 0; max-width: 46rem; }
+.c2-index__h {
+  margin: 0 0 0.25rem;
+  font-family: var(--font-content);
+  font-weight: 400;
+  font-size: 1.625rem;
+  line-height: 1.15;
+  color: var(--sp-ink);
+}
+.c2-index__era { margin-top: 1rem; }
+.c2-index__eraname {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--sp-ink-2);
+}
+.c2-index__eraname span { margin-left: 0.35em; font-weight: 400; color: var(--sp-ink-3); }
+.c2-index__list { display: flex; flex-wrap: wrap; column-gap: 20px; margin: 0; padding: 0; list-style: none; }
+.c2-index__link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-family: var(--font-content);
+  font-size: 1.125rem;
+  line-height: 1.25;
+  color: var(--sp-ink);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  text-decoration-color: var(--sp-hair-strong);
+}
+.story-page a.c2-index__link { border-bottom: 0; }
+.c2-index__link:hover { color: var(--sp-accent); text-decoration-color: currentColor; }
+.c2-index__link[aria-current="true"] { color: var(--sp-accent); }
+
+/* ---- a desktop: the words left, the painting right to the window's edge, the thirty across its foot -------------- */
+@media (min-width: 1024px) {
+  .c2-hero { margin-top: -0.75rem; }
+  .c2-hero__in {
+    display: grid;
+    grid-template-columns: minmax(0, 33rem) minmax(0, 1fr);
+    grid-template-areas: "h1 ." "intro ." "stage ." "rail rail";
+    align-content: start;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 16px 0;
+  }
+  .c2-h1 { grid-area: h1; font-size: 3rem; line-height: 1.05; }
+  .c2-intro { grid-area: intro; margin-top: 0.75rem; font-size: 1.125rem; }
+  .c2-stage { grid-area: stage; }
+  .c2-rail { grid-area: rail; margin: 18px 0 0; }
+  .c2-hero .ls-card__mat {
+    left: auto;
+    bottom: 0;
+    width: 62%;
+    height: auto;
+    -webkit-mask-image: linear-gradient(to right, transparent 0%, var(--sp-n-void) 34%), linear-gradient(to bottom, var(--sp-n-void) 58%, transparent 86%);
+    -webkit-mask-composite: source-in;
+    mask-image: linear-gradient(to right, transparent 0%, var(--sp-n-void) 34%), linear-gradient(to bottom, var(--sp-n-void) 58%, transparent 86%);
+    mask-composite: intersect;
+  }
+  .c2-hero .ls-card__img { object-position: var(--ls-fx, 50%) 16%; }
+  .c2-hero .ls-name { font-size: 3rem; }
+  .c2-hero .ls-name[data-long] { font-size: 2.5rem; }
+  .c2-hero .ls-line { font-size: 1.25rem; }
+  .c2-rail__lead { margin: 0 0 6px; font-size: 1rem; }
+  .c2-rail__scroll { overflow: visible; padding: 0; }
+  .c2-rail__eras { flex-wrap: wrap; width: auto; row-gap: 4px; column-gap: 8px; }
+  .c2-rail__eraname { padding-top: 5px; }
+  .c2-pick { width: auto; min-width: 64px; padding: 4px 4px 2px; gap: 4px; }
+  .c2-pick img { width: 50px; height: 50px; }
+  .c2-rail__credit { margin: 4px 0 0 4px; }
+  .c2-index { margin-top: 3.5rem; }
+}

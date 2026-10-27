@@ -1,10 +1,12 @@
 ---
-// Concept 2's layout slot, empty: replace everything below with the concept, using the base parts:
-// Stage.astro (the stage), thirty.ts (the thirty, build time), words/ (placeholder words), stage.ts (swapStage,
-// onStageSwap, stageFigures, stageMoment, in a <script>), dust.ts (runMoment on any image), landing.css.
+// Concept 2, the full face: the painting fills the first screen, the tagline, the name block, the label and the plate
+// sit on its dark foot, the thirty run under it. Below: the words, then the thirty by era as plain links.
 import Stage from '../../Stage.astro';
+import PortraitCredit from '../../../components/PortraitCredit.astro';
 import { landingWords } from '../../words';
+import { byEra, DEFAULT_FIGURE, thumbSrcset, thumbUrl } from '../../thirty';
 import type { LandingLang } from '../../thirty';
+import './c2.css';
 
 interface Props {
   lang: LandingLang;
@@ -12,8 +14,81 @@ interface Props {
 
 const { lang } = Astro.props;
 const W = landingWords(lang);
+const eras = byEra();
+// The rail's label: a one-word name as it is (the catalog's short German "Plato" is "Platon"), else the catalog's
+// short name, cut to its first word where it is still long ("Hildegard").
+const railName = (f: (typeof eras)[number]['figures'][number]): string => {
+  const full = f.name[lang];
+  const short = f.short[lang];
+  if (!full.includes(' ')) return full;
+  return short.length > 12 ? short.split(' ')[0] ?? short : short;
+};
 ---
-<h1 class="landing-lab__h1">{W.tagline}</h1>
-<p class="landing-lab__intro">{W.intro}</p>
-<Stage lang={lang} />
-<p class="landing-lab__note">{W.lab.slotEmpty(2)}</p>
+<div class="c2">
+  <section class="c2-hero" data-c2-hero aria-labelledby="c2-h1">
+    <div class="c2-hero__in">
+      <h1 class="c2-h1" id="c2-h1" data-c2-keep>{W.tagline}</h1>
+      <p class="c2-intro">{W.intro}</p>
+      <Stage
+        lang={lang}
+        variant="below"
+        sizes="(min-width: 1024px) 62vw, 100vw"
+        class="c2-stage"
+      />
+      <nav class="c2-rail" aria-label={W.rowLabel}>
+        <p class="c2-rail__lead" aria-hidden="true">{W.choose}</p>
+        <div class="c2-rail__scroll" data-c2-rail>
+          <ol class="c2-rail__eras">
+            {eras.map(({ era, figures }) => (
+              <li class="c2-rail__era">
+                <span class="c2-rail__eraname" aria-hidden="true">{era.short[lang]}</span>
+                <ol class="c2-rail__list" aria-label={era.name[lang]}>
+                  {figures.map(f => (
+                    <li>
+                      <a
+                        class="c2-pick"
+                        href={f.href[lang]}
+                        data-landing-pick={f.id}
+                        data-c2-from="rail"
+                        aria-current={f.id === DEFAULT_FIGURE ? 'true' : undefined}
+                      >
+                        <img
+                          src={thumbUrl(f.id, 160)}
+                          srcset={thumbSrcset(f.id)}
+                          sizes="64px"
+                          alt=""
+                          width="64"
+                          height="64"
+                          loading="lazy"
+                          decoding="async"
+                        />
+                        <span class="c2-pick__name">{railName(f)}</span>
+                      </a>
+                    </li>
+                  ))}
+                </ol>
+              </li>
+            ))}
+          </ol>
+        </div>
+        <PortraitCredit lang={lang} heard class="c2-rail__credit" />
+      </nav>
+    </div>
+  </section>
+
+  <section class="c2-index" aria-labelledby="c2-index-h">
+    <h2 class="c2-index__h" id="c2-index-h">{W.lab.thirty}</h2>
+    {eras.map(({ era, figures }) => (
+      <div class="c2-index__era">
+        <h3 class="c2-index__eraname">{era.name[lang]} <span>{era.span[lang]}</span></h3>
+        <ul class="c2-index__list">
+          {figures.map(f => (
+            <li>
+              <a class="c2-index__link" href={f.href[lang]} data-landing-pick={f.id} data-c2-from="index">{f.name[lang]}</a>
+            </li>
+          ))}
+        </ul>
+      </div>
+    ))}
+  </section>
+</div>
