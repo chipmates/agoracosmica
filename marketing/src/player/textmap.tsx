@@ -174,6 +174,17 @@ function placePage(el: HTMLElement | null, seg: MapSegment, last: boolean, durat
   el.style.setProperty('--sp-last', `${Math.round((seg.lines[seg.lines.length - 1] ?? 0.6) * 100)}%`);
 }
 
+/** A page under 2 % of the story (a closing line) is drawn as part of the page before it: a sliver reads as a glitch. */
+function drawnSegments(segs: MapSegment[], duration: number): MapSegment[] {
+  const out: MapSegment[] = [];
+  for (const seg of segs) {
+    const prev = out[out.length - 1];
+    if (prev && duration > 0 && (seg.end - seg.start) / duration < 0.02) out[out.length - 1] = { ...prev, end: seg.end };
+    else out.push(seg);
+  }
+  return out;
+}
+
 interface DrawProps {
   map: TextMapModel | null;
   duration: number;
@@ -182,7 +193,7 @@ interface DrawProps {
 
 /** The drawing alone: each page four lines (2 px every 6 px, the last one short), the heard part lit, a clip. */
 export function TextMapDrawing({ map, duration, className = '' }: DrawProps) {
-  const segs = map ? map.segments : flatSegments(duration);
+  const segs = map ? drawnSegments(map.segments, duration) : flatSegments(duration);
   const pages = segs.map((seg, i) => (
     <span key={i} className="sp-page" ref={el => placePage(el, seg, i === segs.length - 1, duration)} />
   ));
