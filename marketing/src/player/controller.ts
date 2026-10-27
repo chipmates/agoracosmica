@@ -398,6 +398,11 @@ export function audioTime(): number {
   return audio && !audio.seeking && state.current !== null ? audio.currentTime : state.time;
 }
 
+/** Where the voice is or is about to be: a seek's target at once, so steps pressed in a row add up. */
+export function voicePosition(): number {
+  return audio && state.current !== null ? audio.currentTime : state.time;
+}
+
 export function seekTo(seconds: number): void {
   if (!audio || state.current === null || !Number.isFinite(seconds)) return;
   if (audio.readyState === 0) {

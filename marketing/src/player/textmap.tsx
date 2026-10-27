@@ -6,7 +6,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import { loadText, loadTiming } from './content';
-import { audioTime, seekTo as seekVoice, skipBack } from './controller';
+import { seekTo as seekVoice, skipBack, voicePosition } from './controller';
 import { blockAt, buildModel, paragraphStep, sentenceStart, wordAt } from './readalong';
 import type { ReaderModel } from './readalong';
 import { Icon } from './icons';
@@ -202,7 +202,7 @@ export function setHeard(root: Element | null, share: number): void {
 
 /** One step by sentence (held: by paragraph); back from well inside a sentence replays it from its start. */
 export function stepSentence(model: ReaderModel, dir: 1 | -1, paragraph = false): void {
-  const now = audioTime();
+  const now = voicePosition();
   const at = sentenceAtTime(model, now);
   if (!at) return;
   let si = at.si;
@@ -214,7 +214,7 @@ export function stepSentence(model: ReaderModel, dir: 1 | -1, paragraph = false)
 
 /** Back a few seconds: the bar's step until the story's timing is in. */
 export function backAFew(): void {
-  seekVoice(Math.max(0, audioTime() - 5));
+  seekVoice(Math.max(0, voicePosition() - 5));
 }
 
 interface BarProps {
@@ -296,7 +296,11 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
 
   const onDown = (e: ReactPointerEvent<HTMLDivElement>) => {
     if (e.button !== 0) return;
-    e.currentTarget.setPointerCapture(e.pointerId);
+    try {
+      e.currentTarget.setPointerCapture(e.pointerId);
+    } catch {
+      // a pointer the browser no longer tracks: the drag still follows its moves over the band
+    }
     const b = boxRef.current!.getBoundingClientRect();
     setDrag({ t: timeAt(e.clientX), at: Math.min(b.width, Math.max(0, e.clientX - b.left)) });
   };
@@ -311,12 +315,26 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
     setDrag(null);
     seekTo(to ? to.start : drag.t);
   };
+  // Keys as in the edition: the arrows step by sentence (with Shift by paragraph; 5 s where the words are not timed),
+  // the page keys by scene, Home and End to the first and the last scene.
   const onKey = (e: ReactKeyboardEvent<HTMLInputElement>) => {
-    if (!map || (e.key !== 'PageDown' && e.key !== 'PageUp')) return;
-    // Page keys step by scene, as the arrows step by second
+    const words = map && map.model.mode === 'word' ? map.model : null;
+    const dir = e.key === 'ArrowRight' || e.key === 'ArrowUp' ? 1 : e.key === 'ArrowLeft' || e.key === 'ArrowDown' ? -1 : 0;
+    if (dir) {
+      e.preventDefault();
+      if (words) stepSentence(words, dir, e.shiftKey);
+      else seekTo(Math.min(duration, Math.max(0, voicePosition() + dir * 5)));
+      return;
+    }
+    const list = map?.segments ?? flatSegments(duration);
+    if (e.key === 'Home' || e.key === 'End') {
+      e.preventDefault();
+      seekTo(e.key === 'Home' ? 0 : list[list.length - 1]!.start);
+      return;
+    }
+    if (e.key !== 'PageDown' && e.key !== 'PageUp') return;
     e.preventDefault();
     const now = state.time;
-    const list = map.segments;
     const i = Math.max(0, list.findIndex(x => now >= x.start && now < x.end));
     const next = list[Math.min(list.length - 1, Math.max(0, i + (e.key === 'PageDown' ? 1 : now - list[i]!.start > 2 ? 0 : -1)))];
     if (next) seekTo(next.start);

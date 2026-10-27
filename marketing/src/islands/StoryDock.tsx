@@ -8,10 +8,9 @@
 // back one sentence; the caret to the open player, which holds everything else.
 
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
-import type { PointerEvent as ReactPointerEvent } from 'react';
+import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
 import {
   acceptResume,
-  audioTime,
   declineResume,
   getState,
   installPlayer,
@@ -20,6 +19,7 @@ import {
   readPageQueue,
   seekTo,
   setAway,
+  voicePosition,
   stayHere,
   subscribe,
   togglePlay,
@@ -95,12 +95,24 @@ function textWidth(text: string, el: Element): number {
   return measureCtx.measureText(text).width;
 }
 
-/** A tap on the bar's empty part, or a short swipe up, opens the player (the caret stays the keyboard's way). */
+/** A tap on the bar's empty part, or a short swipe up, opens the player (the caret stays the keyboard's way). The tap
+ * is a click, which every engine sends for a touch; the swipe is read from pointer events. */
 function useOpenGesture(open: () => void) {
   const start = useRef<{ x: number; y: number } | null>(null);
+  const free = (t: EventTarget | null) => t instanceof Element && !t.closest('button, a, input, .sp-tmap');
+  const onClick = (e: ReactMouseEvent<HTMLElement>) => {
+    if (free(e.target)) open();
+  };
   const onPointerDown = (e: ReactPointerEvent<HTMLElement>) => {
-    const t = e.target instanceof Element ? e.target : null;
-    start.current = t && !t.closest('button, a, input, .sp-tmap') ? { x: e.clientX, y: e.clientY } : null;
+    start.current = free(e.target) ? { x: e.clientX, y: e.clientY } : null;
+    // a swipe up ends over the page: the bar keeps the pointer so its release still comes here
+    if (start.current) {
+      try {
+        e.currentTarget.setPointerCapture(e.pointerId);
+      } catch {
+        // a pointer the browser no longer tracks
+      }
+    }
   };
   const onPointerUp = (e: ReactPointerEvent<HTMLElement>) => {
     const s0 = start.current;
@@ -108,9 +120,9 @@ function useOpenGesture(open: () => void) {
     if (!s0) return;
     const dx = e.clientX - s0.x;
     const dy = e.clientY - s0.y;
-    if ((dy < -28 && Math.abs(dy) > Math.abs(dx)) || (Math.abs(dx) < 6 && Math.abs(dy) < 6)) open();
+    if (dy < -28 && Math.abs(dy) > Math.abs(dx)) open();
   };
-  return { onPointerDown, onPointerUp, onPointerCancel: () => { start.current = null; } };
+  return { onClick, onPointerDown, onPointerUp, onPointerCancel: () => { start.current = null; } };
 }
 
 export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
@@ -342,7 +354,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     </div>
   );
   const plainBack = (
-    <button type="button" className="story-btn story-dock__back" onClick={() => seekTo(Math.max(0, audioTime() - 5))}
+    <button type="button" className="story-btn story-dock__back" onClick={() => seekTo(Math.max(0, voicePosition() - 5))}
       aria-label={s.sentenceBack}>{Icon.again}</button>
   );
 

@@ -60,7 +60,9 @@ export default function Sheets({ state, facts, wide, home }: Props) {
   const kind = state.sheet;
 
   useEffect(() => {
-    opener.current = document.activeElement;
+    // A tap does not focus a button in Safari: the open player then hands focus back to the bar's caret.
+    const active = document.activeElement;
+    opener.current = kind === 'player' && (!active || active === document.body) ? document.querySelector('.story-dock .story-dock__open') : active;
     titleRef.current?.focus({ preventScroll: true });
     if (kind) hideToast();
     const onKey = (e: KeyboardEvent) => {
