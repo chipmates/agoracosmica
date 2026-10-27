@@ -6,7 +6,7 @@
 // line and the facts are fetched when the visitor opens them.
 import { numberWord } from '../../lib/figureWorld';
 import { figureMinutes } from '../../lib/storyRuntime';
-import { playerStrings } from '../../player/strings';
+import { LIST_SEP, playerStrings } from '../../player/strings';
 import { factWords } from '../../player/factWords';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -55,7 +55,7 @@ const lead = P.tocLead(stories[0]?.age ?? '', stories[stories.length - 1]?.age ?
         : [r.year ? P.approxYear(r.year) : '', r.place ?? '', r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''];
       const sub = intro
         ? (r.minutes ? P.introRowSub(r.minutes) : '')
-        : [r.place, r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''].filter(Boolean).join(' · ');
+        : [r.place, r.age ? P.ageAt(r.age) : '', r.minutes ? P.minutes(r.minutes) : ''].filter(Boolean).join(LIST_SEP);
       return (
         <li class:list={['sp-row', intro && 'sp-row--intro']} id={`idea-${r.n}`} data-n={r.n}>
           <button

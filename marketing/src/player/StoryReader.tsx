@@ -29,7 +29,7 @@ import { getDisplay, subscribeDisplay, SERVER_DISPLAY } from './theme';
 import { Icon } from './icons';
 import { shareStory } from './page';
 import { showToast } from './toast';
-import { clockLabel, playerStrings } from './strings';
+import { LIST_SEP, clockLabel, playerStrings } from './strings';
 import type { PlayerState, StoryQueue } from './types';
 
 interface Props {
@@ -336,8 +336,8 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const headingText = heading ? blocks?.[model!.blocks.indexOf(heading)]?.text : undefined;
   const title = n === 0 ? headingText ?? s.introTitle : entry?.title ?? s.storyN(n);
   const kicker = n === 0
-    ? [s.introTitle, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ')
-    : [s.storyN(n), entry?.year ? s.approxYear(entry.year) : '', entry?.place, entry?.age ? s.ageAt(entry.age) : '', entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ');
+    ? [s.introTitle, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(LIST_SEP)
+    : [s.storyN(n), entry?.year ? s.approxYear(entry.year) : '', entry?.place, entry?.age ? s.ageAt(entry.age) : '', entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(LIST_SEP);
   const kept = here ? null : readProgress(queue, n);
   const nextEntry = queue.entries.find(e => e.n === n + 1);
   const firstParagraph = model?.blocks.find(b => !b.rule && !b.heading);

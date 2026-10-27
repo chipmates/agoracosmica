@@ -19,7 +19,7 @@ import {
   subscribe,
 } from './controller';
 import { firstSentence } from './content';
-import { clockLabel, playerStrings } from './strings';
+import { LIST_SEP, clockLabel, playerStrings } from './strings';
 import { showToast } from './toast';
 import type { PlayerState, StoryQueue } from './types';
 
@@ -104,14 +104,14 @@ function syncPlate(state: PlayerState, queue: StoryQueue): void {
     } else if (v.onPage && v.current !== null) {
       const entry = queue.entries.find(e => e.n === v.current);
       doText = v.mode === 'playing' || v.mode === 'loading' ? s.pause : s.resume;
-      whatText = [v.current === 0 ? s.introTitle : entry?.title, leftWords(state, queue.lang, entry?.seconds)].filter(Boolean).join(' · ');
+      whatText = [v.current === 0 ? s.introTitle : entry?.title, leftWords(state, queue.lang, entry?.seconds)].filter(Boolean).join(LIST_SEP);
       plate.dataset.storyN = String(v.current);
       ringTo(plate.querySelector('[data-story-ring]') ?? plate, state.duration > 0 ? state.time / state.duration : 0);
     } else if (action.kind === 'play' && action.from > 0) {
       const entry = queue.entries.find(e => e.n === action.n);
       offer = true;
       doText = s.continueStory(action.n);
-      whatText = [entry?.title, s.fromTime(clockLabel(action.from))].filter(Boolean).join(' · ');
+      whatText = [entry?.title, s.fromTime(clockLabel(action.from))].filter(Boolean).join(LIST_SEP);
       plate.dataset.storyN = String(action.n);
       const total = entry?.seconds ?? 0;
       ringTo(plate.querySelector('[data-story-ring]') ?? plate, total > 0 ? action.from / total : 0);
@@ -119,7 +119,7 @@ function syncPlate(state: PlayerState, queue: StoryQueue): void {
       const entry = queue.entries.find(e => e.n === action.n);
       offer = true;
       doText = s.continueWith(action.n);
-      whatText = [entry?.title, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(' · ');
+      whatText = [entry?.title, entry?.minutes ? s.minutes(entry.minutes) : ''].filter(Boolean).join(LIST_SEP);
       plate.dataset.storyN = String(action.n);
     } else {
       doText = s.begin;

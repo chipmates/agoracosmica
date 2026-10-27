@@ -387,6 +387,9 @@ export function rateLabel(rate: number, lang: PlayerLang): string {
   return `${lang === 'de' ? n.replace('.', ',') : n}×`;
 }
 
+/** A list's separator: the no-break space keeps the dot at the end of a line when a list wraps. */
+export const LIST_SEP = '\u00a0· ';
+
 /** A clock: 2:05. */
 export function clockLabel(seconds: number): string {
   const v = Number.isFinite(seconds) && seconds > 0 ? Math.floor(seconds) : 0;
