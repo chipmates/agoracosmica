@@ -55,19 +55,15 @@ function reduced(): boolean {
   return momentStill();
 }
 
-/** After a pick from the list below, the stage comes back into view; from the rail, only the plate is brought in. */
+/** After a pick the new face is brought back into view (the moment is the answer to the pick): from the list below
+ * always, from the rail only when the face has scrolled away (a dock up over the rail makes a visitor scroll). */
 function bringStage(from: string): void {
   const root = hero();
   if (!root) return;
-  const behavior: ScrollBehavior = reduced() ? 'auto' : 'smooth';
-  if (from === 'index') {
-    window.scrollTo({ top: Math.max(0, root.getBoundingClientRect().top + window.scrollY - 66), behavior });
-    return;
-  }
-  const plate = root.querySelector<HTMLElement>('[data-story-hero-plate]');
-  if (!plate) return;
-  const r = plate.getBoundingClientRect();
-  if (r.top < 66) window.scrollBy({ top: r.top - 80, behavior });
+  const top = root.getBoundingClientRect().top;
+  if (from !== 'index' && top > -120) return;
+  const bar = document.querySelector('.pub-navbar')?.getBoundingClientRect().height ?? 0;
+  window.scrollTo({ top: Math.max(0, top + window.scrollY - bar), behavior: reduced() ? 'auto' : 'smooth' });
 }
 
 function onPick(e: MouseEvent): void {
