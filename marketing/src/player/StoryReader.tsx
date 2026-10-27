@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent as ReactMouseEvent } from 'react';
+import { useScreenWakeLock } from '@client/hooks/useScreenWakeLock';
 import {
   audioTime,
   closeReader,
@@ -215,6 +216,8 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     followNow.current = { on: display.follow, away: state.away };
   }, [display.follow, state.away]);
   const framed = here && state.status === 'playing' && !!model && model.mode !== 'none';
+  // Reading along, the screen stays on; released on pause, on close and in a hidden tab (the hook takes it back on return).
+  useScreenWakeLock(here && state.status === 'playing');
   useEffect(() => {
     if (!framed) return;
     let raf = 0;
