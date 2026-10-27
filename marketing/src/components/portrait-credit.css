@@ -12,6 +12,8 @@
   white-space: nowrap;
   text-align: center;
   color: var(--text-tertiary);
+  /* the face's serifed capital I, so "KI" and "AI" never read as "Kl" and "Al" */
+  font-feature-settings: "ss05" 1;
 }
 /* On a figure card the credit sits on the mat's foot on a dark chip (a bright painting stays behind it), so the card
    keeps its layout in every grid. */

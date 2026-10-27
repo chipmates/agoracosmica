@@ -346,6 +346,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   font-size: 0.625rem;
   line-height: 1.43;
   color: var(--sp-ink-3);
+  /* the face's serifed capital I, so "KI" and "AI" never read as "Kl" and "Al" */
+  font-feature-settings: "ss05" 1;
 }
 .sp-hero__line {
   margin: 0.875rem 0 0.5rem;

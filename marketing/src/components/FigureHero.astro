@@ -167,6 +167,8 @@ const worldLine = [
     display: block;
     font-size: 0.625rem;
     line-height: 1.43;
+    /* the face's serifed capital I, so "KI" and "AI" never read as "Kl" and "Al" */
+    font-feature-settings: "ss05" 1;
   }
   .pub-fig-hero__gloss { display: block; margin-top: 0.35rem; }
   /* Chapter one as a quiet door under the promise: it names the chapter and
