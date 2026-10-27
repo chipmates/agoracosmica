@@ -91,7 +91,8 @@ type Box = { l: number; t: number; r: number; b: number };
 const STAR_R = 16;
 const starBoxes: Box[] = at.map(([x, y]) => ({ l: x - STAR_R, t: y - STAR_R, r: x + STAR_R, b: y + STAR_R }));
 const overlap = (a: Box, c: Box) => Math.max(0, Math.min(a.r, c.r) - Math.max(a.l, c.l)) * Math.max(0, Math.min(a.b, c.b) - Math.max(a.t, c.t));
-const outside = (a: Box) => Math.max(0, 4 - a.l) + Math.max(0, a.r - (W - 4)) + Math.max(0, 4 - a.t) + Math.max(0, a.b - (VIA_Y - 6));
+// a label keeps SIDE units from the plate's sides: a desktop's frame line stands 13 px in (about 10 units there)
+const outside = (a: Box) => Math.max(0, SIDE - a.l) + Math.max(0, a.r - (W - SIDE)) + Math.max(0, 4 - a.t) + Math.max(0, a.b - (VIA_Y - 6));
 const segBoxes: Box[] = segments.flatMap(s => {
   // a line as a few small boxes along it, so a label keeps off the ink
   const n = Math.max(2, Math.round(Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 10));
@@ -143,13 +144,14 @@ const nextAt = nextPick.map(p => p.c);
 const numbersPlaced: Box[] = [];
 const numberAt = at.map((_, i) => {
   const intro0 = numbers[i] === 0;
-  const w = intro0 ? 6.4 * P.introTitle.length : numbers[i]! >= 10 ? 13 : 7;
+  const w = intro0 ? 7.4 * P.introTitle.length : numbers[i]! >= 10 ? 13 : 7;
   const h = intro0 ? 13 : 10;
   const dy = intro0 ? 37 : 34; // under a "next" ring's foot (r 24)
   const cands: Cand[] = [
     { dx: 0, dy, anchor: 'middle', w, h }, { dx: -12, dy, anchor: 'start', w, h }, { dx: 12, dy, anchor: 'end', w, h },
     { dx: 27, dy: 4, anchor: 'start', w, h }, { dx: -27, dy: 4, anchor: 'end', w, h }, { dx: 0, dy: -29, anchor: 'middle', w, h },
     { dx: 20, dy: 30, anchor: 'start', w, h }, { dx: -20, dy: 30, anchor: 'end', w, h },
+    { dx: -12, dy: -29, anchor: 'start', w, h }, { dx: 12, dy: -29, anchor: 'end', w, h },
   ];
   const others = nextPick.flatMap((p, j) => (j === i ? [] : p.boxes));
   const pick = place(i, cands, [...numbersPlaced, ...nextPick[i]!.boxes], others);
