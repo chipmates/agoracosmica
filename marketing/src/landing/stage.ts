@@ -303,7 +303,9 @@ function onBeforePreparation(e: Event): void {
 }
 
 function onBeforeSwap(e: Event): void {
-  if (!traversing) return;
+  // a traversal answered in place hands the router this very document; when two overlap (back, then forward at once)
+  // the first one's swap arrives after the flag is spent, and a swap of the page with itself drops the dock
+  if (!traversing && (e as RouterEvent).newDocument !== document) return;
   e.stopImmediatePropagation();
   (e as RouterEvent).swap = () => undefined;
 }
