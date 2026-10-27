@@ -69,11 +69,21 @@
   --sp-ring-track: color-mix(in srgb, var(--sp-n-gold) 20%, transparent);
   --sp-hair: color-mix(in srgb, var(--sp-n-gold-subtle) 16%, transparent);
   --sp-hair-strong: color-mix(in srgb, var(--sp-n-gold) 42%, transparent);
-  --sp-plate: color-mix(in srgb, var(--sp-n-gold) 5%, transparent);
-  --sp-plate-hover: color-mix(in srgb, var(--sp-n-gold) 10%, transparent);
+  /* plates and hovers stand on the navy steps, opaque: a gold film over the void read as grey */
+  --sp-plate: color-mix(in srgb, var(--sp-n-gold) 4%, var(--sp-n-page));
+  --sp-plate-hover: color-mix(in srgb, var(--sp-n-gold) 9%, var(--sp-n-page));
   --sp-wash: color-mix(in srgb, var(--sp-n-gold) 11%, transparent);
   --sp-word: color-mix(in srgb, var(--sp-n-gold) 34%, transparent);
-  --sp-word-ink: var(--utility-pure-white);
+  --sp-word-ink: var(--sp-n-ink);
+  /* the sheets in the page navy, set apart by a fine warm line, an inner rule and a soft shadow, no lighter blue */
+  --sp-sheet: var(--sp-n-page);
+  --sp-sheet-line: color-mix(in srgb, var(--sp-n-gold-deep) 50%, transparent);
+  --sp-sheet-rule: color-mix(in srgb, var(--sp-n-gold-deep) 20%, transparent);
+  --sp-sheet-head: var(--sp-sheet-rule);
+  --sp-sheet-shadow: color-mix(in srgb, var(--sp-n-void) 72%, transparent);
+  /* a chosen segment or switch: navy with a gold edge, never a brighter blue */
+  --sp-picked: var(--sp-n-page);
+  --sp-picked-edge: var(--sp-accent);
   --sp-scrim: color-mix(in srgb, var(--sp-n-void) 72%, transparent);
   --sp-shadow: color-mix(in srgb, var(--sp-n-void) 45%, transparent);
   --sp-mark: var(--sp-n-gold);
@@ -123,6 +133,13 @@
     --sp-wash: color-mix(in srgb, var(--sp-n-gold) 24%, transparent);
     --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 48%, transparent);
     --sp-word-ink: var(--sp-n-void);
+    --sp-sheet: var(--sp-surface);
+    --sp-sheet-line: var(--sp-hair-strong);
+    --sp-sheet-rule: transparent;
+    --sp-sheet-head: var(--sp-hair);
+    --sp-sheet-shadow: var(--sp-shadow);
+    --sp-picked: var(--sp-raise);
+    --sp-picked-edge: transparent;
     --sp-scrim: color-mix(in srgb, var(--sp-n-page) 38%, transparent);
     --sp-shadow: color-mix(in srgb, var(--sp-n-page) 22%, transparent);
     --sp-mark: var(--sp-n-gold-deep);
@@ -171,6 +188,13 @@ html[data-story-theme="day"]:has(.story-reader) body {
   --sp-wash: color-mix(in srgb, var(--sp-n-gold) 24%, transparent);
   --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 48%, transparent);
   --sp-word-ink: var(--sp-n-void);
+  --sp-sheet: var(--sp-surface);
+  --sp-sheet-line: var(--sp-hair-strong);
+  --sp-sheet-rule: transparent;
+  --sp-sheet-head: var(--sp-hair);
+  --sp-sheet-shadow: var(--sp-shadow);
+  --sp-picked: var(--sp-raise);
+  --sp-picked-edge: transparent;
   --sp-scrim: color-mix(in srgb, var(--sp-n-page) 38%, transparent);
   --sp-shadow: color-mix(in srgb, var(--sp-n-page) 22%, transparent);
   --sp-mark: var(--sp-n-gold-deep);
@@ -220,6 +244,13 @@ html[data-story-theme="vellum"]:has(.story-reader) body {
   --sp-wash: color-mix(in srgb, var(--sp-n-gold-deep) 20%, transparent);
   --sp-word: color-mix(in srgb, var(--sp-n-gold-deep) 46%, transparent);
   --sp-word-ink: var(--sp-n-void);
+  --sp-sheet: var(--sp-surface);
+  --sp-sheet-line: var(--sp-hair-strong);
+  --sp-sheet-rule: transparent;
+  --sp-sheet-head: var(--sp-hair);
+  --sp-sheet-shadow: var(--sp-shadow);
+  --sp-picked: var(--sp-raise);
+  --sp-picked-edge: transparent;
   --sp-scrim: color-mix(in srgb, var(--sp-n-void) 34%, transparent);
   --sp-shadow: color-mix(in srgb, var(--sp-n-void) 22%, transparent);
   --sp-mark: var(--sp-umber);
@@ -558,7 +589,7 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .sp-viewswitch button + button,
 .sp-seg button + button { border-left: 1px solid var(--sp-hair-strong); }
 .sp-viewswitch button[aria-pressed="true"],
-.sp-seg button[aria-checked="true"] { background: var(--sp-raise); color: var(--sp-ink); font-weight: 600; }
+.sp-seg button[aria-checked="true"] { background: var(--sp-picked); box-shadow: inset 0 0 0 1px var(--sp-picked-edge); color: var(--sp-ink); font-weight: 600; }
 .sp-viewswitch button:focus-visible,
 .sp-seg button:focus-visible { outline-offset: -3px; }
 .sp-savedbtn {
@@ -1183,9 +1214,9 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   white-space: nowrap;
 }
 .story-dock__read svg { width: 20px; height: 20px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-.story-dock__read[aria-pressed="true"] { background: var(--sp-raise); border-color: var(--sp-accent); }
+.story-dock__read[aria-pressed="true"] { background: var(--sp-picked); border-color: var(--sp-accent); }
 .story-dock__read:hover { border-color: var(--sp-accent); }
-.story-dock__read--voice { background: var(--sp-raise); border-color: var(--sp-accent); }
+.story-dock__read--voice { background: var(--sp-picked); border-color: var(--sp-accent); }
 /* 360 px holds the row on one line in both languages ("Read along" beside the speed) with the disc at its size. */
 @media (max-width: 379.98px) {
   .story-dock__ctrls { gap: 2px; }
@@ -1364,11 +1395,13 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   flex-direction: column;
   max-height: 88vh;
   max-height: 88dvh;
-  background: var(--sp-surface);
+  background: var(--sp-sheet);
   color: var(--sp-ink);
-  border-top: 1px solid var(--sp-hair-strong);
+  border-top: 1px solid var(--sp-sheet-line);
   border-radius: 14px 14px 0 0;
-  box-shadow: 0 -14px 40px var(--sp-shadow);
+  box-shadow: 0 -18px 44px var(--sp-sheet-shadow);
+  outline: 1px solid var(--sp-sheet-rule);
+  outline-offset: -6px;
   font-family: var(--font-ui);
 }
 .sp-sheet__head {
@@ -1380,9 +1413,9 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   gap: 10px;
   min-height: 60px;
   padding: 10px 6px 4px var(--sp-gutter);
-  border-bottom: 1px solid var(--sp-hair);
+  border-bottom: 1px solid var(--sp-sheet-head);
 }
-.sp-sheet__head::before { content: ""; position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--sp-hair-strong); }
+.sp-sheet__head::before { content: ""; position: absolute; top: 6px; left: 50%; width: 36px; height: 4px; margin-left: -18px; border-radius: 2px; background: var(--sp-sheet-line); }
 .sp-sheet__title { margin: 0; min-width: 0; font-family: var(--font-content); font-weight: 400; font-size: 1.375rem; line-height: 1.2; color: var(--sp-ink); }
 .sp-sheet__title:focus { outline: none; }
 .sp-sheet__kicker { display: block; margin-bottom: 2px; font-family: var(--font-ui); font-size: 0.8125rem; color: var(--sp-ink-3); }
@@ -1404,8 +1437,9 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
     width: 440px;
     max-height: calc(100vh - var(--sp-dock-h, 0px) - 100px);
     border: 1px solid var(--sp-hair-strong);
+    border-top-color: var(--sp-sheet-line);
     border-radius: 10px;
-    box-shadow: 0 18px 50px var(--sp-shadow);
+    box-shadow: 0 18px 50px var(--sp-sheet-shadow);
   }
   .sp-sheet__head::before { display: none; }
   .sp-sheet__head { min-height: 56px; padding-top: 6px; }
@@ -1419,7 +1453,7 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
     max-height: none;
     border-width: 0 0 0 1px;
     border-radius: 0;
-    box-shadow: -10px 0 30px var(--sp-shadow);
+    box-shadow: -10px 0 30px var(--sp-sheet-shadow);
   }
 }
 
