@@ -19,9 +19,11 @@ interface Props {
   /** A story player figure page: the language switch stays on the phone bar, and
    *  the page's own plate is the one gold control, so the app button stays out. */
   storyPage?: boolean;
+  /** A page's own line in place of the platform tagline beside the wordmark. */
+  tagline?: string;
 }
 
-const { lang, currentPath, noTwin = false, altEn, altDe, storyPage = false } = Astro.props;
+const { lang, currentPath, noTwin = false, altEn, altDe, storyPage = false, tagline } = Astro.props;
 const t = getT(lang);
 
 const otherLang: Lang = lang === 'de' ? 'en' : 'de';
@@ -61,7 +63,7 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
       </svg>
       <span class="pub-navbar__logo-text">
         <span class="pub-navbar__logo-name">Agora Cosmica</span>
-        <span class="pub-navbar__logo-tagline">{t('footer.tagline')}</span>
+        <span class="pub-navbar__logo-tagline">{tagline ?? t('footer.tagline')}</span>
       </span>
     </a>
 

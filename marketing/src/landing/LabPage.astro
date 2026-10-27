@@ -12,9 +12,11 @@ interface Props {
   /** The page's path without the language prefix, e.g. /landing-lab/c1 */
   path: string;
   title?: string;
+  /** The redesign's chrome: the landing's tagline in the bar and the footer, no Echoes link. */
+  newChrome?: boolean;
 }
 
-const { lang, path, title } = Astro.props;
+const { lang, path, title, newChrome = false } = Astro.props;
 const W = landingWords(lang);
 const name = title ? `${title} · ${W.lab.title}` : W.lab.title;
 ---
@@ -27,6 +29,8 @@ const name = title ? `${title} · ${W.lab.title}` : W.lab.title;
   noindex
   stickyCta={false}
   storyPage
+  tagline={newChrome ? W.tagline : undefined}
+  echoesLink={!newChrome}
 >
   <PlayerHead slot="head" figurePage />
   <div class="story-page landing-lab">

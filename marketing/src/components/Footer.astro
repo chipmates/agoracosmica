@@ -6,9 +6,13 @@ import FooterChoice from '../islands/FooterChoice';
 
 interface Props {
   lang: Lang;
+  /** A page's own line in place of the platform tagline (the landing's redesign). */
+  tagline?: string;
+  /** Off: no "why we call them Echoes" link (the method page's link stays). */
+  echoesLink?: boolean;
 }
 
-const { lang } = Astro.props;
+const { lang, tagline, echoesLink = true } = Astro.props;
 const t = getT(lang);
 
 // The museum's name stays English in every language; its descriptor always stands beside it.
@@ -19,7 +23,7 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
   <div class="pub-footer__inner">
     <div class="pub-footer__brand">
       <span class="pub-footer__name">Agora Cosmica</span>
-      <p class="pub-footer__tagline">{t('footer.tagline')}</p>
+      <p class="pub-footer__tagline">{tagline ?? t('footer.tagline')}</p>
     </div>
 
     <div class="pub-footer__links">
@@ -28,7 +32,7 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
         <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>
         <a href={publicUrl(lang, '/audio')}>{t('nav.audio')}</a>
         <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
-        <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>
+        {echoesLink && <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>}
         <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
         <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>
         <a href={lang === 'de' ? '/de/about/#kontakt' : '/about/#contact'}>{t('nav.contact')}</a>
