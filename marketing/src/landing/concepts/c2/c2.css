@@ -267,6 +267,8 @@
 
 /* ---- the thirty by era, as plain links ------------------------------------------------------------------- */
 .c2-index { margin: 3rem 0 0; max-width: 46rem; }
+/* the old figure list forwards to this list's anchor: the heading lands below the sticky bar (its 44 px + 1.3rem) */
+.c2-index { scroll-margin-top: calc(44px + 1.3rem + 1rem); }
 .c2-index__h {
   margin: 0 0 0.25rem;
   font-family: var(--font-content);
