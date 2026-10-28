@@ -223,123 +223,123 @@ export function ownWords(figureId: string, lang: PlayerLang): OwnWords | null {
 // figure, because "from his writings" holds only for one who left writings.
 const STORY_NOTES: Record<string, Record<PlayerLang, (name: string) => string>> = {
   aurelius: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Schriften und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   angelou: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her autobiographies and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her autobiographies and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Autobiografien und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   austen: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her novels, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her novels, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Romanen, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   beauvoir: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her memoirs and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her memoirs and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Memoiren und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   bingen: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her writings, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her writings, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Schriften, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   blake: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his poems and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his poems and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Gedichten und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   campbell: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   dickinson: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her poems, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her poems, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Gedichten, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   eckhart: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his sermons, his Latin works and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his sermons, his Latin works and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Predigten, seinen lateinischen Werken und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   einstein: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his papers, his letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his papers, his letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Arbeiten, seinen Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   galilei: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books, the trial records and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books, the trial records and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern, den Prozessakten und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   gandhi: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his autobiography and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his autobiography and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seiner Autobiografie und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   gautama: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Pāli Canon and the later accounts of his life and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Pāli Canon and the later accounts of his life, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach dem Pāli-Kanon und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   goethe: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings, his letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings, his letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Schriften, seinen Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   jung: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his memoir and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his memoir and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Lebenserinnerungen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   kahlo: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her diary, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her diary, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihrem Tagebuch, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   king: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   laozi: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Daodejing and the earliest account of his life and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Daodejing and the earliest account of his life, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach dem Daodejing und dem frühesten Bericht über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   lovelace: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her published Notes, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her published Notes, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren veröffentlichten Notes, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   mandela: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his autobiography and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his autobiography and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seiner Autobiografie und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   mozart: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Mozart family's letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from the Mozart family's letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Briefen der Familie Mozart und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   nietzsche: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books, his letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books, his letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern, seinen Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   plato: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his dialogues and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his dialogues and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Dialogen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   rumi: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his poems and the accounts of his followers and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his poems and the accounts of his followers, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Gedichten und den Berichten seiner Anhänger. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   schopenhauer: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his books and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   shakespeare: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his plays, the parish records and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his plays, the parish records and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Stücken, den Kirchenbüchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   tubman: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from the interviews she gave and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from the interviews she gave and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Interviews mit ihr und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   vinci: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his notebooks and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his notebooks and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Notizbüchern und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   woolf: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her diaries, her letters and the sources and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of her life in the first person, written as a human-AI collaboration from her diaries, her letters and the sources, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung ihres Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Tagebüchern, ihren Briefen und den Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
   zenji: {
-    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings and the later accounts of his life and read by a synthetic voice. Not a recording.`,
+    en: name => `The portrait of ${name} is an AI-generated image. The stories on this page are a retelling of his life in the first person, written as a human-AI collaboration from his writings and the later accounts of his life, and read by a synthetic voice. Not a recording.`,
     de: name => `Das Porträt von ${name} ist ein KI-erzeugtes Bild. Die Geschichten auf dieser Seite sind eine Nacherzählung seines Lebens in der Ich-Form. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Schriften und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme.`,
   },
 };

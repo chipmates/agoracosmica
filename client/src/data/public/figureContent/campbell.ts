@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Joseph Campbell speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his books and the historical sources. A synthetic voice reads them. Not a recording. Joseph Campbell lived from 1904 to 1987. His books are still in copyright, so the stories retell his ideas in sentences written as a human-AI collaboration. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his books and the historical sources. A synthetic voice reads them. Not a recording. Joseph Campbell lived from 1904 to 1987. His books are still in copyright, so the stories retell his ideas in new sentences. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Joseph Campbell?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Joseph Campbell lebte von 1904 bis 1987. Seine Bücher stehen noch unter Urheberrecht, die Geschichten erzählen seine Gedanken also in Sätzen nach, die in Mensch-KI-Zusammenarbeit geschrieben wurden. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Joseph Campbell lebte von 1904 bis 1987. Seine Bücher stehen noch unter Urheberrecht, die Geschichten erzählen seine Gedanken also in neuen Sätzen nach. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

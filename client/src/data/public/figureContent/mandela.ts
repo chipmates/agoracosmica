@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Nelson Mandela speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from Long Walk to Freedom, his Rivonia Trial statement and the historical sources. A synthetic voice reads them. Not a recording. Nelson Mandela lived from 1918 to 2013. His autobiography is still under copyright, so the stories retell it in sentences written as a human-AI collaboration. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from Long Walk to Freedom, his Rivonia Trial statement and the historical sources. A synthetic voice reads them. Not a recording. Nelson Mandela lived from 1918 to 2013. His autobiography is still under copyright, so the stories retell it in new sentences. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Nelson Mandela?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach „Der lange Weg zur Freiheit“, seiner Erklärung im Rivonia-Prozess und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nelson Mandela lebte von 1918 bis 2013. Seine Autobiografie steht noch unter Urheberrecht, die Geschichten erzählen sie also in Sätzen nach, die in Mensch-KI-Zusammenarbeit geschrieben wurden. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach „Der lange Weg zur Freiheit“, seiner Erklärung im Rivonia-Prozess und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nelson Mandela lebte von 1918 bis 2013. Seine Autobiografie steht noch unter Urheberrecht, die Geschichten erzählen sie also in neuen Sätzen nach. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
