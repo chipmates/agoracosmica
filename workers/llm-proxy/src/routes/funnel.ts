@@ -1,6 +1,7 @@
 // Anonymous funnel-step beacon
 // Fires from the marketing pages (cta_click, paid_arrival, read and audio_play
-// via agc-public.js, the ad_consent_* counters via the ArrivalChoice island),
+// via agc-public.js, the ad_consent_* counters via the ArrivalChoice island,
+// story_started and story_heard via its listen counts),
 // from the client app (cinematic_start / cinematic_end / welcome_shown /
 // first_turn / figure_selected / mode_selected / first_reply / engaged /
 // council_heard via utils/funnelBeacon.ts) and from the museum (the museum_* steps via
@@ -49,6 +50,24 @@ const CONSENT_ANSWER_STEPS = [
   'ad_consent_dismissed',
 ] as const;
 const CONSENT_STEPS = ['ad_consent_shown', ...CONSENT_ANSWER_STEPS] as const;
+
+// The card's split test: an undecided grant arrival is drawn into one of two
+// arms per page load, asked at once or later in the visit. ad_consent_arm is
+// the draw itself, one row per such page load with its arm in the label slot,
+// so each arm's answers and listens can be read per grant visitor. The arm is
+// the whole content of that row, so a row without a readable one is dropped.
+export const CARD_ARMS: ReadonlySet<string> = new Set(['arrival', 'later']);
+const ARM_STEPS = ['ad_consent_arm'] as const;
+
+// The story player's two listen counts, for every visitor: a story started
+// (its first play in a page load) and a story heard for 30 seconds (once per
+// story per page load). The row is the figure, never the path, and for a
+// grant arrival the card's arm in the label slot.
+const STORY_STEPS = ['story_started', 'story_heard'] as const;
+const STORY_STEP_SET = new Set<string>(STORY_STEPS);
+
+// The steps whose label slot takes an arm, and nothing but an arm.
+const ARM_LABEL_STEPS = new Set<string>([...ARM_STEPS, ...CONSENT_STEPS, ...STORY_STEPS]);
 
 // A reading page was read: it stayed visible for thirty seconds, or the
 // visitor scrolled past the middle of its text. One-shot per page load on the
@@ -139,6 +158,8 @@ const VALID_STEPS = new Set([
   // clicked.
   'paid_arrival',
   ...CONSENT_STEPS,
+  ...ARM_STEPS,
+  ...STORY_STEPS,
   ...READ_STEPS,
   ...PLAY_STEPS,
 ]);
@@ -204,14 +225,15 @@ const DIMENSIONLESS_STEPS = new Set(['paid_arrival']);
 // language, the country and device class the edge derives, on the consent
 // answers the coarse time-to-answer bucket, and the in-house probe constant
 // when a marked browser sent it (every funnel row can carry that one). Nothing
-// else. The mode slot is blanked, the outcome is forced to '200' server-side,
+// else, apart from the card's arm on the consent steps (ARM_LABEL_STEPS). The
+// mode slot is otherwise blanked, the outcome is forced to '200' server-side,
 // and the path slot only ever takes a path — a figure id sent on one of these
 // steps is dropped rather than stored, so no content dimension can ride along
 // with a consent answer, a read or a play. The route reads no gclid field on
 // any step, so none can be stored either. Derived from the step lists above
 // rather than re-listed, so the lists cannot drift apart.
 // docs/MEASUREMENT.md states this shape.
-const COUNTER_ONLY_STEPS = new Set<string>([...CONSENT_STEPS, ...READ_STEPS, ...PLAY_STEPS]);
+const COUNTER_ONLY_STEPS = new Set<string>([...CONSENT_STEPS, ...ARM_STEPS, ...READ_STEPS, ...PLAY_STEPS]);
 
 // Counter-only steps that may still carry a bucket. Everything else on the
 // counter-only list is pinned to 0. The consent set has exactly four buckets,
@@ -288,6 +310,14 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
   if (museum && !museumRow) {
     return new Response(null, { status: 204 });
   }
+  // The arm, on the steps that carry one. The draw's own row is nothing
+  // without it, so an unreadable arm there writes nothing at all.
+  const arm = ARM_LABEL_STEPS.has(step) && typeof payload.mode === 'string' && CARD_ARMS.has(payload.mode)
+    ? payload.mode
+    : '';
+  if (step === 'ad_consent_arm' && !arm) {
+    return new Response(null, { status: 204 });
+  }
 
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
   const rateLimitKey = `funnel_rl:${ip}`;
@@ -350,21 +380,24 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
   const counterOnly = COUNTER_ONLY_STEPS.has(step);
   const timedCounter = TIMED_COUNTER_STEPS.has(step);
   const dimensionless = DIMENSIONLESS_STEPS.has(step);
+  const story = STORY_STEP_SET.has(step);
   let outBucket = !counterOnly || timedCounter ? bucket : 0;
   if (timedCounter && outBucket > CONSENT_MAX_BUCKET) outBucket = 0;
-  if (dimensionless) outBucket = 0;
+  if (dimensionless || story) outBucket = 0;
+  const figure = (typeof payload.figureId === 'string' && FIGURE_RE.test(payload.figureId)) ? payload.figureId : '';
 
   trackFunnel(env, {
     step,
     // Path only on the counter-only steps, so a figure id can never ride
-    // along with a consent answer, and nothing at all on the dimensionless
-    // ones (a forged payload cannot attach a path to them either).
-    ref: dimensionless ? '' : (counterOnly ? path : ref),
-    mode: counterOnly || dimensionless ? '' : mode,
+    // along with a consent answer, the figure only on the story steps, and
+    // nothing at all on the dimensionless ones (a forged payload cannot
+    // attach a path to them either).
+    ref: dimensionless ? '' : story ? figure : (counterOnly ? path : ref),
+    mode: ARM_LABEL_STEPS.has(step) ? arm : (counterOnly || dimensionless ? '' : mode),
     language: lang,
     // '200', never '', so a counter row stays recognizable as a funnel row
     // (the dashboard tells conversion rows apart by an empty outcome slot).
-    outcome: counterOnly || dimensionless ? '200' : outcome,
+    outcome: counterOnly || dimensionless || story ? '200' : outcome,
     bucket: outBucket,
     country: readCountry(request),
     device: readDevice(request),

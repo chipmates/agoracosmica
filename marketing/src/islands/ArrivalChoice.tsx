@@ -12,7 +12,7 @@
 // minute of story audio has been heard, on a page with poems once a poem's
 // last line has been in view for its reading time (utils/cardMoment.ts), and
 // on no other page. The words are the same in both. The arm lives in page
-// memory only, never stored, never sent to Google. Until the answer the
+// memory and rides on our own counts, never to Google. Until the answer the
 // click ID lives in page memory only: it leaves the address bar when this
 // module loads, nothing about the ad is stored, and a full page load forgets
 // it (a reload no longer asks).
@@ -44,9 +44,10 @@ import {
   adConsentDecided,
   grantAdConsent,
 } from '@client/utils/public/gclidCapture';
-import { isProbeSessionNow, probeField } from '@client/utils/probeSession';
+import { isProbeSessionNow } from '@client/utils/probeSession';
 import {
   armPreDecisionListening,
+  cardArm,
   clickId,
   dropPreDecisionListening,
   flushPreDecisionListening,
@@ -64,6 +65,7 @@ import {
   watchStorySeconds,
 } from '../utils/cardMoment';
 import type { StorySource } from '../utils/cardMoment';
+import { postCount, watchListens } from '../utils/listenCounts';
 import './ArrivalChoice.css';
 
 interface Props {
@@ -108,7 +110,6 @@ const COPY = {
 // CORS allows this origin. (Same posture as the former agc-public.js
 // fireConversion.)
 const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
-const FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 const CODE_URL =
   'https://github.com/chipmates/agoracosmica/blob/main/client/src/utils/public/gclidCapture.ts';
 const GOOGLE_PARTNER_URL = 'https://business.safety.google/privacy';
@@ -146,12 +147,15 @@ export function drawArm(share: number = LATER_SHARE, random: () => number = fair
 
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, the interface language, on the three answer steps a
-// coarse time-to-answer bucket, and from a browser marked as in-house the
-// probe constant every other count carries. It has to stay that way. A gclid
-// or an id here would pair a user dimension with a consent decision, which is
-// exactly what this measurement must not do.
+// step, the page path, the interface language, the card's arm in the label
+// slot, on the three answer steps a coarse time-to-answer bucket, and from a
+// browser marked as in-house the probe constant every other count carries. It
+// has to stay that way. A gclid or an id here would pair a user dimension with
+// a consent decision, which is exactly what this measurement must not do.
+// ad_consent_arm is the draw itself, one per undecided grant arrival: the
+// denominator each arm's answers are read against.
 type ConsentCounter =
+  | 'ad_consent_arm'
   | 'ad_consent_shown'
   | 'ad_consent_accepted'
   | 'ad_consent_declined'
@@ -217,39 +221,21 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
   if (!onProductionHost()) return;
   if (countedSteps.has(step)) return;
   countedSteps.add(step);
-  try {
-    // Path only, no query and no hash, exactly like the cta_click beacon.
-    // The worker holds it to the same closed shape it holds that one to
-    // (a short slug path or nothing), plus the coarse bucket on the three
-    // answer steps. JSON drops an undefined bucket or probe, so a shown step
-    // has no bucket and an unmarked browser sends no probe field at all.
-    const body = JSON.stringify({
-      step,
-      path: window.location.pathname,
-      language: lang,
-      bucket,
-      probe: probeField(),
-    });
-    // sendBeacon survives the navigation an accept can trigger. text/plain
-    // keeps it a simple CORS request, so no preflight gets lost in transit.
-    if (
-      typeof navigator !== 'undefined' &&
-      typeof navigator.sendBeacon === 'function' &&
-      navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))
-    ) {
-      return;
-    }
-    fetch(FUNNEL_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: true,
-    }).catch(() => {
-      /* never surface */
-    });
-  } catch {
-    /* same posture */
-  }
+  // Path only, no query and no hash, exactly like the cta_click beacon. The
+  // worker holds it to the same closed shape it holds that one to (a short
+  // slug path or nothing), plus the arm and the coarse bucket on the three
+  // answer steps. JSON drops an undefined bucket, so a shown step has none.
+  postCount({
+    step,
+    path: window.location.pathname,
+    language: lang,
+    mode: cardArm() ?? undefined,
+    bucket,
+  });
+}
+
+function pageLanguage(): Props['lang'] {
+  return (document.documentElement.lang || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
 }
 
 /**
@@ -299,7 +285,8 @@ function fireStartExploring(): void {
     fetch(CONVERSIONS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gclid, event: 'start_exploring', timestamp: Date.now() }),
+      // The arm is for our own analytics row only: the worker passes it to no one.
+      body: JSON.stringify({ gclid, event: 'start_exploring', timestamp: Date.now(), arm: cardArm() ?? undefined }),
       keepalive: true,
     }).catch(() => {
       /* never surface */
@@ -369,6 +356,7 @@ function arrive(): void {
   if (id === null || isPaidVisitor() || adConsentDecided()) return;
   const arm = drawArm();
   holdArm(arm);
+  countConsentStep('ad_consent_arm', pageLanguage());
   armPreDecisionListening();
   phase = arm === 'arrival' ? 'due' : 'waiting';
 }
@@ -383,8 +371,8 @@ function standDown(): void {
 
 /**
  * Once per page load, on the first mount, when the page's content is in place.
- * On a page with the story player the card steps back while the reading view
- * is open, in both arms.
+ * A page with the story player counts its stories for every visitor; the card
+ * there steps back while the reading view is open, in both arms.
  */
 function armPage(): void {
   if (pageArmed) return;
@@ -393,6 +381,7 @@ function armPage(): void {
     import('../player/controller')
       .then((player) => {
         const source: StorySource = player;
+        watchListens(source);
         const rule: KeepClear = {
           blocked: () => player.getState().readerOpen,
           boxes: () => Array.from(document.querySelectorAll(NEXT_LABEL_SELECTOR), (el) => el.getBoundingClientRect()),

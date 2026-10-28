@@ -206,6 +206,8 @@ function fireListened(figureId?: string, timestamp: number = Date.now()): void {
         event: 'listened',
         timestamp,
         ...(figureId ? { figureId } : {}),
+        // Our own analytics row only: the worker passes it to no one.
+        ...(heldArm ? { arm: heldArm } : {}),
       }),
       keepalive: true,
     }).catch(() => {

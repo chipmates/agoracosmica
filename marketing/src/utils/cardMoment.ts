@@ -9,7 +9,7 @@ export const STORY_MOMENT_S = 60;
 
 // A playhead step longer than this is a seek or a stall, not listening. Above
 // the 0.375 s a 250 ms timeupdate carries at the player's top rate of 1.5.
-const MAX_STORY_STEP_S = 4;
+export const MAX_STORY_STEP_S = 4;
 
 /** The parts of the player's state the moment reads. */
 export interface StoryStateLike {
@@ -23,6 +23,11 @@ export interface StoryStateLike {
 export interface StorySource {
   subscribe(listener: () => void): () => void;
   getState(): StoryStateLike;
+}
+
+/** The item the player has loaded (figure, language, number), or null before the first tap. */
+export function storyKey(s: StoryStateLike): string | null {
+  return s.queue && s.current !== null ? `${s.queue.figureId}/${s.queue.lang}/${s.current}` : null;
 }
 
 let storySeconds = 0;
@@ -50,7 +55,7 @@ export function watchStorySeconds(
   const read = (): void => {
     if (done) return;
     const s = source.getState();
-    const key = s.queue && s.current !== null ? `${s.queue.figureId}/${s.queue.lang}/${s.current}` : null;
+    const key = storyKey(s);
     if (key !== null && key === lastKey && s.status === 'playing') {
       const step = s.time - lastTime;
       if (step > 0 && step <= MAX_STORY_STEP_S) storySeconds += step;

@@ -2,7 +2,7 @@
 // the split (the later arm after a minute of story audio or at a poem's end,
 // the arrival arm at once), what each answer stores and sends, what a paid
 // arrival gets (nothing at all), that nothing about the ad is stored before the
-// answer. Most cases run the later arm.
+// answer, and the counts that carry the arm. Most cases run the later arm.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
@@ -327,9 +327,13 @@ describe('ArrivalChoice: the answers', () => {
     expect(events[1].timestamp).toBe(Date.parse('2026-10-26T10:00:00Z'));
     expect(events[1].figureId).toBe('aurelius');
     expect(events[0].timestamp).toBe(Date.parse('2026-10-26T10:00:40Z'));
+    for (const e of events) expect(e.arm).toBe('later');
     expect(card(container)).toBeNull();
     const counts = funnelRows();
     expect(counts.filter((c) => CARD_STEP.test(String(c.step))).map((c) => c.step)).toEqual(['ad_consent_shown', 'ad_consent_accepted']);
+    expect(counts.filter((c) => c.step === 'ad_consent_arm')).toEqual([
+      { step: 'ad_consent_arm', path: '/marcus-aurelius/', language: 'en', mode: 'later' },
+    ]);
     for (const c of counts) expect(JSON.stringify(c)).not.toContain(CLICK);
   });
 
@@ -723,11 +727,12 @@ describe('ArrivalChoice close control', () => {
     expect(conversions()).toHaveLength(0);
     expect(sent).toHaveLength(1);
     expect(sent[0].url).toBe('https://llm.agoracosmica.org/v1/funnel');
-    const { step, path, language, bucket, ...rest } = sent[0].body;
+    const { step, path, language, bucket, mode, ...rest } = sent[0].body;
     expect(step).toBe('ad_consent_dismissed');
     expect(path).toBe('/marcus-aurelius/');
     expect(language).toBe('de');
     expect([0, 1, 2, 3]).toContain(bucket);
+    expect(mode).toBe('later');
     expect(rest).toEqual({});
     expect(JSON.stringify(sent[0].body)).not.toContain(CLICK);
   });
@@ -881,7 +886,7 @@ describe('the draw', () => {
     expect(drawArm(0, () => 0.1)).toBe('arrival');
   });
 
-  it('draws for an undecided grant arrival only', async () => {
+  it('draws for an undecided grant arrival only, and counts each draw once', async () => {
     forceArm(undefined);
     vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(a: T): T => {
       (a as unknown as Uint32Array)[0] = 0; // the later arm
@@ -889,17 +894,22 @@ describe('the draw', () => {
     });
     await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     await settle();
+    expect(funnelRows().filter((r) => r.step === 'ad_consent_arm')).toEqual([
+      { step: 'ad_consent_arm', path: '/marcus-aurelius/', language: 'en', mode: 'later' },
+    ]);
     expect(heard.cardArm()).toBe('later');
     for (const url of ['/marcus-aurelius/', `/marcus-aurelius/?p=1&gclid=${CLICK}`]) {
       sent = [];
       await mountAt(url);
       await settle();
+      expect(funnelRows().filter((r) => r.step === 'ad_consent_arm'), url).toEqual([]);
       expect(heard.cardArm(), url).toBeNull();
     }
     sent = [];
     localStorage.setItem('agc_ad_consent', YES);
     await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     await settle();
+    expect(funnelRows().filter((r) => r.step === 'ad_consent_arm')).toEqual([]);
     expect(heard.cardArm()).toBeNull();
   });
 });
@@ -925,6 +935,12 @@ describe('ArrivalChoice: the arrival arm', () => {
       expect(heard.cardArm(), kind).toBe('arrival');
       unmount();
     }
+    const draws = funnelRows().filter((r) => r.step === 'ad_consent_arm');
+    expect(draws.map((r) => [r.path, r.mode, r.language])).toEqual([
+      ['/marcus-aurelius/', 'arrival', 'de'],
+      ['/figures/emily-dickinson/poems/hope/', 'arrival', 'de'],
+      ['/themes/stoicism/', 'arrival', 'de'],
+    ]);
   });
 
   it('ignores a tap in its first 700 ms here too', async () => {
@@ -947,6 +963,7 @@ describe('ArrivalChoice: the arrival arm', () => {
     await act(async () => { fireEvent.click(yes); });
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
     expect(conversions().map((c) => c.body.event)).toEqual(['start_exploring']);
+    expect(conversions()[0].body.arm).toBe('arrival');
     expect(conversions()[0].body.timestamp).toBe(Date.parse('2026-10-28T18:00:00Z'));
     vi.setSystemTime(new Date('2026-10-28T18:02:00Z'));
     await hear(29);
@@ -954,10 +971,12 @@ describe('ArrivalChoice: the arrival arm', () => {
     await hear(1);
     const listened = conversions().filter((c) => c.body.event === 'listened');
     expect(listened).toHaveLength(1);
-    expect(listened[0].body).toMatchObject({ gclid: CLICK, figureId: 'aurelius' });
+    expect(listened[0].body).toMatchObject({ gclid: CLICK, figureId: 'aurelius', arm: 'arrival' });
     expect(listened[0].body.timestamp).toBe(Date.parse('2026-10-28T18:02:00Z'));
     await hear(60);
     expect(conversions()).toHaveLength(2);
+    const counts = funnelRows().filter((c) => CARD_STEP.test(String(c.step)));
+    expect(counts.map((c) => [c.step, c.mode])).toEqual([['ad_consent_shown', 'arrival'], ['ad_consent_accepted', 'arrival']]);
   });
 
   it('a yes after some listening sends the crossing held before it, dated when it happened', async () => {
@@ -973,6 +992,7 @@ describe('ArrivalChoice: the arrival arm', () => {
     const events = conversions().map((c) => c.body);
     expect(events.map((e) => e.event)).toEqual(['start_exploring', 'listened']);
     expect(events[1].timestamp).toBe(Date.parse('2026-10-28T18:00:00Z'));
+    for (const e of events) expect(e.arm).toBe('arrival');
   });
 
   it('no and the X send nothing to Google, and the card does not come back', async () => {
@@ -1021,13 +1041,15 @@ describe('ArrivalChoice: the arrival arm', () => {
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
     await hear(20);
     expect(conversions().map((c) => c.body.event)).toEqual(['start_exploring', 'listened']);
+    expect(funnelRows().filter((r) => r.step === 'ad_consent_arm')).toHaveLength(1);
   });
 
   it('a reload of the stripped address does not ask, and draws nothing', async () => {
     await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    sent = [];
     const { container } = await mountAt(`${window.location.pathname}${window.location.search}`);
     expect(card(container)).toBeNull();
-    expect(heard.cardArm()).toBeNull();
+    expect(funnelRows().filter((r) => r.step === 'ad_consent_arm')).toEqual([]);
   });
 
   it('a paid arrival and a decided visitor get no card and no draw', async () => {
@@ -1039,6 +1061,7 @@ describe('ArrivalChoice: the arrival arm', () => {
       const { container, unmount } = await mountAt(`/marcus-aurelius/?${setup === 'paid' ? 'p=1&' : ''}gclid=${CLICK}`);
       expect(card(container), setup).toBeNull();
       expect(heard.cardArm(), setup).toBeNull();
+      expect(funnelRows().filter((r) => r.step === 'ad_consent_arm'), setup).toEqual([]);
       unmount();
     }
   });
@@ -1051,8 +1074,71 @@ describe('ArrivalChoice: the arrival arm', () => {
     await new Promise((r) => setTimeout(r, 0));
     expect(conversions()).toHaveLength(0);
     const rows = funnelRows();
-    expect(rows.length).toBeGreaterThan(0);
+    expect(rows.length).toBeGreaterThanOrEqual(4);
     for (const r of rows) expect(r.probe).toBe(1);
   });
 });
 
+describe('the story counts', () => {
+  const stories = () => funnelRows().filter((r) => r.step === 'story_started' || r.step === 'story_heard');
+
+  it('count every visitor on a player page: a story started, and heard once 30 s of it ran', async () => {
+    await mountAt('/de/figures/marcus-aurelius/', 'de');
+    await hear(29);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories()).toEqual([{ step: 'story_started', figureId: 'aurelius', language: 'en' }]);
+    await hear(1);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories().map((r) => r.step)).toEqual(['story_started', 'story_heard']);
+    await hear(120);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories()).toHaveLength(2);
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  it('carry the arm for a grant arrival, in either arm', async () => {
+    for (const arm of ['later', 'arrival'] as const) {
+      sent = [];
+      forceArm(arm);
+      await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      await hear(31);
+      await new Promise((r) => setTimeout(r, 0));
+      expect(stories().map((r) => [r.step, r.mode]), arm).toEqual([['story_started', arm], ['story_heard', arm]]);
+      for (const r of stories()) expect(JSON.stringify(r)).not.toContain(CLICK);
+    }
+  });
+
+  it('count each story once per page load, the introduction too', async () => {
+    await mountAt('/figures/marcus-aurelius/');
+    await act(async () => { player.set({ queue: { figureId: 'aurelius', lang: 'en' }, current: 0, status: 'playing', time: 0 }); });
+    await hear(31);
+    await act(async () => { player.set({ current: 1, time: 0 }); });
+    await hear(10);
+    await act(async () => { player.set({ current: 0, time: 0 }); });
+    await hear(40);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories().map((r) => r.step)).toEqual(['story_started', 'story_heard', 'story_started']);
+  });
+
+  it('count only audio that ran: a pause, a stall and a seek add nothing', async () => {
+    await mountAt('/figures/marcus-aurelius/');
+    await hear(20);
+    await act(async () => { player.set({ status: 'paused' }); });
+    await act(async () => { player.set({ time: player.getState().time + 3 }); });
+    await act(async () => { player.set({ status: 'playing' }); });
+    await act(async () => { player.set({ time: player.getState().time + 30 }); });
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories().map((r) => r.step)).toEqual(['story_started']);
+    await hear(10);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories().map((r) => r.step)).toEqual(['story_started', 'story_heard']);
+  });
+
+  it('send nothing on a page without the player', async () => {
+    await mountAt(`/themes/stoicism/?gclid=${CLICK}`, 'en', 'plain');
+    await hear(60);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(stories()).toEqual([]);
+  });
+});
