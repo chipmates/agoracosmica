@@ -640,7 +640,7 @@ describe('ArrivalChoice copy and version', () => {
   it('names what Google learns, the year, the footer switch, and links Google’s page', async () => {
     const { container } = await arriveAndListen();
     const fine = container.querySelector('.agc-consent__fine')!.textContent!;
-    expect(fine.startsWith('A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30 seconds. ')).toBe(true);
+    expect(fine.startsWith('A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30\u00a0seconds. ')).toBe(true);
     expect(fine).toContain('for a year');
     expect(fine).toContain('at the foot of every page');
     const google = Array.from(container.querySelectorAll('a')).find((a) => a.textContent === 'How Google uses this')!;
@@ -651,7 +651,7 @@ describe('ArrivalChoice copy and version', () => {
   it('speaks German, with the same three links', async () => {
     const { container } = await arriveAndListen(`/de/figures/marcus-aurelius/?gclid=${CLICK}`, 'de');
     expect(container.querySelector('.agc-consent__fine')!.textContent!.startsWith(
-      'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. '
+      'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30\u00a0Sekunden zugehört hast. '
     )).toBe(true);
     const labels = Array.from(container.querySelectorAll('.agc-consent__link')).map((a) => a.textContent);
     expect(labels).toEqual(['Code ansehen', 'Datenschutzerklärung', 'Wie Google das nutzt']);
@@ -660,7 +660,7 @@ describe('ArrivalChoice copy and version', () => {
   it('names the Google account, the USA and no personalised ads right after what Google learns', async () => {
     const en = (await arriveAndListen()).container;
     expect(en.querySelector('.agc-consent__fine')!.textContent).toContain(
-      'for 30 seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you.'
+      'for 30\u00a0seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you.'
     );
     const de = (await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
     expect(de.querySelector('.agc-consent__fine')!.textContent).toContain(
