@@ -494,15 +494,26 @@ export function runMoment(opts: MomentOptions): Moment {
       .filter(c => c.box.w > 0 && c.box.h > 0 && intersects(c.box, canvasBox))
       .map(c => ({ x: c.box.x - origin.x, y: c.box.y - origin.y, w: c.box.w, h: c.box.h, holdsEnd: !!(endEl && c.el.contains(endEl)) }));
     const endLocal = endDoc ? { x: endDoc.x - origin.x, y: endDoc.y - origin.y, w: endDoc.w, h: endDoc.h } : null;
-    // the text's own line boxes, not its block: a full-width block would cut a band out of the face
-    const kept: Box[] = [];
-    for (const el of opts.keep ?? []) {
-      const range = document.createRange();
-      range.selectNodeContents(el);
-      for (const r of Array.from(range.getClientRects())) {
-        if (r.width > 0 && r.height > 0) kept.push({ x: r.left + window.scrollX - origin.x, y: r.top + window.scrollY - origin.y, w: r.width, h: r.height });
+    // Each kept text's own lines, as one box around them with a margin, read again every frame: a full-width block
+    // would cut a band out of the face, and tight line boxes left the dust beside the letters and between the lines
+    // (and a late font moves them).
+    const KEEP_MARGIN = 8;
+    const range = document.createRange();
+    const keptBoxes = (): Box[] => {
+      const out: Box[] = [];
+      for (const el of opts.keep ?? []) {
+        range.selectNodeContents(el);
+        let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+        for (const r of Array.from(range.getClientRects())) {
+          if (r.width <= 0 || r.height <= 0) continue;
+          x0 = Math.min(x0, r.left); y0 = Math.min(y0, r.top); x1 = Math.max(x1, r.right); y1 = Math.max(y1, r.bottom);
+        }
+        if (x1 > x0) {
+          out.push({ x: x0 + window.scrollX - origin.x - KEEP_MARGIN, y: y0 + window.scrollY - origin.y - KEEP_MARGIN, w: x1 - x0 + 2 * KEEP_MARGIN, h: y1 - y0 + 2 * KEEP_MARGIN });
+        }
       }
-    }
+      return out;
+    };
 
     // the timeline, by beats
     const faceAt = beats === 'line+face' ? FACE_AFTER_LINE : 0;
@@ -568,7 +579,15 @@ export function runMoment(opts: MomentOptions): Moment {
       }
     };
     const guard = () => {
-      for (const b of kept) ctx.clearRect(b.x - 2, b.y - 2, b.w + 4, b.h + 4);
+      // the box clear, its edge faded over 12 px so the dust thins out towards the words instead of stopping on a line
+      ctx.save();
+      ctx.globalCompositeOperation = 'destination-out';
+      ctx.globalAlpha = 0.35;
+      for (const b of keptBoxes()) {
+        for (let k = 3; k >= 1; k--) ctx.fillRect(b.x - 4 * k, b.y - 4 * k, b.w + 8 * k, b.h + 8 * k);
+        ctx.clearRect(b.x, b.y, b.w, b.h);
+      }
+      ctx.restore();
       for (const b of guards) {
         if (!b.holdsEnd || !endLocal) {
           ctx.clearRect(b.x - 1, b.y - 1, b.w + 2, b.h + 2);
