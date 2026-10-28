@@ -1,7 +1,8 @@
-// The consent card on the public pages, rendered: when it asks (after a minute
-// of story audio, or at a poem's end, never on arrival), what each answer
-// stores and sends, what a paid arrival gets (nothing at all), and that nothing
-// about the ad is stored before the answer.
+// The consent card on the public pages, rendered: when it asks in each arm of
+// the split (the later arm after a minute of story audio or at a poem's end,
+// the arrival arm at once), what each answer stores and sends, what a paid
+// arrival gets (nothing at all), that nothing about the ad is stored before the
+// answer. Most cases run the later arm.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
@@ -95,6 +96,7 @@ async function settle(): Promise<void> {
 /** A fresh page load at `url`: the island's module runs anew. */
 async function mountAt(url: string, lang: 'en' | 'de' = 'en', kind: Kind = 'story') {
   window.history.replaceState({}, '', url);
+  document.documentElement.lang = lang;
   pageFor(kind);
   vi.resetModules();
   player = makePlayer();
@@ -145,8 +147,15 @@ async function arriveAndListen(url = `/marcus-aurelius/?gclid=${CLICK}`, lang: '
   return view;
 }
 
+type ArmWindow = Window & { __agcCardArm?: unknown };
+function forceArm(arm: 'arrival' | 'later' | undefined): void {
+  if (arm === undefined) Reflect.deleteProperty(window as ArmWindow, '__agcCardArm');
+  else (window as ArmWindow).__agcCardArm = arm;
+}
+
 beforeEach(() => {
   serveFrom('https://agoracosmica.org/');
+  forceArm('later');
   sent = [];
   clock = 1000;
   sessionStorage.clear();
@@ -166,6 +175,7 @@ beforeEach(() => {
   });
 });
 afterEach(() => {
+  forceArm(undefined);
   Reflect.deleteProperty(navigator, 'sendBeacon');
   vi.doUnmock(CONTROLLER);
   vi.restoreAllMocks();
@@ -175,6 +185,8 @@ afterEach(() => {
 });
 
 const conversions = () => sent.filter((s) => s.url.endsWith('/api/conversions'));
+const funnelRows = () => sent.filter((s) => s.url.endsWith('/v1/funnel')).map((s) => s.body);
+const CARD_STEP = /^ad_consent_(shown|accepted|declined|dismissed)$/;
 
 describe('ArrivalChoice: the moment', () => {
   it('does not ask on arrival, and the click ID leaves the address at once', async () => {
@@ -316,9 +328,9 @@ describe('ArrivalChoice: the answers', () => {
     expect(events[1].figureId).toBe('aurelius');
     expect(events[0].timestamp).toBe(Date.parse('2026-10-26T10:00:40Z'));
     expect(card(container)).toBeNull();
-    const counts = sent.filter((s) => s.url.endsWith('/v1/funnel'));
-    expect(counts.map((c) => c.body.step)).toEqual(['ad_consent_shown', 'ad_consent_accepted']);
-    for (const c of counts) expect(JSON.stringify(c.body)).not.toContain(CLICK);
+    const counts = funnelRows();
+    expect(counts.filter((c) => CARD_STEP.test(String(c.step))).map((c) => c.step)).toEqual(['ad_consent_shown', 'ad_consent_accepted']);
+    for (const c of counts) expect(JSON.stringify(c)).not.toContain(CLICK);
   });
 
   it('no stores only the no, sends no conversion, and never asks again', async () => {
@@ -829,3 +841,218 @@ describe('off the production hosts', () => {
     });
   }
 });
+
+describe('the draw', () => {
+  async function load() {
+    vi.resetModules();
+    vi.doMock(CONTROLLER, () => ({ subscribe: player.subscribe, getState: player.getState }));
+    return import('../../../../marketing/src/islands/ArrivalChoice');
+  }
+
+  it('puts half the undecided grant arrivals in the later arm, and at 0 none', async () => {
+    const { drawArm, LATER_SHARE } = await load();
+    forceArm(undefined);
+    expect(LATER_SHARE).toBe(0.5);
+    expect(drawArm(0.5, () => 0.4999)).toBe('later');
+    expect(drawArm(0.5, () => 0.5)).toBe('arrival');
+    for (const r of [0, 0.25, 0.5, 0.9999]) expect(drawArm(0, () => r)).toBe('arrival');
+  });
+
+  it('draws near half over 200 page loads from the browser\'s own random source', async () => {
+    const { drawArm } = await load();
+    forceArm(undefined);
+    const later = Array.from({ length: 200 }, () => drawArm()).filter((a) => a === 'later').length;
+    // Fair: 100 expected, a standard deviation of about 7; outside 70 to 130 happens about once in 30,000 runs.
+    expect(later).toBeGreaterThanOrEqual(70);
+    expect(later).toBeLessThanOrEqual(130);
+  });
+
+  it('takes a forced arm from a test harness, never from the address', async () => {
+    const { drawArm } = await load();
+    forceArm('later');
+    expect(drawArm(0, () => 0.9)).toBe('later');
+    forceArm('arrival');
+    expect(drawArm(1, () => 0)).toBe('arrival');
+    forceArm(undefined);
+    (window as ArmWindow).__agcCardArm = 'sideways';
+    expect(drawArm(0, () => 0.1)).toBe('arrival');
+    forceArm(undefined);
+    window.history.replaceState({}, '', `/marcus-aurelius/?__agcCardArm=later&arm=later&gclid=${CLICK}`);
+    expect(drawArm(0, () => 0.1)).toBe('arrival');
+  });
+
+  it('draws for an undecided grant arrival only', async () => {
+    forceArm(undefined);
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(a: T): T => {
+      (a as unknown as Uint32Array)[0] = 0; // the later arm
+      return a;
+    });
+    await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    await settle();
+    expect(heard.cardArm()).toBe('later');
+    for (const url of ['/marcus-aurelius/', `/marcus-aurelius/?p=1&gclid=${CLICK}`]) {
+      sent = [];
+      await mountAt(url);
+      await settle();
+      expect(heard.cardArm(), url).toBeNull();
+    }
+    sent = [];
+    localStorage.setItem('agc_ad_consent', YES);
+    await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    await settle();
+    expect(heard.cardArm()).toBeNull();
+  });
+});
+
+describe('ArrivalChoice: the arrival arm', () => {
+  beforeEach(() => forceArm('arrival'));
+
+  it('asks at once on a story page, a poem page and any other page, and stores nothing', async () => {
+    for (const [url, kind] of [
+      [`/marcus-aurelius/?utm_source=x&gclid=${CLICK}#chapter-2`, 'story'],
+      [`/figures/emily-dickinson/poems/hope/?gclid=${CLICK}`, 'poem'],
+      [`/themes/stoicism/?gclid=${CLICK}`, 'plain'],
+    ] as const) {
+      sessionStorage.clear();
+      localStorage.clear();
+      const { container, unmount } = await mountAt(url, 'de', kind);
+      expect(shownCard(container), kind).not.toBeNull();
+      expect(window.location.href, kind).not.toContain(CLICK);
+      expect(window.location.search, kind).toMatch(/(^\?|&)gclid=(&|$)/);
+      expect(storageKeys(sessionStorage), kind).toEqual([]);
+      expect(storageKeys(localStorage), kind).toEqual([]);
+      expect(heard.clickId(), kind).toBe(CLICK);
+      expect(heard.cardArm(), kind).toBe('arrival');
+      unmount();
+    }
+  });
+
+  it('ignores a tap in its first 700 ms here too', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    expect(shownCard(container)).not.toBeNull();
+    expect(storageKeys(localStorage)).toEqual([]);
+    await pass(750);
+    await act(async () => { fireEvent.click(yes); });
+    expect(card(container)).toBeNull();
+  });
+
+  it('a yes before any listening sends Start Exploring now and Listened once 30 s of story have run, dated then', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-28T18:00:00Z'));
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'de');
+    await pass(1000);
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
+    expect(conversions().map((c) => c.body.event)).toEqual(['start_exploring']);
+    expect(conversions()[0].body.timestamp).toBe(Date.parse('2026-10-28T18:00:00Z'));
+    vi.setSystemTime(new Date('2026-10-28T18:02:00Z'));
+    await hear(29);
+    expect(conversions()).toHaveLength(1);
+    await hear(1);
+    const listened = conversions().filter((c) => c.body.event === 'listened');
+    expect(listened).toHaveLength(1);
+    expect(listened[0].body).toMatchObject({ gclid: CLICK, figureId: 'aurelius' });
+    expect(listened[0].body.timestamp).toBe(Date.parse('2026-10-28T18:02:00Z'));
+    await hear(60);
+    expect(conversions()).toHaveLength(2);
+  });
+
+  it('a yes after some listening sends the crossing held before it, dated when it happened', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2026-10-28T18:00:00Z'));
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    await hear(30);
+    vi.setSystemTime(new Date('2026-10-28T18:01:00Z'));
+    await pass(1000);
+    expect(conversions()).toHaveLength(0);
+    const [yes] = Array.from(container.querySelectorAll('button'));
+    await act(async () => { fireEvent.click(yes); });
+    const events = conversions().map((c) => c.body);
+    expect(events.map((e) => e.event)).toEqual(['start_exploring', 'listened']);
+    expect(events[1].timestamp).toBe(Date.parse('2026-10-28T18:00:00Z'));
+  });
+
+  it('no and the X send nothing to Google, and the card does not come back', async () => {
+    for (const pick of ['no', 'x'] as const) {
+      sent = [];
+      sessionStorage.clear();
+      localStorage.clear();
+      const { container, unmount } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+      await pass(1000);
+      const target = pick === 'no' ? container.querySelectorAll('button')[1] : container.querySelector('button.agc-consent__x')!;
+      await act(async () => { fireEvent.click(target as HTMLElement); });
+      expect(card(container), pick).toBeNull();
+      await hear(90);
+      expect(card(container), pick).toBeNull();
+      expect(conversions(), pick).toHaveLength(0);
+      expect(storageKeys(sessionStorage), pick).toEqual([]);
+      expect(storageKeys(localStorage), pick).toEqual(pick === 'no' ? ['agc_ad_consent'] : []);
+      unmount();
+    }
+  });
+
+  it('steps back while the reading view is open', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(shownCard(container)).not.toBeNull();
+    await act(async () => { player.set({ readerOpen: true }); });
+    expect(shownCard(container)).toBeNull();
+    await act(async () => { player.set({ readerOpen: false }); });
+    expect(shownCard(container)).not.toBeNull();
+  });
+
+  it('stays across a page change in place, and the yes stores the held click ID', async () => {
+    const first = await mountAt(`/de/figures/marcus-aurelius/?gclid=${CLICK}`, 'de');
+    expect(shownCard(first.container)).not.toBeNull();
+    await hear(10);
+    const capture = await import('@client/utils/public/gclidCapture');
+    capture.clearGclid();
+    first.unmount();
+    window.history.pushState({}, '', '/de/stoizismus/');
+    const { default: ArrivalChoice } = await import('../../../../marketing/src/islands/ArrivalChoice');
+    let view!: ReturnType<typeof render>;
+    await act(async () => { view = render(<ArrivalChoice lang="de" />); });
+    await settle();
+    expect(shownCard(view.container)).not.toBeNull();
+    await pass(1000);
+    await act(async () => { fireEvent.click(view.container.querySelectorAll('button')[0]); });
+    expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
+    await hear(20);
+    expect(conversions().map((c) => c.body.event)).toEqual(['start_exploring', 'listened']);
+  });
+
+  it('a reload of the stripped address does not ask, and draws nothing', async () => {
+    await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
+    const { container } = await mountAt(`${window.location.pathname}${window.location.search}`);
+    expect(card(container)).toBeNull();
+    expect(heard.cardArm()).toBeNull();
+  });
+
+  it('a paid arrival and a decided visitor get no card and no draw', async () => {
+    for (const setup of ['paid', 'yes', 'no'] as const) {
+      sent = [];
+      sessionStorage.clear();
+      localStorage.clear();
+      if (setup !== 'paid') localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: setup === 'yes', version: '1.3.0', timestamp: Date.now() }));
+      const { container, unmount } = await mountAt(`/marcus-aurelius/?${setup === 'paid' ? 'p=1&' : ''}gclid=${CLICK}`);
+      expect(card(container), setup).toBeNull();
+      expect(heard.cardArm(), setup).toBeNull();
+      unmount();
+    }
+  });
+
+  it('a probe visit sees the card at once, counts with the marker, and sends Google nothing', async () => {
+    const { container } = await mountAt(`/marcus-aurelius/?probe=1&gclid=${CLICK}`);
+    await pass(1000);
+    await act(async () => { fireEvent.click(container.querySelectorAll('button')[0]); });
+    await hear(40);
+    await new Promise((r) => setTimeout(r, 0));
+    expect(conversions()).toHaveLength(0);
+    const rows = funnelRows();
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) expect(r.probe).toBe(1);
+  });
+});
+
