@@ -15,7 +15,7 @@ import FigureShadow from '../FigureShadow.astro';
 import FigureQA from '../FigureQA.astro';
 import EchoNote from '../EchoNote.astro';
 import StaticImage from '../StaticImage.astro';
-import PortraitCredit from '../PortraitCredit.astro';
+import '../portrait-credit.css';
 import { portraitAlt } from '../../lib/portraitCredit';
 import SourcesBlock from '../SourcesBlock.astro';
 import StoryHero from './StoryHero.astro';
@@ -177,7 +177,6 @@ const note = storyNote(figureId, lang, figure.name);
                 <a href={publicUrl(lang, `/figures/${relSlug}`)} class="pub-figure-card pub-figure-card--row">
                   <span class="ai-portrait">
                     <StaticImage figureId={relId} type="thumbnail" alt={portraitAlt(relFigure.name, lang)} loading="lazy" width={64} height={64} sizes="64px" />
-                    <PortraitCredit lang={lang} />
                   </span>
                   <div>
                     <div class="pub-figure-card__name">{relFigure.name}</div>

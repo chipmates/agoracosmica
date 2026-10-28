@@ -8,6 +8,7 @@ import Public from '../../../../layouts/Public.astro';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
 import EssayStyles from '../../../../components/EssayStyles.astro';
 import EssayInvite from '../../../../components/EssayInvite.astro';
+import AiLabel from '../../../../components/AiLabel.astro';
 import { figureImage } from '../../../../lib/figureImages';
 import { getT } from '../../../../i18n';
 import { articleSchema, breadcrumbSchema, faqSchema } from '../../../../lib/schemas';
@@ -85,6 +86,7 @@ const schemas = [
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">Urbilder und Abbilder</p>
       <h1 class="esy-hero__title">Die Ideenlehre</h1>
+      <AiLabel lang={lang} class="esy-hero__label" />
       <p class="esy-hero__lead">
         Warum nennst du ganz verschiedene Dinge, einen Menschen, eine Tat, ein
         Bild, mit demselben Wort schön? <a href="/de/figures/plato/">Platon</a> antwortet

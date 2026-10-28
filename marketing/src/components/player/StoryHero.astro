@@ -28,7 +28,7 @@ const first = queue.entries[0];
 const intro = queue.entries.find(e => e.n === 0);
 const doText = P.begin;
 const whatText = intro?.minutes ? P.beginSub(intro.minutes) : [first?.title, first?.minutes ? P.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
-// The alt carries the credit too: the name, then the same words as the line under the picture.
+// The alt names the picture as an AI image; the label below names the images for the eye.
 const alt = `${name}, ${P.portraitNote}`;
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
@@ -54,7 +54,6 @@ const halves = labelHalves(label.brief);
           decoding="async"
         />
       </picture>
-      <figcaption>{P.portraitNote}</figcaption>
     </figure>
   </div>
   <p class="sp-hero__line">{heroLine(figureId, lang, leadAnswer)}</p>

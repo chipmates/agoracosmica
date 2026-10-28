@@ -55,6 +55,8 @@ interface Label {
   title: string;
   brief: string;
   expanded: string;
+  /** The lock screen's line: the voice and the making, not the images. */
+  lock: string;
 }
 
 // How long the dock names the synthetic voice at each story's start, from its first sound; then the figure's name.
@@ -87,7 +89,7 @@ export default function StoryDock({ lang, labels, facts }: Props) {
   const [noteOpen, setNoteOpen] = useState(false);
 
   useEffect(() => {
-    installPlayer({ en: labels.en.brief, de: labels.de.brief });
+    installPlayer({ en: labels.en.lock, de: labels.de.lock });
     installPage();
   }, [labels]);
 
