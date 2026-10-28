@@ -32,9 +32,10 @@ const constellation = CONSTELLATION_PATTERNS[`Echo of ${enName}`];
 const stories = queue.entries.filter(e => e.n > 0);
 const hasIntro = queue.entries.some(e => e.n === 0);
 
-// The app keys its German names by the English name in camel case ("The Stoic Taurus" -> theStoicTaurus).
+// The app keys its German names by the English name in camel case ("The Stoic Taurus" -> theStoicTaurus), a
+// letter's accent dropped ("Ensō Circle" -> ensoCircle).
 function nameKey(name: string): string {
-  const words = name.replace(/[^A-Za-z ]/g, '').split(/\s+/).filter(Boolean);
+  const words = name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z ]/g, '').split(/\s+/).filter(Boolean);
   return words.map((w, i) => (i === 0 ? w.toLowerCase() : w[0]!.toUpperCase() + w.slice(1).toLowerCase())).join('');
 }
 const deNames = (constellationsDe as { constellations?: { names?: Record<string, string> } }).constellations?.names ?? {};
