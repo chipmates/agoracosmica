@@ -153,6 +153,13 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
     en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
     de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
   },
+  plato: {
+    en: [],
+    de: [
+      { href: '/de/figures/plato/hoehlengleichnis/', label: 'Das Höhlengleichnis, einfach erklärt →', under: 'Was ist das Höhlengleichnis?' },
+      { href: '/de/figures/plato/ideenlehre/', label: 'Die Ideenlehre, und was Platon damit meinte →', under: 'Die Ideenlehre am Beispiel eines Kreises' },
+    ],
+  },
 };
 
 /** The figure's own writing on this site, offered under the plate. */
