@@ -192,6 +192,16 @@
 @media (max-width: 1023px) and (max-height: 700px) {
   .c2-hero { --c2-face: max(170px, min(65vw, calc(100svh - 469px))); }
 }
+/* a tall phone while the player bar shows: the face gives up what the words and the row need to end above the bar (the
+   top bar, the words and the row under the face take 605 px at most, German at 390), down to 130 px. A page change
+   resets the root's --sp-dock-h to 0 until the bar measures again, after the router's scroll: the bar's usual 89 px
+   stand in, so a landing is not moved under the visitor. Under 816 px even the floor leaves the row under the bar:
+   there the face stays and the row below the fold. */
+@media (max-width: 1023px) and (min-height: 816px) {
+  :root:has(.story-dock) .c2-hero {
+    --c2-face: max(130px, min(65vw, calc(100svh - 469px), calc(100svh - max(var(--sp-dock-h, 0px), 89px) - 605px)));
+  }
+}
 /* a short phone with Safari's bars out (an SE: about 553 px): the tagline on one line, the gaps closer */
 @media (max-width: 1023px) and (max-height: 600px) {
   .c2-hero { --c2-face: max(150px, min(65vw, calc(100svh - 453px))); }
