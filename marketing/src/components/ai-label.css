@@ -32,6 +32,15 @@
 }
 .ai-label[open] .ai-label__i { background: var(--gold-primary); color: var(--bg-void); box-shadow: none; }
 .ai-label__half { display: inline-block; max-width: 100%; }
+/* the hidden comma between the items, for a screen reader only */
+.ai-label__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 .ai-label > p {
   margin: 0 0 8px 29px;
   text-align: left;

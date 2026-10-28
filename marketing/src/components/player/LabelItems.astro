@@ -1,0 +1,17 @@
+---
+// The label's items with their dots for the eye only: a screen reader hears the items apart by a hidden comma, never
+// "middle dot". A dot stays with the item before it, so it never starts a line.
+interface Props {
+  brief: string;
+  /** The class of each item (the whole item wraps as one). */
+  half: string;
+  /** The page's visually hidden class. */
+  sr: string;
+}
+
+const { brief, half, sr } = Astro.props;
+const items = brief.split(' · ');
+---
+{items.map((item, i) => (
+  <Fragment>{i > 0 ? ' ' : ''}<span class={half}>{item}{i < items.length - 1 && <Fragment><span aria-hidden="true">{'\u00a0·'}</span><span class={sr}>,</span></Fragment>}</span></Fragment>
+))}

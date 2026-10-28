@@ -35,7 +35,8 @@ import { Icon } from './icons';
 import { shareStory } from './page';
 import { takeFocus } from './focus';
 import { showToast } from './toast';
-import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from './strings';
+import { LIST_SEP, VOICE_DESC_ID, clockLabel, playerStrings } from './strings';
+import { LabelItems } from './LabelItems';
 import type { PlayerState, StoryQueue } from './types';
 
 interface Props {
@@ -542,9 +543,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
               <summary>
                 <span className="sp-label__i" aria-hidden="true">i</span>
                 <span className="sp-label__brief">
-                  {labelHalves(label.brief).map((half, i) => (
-                    <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
-                  ))}
+                  <LabelItems brief={label.brief} />
                 </span>
               </summary>
               <p>{label.expanded}</p>

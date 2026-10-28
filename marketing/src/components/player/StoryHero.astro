@@ -6,7 +6,8 @@
 // it one quiet line: the text without sound, and the figure's own writing.
 import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
 import { numberWord } from '../../lib/figureWorld';
-import { VOICE_DESC_ID, labelHalves, playerStrings } from '../../player/strings';
+import { VOICE_DESC_ID, playerStrings } from '../../player/strings';
+import LabelItems from './LabelItems.astro';
 import { storyLabel } from '../../player/label';
 import { keepRanges } from '../../player/storyFields';
 import { heroLine, ownWords } from '../../player/figureCopy';
@@ -33,8 +34,6 @@ const whatText = intro?.minutes ? P.beginSub(intro.minutes) : [first?.title, fir
 const alt = `${name}, ${P.portraitNote}`;
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
-// The label breaks at its middle dot; a half wider than the line (200 % text) at its hyphens.
-const halves = labelHalves(label.brief);
 ---
 <section class="sp-hero" aria-labelledby="sp-name" data-story-hero>
   <div class="sp-hero__id">
@@ -62,9 +61,8 @@ const halves = labelHalves(label.brief);
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>
-      <span class="sp-label__brief">{halves.map((half, i) => (
-        <Fragment>{i > 0 ? ' ' : ''}<span class="sp-label__half">{half}</span></Fragment>
-      ))}</span>
+      {/* the label breaks at its middle dots; an item wider than the line (200 % text) at its hyphens */}
+      <span class="sp-label__brief"><LabelItems brief={label.brief} half="sp-label__half" sr="sp-sr" /></span>
     </summary>
     <p>{label.expanded}</p>
   </details>
