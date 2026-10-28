@@ -56,7 +56,7 @@ export const fragment: FigureFragment = {
           h2: 'What is Still I Rise about?',
           seedId: 12,
           body:
-            'Still I Rise was published in 1978, in the collection And Still I Rise. Maya Angelou was fifty. The poem is addressed to someone, and that someone is trying to hold the speaker down. Lies get written about her. She gets looked at with contempt. After each blow the same answer comes back, and the answer is that she rises anyway. What makes it unusual is the tone. It is not wounded and it is not asking for pity. It sits closer to joy, and the joy is the defiance. The poem is still in copyright, so we do not reprint it here. What we can do is hand you the door. Ask her what she meant.',
+            'Still I Rise was published in 1978, in the collection And Still I Rise. Maya Angelou was fifty. The poem is addressed to someone, and that someone is trying to hold the speaker down. Lies get written about her. She gets looked at with contempt. After each blow the same answer comes back, and the answer is that she rises anyway. What makes it unusual is the tone. It is not wounded and it is not asking for pity. It sits closer to joy, and the joy is the defiance. The poem is still in copyright, so we do not reprint it here. What we can do is point the way: to her life in the stories on this page, and to the collection And Still I Rise.',
         },
         {
           h2: 'What did Maya Angelou mean by making a way out of no way?',
@@ -87,7 +87,7 @@ export const fragment: FigureFragment = {
           h2: 'Worum geht es in Still I Rise?',
           seedId: 12,
           body:
-            'Still I Rise erschien 1978, im Gedichtband And Still I Rise. Maya Angelou war fünfzig. Das Gedicht spricht jemanden direkt an, und dieser Jemand will die Sprecherin klein halten. Es werden Lügen über sie geschrieben. Sie wird verächtlich angesehen. Nach jedem Schlag kommt dieselbe Antwort, und die Antwort lautet: Sie steht trotzdem wieder auf. Ungewöhnlich ist der Ton. Er ist nicht verletzt, und er bittet nicht um Mitleid. Er liegt näher an Freude, und die Freude ist der Trotz. Das Gedicht steht bis heute unter Urheberrecht. Deshalb drucken wir es hier nicht ab. Was wir tun können, ist dich zu ihr bringen. Frag sie, was sie gemeint hat.',
+            'Still I Rise erschien 1978, im Gedichtband And Still I Rise. Maya Angelou war fünfzig. Das Gedicht spricht jemanden direkt an, und dieser Jemand will die Sprecherin klein halten. Es werden Lügen über sie geschrieben. Sie wird verächtlich angesehen. Nach jedem Schlag kommt dieselbe Antwort, und die Antwort lautet: Sie steht trotzdem wieder auf. Ungewöhnlich ist der Ton. Er ist nicht verletzt, und er bittet nicht um Mitleid. Er liegt näher an Freude, und die Freude ist der Trotz. Das Gedicht steht bis heute unter Urheberrecht. Deshalb drucken wir es hier nicht ab. Was wir tun können, ist den Weg zu zeigen: zum Gedichtband And Still I Rise und zu ihrem Leben in den Geschichten auf dieser Seite.',
         },
         {
           h2: 'Maya Angelou einfach erklärt',

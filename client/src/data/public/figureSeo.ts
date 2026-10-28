@@ -192,12 +192,12 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   jung: {
     en: {
-      description: "Carl Gustav Jung on depth psychology: shadow work, individuation, archetypes, and the collective unconscious. A narrated life story and guided talks.",
+      description: "Carl Gustav Jung on depth psychology: shadow work, individuation, archetypes, and the collective unconscious. His life in twelve short stories, to hear or to read.",
       teachingsHeading: "Jung on the Shadow, Individuation, and the Unconscious",
       seoTitle: "Carl Jung on Shadow Work & Archetypes | Agora Cosmica",
     },
     de: {
-      description: "Schattenarbeit nach C. G. Jung: der Schatten einfach erklärt, dazu Archetypen und Individuation. Erzählte Lebensgeschichte und Gespräche mit seinem KI-Echo.",
+      description: "Schattenarbeit nach C. G. Jung: der Schatten einfach erklärt, dazu Archetypen und Individuation. Jungs Leben in zwölf kurzen Geschichten, zum Hören oder Lesen.",
       teachingsHeading: "Jung über Schatten, Individuation und das Unbewusste",
       seoTitle: "Schattenarbeit nach C. G. Jung: Schatten & Archetypen",
     },

@@ -79,7 +79,7 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
   },
   king: {
     en: 'American Baptist minister. He led the movement that ended legal segregation.',
-    de: 'Amerikanischer Baptistenpfarrer. Er führte die Bewegung an, die die staatliche Rassentrennung beendete.',
+    de: 'Amerikanischer Baptistenpfarrer. Er führte die Bewegung an, mit der die staatliche Rassentrennung endete.',
   },
   laozi: {
     en: 'Chinese philosopher. The Daodejing bears his name, and whether he ever lived, nobody knows.',
