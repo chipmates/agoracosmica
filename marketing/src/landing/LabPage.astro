@@ -19,11 +19,14 @@ interface Props {
 const { lang, path, title, newChrome = false } = Astro.props;
 const W = landingWords(lang);
 const name = title ? `${title} · ${W.lab.title}` : W.lab.title;
+// The landing's head and the note behind its "i" (the stage's and the bar's) come from its own words.
+const words = { en: landingWords('en'), de: landingWords('de') };
+const dockLabel = newChrome ? { en: { expanded: words.en.note }, de: { expanded: words.de.note } } : undefined;
 ---
 <Public
-  title={name}
-  fullTitle={`${name} · Agora Cosmica`}
-  description={W.lab.note}
+  title={newChrome ? W.pageTitle : name}
+  fullTitle={newChrome ? W.pageTitle : `${name} · Agora Cosmica`}
+  description={newChrome ? W.description : W.lab.note}
   canonicalPath={path}
   lang={lang}
   noindex
@@ -36,5 +39,5 @@ const name = title ? `${title} · ${W.lab.title}` : W.lab.title;
   <div class="story-page landing-lab">
     <slot />
   </div>
-  <PlayerDock slot="dock" lang={lang} />
+  <PlayerDock slot="dock" lang={lang} label={dockLabel} />
 </Public>

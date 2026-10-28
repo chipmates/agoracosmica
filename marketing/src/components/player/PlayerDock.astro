@@ -12,10 +12,13 @@ interface Props {
   lang: PlayerLang;
   /** False on a page outside the player's router (the poem door): the dock lives with that page. */
   persist?: boolean;
+  /** A page's own label words (the landing's), both languages; the app's label where none is given. */
+  label?: Record<PlayerLang, { brief?: string; expanded?: string }>;
 }
 
-const { lang, persist = true } = Astro.props;
-const labels = { en: storyLabel('en'), de: storyLabel('de') };
+const { lang, persist = true, label } = Astro.props;
+const own = (l: PlayerLang) => ({ ...storyLabel(l), ...label?.[l] });
+const labels = { en: own('en'), de: own('de') };
 // The app's own words for the facts, both languages: the dock outlives a language switch.
 const facts = { en: factWords('en'), de: factWords('de') };
 // The bar's name where the full one does not fit: the short name the rail uses, its first word when it is still long.

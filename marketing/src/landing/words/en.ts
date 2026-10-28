@@ -3,7 +3,12 @@ import type { LandingWords } from './types';
 
 const words: LandingWords = {
   tagline: 'Short stories about life',
-  lead: 'Thirty real lives, retold in the first person.',
+  pageTitle: 'Agora Cosmica · Short Stories About Life',
+  description:
+    'Short stories from the lives of 30 people, from Plato to Frida Kahlo, freely retold. Nonprofit and open source.',
+  lead: 'Thirty lives, freely retold.',
+  note:
+    'Real lives, freely retold: the facts come from the sources, the scenes are imagined. Written in human-AI collaboration, read by a synthetic voice.',
   intro:
     'From Plato to Frida Kahlo, each story is a moment that taught them something about life.',
   choose: 'Pick someone who makes you curious.',
@@ -49,6 +54,7 @@ const words: LandingWords = {
     steam: 'Steam and Ink',
     modern: 'Modern Voices',
   },
+  listHeading: 'All thirty, by era',
   rowLabel: 'The thirty',
   turnNext: name => `Next: ${name}`,
   turnPrevious: name => `Previous: ${name}`,

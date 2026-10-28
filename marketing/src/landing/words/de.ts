@@ -3,7 +3,12 @@ import type { LandingWords } from './types';
 
 const words: LandingWords = {
   tagline: 'Kurze Geschichten übers Leben',
-  lead: 'Dreißig echte Leben, in der Ich-Form nacherzählt.',
+  pageTitle: 'Agora Cosmica · Kurze Geschichten übers Leben',
+  description:
+    'Kurze Geschichten aus dem Leben von 30 Menschen, von Platon bis Frida Kahlo, frei nacherzählt. Non-Profit und Open Source.',
+  lead: 'Dreißig Leben, frei nacherzählt.',
+  note:
+    'Echte Leben, frei nacherzählt: Die Fakten stammen aus den Quellen, die Szenen sind erdacht. Geschrieben in Mensch-KI-Zusammenarbeit, gelesen von einer synthetischen Stimme.',
   intro:
     'Von Platon bis Frida Kahlo: Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt.',
   choose: 'Wähl jemanden, der dich neugierig macht.',
@@ -49,6 +54,7 @@ const words: LandingWords = {
     steam: 'Dampf und Tinte',
     modern: 'Moderne Stimmen',
   },
+  listHeading: 'Alle dreißig, nach Epochen',
   rowLabel: 'Die dreißig',
   turnNext: name => `Weiter zu ${name}`,
   turnPrevious: name => `Zurück zu ${name}`,

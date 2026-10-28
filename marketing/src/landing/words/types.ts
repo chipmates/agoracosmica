@@ -4,8 +4,13 @@
 export interface LandingWords {
   /** W1, the h1: what the stories are (the platform tagline). */
   tagline: string;
+  /** The page's title and description in the head (the lab pages stay noindex). */
+  pageTitle: string;
+  description: string;
   /** The one sentence under the tagline on the hero: who the stories are about and how they are told. */
   lead: string;
+  /** The note behind the label's "i" (on the stage and the bar's "i"): what is real, what is made, and by whom. */
+  note: string;
   /** W2: what each story holds (it never opens with the tagline's words, and the lead already says how they are told). */
   intro: string;
   /** The line that invites a choice among the thirty. */
@@ -20,6 +25,8 @@ export interface LandingWords {
   stageTitle: (name: string) => string;
   /** One name per era, by the era's id, oldest age first in a compound name; the same in the row and the list. */
   eras: Record<string, string>;
+  /** The heading over the thirty by era, as plain links. */
+  listHeading: string;
   /** The row of thirty's accessible name. */
   rowLabel: string;
   /** The two buttons that turn the stage to the next or previous figure, with the name they lead to. */
