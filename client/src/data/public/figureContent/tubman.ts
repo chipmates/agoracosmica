@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Harriet Tubman speaking?',
-        a: "No. These stories retell her life in the first person. They were written with AI from the interviews she gave and the historical sources. A synthetic voice reads them. Not a recording. Harriet Tubman lived from about 1822 to 1913. No recording of her exists, and almost everything we have in her words was written down by the people who interviewed her. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from the interviews she gave and the historical sources. A synthetic voice reads them. Not a recording. Harriet Tubman lived from about 1822 to 1913. No recording of her exists, and almost everything we have in her words was written down by the people who interviewed her. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Harriet Tubman?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Interviews mit ihr und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Harriet Tubman lebte von etwa 1822 bis 1913. Von ihr gibt es keine Aufnahme, und fast alles, was wir in ihren Worten haben, stammt aus Interviews, die andere aufgeschrieben haben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Interviews mit ihr und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Harriet Tubman lebte von etwa 1822 bis 1913. Von ihr gibt es keine Aufnahme, und fast alles, was wir in ihren Worten haben, stammt aus Interviews, die andere aufgeschrieben haben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

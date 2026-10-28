@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Galileo Galilei speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from his books, the trial records and the historical sources. A synthetic voice reads them. Not a recording. Galileo Galilei lived from 1564 to 1642. No recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his books, the trial records and the historical sources. A synthetic voice reads them. Not a recording. Galileo Galilei lived from 1564 to 1642. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Galileo Galilei?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Büchern, den Prozessakten und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Galileo Galilei lebte von 1564 bis 1642. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern, den Prozessakten und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Galileo Galilei lebte von 1564 bis 1642. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

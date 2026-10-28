@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Mahatma Gandhi speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from his autobiography, from Hind Swaraj and from the historical sources. A synthetic voice reads them. Not a recording. Mohandas Gandhi lived from 1869 to 1948. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his autobiography, from Hind Swaraj and from the historical sources. A synthetic voice reads them. Not a recording. Mohandas Gandhi lived from 1869 to 1948. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Mahatma Gandhi?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seiner Autobiografie, nach „Hind Swaraj“ und nach den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Mohandas Gandhi lebte von 1869 bis 1948. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seiner Autobiografie, nach „Hind Swaraj“ und nach den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Mohandas Gandhi lebte von 1869 bis 1948. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

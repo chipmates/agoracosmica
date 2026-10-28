@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Frida Kahlo speaking?',
-        a: "No. These stories retell her life in the first person. They were written with AI from her diary, her letters and the historical sources. A synthetic voice reads them. Not a recording. Frida Kahlo lived from 1907 to 1954. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her diary, her letters and the historical sources. A synthetic voice reads them. Not a recording. Frida Kahlo lived from 1907 to 1954. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Frida Kahlo?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihrem Tagebuch, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Frida Kahlo lebte von 1907 bis 1954. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihrem Tagebuch, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Frida Kahlo lebte von 1907 bis 1954. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

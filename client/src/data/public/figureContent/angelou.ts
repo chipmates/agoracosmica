@@ -25,7 +25,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Maya Angelou speaking?',
-        a: "No. These stories retell her life in the first person. They were written with AI from her autobiographies and the historical sources. A synthetic voice reads them. Not a recording. Maya Angelou lived from 1928 to 2014. Recordings of her exist, and none of them are used here. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her autobiographies and the historical sources. A synthetic voice reads them. Not a recording. Maya Angelou lived from 1928 to 2014. Recordings of her exist, and none of them are used here. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -45,7 +45,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Maya Angelou?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Autobiografien und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Maya Angelou lebte von 1928 bis 2014. Von ihr gibt es Tonaufnahmen, und hier wird keine davon verwendet. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Autobiografien und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Maya Angelou lebte von 1928 bis 2014. Von ihr gibt es Tonaufnahmen, und hier wird keine davon verwendet. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

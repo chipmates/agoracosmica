@@ -116,7 +116,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Is this really Carl Gustav Jung speaking?",
-        a: "No. These stories retell his life in the first person. They were written with AI from his memoir and the historical sources. A synthetic voice reads them. Not a recording. Carl Gustav Jung lived from 1875 to 1961. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his memoir and the historical sources. A synthetic voice reads them. Not a recording. Carl Gustav Jung lived from 1875 to 1961. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -136,7 +136,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Carl Gustav Jung?",
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Lebenserinnerungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Carl Gustav Jung lebte von 1875 bis 1961. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Lebenserinnerungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Carl Gustav Jung lebte von 1875 bis 1961. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
@@ -200,7 +200,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Is this really Marcus Aurelius speaking?",
-        a: "No. These stories retell his life in the first person. They were written with AI from the Meditations and the historical sources. A synthetic voice reads them. Not a recording. Marcus Aurelius lived from 121 to 180 AD. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Meditations and the historical sources. A synthetic voice reads them. Not a recording. Marcus Aurelius lived from 121 to 180 AD. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -220,7 +220,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Mark Aurel?",
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Selbstbetrachtungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Mark Aurel lebte von 121 bis 180 n. Chr. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Selbstbetrachtungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Mark Aurel lebte von 121 bis 180 n. Chr. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

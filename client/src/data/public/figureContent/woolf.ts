@@ -25,7 +25,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Virginia Woolf speaking?',
-        a: "No. These stories retell her life in the first person. They were written with AI from her diaries, her letters and the historical sources. A synthetic voice reads them. Not a recording. Virginia Woolf lived from 1882 to 1941. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her diaries, her letters and the historical sources. A synthetic voice reads them. Not a recording. Virginia Woolf lived from 1882 to 1941. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -45,7 +45,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Virginia Woolf?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Tagebüchern, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Virginia Woolf lebte von 1882 bis 1941. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Tagebüchern, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Virginia Woolf lebte von 1882 bis 1941. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

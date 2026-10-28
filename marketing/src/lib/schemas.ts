@@ -33,12 +33,11 @@ export function personSchema(figure: {
         entity.wikidata,
       ].filter(Boolean)
     : [];
-  // Keeps the entity honest: the page retells the life in stories written with AI, beside an AI portrait
-  // of the real Wikidata person, and the schema says so explicitly.
+  // Says what the page is: a retelling of the real person's life, so the entity is not taken for the person.
   const disambiguatingDescription =
     figure.lang === 'de'
-      ? `Seite über ${figure.name}: das Leben, wie es überliefert ist, nacherzählt in kurzen Geschichten in der Ich-Form. Sie sind mit KI geschrieben und werden von einer synthetischen Stimme vorgelesen. Keine Aufnahme. Das Porträt ist ein KI-erzeugtes Bild, keine Fotografie.`
-      : `Page about ${figure.name}: the life as it has come down to us, retold in short first-person stories. They are written with AI and read by a synthetic voice. Not a recording. The portrait is an AI-generated image, not a photograph.`;
+      ? `Seite über ${figure.name}: das Leben, wie es überliefert ist, nacherzählt in kurzen Geschichten in der Ich-Form.`
+      : `Page about ${figure.name}: the life as it has come down to us, retold in short first-person stories.`;
   // knowsAbout stays a plain string when no concepts are passed, so nothing
   // changes for the callers that do not supply them.
   const alternateName = figure.lang === 'de' ? entity?.alternateNamesDe : undefined;

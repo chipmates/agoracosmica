@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Plato speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from his dialogues and the historical sources. A synthetic voice reads them. Not a recording. Plato lived from about 428 to 348 BC. Even in his own books the words go to Socrates and the others, never to him. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his dialogues and the historical sources. A synthetic voice reads them. Not a recording. Plato lived from about 428 to 348 BC. Even in his own books the words go to Socrates and the others, never to him. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Platon?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Dialogen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Platon lebte von etwa 428 bis 348 v. Chr. Selbst in seinen eigenen Büchern spricht Sokrates oder ein anderer, nie er selbst. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Dialogen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Platon lebte von etwa 428 bis 348 v. Chr. Selbst in seinen eigenen Büchern spricht Sokrates oder ein anderer, nie er selbst. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
