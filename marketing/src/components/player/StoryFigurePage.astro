@@ -15,7 +15,7 @@ import FigureShadow from '../FigureShadow.astro';
 import FigureQA from '../FigureQA.astro';
 import EchoNote from '../EchoNote.astro';
 import StaticImage from '../StaticImage.astro';
-import PortraitCredit from '../PortraitCredit.astro';
+import '../portrait-credit.css';
 import { portraitAlt } from '../../lib/portraitCredit';
 import SourcesBlock from '../SourcesBlock.astro';
 import StoryHero from './StoryHero.astro';
@@ -28,8 +28,10 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
+import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../../lib/dickinsonPoemsFaq';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
 import { buildStoryQueue } from '../../player/queue';
+import { periodShown } from '../../player/storyFields';
 import { playerStrings } from '../../player/strings';
 import { deepLinks, storyNote } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
@@ -43,6 +45,11 @@ interface Props {
 const { figureId, slug, lang } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
+// Dickinson's poems capsule: the head's FAQ schema (player/figurePage.ts) holds these questions, so the page shows them.
+const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
+const poemsLink = de
+  ? 'Ihre Gedichte nach Themen, in ihrer eigenen Handschrift, auf Englisch →'
+  : 'Her poems by theme, in her own hand →';
 const P = playerStrings(lang);
 const figure = getFigureById(figureId, lang);
 if (!figure) throw new Error(`Unknown figure: ${figureId}`);
@@ -50,7 +57,7 @@ if (!figure) throw new Error(`Unknown figure: ${figureId}`);
 const qa = getFigureQA(figureId, lang);
 const leadAnswer = qa?.pairs[0]?.a ?? '';
 const aboutParas = !leadAnswer ? figure.about.split('\n').map(p => p.trim()).filter(Boolean) : [];
-const meta = [figure.tradition, figure.period].filter(Boolean).join(' · ');
+const meta = [figure.tradition, figure.period ? periodShown(figure.period) : ''].filter(Boolean).join(' · ');
 
 
 // Deep pages: the ones named under a concept heading sit there, the rest
@@ -142,6 +149,22 @@ const note = storyNote(figureId, lang, figure.name);
 
     <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player />
 
+    {poemsFaq && (
+      <section class="pub-section pub-figure__poems">
+        <h2 class="pub-section__title">{poemsFaq[0]!.q}</h2>
+        <p class="pub-section__text">{poemsFaq[0]!.a}</p>
+        <p class="pub-section__text pub-figure__poems-link">
+          <a class="pub-textlink" href="/figures/emily-dickinson/poems/">{poemsLink}</a>
+        </p>
+        {poemsFaq.slice(1).map(item => (
+          <div class="pub-figure__qa">
+            <h3 class="pub-figure__qa-q">{item.q}</h3>
+            <p class="pub-section__text">{item.a}</p>
+          </div>
+        ))}
+      </section>
+    )}
+
     <FigureLattice figureId={figureId} figureName={figure.name} lang={lang}>
       {relatedFigureIds.length > 0 && (
         <div class="fig-related" slot="coda">
@@ -155,7 +178,6 @@ const note = storyNote(figureId, lang, figure.name);
                 <a href={publicUrl(lang, `/figures/${relSlug}`)} class="pub-figure-card pub-figure-card--row">
                   <span class="ai-portrait">
                     <StaticImage figureId={relId} type="thumbnail" alt={portraitAlt(relFigure.name, lang)} loading="lazy" width={64} height={64} sizes="64px" />
-                    <PortraitCredit lang={lang} />
                   </span>
                   <div>
                     <div class="pub-figure-card__name">{relFigure.name}</div>

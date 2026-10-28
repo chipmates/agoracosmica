@@ -10,6 +10,7 @@ import { getSeedsFor } from '../lib/seeds';
 import { chapterDisplayMinutes } from '../lib/storyRuntime';
 import { getChapterFactcheck } from '../lib/factchecks';
 import { cleanDisplayText, cleanFactText } from '../lib/figureWorld';
+import { yearValue } from './storyFields';
 import { figureImage } from '../lib/figureImages';
 import { playerStrings } from './strings';
 import { isShe } from './figureCopy';
@@ -67,6 +68,13 @@ function contentVersions(): { factchecks?: string; stories?: string } {
   };
   versionsMemo = { factchecks: one('factchecks'), stories: one('stories') };
   return versionsMemo;
+}
+
+/** Whether the stories' years follow the life's order (each story's first year at or after the one before). */
+export function inLifeOrder(queue: StoryQueue): boolean {
+  // a year before Christ counts below zero, so a life BC runs forward as its years fall
+  const years = queue.entries.filter(e => e.n > 0).map(e => yearValue(e.year));
+  return years.every((y, i) => i === 0 || Number.isNaN(y) || Number.isNaN(years[i - 1]!) || y >= years[i - 1]!);
 }
 
 export function buildStoryQueue(

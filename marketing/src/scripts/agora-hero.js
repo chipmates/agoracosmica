@@ -128,9 +128,9 @@ var F = RAW.map(function (a) {
 var byId = {}; F.forEach(function (f) { byId[f.id] = f; });
 
 var T = DE ? {
-  tagline:'Eine lebendige Bibliothek, mit der du sprechen kannst',
+  tagline:'Kurze Geschichten übers Leben',
   eyebrow:'Stimmen aus der ganzen Geschichte',
-  h1:'Eine lebendige Bibliothek, <i>mit der du sprechen kannst</i>',
+  h1:'Kurze Geschichten <i>übers Leben</i>',
   sub:'Lerne von 30 bemerkenswerten Menschen, von Mark Aurel bis Frida Kahlo.',
   play:'Das Echo hören', playing:'Läuft',
   qkickM:'Wohin sein Weg führt', qkickF:'Wohin ihr Weg führt',
@@ -146,9 +146,9 @@ var T = DE ? {
   nav:['Menschen','Themen','Über uns'], navCta:'Jetzt entdecken', navLang:'EN',
   figuresHref:'/de/figures/'
 } : {
-  tagline:'A Living Library You Can Talk To',
+  tagline:'Short stories about life',
   eyebrow:'Voices from across history',
-  h1:'A Living Library <i>You Can Talk To</i>',
+  h1:'Short stories <i>about life</i>',
   sub:"Learn from 30 of history's remarkable people, Marcus Aurelius to Frida Kahlo.",
   play:'Hear the Echo', playing:'Playing',
   qkickM:'Where his path leads', qkickF:'Where her path leads',

@@ -14,6 +14,7 @@ import Public from '../../../layouts/Public.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
+import AiLabel from '../../../components/AiLabel.astro';
 import PoemDoor from '../../../components/PoemDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
@@ -106,6 +107,7 @@ const schemas = [
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">In his own words</p>
       <h1 class="esy-hero__title">William Blake's poems</h1>
+      <AiLabel lang={lang} class="esy-hero__label" />
       <p class="esy-hero__lead">
         1757-1827 · London. Engraver, painter, and poet, ignored in his own
         lifetime and unlike anyone before or since. He wrote his poems, etched

@@ -9,10 +9,11 @@
 //
 // The disclosure sits under the portrait because that is what it describes:
 // the image and the voice. Its wording is fixed by the transparency program,
-// so it is rendered from its translation key and never restated here. Above it
-// the portrait's credit, the player's own string, stands at every width.
+// so it is rendered from its translation key and never restated here. Above
+// it the label block, which names the AI images, so no picture carries a credit.
 
 import FigurePortrait from './FigurePortrait.astro';
+import AiLabel from './AiLabel.astro';
 import FigureTrailer from '../islands/FigureTrailer';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
@@ -43,7 +44,6 @@ const { figure, slug, lang, answer } = Astro.props;
 const t = getT(lang);
 const de = lang === 'de';
 const heroAnswer = answer ?? '';
-const credit = playerStrings(lang).portraitNote;
 // The promise is our line about the figure, never a quotation of them.
 const learnLine = figure.learn ?? '';
 
@@ -100,7 +100,7 @@ const worldLine = [
       <FigurePortrait figureId={figure.id} name={figure.name} lang={lang} />
     </div>
     <figcaption class="pub-fig-hero__caption">
-      <span class="pub-fig-hero__credit">{credit}</span>
+      <AiLabel lang={lang} class="pub-fig-hero__label" />
       <span class="pub-fig-hero__gloss">{t('figures.echoGloss')}</span>
     </figcaption>
   </figure>
@@ -162,15 +162,8 @@ const worldLine = [
     letter-spacing: 0.02em;
     color: var(--text-dim);
   }
-  /* The credit stays beside the picture at every width and is never behind a tap. */
-  .pub-fig-hero__credit {
-    display: block;
-    font-size: 0.625rem;
-    line-height: 1.43;
-    /* the face's serifed capital I, so "KI" and "AI" never read as "Kl" and "Al" */
-    font-feature-settings: "ss05" 1;
-  }
-  .pub-fig-hero__gloss { display: block; margin-top: 0.35rem; }
+  .pub-fig-hero__gloss { display: block; }
+  .pub-fig-hero .pub-fig-hero__label { margin: 0 0 0.25rem; }
   /* Chapter one as a quiet door under the promise: it names the chapter and
      the runtime, and the click plays that chapter. */
   .fig-hero-chapter { margin: 1.2rem 0 0; }
@@ -232,11 +225,12 @@ const worldLine = [
   }
   /* One gloss, two homes: desktop keeps it under the portrait, phones show
      it at the hero's end instead. Exactly one is displayed per viewport, so
-     assistive tech hears the disclosure once. The credit stays in the figure. */
+     assistive tech hears the disclosure once. */
   .pub-fig-hero__caption--end { display: none; }
   @media (max-width: 819.98px) {
-    .pub-fig-hero__figure .pub-fig-hero__caption { margin-top: 0.6rem; text-align: center; }
+    .pub-fig-hero__figure .pub-fig-hero__caption { margin-top: 0.6rem; max-width: none; text-align: center; }
     .pub-fig-hero__figure .pub-fig-hero__gloss { display: none; }
+    .pub-fig-hero .pub-fig-hero__label { width: fit-content; margin-left: auto; margin-right: auto; }
     .pub-fig-hero__caption--end {
       display: block;
       margin: 1.1rem auto 0;

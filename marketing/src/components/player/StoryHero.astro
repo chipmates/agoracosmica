@@ -8,6 +8,7 @@ import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/pu
 import { numberWord } from '../../lib/figureWorld';
 import { VOICE_DESC_ID, labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
+import { keepRanges } from '../../player/storyFields';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -28,7 +29,7 @@ const first = queue.entries[0];
 const intro = queue.entries.find(e => e.n === 0);
 const doText = P.begin;
 const whatText = intro?.minutes ? P.beginSub(intro.minutes) : [first?.title, first?.minutes ? P.minutes(first.minutes) : ''].filter(Boolean).join(' · ');
-// The alt carries the credit too: the name, then the same words as the line under the picture.
+// The alt names the picture as an AI image; the label below names the images for the eye.
 const alt = `${name}, ${P.portraitNote}`;
 const own = ownWords(figureId, lang);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
@@ -39,7 +40,7 @@ const halves = labelHalves(label.brief);
   <div class="sp-hero__id">
     <div class="sp-hero__names">
       <h1 class="sp-hero__name" id="sp-name">{name}</h1>
-      {meta && <p class="sp-hero__meta">{meta}</p>}
+      {meta && <p class="sp-hero__meta">{keepRanges(meta).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>}
     </div>
     <figure class="sp-hero__portrait">
       <picture>
@@ -54,7 +55,6 @@ const halves = labelHalves(label.brief);
           decoding="async"
         />
       </picture>
-      <figcaption>{P.portraitNote}</figcaption>
     </figure>
   </div>
   <p class="sp-hero__line">{heroLine(figureId, lang, leadAnswer)}</p>

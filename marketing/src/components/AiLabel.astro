@@ -1,0 +1,25 @@
+---
+// The label block of a page that shows AI portraits: the player's label line (player/label.ts), word for word, its
+// note one tap away. It stands on the page's first screen, before any portrait lower down.
+import { storyLabel } from '../player/label';
+import { labelHalves } from '../player/strings';
+import type { Lang } from '../i18n';
+import './ai-label.css';
+
+interface Props {
+  lang: Lang;
+  class?: string;
+}
+
+const { lang, class: cls } = Astro.props;
+const label = storyLabel(lang);
+---
+<details class:list={['ai-label', cls]}>
+  <summary>
+    <span class="ai-label__i" aria-hidden="true">i</span>
+    <span class="ai-label__brief">{labelHalves(label.brief).map((half, i) => (
+      <Fragment>{i > 0 ? ' ' : ''}<span class="ai-label__half">{half}</span></Fragment>
+    ))}</span>
+  </summary>
+  <p>{label.expanded}</p>
+</details>

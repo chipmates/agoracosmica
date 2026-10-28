@@ -679,10 +679,20 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   white-space: nowrap;
 }
 .sp-row__approx { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-bottom: 2px; }
+/* a decade ("1910s", "1970er") at the year's size is wider than the column */
+.sp-row__decade { font-size: 0.7em; }
+/* a year or decade a little wider than the column ("1900", "2000er") */
+.sp-row__tight { letter-spacing: -0.04em; }
+.sp-row__decade.sp-row__tight { font-size: 0.62em; letter-spacing: 0; }
+/* a range of numbers never breaks at its hyphen */
+.sp-nb { white-space: nowrap; }
+.sp-row__yearto { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-top: 3px; }
 .sp-row__scroll { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .sp-row__body { min-width: 0; }
 .sp-row__title { display: block; font-family: var(--font-content); font-size: 1.1875rem; line-height: 1.22; color: var(--sp-ink); text-wrap: pretty; }
 .sp-row__sub { display: block; margin-top: 3px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.35; color: var(--sp-ink-3); }
+/* an age reads as one piece ("mit 48 Jahren") */
+.sp-row__age { white-space: nowrap; }
 .sp-row__state { position: relative; width: 24px; height: 24px; color: var(--sp-accent); }
 .sp-ring--row circle { stroke-width: 2.4; }
 .sp-row__check { display: none; width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
@@ -945,6 +955,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 @media (min-width: 1024px) { .sp-atlas__name { font-size: 1.05rem; } }
 
 .sp-mapnote { margin: 8px 0 4px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; color: var(--sp-ink-3); }
+/* a next star with no clear spot for its tag on the plate: the tag's words under the map, in the tag's gold */
+.sp-mapnext { margin: 8px 0 0; font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 500; line-height: 1.4; color: var(--sp-accent); }
 
 /* a phone's chosen star: the app's seed note under the plate, holding the story's row */
 .sp-mapsel {
