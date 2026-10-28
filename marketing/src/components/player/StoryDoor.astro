@@ -10,6 +10,7 @@ import { VOICE_DESC_ID, playerStrings } from '../../player/strings';
 import LabelItems from './LabelItems.astro';
 import { storyLabel } from '../../player/label';
 import { buildStoryQueue } from '../../player/queue';
+import { keepCompounds } from '../../player/storyFields';
 import type { PlayerLang } from '../../player/strings';
 
 interface Props {
@@ -35,7 +36,7 @@ const label = storyLabel(lang, portraits);
 <aside class="sp-door" aria-labelledby="sp-door-title" data-nosnippet>
   <script is:inline type="application/json" data-story-door-queue set:html={queueJson} />
   <h2 class="sp-door__title" id="sp-door-title">{P.doorTitle(name, countWord)}</h2>
-  <p class="sp-door__note">{P.retellingNote(!!queue.she)}</p>
+  <p class="sp-door__note">{keepCompounds(P.retellingNote(!!queue.she)).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>

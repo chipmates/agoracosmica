@@ -9,7 +9,7 @@ import { numberWord } from '../../lib/figureWorld';
 import { VOICE_DESC_ID, playerStrings } from '../../player/strings';
 import LabelItems from './LabelItems.astro';
 import { storyLabel } from '../../player/label';
-import { keepRanges } from '../../player/storyFields';
+import { keepCompounds, keepRanges } from '../../player/storyFields';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -57,7 +57,7 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
     </figure>
   </div>
   <p class="sp-hero__line">{heroLine(figureId, lang, leadAnswer)}</p>
-  <p class="sp-hero__note">{P.heroNote(numberWord(storyCount, lang), !!queue.she)}</p>
+  <p class="sp-hero__note">{keepCompounds(P.heroNote(numberWord(storyCount, lang), !!queue.she)).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>

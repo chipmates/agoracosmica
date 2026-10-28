@@ -153,9 +153,18 @@ export function ageBound(age: string | undefined, lang: PlayerLang, end: 'first'
 
 /** A text in parts, each range of numbers ("1934-35", "121-180", "2.-3.") a part that never breaks. */
 export function keepRanges(text: string): { text: string; keep: boolean }[] {
+  return keepMatches(text, /\S*\d[-–]\d\S*/g);
+}
+
+/** The same for a hyphenated compound ("Ich-Form"), which WebKit's pretty wrapping may break at its hyphen. */
+export function keepCompounds(text: string): { text: string; keep: boolean }[] {
+  return keepMatches(text, /\S*\p{L}-\p{L}\S*/gu);
+}
+
+function keepMatches(text: string, re: RegExp): { text: string; keep: boolean }[] {
   const out: { text: string; keep: boolean }[] = [];
   let at = 0;
-  for (const m of text.matchAll(/\S*\d[-–]\d\S*/g)) {
+  for (const m of text.matchAll(re)) {
     if (m.index! > at) out.push({ text: text.slice(at, m.index), keep: false });
     out.push({ text: m[0], keep: true });
     at = m.index! + m[0].length;
