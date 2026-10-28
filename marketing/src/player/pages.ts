@@ -6,7 +6,7 @@
 import { poemsByPoet } from '../data/poems/index.mjs';
 import { figureSlugToId } from '@client/data/public/slugMap';
 
-const LIVE: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart', 'william-shakespeare', 'johann-wolfgang-von-goethe', 'dogen-zenji', 'frida-kahlo', 'harriet-tubman', 'ada-lovelace', 'simone-de-beauvoir', 'arthur-schopenhauer', 'laozi', 'mahatma-gandhi', 'martin-luther-king-jr', 'nelson-mandela', 'wolfgang-amadeus-mozart', 'galileo-galilei', 'leonardo-da-vinci', 'friedrich-nietzsche', 'jane-austen', 'albert-einstein', 'hildegard-von-bingen'];
+const LIVE: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart', 'william-shakespeare', 'johann-wolfgang-von-goethe', 'dogen-zenji', 'frida-kahlo', 'harriet-tubman', 'ada-lovelace', 'simone-de-beauvoir', 'arthur-schopenhauer', 'laozi', 'mahatma-gandhi', 'martin-luther-king-jr', 'nelson-mandela', 'wolfgang-amadeus-mozart', 'galileo-galilei', 'leonardo-da-vinci', 'friedrich-nietzsche', 'jane-austen', 'albert-einstein', 'hildegard-von-bingen', 'plato', 'william-blake', 'virginia-woolf', 'siddhartha-gautama', 'carl-gustav-jung', 'rumi', 'maya-angelou'];
 
 // The fit check (scripts/check-player-fit.mjs) builds every figure on the player into its own folder, so a figure's
 // page is checked before it is listed above; a plain build never sets the flag.
@@ -22,6 +22,9 @@ export const STORY_PLAYER_COMPANIONS: Readonly<Record<string, readonly string[]>
     '/figures/william-shakespeare/sonnets/',
     ...poemsByPoet('shakespeare').map((poem: { path: string }) => poem.path),
   ],
+  'plato': ['/de/figures/plato/hoehlengleichnis/', '/de/figures/plato/ideenlehre/'],
+  'william-blake': ['/figures/william-blake/poems/', ...poemsByPoet('blake').map((poem: { path: string }) => poem.path)],
+  'rumi': ['/figures/rumi/poems/'],
 };
 
 export function hasStoryPlayer(slug: string): boolean {

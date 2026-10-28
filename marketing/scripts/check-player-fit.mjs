@@ -15,8 +15,10 @@
 // the title box, a path, another star's playing ring (r 20) or its own next ring (r 24); where a star has no tag on the
 // plate, its line under the map says "<tag>: <n>. <title>"; no number touches a path, another star's ring or another
 // number; the introduction's name keeps off the stars, the paths and the numbers; the title box keeps off
-// "via sapientiae" and the stars; every story and the introduction has a star of its own. A star's tap target under
-// 44 px is reported (TAP lines), not failed: a pattern wider than tall cannot grow on a phone without losing its shape.
+// "via sapientiae" and the stars; every story and the introduction has a star of its own. The map is offered only where
+// its smallest star target reaches 44 px under a finger (the phone sizes run as touch screens) or 24 px under a mouse
+// (1440); the page's own choice is checked against that, a size without the map reports a NOMAP line, and an offered
+// map's target under 44 px a TAP line.
 // Words: the hero's meta line is the field and plain years (no bracket, no note); a row's place has no slash and no
 // bracket; an age reads as an age, and carries "etwa" / "about" where the birth year is approximate; every year
 // field sets in the year column (a year or a decade in the large figure, each small line inside the column, nothing
@@ -170,6 +172,10 @@ function measure({ checkMap }) {
   const svg = document.querySelector('[data-story-map]');
   if (!svg) return out;
   const spread = document.querySelector('.sp-spread');
+  // the page's own choice first, then the map shown for the measure wherever the page withholds it
+  const offered = !spread?.hasAttribute('data-map-off');
+  const fine = matchMedia('(pointer: fine)').matches;
+  document.querySelector('.sp-mapwrap')?.style.removeProperty('display');
   if (spread) spread.dataset.view = 'map';
   const fs = el => parseFloat(getComputedStyle(el).fontSize);
   // caps and figures: their ink sits on the baseline; the box is the advance less the last letter's spacing
@@ -208,7 +214,7 @@ function measure({ checkMap }) {
   });
   const caps = Object.fromEntries([...document.querySelectorAll('[data-next-cap]')].map(c => [c.dataset.nextCap, c.textContent.trim()]));
   const vb = svg.viewBox.baseVal;
-  out.map = { stars: stars.map(({ n, x, y, tap }) => ({ n, x, y, tap })), nums, intro, via, segs, title, tags, caps, w: vb.width, h: vb.height,
+  out.map = { offered, fine, stars: stars.map(({ n, x, y, tap }) => ({ n, x, y, tap })), nums, intro, via, segs, title, tags, caps, w: vb.width, h: vb.height,
     word: svg.dataset.nextWord ?? null, titles: Object.fromEntries([...document.querySelectorAll('.sp-row')].map(r => [r.dataset.n, r.querySelector('.sp-row__title')?.textContent.trim()])) };
   return out;
 }
@@ -283,7 +289,11 @@ function judgeMap(slug, lang, where, m) {
     if (Math.hypot(a.x - b.x, a.y - b.y) < 1) fail(slug, lang, where, `stars ${a.n} and ${b.n} stand at one place`, '');
   }));
   const small = m.stars.reduce((x, o) => (o.tap < x.tap ? o : x), { tap: Infinity });
-  if (small.tap < 44) taps.push(`TAP ${slug} ${lang} ${where} smallest star target ${f1(small.tap)} px (star ${small.n})`);
+  const bar = m.fine ? 24 : 44;
+  if (m.offered && small.tap < bar) fail(slug, lang, where, 'the map is offered under its tap bar', `${f1(small.tap)} px (star ${small.n}) against ${bar}`);
+  if (!m.offered && small.tap >= bar) fail(slug, lang, where, 'the map is withheld over its tap bar', `${f1(small.tap)} px (star ${small.n}) against ${bar}`);
+  if (!m.offered) taps.push(`NOMAP ${slug} ${lang} ${where} the list alone: smallest star target ${f1(small.tap)} px (star ${small.n}) under ${bar}`);
+  else if (small.tap < 44) taps.push(`TAP ${slug} ${lang} ${where} smallest star target ${f1(small.tap)} px (star ${small.n}), ${m.fine ? 'a mouse' : 'a finger'}`);
 }
 const taps = [];
 
@@ -346,7 +356,9 @@ function judgeWords(slug, id, lang, where, r) {
 for (const engine of engines) {
   const browser = await pw[engine].launch();
   for (const width of [390, 360, 1440]) {
-    const ctx = await browser.newContext({ viewport: { width, height: width > 1000 ? 900 : 844 } });
+    // a phone is a touch screen (its tap bar 44 px), the desktop a mouse (24 px)
+    const touch = width < 1000 ? { hasTouch: true, ...(engine === 'chromium' ? { isMobile: true } : {}) } : {};
+    const ctx = await browser.newContext({ viewport: { width, height: width > 1000 ? 900 : 844 }, ...touch });
     await ctx.route('**/*', r => (new URL(r.request().url()).origin === origin ? r.continue() : r.abort()));
     const page = await ctx.newPage();
     for (const lang of langs) {
@@ -354,9 +366,15 @@ for (const engine of engines) {
         const path = lang === 'de' ? `/de/figures/${slug}/` : `/figures/${slug}/`;
         const res = await page.goto(origin + path, { waitUntil: 'load' });
         if (!res || res.status() !== 200 || !(await page.$('.sp-hero'))) { fail(slug, lang, `${engine} ${width}`, 'no player page', String(res?.status())); continue; }
-        // the map's own type loads only once the map shows: show it, wait for the fonts, then measure as built
+        // the page's script has run once the plate carries its offer (the map's choice is made before it)
+        if (!(await page.waitForSelector('[data-story-hero-plate][data-offer]', { state: 'attached', timeout: 10000 }).catch(() => null))) {
+          fail(slug, lang, `${engine} ${width}`, 'the page script never ran', ''); continue;
+        }
+        // the map's own type loads only once the map shows: show it (a withheld map too), wait for the fonts, then
+        // measure as built
         await page.evaluate(() => {
           const sp = document.querySelector('.sp-spread'); const was = sp?.dataset.view;
+          document.querySelector('.sp-mapwrap')?.style.removeProperty('display');
           if (sp) sp.dataset.view = 'map';
           return document.fonts.ready.then(() => { if (sp) { if (was === undefined) delete sp.dataset.view; else sp.dataset.view = was; } });
         });

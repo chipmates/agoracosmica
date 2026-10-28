@@ -320,6 +320,38 @@ function setView(kind: 'list' | 'map'): void {
   });
 }
 
+// The map is offered only where its smallest star target, at the plate's real width, reaches 44 px under a finger
+// or 24 px under a mouse (WCAG 2.2, 2.5.8); elsewhere the list stands alone, with no switch to the map.
+const FINE = '(pointer: fine)';
+
+function mapFits(spread: HTMLElement, map: SVGSVGElement): boolean {
+  const units = Math.min(...Array.from(map.querySelectorAll<SVGCircleElement>('.sp-star__hit'), c => 2 * c.r.baseVal.value));
+  // the plate fills the map's column; the grid resolves that column even while the map is hidden
+  const column = parseFloat(getComputedStyle(spread).gridTemplateColumns);
+  const px = (units * column) / (map.viewBox.baseVal.width || 1);
+  return !Number.isFinite(px) || px >= (window.matchMedia(FINE).matches ? 24 : 44);
+}
+
+function offerMap(): void {
+  const spread = document.querySelector<HTMLElement>('.sp-spread');
+  const map = spread?.querySelector<SVGSVGElement>('svg[data-story-map]');
+  if (!spread || !map) return;
+  const fits = mapFits(spread, map);
+  if (fits === !spread.hasAttribute('data-map-off')) return;
+  spread.toggleAttribute('data-map-off', !fits);
+  if (!fits && spread.dataset.view === 'map') setView('list');
+  // the tools row keeps its height for the switch only; the saved count, when shown, holds it open by itself
+  const set = (el: HTMLElement, prop: string, value: string) => {
+    if (!fits) el.style.setProperty(prop, value);
+    else {
+      el.style.removeProperty(prop);
+      if (!el.getAttribute('style')) el.removeAttribute('style');
+    }
+  };
+  spread.querySelectorAll<HTMLElement>('.sp-viewswitch, .sp-mapwrap').forEach(el => set(el, 'display', 'none'));
+  spread.querySelectorAll<HTMLElement>('.sp-toc__tools').forEach(el => set(el, 'min-height', '0'));
+}
+
 function selectStar(n: number): void {
   const queue = readPageQueue();
   if (!queue) return;
@@ -495,9 +527,17 @@ export function installPage(): void {
   subscribe(sync);
   document.addEventListener('astro:page-load', () => {
     last = null;
+    offerMap();
     sync();
     openFromHash();
   });
+  let sized = 0;
+  window.addEventListener('resize', () => {
+    cancelAnimationFrame(sized);
+    sized = requestAnimationFrame(offerMap);
+  });
+  window.matchMedia(FINE).addEventListener('change', offerMap);
+  offerMap();
   sync();
   openFromHash();
 }
