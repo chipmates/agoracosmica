@@ -133,7 +133,7 @@ const round = (radii: number[]): Spot[] => radii.flatMap(r => Array.from({ lengt
 // One whole layout for an introduction point, a fit height and one language's words: the stars, the lines,
 // "via sapientiae", the numbers, the introduction's name and every star's tag, each label kept off every other mark
 // by MARGIN.
-function layout(intro: Pt | null, FIT_H: number, words: Words) {
+function layout(intro: Pt | null, FIT_H: number, words: Words, earlierRule = false) {
   const TAG_W = words.tag; const NAME_W = words.name;
   const tagBoxAt = (x: number, y: number): Box => ({ l: x, t: y - 8.2, r: x + TAG_W, b: y + 0.3 });
   const VIA_Y = TOP + FIT_H + 18;
@@ -185,31 +185,101 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
     if (a.l < SIDE || a.r > W - SIDE || a.t < 4 || a.b > VIA_Y - 6) bad++;
     return bad;
   };
-  // the stars' numbers: over the star, else the first spot around it clear of the marks, the earlier numbers and
-  // nearer its own star than any other
+  // the stars' numbers: over the star, else the next spot round its own star (from the top) that is clear of the
+  // marks and the other numbers and reads as its own
+  const OVER: Spot = { dx: 0, dy: NUM_DY, anchor: 'middle' };
+  const fromTop = (c: Spot) => Math.abs(Math.atan2(c.dx, -(c.dy - 4)));
   const numSpots: Spot[] = [
-    { dx: 0, dy: NUM_DY, anchor: 'middle' }, { dx: 0, dy: 37, anchor: 'middle' },
-    { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
+    OVER,
     { dx: 21, dy: -21, anchor: 'start' }, { dx: -21, dy: -21, anchor: 'end' },
+    { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
     { dx: 21, dy: 30, anchor: 'start' }, { dx: -21, dy: 30, anchor: 'end' },
-    ...round([29, 34, 40]),
+    { dx: 0, dy: 37, anchor: 'middle' },
+    ...[29, 34, 40].flatMap(r => round([r]).sort((a, b) => fromTop(a) - fromTop(b))),
+    // then a finer ring between them, for the crowded middles of a map
+    ...[27, 31, 36].flatMap(r => Array.from({ length: 48 }, (_, k) => {
+      const t = (k * Math.PI) / 24; const cx = Math.cos(t);
+      return { dx: Math.abs(cx) > 0.3 ? r * cx : 0, dy: r * Math.sin(t) + 4, anchor: cx > 0.3 ? 'start' : cx < -0.3 ? 'end' : 'middle' } as Spot;
+    }).sort((a, b) => fromTop(a) - fromTop(b))),
   ];
   const numBoxOf = (i: number, c: Spot): Box => {
     const [x, y] = at[i]!; const w = numW(numbers[i]!);
     const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - w : x + c.dx - w / 2;
     return { l, t: y + c.dy - 8.9, r: l + w, b: y + c.dy + 0.3 };
   };
-  const nearestIs = (i: number, a: Box) => at.every(([x, y], j) => j === i || toPoint(a, x, y) > toPoint(a, at[i]![0], at[i]![1]));
+  // how clearly a number reads as its own star's (4 or more holds): its centre a step nearer its own star than any
+  // other; moved off its spot, also a third nearer (a fifth while it still stands above its star, where the map's habit
+  // of numbers over stars reads it), and not in the gap between its star and another, beside the line joining them,
+  // unless about twice as near, nor where that star's number stands in the same gap (a stacked pair)
+  // (the margins a little over the number check's, which measures the smaller desktop figures too)
+  const inGap = (i: number, j: number, x: number, y: number) => {
+    const [ox, oy] = at[i]!; const [sx, sy] = at[j]!;
+    const len2 = (sx - ox) ** 2 + (sy - oy) ** 2;
+    const along = ((x - ox) * (sx - ox) + (y - oy) * (sy - oy)) / len2;
+    return along > 0 && along < 1 && Math.abs((sx - ox) * (y - oy) - (sy - oy) * (x - ox)) / Math.sqrt(len2) <= 14;
+  };
+  const readScore = (i: number, a: Box, moved: boolean) => {
+    const cx = (a.l + a.r) / 2; const cy = (a.t + a.b) / 2; const [ox, oy] = at[i]!;
+    const d0 = Math.hypot(ox - cx, oy - cy);
+    return Math.min(Infinity, ...at.map(([x, y], j) => {
+      if (j === i) return Infinity;
+      const d = Math.hypot(x - cx, y - cy);
+      if (!moved) return d - d0;
+      const theirs = numberBox[j] ?? (numbers[j] ? numBoxOf(j, OVER) : null);
+      const pair = !!theirs && inGap(i, j, (theirs.l + theirs.r) / 2, (theirs.t + theirs.b) / 2);
+      const between = inGap(i, j, cx, cy) && (d < 1.9 * d0 || (pair && d <= 2.3 * d0));
+      const clearance = cy < oy - 10 ? 1.2 : 1.35;
+      return Math.min(d - d0, d - clearance * d0 + 4) - (between ? 100 : 0);
+    }));
+  };
+  const VIA_NUM = 16; // a number keeps this far from "via sapientiae", or the two read as one line
   const numberAt: (Spot | null)[] = at.map(() => null);
   const numberBox: (Box | null)[] = at.map(() => null);
-  at.forEach((_, i) => {
-    if (numbers[i] === 0) return;
-    const cost = (c: Spot) => {
-      const a = numBoxOf(i, c);
-      return clearOfMarks(i, a, 24) + numberBox.filter((b): b is Box => !!b).filter(b => hits(a, grow(b, MARGIN))).length + (nearestIs(i, a) ? 0 : 1);
-    };
-    const best = numSpots.find(c => cost(c) === 0) ?? numSpots.reduce((m, c) => (cost(c) < cost(m) ? c : m));
-    if (cost(best) > 0) fails++;
+  const clearCost = (i: number, c: Spot) => {
+    const a = numBoxOf(i, c);
+    return clearOfMarks(i, a, 24) + (hits(a, grow(via, VIA_NUM)) ? 1 : 0)
+      + numberBox.filter((b, j): b is Box => !!b && j !== i).filter(b => hits(a, grow(b, 5))).length;
+  };
+  const numCost = (i: number, c: Spot) => clearCost(i, c) + (readScore(i, numBoxOf(i, c), c !== OVER) >= 4 ? 0 : 1);
+  // the earlier number rule (the first clear spot, below the star second), kept only to choose the introduction's spot
+  // and the plate's height below, so the stars stand where they stood
+  const earlierNumbers = () => {
+    const spots: Spot[] = [
+      OVER, { dx: 0, dy: 37, anchor: 'middle' },
+      { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
+      { dx: 21, dy: -21, anchor: 'start' }, { dx: -21, dy: -21, anchor: 'end' },
+      { dx: 21, dy: 30, anchor: 'start' }, { dx: -21, dy: 30, anchor: 'end' },
+      ...round([29, 34, 40]),
+    ];
+    const nearestIs = (i: number, a: Box) => at.every(([x, y], j) => j === i || toPoint(a, x, y) > toPoint(a, at[i]![0], at[i]![1]));
+    at.forEach((_, i) => {
+      if (numbers[i] === 0) return;
+      const cost = (c: Spot) => {
+        const a = numBoxOf(i, c);
+        return clearOfMarks(i, a, 24) + numberBox.filter((b): b is Box => !!b).filter(b => hits(a, grow(b, MARGIN))).length + (nearestIs(i, a) ? 0 : 1);
+      };
+      const best = spots.find(c => cost(c) === 0) ?? spots.reduce((m, c) => (cost(c) < cost(m) ? c : m));
+      if (cost(best) > 0) fails++;
+      numberAt[i] = best;
+      numberBox[i] = numBoxOf(i, best);
+    });
+  };
+  if (earlierRule) earlierNumbers();
+  // every number whose spot over its star is clear takes it first, so a moved number never pushes another off its own
+  else at.forEach((_, i) => {
+    if (numbers[i] === 0 || numCost(i, OVER) > 0) return;
+    numberAt[i] = OVER;
+    numberBox[i] = numBoxOf(i, OVER);
+  });
+  // the rest: the first spot round the star that holds every rule; else, among the spots clear of every mark, the one
+  // that reads most clearly as its own
+  if (!earlierRule) at.forEach((_, i) => {
+    if (numbers[i] === 0 || numberAt[i]) return;
+    const clear = numSpots.filter(c => clearCost(i, c) === 0);
+    const score = (c: Spot) => readScore(i, numBoxOf(i, c), c !== OVER);
+    const best = numSpots.find(c => numCost(i, c) === 0)
+      ?? (clear.length ? clear.reduce((m, c) => (score(c) > score(m) ? c : m)) : numSpots.reduce((m, c) => (numCost(i, c) < numCost(i, m) ? c : m)));
+    if (numCost(i, best) > 0) fails++;
     numberAt[i] = best;
     numberBox[i] = numBoxOf(i, best);
   });
@@ -331,7 +401,7 @@ const introCands: (Pt | null)[] = earlier ? [earlier, ...introFound.filter(q => 
 let chosen: { q: Pt | null; h: number; fails: number; clean: boolean } | null = null;
 for (const q of introCands) {
   const h = fitHeight(q);
-  const [de, en] = [layout(q, h, wordsOf('de')), layout(q, h, wordsOf('en'))];
+  const [de, en] = [layout(q, h, wordsOf('de'), true), layout(q, h, wordsOf('en'), true)];
   const fails = de.fails + en.fails; const clean = de.nameClean && en.nameClean;
   if (!chosen || (clean && !chosen.clean) || (clean === chosen.clean && fails < chosen.fails)) chosen = { q, h, fails, clean };
   if (fails === 0) break;
