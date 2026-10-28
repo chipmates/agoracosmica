@@ -7,6 +7,7 @@
 import Public from '../layouts/Public.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
 import PoemDoor from './PoemDoor.astro';
+import BackLink from './BackLink.astro';
 import { figureImage } from '../lib/figureImages';
 import { breadcrumbSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../lib/urls';
@@ -42,6 +43,14 @@ const lang = 'en' as const;
 const PAGE_PATH = poem.path.replace(/\/$/, '');
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 const MS = 'https://media.agoracosmica.org/images/dickinson';
+
+// The collection's own heading, as its page shows it.
+const COLLECTION_HEADING: Record<string, string> = {
+  dickinson: "Emily Dickinson's poems",
+  blake: "William Blake's poems",
+  shakespeare: "Shakespeare's sonnets",
+};
+const collectionHeading = COLLECTION_HEADING[poem.poet] ?? poet.collectionLabel;
 
 const siblings = poemsByPoet(poem.poet);
 const at = siblings.findIndex((p) => p.slug === poem.slug);
@@ -111,6 +120,7 @@ const schemas = [
         { label: poem.title },
       ]}
     />
+    <BackLink at="top" href={poet.collectionPath} label={collectionHeading} />
 
     <header class="pm-hero">
       <p class="pm-hero__eyebrow">{poet.eyebrow}</p>
@@ -173,6 +183,7 @@ const schemas = [
     <footer class="pm-sources">
       <p>{poet.sourceNote}</p>
     </footer>
+    <BackLink at="end" href={poet.collectionPath} label={collectionHeading} />
   </div>
 </Public>
 

@@ -9,6 +9,8 @@ import PlayerHead from '../../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../../../player/pages';
 import Breadcrumbs from '../../../../components/Breadcrumbs.astro';
+import BackLink from '../../../../components/BackLink.astro';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../../components/EssayStyles.astro';
 import EssayInvite from '../../../../components/EssayInvite.astro';
 import AiLabel from '../../../../components/AiLabel.astro';
@@ -18,6 +20,8 @@ import { articleSchema, breadcrumbSchema, faqSchema } from '../../../../lib/sche
 import { canonicalUrl, SITE_URL } from '../../../../lib/urls';
 
 const lang = 'de' as const;
+// The way back names the figure page by its own heading.
+const parentName = getFigureById('plato', lang)!.name;
 const t = getT(lang);
 const PAGE_PATH = '/de/figures/plato/ideenlehre';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
@@ -89,6 +93,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         { label: 'Ideenlehre' },
       ]}
     />
+    <BackLink at="top" href="/de/figures/plato/" label={parentName} />
 
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">Urbilder und Abbilder</p>
@@ -274,5 +279,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         ohne wörtliche Zitate aus einer bestimmten Übersetzung.
       </p>
     </footer>
+    <BackLink at="end" href="/de/figures/plato/" label={parentName} />
   </div>
 </Public>

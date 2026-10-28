@@ -13,6 +13,8 @@
 
 import Public from '../../../layouts/Public.astro';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import BackLink from '../../../components/BackLink.astro';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import StoryDoor from '../../../components/player/StoryDoor.astro';
 import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
@@ -39,6 +41,8 @@ const MS = 'https://media.agoracosmica.org/images/dickinson';
 const msUrl = (stem: string) => `${MS}/${stem}.webp`;
 
 const lang = 'en' as const;
+// The way back names the figure page by its own heading.
+const parentName = getFigureById('dickinson', lang)!.name;
 
 // --- Poems, manuscript leaves and repositories: one copy in the data module,
 //     shared with the page each poem has of its own ---
@@ -184,6 +188,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         { label: 'Poems' },
       ]}
     />
+    <BackLink at="top" href="/figures/emily-dickinson/" label={parentName} />
 
     <header class="ed-hero">
       <figure class="ed-hero__portrait">
@@ -361,6 +366,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <footer class="ed-sources">
       <p>{dickinsonSourceNote}</p>
     </footer>
+    <BackLink at="end" href="/figures/emily-dickinson/" label={parentName} />
   </div>
   {storyDock && <PlayerHead slot="head" />}
   <PlayerDock slot="dock" lang={lang} persist={storyDock} portraits={false} />

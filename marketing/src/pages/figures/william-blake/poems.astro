@@ -15,6 +15,8 @@ import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../../player/pages';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import BackLink from '../../../components/BackLink.astro';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
@@ -26,6 +28,8 @@ import { blakePoems as POEMS, blakeGroups as GROUPS } from '../../../data/poems/
 import { poemsByPoet } from '../../../data/poems/index.mjs';
 
 const lang = 'en' as const;
+// The way back names the figure page by its own heading.
+const parentName = getFigureById('blake', lang)!.name;
 // Slot 4 of the app's ask contract is this page's own question: the door skips
 // the mode choice and opens Free Talk about the poem the visitor just read.
 const DOOR_HREF = '/app?figure=william-blake&lang=en&ask=f:blake:4';
@@ -110,6 +114,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         { label: 'Poems' },
       ]}
     />
+    <BackLink at="top" href="/figures/william-blake/" label={parentName} />
 
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">In his own words</p>
@@ -188,6 +193,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         groupings are ours.
       </p>
     </footer>
+    <BackLink at="end" href="/figures/william-blake/" label={parentName} />
   </div>
 </Public>
 

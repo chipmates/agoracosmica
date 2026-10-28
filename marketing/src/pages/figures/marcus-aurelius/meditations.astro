@@ -14,6 +14,8 @@ import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../../player/pages';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import BackLink from '../../../components/BackLink.astro';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -25,6 +27,8 @@ import {
 import { isIndexable, readingPages } from '../../../data/poems/index.mjs';
 
 const lang = 'en' as const;
+// The way back names the figure page by its own heading.
+const parentName = getFigureById('aurelius', lang)!.name;
 const PAGE_PATH = MEDITATIONS_PATH;
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -157,6 +161,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         { label: 'Meditations' },
       ]}
     />
+    <BackLink at="top" href="/figures/marcus-aurelius/" label={parentName} />
 
     <header class="med-hero">
       <p class="med-hero__eyebrow">In his own words</p>
@@ -203,9 +208,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
       </p>
     </section>
 
-    <p class="med-more">
-      <a class="pub-textlink" href="/figures/marcus-aurelius/">Read more about Marcus Aurelius</a>
-    </p>
+    <BackLink at="end" href="/figures/marcus-aurelius/" label={parentName} />
   </div>
 </Public>
 
@@ -321,13 +324,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
   }
   .med-passage__para:last-child {
     margin-bottom: 0;
-  }
-
-  .med-more {
-    margin: 0;
-    font-size: var(--text-sm);
-    line-height: 2;
-    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
   }
 
   @media (max-width: 560px) {

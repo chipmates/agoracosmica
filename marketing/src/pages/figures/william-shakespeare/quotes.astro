@@ -10,6 +10,8 @@ import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../../player/pages';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
+import BackLink from '../../../components/BackLink.astro';
+import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
@@ -25,6 +27,8 @@ import {
 } from '../../../data/quotes/shakespeare.mjs';
 
 const lang = 'en' as const;
+// The way back names the figure page by its own heading.
+const parentName = getFigureById('shakespeare', lang)!.name;
 const PAGE_PATH = SHAKESPEARE_QUOTES_PATH;
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 const NEVER_ID = 'lines-he-never-wrote';
@@ -109,6 +113,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         { label: 'Quotes' },
       ]}
     />
+    <BackLink at="top" href="/figures/william-shakespeare/" label={parentName} />
 
     <header class="esy-hero sq-hero">
       <p class="esy-hero__eyebrow">In his own words</p>
@@ -202,6 +207,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         different, the note says so. The explanations are ours.
       </p>
     </footer>
+    <BackLink at="end" href="/figures/william-shakespeare/" label={parentName} />
   </div>
 </Public>
 
