@@ -1,0 +1,53 @@
+---
+// The site's root landing at / and /de/: the story chrome, the player's router and dock (a story keeps playing across
+// a soft page change), indexable, with its own head words. The layout goes in the default slot.
+import Public from '../layouts/Public.astro';
+import PlayerHead from '../components/player/PlayerHead.astro';
+import PlayerDock from '../components/player/PlayerDock.astro';
+import { agoraCosmicaSchema, breadcrumbSchema, itemListSchema, organizationSchema, webSiteSchema } from '../lib/schemas';
+import { canonicalUrl, SITE_URL } from '../lib/urls';
+import { landingWords } from './words';
+import { THIRTY } from './thirty';
+import type { LandingLang } from './thirty';
+
+interface Props {
+  lang: LandingLang;
+}
+
+const { lang } = Astro.props;
+const W = landingWords(lang);
+// The note behind the label's "i" (the stage's and the bar's) comes from the landing's own words.
+const words = { en: landingWords('en'), de: landingWords('de') };
+const dockLabel = {
+  en: { brief: words.en.label, expanded: words.en.note },
+  de: { brief: words.de.label, expanded: words.de.note },
+};
+const home = lang === 'de' ? `${SITE_URL}/de/` : `${SITE_URL}/`;
+// Markup says what the page shows: the thirty it lists (oldest first), the site and its makers, in the head's words.
+const schemas = [
+  { ...agoraCosmicaSchema(), description: W.description, slogan: W.tagline },
+  organizationSchema(),
+  { ...webSiteSchema(), description: W.tagline },
+  itemListSchema(THIRTY.map(f => ({ name: f.name[lang], url: canonicalUrl(f.href[lang]) }))),
+  breadcrumbSchema([{ name: 'Agora Cosmica', url: home }]),
+];
+---
+<Public
+  title={W.pageTitle}
+  fullTitle={W.pageTitle}
+  description={W.description}
+  canonicalPath="/"
+  lang={lang}
+  schemas={schemas}
+  stickyCta={false}
+  storyPage
+  tagline={W.tagline}
+  echoesLink={false}
+  trimmedChrome={{ explainers: W.explainers }}
+>
+  <PlayerHead slot="head" figurePage />
+  <div class="story-page landing-lab">
+    <slot />
+  </div>
+  <PlayerDock slot="dock" lang={lang} label={dockLabel} />
+</Public>

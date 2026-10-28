@@ -42,6 +42,15 @@
 /de/von-historischen-persoenlichkeiten-lernen  /de/figures/ 301
 /de/von-historischen-persoenlichkeiten-lernen/ /de/figures/ 301
 
+# The landing lab's pages became the landing at / and /de/. Every form of
+# their addresses goes there (no static file is left to normalize the slash).
+/landing-lab      /    301
+/landing-lab/     /    301
+/landing-lab/*    /    301
+/de/landing-lab   /de/ 301
+/de/landing-lab/  /de/ 301
+/de/landing-lab/* /de/ 301
+
 # A poem page that was taken down goes to the collection it stood in. Both
 # slug forms again, since no static file is left to normalize the slash.
 /figures/emily-dickinson/poems/tell-all-the-truth-but-tell-it-slant  /figures/emily-dickinson/poems/ 301

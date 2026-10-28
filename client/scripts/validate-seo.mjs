@@ -134,20 +134,20 @@ for (const f of files) {
   // below. Hydration props="{…}" blobs and JSON-LD do not count as text.
   const text = body.replace(/<[^>]+>/g, ' ');
 
-  // 10. Homepage content-presence guard. The six ways moved from a static card
-  //     grid into the interactive LibraryShowcase, whose six panels are all
-  //     server-rendered. Assert every mode name + the volume band survive in
-  //     crawlable TEXT (tags stripped, so the hydration props="{…}" blob does
-  //     NOT count). If a future refactor pushes the panels JS-only, their prose
-  //     lives only in that attribute and this guard fails the deploy instead of
-  //     silently thinning the homepage.
+  // 10. Landing content-presence guard: the tagline (the h1), the label block
+  //     that names the AI work, and a link to every one of the thirty figure
+  //     pages survive as crawlable TEXT and markup, so a refactor that pushes
+  //     the list or the label JS-only fails the deploy.
   const HOMEPAGE_TERMS = {
-    'index.html': ['Story', 'Wisdom', 'Prism', 'Quest', 'Council', 'Free Talk', '360', '110'],
-    'de/index.html': ['Story', 'Weisheit', 'Prisma', 'Quest', 'Council', 'Free Talk', '360', '110'],
+    'index.html': ['Short stories about life', 'Human-AI collaboration', 'AI images', 'Synthetic voice', 'All thirty, by era'],
+    'de/index.html': ['Kurze Geschichten übers Leben', 'Mensch-KI-Zusammenarbeit', 'KI-Bilder', 'Synthetische Stimme', 'Alle dreißig, nach Epochen'],
   };
   if (HOMEPAGE_TERMS[rel]) {
     for (const term of HOMEPAGE_TERMS[rel])
-      if (!text.includes(term)) hard.push(`${rel}: homepage missing crawlable text "${term}" (six-ways content regression?)`);
+      if (!text.includes(term)) hard.push(`${rel}: landing missing crawlable text "${term}"`);
+    const prefix = rel === 'de/index.html' ? '/de/figures/' : '/figures/';
+    const figureLinks = new Set([...html.matchAll(/href="([^"]+)"/g)].map(m => m[1]).filter(h => h.startsWith(prefix) && /^\/(de\/)?figures\/[^/]+\/$/.test(h)));
+    if (figureLinks.size !== 30) hard.push(`${rel}: landing links ${figureLinks.size} figure pages (expected 30)`);
   }
 
   // 11. AI-disclosure invariants (the 2026-07 Art-50 transparency revision).
@@ -198,8 +198,8 @@ for (const f of files) {
   ]);
   if (DISCLOSURE_PAGES.has(rel)) {
     const disclosure = isDe
-      ? /KI-Echo|KI-Stimme|KI-generiert|KI-erzeugt/
-      : /AI Echo|AI voice|AI-generated/;
+      ? /KI-Echo|KI-Stimme|KI-generiert|KI-erzeugt|KI-Bilder|Synthetische Stimme/
+      : /AI Echo|AI voice|AI-generated|AI images|Synthetic voice/;
     if (!disclosure.test(text)) hard.push(`${rel}: missing AI disclosure line in visible text`);
   }
 }

@@ -30,6 +30,8 @@ const leadParts = W.lead.split(/(?<=,)\s+/);
 const at = THIRTY.findIndex(f => f.id === DEFAULT_FIGURE);
 const nextName = THIRTY[(at + 1) % THIRTY.length]?.name[lang] ?? '';
 const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ?? '';
+// The list's anchor: the old figure list's addresses forward here (_redirects).
+const listId = lang === 'de' ? 'alle' : 'all';
 ---
 <div class="c2">
   <section class="c2-hero" data-c2-hero aria-labelledby="c2-h1">
@@ -96,7 +98,7 @@ const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ??
     </div>
   </section>
 
-  <section class="c2-index" aria-labelledby="c2-index-h">
+  <section class="c2-index" id={listId} aria-labelledby="c2-index-h">
     <h2 class="c2-index__h" id="c2-index-h">{W.listHeading}</h2>
     {eras.map(({ era, figures }) => (
       <div class="c2-index__era">

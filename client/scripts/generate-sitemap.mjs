@@ -115,6 +115,7 @@ function deUrl(rawPath, priority, lastmod, changefreq = 'monthly') {
 const HOME_MOD = gitLastModified(
   'marketing/src/pages/index.astro',
   'marketing/src/pages/de/index.astro',
+  'marketing/src/landing',
   'marketing/src/components/BaseHead.astro',
   'marketing/src/lib/schemas.ts',
 );
