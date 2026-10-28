@@ -356,3 +356,8 @@
   .c2-pick img { width: 50px; height: 50px; }
   .c2-index { margin-top: 3.5rem; }
 }
+
+/* ---- the footer: the landing's carries a fourth group (the explainers), so four columns where the site has three -- */
+@media (min-width: 641px) {
+  .pub-footer .pub-footer__links--four { grid-template-columns: repeat(4, 1fr); }
+}

@@ -29,7 +29,7 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
       <p class="pub-footer__tagline">{tagline ?? t('footer.tagline')}</p>
     </div>
 
-    <div class="pub-footer__links">
+    <div class:list={['pub-footer__links', { 'pub-footer__links--four': explainers.length > 0 }]}>
       <div class="pub-footer__col">
         {!trimmed && <a href={publicUrl(lang, '/figures')}>{t('nav.figures')}</a>}
         {!trimmed && <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>}
