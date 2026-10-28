@@ -164,6 +164,10 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
     en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
     de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
   },
+  rumi: {
+    en: [{ href: '/figures/rumi/poems/', label: "Read Rumi's poems →" }],
+    de: [],
+  },
   plato: {
     en: [],
     de: [
