@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Wolfgang Amadeus Mozart speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Mozart family's letters and the historical sources. Mozart lived from 1756 to 1791. No recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Mozart family's letters and the historical sources. Mozart lived from 1756 to 1791. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Wolfgang Amadeus Mozart?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Briefen der Familie Mozart und den historischen Quellen. Mozart lebte von 1756 bis 1791. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Briefen der Familie Mozart und den historischen Quellen. Mozart lebte von 1756 bis 1791. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

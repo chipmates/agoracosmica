@@ -21,7 +21,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Hildegard von Bingen speaking?',
-        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her writings, her letters and the historical sources. Hildegard von Bingen lived from 1098 to 1179. No recording of her exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her writings, her letters and the historical sources. Hildegard von Bingen lived from 1098 to 1179. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -41,7 +41,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Hildegard von Bingen?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Schriften, ihren Briefen und den historischen Quellen. Hildegard von Bingen lebte von 1098 bis 1179. Von ihr gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Schriften, ihren Briefen und den historischen Quellen. Hildegard von Bingen lebte von 1098 bis 1179. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

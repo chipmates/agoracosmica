@@ -21,7 +21,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Laozi speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Daodejing and the earliest account of his life. Whether he lived at all is debated, and no recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Daodejing and the earliest account of his life. Whether he lived at all is debated. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -41,7 +41,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Laozi?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach dem Daodejing und dem frühesten Bericht über sein Leben. Ob er überhaupt gelebt hat, ist umstritten, und von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach dem Daodejing und dem frühesten Bericht über sein Leben. Ob er überhaupt gelebt hat, ist umstritten. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

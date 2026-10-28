@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Meister Eckhart speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his sermons, his Latin works and the historical sources. Meister Eckhart was born about 1260 and died in 1327 or 1328. No recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his sermons, his Latin works and the historical sources. Meister Eckhart was born about 1260 and died in 1327 or 1328. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Meister Eckhart?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Predigten, seinen lateinischen Werken und den historischen Quellen. Meister Eckhart wurde um 1260 geboren und starb 1327 oder 1328. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Predigten, seinen lateinischen Werken und den historischen Quellen. Meister Eckhart wurde um 1260 geboren und starb 1327 oder 1328. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

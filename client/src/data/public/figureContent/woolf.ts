@@ -3,9 +3,7 @@ import type { FigureFragment } from './types';
 // woolf: voice-passed QA + authored page content. Quoting is limited to work
 // that is public domain in both the US and the EU: Modern Fiction (1925),
 // Women and Fiction (1929), A Room of One's Own (1929). The Waves (1931) and
-// Three Guineas (1938) are described, never quoted. The old disclosure claimed
-// no recording of her exists, which is not true, so it now states the honest
-// version: no recording of her speaks here.
+// Three Guineas (1938) are described, never quoted.
 export const fragment: FigureFragment = {
   qa: {
     en: {

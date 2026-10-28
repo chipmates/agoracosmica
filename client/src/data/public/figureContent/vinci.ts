@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Leonardo da Vinci speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his notebooks and the historical sources. Leonardo da Vinci lived from 1452 to 1519. No recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his notebooks and the historical sources. Leonardo da Vinci lived from 1452 to 1519. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Leonardo da Vinci?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Notizbüchern und den historischen Quellen. Leonardo da Vinci lebte von 1452 bis 1519. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Notizbüchern und den historischen Quellen. Leonardo da Vinci lebte von 1452 bis 1519. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
