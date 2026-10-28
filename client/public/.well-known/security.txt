@@ -1,0 +1,9 @@
+# When we confirm your report, we credit you in a published security advisory, unless you would rather stay anonymous.
+# On request we also send a signed letter of acknowledgment. As a nonprofit we pay no bug bounties.
+Contact: https://github.com/chipmates/agoracosmica/security/advisories/new
+Contact: mailto:security@chipmates.ai
+Expires: 2027-10-25T23:00:00.000Z
+Preferred-Languages: en, de
+Policy: https://github.com/chipmates/agoracosmica/blob/main/SECURITY.md
+Acknowledgments: https://github.com/chipmates/agoracosmica/blob/main/SECURITY.md#acknowledgments
+Canonical: https://agoracosmica.org/.well-known/security.txt

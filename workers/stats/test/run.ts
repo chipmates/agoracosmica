@@ -7,7 +7,9 @@
 
 import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
+import { handleMuseum } from '../src/museum';
 import type { Env } from '../src/types';
+import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
 const results: { name: string; error?: string }[] = [];
 
@@ -24,13 +26,18 @@ function assertEqual(actual: unknown, expected: unknown, message: string): void 
   if (actual !== expected) throw new Error(`${message} (expected ${String(expected)}, got ${String(actual)})`);
 }
 
-const env = { CF_API_TOKEN: 'test-token', CF_ACCOUNT_ID: 'test-account' } as unknown as Env;
+const env = { CF_API_TOKEN: 'test-token', CF_ACCOUNT_ID: 'test-account', ACCESS_TEAM_DOMAIN: TEAM_DOMAIN, ACCESS_AUD: AUD } as unknown as Env;
+
+// Every request carries a valid Access JWT; the key set is answered locally and not counted as a query.
+let SIGNER: Signer;
+let TOKEN = '';
 
 /** Run one call with fetch answered locally and recorded. */
 async function withStubbedFetch(fn: () => Promise<Response>): Promise<{ response: Response; fetched: string[] }> {
   const fetched: string[] = [];
   const previous = globalThis.fetch;
   globalThis.fetch = (async (url: string) => {
+    if (String(url) === CERTS_URL) return certsAnswer(SIGNER);
     fetched.push(String(url));
     return Response.json({ data: [] });
   }) as unknown as typeof fetch;
@@ -47,7 +54,7 @@ async function withStubbedFetch(fn: () => Promise<Response>): Promise<{ response
 function post(path: string, body: string | Uint8Array | ReadableStream<Uint8Array>, headers: Record<string, string> = {}): Request {
   return new Request(`https://stats.example${path}`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json', ...headers },
+    headers: { 'Content-Type': 'application/json', 'Cf-Access-Jwt-Assertion': TOKEN, ...headers },
     body,
     ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
   } as RequestInit);
@@ -62,6 +69,8 @@ function padded(base: Record<string, unknown>, bytes: number): Uint8Array {
 }
 
 async function main(): Promise<void> {
+  SIGNER = await makeSigner();
+  TOKEN = await signToken(SIGNER);
   // The cap's contract, written out so the suite also runs against a tree that predates it.
   const QUERY_LIMIT = 1024 * 1024;
   const routes = [
@@ -133,7 +142,7 @@ async function main(): Promise<void> {
     const lines: string[] = [];
     const previous = globalThis.fetch;
     const realError = console.error;
-    globalThis.fetch = (async () => answer()) as unknown as typeof fetch;
+    globalThis.fetch = (async (url: string) => (String(url) === CERTS_URL ? certsAnswer(SIGNER) : answer())) as unknown as typeof fetch;
     console.error = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
     try {
       return { response: await call(), lines };
@@ -225,7 +234,7 @@ async function main(): Promise<void> {
   }
 
   function withBody(path: string, body: ReadableStream<Uint8Array>): Request {
-    const request = new Request(`https://stats.example${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json' } });
+    const request = new Request(`https://stats.example${path}`, { method: 'POST', headers: { 'Content-Type': 'application/json', 'Cf-Access-Jwt-Assertion': TOKEN } });
     return Object.defineProperty(request, 'body', { value: body });
   }
 
@@ -337,6 +346,25 @@ async function main(): Promise<void> {
     same(body.sources.real, { '': [2, 1, 0], search: [0, 2, 0], ad_grant: [0, 1, 0], forum: [0, 0, 1] }, 'third stops by word');
     same(body.sources.walks, { search: [10, 8, 0], '': [4, 0, 0] }, 'arrivals by word');
     same(body.sources.uses, { search: [3, 2, 0] }, 'uses by word');
+  });
+
+  // Stop ids come from request paths: only the walk's own stops keep their name.
+
+  await test('museum: a stop id that is not one of the walk\'s own shows only as other, in the present and in the trends', async () => {
+    const day = new Date().toISOString().slice(0, 10);
+    const still = (stop: string, n: number) => ({ count: n, dimensions: { date: day, clientRequestPath: '/film/vinci/stills/desk/1280/stop-' + stop + '.abc123.webp' } });
+    const list = [still('picture-room', 5), still('flight', 4), still('<img src=x onerror=alert(1)>', 3), still('made-up', 2)];
+    const zone = { settings: {}, days: [], week: [], open: [], pages: [], index: [], sToday: list, sWeek: list, sAll: list, stills: list };
+    const fetcher = async () => Response.json({ data: { viewer: { zones: [zone] } } });
+    const museumEnv = {
+      MUSEUM_CF_API_TOKEN: 'test-token', MUSEUM_ZONE_TAG: '0123456789abcdef0123456789abcdef',
+      MUSEUM_WALK_STOPS: 'picture-room,flight,works', MUSEUM_OPEN_DATE: day,
+    } as unknown as Env;
+    const now = (await (await handleMuseum(new Request('https://stats.example/api/museum'), museumEnv, fetcher)).json()) as { stops: Array<{ id: string; week: number }> };
+    assertEqual(JSON.stringify(now.stops.map((x) => [x.id, x.week])), JSON.stringify([['picture-room', 5], ['flight', 4], ['works', 0], ['other', 5]]), 'the present view\'s stops');
+    const trends = (await (await handleMuseum(new Request('https://stats.example/api/museum/trends'), museumEnv, fetcher)).json()) as { stops: { ids: string[]; days: Array<number[] | null> } };
+    assertEqual(JSON.stringify(trends.stops.ids), JSON.stringify(['picture-room', 'flight', 'works', 'other']), 'the trends\' stop ids');
+    assertEqual(JSON.stringify(trends.stops.days[trends.stops.days.length - 1]), JSON.stringify([5, 4, 0, 5]), 'today\'s stops');
   });
 
   const failed = results.filter((r) => r.error);

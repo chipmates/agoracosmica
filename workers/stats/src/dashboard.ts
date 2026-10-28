@@ -1322,8 +1322,8 @@ function donutSvg(items, cMap, lFn, size) {
 function kpi(label, value, opts) {
   opts = opts || {};
   const heroClass = opts.hero ? ' card-hero' : '';
-  const interClass = opts.click ? ' card-interactive' : '';
-  const clickAttr = opts.click ? ' onclick="' + opts.click + '" tabindex="0" role="button"' : '';
+  const interClass = opts.tab ? ' card-interactive' : '';
+  const clickAttr = opts.tab ? ' data-go-tab="' + opts.tab + '" tabindex="0" role="button"' : '';
   const sparkHtml = opts.spark ? '<div class="kpi-spark">' + sparkSvg(opts.spark, 72, 28, opts.sparkColor || '#D4A539') + '</div>' : '';
   const deltaStr = opts.delta !== undefined ? deltaHtml(value, opts.delta, opts.deltaInvert) : '';
   const subStr = opts.sub ? '<span class="kpi-sub">' + opts.sub + '</span>' : '';
@@ -2457,7 +2457,7 @@ async function loadOverview() {
   // it as normal and point at the 7-day view rather than letting it read as a
   // failure. Only fires on the 24h window with near-zero conversations.
   if (!S.fetchError && S.range === 1 && chats < 3) {
-    alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a onclick="setRange(7)">The 7-day view</a> is the real read, not any single day.</div>';
+    alertsEl.innerHTML += '<div class="hint-banner">Quiet 24h is normal at this stage. <a data-set-range="7" tabindex="0" role="button">The 7-day view</a> is the real read, not any single day.</div>';
   }
 
   var html = '';
@@ -2617,7 +2617,7 @@ async function loadOverview() {
   html += kpi('Errors', totalErrors, { sub: totalErrors > 0 ? llmErrors + ' LLM + ' + audioErrors + ' audio' : 'all clear', valColor: totalErrors > 0 ? '#E97451' : '#68C397' });
 
   // Mini server health
-  html += '<div class="card card-interactive" onclick="switchTab(\\\'servers\\\')" onkeydown="if(event.key===\\\'Enter\\\'||event.key===\\\' \\\'){event.preventDefault();switchTab(\\\'servers\\\')}" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
+  html += '<div class="card card-interactive" data-go-tab="servers" tabindex="0" role="button" id="mini-servers"><div class="kpi-label">Server Health</div><div id="mini-servers-inner" style="margin-top:8px">Loading...</div></div>';
 
   // Chat activity graph (always visible)
   html += '<div class="section-divider" style="grid-column:1/-1">Activity &amp; content</div>';
@@ -3830,6 +3830,8 @@ function musCountry(code) {
   } catch (e) { return code; }
 }
 function musStop(id, i) {
+  // the server folds every stop id that is not one of the walk's into this one bucket
+  if (id === 'other') return 'Other';
   var words = String(id).split('-').join(' ');
   return (i + 1) + '. ' + cap(words);
 }
@@ -4846,7 +4848,7 @@ function renderTrends() {
   html += '<div class="grid tr-grid2">';
   if (cOk) {
     var cStops = TR.count.stops || {};
-    var nStops = Math.max(cfOk && TR.cf.stops ? TR.cf.stops.ids.length : 0, 17);
+    var nStops = Math.max(cfOk && TR.cf.stops ? TR.cf.stops.ids.filter(function(idv) { return idv !== 'other'; }).length : 0, 17);
     var cur = [], prev = [], anyPrev = false, full = true;
     for (var s = 1; s <= nStops; s++) {
       var cw = trCountWeeks(cStops[String(s)]);
@@ -4911,6 +4913,7 @@ function renderTrends() {
   // --- The museum's own count ---
   if (cOk) {
     html += '<div class="section-divider">Counted by the museum from ' + trShort(TR.count.first) + '</div>';
+    html += trPlausible();
     html += trSources();
     html += '<div class="grid tr-grid2">' +
       trCard('Page arrivals by kind of page', trGhost(trPageKinds(), 'arrivals'), '', 'A site page opened in a browser. Under each name: how many read to the middle of the text.') +
@@ -4925,6 +4928,57 @@ function renderTrends() {
 
   el.innerHTML = html;
   trPaint();
+}
+
+// The count against an independent total: page loads the count saw beside the
+// pages Cloudflare served. The count can only see fewer, so a full day above
+// Cloudflare's figure points at rows no page load sent. Cloudflare's page
+// totals are sampled, so small gaps are left alone.
+var TR_PLAUS = [
+  { label: 'Site pages', step: 'page_arrival', cf: function(r) { return r.pages == null || r.walks == null ? null : r.pages - r.walks; } },
+  { label: 'The walk', step: 'museum_arrival', cf: function(r) { return r.walks; } },
+];
+function trPlausPairs(p, dates) {
+  var c = trAlign(dates, TR.count.steps ? TR.count.steps[p.step] : null);
+  var f = trCfCol(dates, TR.cf.days.map(p.cf));
+  return dates.map(function(d, i) { return c[i] == null || f[i] == null ? null : [c[i], f[i]]; });
+}
+function trPlausSum(pairs) {
+  var a = 0, b = 0, n = 0;
+  pairs.forEach(function(x) { if (x) { a += x[0]; b += x[1]; n++; } });
+  return n ? { count: a, cf: b, days: n } : null;
+}
+function trPlausShare(s) {
+  if (!s) return '<span class="mus-na">n/a</span>';
+  return s.cf > 0 ? Math.round(s.count / s.cf * 100) + '%' : '<span class="mus-na">n/a</span>';
+}
+function trPlausible() {
+  var title = 'The count against Cloudflare';
+  var cfPages = trCfOk() && TR.cf.days.some(function(r) { return r.pages != null; });
+  if (!cfPages) {
+    return trCard(title, '<div class="empty-state">Not wired. This line needs Cloudflare&rsquo;s page totals for the museum: MUSEUM_CF_API_TOKEN and MUSEUM_ZONE_TAG on this worker.</div>', 'card-full');
+  }
+  var today = trToday();
+  var last = trDates(trShift(today, -7), trShift(today, -1));
+  var prev = trDates(trShift(today, -14), trShift(today, -8));
+  var full = trDates(TR.count.first, trShift(today, -1));
+  var rows = [], flags = [];
+  TR_PLAUS.forEach(function(p) {
+    var now = trPlausSum(trPlausPairs(p, last));
+    var before = trPlausSum(trPlausPairs(p, prev));
+    rows.push([p.label, now ? musFull(now.count) : '<span class="mus-na">n/a</span>', now ? musFull(now.cf) : '<span class="mus-na">n/a</span>', trPlausShare(now), trPlausShare(before)]);
+    trPlausPairs(p, full).forEach(function(x, i) {
+      if (x && x[0] - x[1] >= 10 && x[0] > x[1] * 1.1) flags.push(trShort(full[i]) + ', ' + p.label.toLowerCase() + ': ' + musFull(x[0]) + ' counted, ' + musFull(x[1]) + ' served');
+    });
+  });
+  var body = musTable(['', 'Counted', 'Cloudflare', 'Share', 'The 7 before'], rows, [4]);
+  body += flags.length
+    ? '<div class="alert-card a-warn">Counted above what Cloudflare served on ' + flags.length + (flags.length === 1 ? ' day' : ' days') + '. ' + esc(flags.slice(-3).join('. ')) + '. Rows with no page load behind them: look at the count&rsquo;s beacon.</div>'
+    : '<div class="mus-cap">No full day since the count began has more counted than Cloudflare served.</div>';
+  return trCard(title + ', last 7 full days', body, 'card-full',
+    'Counted: page arrivals and walks opened, from the museum&rsquo;s beacon. Cloudflare: the pages it served on the museum&rsquo;s address, bots included. ' +
+    'The count sees fewer, since bots, browsers without scripts, Global Privacy Control and our own test browsers are not counted. ' +
+    'A share that jumps, or a day above Cloudflare by more than a tenth, means rows the site did not serve a page for.');
 }
 
 function trClipText() {
@@ -4976,7 +5030,7 @@ function trRateWow(numKey, denKey) {
   return '<div class="tr-wow">' + out + '</div>';
 }
 function trStopNames(n) {
-  var ids = trCfOk() && TR.cf.stops ? TR.cf.stops.ids : [];
+  var ids = trCfOk() && TR.cf.stops ? TR.cf.stops.ids.filter(function(idv) { return idv !== 'other'; }) : [];
   var out = [];
   for (var i = 0; i < n; i++) out.push(ids[i] ? musStop(ids[i], i) : 'Stop ' + (i + 1));
   return out;
@@ -5218,8 +5272,8 @@ function renderRangePills() {
 
   RANGE_OPTS.forEach(function(opt) {
     var active = opt.val === S.range ? ' active' : '';
-    dHtml += '<button class="range-pill' + active + '" data-range="' + opt.val + '" onclick="setRange(' + opt.val + ')">' + opt.label + '</button>';
-    mHtml += '<button class="range-pill-h' + active + '" data-range="' + opt.val + '" onclick="setRange(' + opt.val + ')">' + opt.label + '</button>';
+    dHtml += '<button class="range-pill' + active + '" data-range="' + opt.val + '" data-set-range="' + opt.val + '">' + opt.label + '</button>';
+    mHtml += '<button class="range-pill-h' + active + '" data-range="' + opt.val + '" data-set-range="' + opt.val + '">' + opt.label + '</button>';
   });
 
   desktopEl.innerHTML = dHtml;
@@ -5263,6 +5317,27 @@ function init() {
   // Sidebar + mobile tab click handlers
   document.querySelectorAll('.nav-item, .mob-tab').forEach(function(el) {
     el.addEventListener('click', function() { switchTab(el.dataset.tab); });
+  });
+
+  // Range pills, the 7-day hint and cards that open a tab: one listener, since
+  // the page's policy allows no inline handlers.
+  function actionOf(ev) {
+    return ev.target && ev.target.closest ? ev.target.closest('[data-set-range], [data-go-tab]') : null;
+  }
+  function act(el) {
+    if (el.dataset.setRange) setRange(Number(el.dataset.setRange));
+    else if (el.dataset.goTab) switchTab(el.dataset.goTab);
+  }
+  document.addEventListener('click', function(ev) {
+    var el = actionOf(ev);
+    if (el) act(el);
+  });
+  document.addEventListener('keydown', function(ev) {
+    if (ev.key !== 'Enter' && ev.key !== ' ') return;
+    var el = actionOf(ev);
+    if (!el || el.tagName === 'BUTTON') return;
+    ev.preventDefault();
+    act(el);
   });
 
   // Hash change
