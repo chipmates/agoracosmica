@@ -147,7 +147,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
   schemas={schemas}
 >
   {storyDock && <PlayerHead slot="head" />}
-  {storyDock && <PlayerDock slot="dock" lang="en" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" portraits={false} />}
   <div class="pub-content med">
     <Breadcrumbs
       lang={lang}

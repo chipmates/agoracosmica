@@ -15,9 +15,11 @@ interface Props {
   figureId: string;
   slug: string;
   lang: PlayerLang;
+  /** Whether the page around the door shows an AI portrait: its label names the images only then. */
+  portraits: boolean;
 }
 
-const { figureId, slug, lang } = Astro.props;
+const { figureId, slug, lang, portraits } = Astro.props;
 const P = playerStrings(lang);
 const name = getFigureById(figureId, lang)?.name ?? '';
 const queue = buildStoryQueue(figureId, slug, name, lang);
@@ -27,7 +29,7 @@ const first = queue.entries.find(e => e.n === 1);
 const storyCount = queue.entries.filter(e => e.n > 0).length;
 const countWord = numberWord(storyCount, lang);
 const idleWhat = intro?.minutes && first ? P.beginSubWith(intro.minutes, first.title) : first?.title ?? '';
-const label = storyLabel(lang);
+const label = storyLabel(lang, portraits);
 const halves = labelHalves(label.brief);
 ---
 <aside class="sp-door" aria-labelledby="sp-door-title" data-nosnippet>
