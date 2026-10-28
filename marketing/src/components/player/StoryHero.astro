@@ -8,6 +8,7 @@ import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/pu
 import { numberWord } from '../../lib/figureWorld';
 import { VOICE_DESC_ID, labelHalves, playerStrings } from '../../player/strings';
 import { storyLabel } from '../../player/label';
+import { keepRanges } from '../../player/storyFields';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -39,7 +40,7 @@ const halves = labelHalves(label.brief);
   <div class="sp-hero__id">
     <div class="sp-hero__names">
       <h1 class="sp-hero__name" id="sp-name">{name}</h1>
-      {meta && <p class="sp-hero__meta">{meta}</p>}
+      {meta && <p class="sp-hero__meta">{keepRanges(meta).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>}
     </div>
     <figure class="sp-hero__portrait">
       <picture>
