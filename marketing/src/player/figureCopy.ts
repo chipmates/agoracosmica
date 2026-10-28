@@ -27,7 +27,7 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
   },
   beauvoir: {
     en: 'French philosopher. Her book The Second Sex is a founding text of modern feminism.',
-    de: 'Französische Philosophin. Ihr „Das andere Geschlecht“ ist ein Grundtext des modernen Feminismus.',
+    de: 'Französische Philosophin. Ihr Buch „Das andere Geschlecht“ steht am Anfang des modernen Feminismus.',
   },
   bingen: {
     en: 'German abbess and composer. She began to write down her visions at forty-three.',
@@ -78,8 +78,8 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
     de: 'Mexikanische Künstlerin. Sie malte ihre eigene Wirklichkeit, sagte sie, keine Träume.',
   },
   king: {
-    en: 'American Baptist minister. He led the nonviolent movement that ended the segregation laws.',
-    de: 'Amerikanischer Baptistenpfarrer. Er führte die gewaltfreie Bewegung an, die die Rassengesetze beendete.',
+    en: 'American Baptist minister. He led the movement that ended legal segregation.',
+    de: 'Amerikanischer Baptistenpfarrer. Er führte die Bewegung an, die die staatliche Rassentrennung beendete.',
   },
   laozi: {
     en: 'Chinese philosopher. The Daodejing bears his name, and whether he ever lived, nobody knows.',
@@ -122,8 +122,8 @@ const HERO_LINES: Record<string, Record<PlayerLang, string>> = {
     de: 'Amerikanische Abolitionistin. Sie floh aus der Sklaverei und befreite danach etwa siebzig Menschen.',
   },
   vinci: {
-    en: 'Italian polymath. He finished fewer than twenty paintings and left thousands of pages of notes.',
-    de: 'Italienischer Universalgelehrter. Unter zwanzig Gemälde vollendete er, dazu Tausende Seiten Notizen.',
+    en: 'Italian polymath. He finished fewer than twenty paintings but filled thousands of pages with notes.',
+    de: 'Italienischer Universalgelehrter. Er vollendete keine zwanzig Gemälde, füllte aber Tausende Seiten.',
   },
   woolf: {
     en: 'English writer. A woman, she wrote, needs money and a room of her own if she is to write fiction.',

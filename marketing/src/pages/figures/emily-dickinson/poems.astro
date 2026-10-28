@@ -310,24 +310,21 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <aside class="ed-invite">
       <p class="ed-invite__eyebrow">Short stories about life</p>
       <p class="ed-invite__line">
-        You have just read Emily Dickinson in her own words and seen her own
-        hand. On Agora Cosmica you can go one step further: hear narrated stories
-        from her life, sit with the ideas behind the poems, and talk them through
-        with her Echo, a voice shaped by her poems and letters.
+        You have just read Emily Dickinson in her own words and seen her own hand. On Agora Cosmica you can go one step further: hear her life told in short stories, or read them at your own pace, and see where the poems came from. The stories are written with AI from her poems and letters and read by a synthetic voice. A retelling, never the poet herself.
       </p>
       <a
         class="ed-invite__button pub-cta__button"
-        href={'/app?figure=emily-dickinson&lang=en'}
+        href={'/figures/emily-dickinson/'}
         data-agc-cta="start-exploring"
         data-agc-figure="dickinson"
       >
-        Learn from her Echo
+        Hear her life in stories
       </a>
       <p class="ed-invite__reassure">Nonprofit · Open Source · No tracking cookies, no profiling</p>
-      <p class="ed-invite__reassure">30 free messages a day. No signup needed.</p>
+      <p class="ed-invite__reassure">No account needed. Listen or read.</p>
       {ECHO_AUDIO && (
         <div class="ed-listen" data-ed-audio>
-          <p class="ed-listen__eyebrow">In her Echo's voice. An AI voice, not a recording.</p>
+          <p class="ed-listen__eyebrow">Read by a synthetic voice. Not a recording.</p>
           <p class="ed-listen__poem">"{ECHO_AUDIO_POEM}"</p>
           {/* Styled play button (reveals via JS); native controls below are the
               no-JS fallback, hidden by the script once it takes over. */}
@@ -341,7 +338,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
           <audio class="ed-listen__player" data-ed-audio-el controls preload="none">
             {ECHO_AUDIO_WEBM && <source src={ECHO_AUDIO_WEBM} type="audio/webm" />}
             <source src={ECHO_AUDIO} type="audio/mpeg" />
-            <a href={ECHO_AUDIO}>Download the recording</a>
+            <a href={ECHO_AUDIO}>Download the audio</a>
           </audio>
         </div>
       )}
