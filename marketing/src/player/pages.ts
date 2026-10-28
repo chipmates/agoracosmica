@@ -6,7 +6,7 @@
 import { poemsByPoet } from '../data/poems/index.mjs';
 import { figureSlugToId } from '@client/data/public/slugMap';
 
-const LIVE: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart', 'arthur-schopenhauer', 'laozi', 'mahatma-gandhi', 'martin-luther-king-jr', 'nelson-mandela', 'wolfgang-amadeus-mozart'];
+const LIVE: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart', 'william-shakespeare', 'johann-wolfgang-von-goethe', 'dogen-zenji', 'frida-kahlo', 'harriet-tubman', 'ada-lovelace', 'simone-de-beauvoir', 'arthur-schopenhauer', 'laozi', 'mahatma-gandhi', 'martin-luther-king-jr', 'nelson-mandela', 'wolfgang-amadeus-mozart'];
 
 // The fit check (scripts/check-player-fit.mjs) builds every figure on the player into its own folder, so a figure's
 // page is checked before it is listed above; a plain build never sets the flag.
@@ -17,6 +17,11 @@ export const STORY_PLAYER_COMPANIONS: Readonly<Record<string, readonly string[]>
   'marcus-aurelius': ['/figures/marcus-aurelius/meditations/', '/stoicism/', '/de/stoizismus/'],
   'joseph-campbell': ['/the-heros-journey/', '/de/heldenreise/'],
   'emily-dickinson': ['/figures/emily-dickinson/poems/', ...poemsByPoet('dickinson').map((poem: { path: string }) => poem.path)],
+  'william-shakespeare': [
+    '/figures/william-shakespeare/quotes/',
+    '/figures/william-shakespeare/sonnets/',
+    ...poemsByPoet('shakespeare').map((poem: { path: string }) => poem.path),
+  ],
 };
 
 export function hasStoryPlayer(slug: string): boolean {

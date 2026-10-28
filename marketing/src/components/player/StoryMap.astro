@@ -32,9 +32,10 @@ const constellation = CONSTELLATION_PATTERNS[`Echo of ${enName}`];
 const stories = queue.entries.filter(e => e.n > 0);
 const hasIntro = queue.entries.some(e => e.n === 0);
 
-// The app keys its German names by the English name in camel case ("The Stoic Taurus" -> theStoicTaurus).
+// The app keys its German names by the English name in camel case ("The Stoic Taurus" -> theStoicTaurus), a
+// letter's accent dropped ("Ensō Circle" -> ensoCircle).
 function nameKey(name: string): string {
-  const words = name.replace(/[^A-Za-z ]/g, '').split(/\s+/).filter(Boolean);
+  const words = name.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^A-Za-z ]/g, '').split(/\s+/).filter(Boolean);
   return words.map((w, i) => (i === 0 ? w.toLowerCase() : w[0]!.toUpperCase() + w.slice(1).toLowerCase())).join('');
 }
 const deNames = (constellationsDe as { constellations?: { names?: Record<string, string> } }).constellations?.names ?? {};
@@ -352,7 +353,14 @@ const H = Math.max(VIA_Y + 116, Math.ceil((needTop + boxU + 1) / 0.95));
 const r1 = (v: number) => Math.round(v * 10) / 10;
 // A star's tap area (r 25) stops halfway to its nearest neighbour, so where stars stand close (a ladder) each
 // star is still tapped at its own centre rather than under the next star's area.
-const hitR = at.map(([x, y], i) => Math.min(25, ...at.filter((_, j) => j !== i).map(([u, v]) => Math.floor(Math.hypot(u - x, v - y) * 5) / 10)));
+// The centres are drawn rounded; where that brings two stars nearer than twice the radius, the radius is taken
+// from the drawn centres to the hundredth, so the areas meet without overlapping and keep their size.
+const halfTo = (x: number, y: number, u: number, v: number) => {
+  const half = Math.floor(Math.hypot(u - x, v - y) * 5) / 10;
+  const drawn = Math.hypot(r1(u) - r1(x), r1(v) - r1(y));
+  return half * 2 > drawn + 1e-6 ? Math.floor(drawn * 50) / 100 : half;
+};
+const hitR = at.map(([x, y], i) => Math.min(25, ...at.filter((_, j) => j !== i).map(([u, v]) => halfTo(x, y, u, v))));
 // Where a star's rings (outer edge r 24.5 with its stroke) reach into a neighbour's tap area, the rings take no
 // press, so a press inside a star's own area opens that star (a crowded pattern, stars under 49 units apart).
 const ringsReach = at.some(([x, y], i) => at.some(([u, v], j) => j !== i && Math.hypot(u - x, v - y) - hitR[j]! < 24.5));

@@ -153,6 +153,13 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
     en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
     de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
   },
+  shakespeare: {
+    en: [
+      { href: '/figures/william-shakespeare/sonnets/', label: "Read Shakespeare's sonnets →" },
+      { href: '/figures/william-shakespeare/quotes/', label: 'Famous Shakespeare quotes and what they mean →' },
+    ],
+    de: [],
+  },
 };
 
 /** The figure's own writing on this site, offered under the plate. */
