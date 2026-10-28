@@ -97,6 +97,55 @@ function centreRail(smooth: boolean): void {
   rail.scrollTo({ left: to, behavior: smooth && !reduced() ? 'smooth' : 'auto' });
 }
 
+// ---- the italic line's left edge ---------------------------------------------------------------------------
+let measure: CanvasRenderingContext2D | null = null;
+
+/** The first letter of each of the element's lines, read from the layout. */
+function lineStarts(el: HTMLElement): string[] {
+  const out: string[] = [];
+  let lastTop = Number.NEGATIVE_INFINITY;
+  const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT);
+  const range = document.createRange();
+  for (let n = walker.nextNode(); n; n = walker.nextNode()) {
+    const text = n.textContent ?? '';
+    for (let i = 0; i < text.length; i++) {
+      if (/\s/.test(text[i]!)) continue;
+      range.setStart(n, i);
+      range.setEnd(n, i + 1);
+      const r = range.getClientRects()[0];
+      if (!r) continue;
+      if (r.top > lastTop + 4) out.push(text[i]!);
+      lastTop = Math.max(lastTop, r.top);
+    }
+  }
+  return out;
+}
+
+/** An italic letter can reach left of its line (an f's hook, a D's serif): each line is set in by its first letter's
+ * measured overhang, the first line by text-indent and the others by padding, so the ink starts on the text edge. */
+function alignLine(): void {
+  const el = hero()?.querySelector<HTMLElement>('[data-stage-line]');
+  if (!el) return;
+  measure ??= document.createElement('canvas').getContext('2d');
+  if (!measure) return;
+  const cs = getComputedStyle(el);
+  measure.font = `${cs.fontStyle} ${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+  const over = (ch: string) => Math.max(0, Math.ceil(measure!.measureText(ch).actualBoundingBoxLeft * 2) / 2);
+  el.style.removeProperty('padding-left');
+  el.style.removeProperty('text-indent');
+  let starts = lineStarts(el);
+  // a set-in can move a break: measured again once
+  for (let pass = 0; pass < 2; pass++) {
+    const first = over(starts[0] ?? '');
+    const rest = Math.max(0, ...starts.slice(1).map(over));
+    el.style.setProperty('padding-left', `${rest}px`);
+    el.style.setProperty('text-indent', `${first - rest}px`);
+    const now = lineStarts(el);
+    if (now.join('') === starts.join('')) break;
+    starts = now;
+  }
+}
+
 let installed = false;
 
 export function installC2(): void {
@@ -105,11 +154,20 @@ export function installC2(): void {
   window.addEventListener('click', onPick, true);
   installSwipe();
   onStageSwap(d => {
+    alignLine();
     attach(d.previous === '');
     centreRail(d.previous !== '');
     afterSwap();
   });
   // the stage may have attached before this script ran (the opening swap event is then past)
+  alignLine();
+  void document.fonts?.ready.then(alignLine);
+  let width = window.innerWidth;
+  window.addEventListener('resize', () => {
+    if (window.innerWidth === width) return;
+    width = window.innerWidth;
+    window.requestAnimationFrame(alignLine);
+  });
   if (stageFigureId()) {
     attach(true);
     centreRail(false);
