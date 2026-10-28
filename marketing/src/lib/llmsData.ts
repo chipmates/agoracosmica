@@ -7,9 +7,6 @@ import { figureEntities } from './figureEntities';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { getFigureQA } from '@client/data/public/figureQA';
-import { THEMES } from '@client/data/councilCatalog';
-import publicEn from '@client/assets/translations/public-en.json';
-import publicDe from '@client/assets/translations/public-de.json';
 import { SITE_URL } from './urls';
 
 // Last time any published content changed, taken from git (the same source the
@@ -45,21 +42,19 @@ export function figureYears(slug: string, lang: 'en' | 'de'): string {
 }
 
 // The llms.txt convention's long half: every figure description and every
-// question-and-answer pair in full, plus the eight themes. Generated from the
+// question-and-answer pair in full. Generated from the
 // same catalogs the pages render, so it cannot drift, and it carries each
 // figure's AI disclosure so anything quoting this file quotes that too.
 export function buildLlmsFull(lang: 'en' | 'de'): string {
   const isDe = lang === 'de';
   const base = isDe ? `${SITE_URL}/de` : SITE_URL;
-  const bundle = (isDe ? publicDe : publicEn) as Record<string, any>;
   const figures = getFiguresCatalog(lang);
   const L = isDe
     ? {
       head: '# Agora Cosmica, Volltext-Verzeichnis',
-      intro: 'Diese Datei enthält die vollständige Beschreibung jedes Menschen, alle Frage-Antwort-Paare und die acht Themenfragen. Das kurze Verzeichnis steht unter',
+      intro: 'Diese Datei enthält die vollständige Beschreibung jedes Menschen und alle Frage-Antwort-Paare. Das kurze Verzeichnis steht unter',
       shortIndex: `${SITE_URL}/de/llms.txt`,
       figuresH: '## Menschen',
-      themesH: '## Themen',
       tradition: 'Tradition',
       period: 'Lebenszeit',
       about: 'Beschreibung',
@@ -67,10 +62,9 @@ export function buildLlmsFull(lang: 'en' | 'de'): string {
     }
     : {
       head: '# Agora Cosmica, full text index',
-      intro: 'This file carries the complete description of every figure, all question-and-answer pairs, and the eight theme questions. The short index is at',
+      intro: 'This file carries the complete description of every figure and all question-and-answer pairs. The short index is at',
       shortIndex: `${SITE_URL}/llms.txt`,
       figuresH: '## Figures',
-      themesH: '## Themes',
       tradition: 'Tradition',
       period: 'Period',
       about: 'About',
@@ -101,24 +95,6 @@ export function buildLlmsFull(lang: 'en' | 'de'): string {
         lines.push(`Q: ${pair.q}`);
         lines.push(`A: ${pair.a.replace(/\s+/g, ' ').trim()}`);
       }
-    }
-    lines.push('');
-  }
-
-  lines.push(L.themesH);
-  lines.push('');
-  for (const th of THEMES) {
-    const entry = bundle.themes?.[th.id];
-    if (!entry) continue;
-    lines.push(`### ${entry.name}`);
-    lines.push(`${L.pageUrl}: ${base}/themes/${th.id}/`);
-    if (entry.question && entry.answer) {
-      lines.push(`Q: ${entry.question}`);
-      lines.push(`A: ${String(entry.answer).replace(/\s+/g, ' ').trim()}`);
-    }
-    for (const block of (entry.substance ?? []) as { q: string; a: string }[]) {
-      lines.push(`Q: ${block.q}`);
-      lines.push(`A: ${block.a.replace(/\s+/g, ' ').trim()}`);
     }
     lines.push('');
   }

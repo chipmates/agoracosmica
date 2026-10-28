@@ -12,3 +12,8 @@ export {
 export const SITE_URL = 'https://agoracosmica.org';
 export const MEDIA_URL = 'https://media.agoracosmica.org';
 export const ORG_LOGO = `${MEDIA_URL}/images/ui/logo/512.webp`;
+
+/** The landing's list of the thirty, where the old figure list's addresses forward (_redirects). */
+export function figureListUrl(lang: 'en' | 'de'): string {
+  return lang === 'de' ? '/de/#alle' : '/#all';
+}

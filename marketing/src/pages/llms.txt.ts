@@ -1,8 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { THEMES } from '@client/data/councilCatalog';
-import { getT } from '../i18n';
 import { SITE_URL } from '../lib/urls';
 import { citationBlock, figureYears } from '../lib/llmsData';
 
@@ -37,7 +35,6 @@ function teachings(concepts: { term: string }[], limit = 3): string {
 }
 
 export const GET: APIRoute = () => {
-  const t = getT('en');
   const figures = getFiguresCatalog('en');
   const lines: string[] = [];
 
@@ -86,24 +83,11 @@ export const GET: APIRoute = () => {
   }
   lines.push('');
 
-  lines.push('## Themes');
-  for (const th of THEMES) {
-    const name = t(`themes.${th.id}.name`);
-    const question = t(`themes.${th.id}.question`);
-    lines.push(`- [${question}](${SITE_URL}/themes/${th.id}/): ${name}`);
-  }
-  lines.push('');
-
   lines.push('## Key pages');
   lines.push(`- [Home](${SITE_URL}/)`);
-  lines.push(`- [All figures](${SITE_URL}/figures/)`);
-  lines.push(`- [All themes](${SITE_URL}/themes/)`);
   lines.push(`- [About](${SITE_URL}/about/)`);
-  lines.push(`- [Why we call them Echoes](${SITE_URL}/echoes/)`);
   lines.push(`- [Methodology: how we build the Echoes](${SITE_URL}/methodology/): how each AI Echo is built from primary works, sourced, and fact-checked, with a public factcheck per figure and open-source code.`);
-  lines.push(`- [Open source philosophy app](${SITE_URL}/open-source-philosophy-app/): an open source, nonprofit alternative to AI character apps, for philosophy and history.`);
-  lines.push(`- [Where should I start with philosophy?](${SITE_URL}/ai-philosophy-tutor/): one recommendation and six other ways in, each carrying a first question into the app.`);
-  lines.push(`- [Full text index (llms-full.txt)](${SITE_URL}/llms-full.txt): every figure's full description and all question-and-answer pairs, plus the eight themes.`);
+  lines.push(`- [Full text index (llms-full.txt)](${SITE_URL}/llms-full.txt): every figure's full description and all question-and-answer pairs.`);
   lines.push('- [Source code (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 
@@ -111,9 +95,6 @@ export const GET: APIRoute = () => {
   lines.push(`Every page has a German mirror under /de/ (e.g. ${SITE_URL}/de/figures/{slug}/).`);
   lines.push(`- [Deutsche llms.txt](${SITE_URL}/de/llms.txt)`);
   lines.push(`- [Startseite](${SITE_URL}/de/)`);
-  lines.push(`- [Alle Menschen](${SITE_URL}/de/figures/)`);
-  lines.push(`- [Alle Themen](${SITE_URL}/de/themes/)`);
-  lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/)`);
   lines.push(`- [Platons Höhlengleichnis einfach erklärt](${SITE_URL}/de/figures/plato/hoehlengleichnis/)`);
   lines.push(`- [Platons Ideenlehre einfach erklärt](${SITE_URL}/de/figures/plato/ideenlehre/)`);
   lines.push('');

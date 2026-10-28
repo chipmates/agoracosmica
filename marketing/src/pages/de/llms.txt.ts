@@ -1,8 +1,6 @@
 import type { APIRoute } from 'astro';
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { THEMES } from '@client/data/councilCatalog';
-import { getT } from '../../i18n';
 import { SITE_URL } from '../../lib/urls';
 import { citationBlock, figureYears } from '../../lib/llmsData';
 
@@ -37,7 +35,6 @@ function teachings(concepts: { term: string }[], limit = 3): string {
 }
 
 export const GET: APIRoute = () => {
-  const t = getT('de');
   const figures = getFiguresCatalog('de');
   const lines: string[] = [];
 
@@ -86,26 +83,13 @@ export const GET: APIRoute = () => {
   }
   lines.push('');
 
-  lines.push('## Themen');
-  for (const th of THEMES) {
-    const name = t(`themes.${th.id}.name`);
-    const tagline = t(`themes.${th.id}.tagline`);
-    lines.push(`- [${name}](${SITE_URL}/de/themes/${th.id}/): ${tagline}`);
-  }
-  lines.push('');
-
   lines.push('## Wichtige Seiten');
   lines.push(`- [Startseite](${SITE_URL}/de/)`);
-  lines.push(`- [Alle Menschen](${SITE_URL}/de/figures/)`);
-  lines.push(`- [Alle Themen](${SITE_URL}/de/themes/)`);
   lines.push(`- [Über uns](${SITE_URL}/de/about/)`);
-  lines.push(`- [Warum wir sie Echos nennen](${SITE_URL}/de/echoes/)`);
   lines.push(`- [Methodik: wie wir die Echos bauen](${SITE_URL}/de/methodik/): wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, mit einem öffentlichen Faktencheck pro Mensch und Open-Source-Code.`);
-  lines.push(`- [Open-Source-Philosophie-App](${SITE_URL}/de/open-source-philosophy-app/): eine gemeinnützige Open-Source-Alternative zu KI-Charakter-Apps, für Philosophie und Geschichte.`);
-  lines.push(`- [Philosophie lernen mit einem KI-Tutor](${SITE_URL}/de/philosophie-lernen/): Philosophie im Gespräch mit den KI-Echos der Philosophen der Geschichte lernen, gemeinnützig und Open Source, 30 kostenlose Nachrichten pro Tag.`);
   lines.push(`- [Platons Höhlengleichnis einfach erklärt](${SITE_URL}/de/figures/plato/hoehlengleichnis/): Platons Höhlengleichnis aus der Politeia, Buch 7, Schritt für Schritt erklärt: das Bild, der Aufstieg, die Rückkehr und was Platon damit sagen will.`);
   lines.push(`- [Platons Ideenlehre einfach erklärt](${SITE_URL}/de/figures/plato/ideenlehre/): Platons Ideenlehre für Schüler erklärt: die zwei Welten, das Beispiel vom Kreis, die Teilhabe, die Idee des Guten und die bekanntesten Einwände.`);
-  lines.push(`- [Volltext-Verzeichnis (llms-full.txt)](${SITE_URL}/de/llms-full.txt): die vollständigen Beschreibungen aller Menschen und alle Frage-Antwort-Paare, dazu die acht Themen.`);
+  lines.push(`- [Volltext-Verzeichnis (llms-full.txt)](${SITE_URL}/de/llms-full.txt): die vollständigen Beschreibungen aller Menschen und alle Frage-Antwort-Paare.`);
   lines.push('- [Quellcode (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');
 
@@ -113,8 +97,6 @@ export const GET: APIRoute = () => {
   lines.push(`Every page also exists in English (e.g. ${SITE_URL}/figures/{slug}/).`);
   lines.push(`- [English llms.txt](${SITE_URL}/llms.txt)`);
   lines.push(`- [Home](${SITE_URL}/)`);
-  lines.push(`- [All figures](${SITE_URL}/figures/)`);
-  lines.push(`- [All themes](${SITE_URL}/themes/)`);
   lines.push('');
 
   return new Response(lines.join('\n'), {

@@ -6,41 +6,68 @@
 # SPA fallback below and rendered identical React content, creating
 # duplicate-content entries in Google's index alongside the canonical URL.
 
+# Pages that went when Agora became its stories. Each page also left the
+# build, so these rules are what answers; both slash forms are listed, since
+# no static file is left to normalize the slash, and they sit above the slug
+# rules so the first matching rule is the final target (no chains). The
+# figure list merged into the landing's list of the thirty.
+/figures/      /#all        301
+/figures       /#all        301
+/de/figures/   /de/#alle    301
+/de/figures    /de/#alle    301
+/audio         /            301
+/audio/        /            301
+/de/audio      /de/         301
+/de/audio/     /de/         301
+/themes        /            301
+/themes/       /            301
+/themes/*      /            301
+/de/themes     /de/         301
+/de/themes/    /de/         301
+/de/themes/*   /de/         301
+/echoes        /methodology/ 301
+/echoes/       /methodology/ 301
+/de/echoes     /de/methodik/ 301
+/de/echoes/    /de/methodik/ 301
+/open-source-philosophy-app     /about/    301
+/open-source-philosophy-app/    /about/    301
+/de/open-source-philosophy-app  /de/about/ 301
+/de/open-source-philosophy-app/ /de/about/ 301
+/ai-philosophy-tutor            /          301
+/ai-philosophy-tutor/           /          301
+/talk-to-historical-figures     /          301
+/talk-to-historical-figures/    /          301
+/de/philosophie-lernen          /de/       301
+/de/philosophie-lernen/         /de/       301
+
 # Per-slug Astro pages (EN + DE)
 /figures/:slug    /figures/:slug/    301
-/themes/:slug     /themes/:slug/     301
 /de/figures/:slug /de/figures/:slug/ 301
-/de/themes/:slug  /de/themes/:slug/  301
 
 # Top-level Astro pages (EN + DE)
-/figures   /figures/   301
-/themes    /themes/    301
 /about     /about/     301
-/echoes    /echoes/    301
 /impressum           /impressum/           301
 /datenschutz         /datenschutz/         301
 /cookie-policy       /cookie-policy/       301
 /nutzungsbedingungen /nutzungsbedingungen/ 301
 /privacy             /privacy/             301
 /de        /de/        301
-/de/figures /de/figures/ 301
-/de/themes  /de/themes/ 301
 /de/about   /de/about/  301
-/de/echoes  /de/echoes/ 301
 
 # Consolidated pages. /contact merged into /about (the contact block carries
 # the #contact / #kontakt anchor, /impressum keeps the legal duty), and the
 # wisdom hub was absorbed by the figures index. Both slug forms are listed
 # because these pages no longer exist as static files, so nothing normalizes
-# the trailing slash before these rules run.
+# the trailing slash before these rules run. The old wisdom hub goes straight
+# to the landing, where the figure list it fed now lives.
 /contact    /about/#contact    301
 /contact/   /about/#contact    301
 /de/contact /de/about/#kontakt 301
 /de/contact/ /de/about/#kontakt 301
-/learn-from-historical-figures  /figures/ 301
-/learn-from-historical-figures/ /figures/ 301
-/de/von-historischen-persoenlichkeiten-lernen  /de/figures/ 301
-/de/von-historischen-persoenlichkeiten-lernen/ /de/figures/ 301
+/learn-from-historical-figures  / 301
+/learn-from-historical-figures/ / 301
+/de/von-historischen-persoenlichkeiten-lernen  /de/ 301
+/de/von-historischen-persoenlichkeiten-lernen/ /de/ 301
 
 # The landing lab's pages became the landing at / and /de/. Every form of
 # their addresses goes there (no static file is left to normalize the slash).

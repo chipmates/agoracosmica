@@ -17,7 +17,7 @@
 // (FAQ, pillars, CTA, star) into this component, since those are scoped to
 // CategoryPageContent and not global. CSS architecture frozen at 89/100.
 import Breadcrumbs from './Breadcrumbs.astro';
-import { publicUrl } from '../lib/urls';
+import { figureListUrl } from '../lib/urls';
 import type { Lang } from '../i18n';
 
 interface Props {
@@ -27,13 +27,6 @@ interface Props {
 
 const { lang, faq } = Astro.props;
 const isDe = lang === 'de';
-
-// Hub hrefs are lang-aware: the two hubs use localized DE slugs, not a /de/
-// prefix of the EN slug.
-const philoHubHref = isDe ? '/de/philosophie-lernen/' : '/ai-philosophy-tutor/';
-const wisdomHubHref = isDe
-  ? '/de/figures/'
-  : '/figures/';
 
 const en = {
   crumb: 'How we build the Echoes',
@@ -94,16 +87,9 @@ const en = {
   starCta: 'Star on GitHub →',
 
   linksTitle: 'Read further',
-  echoesPre: 'This page covers how we build the Echoes. For why we give the dead a voice at all, the tradition behind it and where the risks lie, read ',
-  echoesLink: 'why we call them Echoes',
-  echoesMid: '. To see the method in a single life, browse the ',
+  figuresPre: 'To see the method in a single life, browse the ',
   figuresLink: 'figures',
-  echoesPost: ' and open any factcheck.',
-  hubsPre: 'To learn philosophy in conversation, start at the ',
-  hubsPhiloLink: 'AI philosophy tutor',
-  hubsMid: '. To learn timeless wisdom from history’s figures, start at the ',
-  hubsWisdomLink: 'wisdom guide',
-  hubsPost: '.',
+  figuresPost: ' and open any factcheck.',
   ghPre: 'Or read the method in the code on ',
   ghLink: 'GitHub',
   ghPost: '.',
@@ -168,16 +154,9 @@ const de = {
   starCta: 'Auf GitHub einen Stern geben →',
 
   linksTitle: 'Weiterlesen',
-  echoesPre: 'Diese Seite behandelt, wie wir die Echos bauen. Warum wir den Toten überhaupt eine Stimme geben, die Tradition dahinter und wo die Risiken liegen, liest du unter ',
-  echoesLink: 'warum wir sie Echos nennen',
-  echoesMid: '. Um die Methode an einem einzelnen Leben zu sehen, durchstöbere die ',
+  figuresPre: 'Um die Methode an einem einzelnen Leben zu sehen, durchstöbere die ',
   figuresLink: 'Menschen',
-  echoesPost: ' und öffne einen beliebigen Faktencheck.',
-  hubsPre: 'Um Philosophie im Gespräch zu lernen, beginne beim ',
-  hubsPhiloLink: 'KI-Philosophie-Tutor',
-  hubsMid: '. Um zeitlose Weisheit von den Menschen der Geschichte zu lernen, beginne beim ',
-  hubsWisdomLink: 'Weisheits-Leitfaden',
-  hubsPost: '.',
+  figuresPost: ' und öffne einen beliebigen Faktencheck.',
   ghPre: 'Oder lies die Methode im Code auf ',
   ghLink: 'GitHub',
   ghPost: '.',
@@ -272,10 +251,7 @@ const c = isDe ? de : en;
 
     <h2 class="pub-section__title mth-links-title">{c.linksTitle}</h2>
     <p class="pub-section__text mth-links">
-      {c.echoesPre}<a class="pub-textlink" href={publicUrl(lang, '/echoes')}>{c.echoesLink}</a>{c.echoesMid}<a class="pub-textlink" href={publicUrl(lang, '/figures')}>{c.figuresLink}</a>{c.echoesPost}
-    </p>
-    <p class="pub-section__text mth-links">
-      {c.hubsPre}<a class="pub-textlink" href={philoHubHref}>{c.hubsPhiloLink}</a>{c.hubsMid}<a class="pub-textlink" href={wisdomHubHref}>{c.hubsWisdomLink}</a>{c.hubsPost}
+      {c.figuresPre}<a class="pub-textlink" href={figureListUrl(lang)}>{c.figuresLink}</a>{c.figuresPost}
     </p>
     <p class="pub-section__text mth-links">
       {c.ghPre}<a class="pub-textlink" href="https://github.com/chipmates/agoracosmica" target="_blank" rel="noopener noreferrer">{c.ghLink}</a>{c.ghPost}

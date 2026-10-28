@@ -12,7 +12,6 @@ import { join } from 'path';
 import { isIndexable, poemRoutes, readingPages } from '../../marketing/src/data/poems/index.mjs';
 import { SHAKESPEARE_QUOTES_INDEXABLE, SHAKESPEARE_QUOTES_PATH } from '../../marketing/src/data/quotes/shakespeare.mjs';
 // The theme pages print the same date as their JSON-LD dateModified.
-import { themeLastmod } from '../../marketing/src/lib/themeLastmod.mjs';
 
 const SITE_URL = 'https://agoracosmica.org';
 const SCRIPTS_DIR = import.meta.dirname;
@@ -46,10 +45,6 @@ const SLUG_TO_ID = {
   'william-shakespeare': 'shakespeare', 'harriet-tubman': 'tubman', 'virginia-woolf': 'woolf',
 };
 
-const THEME_IDS = [
-  'meaning-purpose', 'loss-grief', 'who-am-i', 'mind-creativity',
-  'love-connection', 'freedom-justice', 'faith-death-mystery', 'moral-life',
-];
 
 const today = new Date().toISOString().split('T')[0];
 
@@ -83,7 +78,7 @@ const slash = (p) => (p === '/' ? '/' : p.endsWith('/') ? p : `${p}/`);
 // pages (/nutzungsbedingungen + /terms) are a cross-slug hreflang pair below.
 const NO_HREFLANG_PATHS = new Set(['/impressum', '/datenschutz', '/cookie-policy', '/privacy', '/figures/emily-dickinson/poems',
   '/figures/william-blake/poems', '/figures/william-shakespeare/sonnets', '/figures/rumi/poems',
-  '/talk-to-historical-figures', '/de/figures/plato/hoehlengleichnis', '/de/figures/plato/ideenlehre']);
+  '/de/figures/plato/hoehlengleichnis', '/de/figures/plato/ideenlehre']);
 
 function url(rawPath, priority, lastmod, changefreq = 'monthly') {
   const isLegalDe = NO_HREFLANG_PATHS.has(rawPath);
@@ -124,26 +119,6 @@ const ABOUT_MOD = gitLastModified(
   'marketing/src/pages/de/about.astro',
   'marketing/src/components/AboutContent.astro',
 );
-const ECHOES_MOD = gitLastModified(
-  'marketing/src/pages/echoes.astro',
-  'marketing/src/pages/de/echoes.astro',
-  'marketing/src/components/EchoesContent.astro',
-);
-const FIGURES_CATALOG_MOD = gitLastModified(
-  'marketing/src/pages/figures/index.astro',
-  'marketing/src/pages/de/figures/index.astro',
-  'marketing/src/components/FiguresCatalogContent.astro',
-);
-const THEMES_CATALOG_MOD = gitLastModified(
-  'marketing/src/pages/themes/index.astro',
-  'marketing/src/pages/de/themes/index.astro',
-  'marketing/src/components/ThemesCatalogContent.astro',
-);
-const AUDIO_CATALOG_MOD = gitLastModified(
-  'marketing/src/pages/audio.astro',
-  'marketing/src/pages/de/audio.astro',
-  'marketing/src/components/AudioLibraryContent.astro',
-);
 const FIGURE_TEMPLATE_MOD = gitLastModified(
   'marketing/src/pages/figures/[slug].astro',
   'marketing/src/pages/de/figures/[slug].astro',
@@ -177,16 +152,6 @@ urls.push(deUrl('/', '1.0', HOME_MOD, 'weekly'));
 // Static pages (EN + DE pairs)
 urls.push(url('/about', '0.8', ABOUT_MOD));
 urls.push(deUrl('/about', '0.8', ABOUT_MOD));
-urls.push(url('/echoes', '0.6', ECHOES_MOD));
-urls.push(deUrl('/echoes', '0.6', ECHOES_MOD));
-
-// Catalog pages
-urls.push(url('/figures', '0.9', FIGURES_CATALOG_MOD, 'weekly'));
-urls.push(deUrl('/figures', '0.9', FIGURES_CATALOG_MOD, 'weekly'));
-urls.push(url('/themes', '0.9', THEMES_CATALOG_MOD, 'weekly'));
-urls.push(deUrl('/themes', '0.9', THEMES_CATALOG_MOD, 'weekly'));
-urls.push(url('/audio', '0.8', AUDIO_CATALOG_MOD, 'weekly'));
-urls.push(deUrl('/audio', '0.8', AUDIO_CATALOG_MOD, 'weekly'));
 
 // Figure detail pages
 for (const slug of FIGURE_SLUGS) {
@@ -206,7 +171,6 @@ urls.push(url('/figures/william-shakespeare/sonnets', '0.6', gitLastModified('ma
 if (isIndexable(readingPages.rumi)) {
   urls.push(url(readingPages.rumi.path, '0.6', gitLastModified('marketing/src/pages/figures/rumi/poems.astro')));
 }
-urls.push(url('/talk-to-historical-figures', '0.7', gitLastModified('marketing/src/pages/talk-to-historical-figures.astro')));
 
 // The Shakespeare quotes page, English only; its flag also sets its noindex.
 if (SHAKESPEARE_QUOTES_INDEXABLE) {
@@ -245,17 +209,8 @@ if (isIndexable(readingPages.meditations)) {
 urls.push(url('/de/figures/plato/hoehlengleichnis', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/hoehlengleichnis.astro')));
 urls.push(url('/de/figures/plato/ideenlehre', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/ideenlehre.astro')));
 
-// Open-source philosophy app (product-category positioning; EN + DE twin)
-const CATEGORY_MOD = gitLastModified(
-  'marketing/src/pages/open-source-philosophy-app.astro',
-  'marketing/src/pages/de/open-source-philosophy-app.astro',
-  'marketing/src/components/CategoryPageContent.astro',
-);
-urls.push(url('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
-urls.push(deUrl('/open-source-philosophy-app', '0.7', CATEGORY_MOD));
-
-// Category hubs (philosophy + wisdom). Unlike every pair above, these EN/DE
-// twins use DIFFERENT slugs, so the standard url()/deUrl() helpers (which
+// Cross-slug pairs (the explainers, the method page, the terms). Unlike every
+// pair above, these EN/DE twins use DIFFERENT slugs, so the standard url()/deUrl() helpers (which
 // assume a /de prefix of the same slug) cannot express their hreflang block.
 // crossPair() emits both pages of a pair, each listing the SAME alternate set
 // pointing hreflang="en" -> EN slug, hreflang="de" -> DE slug, x-default -> EN.
@@ -271,12 +226,6 @@ function crossPair(enPath, dePath, priority, lastmod, changefreq = 'monthly') {
   return [entry(enUrl), entry(deFullUrl)];
 }
 
-const PHILO_HUB_MOD = gitLastModified(
-  'marketing/src/pages/ai-philosophy-tutor.astro',
-  'marketing/src/pages/de/philosophie-lernen.astro',
-  'marketing/src/components/TutorHubContent.astro',
-);
-urls.push(...crossPair('/ai-philosophy-tutor', '/de/philosophie-lernen', '0.8', PHILO_HUB_MOD, 'weekly'));
 
 // Topic explainer pages (cross-slug EN/DE twins like the hubs above)
 const HEROS_JOURNEY_MOD = gitLastModified(
@@ -298,13 +247,6 @@ const METHODOLOGY_MOD = gitLastModified(
   'marketing/src/components/MethodologyContent.astro',
 );
 urls.push(...crossPair('/methodology', '/de/methodik', '0.6', METHODOLOGY_MOD));
-
-// Theme detail pages, each dated by its own strings and quotes in its own
-// language, so a round that edits one theme moves one date.
-for (const theme of THEME_IDS) {
-  urls.push(url(`/themes/${theme}`, '0.8', themeLastmod(theme, 'en')));
-  urls.push(deUrl(`/themes/${theme}`, '0.8', themeLastmod(theme, 'de')));
-}
 
 // Legal pages (German only, no hreflang pairs, no /de/ prefix)
 urls.push(url('/impressum', '0.3', LEGAL_MOD['/impressum']));

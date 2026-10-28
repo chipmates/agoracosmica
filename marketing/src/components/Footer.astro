@@ -8,14 +8,11 @@ interface Props {
   lang: Lang;
   /** A page's own line in place of the platform tagline (the landing's redesign). */
   tagline?: string;
-  /** Off: no "why we call them Echoes" link (the method page's link stays). */
-  echoesLink?: boolean;
-  /** The stories' chrome (the landing's redesign): only the pages that stay, with the explainers that stay. */
-  trimmed?: boolean;
+  /** The explainers that stay, in their own column (the landing). */
   explainers?: Array<{ href: string; label: string }>;
 }
 
-const { lang, tagline, echoesLink = true, trimmed = false, explainers = [] } = Astro.props;
+const { lang, tagline, explainers = [] } = Astro.props;
 const t = getT(lang);
 
 // The museum's name stays English in every language; its descriptor always stands beside it.
@@ -30,14 +27,10 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
     </div>
 
     <div class:list={['pub-footer__links', { 'pub-footer__links--four': explainers.length > 0 }]}>
+      {/* Only the pages that stay: the figure list, themes, audio, Echo and the app page went (they forward). */}
       <div class="pub-footer__col">
-        {!trimmed && <a href={publicUrl(lang, '/figures')}>{t('nav.figures')}</a>}
-        {!trimmed && <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>}
-        {!trimmed && <a href={publicUrl(lang, '/audio')}>{t('nav.audio')}</a>}
         <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
-        {echoesLink && !trimmed && <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>}
         <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
-        {!trimmed && <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>}
         <a href={lang === 'de' ? '/de/about/#kontakt' : '/about/#contact'}>{t('nav.contact')}</a>
       </div>
       {explainers.length > 0 && (

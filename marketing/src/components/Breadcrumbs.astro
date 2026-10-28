@@ -7,7 +7,7 @@
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
-import { publicUrl } from '../lib/urls';
+import { figureListUrl, publicUrl } from '../lib/urls';
 
 export interface BreadcrumbItem {
   label: string;
@@ -27,6 +27,9 @@ const allItems: BreadcrumbItem[] = [
   { label: t('breadcrumbs.home'), path: '/' },
   ...items,
 ];
+// The figure list went into the landing (its address forwards there), so its crumb links the landing's list.
+const hrefFor = (path: string): string =>
+  path.replace(/\/$/, '') === '/figures' ? figureListUrl(lang) : publicUrl(lang, path);
 ---
 <nav aria-label="Breadcrumb" class="pub-breadcrumbs">
   <ol>
@@ -34,7 +37,7 @@ const allItems: BreadcrumbItem[] = [
       <li>
         {i > 0 && <span class="pub-breadcrumbs__sep" aria-hidden="true">/</span>}
         {item.path ? (
-          <a href={publicUrl(lang, item.path)}>{item.label}</a>
+          <a href={hrefFor(item.path)}>{item.label}</a>
         ) : (
           <span aria-current="page">{item.label}</span>
         )}

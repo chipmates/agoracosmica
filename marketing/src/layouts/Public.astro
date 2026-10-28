@@ -54,10 +54,9 @@ interface Props {
   reading?: boolean;
   /** A story player figure page (player/pages.ts). */
   storyPage?: boolean;
-  /** The landing's redesign: its own tagline in the bar and the footer, no Echoes link. */
+  /** The landing's redesign: its own tagline in the bar and the footer. */
   tagline?: string;
-  echoesLink?: boolean;
-  /** The landing's redesign: the bar and the footer link only the pages that stay, plus these explainers. */
+  /** The landing's redesign: no line under the wordmark, and the explainers in the footer. */
   trimmedChrome?: { explainers: Array<{ href: string; label: string }> };
 }
 
@@ -100,8 +99,6 @@ const revealSticky = isHome || props.heroReveal === true;
       <Footer
         lang={props.lang}
         tagline={props.tagline}
-        echoesLink={props.echoesLink}
-        trimmed={props.trimmedChrome !== undefined}
         explainers={props.trimmedChrome?.explainers}
       />
     </div>

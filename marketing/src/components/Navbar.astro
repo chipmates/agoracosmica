@@ -21,8 +21,7 @@ interface Props {
   storyPage?: boolean;
   /** A page's own line in place of the platform tagline beside the wordmark. */
   tagline?: string;
-  /** The stories' chrome (the landing's redesign): only the pages that stay, and no line under the wordmark (the
-   *  page's h1 says it). */
+  /** The landing: no line under the wordmark (the page's h1 says it). */
   trimmed?: boolean;
 }
 
@@ -40,12 +39,8 @@ const langSwitchUrl = crossSlugTwin
     ? (otherLang === 'de' ? '/de/' : '/')
     : publicUrl(otherLang, stripLangPrefix(currentPath));
 
+// Only the pages that stay: the figure list, the themes and the audio page went (their addresses forward).
 const navLinks = [
-  ...(trimmed ? [] : [
-    { to: publicUrl(lang, '/figures'), label: t('nav.figures') },
-    { to: publicUrl(lang, '/themes'), label: t('nav.themes') },
-    { to: publicUrl(lang, '/audio'), label: t('nav.audio') },
-  ]),
   { to: publicUrl(lang, '/about'), label: t('nav.about') },
   { to: publicUrl(lang, lang === 'de' ? '/about/#kontakt' : '/about/#contact'), label: t('nav.contact') },
 ];
