@@ -54,8 +54,6 @@ interface Label {
   title: string;
   brief: string;
   expanded: string;
-  /** The lock screen's line: the making, the images and the voice (its artwork is the portrait). */
-  lock: string;
 }
 
 // How long the bar shows the voice note at a visit's first story, from its first sound.
@@ -153,7 +151,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const [noteOpen, setNoteOpen] = useState(false);
 
   useEffect(() => {
-    installPlayer({ en: labels.en.lock, de: labels.de.lock });
+    installPlayer();
     installPage();
   }, [labels]);
 

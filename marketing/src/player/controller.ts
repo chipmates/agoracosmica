@@ -21,7 +21,6 @@ import { trackHeardSeconds } from '../utils/heardSeconds';
 import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
 import { applyStoredTheme } from './theme';
-import type { PlayerLang } from './strings';
 import type { PlayerState, ResumePoint, SavedSentence, SheetKind, SleepChoice, StoryQueue } from './types';
 
 // The worker's mode allow-list (llm-proxy routes/playback.ts) has no
@@ -742,9 +741,8 @@ function updateMetadata(): void {
   const entry = queue.entries.find(e => e.n === current);
   const s = playerStrings(queue.lang);
   navigator.mediaSession.metadata = new MediaMetadata({
-    title: current === 0 ? s.introTitle : entry ? `${s.storyN(current)}: ${entry.title}` : s.storyN(current),
-    // The lock screen travels without the page, so the label rides along, voice first: a cut line drops the name.
-    artist: [...lockScreenLabel[queue.lang].split(' · ').reverse(), queue.name].join(' · '),
+    title: current === 0 ? s.introTitle : entry?.title ?? s.storyN(current),
+    artist: queue.name,
     album: 'Agora Cosmica',
     artwork: [{ src: queue.artwork, sizes: '640x640', type: 'image/webp' }],
   });
@@ -770,17 +768,14 @@ function updatePositionState(force = false): void {
   }
 }
 
-let lockScreenLabel: Record<PlayerLang, string> = { en: '', de: '' };
-
 // ---- start --------------------------------------------------------------
 
 let installed = false;
 
 /** Wire the page once per document. The dock island calls this on mount. */
-export function installPlayer(label: Record<PlayerLang, string>): void {
+export function installPlayer(): void {
   if (installed) return;
   installed = true;
-  lockScreenLabel = label;
   const rate = readNumber(RATE_KEY);
   let after: string | null = null;
   try {
