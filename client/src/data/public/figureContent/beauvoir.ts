@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Simone de Beauvoir speaking?',
-        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from The Second Sex, from her memoirs and from the historical sources. A synthetic voice reads them. Not a recording. Simone de Beauvoir lived from 1908 to 1986. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from The Second Sex, from her memoirs and from the historical sources. Simone de Beauvoir lived from 1908 to 1986. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Simone de Beauvoir?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach „Das andere Geschlecht“, nach ihren Memoiren und nach den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Simone de Beauvoir lebte von 1908 bis 1986. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach „Das andere Geschlecht“, nach ihren Memoiren und nach den historischen Quellen. Simone de Beauvoir lebte von 1908 bis 1986. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

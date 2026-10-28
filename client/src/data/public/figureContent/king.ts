@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Martin Luther King Jr. speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his books and the historical sources. A synthetic voice reads them. Not a recording. Martin Luther King Jr. lived from 1929 to 1968. His speeches and letters are still under copyright. The stories paraphrase his thinking in new sentences and quote nothing of his. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his books and the historical sources. Martin Luther King Jr. lived from 1929 to 1968. His speeches and letters are still under copyright. The stories paraphrase his thinking in new sentences and quote nothing of his. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Martin Luther King Jr.?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Martin Luther King Jr. lebte von 1929 bis 1968. Seine Reden und Briefe stehen noch unter Urheberrecht. Die Geschichten geben sein Denken in neuen Sätzen wieder und zitieren nichts von ihm. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Büchern und den historischen Quellen. Martin Luther King Jr. lebte von 1929 bis 1968. Seine Reden und Briefe stehen noch unter Urheberrecht. Die Geschichten geben sein Denken in neuen Sätzen wieder und zitieren nichts von ihm. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

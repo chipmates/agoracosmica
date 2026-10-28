@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Albert Einstein speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his papers, his letters and the historical sources. A synthetic voice reads them. Not a recording. Albert Einstein lived from 1879 to 1955. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from his papers, his letters and the historical sources. Albert Einstein lived from 1879 to 1955. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Albert Einstein?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Arbeiten, seinen Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Albert Einstein lebte von 1879 bis 1955. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach seinen Arbeiten, seinen Briefen und den historischen Quellen. Albert Einstein lebte von 1879 bis 1955. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

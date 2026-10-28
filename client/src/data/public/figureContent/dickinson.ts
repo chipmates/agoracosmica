@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Emily Dickinson speaking?',
-        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her poems, her letters and the historical sources. A synthetic voice reads them. Not a recording. Emily Dickinson lived from 1830 to 1886. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written as a human-AI collaboration from her poems, her letters and the historical sources. Emily Dickinson lived from 1830 to 1886. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Emily Dickinson?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Gedichten, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Emily Dickinson lebte von 1830 bis 1886. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach ihren Gedichten, ihren Briefen und den historischen Quellen. Emily Dickinson lebte von 1830 bis 1886. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

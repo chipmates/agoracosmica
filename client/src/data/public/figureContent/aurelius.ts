@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Marcus Aurelius speaking?',
-        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Meditations and the historical sources. A synthetic voice reads them. Not a recording. Marcus Aurelius lived from 121 to 180 AD. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written as a human-AI collaboration from the Meditations and the historical sources. Marcus Aurelius lived from 121 to 180 AD. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Mark Aurel?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Selbstbetrachtungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Mark Aurel lebte von 121 bis 180 n. Chr. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie in Mensch-KI-Zusammenarbeit nach den Selbstbetrachtungen und den historischen Quellen. Mark Aurel lebte von 121 bis 180 n. Chr. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
