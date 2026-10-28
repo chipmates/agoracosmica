@@ -1,5 +1,8 @@
 ---
 import '../../styles/legal.css';
+import BackLink from '../BackLink.astro';
+import { getT } from '../../i18n';
+import { publicUrl } from '../../lib/urls';
 
 interface Props {
   title: string;
@@ -9,8 +12,11 @@ interface Props {
 
 const { title, lastUpdated, lang = 'de' } = Astro.props;
 const isEn = lang === 'en';
+const t = getT(lang);
+const home = publicUrl(lang, '/');
 ---
 <article class="legal-doc">
+  <BackLink at="top" href={home} label={t('breadcrumbs.home')} />
   <header class="legal-doc__header">
     <h1 class="legal-doc__title">{title}</h1>
     <p class="legal-doc__date">{lastUpdated}</p>
@@ -29,4 +35,5 @@ const isEn = lang === 'en';
       <a href={isEn ? '/terms/' : '/nutzungsbedingungen/'}>{isEn ? 'Terms' : 'Nutzungsbedingungen'}</a>
     </nav>
   </div>
+  <BackLink at="end" href={home} label={t('breadcrumbs.home')} />
 </article>
