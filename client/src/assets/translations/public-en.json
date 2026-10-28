@@ -344,7 +344,7 @@
     "valueTransformation": "Transformation: Inner growth ripples outward.",
     "whyTitle": "Why it exists",
     "whyP1": "The ideas that help people most are often the hardest to reach. They sit in books nobody hands you, in courses that cost money, in sentences written for other scholars. We think that is the wrong way round. So we took 30 people from philosophy, science, faith, art, and activism, and put their lives and their thinking into short stories.",
-    "whyP2": "We count it a success the day you outgrow us. From our short stories to the real books. From a story written with AI to a human teacher. From curiosity to study of your own. That is the whole point.",
+    "whyP2": "We count it a success the day you outgrow us. From our short stories to the real books. From curiosity to study of your own. That is the whole point.",
     "barriersTitle": "What usually gets in the way",
     "barriersIntro": "The ideas of history's most remarkable people belong to everyone.",
     "barrierGeographic": "Geographic: Available worldwide, around the clock.",
@@ -353,8 +353,6 @@
     "barrierEconomic": "Economic: Open source, nonprofit, no paywalls, no ads.",
     "doTitle": "What you can do here",
     "doP1": "30 remarkable people from history, each life told in the first person in a set of short stories. From Marcus Aurelius to Frida Kahlo, from Rumi to Virginia Woolf. The stories draw on what these people wrote, on their documented lives, and on the ideas they spent their lives developing.",
-    "doP2": "Every story is written as a human-AI collaboration from primary works, historical context, and sources we cross-check. The words are a retelling. The source material underneath is not. Where a story goes past the documented record, the factcheck says so.",
-    "doP3": "You can listen to every story, read aloud by a synthetic voice, or read it yourself as text. No account needed.",
     "howItWorks": {
       "subtitle": "Every person here comes with six ways in. Pick the one that fits your evening.",
       "story": "Listen to a 12-chapter narrated life story. Every story is fact-checked and covers the moments that shaped their thinking.",
@@ -381,10 +379,6 @@
       "github": "The code is open source on GitHub."
     },
     "echoesLink": "Why we call them Echoes",
-    "voiceCredits": {
-      "title": "Voice technology",
-      "body": "The stories and the introductions are read by synthetic voices made with ElevenLabs, a commercial text-to-speech service. The reading of Emily Dickinson's poem on her poems page was made the same way. No recording of any of the thirty reading these words exists."
-    },
     "contactTitle": "Contact",
     "contactP1": "We are early in this, and we will get things wrong. When we oversimplify, misrepresent, or miss the point, tell us. We are not building this for you, we are building it with you.",
     "contactEmailLabel": "Email",
