@@ -232,11 +232,12 @@ function layout(intro: Pt | null, FIT_H: number, words: Words, earlierRule = fal
       return Math.min(d - d0, d - clearance * d0 + 4) - (between ? 100 : 0);
     }));
   };
+  const VIA_NUM = 16; // a number keeps this far from "via sapientiae", or the two read as one line
   const numberAt: (Spot | null)[] = at.map(() => null);
   const numberBox: (Box | null)[] = at.map(() => null);
   const clearCost = (i: number, c: Spot) => {
     const a = numBoxOf(i, c);
-    return clearOfMarks(i, a, 24)
+    return clearOfMarks(i, a, 24) + (hits(a, grow(via, VIA_NUM)) ? 1 : 0)
       + numberBox.filter((b, j): b is Box => !!b && j !== i).filter(b => hits(a, grow(b, 5))).length;
   };
   const numCost = (i: number, c: Spot) => clearCost(i, c) + (readScore(i, numBoxOf(i, c), c !== OVER) >= 4 ? 0 : 1);
