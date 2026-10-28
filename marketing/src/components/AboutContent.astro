@@ -16,7 +16,6 @@
 // cross-language link still lands. /impressum keeps the legal duty.
 import Breadcrumbs from './Breadcrumbs.astro';
 import ContentVolume from './ContentVolume.astro';
-import PublicCTA from './PublicCTA.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
@@ -266,7 +265,6 @@ const museum = isDe
     <cite class="pub-about-quote__cite">— {t('about.closingAttribution')}</cite>
   </div>
 
-  <PublicCTA variant="inline" lang={lang} />
 </div>
 
 <style>
