@@ -1,6 +1,6 @@
-/* Concept 2, the full face. The base's stage restyled from outside (landing.css stays as it is): the painting leaves
-   its card and fills the first screen, its foot goes dark, and the tagline, the name block, the label and the plate
-   stand on that dark. Tokens only, no colour literals. */
+/* Concept 2, the full face. The base's stage restyled from outside (landing.css stays as it is): on a phone the
+   painting leaves its card and fills the first screen, its foot goes dark, and the tagline, the name block, the label
+   and the plate stand on that dark; a desktop frames it whole beside the words. Tokens only, no colour literals. */
 
 /* ---- the hero: night in every light, the painting behind its own words ------------------------------------- */
 .c2-hero {
@@ -275,48 +275,78 @@
   .c2-pick { width: 68px; }
 }
 
-/* ---- a desktop: the words left, the painting right to the window's edge, the thirty across its foot -------------- */
+/* ---- a desktop: the words left, the whole painting in a framed plate beside them, the thirty under both ------ */
 @media (min-width: 1024px) {
-  .c2-hero { margin-top: -0.75rem; }
+  .c2-hero {
+    margin-top: -0.75rem;
+    /* the plate's width; its height is the words' (h1 to the label), so the painting shows head to chest */
+    --c2-plate-w: min(440px, calc(100% - 40px));
+  }
   .c2-hero__in {
     display: grid;
     grid-template-columns: minmax(0, 33rem) minmax(0, 1fr);
-    grid-template-areas: "h1 ." "lead ." "intro ." "stage ." "rail rail";
+    grid-template-areas: "h1 plate" "lead plate" "intro plate" "names plate" "play plate" "all plate" "label plate" "rail rail";
     align-content: start;
     max-width: 1200px;
     margin: 0 auto;
     padding: 40px 16px 1.5rem;
   }
+  /* the stage's parts join the grid: the words in the left column, the painting in the right */
+  .c2-hero .ls-stage.c2-stage, .c2-hero .ls-card { display: contents; }
   .c2-h1 { grid-area: h1; font-size: 3rem; line-height: 1.05; }
   .c2-lead { grid-area: lead; margin-top: 0.75rem; font-size: 1.375rem; line-height: 1.3; color: var(--sp-n-ink); }
   .c2-intro { grid-area: intro; margin-top: 0.75rem; font-size: 1.125rem; }
-  .c2-stage { grid-area: stage; }
-  .c2-rail { grid-area: rail; position: relative; margin: 18px 0 0; }
-  /* the rail lies on the painting's foot: a night band under it keeps its small names legible on any painting */
-  .c2-rail::before {
-    content: '';
-    position: absolute;
-    z-index: -1;
-    top: -28px;
-    bottom: -1.5rem;
-    left: calc(600px - 50vw);
-    right: calc(600px - 50vw);
-    background: linear-gradient(to bottom, transparent, color-mix(in srgb, var(--sp-n-void) 78%, transparent) 64px);
-    pointer-events: none;
-  }
+  .c2-hero .ls-card__names { grid-area: names; }
+  .c2-hero .ls-plate-wrap { grid-area: play; }
+  .c2-hero .ls-allbtn { grid-area: all; }
+  .c2-hero .ls-label { grid-area: label; }
+  .c2-rail { grid-area: rail; margin: 18px 0 0; }
+
+  /* the plate: a frame round the window, the painting whole inside it; overflow clips at the frame's inner edge */
   .c2-hero .ls-card__mat {
-    left: auto;
-    bottom: 0;
-    width: 62%;
+    grid-area: plate;
+    justify-self: end;
+    position: relative;
+    z-index: auto;
+    inset: auto;
+    width: var(--c2-plate-w);
     height: auto;
-    -webkit-mask-image: linear-gradient(to right, transparent 0%, var(--sp-n-void) 34%), linear-gradient(to bottom, var(--sp-n-void) 58%, transparent 86%);
-    -webkit-mask-composite: source-in;
-    mask-image: linear-gradient(to right, transparent 0%, var(--sp-n-void) 34%), linear-gradient(to bottom, var(--sp-n-void) 58%, transparent 86%);
-    mask-composite: intersect;
+    min-height: 0;
+    aspect-ratio: auto;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 11px solid var(--sp-plate);
+    border-radius: 6px;
+    background: var(--sp-n-astral);
+    box-shadow: 0 0 0 1px var(--sp-hair-strong), 0 18px 44px color-mix(in srgb, var(--sp-n-void) 72%, transparent);
+    /* the window's own hairline, drawn over the painting's edge */
+    outline: 1px solid var(--sp-hair);
+    outline-offset: -12px;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
-  .c2-hero .ls-card__img { object-position: var(--ls-fx, 50%) var(--ls-pyd, 16%); }
-  /* the arrows sit on the painting's lit part, at the face's height */
-  .c2-turn { left: 50%; right: max(16px, calc(50vw - 600px)); top: 0; height: 74%; }
+  /* a little larger than the window, so the paintings' own thin gold border stays under the frame; the top holds */
+  .c2-hero .ls-card__img {
+    position: absolute;
+    top: -2.6%;
+    left: -2.8%;
+    width: 105.6%;
+    height: 105.2%;
+    margin: 0;
+    object-position: var(--ls-fx, 50%) 0%;
+  }
+  /* the arrows on the plate's sides, at its middle */
+  .c2-turn {
+    grid-area: plate;
+    justify-self: end;
+    position: relative;
+    inset: auto;
+    width: var(--c2-plate-w);
+    height: auto;
+  }
+  .c2-turn__btn--prev { left: 20px; }
+  .c2-turn__btn--next { right: 20px; }
+
   .c2-hero .ls-name { font-size: 3rem; }
   .c2-hero .ls-name[data-long] { font-size: 2.5rem; }
   .c2-hero .ls-line { font-size: 1.25rem; }

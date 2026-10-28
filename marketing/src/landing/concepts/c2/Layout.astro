@@ -1,7 +1,8 @@
 ---
-// Concept 2, the full face: the painting fills the first screen, the tagline, the name block, the label and the plate
-// sit on its dark foot, the thirty run under it. The stage is the base's (moment off: c2.ts runs it, so the tagline
-// over the painting stays as clear as the name). Below: the words, then the era descent with the thirty's portraits.
+// Concept 2, the full face: on a phone the painting fills the first screen, the tagline, the name block, the label and
+// the plate sit on its dark foot, the thirty run under it; on a desktop the painting stands whole in a framed plate
+// beside the words. The stage is the base's (moment off: c2.ts runs it, so the tagline over the painting stays as clear
+// as the name). Below: the words, then the era descent with the thirty's portraits.
 import Stage from '../../Stage.astro';
 import FigureDescent from '../../../components/FigureDescent.astro';
 import { landingWords } from '../../words';
@@ -47,7 +48,7 @@ const listId = lang === 'de' ? 'alle' : 'all';
         lang={lang}
         variant="below"
         moment={false}
-        sizes="(min-width: 1024px) 62vw, (min-resolution: 2.5dppx) 300px, 100vw"
+        sizes="(min-width: 1024px) 440px, (min-resolution: 2.5dppx) 300px, 100vw"
         class="c2-stage"
       />
       <div class="c2-turn" data-c2-turn data-next={W.turnNext('{name}')} data-prev={W.turnPrevious('{name}')} hidden>
