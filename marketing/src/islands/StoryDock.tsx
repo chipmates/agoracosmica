@@ -106,6 +106,13 @@ function expandDock(): void {
   else openReader(now.current, now.queue);
 }
 
+/** The end card's "Listen now" plays a story: its reading view opens with it, as from the page (not by the poem door). */
+function listenAndRead(): void {
+  listenNow();
+  const now = getState();
+  if (now.current !== null && now.queue && !document.querySelector('.sp-door')) openReader(now.current, now.queue);
+}
+
 function currentPath(): string {
   return typeof window === 'undefined' ? '' : window.location.pathname;
 }
@@ -469,7 +476,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
             </div>
             <div className="story-dock__endacts">
               <button type="button" className="story-dock__stay" onClick={stayHere}>{s.stay}</button>
-              <button type="button" className="story-dock__now" onClick={listenNow} aria-describedby={VOICE_DESC_ID}>{s.listenNow}</button>
+              <button type="button" className="story-dock__now" onClick={listenAndRead} aria-describedby={VOICE_DESC_ID}>{s.listenNow}</button>
             </div>
           </div>
         )}

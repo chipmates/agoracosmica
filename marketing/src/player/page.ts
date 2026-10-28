@@ -379,8 +379,10 @@ function selectStar(n: number): void {
 }
 
 /** The dock rises under the thumb: the control just pressed, with the whole row or map card around it, moves up out of its way. */
-/** A tap that starts the voice opens its reading view in the same tap (the text follows the voice). */
-function readAlong(): void {
+/** A tap that starts the voice opens its reading view in the same tap (the text follows the voice); the poem door
+ *  stays sound only, its page is the text. */
+function readAlong(from: Element): void {
+  if (from.closest('.sp-door')) return;
   const now = getState();
   if (now.current !== null && now.queue) openReader(now.current, now.queue);
 }
@@ -438,7 +440,7 @@ function onClick(e: MouseEvent): void {
     } else {
       playStory(queue, action.n, action.from);
     }
-    if (!pausing) readAlong();
+    if (!pausing) readAlong(plate);
     if (!dockWasUp) keepPressedInView(plate);
     return;
   }
@@ -453,7 +455,7 @@ function onClick(e: MouseEvent): void {
       && (state.status === 'playing' || state.status === 'loading');
     if (playBtn.dataset.storyFrom !== undefined) playFrom(queue, n, Number(playBtn.dataset.storyFrom) || 0);
     else playStory(queue, n);
-    if (!pausing) readAlong();
+    if (!pausing) readAlong(playBtn);
     if (!dockWasUp) keepPressedInView(playBtn);
     return;
   }
