@@ -6,12 +6,16 @@
 // no scroll lock, no focus trap), which is what keeps the consent lawful
 // (EDPB cookie-wall rule).
 //
-// It asks later, never on arrival: on a page with the story player once a
+// When it asks is a split test, drawn at random once per page load for an
+// undecided grant arrival (LATER_SHARE below): the arrival arm asks at once,
+// on any page; the later arm asks on a page with the story player once a
 // minute of story audio has been heard, on a page with poems once a poem's
-// last line has been in view for its reading time (utils/cardMoment.ts). No
-// other page asks. Until the answer the click ID lives in page memory only:
-// it leaves the address bar when this module loads, nothing about the ad is
-// stored, and a full page load forgets it (a reload no longer asks).
+// last line has been in view for its reading time (utils/cardMoment.ts), and
+// on no other page. The words are the same in both. The arm lives in page
+// memory and rides on our own counts, never to Google. Until the answer the
+// click ID lives in page memory only: it leaves the address bar when this
+// module loads, nothing about the ad is stored, and a full page load forgets
+// it (a reload no longer asks).
 //
 //   Accept  -> grantAdConsent() stores the yes and the click ID, then
 //              start_exploring and a Listened crossing held since it happened.
@@ -40,17 +44,20 @@ import {
   adConsentDecided,
   grantAdConsent,
 } from '@client/utils/public/gclidCapture';
-import { isProbeSessionNow, probeField } from '@client/utils/probeSession';
+import { isProbeSessionNow } from '@client/utils/probeSession';
 import {
   armPreDecisionListening,
+  cardArm,
   clickId,
   dropPreDecisionListening,
   flushPreDecisionListening,
+  holdArm,
   holdClick,
   keepClickAfterYes,
   onProductionHost,
   revokeAdConsent,
 } from '../utils/heardSeconds';
+import type { CardArm } from '../utils/heardSeconds';
 import {
   boxesOverlap,
   findPoemEnds,
@@ -58,6 +65,7 @@ import {
   watchStorySeconds,
 } from '../utils/cardMoment';
 import type { StorySource } from '../utils/cardMoment';
+import { postCount, watchListens } from '../utils/listenCounts';
 import './ArrivalChoice.css';
 
 interface Props {
@@ -69,7 +77,7 @@ const COPY = {
     kicker: 'One question about this ad',
     heading: 'May we count your visit for Google?',
     lead: 'We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.',
-    fine: 'A yes sends Google the ad’s click ID with each step you take here: this yes, opening the app, listening, starting a conversation, a third message, a council. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
+    fine: 'A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30 seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.',
     age: 'If you’re under 16, please say no.',
     accept: 'Yes, count it',
     decline: 'No, don’t count it',
@@ -83,7 +91,7 @@ const COPY = {
     kicker: 'Eine Frage zu dieser Anzeige',
     heading: 'Dürfen wir deinen Besuch für Google zählen?',
     lead: 'Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.',
-    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige bei jedem Schritt, den du hier machst: diesem Ja, dem Öffnen der App, dem Zuhören, dem Beginn eines Gesprächs, deiner dritten Nachricht, einem Council. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
+    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
     age: 'Bist du unter 16, sag bitte Nein.',
     accept: 'Ja, zählen',
     decline: 'Nein, nicht zählen',
@@ -102,20 +110,52 @@ const COPY = {
 // CORS allows this origin. (Same posture as the former agc-public.js
 // fireConversion.)
 const CONVERSIONS_URL = 'https://llm.agoracosmica.org/api/conversions';
-const FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
 const CODE_URL =
   'https://github.com/chipmates/agoracosmica/blob/main/client/src/utils/public/gclidCapture.ts';
 const GOOGLE_PARTNER_URL = 'https://business.safety.google/privacy';
 const SS_FIRED = 'agc_conv_fired_start_exploring';
 
+// The later arm's share of undecided grant arrivals. At 0 every one of them
+// gets the card at once, as before the split.
+export const LATER_SHARE = 0.5;
+
+// A browser test may fix the arm from an init script that runs before the
+// page's own (window.__agcCardArm = 'arrival' or 'later'). Nothing in the
+// address and nothing in storage can reach it.
+const FORCED_ARM_KEY = '__agcCardArm';
+
+function fairRandom(): number {
+  try {
+    const word = new Uint32Array(1);
+    crypto.getRandomValues(word);
+    return (word[0] as number) / 2 ** 32;
+  } catch {
+    return Math.random();
+  }
+}
+
+/** The arm for this page load: the later arm with probability `share`, else the arrival arm. */
+export function drawArm(share: number = LATER_SHARE, random: () => number = fairRandom): CardArm {
+  try {
+    const forced = (window as unknown as Record<string, unknown>)[FORCED_ARM_KEY];
+    if (forced === 'arrival' || forced === 'later') return forced;
+  } catch {
+    // no window: draw
+  }
+  return random() < share ? 'later' : 'arrival';
+}
+
 // Anonymous consent counters: how many ad arrivals get asked, and what they
 // answer. Same keyless posture as the cta_click beacon in agc-public.js: the
-// step, the page path, the interface language, on the three answer steps a
-// coarse time-to-answer bucket, and from a browser marked as in-house the
-// probe constant every other count carries. It has to stay that way. A gclid
-// or an id here would pair a user dimension with a consent decision, which is
-// exactly what this measurement must not do.
+// step, the page path, the interface language, the card's arm in the label
+// slot, on the three answer steps a coarse time-to-answer bucket, and from a
+// browser marked as in-house the probe constant every other count carries. It
+// has to stay that way. A gclid or an id here would pair a user dimension with
+// a consent decision, which is exactly what this measurement must not do.
+// ad_consent_arm is the draw itself, one per undecided grant arrival: the
+// denominator each arm's answers are read against.
 type ConsentCounter =
+  | 'ad_consent_arm'
   | 'ad_consent_shown'
   | 'ad_consent_accepted'
   | 'ad_consent_declined'
@@ -153,6 +193,9 @@ const PLAYER_SELECTOR = '[data-astro-transition-persist="story-dock"], script[da
 // page carries several, and waiting for all of them to scroll away would leave
 // most listeners unasked.
 const DOCK_SELECTOR = '.story-dock';
+// The map's label for the story that comes next, beside its star or as a line
+// under the map: a card that comes later waits until it would not cover it.
+const NEXT_LABEL_SELECTOR = '.sp-mapnext:not([hidden]), .sp-star__next';
 
 function answerBucket(elapsedMs: number): number {
   const seconds = elapsedMs / 1000;
@@ -178,39 +221,21 @@ function countConsentStep(step: ConsentCounter, lang: Props['lang'], bucket?: nu
   if (!onProductionHost()) return;
   if (countedSteps.has(step)) return;
   countedSteps.add(step);
-  try {
-    // Path only, no query and no hash, exactly like the cta_click beacon.
-    // The worker holds it to the same closed shape it holds that one to
-    // (a short slug path or nothing), plus the coarse bucket on the three
-    // answer steps. JSON drops an undefined bucket or probe, so a shown step
-    // has no bucket and an unmarked browser sends no probe field at all.
-    const body = JSON.stringify({
-      step,
-      path: window.location.pathname,
-      language: lang,
-      bucket,
-      probe: probeField(),
-    });
-    // sendBeacon survives the navigation an accept can trigger. text/plain
-    // keeps it a simple CORS request, so no preflight gets lost in transit.
-    if (
-      typeof navigator !== 'undefined' &&
-      typeof navigator.sendBeacon === 'function' &&
-      navigator.sendBeacon(FUNNEL_URL, new Blob([body], { type: 'text/plain' }))
-    ) {
-      return;
-    }
-    fetch(FUNNEL_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body,
-      keepalive: true,
-    }).catch(() => {
-      /* never surface */
-    });
-  } catch {
-    /* same posture */
-  }
+  // Path only, no query and no hash, exactly like the cta_click beacon. The
+  // worker holds it to the same closed shape it holds that one to (a short
+  // slug path or nothing), plus the arm and the coarse bucket on the three
+  // answer steps. JSON drops an undefined bucket, so a shown step has none.
+  postCount({
+    step,
+    path: window.location.pathname,
+    language: lang,
+    mode: cardArm() ?? undefined,
+    bucket,
+  });
+}
+
+function pageLanguage(): Props['lang'] {
+  return (document.documentElement.lang || 'en').toLowerCase().startsWith('de') ? 'de' : 'en';
 }
 
 /**
@@ -260,7 +285,8 @@ function fireStartExploring(): void {
     fetch(CONVERSIONS_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gclid, event: 'start_exploring', timestamp: Date.now() }),
+      // The arm is for our own analytics row only: the worker passes it to no one.
+      body: JSON.stringify({ gclid, event: 'start_exploring', timestamp: Date.now(), arm: cardArm() ?? undefined }),
       keepalive: true,
     }).catch(() => {
       /* never surface */
@@ -288,8 +314,16 @@ let phase: Phase = 'off';
 let keepClear: KeepClear | null = null;
 let stopMoment: (() => void) | null = null;
 let arrived = false;
-let momentArmed = false;
+let pageArmed = false;
 const phaseListeners = new Set<() => void>();
+// A card that is up re-checks at once when its rule changes (the arrival arm
+// is up before the player's rule has loaded).
+const ruleListeners = new Set<() => void>();
+
+function setKeepClear(rule: KeepClear | null): void {
+  keepClear = rule;
+  ruleListeners.forEach((listener) => listener());
+}
 
 function setPhase(next: Phase): void {
   phase = next;
@@ -309,7 +343,8 @@ const serverPhase = (): Phase => 'off';
 /**
  * Once per page load, when this module first runs: the click ID goes into
  * page memory and out of the address. A grant arrival with no answer on
- * record starts waiting for its moment.
+ * record draws its arm: the arrival arm is due at once, the later arm waits
+ * for its moment.
  */
 function arrive(): void {
   if (arrived || typeof window === 'undefined') return;
@@ -319,8 +354,11 @@ function arrive(): void {
   holdClick(id);
   dropClickIdFromAddress();
   if (id === null || isPaidVisitor() || adConsentDecided()) return;
-  phase = 'waiting';
+  const arm = drawArm();
+  holdArm(arm);
+  countConsentStep('ad_consent_arm', pageLanguage());
   armPreDecisionListening();
+  phase = arm === 'arrival' ? 'due' : 'waiting';
 }
 
 /** No question can come on this page: the held click ID goes now. */
@@ -331,37 +369,47 @@ function standDown(): void {
   setPhase('done');
 }
 
-/** Once per page load, on the first mount, when the page's content is in place. */
-function armMoment(): void {
-  if (momentArmed || phase !== 'waiting') return;
-  momentArmed = true;
+/**
+ * Once per page load, on the first mount, when the page's content is in place.
+ * A page with the story player counts its stories for every visitor; the card
+ * there steps back while the reading view is open, in both arms.
+ */
+function armPage(): void {
+  if (pageArmed) return;
+  pageArmed = true;
   if (document.querySelector(PLAYER_SELECTOR)) {
     import('../player/controller')
       .then((player) => {
-        if (phase !== 'waiting') return;
         const source: StorySource = player;
+        watchListens(source);
+        const rule: KeepClear = {
+          blocked: () => player.getState().readerOpen,
+          boxes: () => Array.from(document.querySelectorAll(NEXT_LABEL_SELECTOR), (el) => el.getBoundingClientRect()),
+          subscribe: player.subscribe,
+        };
+        if (phase === 'due') setKeepClear(rule);
+        if (phase !== 'waiting') return;
         stopMoment = watchStorySeconds(source, () => {
-          keepClear = {
-            blocked: () => player.getState().readerOpen,
-            boxes: () => [],
-            subscribe: player.subscribe,
-          };
+          setKeepClear(rule);
           setPhase('due');
         });
       })
-      .catch(() => standDown());
+      .catch(() => {
+        if (phase === 'waiting') standDown();
+      });
     return;
   }
+  if (phase !== 'waiting') return;
   const ends = findPoemEnds(document);
   if (ends.length) {
     stopMoment = watchPoemEnd(window, ends, (line) => {
-      keepClear = {
+      setKeepClear({
         blocked: () => false,
         boxes: () => {
           const box = line();
           return box ? [box] : [];
         },
-      };
+      });
       setPhase('due');
     });
     return;
@@ -373,7 +421,7 @@ function armMoment(): void {
 function finish(): void {
   stopMoment?.();
   stopMoment = null;
-  keepClear = null;
+  setKeepClear(null);
   setPhase('done');
 }
 
@@ -396,7 +444,7 @@ export default function ArrivalChoice({ lang }: Props) {
   const t = COPY[lang] ?? COPY.en;
 
   useEffect(() => {
-    armMoment();
+    armPage();
   }, []);
 
   // The moment has come: appear as soon as the card's place is clear of the
@@ -404,6 +452,9 @@ export default function ArrivalChoice({ lang }: Props) {
   useEffect(() => {
     if (current !== 'due') return;
     let showing = false;
+    // The arrival arm is up before the player's rule exists: follow it once it does.
+    let followed: KeepClear | null = null;
+    let unsubscribe: (() => void) | undefined;
     const check = (): void => {
       const card = cardRef.current;
       if (!card) return;
@@ -411,6 +462,11 @@ export default function ArrivalChoice({ lang }: Props) {
       if (dock) card.style.setProperty('--agc-dock-h', `${dock.getBoundingClientRect().height}px`);
       else card.style.removeProperty('--agc-dock-h');
       const rule = keepClear;
+      if (rule !== followed) {
+        unsubscribe?.();
+        unsubscribe = rule?.subscribe?.(check);
+        followed = rule;
+      }
       if (rule?.blocked()) {
         if (showing) {
           showing = false;
@@ -429,8 +485,9 @@ export default function ArrivalChoice({ lang }: Props) {
     const timer = window.setInterval(check, CLEAR_CHECK_MS);
     window.addEventListener('scroll', check, { passive: true });
     window.addEventListener('resize', check);
-    const unsubscribe = keepClear?.subscribe?.(check);
+    ruleListeners.add(check);
     return () => {
+      ruleListeners.delete(check);
       window.clearInterval(timer);
       window.removeEventListener('scroll', check);
       window.removeEventListener('resize', check);

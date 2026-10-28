@@ -11,15 +11,49 @@ Dates are commit dates from this repository's history. A version reaches visitor
 - Any answer older than 12 months is removed and the card asks again (from 2026-09-28, commit `1c693642`; before that an answer had no time limit).
 - Visitors from paid ads (`p=1` in the address) are never asked and never have a click ID kept.
 
+## 1.3.0, from 28 October 2026
+
+Written on 2026-10-28.
+
+**What changed from 1.2.0.** Only the list of steps on the card. The app's chat ends with this version, so of the steps 1.2.0 named only two still send anything: the yes itself and 30 seconds of listening. The first sentence of the fine print became two sentences, what a yes sends and what Google learns from it. Every other word of the card stays as in 1.2.0. With it, a click on a Start Exploring button sends no conversion any more ([`marketing/public/agc-public.js`](../marketing/public/agc-public.js)), and the worker refuses every step but these two ([`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts)). **Re-ask:** every 1.2.0 yes is asked again. A no stays a no.
+
+**When it is asked.** At one of two moments, drawn at random for each page load that arrives with a click ID and no answer on record, half and half, with the same words in both. At once: on any page, as 1.2.0 asked from 14 October. Later: on a figure's story page once a minute of a story has been heard, on a poem page once the poem is read, on any other page not at all, as 1.2.0 was changed to ask on 2026-10-26. The draw lives in the page's memory and nothing is stored for it. It rides on our own anonymous counts of the question and of the listening, never to Google ([MEASUREMENT.md](MEASUREMENT.md), [`marketing/src/islands/ArrivalChoice.tsx`](../marketing/src/islands/ArrivalChoice.tsx)). The click ID leaves the address on arrival in both, so a reload is not asked.
+
+**How it is shown.** As under 1.2.0. On a story page the card stands at the foot of the screen until the player's dock appears with the first story, then just above the dock.
+
+**What it says**, German:
+
+> Eine Frage zu dieser Anzeige
+> **Dürfen wir deinen Besuch für Google zählen?**
+> Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.
+> Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.
+> Bist du unter 16, sag bitte Nein.
+> [Ja, zählen] [Nein, nicht zählen]
+> Code ansehen · Datenschutzerklärung · Wie Google das nutzt
+
+English:
+
+> One question about this ad
+> **May we count your visit for Google?**
+> We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.
+> A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30 seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.
+> If you’re under 16, please say no.
+> [Yes, count it] [No, don’t count it]
+> See the code · Privacy policy · How Google uses this
+
+The privacy pages changed with it, so the card and the page it links to say the same: the click ID goes to Google at most twice (the yes, and once 30 seconds of audio have been heard in total, seconds heard before the answer included), a returning visitor whose yes still holds is not asked again and sends the new click ID at most once, the question may come at once or later in the visit, the click ID leaves the address as soon as the page has read it, and the yes is withdrawn with the "Ad measurement" link at the foot of every page.
+
 ## 1.2.0, live from 14 October 2026
 
 Written on 2026-10-14.
 
-**How it is shown.** At once on the landing page, and only there. A card fixed to the foot of the screen: full width on upright phones, a corner card on wide screens, centred in between. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. On short screens (at most 700 px high, phones turned sideways too) the fine print stands before the lead. Same words. The question, the age line, both answers, the links and the X stay in view. On phones, upright or turned sideways, the plate is opaque.
+**When it is asked.** From 14 October: at once on the landing page, and only there. Changed on 2026-10-26, with the same words and version, so earlier answers stand: no longer on arrival. On a figure's story page the card comes once a minute of a story has been heard, counting only audio that ran (a skip does not count). On a poem page it comes once the poem's last line is in view and the poem has had time to be read: two seconds a line, at least 8 and at most 45 seconds of the page in view. On any other page nobody is asked and the click ID is dropped at once. It asks once per visit.
+
+**How it is shown.** A card fixed to the foot of the screen: full width on upright phones, a corner card on wide screens, centred in between. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. On short screens (at most 700 px high, phones turned sideways too) the fine print stands before the lead. Same words. The question, the age line, both answers, the links and the X stay in view. On phones, upright or turned sideways, the plate is opaque. On a story page it stands just above the player's dock and never covers it.
 
 **The X** (new). A no for this visit: the click ID is discarded, nothing is stored, nothing is sent to Google. It is not remembered, so the next arrival from an ad is asked again. Its accessible name: "Schließen. Das zählt als Nein." / "Close. This counts as no."
 
-**After any answer** (new) the click ID leaves the address bar. The `gclid` key stays, empty, so the anonymous source count still sees a reload as an arrival from an ad.
+**After any answer** (new) the click ID leaves the address bar. The `gclid` key stays, empty, so the anonymous source count still sees a reload as an arrival from an ad. From 2026-10-26 it leaves on arrival, before any answer, and waits in the page's memory until the card comes. A reload before then finds no click ID, so that visit is not asked.
 
 **What it says**, German:
 

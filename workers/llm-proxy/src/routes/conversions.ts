@@ -7,38 +7,28 @@ import type { Env } from '../utils/types';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
 import { trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
+import { CARD_ARMS } from './funnel';
 
-type ConversionEvent =
-  | 'profile_created'
-  | 'start_exploring'
-  | 'council_engaged'
-  // Engagement ladder: 30s of audio actually played, a first chat turn sent,
-  // a third user message in the same conversation.
-  | 'listened'
-  | 'dialogue_started'
-  | 'conversation_deepened';
+// The two steps the card's words name (consent version 1.3.0): the yes
+// itself and 30 seconds of audio actually played.
+type ConversionEvent = 'start_exploring' | 'listened';
 
 interface ConversionPayload {
   gclid: string;
   event: ConversionEvent;
   timestamp: number;
   figureId?: string;
+  // The card's arm of the split test, for our own analytics row only.
+  arm?: unknown;
 }
 
-// mode_selected is retired as a conversion: picking a mode said nothing about
-// engagement. Its funnel beacon (routes/funnel.ts) stays, and the CAPI action
-// map keeps the id until the action is deleted in the Ads UI.
-const VALID_EVENTS = new Set<ConversionEvent>([
-  'profile_created',
-  'start_exploring',
-  'council_engaged',
-  'listened',
-  'dialogue_started',
-  'conversation_deepened',
-]);
+// Only what the visitor said yes to reaches Google: a step the words no
+// longer name is refused, whatever an older cached page still posts. The CAPI
+// action map keeps the other ids until the actions are removed in the Ads UI.
+const VALID_EVENTS = new Set<ConversionEvent>(['start_exploring', 'listened']);
 
 // Rate limit: 500 conversion events per IP per hour. Generous on purpose:
-// a single legit user fires at most 6 events per session (one per event,
+// a single legit user fires at most 2 events per session (one per event,
 // client-deduped), so 500/hr supports a NATted network (school, office,
 // conference WiFi, carrier-grade NAT) without false positives. Abuse
 // protection still bounded since each excess request gets 429.
@@ -88,6 +78,9 @@ export async function handleConversions(
     typeof payload.figureId === 'string' && FIGURE_RE.test(payload.figureId)
       ? payload.figureId
       : '';
+  // Read like the funnel's arm: one of the two values, else blank. It never
+  // reaches Google: the upload below is built without it.
+  const arm = typeof payload.arm === 'string' && CARD_ARMS.has(payload.arm) ? payload.arm : '';
 
   // Rate limiting
   const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
@@ -104,10 +97,10 @@ export async function handleConversions(
   // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
   // never written here — it goes only to Google Ads for attribution. Keeping
   // it out of our analytics is what makes the "click ID is not combined with
-  // our analytics" claim true.
+  // our analytics" claim true. blob3 is the card's arm, or blank.
   if (env.ANALYTICS) {
     env.ANALYTICS.writeDataPoint({
-      blobs: [payload.event, figureId],
+      blobs: [payload.event, figureId, arm],
       doubles: [payload.timestamp],
       indexes: [payload.event],
     });

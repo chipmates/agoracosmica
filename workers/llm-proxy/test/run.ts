@@ -2463,6 +2463,81 @@ async function main(): Promise<number> {
     assertEqual(high.doubles[0], 0, 'a bucket above the consent set collapses to 0');
   });
 
+  // The card's split test: the draw, the card's steps and the story counts carry the arm in the label slot.
+  await test('the draw is counted once per arm, its arm in the label slot and nothing else', async () => {
+    for (const arm of ['arrival', 'later']) {
+      const row = await funnelBeacon({
+        step: 'ad_consent_arm', path: '/de/figures/marcus-aurelius/', language: 'de', mode: arm,
+        figureId: 'aurelius', outcome: 'error', bucket: 3, source: 'ad_google_grant', gclid: 'TESTCLICKID0001',
+      });
+      assert(row !== undefined, `${arm}: no row`);
+      assertEqual(row.blobs.length, 9, 'the nine funnel slots');
+      assertEqual(row.blobs[0], 'ad_consent_arm', 'the step is blob1');
+      assertEqual(row.blobs[1], '/de/figures/marcus-aurelius/', 'the path, never the figure');
+      assertEqual(row.blobs[2], arm, 'the arm is blob3');
+      assertEqual(row.blobs[3], 'de', 'the language is blob4');
+      assertEqual(row.blobs[4], '200', 'the outcome is pinned');
+      assertEqual(row.blobs[7], '', 'no source class');
+      assertEqual(row.blobs[8], '', 'unmarked');
+      assertEqual(row.doubles[0], 0, 'no bucket');
+      assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
+      assertEqual(row.indexes[0], 'ad_consent_arm', 'indexed by the step');
+    }
+    const marked = await funnelBeacon({ step: 'ad_consent_arm', path: '/', language: 'en', mode: 'later', probe: 1 });
+    assertEqual(marked.blobs[8], 'probe', 'a marked draw keeps the marker');
+  });
+
+  await test('a draw without a readable arm writes nothing', async () => {
+    for (const mode of [undefined, '', 'both', 'typed', 'Arrival', 'later ', 'arrivals', 7, ['later']]) {
+      const row = await funnelBeacon({ step: 'ad_consent_arm', path: '/', language: 'en', mode });
+      assertEqual(row, undefined, `a draw with ${JSON.stringify(mode)} was recorded`);
+    }
+  });
+
+  await test('the card\'s four steps carry the arm, and a forged label is stored blank', async () => {
+    for (const step of ['ad_consent_shown', 'ad_consent_accepted', 'ad_consent_declined', 'ad_consent_dismissed']) {
+      for (const arm of ['arrival', 'later']) {
+        const row = await funnelBeacon({ step, path: '/figures/rumi/', language: 'en', mode: arm, bucket: 1 });
+        assertEqual(row.blobs[2], arm, `${step} keeps ${arm}`);
+        assertEqual(row.blobs[1], '/figures/rumi/', `${step} keeps the path`);
+      }
+      for (const mode of ['story', 'hero', 'both', 'Later', 3]) {
+        const row = await funnelBeacon({ step, path: '/figures/rumi/', language: 'en', mode, bucket: 1 });
+        assert(row !== undefined, `${step} still counts with ${JSON.stringify(mode)}`);
+        assertEqual(row.blobs[2], '', `${step} blanks ${JSON.stringify(mode)}`);
+      }
+    }
+  });
+
+  await test('a story started and a story heard are the figure, the language and the arm, nothing else', async () => {
+    for (const step of ['story_started', 'story_heard']) {
+      for (const mode of ['arrival', 'later', undefined]) {
+        const row = await funnelBeacon({
+          step, figureId: 'aurelius', language: 'de', mode, path: '/de/figures/marcus-aurelius/',
+          outcome: 'watched', bucket: 4, source: 'ad_google_grant', gclid: 'TESTCLICKID0001',
+        });
+        assert(row !== undefined, `${step} wrote no row`);
+        assertEqual(row.blobs.length, 9, 'the nine funnel slots');
+        assertEqual(row.blobs[0], step, 'the step is blob1');
+        assertEqual(row.blobs[1], 'aurelius', 'the figure, never the path');
+        assertEqual(row.blobs[2], mode ?? '', 'the arm, or blank for a visitor without one');
+        assertEqual(row.blobs[3], 'de', 'the language is blob4');
+        assertEqual(row.blobs[4], '200', 'the outcome is pinned');
+        assertEqual(row.blobs[7], '', 'no source class');
+        assertEqual(row.doubles[0], 0, 'no bucket');
+        assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
+      }
+      const forged = await funnelBeacon({ step, figureId: 'aurelius/../x', language: 'en', mode: 'story' });
+      assert(forged !== undefined, `${step} still counts with a forged figure and label`);
+      assertEqual(forged.blobs[1], '', `${step} blanks a figure off the slug shape`);
+      assertEqual(forged.blobs[2], '', `${step} blanks a label that is no arm`);
+      const pathOnly = await funnelBeacon({ step, path: '/figures/rumi/', language: 'en' });
+      assertEqual(pathOnly.blobs[1], '', `${step} never stores a path`);
+      const marked = await funnelBeacon({ step, figureId: 'rumi', language: 'en', probe: 1 });
+      assertEqual(marked.blobs[8], 'probe', `${step} keeps the marker`);
+    }
+  });
+
   await test('a step outside the allowlist writes nothing at all', async () => {
     for (const step of ['ask_listen', 'ask_listen_failed', 'ask_listen_resume', '', 'made_up_step']) {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });
@@ -2881,6 +2956,67 @@ async function main(): Promise<number> {
     assertEqual(records.length, 0, `event record writes: ${records.join(', ')}`);
     assertEqual(kv.puts.join(','), 'conv_rl:10.0.0.31', 'the only KV write');
     assertEqual(outbound.length, 0, 'outbound calls');
+  });
+
+  // Consent version 1.3.0 names two steps: the yes and 30 seconds of listening.
+  // Whatever an older cached page posts, no other step reaches Google.
+  const conversionPost = async (body: Record<string, unknown>, ip = '10.0.0.41') => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv, GOOGLE_ADS_DEVELOPER_TOKEN: 'dev', GOOGLE_ADS_LOGIN_CUSTOMER_ID: '1' });
+    await kv.kv.put('google_ads_access_token', 'cached-token');
+    const { ctx, pending } = fakeCtx();
+    analyticsRows.length = 0;
+    const uploads: string[] = [];
+    globalThis.fetch = (async (url: string, init: RequestInit) => {
+      uploads.push(`${url} ${String(init.body)}`);
+      return new Response('{}', { status: 200, headers: { 'Content-Type': 'application/json' } });
+    }) as unknown as typeof fetch;
+    let response: Response;
+    try {
+      response = await handleConversions(new Request('https://example.invalid/api/conversions', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': ip, 'Content-Type': 'text/plain' },
+        body: JSON.stringify(body),
+      }), env, ctx);
+      await Promise.all(pending);
+    } finally {
+      globalThis.fetch = realFetch;
+    }
+    return { response, rows: analyticsRows.slice(), uploads, puts: kv.puts };
+  };
+
+  await test('the conversion route refuses the four steps the 1.3.0 words no longer name', async () => {
+    for (const event of ['profile_created', 'dialogue_started', 'conversation_deepened', 'council_engaged']) {
+      const r = await conversionPost({ gclid: 'TESTCLICKID0001', event, timestamp: Date.now(), figureId: 'aurelius' });
+      assertEqual(r.response.status, 400, `${event} status`);
+      assertEqual(JSON.stringify(await r.response.json()), JSON.stringify({ error: 'Invalid event type' }), `${event} body`);
+      assertEqual(r.rows.length, 0, `${event} wrote an analytics row`);
+      assertEqual(r.uploads.length, 0, `${event} reached Google`);
+      assertEqual(r.puts.filter(k => k.startsWith('conv_rl:')).length, 0, `${event} cost a rate-limit write`);
+    }
+  });
+
+  await test('a conversion row carries the card\'s arm, and Google never sees it', async () => {
+    for (const [arm, stored] of [['arrival', 'arrival'], ['later', 'later'], [undefined, ''], ['both', ''], ['Later', ''], [1, '']] as const) {
+      const r = await conversionPost({ gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now(), figureId: 'aurelius', arm });
+      assertEqual(r.response.status, 200, `${JSON.stringify(arm)} status`);
+      assertEqual(r.rows.length, 1, `${JSON.stringify(arm)} one row`);
+      assertEqual(JSON.stringify(r.rows[0].blobs), JSON.stringify(['listened', 'aurelius', stored]), `${JSON.stringify(arm)} row`);
+      assertEqual(r.uploads.length, 1, `${JSON.stringify(arm)} one upload`);
+      const upload = r.uploads[0];
+      assert(!/"arm"|arrival|later/i.test(upload), `the upload to Google carries the arm: ${upload.slice(0, 120)}`);
+    }
+  });
+
+  await test('the conversion route still takes the yes and the 30 s listen, each uploaded once', async () => {
+    for (const event of ['start_exploring', 'listened']) {
+      const r = await conversionPost({ gclid: 'TESTCLICKID0001', event, timestamp: Date.now() });
+      assertEqual(r.response.status, 200, `${event} status`);
+      assertEqual(r.rows.length, 1, `${event} analytics row`);
+      assertEqual(r.rows[0].blobs[0], event, `${event} is blob1`);
+      assertEqual(r.uploads.length, 1, `${event} uploads`);
+      assert(r.uploads[0].includes('TESTCLICKID0001'), `${event} carries the click id to Google`);
+    }
   });
 
   // -------------------------------------------------------------------------

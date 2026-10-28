@@ -117,6 +117,25 @@ export function keepClickAfterYes(): void {
   }
 }
 
+// ---- the card's arm ---------------------------------------------------------
+
+/** When the card asks an undecided grant arrival: on arrival, or after a minute of a story or at a poem's end. */
+export type CardArm = 'arrival' | 'later';
+
+// Drawn once per page load by the card and held here, in page memory only, so
+// our own counts and conversion rows can carry it. Never stored, never sent to
+// Google; a full page load forgets it, as it forgets the held click ID.
+let heldArm: CardArm | null = null;
+
+export function holdArm(arm: CardArm | null): void {
+  heldArm = arm;
+}
+
+/** This page load's arm, or null when it is no undecided grant arrival. */
+export function cardArm(): CardArm | null {
+  return heldArm;
+}
+
 // ---- the seconds ----------------------------------------------------------
 
 let heardSeconds = 0;
@@ -187,6 +206,8 @@ function fireListened(figureId?: string, timestamp: number = Date.now()): void {
         event: 'listened',
         timestamp,
         ...(figureId ? { figureId } : {}),
+        // Our own analytics row only: the worker passes it to no one.
+        ...(heldArm ? { arm: heldArm } : {}),
       }),
       keepalive: true,
     }).catch(() => {
