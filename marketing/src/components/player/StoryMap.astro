@@ -248,6 +248,9 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
     if (at.some(([x, y], j) => j !== i && toPoint(a, x, y) - 20 <= own)) bad++;
     const others = [...numberBox.filter((b, j): b is Box => !!b && j !== i), ...(nameBox && i !== introAt ? [nameBox] : [])];
     for (const b of others) if (hits(a, grow(b, 4.5, 13.5)) || gap(a, b) <= own + 0.5) bad++;
+    // its own number keeps the same margins: a tag set right under the number reads as part of it
+    const ownNumber = numberBox[i];
+    if (ownNumber && hits(a, grow(ownNumber, 4.5, 13.5))) bad++;
     return bad;
   };
   const tagBox = (i: number, c: Spot): Box => {
