@@ -5,7 +5,7 @@
 <h1 align="center">Agora Cosmica</h1>
 
 <p align="center">
-  <strong>A Living Library You Can Talk To</strong><br/>
+  <strong>Short stories about life</strong><br/>
   <sub>Nonprofit · Open Source · No tracking cookies, no profiling</sub>
 </p>
 
