@@ -768,7 +768,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
   }
 </style>
 
-<!-- Carousel + audio enhancements, served as static files so they load under
-     script-src 'self' in both the meta and header CSP (no inline-hash). -->
+{/* Carousel + audio enhancements, served as static files so they load under
+    script-src 'self' in both the meta and header CSP (no inline-hash). */}
 <script src="/ed-carousel.js" is:inline defer></script>
 <script src="/ed-audio.js" is:inline defer></script>
