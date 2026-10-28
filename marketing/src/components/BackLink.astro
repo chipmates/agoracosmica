@@ -8,12 +8,16 @@ interface Props {
   /** The parent's own heading (or the front's word for it). */
   label: string;
   at: 'top' | 'end';
+  /** A German-only page's way back for an English visitor: shown in place of the
+      first while an `#en` marker before this link is the page's target. */
+  en?: { href: string; label: string };
 }
 
-const { href, label, at } = Astro.props;
+const { href, label, at, en } = Astro.props;
 ---
 <div class:list={['pub-back', `pub-back--${at}`]}>
   <a class="pub-back__link" href={href} data-back-link={at}>{label}</a>
+  {en && <a class="pub-back__link pub-back__link--en" href={en.href} lang="en">{en.label}</a>}
 </div>
 
 <style>
@@ -76,5 +80,16 @@ const { href, label, at } = Astro.props;
   .pub-back__link:focus-visible {
     outline: 2px solid var(--gold-hover);
     outline-offset: 2px;
+  }
+  /* No script needed (the CSP allows none inline): the English footer's link
+     carries #en, and the marker's :target swaps the two links. */
+  .pub-back__link--en {
+    display: none;
+  }
+  :global(#en:target) ~ .pub-back .pub-back__link--en {
+    display: inline-flex;
+  }
+  :global(#en:target) ~ .pub-back .pub-back__link[data-back-link] {
+    display: none;
   }
 </style>

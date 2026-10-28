@@ -14,9 +14,13 @@ const { title, lastUpdated, lang = 'de' } = Astro.props;
 const isEn = lang === 'en';
 const t = getT(lang);
 const home = publicUrl(lang, '/');
+// A German-only page opened from an English page (its link ends in #en) leads back to the English front.
+const en = isEn ? undefined : { href: publicUrl('en', '/'), label: getT('en')('breadcrumbs.home') };
+const fromEn = isEn ? '#en' : '';
 ---
 <article class="legal-doc">
-  <BackLink at="top" href={home} label={t('breadcrumbs.home')} />
+  {en && <span id="en" hidden></span>}
+  <BackLink at="top" href={home} label={t('breadcrumbs.home')} en={en} />
   <header class="legal-doc__header">
     <h1 class="legal-doc__title">{title}</h1>
     <p class="legal-doc__date">{lastUpdated}</p>
@@ -26,16 +30,16 @@ const home = publicUrl(lang, '/');
 
   <div class="legal-doc__footer">
     <nav class="legal-doc__footer-links" aria-label={isEn ? 'Legal' : 'Rechtliches'}>
-      <a href="/impressum/">{isEn ? 'Imprint' : 'Impressum'}</a>
+      <a href={`/impressum/${fromEn}`}>{isEn ? 'Imprint' : 'Impressum'}</a>
       <span class="legal-doc__footer-sep">•</span>
       <a href={isEn ? '/privacy/' : '/datenschutz/'}>{isEn ? 'Privacy Policy' : 'Datenschutzerklärung'}</a>
       <span class="legal-doc__footer-sep">•</span>
-      <a href="/cookie-policy/">{isEn ? 'Cookie Policy' : 'Cookie-Richtlinie'}</a>
+      <a href={`/cookie-policy/${fromEn}`}>{isEn ? 'Cookie Policy' : 'Cookie-Richtlinie'}</a>
       <span class="legal-doc__footer-sep">•</span>
       <a href={isEn ? '/terms/' : '/nutzungsbedingungen/'}>{isEn ? 'Terms' : 'Nutzungsbedingungen'}</a>
     </nav>
   </div>
-  <BackLink at="end" href={home} label={t('breadcrumbs.home')} />
+  <BackLink at="end" href={home} label={t('breadcrumbs.home')} en={en} />
 </article>
 
 <style>

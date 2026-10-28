@@ -219,7 +219,7 @@ const museum = isDe
       </div>
     </dl>
     <p class="pub-section__text pub-about-legalnote">
-      {t('about.contactLegalPre')}<a class="pub-textlink" href="/impressum/">{t('about.contactLegalLink')}</a>{t('about.contactLegalPost')}
+      {t('about.contactLegalPre')}<a class="pub-textlink" href={lang === 'en' ? '/impressum/#en' : '/impressum/'}>{t('about.contactLegalLink')}</a>{t('about.contactLegalPost')}
     </p>
   </section>
 
