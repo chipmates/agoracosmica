@@ -953,6 +953,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 }
 .sp-atlas__epithet { margin: 0; font-family: var(--font-content); font-style: italic; font-size: 0.85rem; line-height: 1.3; color: var(--sp-n-ink-3); }
 @media (min-width: 1024px) { .sp-atlas__name { font-size: 1.05rem; } }
+/* a name's word wider than its line (set at build time): tighter tracking, so a word a little too wide sets whole */
+.sp-atlas__name--tight { letter-spacing: 0.09em; }
 
 .sp-mapnote { margin: 8px 0 4px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; color: var(--sp-ink-3); }
 /* a next star with no clear spot for its tag on the plate: the tag's words under the map, in the tag's gold */
