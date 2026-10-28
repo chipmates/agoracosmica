@@ -47,5 +47,11 @@ if (existsSync(REACT_SHELL)) {
 
 cpSync(MARKETING_DIST, CLIENT_BUILD, { recursive: true });
 
+// The chat ended: marketing's /app/index.html (the forwarder to the landing)
+// replaces the React shell moved there above, so /app serves the forwarder.
+if (existsSync(join(MARKETING_DIST, 'app', 'index.html'))) {
+  console.log('[merge-marketing] /app/index.html is the forwarder to the landing (the React shell is not served)');
+}
+
 const topLevel = readdirSync(MARKETING_DIST).length;
 console.log(`[merge-marketing] copied ${topLevel} top-level entries from marketing/dist/ → client/build/`);

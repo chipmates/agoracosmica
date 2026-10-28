@@ -1,8 +1,6 @@
 ---
-// Sticky top navbar for all marketing pages. Static HTML — no React needed.
-// The "Start Exploring" CTA is a plain <a href="/app?lang=.."> that does a hard
-// nav into the React SPA in the page's language. The conversion + entry-intent fire from a tiny global click
-// handler set up in Public.astro (vanilla JS, no React island for this).
+// Sticky top navbar for all marketing pages. Static HTML — no React needed. The app's
+// button went with the chat (its addresses forward to the landing).
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
@@ -16,8 +14,7 @@ interface Props {
   /** Cross-slug twins (lang-prefixed paths), for pages whose EN/DE slugs differ. */
   altEn?: string;
   altDe?: string;
-  /** A story player figure page: the language switch stays on the phone bar, and
-   *  the page's own plate is the one gold control, so the app button stays out. */
+  /** A story player figure page: the language switch stays on the phone bar. */
   storyPage?: boolean;
   /** A page's own line in place of the platform tagline beside the wordmark. */
   tagline?: string;
@@ -84,12 +81,6 @@ const isActive = (path: string) => currentPath === path || currentPath === path.
       >
         {otherLang.toUpperCase()}
       </a>
-
-      {!storyPage && (
-        <a href={`/app?lang=${lang}`} class="pub-navbar__cta" data-agc-cta="start-exploring">
-          {t('nav.startExploring')}
-        </a>
-      )}
     </nav>
 
     {storyPage && (

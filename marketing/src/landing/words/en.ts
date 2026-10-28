@@ -56,6 +56,8 @@ const words: LandingWords = {
     modern: 'Modern Voices',
   },
   listHeading: 'All thirty, by era',
+  chatEnded: 'Agora Cosmica now focuses on its short stories about life. The chat has ended.',
+  close: 'Close',
   explainers: [
     { href: '/stoicism/', label: 'What Is Stoicism?' },
     { href: '/the-heros-journey/', label: "The Hero's Journey" },

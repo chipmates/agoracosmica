@@ -1,0 +1,27 @@
+---
+// /app and every address under it (the ended chat): _redirects serves this page there. Its script forwards to the
+// landing in the visitor's language; without script the visitor reads the line and picks a language.
+import { landingWords } from '../../landing/words';
+
+const en = landingWords('en');
+const de = landingWords('de');
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, follow" />
+    {/* the landing counts this visit as an arrival, not as a step from this page */}
+    <meta name="referrer" content="no-referrer" />
+    <title>Agora Cosmica</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <script is:inline src="/app-forward.js"></script>
+  </head>
+  <body>
+    <main>
+      <p>{en.chatEnded} <a href="/">{en.tagline}</a></p>
+      <p lang="de">{de.chatEnded} <a href="/de/">{de.tagline}</a></p>
+    </main>
+  </body>
+</html>

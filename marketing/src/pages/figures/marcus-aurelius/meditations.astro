@@ -14,7 +14,6 @@ import PlayerHead from '../../../components/player/PlayerHead.astro';
 import PlayerDock from '../../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../../player/pages';
 import Breadcrumbs from '../../../components/Breadcrumbs.astro';
-import PoemDoor from '../../../components/PoemDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -26,9 +25,6 @@ import {
 import { isIndexable, readingPages } from '../../../data/poems/index.mjs';
 
 const lang = 'en' as const;
-// Slot 4 of the app's ask contract is this page's own question: the door skips
-// the mode choice and opens Free Talk about the passage the visitor just read.
-const DOOR_HREF = '/app?figure=marcus-aurelius&lang=en&ask=f:aurelius:4';
 const PAGE_PATH = MEDITATIONS_PATH;
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -175,16 +171,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         Long's English translation of 1862.
       </p>
     </header>
-
-    <PoemDoor
-      at="hero"
-      href={DOOR_HREF}
-      line="Want to stay with a passage a little longer?"
-      buttonLabel="Ask his Echo about it"
-      figureId="aurelius"
-      shapedBy="his real work"
-      door="text_top"
-    />
 
     {THEMES.map((theme) => (
       <section class="med-section" id={theme.id}>

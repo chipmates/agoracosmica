@@ -29,6 +29,9 @@ export interface LandingWords {
   eras: Record<string, string>;
   /** The heading over the thirty by era, as plain links. */
   listHeading: string;
+  /** The one line a visitor forwarded from the ended chat's address sees (D-178), and its close button's name. */
+  chatEnded: string;
+  close: string;
   /** The explainers that stay (D-171), linked from the footer by their own pages' headings. */
   explainers: Array<{ href: string; label: string }>;
   /** The row of thirty's accessible name. */

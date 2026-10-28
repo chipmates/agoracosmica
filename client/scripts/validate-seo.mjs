@@ -69,6 +69,13 @@ for (const f of files) {
   const dhtml = decode(html);
   const isLegal = NO_HREFLANG.has(slug) || NO_HREFLANG_PATTERNS.some((re) => re.test(slug));
 
+  // The ended chat's forwarder (/app and everything under it) is no page of its
+  // own: it only has to stay out of the index.
+  if (slug === 'app') {
+    if (!/<meta name="robots" content="noindex/.test(html)) hard.push(`${rel}: the app forwarder lacks robots noindex`);
+    continue;
+  }
+
   // 1. At most one BreadcrumbList per page (the dup-schema bug).
   const bc = (html.match(/"BreadcrumbList"/g) || []).length;
   if (bc > 1) hard.push(`${rel}: ${bc} BreadcrumbList blocks (duplicate schema)`);

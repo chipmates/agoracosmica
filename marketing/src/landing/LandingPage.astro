@@ -4,6 +4,7 @@
 import Public from '../layouts/Public.astro';
 import PlayerHead from '../components/player/PlayerHead.astro';
 import PlayerDock from '../components/player/PlayerDock.astro';
+import AppEnded from './AppEnded.astro';
 import { agoraCosmicaSchema, breadcrumbSchema, itemListSchema, organizationSchema, webSiteSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../lib/urls';
 import { landingWords } from './words';
@@ -46,6 +47,7 @@ const schemas = [
 >
   <PlayerHead slot="head" figurePage />
   <div class="story-page landing-lab">
+    <AppEnded lang={lang} />
     <slot />
   </div>
   <PlayerDock slot="dock" lang={lang} label={dockLabel} />

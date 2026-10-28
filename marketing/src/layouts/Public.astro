@@ -9,7 +9,6 @@ import Navbar from '../components/Navbar.astro';
 import Footer from '../components/Footer.astro';
 import PublicScript from '../components/PublicScript.astro';
 import ArrivalChoice from '../islands/ArrivalChoice';
-import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 
 import '@client/index.css';
@@ -44,7 +43,7 @@ interface Props {
   robots?: string;
   /** No canonical or og:url (the 404 page). Forwarded to BaseHead. */
   noCanonical?: boolean;
-  /** Set false on pages that render their own dedicated CTA (figure + theme detail). */
+  /** Inert since the app's sticky bar went with the chat; callers may still pass it. */
   stickyCta?: boolean;
   /** Pages with a full hero (like the homepage): the mobile sticky CTA starts
    *  hidden and slides in on first scroll, instead of showing from first paint. */
@@ -62,7 +61,6 @@ interface Props {
 
 const props = Astro.props;
 const currentPath = Astro.url.pathname;
-const t = getT(props.lang);
 // The homepage hero already shows a Start Exploring CTA, so the mobile sticky
 // bar starts hidden there and only slides in once the hero scrolls away (see
 // .pub-cta--sticky in public-layout.css + the reveal logic in agc-public.js).
@@ -102,17 +100,6 @@ const revealSticky = isHome || props.heroReveal === true;
         explainers={props.trimmedChrome?.explainers}
       />
     </div>
-    <!-- Mobile-only sticky CTA. On mobile the navbar CTA sits inside the
-         hamburger, so this keeps a visible app entry at the bottom. Hidden on
-         desktop, where the navbar CTA is always shown. Suppressed on pages that
-         render their own dedicated CTA (figure + theme detail). -->
-    {props.stickyCta !== false && (
-      <div class="pub-cta pub-cta--sticky">
-        <div class="pub-cta__inner">
-          <a href={`/app?lang=${props.lang}`} class="pub-cta__button" data-agc-cta="start-exploring">{t('nav.startExploring')}</a>
-        </div>
-      </div>
-    )}
     <slot name="dock" />
     <PublicScript />
     {/* Ad-measurement consent prompt, shown only to Google ad-grant arrivals

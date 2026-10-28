@@ -1,0 +1,72 @@
+---
+// The one line a visitor forwarded from the ended chat's address sees (D-178): only with the forwarder's mark
+// (?from=app), quiet, closable, nothing stored. The polite region is in the page from the start, so the line is read
+// out when it appears.
+import { landingWords } from './words';
+import type { LandingLang } from './thirty';
+
+interface Props {
+  lang: LandingLang;
+}
+
+const { lang } = Astro.props;
+const W = landingWords(lang);
+---
+<div class="landing-ended" role="status" data-landing-ended>
+  <div class="landing-ended__in" data-landing-ended-in hidden>
+    <p class="landing-ended__line">{W.chatEnded}</p>
+    <button type="button" class="landing-ended__close" data-landing-ended-close aria-label={W.close}>
+      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M7 7l10 10M17 7 7 17" /></svg>
+    </button>
+  </div>
+</div>
+
+<script>
+  import { installEnded } from './ended';
+  installEnded();
+</script>
+
+<style>
+  .landing-ended__in {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: 46rem;
+    margin: 0.5rem auto 1rem;
+    padding-left: 0.9rem;
+    border-left: 2px solid var(--sp-hair-strong);
+    color: var(--sp-ink-2);
+  }
+  .landing-ended__in[hidden] { display: none; }
+  .landing-ended__line {
+    flex: 1 1 auto;
+    margin: 0;
+    font-family: var(--font-ui, 'Space Grotesk', sans-serif);
+    font-size: 0.9375rem;
+    line-height: 1.5;
+  }
+  .landing-ended__close {
+    flex: 0 0 auto;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: none;
+    color: var(--sp-ink-3);
+    cursor: pointer;
+  }
+  .landing-ended__close:hover { color: var(--sp-ink); }
+  .landing-ended__close:focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 2px; }
+  .landing-ended__close svg {
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.6;
+    stroke-linecap: round;
+  }
+</style>

@@ -56,6 +56,8 @@ const words: LandingWords = {
     modern: 'Moderne Stimmen',
   },
   listHeading: 'Alle dreißig, nach Epochen',
+  chatEnded: 'Agora Cosmica konzentriert sich jetzt ganz auf die kurzen Geschichten übers Leben. Den Chat gibt es nicht mehr.',
+  close: 'Schließen',
   explainers: [
     { href: '/de/stoizismus/', label: 'Was ist Stoizismus?' },
     { href: '/de/heldenreise/', label: 'Die Heldenreise' },

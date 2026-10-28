@@ -97,18 +97,33 @@
 /de/privacy              /datenschutz/         301
 /de/privacy/             /datenschutz/         301
 
-# App SPA — the React app (login + in-app surface) lives under /app. The
+# The app's legal pages are the site's own. Above the /app rules: the first
+# matching rule wins.
+/app/impressum             /impressum/           301
+/app/impressum/            /impressum/           301
+/app/datenschutz           /datenschutz/         301
+/app/datenschutz/          /datenschutz/         301
+/app/cookie-policy         /cookie-policy/       301
+/app/cookie-policy/        /cookie-policy/       301
+/app/nutzungsbedingungen   /nutzungsbedingungen/ 301
+/app/nutzungsbedingungen/  /nutzungsbedingungen/ 301
+/app/terms                 /terms/               301
+/app/terms/                /terms/               301
+
+# The chat ended. /app and every address under it get the forwarder at
+# /app/ (marketing/src/pages/app), which reads the query (lang, figure) a
+# rule cannot and sends the visitor to the landing in their language. The
 # rewrite destination must be the NORMALIZED form /app/ — CF Pages 308s any
 # /app/index.html request to /app/ at the asset layer, and a rewrite that
-# targets the pre-normalization path falls through to the 404 page instead of
-# serving the shell (observed live 2026-06-10 once 404.html existed). The
-# asset layer also 308s bare /app → /app/ on its own, before these rules.
+# targets the pre-normalization path falls through to the 404 page instead
+# (observed live 2026-06-10 once 404.html existed). The asset layer also
+# 308s bare /app → /app/ on its own, before these rules.
 /app    /app/  200
 /app/*  /app/  200
 
 # No catch-all on purpose (removed 2026-06-10). The old `/* /app/index.html 200`
 # answered every junk URL with a 200 SPA shell whose canonical pointed at the
-# homepage, a classic soft-404 that erodes crawl trust. The SPA owns exactly
-# /app and /app/* (rules above). Everything else either matches a static Astro
+# homepage, a classic soft-404 that erodes crawl trust. The forwarder owns
+# exactly /app and /app/* (rules above). Everything else either matches a static Astro
 # file, a rule here, or gets the real 404.html, which CF Pages serves with
 # HTTP status 404 whenever a root 404.html exists in the build.
