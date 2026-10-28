@@ -62,7 +62,7 @@ const plateListItem: CSSProperties = {
 };
 
 const InfoPanel: FC = () => {
-  const { tNode, tArray, tString, language } = useTranslation();
+  const { tNode, tArray, tString } = useTranslation();
   
   return (
     <div className={styles.tabPanel}>
