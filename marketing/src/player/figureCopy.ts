@@ -205,6 +205,10 @@ const OWN_WORDS: Record<string, Record<PlayerLang, OwnWords>> = {
     en: { href: '/figures/emily-dickinson/poems/', label: 'Her own words: the poems' },
     de: { href: '/figures/emily-dickinson/poems/', label: 'Ihre eigenen Worte: die Gedichte', note: 'auf Englisch' },
   },
+  rumi: {
+    en: { href: '/figures/rumi/poems/', label: 'His own words: the poems' },
+    de: { href: '/figures/rumi/poems/', label: 'Seine eigenen Worte: die Gedichte', note: 'auf Englisch' },
+  },
   shakespeare: {
     en: { href: '/figures/william-shakespeare/sonnets/', label: 'His own words: the Sonnets' },
     de: { href: '/figures/william-shakespeare/sonnets/', label: 'Seine eigenen Worte: die Sonette', note: 'auf Englisch' },
