@@ -11,6 +11,7 @@ import { useScreenWakeLock } from '@client/hooks/useScreenWakeLock';
 import {
   audioTime,
   closeReader,
+  KEEP_EVENT,
   getState,
   markRead,
   openReader,
@@ -407,6 +408,12 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     showToast(s.kept, added ? { label: s.undo, run: () => removeSaved(n, si) } : undefined, { label: s.showSaved, run: () => openSheet('saved') });
   };
   const keepCurrent = () => keep(sentenceInView());
+  // the Aa sheet's copy of the bar's bookmark (a phone's bar has no room for it)
+  useEffect(() => {
+    const on = () => keepCurrent();
+    window.addEventListener(KEEP_EVENT, on);
+    return () => window.removeEventListener(KEEP_EVENT, on);
+  });
 
   const onTextClick = (e: ReactMouseEvent) => {
     const target = e.target instanceof Element ? e.target : null;
@@ -493,7 +500,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     );
   };
 
-  // Two ways out, under the title and again at the end; a link's page change goes on with the voice.
+  // The two ways out: in the bar all the way, and again at the end in full words; the page change keeps the voice.
   const storyCount = queue.entries.filter(e => e.n > 0).length;
   const ways = (
     <p className="story-reader__ways">
@@ -520,6 +527,14 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
             {Icon.back}
             <span>{queue.name}</span>
           </button>
+          <a className="story-btn story-reader__way" href={`${home}#stories`} onClick={closeReader}>
+            {Icon.list}
+            <span>{s.storiesWay(String(storyCount))}</span>
+          </a>
+          <a className="story-btn story-reader__way" href={selection} onClick={closeReader}>
+            {Icon.people}
+            <span>{s.figuresWay}</span>
+          </a>
           <span className="story-reader__bartitle">{title}</span>
           <span className="story-reader__sp" />
           <span className="story-reader__tools">
@@ -571,7 +586,6 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                 </span>
               </button>
             )}
-            {ways}
           </header>
           <div className="story-reader__orn" aria-hidden="true">
             <svg viewBox="0 0 12 12" focusable="false"><path d="M6 0l1.3 4.7L12 6l-4.7 1.3L6 12l-1.3-4.7L0 6l4.7-1.3z" /></svg>

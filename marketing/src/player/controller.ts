@@ -482,6 +482,9 @@ export function setReaderOpen(open: boolean): void {
   else if (!open) closeReader();
 }
 
+/** The Aa sheet's "Save this sentence" where the reader's bar has no room for it (a phone): the reader keeps it. */
+export const KEEP_EVENT = 'agc:keep-sentence';
+
 export function setAway(away: boolean, dir?: 'up' | 'down'): void {
   const awayDir = dir ?? state.awayDir;
   if (state.away !== away || state.awayDir !== awayDir) setState({ away, awayDir });

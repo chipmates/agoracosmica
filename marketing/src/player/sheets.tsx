@@ -9,6 +9,7 @@ import type { RefObject } from 'react';
 import {
   closeReader,
   closeSheet,
+  KEEP_EVENT,
   dismiss,
   hasNext,
   hasPrevious,
@@ -98,7 +99,7 @@ export default function Sheets({ state, facts, wide, home }: Props) {
         {kind === 'facts' && (
           <FactsSheet queue={queue} n={state.sheetN ?? state.readerN ?? state.current ?? 1} s={s} w={facts[queue.lang]} titleRef={titleRef} />
         )}
-        {kind === 'display' && <DisplaySheet s={s} titleRef={titleRef} />}
+        {kind === 'display' && <DisplaySheet s={s} titleRef={titleRef} keep={state.readerOpen} />}
         {kind === 'saved' && <SavedSheet state={state} queue={queue} s={s} titleRef={titleRef} />}
       </section>
     </>
@@ -325,7 +326,7 @@ function FactsSheet({ queue, n, s, w, titleRef }: { queue: StoryQueue; n: number
 
 // ---- display ("Aa") ------------------------------------------------------------------
 
-function DisplaySheet({ s, titleRef }: { s: PlayerStrings; titleRef: RefObject<HTMLHeadingElement> }) {
+function DisplaySheet({ s, titleRef, keep }: { s: PlayerStrings; titleRef: RefObject<HTMLHeadingElement>; keep: boolean }) {
   const d = useSyncExternalStore(subscribeDisplay, getDisplay, () => SERVER_DISPLAY);
   const wide = typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches;
   const size = d.size ?? (wide ? 21 : 19);
@@ -345,6 +346,13 @@ function DisplaySheet({ s, titleRef }: { s: PlayerStrings; titleRef: RefObject<H
     <>
       <Head title={s.display} s={s} titleRef={titleRef} />
       <div className="sp-sheet__body sp-aa">
+        {keep && (
+          <div className="sp-field sp-aa__keep">
+            <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); window.dispatchEvent(new Event(KEEP_EVENT)); }}>
+              {Icon.mark}<span>{s.bookmark}</span>
+            </button>
+          </div>
+        )}
         <div className="sp-field sp-field--stack">
           <span className="sp-field__label" id="sp-light-l">{s.light}</span>
           <div className="sp-swatches" role="radiogroup" aria-labelledby="sp-light-l">

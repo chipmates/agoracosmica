@@ -18,6 +18,9 @@ export interface PlayerStrings {
   allStories: (countWord: string) => string;
   /** The front's list of the thirty, as the menu names it. */
   allFigures: string;
+  /** The reading view's bar: the figure's stories and the front's list, short. */
+  storiesWay: (countWord: string) => string;
+  figuresWay: string;
   /** The credit under the hero portrait: short, so it never outweighs the picture. */
   portraitNote: string;
   /** The plate: what a tap does, then what plays. */
@@ -174,6 +177,8 @@ const en: PlayerStrings = {
   doorTitle: (name, word) => `${name}'s life, told in ${word} stories`,
   allStories: word => `All ${word} stories`,
   allFigures: 'All 30 figures',
+  storiesWay: word => `${word} stories`,
+  figuresWay: '30 figures',
   portraitNote: PORTRAIT_CREDIT.en,
   begin: 'Begin',
   // The line wraps at its comma (no-break spaces hold the rest), never with a dot at a line's end.
@@ -306,6 +311,8 @@ const de: PlayerStrings = {
   doorTitle: (name, word) => `Das Leben von ${name} in ${word} Geschichten`,
   allStories: word => `Alle ${word} Geschichten`,
   allFigures: 'Alle 30 Menschen',
+  storiesWay: word => `${word} Geschichten`,
+  figuresWay: '30 Menschen',
   portraitNote: PORTRAIT_CREDIT.de,
   begin: 'Beginnen',
   beginSub: m => `Einführung (${m} Min.), dann Geschichte 1`,

@@ -1798,7 +1798,19 @@ html:not([data-story-theme="day"]):not([data-story-theme="vellum"]) .story-reade
 .story-reader__aa { padding: 0 10px; font-family: var(--sp-display); font-size: 1.375rem; line-height: 1; }
 .story-reader__prog { position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; }
 .story-reader__prog i { display: block; height: 100%; width: 0; background: var(--sp-accent); }
-@media (max-width: 359.98px) { .story-reader__back span { display: none; } }
+/* the two ways out, beside back: the figure's stories and the front's list */
+.story-reader__way { flex: none; gap: 6px; padding: 0 8px; font-family: var(--font-ui); font-size: 0.9375rem; color: var(--sp-ink); text-decoration: none; white-space: nowrap; }
+.story-reader__way svg { width: 20px; height: 20px; color: var(--sp-accent); }
+.sp-aa__keep { display: none; }
+/* A phone: a toolbar, icon over a short label; back keeps its arrow (the name stays its spoken label) and the
+   bookmark moves into the Aa sheet, so German fits at 360. */
+@media (max-width: 639.98px) {
+  .story-reader__back span { display: none; }
+  .story-reader__back { padding-right: 0; }
+  .story-reader__way, .story-reader__facts { flex-direction: column; gap: 2px; padding: 0 6px; font-size: 0.6875rem; line-height: 1.15; }
+  .story-reader__mark { display: none; }
+  .sp-aa__keep { display: block; }
+}
 @media (min-width: 1024px) {
   .story-reader__bar-in { padding: 0 max(24px, calc((100vw - 1136px) / 2)); }
   .story-reader__sp { display: none; }

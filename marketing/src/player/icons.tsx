@@ -43,6 +43,10 @@ export const Icon = {
   share: svg(<><path d="M12 15V4" /><path d="M8 7.5L12 3.5l4 4" /><path d="M6 11v8.5h12V11" /></>),
   calendar: svg(<><rect x="4" y="5.5" width="16" height="14" rx="2" /><path d="M4 10h16M8.5 3.5v4M15.5 3.5v4" /></>),
   user: svg(<><circle cx="12" cy="8.5" r="3.5" /><path d="M5 20c1-4 3.8-6 7-6s6 2 7 6" /></>),
+  /** A figure's stories: a list. */
+  list: svg(<><path d="M9.5 7H20M9.5 12H20M9.5 17H20" /><path d="M4.5 7h.01M4.5 12h.01M4.5 17h.01" strokeWidth={2.6} /></>),
+  /** The thirty: two of them. */
+  people: svg(<><circle cx="9" cy="8.5" r="3" /><path d="M3.5 19c.8-3.4 3-5.2 5.5-5.2s4.7 1.8 5.5 5.2" /><path d="M15.5 5.8a3 3 0 0 1 0 5.6M17.2 13.9c1.7.6 2.9 2.3 3.3 5.1" /></>),
   pin: svg(<><path d="M12 21s-6.5-6-6.5-11a6.5 6.5 0 0 1 13 0c0 5-6.5 11-6.5 11z" /><circle cx="12" cy="10" r="2.3" /></>),
   /** Back one sentence in the bar: a curved arrow that turns back. */
   again: svg(<><path d="M4 8.5h10.5a5.75 5.75 0 0 1 0 11.5H8.5" /><path d="M8 4.5l-4 4 4 4" /></>),
