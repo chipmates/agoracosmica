@@ -221,6 +221,7 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
     return { l, t: y + c.dy - 13.5, r: l + NAME_W, b: y + c.dy + 3.6 };
   };
   let introPick: Spot | null = null;
+  let cost0 = (_: Spot) => true;
   if (introAt >= 0) {
     const cands: Spot[] = [
       { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
@@ -232,7 +233,11 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
       ...round([30, 38, 46]),
     ];
     const cost = (c: Spot) => { const a = nameBoxOf(c); return clearOfMarks(introAt, a, 24 + 1.5) + numBoxes.filter(b => hits(a, grow(b, MARGIN))).length; };
-    introPick = cands.find(c => cost(c) === 0) ?? cands.reduce((m, c) => (cost(c) < cost(m) ? c : m));
+    // where no spot is clear, the least crowded spot that stays on the plate: a name past the edge is not seen at all
+    const onPlate = cands.filter(c => { const a = nameBoxOf(c); return a.l >= MARGIN && a.r <= W - MARGIN; });
+    const pool = onPlate.length ? onPlate : cands;
+    introPick = cands.find(c => cost(c) === 0) ?? pool.reduce((m, c) => (cost(c) < cost(m) ? c : m));
+    cost0 = c => cost(c) === 0;
     if (cost(introPick) > 0) fails++;
   }
   const nameBox = introPick ? nameBoxOf(introPick) : null;
@@ -283,7 +288,8 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
     fails++;
     return null;
   });
-  return { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt, fails };
+  const nameClean = !introPick || cost0(introPick);
+  return { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt, fails, nameClean };
 }
 
 // The introduction's spot and the plate's height: the earlier rule's spot first (clear of the stars, its next ring
@@ -318,11 +324,14 @@ function ringClearOfNumbers(q: Pt): boolean {
 const introFound = hasIntro ? introPoints() : [];
 const earlier = introFound.find(ringClearOfNumbers) ?? introFound[0];
 const introCands: (Pt | null)[] = earlier ? [earlier, ...introFound.filter(q => q !== earlier)] : [null];
-let chosen: { q: Pt | null; h: number; fails: number } | null = null;
+// Where no spot holds every rule, a spot whose introduction's name stands clear in both languages comes first: a
+// story may lose its tag to the line under the map, the introduction has no such line.
+let chosen: { q: Pt | null; h: number; fails: number; clean: boolean } | null = null;
 for (const q of introCands) {
   const h = fitHeight(q);
-  const fails = layout(q, h, wordsOf('de')).fails + layout(q, h, wordsOf('en')).fails;
-  if (!chosen || fails < chosen.fails) chosen = { q, h, fails };
+  const [de, en] = [layout(q, h, wordsOf('de')), layout(q, h, wordsOf('en'))];
+  const fails = de.fails + en.fails; const clean = de.nameClean && en.nameClean;
+  if (!chosen || (clean && !chosen.clean) || (clean === chosen.clean && fails < chosen.fails)) chosen = { q, h, fails, clean };
   if (fails === 0) break;
 }
 const { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt } = layout(chosen!.q, chosen!.h, wordsOf(lang));
