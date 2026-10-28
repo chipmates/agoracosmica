@@ -167,8 +167,8 @@ export interface PlayerStrings {
 }
 
 const en: PlayerStrings = {
-  heroNote: (word, she) => `${she ? 'Her' : 'His'} life in ${word} stories. A retelling in the first person, from the sources. Never ${she ? 'her' : 'his'} own words.`,
-  retellingNote: she => `A retelling in the first person. Never ${she ? 'her' : 'his'} own words.`,
+  heroNote: (word, she) => `${she ? 'Her' : 'His'} life in ${word} stories. A retelling in the first person, from the sources.`,
+  retellingNote: () => `A retelling in the first person.`,
   doorTitle: (name, word) => `${name}'s life, told in ${word} stories`,
   allStories: word => `All ${word} stories`,
   portraitNote: PORTRAIT_CREDIT.en,
@@ -298,8 +298,8 @@ const en: PlayerStrings = {
 };
 
 const de: PlayerStrings = {
-  heroNote: (word, she) => `${she ? 'Ihr' : 'Sein'} Leben in ${word} Geschichten. Eine Nacherzählung in der Ich-Form, nach den Quellen. Nie ${she ? 'ihre' : 'seine'} eigenen Worte.`,
-  retellingNote: she => `Eine Nacherzählung in der Ich-Form. Nie ${she ? 'ihre' : 'seine'} eigenen Worte.`,
+  heroNote: (word, she) => `${she ? 'Ihr' : 'Sein'} Leben in ${word} Geschichten. Eine Nacherzählung in der Ich-Form, nach den Quellen.`,
+  retellingNote: () => `Eine Nacherzählung in der Ich-Form.`,
   doorTitle: (name, word) => `Das Leben von ${name} in ${word} Geschichten`,
   allStories: word => `Alle ${word} Geschichten`,
   portraitNote: PORTRAIT_CREDIT.de,

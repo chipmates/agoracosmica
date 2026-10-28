@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really William Shakespeare speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from his plays, the parish records and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. William Shakespeare lived from 1564 to 1616. He left no diary and no letters about himself, and no recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his plays, the parish records and the historical sources. A synthetic voice reads them. Not a recording. William Shakespeare lived from 1564 to 1616. He left no diary and no letters about himself, and no recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich William Shakespeare?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Stücken, den Kirchenbüchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. William Shakespeare lebte von 1564 bis 1616. Er hinterließ kein Tagebuch und keine Briefe über sich selbst, und von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Stücken, den Kirchenbüchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. William Shakespeare lebte von 1564 bis 1616. Er hinterließ kein Tagebuch und keine Briefe über sich selbst, und von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Jane Austen speaking?',
-        a: "No. These stories retell her life in the first person. They were written with AI from her novels, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Jane Austen lived from 1775 to 1817. No recording of her exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell her life in the first person. They were written with AI from her novels, her letters and the historical sources. A synthetic voice reads them. Not a recording. Jane Austen lived from 1775 to 1817. No recording of her exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Jane Austen?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Romanen, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Jane Austen lebte von 1775 bis 1817. Von ihr gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Romanen, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Jane Austen lebte von 1775 bis 1817. Von ihr gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

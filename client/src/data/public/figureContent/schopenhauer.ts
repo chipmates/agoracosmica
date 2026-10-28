@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Arthur Schopenhauer speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from his books and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Arthur Schopenhauer lived from 1788 to 1860. No recording of him exists. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his books and the historical sources. A synthetic voice reads them. Not a recording. Arthur Schopenhauer lived from 1788 to 1860. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Arthur Schopenhauer?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Arthur Schopenhauer lebte von 1788 bis 1860. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Arthur Schopenhauer lebte von 1788 bis 1860. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

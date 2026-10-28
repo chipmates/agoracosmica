@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Siddhartha Gautama speaking?',
-        a: "No. These stories retell his life in the first person. They were written with AI from the Pāli Canon and the later accounts of his life. A synthetic voice reads them. Not a recording. Never his own words. Siddhartha Gautama lived around the fifth century BC. What we have about him was passed on by word of mouth and written down centuries after his death. Each story's facts say what is documented and what is recreated.",
+        a: "No. These stories retell his life in the first person. They were written with AI from the Pāli Canon and the later accounts of his life. A synthetic voice reads them. Not a recording. Siddhartha Gautama lived around the fifth century BC. What we have about him was passed on by word of mouth and written down centuries after his death. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Siddhartha Gautama (Buddha)?',
-        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach dem Pāli-Kanon und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Siddhartha Gautama lebte etwa im fünften Jahrhundert v. Chr. Was wir über ihn haben, wurde mündlich weitergegeben und erst Jahrhunderte nach seinem Tod aufgeschrieben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach dem Pāli-Kanon und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Siddhartha Gautama lebte etwa im fünften Jahrhundert v. Chr. Was wir über ihn haben, wurde mündlich weitergegeben und erst Jahrhunderte nach seinem Tod aufgeschrieben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
