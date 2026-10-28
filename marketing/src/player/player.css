@@ -147,64 +147,8 @@
   color-scheme: dark;
 }
 
-/* Day: the device's light setting under Auto, or the "Aa" sheet's choice.
-   Only on a figure page and in the reading view (the dock and sheets with
-   them); the rest of the site stays night. */
-@media (prefers-color-scheme: light) {
-  html:not([data-story-theme]):has(.story-page) body,
-  html:not([data-story-theme]):has(.story-reader) body {
-    --sp-page: var(--sp-mist);
-    --sp-void: var(--sp-mist-2);
-    --sp-surface: var(--utility-pure-white);
-    --sp-raise: var(--sp-mist-2);
-    --sp-ink: var(--sp-n-page);
-    --sp-ink-2: color-mix(in srgb, var(--sp-n-page) 80%, var(--utility-pure-white));
-    --sp-ink-3: color-mix(in srgb, var(--sp-n-page) 64%, var(--utility-pure-white));
-    --sp-map-mix: 52%;
-    --sp-accent: var(--sp-bronze);
-    --sp-disc: var(--sp-n-page);
-    --sp-disc-hover: var(--sp-n-highlight);
-    --sp-disc-ink: var(--sp-n-gold);
-    --sp-ring: var(--sp-n-gold-deep);
-    --sp-ring-track: color-mix(in srgb, var(--sp-n-page) 15%, transparent);
-    --sp-hair: color-mix(in srgb, var(--sp-n-page) 12%, transparent);
-    --sp-hair-strong: color-mix(in srgb, var(--sp-n-page) 34%, transparent);
-    --sp-plate: var(--utility-pure-white);
-    --sp-plate-hover: var(--sp-mist-2);
-    --sp-wash: color-mix(in srgb, var(--sp-n-gold) 24%, transparent);
-    --sp-sheet: var(--sp-surface);
-    --sp-sheet-line: var(--sp-hair-strong);
-    --sp-sheet-rule: transparent;
-    --sp-sheet-head: var(--sp-hair);
-    --sp-sheet-shadow: var(--sp-shadow);
-    --sp-picked: var(--sp-raise);
-    --sp-picked-edge: transparent;
-    --sp-scrim: color-mix(in srgb, var(--sp-n-page) 38%, transparent);
-    --sp-shadow: color-mix(in srgb, var(--sp-n-page) 22%, transparent);
-    --sp-mark: var(--sp-n-gold-deep);
-    --sp-focus: var(--sp-bronze-strong);
-    --bg-void: var(--sp-mist-2);
-    --bg-primary: var(--sp-mist);
-    --bg-astral: var(--sp-mist-2);
-    --bg-card: var(--utility-pure-white);
-    --bg-highlight: var(--sp-mist-2);
-    --bg-deep-space: var(--sp-mist);
-    --bg-deep-space-darker: var(--sp-mist);
-    --bg-cosmic-void: var(--sp-mist);
-    --text-primary: var(--sp-n-page);
-    --text-secondary: color-mix(in srgb, var(--sp-n-page) 80%, var(--utility-pure-white));
-    --text-tertiary: color-mix(in srgb, var(--sp-n-page) 64%, var(--utility-pure-white));
-    --text-dim: color-mix(in srgb, var(--sp-n-page) 58%, var(--utility-pure-white));
-    --gold-primary: var(--sp-bronze);
-    --gold-subtle: var(--sp-bronze);
-    --gold-hover: var(--sp-bronze-strong);
-    --gold-deep: var(--sp-bronze);
-    --gold-light: var(--sp-bronze);
-    background: var(--sp-mist);
-    color-scheme: light;
-  }
-  html:not([data-story-theme]):has(.story-page) { background: var(--sp-mist); }
-}
+/* Day: the "Aa" sheet's choice. Only on a figure page and in the reading view (the dock and
+   sheets with them); the rest of the site stays night, and Night is the default. */
 html[data-story-theme="day"]:has(.story-page) body,
 html[data-story-theme="day"]:has(.story-reader) body {
   --sp-page: var(--sp-mist);
@@ -330,9 +274,6 @@ body:has(.story-page) .pub-main { padding-top: 0.25rem; padding-left: var(--sp-g
 body:has(.story-page) .pub-navbar { background: var(--bg-void); }
 /* The switch's frame is a night token computed on the root: in a light view it
    takes the light's hairline (hover keeps the site's own rule). */
-@media (prefers-color-scheme: light) {
-  html:not([data-story-theme]):has(.story-page) .pub-navbar__lang:not(:hover) { border-color: var(--sp-hair-strong); }
-}
 html[data-story-theme="day"]:has(.story-page) .pub-navbar__lang:not(:hover),
 html[data-story-theme="vellum"]:has(.story-page) .pub-navbar__lang:not(:hover) { border-color: var(--sp-hair-strong); }
 /* The phone bar keeps the language switch beside the menu button. */
@@ -1764,7 +1705,6 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   font-size: 1.125rem;
   line-height: 1;
 }
-.sp-swatch__card--auto { background: linear-gradient(135deg, var(--sp-mist) 50%, var(--sp-n-page) 50%); color: var(--sp-n-gold-deep); }
 .sp-swatch__card--day { background: var(--sp-mist); color: var(--sp-n-page); }
 .sp-swatch__card--vellum { background: var(--sp-vellum); color: var(--sp-n-void); }
 .sp-swatch__card--night { background: var(--sp-n-page); color: var(--sp-n-ink); }
@@ -1838,6 +1778,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
   color: var(--sp-ink);
 }
 html:has(.story-reader) { overflow: hidden; }
+/* Night reads on the darkest navy, for the most contrast (body text 15:1) */
+html:not([data-story-theme="day"]):not([data-story-theme="vellum"]) .story-reader { --sp-page: var(--sp-n-void); }
 .story-reader__bar { position: relative; flex: none; padding-top: env(safe-area-inset-top, 0px); background: var(--sp-page); border-bottom: 1px solid var(--sp-hair); }
 /* The top line wraps to a second line before a control overlaps another (text at 200 %); the controls keep their size. */
 .story-reader__bar-in { display: flex; flex-wrap: wrap; align-items: center; gap: 2px; min-height: 56px; padding: 0 8px; }

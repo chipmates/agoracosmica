@@ -348,7 +348,7 @@ function DisplaySheet({ s, titleRef }: { s: PlayerStrings; titleRef: RefObject<H
         <div className="sp-field sp-field--stack">
           <span className="sp-field__label" id="sp-light-l">{s.light}</span>
           <div className="sp-swatches" role="radiogroup" aria-labelledby="sp-light-l">
-            {(['auto', 'day', 'vellum', 'night'] as const).map((v, i) => (
+            {(['night', 'day', 'vellum'] as const).map((v, i) => (
               <button key={v} type="button" role="radio" aria-checked={d.light === v} className="sp-swatch" onClick={() => setDisplay({ light: v })}>
                 <span className={`sp-swatch__card sp-swatch__card--${v}`} aria-hidden="true">Aa</span>
                 <span>{s.lights[i]}</span>

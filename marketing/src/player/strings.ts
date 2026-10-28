@@ -136,7 +136,7 @@ export interface PlayerStrings {
   mapValue: (time: string, total: string, scene: number | null) => string;
   /** The display sheet. */
   light: string;
-  lights: [string, string, string, string];
+  lights: [string, string, string];
   textSize: string;
   smaller: string;
   larger: string;
@@ -273,7 +273,7 @@ const en: PlayerStrings = {
   mapScene: n => `Scene ${n}`,
   mapValue: (time, total, scene) => `${time} of ${total}${scene ? `, scene ${scene}` : ''}`,
   light: 'Light',
-  lights: ['Auto', 'Day', 'Vellum', 'Night'],
+  lights: ['Night', 'Day', 'Vellum'],
   textSize: 'Text size',
   smaller: 'Smaller text',
   larger: 'Larger text',
@@ -404,7 +404,7 @@ const de: PlayerStrings = {
   mapScene: n => `Szene ${n}`,
   mapValue: (time, total, scene) => `${time} von ${total}${scene ? `, Szene ${scene}` : ''}`,
   light: 'Licht',
-  lights: ['Auto', 'Tag', 'Pergament', 'Nacht'],
+  lights: ['Nacht', 'Tag', 'Pergament'],
   textSize: 'Schriftgröße',
   smaller: 'Kleinere Schrift',
   larger: 'Größere Schrift',

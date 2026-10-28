@@ -1,5 +1,5 @@
-// The reader's display settings ("Aa"), kept on this device: the light (Auto
-// follows the device, Day, Vellum, Night), text size, typeface, line spacing,
+// The reader's display settings ("Aa"), kept on this device: the light (Night,
+// the default, Day, Vellum; a stored Auto reads as Night), text size, typeface, line spacing,
 // what the read-along marks (and the stronger wash) and whether it follows the voice. The light
 // covers the figure page, the reader and the dock; CSS does the work
 // (player.css), this only sets the root's attribute.
@@ -7,7 +7,7 @@
 const KEY = 'agc_story_display';
 const OLD_THEME_KEY = 'agc_story_theme';
 
-export type Light = 'auto' | 'day' | 'vellum' | 'night';
+export type Light = 'night' | 'day' | 'vellum';
 export type Face = 'book' | 'clear';
 export type Spacing = 'tight' | 'normal' | 'airy';
 export type Highlight = 'word' | 'sentence' | 'off';
@@ -27,9 +27,9 @@ export interface DisplaySettings {
 export const SIZE_MIN = 15;
 export const SIZE_MAX = 28;
 
-const DEFAULTS: DisplaySettings = { light: 'auto', size: null, face: 'book', spacing: 'normal', highlight: 'word', strong: false, follow: true };
+const DEFAULTS: DisplaySettings = { light: 'night', size: null, face: 'book', spacing: 'normal', highlight: 'word', strong: false, follow: true };
 
-const LIGHTS: readonly Light[] = ['auto', 'day', 'vellum', 'night'];
+const LIGHTS: readonly Light[] = ['night', 'day', 'vellum'];
 const FACES: readonly Face[] = ['book', 'clear'];
 const SPACINGS: readonly Spacing[] = ['tight', 'normal', 'airy'];
 const HIGHLIGHTS: readonly Highlight[] = ['word', 'sentence', 'off'];
@@ -89,16 +89,12 @@ export function setDisplay(patch: Partial<DisplaySettings>): void {
   listeners.forEach(listener => listener());
 }
 
-/** The light as it shows: Auto resolved by the device's setting. */
-export function currentLight(): Exclude<Light, 'auto'> {
-  const light = getDisplay().light;
-  if (light !== 'auto') return light;
-  return window.matchMedia('(prefers-color-scheme: light)').matches ? 'day' : 'night';
+/** The light as it shows. */
+export function currentLight(): Light {
+  return getDisplay().light;
 }
 
 /** The router swaps the root element's attributes, so the choice is set again. */
 export function applyStoredTheme(): void {
-  const light = getDisplay().light;
-  if (light === 'auto') delete document.documentElement.dataset.storyTheme;
-  else document.documentElement.dataset.storyTheme = light;
+  document.documentElement.dataset.storyTheme = getDisplay().light;
 }
