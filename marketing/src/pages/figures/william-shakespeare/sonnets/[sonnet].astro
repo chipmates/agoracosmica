@@ -21,5 +21,5 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
 ---
 <PoemPage poem={poem}>
   {storyDock && <PlayerHead slot="head" />}
-  {storyDock && <PlayerDock slot="dock" lang="en" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" portraits={false} />}
 </PoemPage>
