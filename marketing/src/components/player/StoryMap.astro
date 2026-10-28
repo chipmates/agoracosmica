@@ -6,7 +6,6 @@
 // opens its story (its row on a desktop, a card under the plate on a phone); without script a star links to its row.
 import {
   CONSTELLATION_PATTERNS,
-  calculateConstellationPaths,
   calculateConstellationPositions,
 } from '@client/components/ZodiacConstellation';
 import constellationsDe from '@client/assets/translations/constellations/de.json';
@@ -25,6 +24,9 @@ interface Props {
 
 const { figureId, lang, queue } = Astro.props;
 const P = playerStrings(lang);
+// The map's own "next" word, set here at build time: strings.ts sits in a chunk every page loads.
+const nextWordOf = (l: PlayerLang) => (l === 'de' ? 'Danach' : playerStrings(l).nextTag);
+const NEXT_WORD = nextWordOf(lang);
 const enName = getFigureById(figureId, 'en')?.name ?? '';
 const constellation = CONSTELLATION_PATTERNS[`Echo of ${enName}`];
 const stories = queue.entries.filter(e => e.n > 0);
@@ -39,39 +41,266 @@ const deNames = (constellationsDe as { constellations?: { names?: Record<string,
 const mapName = constellation ? cleanDisplayText(lang === 'de' ? deNames[nameKey(constellation.name)] ?? constellation.name : constellation.name) : '';
 
 type Pt = [number, number];
-const pattern = (constellation?.pattern ?? []).slice(0, stories.length) as Pt[];
+type Box = { l: number; t: number; r: number; b: number };
 
 // The plate in viewBox units, one unit a CSS pixel on a 390 px phone (the plate is 358 px there).
 const W = 360;
 const TOP = 34; // room for a "next" label over the top row
-const FIT_H = 330; // the box the app's layout fits the figure into
-const VIA_Y = TOP + FIT_H + 18;
-const H = VIA_Y + 116; // the cartouche's band under the via
 const SIDE = 14; // the fit's box stands in from the plate's sides, so a "next" ring keeps clear of the frame
 const FIT_W = W - 2 * SIDE;
 const NUM_DY = -27; // a story's number, centred this far over its star
+// A tap target of 44 px on the narrowest phone, where the plate is 328 px wide for its 360 units.
+const MIN_GAP = Math.ceil((44 / (328 / W)) * 10) / 10;
+
+// The stories' points, in the pattern's space: the pattern's own first points, each place once. Where the
+// pattern holds fewer places than stories, or the app draws the full set its own way (the eye's twelve), the
+// app lays out all twelve as it does for twelve gathered seeds (the extra stars on its ring), and the lines
+// follow the app's pattern.
+const rawPattern = (constellation?.pattern ?? []) as Pt[];
+const firstPts = rawPattern.slice(0, stories.length);
+const unique = firstPts.filter((p, i) => firstPts.findIndex(q => q[0] === p[0] && q[1] === p[1]) === i);
+const appLaidOut = !!constellation && stories.length > 0 && (unique.length < stories.length || constellation.name === 'The Divine Vision');
+let pattern: Pt[] = firstPts;
+let pathPts: Pt[] = firstPts; // the app's line, in the same space
+if (appLaidOut && constellation) {
+  const dedup = rawPattern.filter((p, i) => rawPattern.findIndex(q => q[0] === p[0] && q[1] === p[1]) === i);
+  const lay = calculateConstellationPositions(
+    stories.map(s => ({ id: String(s.n), gathered: true })),
+    { ...constellation, pattern: constellation.name === 'The Divine Vision' ? rawPattern : dedup },
+    { width: FIT_W, height: 330 },
+    { marginFactor: 0.86 },
+  );
+  pattern = lay.seedPositions.map(p => [(p.coordX / 100) * FIT_W, (p.coordY / 100) * 330]);
+  const bb = lay.boundingBox;
+  const toLay = (p: Pt): Pt => [(p[0] - bb.xMin) * (bb.scale ?? 1) + (bb.offsetX ?? 0), (p[1] - bb.yMin) * (bb.scale ?? 1) + (bb.offsetY ?? 0)];
+  pathPts = constellation.name === 'The Divine Vision' ? rawPattern.filter(p => !(p[0] === 50 && p[1] === 50)).map(toLay) : dedup.slice(0, stories.length).map(toLay);
+}
 
 // The introduction: a step before story 1, against the path's direction (story 2 to story 1), as long as the path's
-// usual step; turned in 15 degree steps until it stands clear of every star, and its "next" ring (r 24) on the
-// plate clear of every story's number (else the first spot clear of the stars).
+// usual step; turned in 15 degree steps where it stands clear of every star. Where no such spot is clear (a pattern
+// that closes round story 1), the step grows until one is.
 function introPoints(): Pt[] {
   const [p1, p2] = pattern;
   if (!p1 || !p2) return [];
   const steps = pattern.slice(1).map((p, i) => Math.hypot(p[0] - pattern[i]![0], p[1] - pattern[i]![1])).sort((a, b) => a - b);
-  const len = (steps[Math.floor(steps.length / 2)] ?? 10) * 0.85;
+  const step = (steps[Math.floor(steps.length / 2)] ?? 10) * 0.85;
   const base = Math.atan2(p1[1] - p2[1], p1[0] - p2[0]);
-  const out: Pt[] = [];
-  for (let k = 0; k < 24; k++) {
-    const a = base + Math.ceil(k / 2) * (Math.PI / 12) * (k % 2 ? 1 : -1);
-    const q: Pt = [p1[0] + Math.cos(a) * len, p1[1] + Math.sin(a) * len];
-    if (pattern.every(p => Math.hypot(p[0] - q[0], p[1] - q[1]) >= len * 0.8)) out.push(q);
+  for (const len of [1, 1.4, 1.8, 2.4].map(f => step * f)) {
+    const out: Pt[] = [];
+    for (let k = 0; k < 24; k++) {
+      const a = base + Math.ceil(k / 2) * (Math.PI / 12) * (k % 2 ? 1 : -1);
+      const q: Pt = [p1[0] + Math.cos(a) * len, p1[1] + Math.sin(a) * len];
+      if (pattern.every(p => Math.hypot(p[0] - q[0], p[1] - q[1]) >= step * 0.8)) out.push(q);
+    }
+    if (out.length) return out;
   }
-  return out;
+  return [];
+}
+
+// The labels' boxes in plate units, at their larger sizes (a phone of 380 px and under): caps and figures by their
+// ink on the baseline, the introduction's italic name by its full line.
+// (the words measured in both engines, a unit over the wider; any other word by a wide letter's width)
+type Words = { tag: number; name: number };
+const wordsOf = (l: PlayerLang): Words => {
+  const tag = nextWordOf(l); const name = playerStrings(l).introTitle;
+  return {
+    tag: ({ Danach: 63.5, 'Up next': 68 } as Record<string, number>)[tag] ?? 10.4 * [...tag].length,
+    name: ({ Einführung: 80, Introduction: 85.5 } as Record<string, number>)[name] ?? 8 * [...name].length,
+  };
+};
+const numW = (n: number) => 7 * String(n).length;
+const MARGIN = 2;
+const grow = (a: Box, x: number, y = x): Box => ({ l: a.l - x, t: a.t - y, r: a.r + x, b: a.b + y });
+const hits = (a: Box, c: Box) => a.l < c.r && c.l < a.r && a.t < c.b && c.t < a.b;
+const overlap = (a: Box, c: Box) => Math.max(0, Math.min(a.r, c.r) - Math.max(a.l, c.l)) * Math.max(0, Math.min(a.b, c.b) - Math.max(a.t, c.t));
+const gap = (a: Box, c: Box) => Math.hypot(Math.max(0, a.l - c.r, c.l - a.r), Math.max(0, a.t - c.b, c.t - a.b));
+const toPoint = (a: Box, x: number, y: number) => Math.hypot(Math.max(a.l - x, 0, x - a.r), Math.max(a.t - y, 0, y - a.b));
+type Seg = { x1: number; y1: number; x2: number; y2: number };
+function toSegment(a: Box, s: Seg): number {
+  const n = Math.max(2, Math.ceil(Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 2));
+  let d = Infinity;
+  for (let k = 0; k <= n; k++) d = Math.min(d, toPoint(a, s.x1 + (s.x2 - s.x1) * (k / n), s.y1 + (s.y2 - s.y1) * (k / n)));
+  return d;
+}
+type Spot = { dx: number; dy: number; anchor: 'start' | 'end' | 'middle' };
+// spots round a star at the given radii, 24 to a turn, each anchored on the side away from the star
+const round = (radii: number[]): Spot[] => radii.flatMap(r => Array.from({ length: 24 }, (_, k) => {
+  const t = (k * Math.PI) / 12; const cx = Math.cos(t); const sy = Math.sin(t);
+  return { dx: Math.abs(cx) > 0.3 ? r * cx : 0, dy: r * sy + 4, anchor: cx > 0.3 ? 'start' : cx < -0.3 ? 'end' : 'middle' } as Spot;
+}));
+
+// One whole layout for an introduction point, a fit height and one language's words: the stars, the lines,
+// "via sapientiae", the numbers, the introduction's name and every star's tag, each label kept off every other mark
+// by MARGIN.
+function layout(intro: Pt | null, FIT_H: number, words: Words) {
+  const TAG_W = words.tag; const NAME_W = words.name;
+  const tagBoxAt = (x: number, y: number): Box => ({ l: x, t: y - 8.2, r: x + TAG_W, b: y + 0.3 });
+  const VIA_Y = TOP + FIT_H + 18;
+  const points: Pt[] = intro ? [intro, ...pattern] : pattern;
+  const numbers = intro ? [0, ...stories.map(s => s.n)] : stories.map(s => s.n);
+  const seeds = points.map((_, i) => ({ id: String(numbers[i]), gathered: false }));
+  const fit = points.length > 1
+    ? calculateConstellationPositions(seeds, { name: constellation?.name ?? '', description: '', pattern: points }, { width: FIT_W, height: FIT_H }, { marginFactor: 0.86 })
+    : null;
+  const at: Pt[] = (fit?.seedPositions ?? []).map(p => [(p.coordX / 100) * FIT_W + SIDE, (p.coordY / 100) * FIT_H + TOP]);
+  // the lines: the app's path through the stories (the introduction's step first), in the fit's own scale
+  const bb = fit?.boundingBox;
+  const place = (p: Pt): Pt => (bb ? [(p[0] - bb.xMin) * (bb.scale ?? 1) + (bb.offsetX ?? 0) + SIDE, (p[1] - bb.yMin) * (bb.scale ?? 1) + (bb.offsetY ?? 0) + TOP] : p);
+  const line: Pt[] = intro ? [intro, ...(appLaidOut ? [pattern[0]!] : []), ...pathPts] : pathPts;
+  const segments: (Seg & { link: string | null })[] = [];
+  for (let i = 0; i + 1 < line.length; i++) {
+    const [a, b] = [place(line[i]!), place(line[i + 1]!)];
+    if (Math.hypot(a[0] - b[0], a[1] - b[1]) < 0.5) continue;
+    if (segments.some(s => (Math.hypot(s.x1 - a[0], s.y1 - a[1]) < 0.5 && Math.hypot(s.x2 - b[0], s.y2 - b[1]) < 0.5) || (Math.hypot(s.x1 - b[0], s.y1 - b[1]) < 0.5 && Math.hypot(s.x2 - a[0], s.y2 - a[1]) < 0.5))) continue;
+    const ends = [a, b].map(q => at.findIndex(s => Math.hypot(s[0] - q[0], s[1] - q[1]) < 0.5));
+    segments.push({ x1: a[0], y1: a[1], x2: b[0], y2: b[1], link: ends.every(e => e >= 0) ? `${numbers[ends[0]!]}-${numbers[ends[1]!]}` : null });
+  }
+  let fails = 0;
+  const segBoxes: Box[] = segments.flatMap(s => {
+    // a line as a few small boxes along it, so a label keeps off the ink
+    const n = Math.max(2, Math.round(Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 10));
+    return Array.from({ length: n - 1 }, (_, k) => {
+      const t = (k + 1) / n; const x = s.x1 + (s.x2 - s.x1) * t; const y = s.y1 + (s.y2 - s.y1) * t;
+      return { l: x - 2, t: y - 2, r: x + 2, b: y + 2 };
+    });
+  });
+  // "via sapientiae" over the arc's crest, where no star's next ring reaches it: its usual place, else the nearest
+  // place along the arc that is clear
+  const viaBoxAt = (x: number): Box => ({ l: x, t: VIA_Y - 14 - 13.4, r: x + 106, b: VIA_Y - 14 + 3.9 });
+  // (a unit more: the italic's first letter overhangs its x)
+  const viaClear = (x: number) => at.every(([sx, sy]) => toPoint(viaBoxAt(x), sx, sy) >= 24 + MARGIN + 1);
+  const viaSpots = Array.from({ length: Math.floor((W - 2 * SIDE - 106) / 2) + 1 }, (_, k) => SIDE + 2 * k)
+    .sort((a, b) => Math.abs(a - W * 0.4) - Math.abs(b - W * 0.4));
+  const viaX = viaClear(W * 0.4) ? W * 0.4 : viaSpots.find(viaClear) ?? W * 0.4;
+  if (!viaClear(viaX)) fails++;
+  const via = viaBoxAt(viaX);
+
+  // what every label keeps clear of, beside the other labels: the stars' rings, the lines, the plate's edge
+  const clearOfMarks = (i: number, a: Box, own: number) => {
+    let bad = 0;
+    at.forEach(([x, y], j) => { if (toPoint(a, x, y) < (j === i ? own : 20 + MARGIN)) bad++; });
+    for (const s of segments) if (toSegment(a, s) < MARGIN) bad++;
+    if (hits(a, grow(via, MARGIN))) bad++;
+    if (a.l < SIDE || a.r > W - SIDE || a.t < 4 || a.b > VIA_Y - 6) bad++;
+    return bad;
+  };
+  // the stars' numbers: over the star, else the first spot around it clear of the marks, the earlier numbers and
+  // nearer its own star than any other
+  const numSpots: Spot[] = [
+    { dx: 0, dy: NUM_DY, anchor: 'middle' }, { dx: 0, dy: 37, anchor: 'middle' },
+    { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
+    { dx: 21, dy: -21, anchor: 'start' }, { dx: -21, dy: -21, anchor: 'end' },
+    { dx: 21, dy: 30, anchor: 'start' }, { dx: -21, dy: 30, anchor: 'end' },
+    ...round([29, 34, 40]),
+  ];
+  const numBoxOf = (i: number, c: Spot): Box => {
+    const [x, y] = at[i]!; const w = numW(numbers[i]!);
+    const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - w : x + c.dx - w / 2;
+    return { l, t: y + c.dy - 8.9, r: l + w, b: y + c.dy + 0.3 };
+  };
+  const nearestIs = (i: number, a: Box) => at.every(([x, y], j) => j === i || toPoint(a, x, y) > toPoint(a, at[i]![0], at[i]![1]));
+  const numberAt: (Spot | null)[] = at.map(() => null);
+  const numberBox: (Box | null)[] = at.map(() => null);
+  at.forEach((_, i) => {
+    if (numbers[i] === 0) return;
+    const cost = (c: Spot) => {
+      const a = numBoxOf(i, c);
+      return clearOfMarks(i, a, 24) + numberBox.filter((b): b is Box => !!b).filter(b => hits(a, grow(b, MARGIN))).length + (nearestIs(i, a) ? 0 : 1);
+    };
+    const best = numSpots.find(c => cost(c) === 0) ?? numSpots.reduce((m, c) => (cost(c) < cost(m) ? c : m));
+    if (cost(best) > 0) fails++;
+    numberAt[i] = best;
+    numberBox[i] = numBoxOf(i, best);
+  });
+  const numBoxes = numberBox.filter((b): b is Box => !!b);
+  // the introduction's name, beside its star where that is clear, under it otherwise; off its own next ring
+  const introAt = numbers.indexOf(0);
+  const nameBoxOf = (c: Spot): Box => {
+    const [x, y] = at[introAt]!;
+    const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - NAME_W : x + c.dx - NAME_W / 2;
+    return { l, t: y + c.dy - 13.5, r: l + NAME_W, b: y + c.dy + 3.6 };
+  };
+  let introPick: Spot | null = null;
+  if (introAt >= 0) {
+    const cands: Spot[] = [
+      { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
+      { dx: 0, dy: 41, anchor: 'middle' }, { dx: -12, dy: 41, anchor: 'start' }, { dx: 12, dy: 41, anchor: 'end' },
+      { dx: 0, dy: -29, anchor: 'middle' },
+      { dx: 20, dy: 34, anchor: 'start' }, { dx: -20, dy: 34, anchor: 'end' },
+      { dx: -12, dy: -29, anchor: 'start' }, { dx: 12, dy: -29, anchor: 'end' },
+      { dx: 31, dy: 4, anchor: 'start' }, { dx: -31, dy: 4, anchor: 'end' },
+      ...round([30, 38, 46]),
+    ];
+    const cost = (c: Spot) => { const a = nameBoxOf(c); return clearOfMarks(introAt, a, 24 + 1.5) + numBoxes.filter(b => hits(a, grow(b, MARGIN))).length; };
+    introPick = cands.find(c => cost(c) === 0) ?? cands.reduce((m, c) => (cost(c) < cost(m) ? c : m));
+    if (cost(introPick) > 0) fails++;
+  }
+  const nameBox = introPick ? nameBoxOf(introPick) : null;
+  // last each star's "next" tag: off every number (its own too), the name, the marks; nearer its own ring than any
+  // other star's; beside the ring first, on the side away from the plate's right edge (the app's 62 % rule), then
+  // round the ring; where no spot is clear the tag stands under the map instead
+  const tagHard = (i: number, a: Box) => {
+    let bad = clearOfMarks(i, a, 24 + MARGIN) + numBoxes.filter(b => hits(a, grow(b, MARGIN))).length;
+    if (nameBox && hits(a, grow(nameBox, MARGIN))) bad++;
+    const own = toPoint(a, at[i]![0], at[i]![1]) - 24;
+    if (at.some(([x, y], j) => j !== i && toPoint(a, x, y) - 20 <= own)) bad++;
+    return bad;
+  };
+  const tagBox = (i: number, c: Spot): Box => {
+    const [x, y] = at[i]!;
+    const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - TAG_W : x + c.dx - TAG_W / 2;
+    return tagBoxAt(l, y + c.dy);
+  };
+  function nextCands(i: number): Spot[] {
+    const first = at[i]![0] / W > 0.62 ? -1 : 1;
+    const S = (dx: number, dy: number): Spot[] => [first, -first].map(s => ({ dx: s * dx, dy, anchor: s > 0 ? 'start' : 'end' }));
+    const M = (dx: number, dy: number): Spot => ({ dx, dy, anchor: 'middle' });
+    const q = Math.round(TAG_W / 5);
+    return [
+      ...S(30, 4), // beside the ring, at the star's height
+      M(0, 38), M(q, 38), M(-q, 38), // under the ring
+      ...S(22, -22), ...S(22, 31), // at the ring's shoulders
+      ...S(30, 24), ...S(30, -16), // beside it, a line lower or higher
+      M(0, -50), M(q, -50), M(-q, -50), // over its own number, a line above it
+      ...[-38, -46, 46, 62, -54, 70].flatMap(dy => S(38, dy)), // further out on the diagonals
+    ];
+  }
+  // among the clear spots, the one the earlier rule liked best (least ink of stars and lines under it); its own
+  // spots first, then round the ring, a step further out each time round
+  const ink = (i: number, a: Box) => at.reduce((s, [x, y], j) => s + (j === i ? 0 : overlap(a, { l: x - 16, t: y - 16, r: x + 16, b: y + 16 })), 0) * 4
+    + segBoxes.reduce((s, sb) => s + overlap(a, sb), 0);
+  const nextAt = at.map((_, i) => {
+    for (const cands of [nextCands(i), round([34, 42, 52])]) {
+      const clear = cands.filter(c => tagHard(i, tagBox(i, c)) === 0);
+      if (clear.length) return clear.reduce((m, c) => (ink(i, tagBox(i, c)) < ink(i, tagBox(i, m)) ? c : m));
+    }
+    fails++;
+    return null;
+  });
+  return { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt, fails };
+}
+
+// The introduction's spot and the plate's height: the earlier rule's spot first (clear of the stars, its next ring
+// clear of every number), then the others; the first whose whole layout holds every rule in both languages, so the
+// stars stand where they stand in either. Each spot's fit grows in height until no two stars stand closer than a
+// phone's tap target (a pattern wider than tall cannot grow so).
+function starsAt(intro: Pt | null, fitH: number): Pt[] {
+  const pts = intro ? [intro, ...pattern] : pattern;
+  if (pts.length < 2) return [];
+  const f = calculateConstellationPositions(pts.map((_, i) => ({ id: String(i), gathered: false })), { name: '', description: '', pattern: pts }, { width: FIT_W, height: fitH }, { marginFactor: 0.86 });
+  return f.seedPositions.map(p => [(p.coordX / 100) * FIT_W + SIDE, (p.coordY / 100) * fitH + TOP] as Pt);
+}
+const minGap = (pts: Pt[]) => Math.min(Infinity, ...pts.flatMap((p, i) => pts.slice(i + 1).map(q => Math.hypot(p[0] - q[0], p[1] - q[1]))));
+function fitHeight(intro: Pt | null): number {
+  let h = 330;
+  for (let k = 0; k < 60 && minGap(starsAt(intro, h)) < MIN_GAP; k++) {
+    if (minGap(starsAt(intro, h + 10)) <= minGap(starsAt(intro, h)) + 0.01) break;
+    h += 10;
+  }
+  return h;
 }
 function ringClearOfNumbers(q: Pt): boolean {
-  const pts = [q, ...pattern];
-  const f = calculateConstellationPositions(pts.map((_, i) => ({ id: String(i), gathered: false })), { name: '', description: '', pattern: pts }, { width: FIT_W, height: FIT_H }, { marginFactor: 0.86 });
-  const xy = f.seedPositions.map(p => [(p.coordX / 100) * FIT_W + SIDE, (p.coordY / 100) * FIT_H + TOP] as Pt);
+  const xy = starsAt(q, 330);
   const [ix, iy] = xy[0]!;
   return xy.slice(1).every(([x, y], j) => {
     const w = j + 1 >= 10 ? 13 : 7;
@@ -80,19 +309,40 @@ function ringClearOfNumbers(q: Pt): boolean {
     return Math.hypot(dx, dy) >= 27;
   });
 }
-const introCands = hasIntro ? introPoints() : [];
-const intro = introCands.find(ringClearOfNumbers) ?? introCands[0] ?? null;
-const points: Pt[] = intro ? [intro, ...pattern] : pattern;
-const numbers = intro ? [0, ...stories.map(s => s.n)] : stories.map(s => s.n);
-const seeds = points.map((_, i) => ({ id: String(numbers[i]), gathered: false }));
-const fit = points.length > 1
-  ? calculateConstellationPositions(seeds, { name: constellation?.name ?? '', description: '', pattern: points }, { width: FIT_W, height: FIT_H }, { marginFactor: 0.86 })
-  : null;
-const at: Pt[] = (fit?.seedPositions ?? []).map(p => [(p.coordX / 100) * FIT_W + SIDE, (p.coordY / 100) * FIT_H + TOP]);
-const segments = fit
-  ? calculateConstellationPaths(fit.seedPositions, fit.boundingBox, points, { width: FIT_W, height: FIT_H }, { name: '', description: '', pattern: points })
-      .map(s => ({ x1: s.x1 + SIDE, y1: s.y1 + TOP, x2: s.x2 + SIDE, y2: s.y2 + TOP }))
-  : [];
+const introFound = hasIntro ? introPoints() : [];
+const earlier = introFound.find(ringClearOfNumbers) ?? introFound[0];
+const introCands: (Pt | null)[] = earlier ? [earlier, ...introFound.filter(q => q !== earlier)] : [null];
+let chosen: { q: Pt | null; h: number; fails: number } | null = null;
+for (const q of introCands) {
+  const h = fitHeight(q);
+  const fails = layout(q, h, wordsOf('de')).fails + layout(q, h, wordsOf('en')).fails;
+  if (!chosen || fails < chosen.fails) chosen = { q, h, fails };
+  if (fails === 0) break;
+}
+const { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt } = layout(chosen!.q, chosen!.h, wordsOf(lang));
+// The cartouche's band under the via, so its box never climbs to a label, "via sapientiae" or a star's next ring:
+// the box on the narrowest phone (253 px wide in a 328 px plate, 5 % over the plate's foot, 53 px and 19 px a line of
+// its name, measured in both engines), the name's lines set from the capitals' measured advances (letter-spacing in;
+// 216 px to a line).
+const CAP: Record<string, number> = { A: 13.5, B: 12.74, C: 13.95, D: 14.35, E: 12.71, F: 12.07, G: 14.47, H: 15.21, I: 7.88,
+  J: 7.69, K: 14.09, L: 12.16, M: 17.57, N: 14.77, O: 14.89, P: 12.17, Q: 14.89, R: 13.33, S: 11.29, T: 13.65, U: 13.95,
+  V: 13.15, W: 18.75, X: 14.15, Y: 12.96, Z: 12.46, 'Ä': 13.5, 'Ö': 14.89, 'Ü': 13.95, '-': 9.26, "'": 5.51 };
+const nameLines = (() => {
+  let lines = 0; let len = 0;
+  // a line breaks at a space or after a hyphen; a word longer than a line breaks anywhere
+  for (const word of mapName.toUpperCase().split(/\s+/).filter(Boolean)) word.split(/(?<=-)/).forEach((part, k) => {
+    const w = [...part].reduce((s, ch) => s + (CAP[ch] ?? 15), 0); const sp = k ? 0 : 6.32;
+    if (len && len + sp + w <= 216) { len += sp + w; return; }
+    lines += Math.max(1, Math.ceil(w / 216)); len = w % 216 || 216;
+  });
+  return Math.max(1, lines);
+})();
+const PX = 328 / W;
+const boxU = (53 + nameLines * 19) / PX;
+const halfBox = 253 / PX / 2;
+const needTop = Math.max(VIA_Y - 6 + MARGIN,
+  ...at.filter(([x]) => Math.abs(x - W / 2) < halfBox + 24 + MARGIN).map(([, y]) => y + 24 + MARGIN));
+const H = Math.max(VIA_Y + 116, Math.ceil((needTop + boxU + 1) / 0.95));
 const r1 = (v: number) => Math.round(v * 10) / 10;
 // A star's tap area (r 25) stops halfway to its nearest neighbour, so where stars stand close (a ladder) each
 // star is still tapped at its own centre rather than under the next star's area.
@@ -104,126 +354,10 @@ const grat = [
   ...[0.3, 0.7].map(fx => { const x = W * fx; return `M${r1(x)} 0Q${r1(x + (fx - 0.5) * -36)} ${H / 2} ${r1(x)} ${H}`; }),
 ];
 const via = `M${r1(-W * 0.05)} ${r1(VIA_Y + 10)}Q${W / 2} ${r1(VIA_Y - 18)} ${r1(W * 1.05)} ${r1(VIA_Y + 10)}`;
-
-// Labels beside the stars, placed at build time: the plate numbers at one place over their stars, the introduction's
-// name beside its star, then each star's "next" tag where it stands clear of every label.
-type Box = { l: number; t: number; r: number; b: number };
-const STAR_R = 16;
-const starBoxes: Box[] = at.map(([x, y]) => ({ l: x - STAR_R, t: y - STAR_R, r: x + STAR_R, b: y + STAR_R }));
-const overlap = (a: Box, c: Box) => Math.max(0, Math.min(a.r, c.r) - Math.max(a.l, c.l)) * Math.max(0, Math.min(a.b, c.b) - Math.max(a.t, c.t));
-const gap = (a: Box, c: Box) => Math.hypot(Math.max(0, a.l - c.r, c.l - a.r), Math.max(0, a.t - c.b, c.t - a.b));
-const grow = (a: Box, x: number, y: number): Box => ({ l: a.l - x, t: a.t - y, r: a.r + x, b: a.b + y });
-// a label keeps SIDE units from the plate's sides: a desktop's frame line stands 13 px in (about 10 units there)
-const outside = (a: Box) => Math.max(0, SIDE - a.l) + Math.max(0, a.r - (W - SIDE)) + Math.max(0, 4 - a.t) + Math.max(0, a.b - (VIA_Y - 6));
-const segBoxes: Box[] = segments.flatMap(s => {
-  // a line as a few small boxes along it, so a label keeps off the ink
-  const n = Math.max(2, Math.round(Math.hypot(s.x2 - s.x1, s.y2 - s.y1) / 10));
-  return Array.from({ length: n - 1 }, (_, k) => {
-    const t = (k + 1) / n; const x = s.x1 + (s.x2 - s.x1) * t; const y = s.y1 + (s.y2 - s.y1) * t;
-    return { l: x - 2, t: y - 2, r: x + 2, b: y + 2 };
-  });
-});
-// what a label costs on the plate: other stars, the lines, the edge
-const ink = (i: number, a: Box) => starBoxes.reduce((s, sb, j) => s + (j === i ? 0 : overlap(a, sb)), 0) * 4
-  + segBoxes.reduce((s, sb) => s + overlap(a, sb), 0) + outside(a) * 400;
-type Spot = { dx: number; dy: number; anchor: 'start' | 'end' | 'middle' };
-type Pick = { c: Spot; score: number };
-function place(i: number, cands: Spot[], boxOf: (i: number, c: Spot) => Box, score: (a: Box) => number): Pick {
-  let best: Pick | null = null;
-  for (const c of cands) {
-    const s = score(boxOf(i, c));
-    if (!best || s < best.score) best = { c, score: s };
-  }
-  return best!;
-}
-// The plate numbers first: one fixed place for every star, centred above it and over a "next" ring's top (r 24), so a
-// number never reads as its neighbour's.
-const numberBox: (Box | null)[] = at.map(([x, y], i) => {
-  if (numbers[i] === 0) return null;
-  const w = numbers[i]! >= 10 ? 13 : 7;
-  return { l: x - w / 2, t: y + NUM_DY - 10 * 0.8, r: x + w / 2, b: y + NUM_DY + 10 * 0.25 };
-});
-const numbersBut = (i: number): Box[] => numberBox.filter((b, j): b is Box => b !== null && j !== i);
-// Then the introduction's name, beside its star where that is clear, under it otherwise; it keeps off the star's own
-// "next" ring, so it stays put whichever star is next.
-const introAt = numbers.indexOf(0);
-const NAME_W = 7.4 * P.introTitle.length;
-function nameBox(i: number, c: Spot): Box {
-  const [x, y] = at[i]!;
-  const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - NAME_W : x + c.dx - NAME_W / 2;
-  return { l, t: y + c.dy - 13 * 0.8, r: l + NAME_W, b: y + c.dy + 13 * 0.25 };
-}
-const introPick = introAt < 0 ? null : (() => {
-  const [x, y] = at[introAt]!;
-  const dy = 37; // under a "next" ring's foot (r 24)
-  const cands: Spot[] = [
-    { dx: 27, dy: 4, anchor: 'start' }, { dx: -27, dy: 4, anchor: 'end' },
-    { dx: 0, dy, anchor: 'middle' }, { dx: -12, dy, anchor: 'start' }, { dx: 12, dy, anchor: 'end' },
-    { dx: 0, dy: -29, anchor: 'middle' },
-    { dx: 20, dy: 30, anchor: 'start' }, { dx: -20, dy: 30, anchor: 'end' },
-    { dx: -12, dy: -29, anchor: 'start' }, { dx: 12, dy: -29, anchor: 'end' },
-  ];
-  const hard = [...numbersBut(introAt).map(b => grow(b, 9, 6)), { l: x - 26, t: y - 26, r: x + 26, b: y + 26 }];
-  return place(introAt, cands, nameBox, a => ink(introAt, a) + hard.reduce((s, pb) => s + overlap(a, pb), 0) * 8);
-})();
-const introBox = introPick ? nameBox(introAt, introPick.c) : null;
-// Last the "next" tag (one star at a time), never on a leader: it keeps every number, its own included, a line
-// (13 units) above and below and half a figure (4) beside, and the introduction's name the same; it stands nearer its
-// own ring than any other star's label. Its box is the ink at its larger size (11 units at 380 px and under).
-const KEEP_X = 4;
-const KEEP_Y = 13;
-const TAG_W = 10.2 * [...P.nextTag].length;
-function tagBox(i: number, c: Spot): Box {
-  const [x, y] = at[i]!;
-  const l = c.anchor === 'start' ? x + c.dx : c.anchor === 'end' ? x + c.dx - TAG_W : x + c.dx - TAG_W / 2;
-  return { l: l - 1.5, t: y + c.dy - 10, r: l + TAG_W + 1.5, b: y + c.dy + 0.5 };
-}
-// nearest the ring first, on the side away from the plate's right edge (the app's 62 % rule)
-function nextCands(i: number): Spot[] {
-  const first = at[i]![0] / W > 0.62 ? -1 : 1;
-  const S = (dx: number, dy: number): Spot[] => [first, -first].map(s => ({ dx: s * dx, dy, anchor: s > 0 ? 'start' : 'end' }));
-  const M = (dx: number, dy: number): Spot => ({ dx, dy, anchor: 'middle' });
-  const q = Math.round(TAG_W / 5);
-  return [
-    ...S(30, 4), // beside the ring, at the star's height
-    M(0, 38), M(q, 38), M(-q, 38), // under the ring
-    ...S(22, -22), ...S(22, 31), // at the ring's shoulders
-    ...S(30, 24), ...S(30, -16), // beside it, a line lower or higher
-    M(0, -50), M(q, -50), M(-q, -50), // over its own number, a line above it
-    ...[-38, -46, 46, 62, -54, 70].flatMap(dy => S(38, dy)), // further out on the diagonals
-  ];
-}
-const marks = (i: number): Box[] => [...numberBox.filter((b): b is Box => b !== null), ...(i !== introAt && introBox ? [grow(introBox, 2, 2)] : [])];
-function tagScore(i: number, L: Box): number {
-  const [x, y] = at[i]!; const star = { l: x, t: y, r: x, b: y };
-  let s = ink(i, L);
-  // never through another star, over the plate's edge, on its own ring or on the introduction's own name
-  if (starBoxes.some((sb, j) => j !== i && overlap(L, sb) > 40) || outside(L) > 0.5 || gap(L, star) < 26
-    || (i === introAt && introBox && overlap(L, grow(introBox, 3, 3)) > 0)) s += 1e7;
-  const ring = Math.max(0, gap(grow(L, -5, -2), star) - 24);
-  let near = Infinity;
-  for (const k of marks(i)) {
-    const o = overlap(L, grow(k, KEEP_X, KEEP_Y));
-    if (o > 0) s += 1e6 + o * 1000;
-    if (k !== numberBox[i]) near = Math.min(near, gap(L, k));
-  }
-  if (near <= ring + 2) s += 1e5 + (ring + 2 - near) * 100;
-  return s;
-}
-// Where no spot clears the margins (a long tag among close stars), the app's diagonal spot, as the earlier rule chose it.
-function earlierPick(i: number): Pick {
-  const first = at[i]![0] / W > 0.62 ? -1 : 1;
-  const hard = numbersBut(i);
-  const cands: Spot[] = [-38, -46, 46, 62].flatMap(dy => [first, -first].map(s => ({ dx: s * 38, dy, anchor: s > 0 ? 'start' : 'end' } as Spot)));
-  return place(i, cands, tagBox, L => ink(i, L) + hard.reduce((s, pb) => s + overlap(L, pb), 0) * 8);
-}
-const nextAt = at.map((_, i) => {
-  const p = place(i, nextCands(i), tagBox, L => tagScore(i, L));
-  return (p.score < 1e6 ? p : earlierPick(i)).c;
-});
-const numberAt = at.map((_, i) => (i === introAt && introPick ? introPick.c : { dx: 0, dy: NUM_DY, anchor: 'middle' } as Spot));
+const NUM_AT: Spot = { dx: 0, dy: NUM_DY, anchor: 'middle' };
 
 const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
+const unplaced = at.map((_, i) => i).filter(i => !nextAt[i]).map(i => numbers[i]!);
 // The map's note where the stories' years do not follow the life's order (a placeholder for the writer).
 const mapNoteLoose = lang === 'de'
   ? 'Jeder Stern ist eine Geschichte. Wähle einen Stern, und die Geschichte öffnet sich.'
@@ -233,21 +367,20 @@ const mapNoteLoose = lang === 'de'
   <section class="sp-mapwrap" aria-labelledby="sp-map-title" data-nosnippet>
     <div class="sp-atlas">
       <div class="sp-atlas__sky" aria-hidden="true"></div>
-      <svg class="sp-map sp-atlas__plate" data-story-map viewBox={`0 0 ${W} ${H}`} role="group" aria-labelledby="sp-map-title">
+      <svg class="sp-map sp-atlas__plate" data-story-map data-next-word={NEXT_WORD} viewBox={`0 0 ${W} ${H}`} role="group" aria-labelledby="sp-map-title">
         <g class="sp-atlas__ink" aria-hidden="true">
           {grat.map(d => <path class="sp-atlas__grat" d={d} />)}
           <path class="sp-atlas__via" d={via} />
-          <text class="sp-atlas__vialabel" x={r1(W * 0.4)} y={r1(VIA_Y - 14)}>via sapientiae</text>
+          <text class="sp-atlas__vialabel" x={r1(viaX)} y={r1(VIA_Y - 14)}>via sapientiae</text>
           {segments.map(s => <line class="sp-atlas__line" x1={r1(s.x1)} y1={r1(s.y1)} x2={r1(s.x2)} y2={r1(s.y2)} />)}
-          {segments.map((s, i) => (
-            <line class="sp-map__link" data-link={`${numbers[i]}-${numbers[i + 1]}`} x1={r1(s.x1)} y1={r1(s.y1)} x2={r1(s.x2)} y2={r1(s.y2)} />
+          {segments.filter(s => s.link).map(s => (
+            <line class="sp-map__link" data-link={s.link} x1={r1(s.x1)} y1={r1(s.y1)} x2={r1(s.x2)} y2={r1(s.y2)} />
           ))}
         </g>
         {at.map(([cx, cy], i) => {
           const n = numbers[i]!;
-          const num = numberAt[i]!;
-          const nx = nextAt[i]!;
-          const lx = cx + nx.dx; const ly = cy + nx.dy;
+          const num = (n === 0 ? introPick : numberAt[i]) ?? NUM_AT;
+          const nx = nextAt[i];
           return (
             <a class:list={['sp-star', n === 0 && 'sp-star--intro']} href={`#story-${n}`} data-story-star={n}
               aria-label={P.rowAria(n, n === 0 ? P.introTitle : title(n), [])}>
@@ -272,7 +405,7 @@ const mapNoteLoose = lang === 'de'
               {n === 0
                 ? <text class="sp-star__intro" x={r1(cx + num.dx)} y={r1(cy + num.dy)} text-anchor={num.anchor}>{P.introTitle}</text>
                 : <text class="sp-star__num" x={r1(cx + num.dx)} y={r1(cy + num.dy)} text-anchor={num.anchor}>{n}</text>}
-              <text class="sp-star__next" x={r1(lx)} y={r1(ly)} text-anchor={nx.anchor}>{P.nextTag}</text>
+              {nx && <text class="sp-star__next" x={r1(cx + nx.dx)} y={r1(cy + nx.dy)} text-anchor={nx.anchor}>{NEXT_WORD}</text>}
             </a>
           );
         })}
@@ -282,6 +415,9 @@ const mapNoteLoose = lang === 'de'
         <p class="sp-atlas__epithet">{P.mapBy(queue.name)}</p>
       </div>
     </div>
+    {unplaced.map(n => (
+      <p class="sp-mapnext" data-next-cap={n} hidden>{`${NEXT_WORD}: ${n === 0 ? P.introTitle : `${n}. ${title(n)}`}`}</p>
+    ))}
     <p class="sp-mapnote">{inLifeOrder(queue) ? P.mapNote(!!queue.she) : mapNoteLoose}</p>
     <div class="sp-mapsel" data-story-mapsel hidden></div>
   </section>

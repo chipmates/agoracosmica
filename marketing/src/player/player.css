@@ -945,6 +945,8 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 @media (min-width: 1024px) { .sp-atlas__name { font-size: 1.05rem; } }
 
 .sp-mapnote { margin: 8px 0 4px; font-family: var(--font-ui); font-size: 0.8125rem; line-height: 1.4; color: var(--sp-ink-3); }
+/* a next star with no clear spot for its tag on the plate: the tag's words under the map, in the tag's gold */
+.sp-mapnext { margin: 8px 0 0; font-family: var(--font-ui); font-size: 0.8125rem; font-weight: 500; line-height: 1.4; color: var(--sp-accent); }
 
 /* a phone's chosen star: the app's seed note under the plate, holding the story's row */
 .sp-mapsel {

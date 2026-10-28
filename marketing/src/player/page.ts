@@ -220,10 +220,12 @@ function syncMap(state: PlayerState, queue: StoryQueue, timeOnly: boolean): void
     star.classList.toggle('is-next', n === next);
     const base = star.dataset.ariaBase ?? star.getAttribute('aria-label') ?? '';
     star.dataset.ariaBase = base;
-    const word = kind === 'current' ? s.playingWord : kind === 'done' ? s.finishedWord : kind === 'started' ? s.startedWord : n === next ? s.nextTag : '';
+    const word = kind === 'current' ? s.playingWord : kind === 'done' ? s.finishedWord : kind === 'started' ? s.startedWord : n === next ? map.dataset.nextWord ?? s.nextTag : '';
     star.setAttribute('aria-label', word ? `${base}, ${word}` : base);
   });
   if (timeOnly) return;
+  // a star with no room for its tag on the plate names itself under the map while it is next
+  document.querySelectorAll<HTMLElement>('[data-next-cap]').forEach(cap => { cap.hidden = Number(cap.dataset.nextCap) !== next; });
   // a gold line joins two neighbours heard (or playing)
   const lit = (n: number) => state.done.includes(n) || v.current === n;
   map.querySelectorAll<SVGLineElement>('[data-link]').forEach(line => {
