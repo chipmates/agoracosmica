@@ -152,20 +152,27 @@ const schemas = [
     padding-bottom: 0.75rem;
     border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
   }
+  /* 44px wide even for "Love": the side padding widens the target, the negative
+     margins keep the spacing, and the rule is drawn under the word only. */
   .pi-jump__link {
+    --pi-jump-rule: color-mix(in srgb, var(--gold-primary) 35%, transparent);
     display: inline-flex;
     align-items: center;
+    justify-content: center;
     min-height: 44px;
+    min-width: 44px;
+    padding: 0 0.5rem;
+    margin: 0 -0.5rem;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: var(--text-sm);
     color: var(--gold-primary);
     text-decoration: none;
-    border-bottom: 1px solid color-mix(in srgb, var(--gold-primary) 35%, transparent);
+    background: linear-gradient(var(--pi-jump-rule), var(--pi-jump-rule)) content-box no-repeat left bottom / 100% 1px;
   }
   .pi-jump__link:hover,
   .pi-jump__link:focus-visible {
+    --pi-jump-rule: var(--gold-hover);
     color: var(--gold-hover);
-    border-bottom-color: var(--gold-hover);
   }
 
   .pi-section {

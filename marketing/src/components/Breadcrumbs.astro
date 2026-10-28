@@ -45,3 +45,27 @@ const hrefFor = (path: string): string =>
     ))}
   </ol>
 </nav>
+
+<style>
+  /* 44px targets; zero specificity, so the figure pages' own rule wins there. Each
+     padding is taken back by an equal negative margin, so no line moves, even when
+     the path wraps. The box reaches mostly up into the free space above, and
+     sideways half the space between two names; the first link also grows left and
+     the last one right over its separator, so short words reach 44px without
+     covering another target. */
+  :global(:where(nav.pub-breadcrumbs) a) {
+    display: inline-flex;
+    align-items: flex-start;
+    min-height: 44px;
+    padding: 20px 0.375rem 7px;
+    margin: -20px -0.375rem -7px;
+  }
+  :global(:where(nav.pub-breadcrumbs li:first-child) > a) {
+    padding-left: 1rem;
+    margin-left: -1rem;
+  }
+  :global(:where(nav.pub-breadcrumbs li:has(+ li > [aria-current])) > a) {
+    padding-right: 0.75rem;
+    margin-right: -0.75rem;
+  }
+</style>

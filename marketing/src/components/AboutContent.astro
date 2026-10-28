@@ -154,9 +154,9 @@ const museum = isDe
             return (
               <a
                 href={publicUrl(lang, `/figures/${figureIdToSlug[id]}`)}
-                class="pub-hero__badge"
+                class="pub-about-name"
               >
-                {fig.name}
+                <span class="pub-hero__badge">{fig.name}</span>
               </a>
             );
           })}
@@ -261,6 +261,19 @@ const museum = isDe
 
   .pub-about-legalnote {
     margin-top: 1.4rem;
+  }
+
+  /* Each name is a 44px target around its unchanged badge; the rows' gap lives
+     inside the targets now, and the negative margins keep the badges as close to
+     their label and the next group as before. */
+  .pub-about-group__figures {
+    row-gap: 0;
+    margin: -8px 0;
+  }
+  .pub-about-name {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
   }
 
   /* Anchored blocks clear the sticky navbar when jumped to. */

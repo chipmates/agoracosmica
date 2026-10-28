@@ -122,7 +122,13 @@ const total = rails.reduce((n, r) => n + lattice[r].length, 0);
     text-decoration: none;
     border-bottom: 1px solid transparent;
     padding-bottom: 1px;
-    min-height: 1.5rem;
+    min-height: 44px;
+  }
+  /* The link's box reaches up over its caption (one caption line plus the gap),
+     so each edge is a 44px target and no line moves. */
+  .fig-lattice__from + .fig-lattice__to {
+    margin-top: -1.15rem;
+    padding-top: 1.15rem;
   }
   .fig-lattice__to:hover,
   .fig-lattice__to:focus-visible {

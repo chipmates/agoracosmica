@@ -162,7 +162,7 @@ const schemas = [
 
     <nav class="pm-nav" aria-label={`More by ${poet.name}`}>
       <p class="pm-nav__all">
-        <a class="pub-textlink" href={poet.collectionPath}>{poet.moreLabel}</a>
+        <a class="pm-nav__more" href={poet.collectionPath}><span class="pub-textlink">{poet.moreLabel}</span></a>
       </p>
       <div class="pm-nav__steps">
         {previous && (
@@ -285,9 +285,22 @@ const schemas = [
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
     padding-top: 1.5rem;
   }
+  /* A 44px target around the unchanged text link; the margins take back the
+     height it adds. */
   .pm-nav__all {
-    margin: 0 0 1.25rem;
+    margin: -0.625rem 0 0.625rem;
     font-size: var(--text-sm);
+  }
+  .pm-nav__more {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .pm-nav__more:hover .pub-textlink,
+  .pm-nav__more:focus-visible .pub-textlink {
+    color: var(--gold-hover);
+    border-bottom-color: var(--gold-hover);
   }
   .pm-nav__steps {
     display: flex;

@@ -37,3 +37,18 @@ const home = publicUrl(lang, '/');
   </div>
   <BackLink at="end" href={home} label={t('breadcrumbs.home')} />
 </article>
+
+<style>
+  /* The links at the end are 44px targets; the rows' gap lives inside them now. */
+  .legal-doc__footer-links {
+    row-gap: 0;
+    margin: -0.7rem 0;
+  }
+  .legal-doc__footer-links a {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 44px;
+    min-width: 44px;
+  }
+</style>

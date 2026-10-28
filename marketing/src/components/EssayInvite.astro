@@ -58,10 +58,10 @@ const freeNote =
   {moreLinks.length > 0 && (
     <p class="esy-invite__more">
       {moreLinks.map((l, i) => (
-        <>
+        <span class="esy-invite__more-item">
           {i > 0 && <span class="esy-invite__sep" aria-hidden="true">·</span>}
-          <a class="pub-textlink" href={l.href}>{l.label}</a>
-        </>
+          <a class="esy-invite__more-link" href={l.href}><span class="pub-textlink">{l.label}</span></a>
+        </span>
       ))}
     </p>
   )}
@@ -120,10 +120,28 @@ const freeNote =
   .esy-invite__reassure + .esy-invite__reassure {
     margin-top: 0.15rem;
   }
+  /* Each link is a 44px target around the unchanged text link; the margins take
+     back the height it adds to the line. */
   .esy-invite__more {
-    margin: 1.4rem 0 0;
+    margin: calc(1.4rem - 8px) 0 -8px;
     font-size: var(--text-sm);
     line-height: 2;
+  }
+  /* A separator travels with the link after it, so a wrapped line never ends on one. */
+  .esy-invite__more-item {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .esy-invite__more-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .esy-invite__more-link:hover .pub-textlink,
+  .esy-invite__more-link:focus-visible .pub-textlink {
+    color: var(--gold-hover);
+    border-bottom-color: var(--gold-hover);
   }
   .esy-invite__sep {
     color: var(--text-tertiary);
