@@ -9,7 +9,6 @@ import {
   agoraCosmicaSchema,
   organizationSchema,
   webSiteSchema,
-  softwareApplicationSchema,
   faqSchema,
   breadcrumbSchema,
 } from '../../lib/schemas';
@@ -35,7 +34,6 @@ const faq = [
     agoraCosmicaSchema(),
     organizationSchema(),
     webSiteSchema(),
-    softwareApplicationSchema(),
     faqSchema(faq, canonical),
     breadcrumbSchema([
       { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
