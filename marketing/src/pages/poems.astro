@@ -5,11 +5,14 @@
 
 import Public from '../layouts/Public.astro';
 import Breadcrumbs from '../components/Breadcrumbs.astro';
+import BackLink from '../components/BackLink.astro';
 import { breadcrumbSchema } from '../lib/schemas';
-import { canonicalUrl, SITE_URL } from '../lib/urls';
+import { canonicalUrl, SITE_URL, figureListUrl } from '../lib/urls';
+import { getT } from '../i18n';
 import { poems, poemSections, poets, POEM_PAGES_INDEXABLE } from '../data/poems/index.mjs';
 
 const lang = 'en' as const;
+const t = getT(lang);
 const PAGE_PATH = '/poems';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -64,6 +67,7 @@ const schemas = [
 >
   <div class="pub-content pi">
     <Breadcrumbs lang={lang} items={[{ label: 'Poems' }]} />
+    <BackLink at="top" href={figureListUrl(lang)} label={t('nav.allFigures')} />
 
     <header class="pi-hero">
       <p class="pi-hero__eyebrow">In their own words</p>
@@ -99,9 +103,7 @@ const schemas = [
       </section>
     ))}
 
-    <p class="pi-more">
-      <a class="pub-textlink" href="/#all">Browse the figures</a>
-    </p>
+    <BackLink at="end" href={figureListUrl(lang)} label={t('nav.allFigures')} />
   </div>
 </Public>
 
@@ -235,13 +237,6 @@ const schemas = [
     font-size: var(--text-sm);
     color: var(--text-secondary);
     margin-top: 0.25rem;
-  }
-
-  .pi-more {
-    margin: 2.5rem 0 0;
-    padding-top: 1.5rem;
-    border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
-    font-size: var(--text-sm);
   }
 
   @media (max-width: 560px) {

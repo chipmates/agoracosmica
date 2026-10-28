@@ -15,6 +15,7 @@
 // #kontakt in German, and both ids resolve in both languages so an old or a
 // cross-language link still lands. /impressum keeps the legal duty.
 import Breadcrumbs from './Breadcrumbs.astro';
+import BackLink from './BackLink.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
@@ -85,6 +86,7 @@ const museum = isDe
 ---
 <div class="pub-content pub-about">
   <Breadcrumbs lang={lang} items={[{ label: t('breadcrumbs.about') }]} />
+  <BackLink at="top" href={publicUrl(lang, '/')} label={t('breadcrumbs.home')} />
 
   <h1 class="pub-hero__title">{t('about.h1')}</h1>
   <p class="pub-about-lead">{t('about.mission')}</p>
@@ -226,6 +228,7 @@ const museum = isDe
     <blockquote>{t('about.closingQuote')}</blockquote>
     <cite class="pub-about-quote__cite">— {t('about.closingAttribution')}</cite>
   </div>
+  <BackLink at="end" href={publicUrl(lang, '/')} label={t('breadcrumbs.home')} />
 
 </div>
 

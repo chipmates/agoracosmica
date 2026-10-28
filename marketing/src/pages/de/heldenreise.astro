@@ -12,14 +12,17 @@ import PlayerHead from '../../components/player/PlayerHead.astro';
 import PlayerDock from '../../components/player/PlayerDock.astro';
 import { isStoryCompanionPath } from '../../player/pages';
 import Breadcrumbs from '../../components/Breadcrumbs.astro';
+import BackLink from '../../components/BackLink.astro';
 import EssayStyles from '../../components/EssayStyles.astro';
 import EssayInvite from '../../components/EssayInvite.astro';
 import AiLabel from '../../components/AiLabel.astro';
 import { figureImage } from '../../lib/figureImages';
 import { articleSchema, breadcrumbSchema, faqSchema } from '../../lib/schemas';
-import { canonicalUrl, SITE_URL } from '../../lib/urls';
+import { canonicalUrl, SITE_URL, figureListUrl } from '../../lib/urls';
+import { getT } from '../../i18n';
 
 const lang = 'de' as const;
+const t = getT(lang);
 const PAGE_PATH = '/de/heldenreise';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -157,6 +160,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
   <EssayStyles />
   <div class="pub-content esy">
     <Breadcrumbs lang={lang} items={[{ label: 'Die Heldenreise' }]} />
+    <BackLink at="top" href={figureListUrl(lang)} label={t('nav.allFigures')} />
 
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">Ein Muster, tausend Gestalten</p>
@@ -312,5 +316,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         uns.
       </p>
     </footer>
+    <BackLink at="end" href={figureListUrl(lang)} label={t('nav.allFigures')} />
   </div>
 </Public>
