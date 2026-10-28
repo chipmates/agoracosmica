@@ -24,12 +24,14 @@
   <a href="CHANGELOG.md">Changelog</a>
 </p>
 
-Thirty figures across 2,500 years. Each has twelve narrated chapters of their life, twelve teachings to talk through, and an Echo to talk to, even mid-chapter.
+> **Agora Cosmica now focuses on its short stories about life. The chat has ended.** The sections below on the modes, the Echo's answers and the free tier describe the chat as it ran. Its code stays in this repository until it is removed.
+
+Thirty figures across 2,500 years, each with twelve narrated chapters of their life.
 
 <p align="center">
   <a href="https://agoracosmica.org"><img src=".github/assets/demo.webp" alt="Agora Cosmica in use: the figure gallery, Marcus Aurelius chosen and his chapter rail, a story chapter playing, the chapter paused with a typed question and the Echo's answer, then a council of four convened" width="100%" /></a><br/>
-  <sub>Listen to a life. Pause when a question comes up. Hear the Echo answer, then pick up the story.</sub><br/>
-  <sub><a href="https://agoracosmica.org">agoracosmica.org</a>: 30 free messages a day, no account, English or German.</sub>
+  <sub>The app as it was until the chat ended: a life told in chapters, with questions to the Echo along the way.</sub><br/>
+  <sub><a href="https://agoracosmica.org">agoracosmica.org</a>: no account, English or German.</sub>
 </p>
 
 The figures run from Laozi to Martin Luther King Jr. The voice that answers is an AI Echo, an interpretation grounded in primary works and historical context, and the app labels it as one throughout. A factcheck per figure separates what is documented from what is recreated.
