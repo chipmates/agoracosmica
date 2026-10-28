@@ -248,6 +248,8 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
     if (at.some(([x, y], j) => j !== i && toPoint(a, x, y) - 20 <= own)) bad++;
     const others = [...numberBox.filter((b, j): b is Box => !!b && j !== i), ...(nameBox && i !== introAt ? [nameBox] : [])];
     for (const b of others) if (hits(a, grow(b, 4.5, 13.5)) || gap(a, b) <= own + 0.5) bad++;
+    // its own number keeps the same figure beside and line above and below
+    if (numberBox[i] && hits(a, grow(numberBox[i]!, 4.5, 13.5))) bad++;
     return bad;
   };
   const tagBox = (i: number, c: Spot): Box => {
@@ -351,6 +353,9 @@ const r1 = (v: number) => Math.round(v * 10) / 10;
 // A star's tap area (r 25) stops halfway to its nearest neighbour, so where stars stand close (a ladder) each
 // star is still tapped at its own centre rather than under the next star's area.
 const hitR = at.map(([x, y], i) => Math.min(25, ...at.filter((_, j) => j !== i).map(([u, v]) => Math.floor(Math.hypot(u - x, v - y) * 5) / 10)));
+// Where a star's rings (outer edge r 24.5 with its stroke) reach into a neighbour's tap area, the rings take no
+// press, so a press inside a star's own area opens that star (a crowded pattern, stars under 49 units apart).
+const ringsReach = at.some(([x, y], i) => at.some(([u, v], j) => j !== i && Math.hypot(u - x, v - y) - hitR[j]! < 24.5));
 
 // The app's graticule (three arcs, two bent meridians) and its via sapientiae, for this plate.
 const grat = [
@@ -389,7 +394,7 @@ const mapNoteLoose = lang === 'de'
             <a class:list={['sp-star', n === 0 && 'sp-star--intro']} href={`#story-${n}`} data-story-star={n}
               aria-label={P.rowAria(n, n === 0 ? P.introTitle : title(n), [])}>
               <circle class="sp-star__hit" cx={r1(cx)} cy={r1(cy)} r={hitR[i]! >= 25 ? '25' : String(hitR[i])} />
-              <g class="sp-star__orn" transform={`translate(${r1(cx)} ${r1(cy)})`}>
+              <g class="sp-star__orn" transform={`translate(${r1(cx)} ${r1(cy)})`} pointer-events={ringsReach ? 'none' : undefined}>
                 <circle class="sp-star__sel" r="16" />
                 <circle class="sp-star__track" r="20" />
                 <circle class="sp-star__arc" r="20" pathLength="100" data-star-arc transform="rotate(-90)" />
