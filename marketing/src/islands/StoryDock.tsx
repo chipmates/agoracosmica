@@ -296,11 +296,34 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   // land after a paint in Chromium, which showed the pages for a frame first.
   const noteDue = storyKey !== null && noteKey !== storyKey && !noteShown();
   const voiceOn = storyKey !== null && quietKey !== storyKey && (noteKey === storyKey || noteDue);
+  // The note closes on a second tap, Escape, a tap anywhere else, a scroll of the page or the text, and a page change.
+  // The text's own scrolls that follow the voice are not the visitor's: there the gesture closes it.
   useEffect(() => {
     if (!noteOpen) return;
-    const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setNoteOpen(false); };
-    document.addEventListener('keydown', close);
-    return () => document.removeEventListener('keydown', close);
+    const close = () => setNoteOpen(false);
+    const inside = (t: EventTarget | null) => t instanceof Element && !!t.closest('#story-dock-note, .story-dock__who');
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') close(); };
+    const onDown = (e: PointerEvent) => { if (!inside(e.target)) close(); };
+    const onGesture = (e: Event) => { if (!inside(e.target)) close(); };
+    const onScroll = (e: Event) => {
+      const t = e.target;
+      if (t instanceof Element && t.classList.contains('story-reader__scroll') && !getState().away) return;
+      if (!inside(t)) close();
+    };
+    document.addEventListener('keydown', onKey);
+    document.addEventListener('pointerdown', onDown, true);
+    document.addEventListener('wheel', onGesture, { capture: true, passive: true });
+    document.addEventListener('touchmove', onGesture, { capture: true, passive: true });
+    document.addEventListener('scroll', onScroll, { capture: true, passive: true });
+    document.addEventListener('astro:before-swap', close);
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.removeEventListener('pointerdown', onDown, true);
+      document.removeEventListener('wheel', onGesture, true);
+      document.removeEventListener('touchmove', onGesture, true);
+      document.removeEventListener('scroll', onScroll, true);
+      document.removeEventListener('astro:before-swap', close);
+    };
   }, [noteOpen]);
 
   // The line names the figure by its short name, the story's number after it (the introduction has none). Where the
