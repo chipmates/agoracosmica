@@ -7,7 +7,10 @@ import Stage from '../../Stage.astro';
 import FigureDescent from '../../../components/FigureDescent.astro';
 import { landingWords } from '../../words';
 import { portraitAlt } from '../../../lib/portraitCredit';
-import { byEra, DEFAULT_FIGURE, THIRTY, thumbSrcset, thumbUrl } from '../../thirty';
+import { figureListUrl } from '../../../lib/urls';
+import { getT } from '../../../i18n';
+import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
+import { byEra, DEFAULT_FIGURE, figure, THIRTY, thumbSrcset, thumbUrl } from '../../thirty';
 import type { LandingLang } from '../../thirty';
 import './c2.css';
 
@@ -34,6 +37,19 @@ const nextName = THIRTY[(at + 1) % THIRTY.length]?.name[lang] ?? '';
 const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ?? '';
 // The descent's anchor: the old figure list's addresses forward here (_redirects).
 const listId = lang === 'de' ? 'alle' : 'all';
+// A desktop's single row of faces, as the earlier front drew it: its nineteen per language, ranked by search demand;
+// the row drops the lowest ranks where the width runs out (c2.css) and keeps the catalog's order on screen.
+const ROW_RANK: Record<LandingLang, string[]> = {
+  en: ['aurelius', 'jung', 'kahlo', 'nietzsche', 'gautama', 'dickinson', 'rumi', 'laozi', 'einstein', 'lovelace',
+    'shakespeare', 'vinci', 'angelou', 'tubman', 'king', 'campbell', 'schopenhauer', 'woolf', 'plato'],
+  de: ['aurelius', 'jung', 'nietzsche', 'goethe', 'eckhart', 'bingen', 'schopenhauer', 'kahlo', 'einstein', 'gautama',
+    'laozi', 'rumi', 'dickinson', 'mozart', 'beauvoir', 'shakespeare', 'vinci', 'campbell', 'king'],
+};
+const row = getFiguresCatalog(lang)
+  .map(c => c.id)
+  .filter(id => ROW_RANK[lang].includes(id))
+  .map(id => ({ f: figure(id), rank: ROW_RANK[lang].indexOf(id) }));
+const t = getT(lang);
 ---
 <div class="c2">
   <section class="c2-hero" data-c2-hero aria-labelledby="c2-h1">
@@ -95,6 +111,35 @@ const listId = lang === 'de' ? 'alle' : 'all';
               </li>
             ))}
           </ol>
+          {/* a desktop: one row of faces and the way to all thirty at its end (the era row above is the phone's) */}
+          <div class="c2-row">
+            <ol class="c2-row__faces">
+              {row.map(({ f, rank }) => (
+                <li data-rank={rank}>
+                  <a
+                    class="c2-pick"
+                    href={f.href[lang]}
+                    title={f.name[lang]}
+                    data-landing-pick={f.id}
+                    data-c2-from="row"
+                    aria-current={f.id === DEFAULT_FIGURE ? 'true' : undefined}
+                  >
+                    <img
+                      src={thumbUrl(f.id, 160)}
+                      srcset={thumbSrcset(f.id)}
+                      sizes="48px"
+                      alt={portraitAlt(f.name[lang], lang)}
+                      width="48"
+                      height="48"
+                      loading="lazy"
+                      decoding="async"
+                    />
+                  </a>
+                </li>
+              ))}
+            </ol>
+            <a class="c2-row__all" href={figureListUrl(lang)}>{t('nav.allFigures')}</a>
+          </div>
         </div>
       </nav>
     </div>

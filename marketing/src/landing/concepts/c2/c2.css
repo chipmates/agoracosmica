@@ -275,7 +275,9 @@
   .c2-pick { width: 68px; }
 }
 
-/* ---- a desktop: the words left, the whole painting in a framed plate beside them, the thirty under both ------ */
+/* ---- a desktop: the words left, the whole painting in a framed plate beside them, one row of faces under both --- */
+/* the row is a desktop's; a phone keeps its row by era */
+.c2-row { display: none; }
 @media (min-width: 1024px) {
   .c2-hero {
     margin-top: -0.75rem;
@@ -353,11 +355,76 @@
   .c2-hero .ls-plate-wrap { margin-top: 1.25rem; }
   .c2-rail__lead { margin: 0 0 6px; font-size: 1rem; }
   .c2-rail__scroll { overflow: visible; padding: 0; }
-  .c2-rail__eras { flex-wrap: wrap; width: auto; row-gap: 4px; column-gap: 8px; }
-  .c2-rail__eraname { padding-top: 5px; }
-  .c2-pick { width: auto; min-width: 64px; padding: 4px 4px 2px; gap: 4px; }
-  .c2-pick img { width: 50px; height: 50px; }
+  .c2-rail__eras { display: none; }
+
+  /* ---- one row of faces, as many as the width holds, the way to all thirty at its end ---- */
+  .c2-row { display: flex; align-items: center; gap: 24px; }
+  .c2-row__faces {
+    container: c2row / inline-size;
+    flex: 1 1 auto;
+    min-width: 0;
+    display: flex;
+    justify-content: space-between;
+    margin: 0;
+    padding: 6px 0;
+    list-style: none;
+  }
+  .c2-row .c2-pick {
+    display: block;
+    width: 48px;
+    height: 48px;
+    min-height: 0;
+    padding: 0;
+    border-radius: 50%;
+  }
+  .c2-row .c2-pick img {
+    width: 48px;
+    height: 48px;
+    filter: saturate(0.62) brightness(0.82);
+    transition: filter 0.22s ease, transform 0.22s ease, box-shadow 0.22s ease;
+  }
+  .c2-row .c2-pick:hover img { filter: none; transform: translateY(-2px); }
+  .c2-row .c2-pick[aria-current="true"] img { filter: none; }
+  .c2-row .c2-pick:focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 3px; }
+  .c2-row__all {
+    flex: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    min-height: 44px;
+    font-family: var(--font-ui);
+    font-size: 0.9375rem;
+    font-weight: 600;
+    color: var(--sp-accent);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+  .c2-row__all::after {
+    content: '';
+    width: 7px;
+    height: 7px;
+    border-top: 2px solid currentColor;
+    border-right: 2px solid currentColor;
+    transform: rotate(45deg);
+  }
+  .c2-row__all:hover { color: var(--sp-n-gold-hover); text-decoration: underline; text-underline-offset: 4px; }
+  .c2-row__all:focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 4px; border-radius: 4px; }
 }
+@media (min-width: 1024px) and (prefers-reduced-motion: reduce) {
+  .c2-row .c2-pick:hover img { transform: none; }
+}
+/* each face needs 48 px and a 10 px gap: under n faces' width the n-th rank leaves */
+@container c2row (max-width: 1091.98px) { .c2-row__faces > li[data-rank="18"] { display: none; } }
+@container c2row (max-width: 1033.98px) { .c2-row__faces > li[data-rank="17"] { display: none; } }
+@container c2row (max-width: 975.98px) { .c2-row__faces > li[data-rank="16"] { display: none; } }
+@container c2row (max-width: 917.98px) { .c2-row__faces > li[data-rank="15"] { display: none; } }
+@container c2row (max-width: 859.98px) { .c2-row__faces > li[data-rank="14"] { display: none; } }
+@container c2row (max-width: 801.98px) { .c2-row__faces > li[data-rank="13"] { display: none; } }
+@container c2row (max-width: 743.98px) { .c2-row__faces > li[data-rank="12"] { display: none; } }
+@container c2row (max-width: 685.98px) { .c2-row__faces > li[data-rank="11"] { display: none; } }
+@container c2row (max-width: 627.98px) { .c2-row__faces > li[data-rank="10"] { display: none; } }
+@container c2row (max-width: 569.98px) { .c2-row__faces > li[data-rank="9"] { display: none; } }
+@container c2row (max-width: 511.98px) { .c2-row__faces > li[data-rank="8"] { display: none; } }
 
 /* ---- the footer: the landing's carries a fourth group (the explainers), so four columns where the site has three -- */
 @media (min-width: 641px) {
