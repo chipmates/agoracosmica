@@ -55,7 +55,6 @@ const words: LandingWords = {
     steam: 'Steam and Ink',
     modern: 'Modern Voices',
   },
-  listHeading: 'All thirty, by era',
   chatEnded: 'Agora Cosmica now focuses on its short stories about life. The chat has ended.',
   close: 'Close',
   explainers: [

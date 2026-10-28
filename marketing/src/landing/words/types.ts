@@ -27,8 +27,6 @@ export interface LandingWords {
   stageTitle: (name: string) => string;
   /** One name per era, by the era's id, oldest age first in a compound name; the same in the row and the list. */
   eras: Record<string, string>;
-  /** The heading over the thirty by era, as plain links. */
-  listHeading: string;
   /** The one line a visitor forwarded from the ended chat's address sees, and its close button's name. */
   chatEnded: string;
   close: string;

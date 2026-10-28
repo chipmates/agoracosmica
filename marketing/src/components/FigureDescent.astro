@@ -1,7 +1,7 @@
 ---
-// The era descent under the /figures orbit hero: a sticky era bar with six
-// anchors (five bands plus the alphabet), then the five bands themselves,
-// newest birth year first. Every anchor, link and word is server rendered, so
+// The era descent on the front, under the hero: a sticky era bar with five
+// anchors, then the five bands, newest birth year first, each portrait a link
+// to that figure's page. Every anchor, link and word is server rendered, so
 // the whole thing works with JS off. The one script sets the active chip, the
 // depth readout and the gauge.
 //
@@ -12,17 +12,19 @@
 
 import { getFiguresCatalog } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { getHeroEntryQuestion } from '@client/data/public/heroEntry';
 import { figureImage, figureSrcset } from '../lib/figureImages';
 import { publicUrl } from '../lib/urls';
 import { portraitAlt } from '../lib/portraitCredit';
-import PortraitCredit from './PortraitCredit.astro';
 import { STRATA, LIFE_YEARS, getStrataUi } from './figureStrata';
 import type { Lang } from '../i18n';
 import './figures-index.css';
 
-interface Props { lang: Lang; }
-const { lang } = Astro.props;
+interface Props {
+  lang: Lang;
+  /** The section's anchor: the old /figures/ addresses land here. */
+  anchor?: string;
+}
+const { lang, anchor } = Astro.props;
 const ui = getStrataUi(lang);
 const byId = new Map(getFiguresCatalog(lang).map(f => [f.id, f]));
 
@@ -36,14 +38,10 @@ const floorLine = lang === 'de'
 
 const bands = STRATA.map(s => {
   const copy = s[lang];
-  const doorFigure = byId.get(s.door);
   return {
     id: s.id,
     num: s.num,
     ...copy,
-    question: getHeroEntryQuestion(s.door, lang) ?? '',
-    doorName: doorFigure ? doorFigure.name : s.door,
-    doorHref: `/app?figure=${figureIdToSlug[s.door]}&lang=${lang}&ask=f:${s.door}:1`,
     people: s.figures.map(id => {
       const f = byId.get(id);
       return {
@@ -59,9 +57,8 @@ const bands = STRATA.map(s => {
     }),
   };
 });
-
-const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
 ---
+<section class="fx-front" id={anchor} aria-labelledby="fx-front-h">
 <nav class="fx-bar" id="fx-bar" aria-label={ui.navAria}>
   <div class="fx-bar__inner">
     <span class="fx-bar__label">{ui.navLabel}</span>
@@ -73,9 +70,6 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
           </a>
         </li>
       ))}
-      <li>
-        <a class="fx-bar__link fx-bar__link--az" href="#a-z" data-span={ui.azLabel}>{ui.azLabel}</a>
-      </li>
     </ul>
     <p class="fx-bar__depth">
       <span>{ui.depthLabel}</span>
@@ -88,7 +82,7 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
 <div class="fx-descent" id="fx-descent">
   <div class="fx-wrap">
     <div class="fx-intro">
-      <p class="fx-eyebrow">{ui.descentHeading}</p>
+      <p class="fx-eyebrow" id="fx-front-h">{ui.descentHeading}</p>
       <p class="fx-intro__text">{intro}</p>
     </div>
 
@@ -100,19 +94,6 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
           <p class="fx-span">{b.span}</p>
           <p class="fx-caption">{b.caption}</p>
           <p class="fx-era">{b.era}</p>
-          {b.question && (
-            <div class="fx-door">
-              <p class="fx-door__lead">{ui.doorLead}</p>
-              <p class="fx-door__q">{b.question}</p>
-              <a
-                class="fx-door__cta"
-                href={b.doorHref}
-                data-agc-cta="start-exploring"
-                data-agc-door={`figures_era_${b.id}`}
-              >{ui.doorCta}</a>
-              <span class="fx-door__who">{askLabel} {b.doorName}</span>
-            </div>
-          )}
         </div>
 
         <div class="fx-voices">
@@ -121,20 +102,17 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
             {b.people.map(p => (
               <li>
                 <a class="fx-voice" href={p.href}>
-                  <span class="ai-portrait">
-                    <span class="fx-voice__face">
-                      <img
-                        src={p.src}
-                        srcset={p.srcset}
-                        sizes="56px"
-                        alt={portraitAlt(p.name, lang)}
-                        width="160"
-                        height="160"
-                        loading="lazy"
-                        decoding="async"
-                      />
-                    </span>
-                    <PortraitCredit lang={lang} />
+                  <span class="fx-voice__face">
+                    <img
+                      src={p.src}
+                      srcset={p.srcset}
+                      sizes="56px"
+                      alt={portraitAlt(p.name, lang)}
+                      width="160"
+                      height="160"
+                      loading="lazy"
+                      decoding="async"
+                    />
                   </span>
                   <span>
                     <span class="fx-voice__name">{p.name}</span>
@@ -151,72 +129,5 @@ const askLabel = lang === 'de' ? 'Frage an' : 'Ask';
   </div>
   <p class="fx-floor">{floorLine}</p>
 </div>
+</section>
 
-<script>
-  // Era bar enhancement: active band, depth readout, descent gauge. Everything
-  // it touches is already correct without it.
-  const bar = document.getElementById('fx-bar');
-  const descent = document.getElementById('fx-descent');
-  const depth = document.getElementById('fx-depth');
-  const gaugeFill = document.querySelector<HTMLElement>('.fx-bar__gauge span');
-  const links = Array.from(document.querySelectorAll<HTMLAnchorElement>('.fx-bar__link'));
-
-  if (bar && descent && links.length) {
-    const surface = depth ? depth.textContent : '';
-    const sections = links
-      .map(link => ({ link, el: document.getElementById(link.hash.slice(1)) }))
-      .filter((s): s is { link: HTMLAnchorElement; el: HTMLElement } => !!s.el);
-    const closers = document.getElementById('fx-closers');
-    let ticking = false;
-
-    const apply = () => {
-      ticking = false;
-      const line = bar.getBoundingClientRect().bottom + 32;
-
-      let active: (typeof sections)[number] | null = null;
-      for (const s of sections) {
-        if (s.el.getBoundingClientRect().top <= line) active = s;
-      }
-      const changed = active ? !active.link.hasAttribute('aria-current') : false;
-      for (const s of sections) {
-        if (s === active) s.link.setAttribute('aria-current', 'true');
-        else s.link.removeAttribute('aria-current');
-      }
-      if (depth) depth.textContent = active ? (active.link.dataset.span || '') : surface;
-
-      // narrow screens scroll the chip row, so keep the live band in view
-      const list = bar.querySelector<HTMLElement>('.fx-bar__list');
-      if (changed && active && list && list.scrollWidth > list.clientWidth + 4) {
-        list.scrollTo({
-          left: active.link.offsetLeft - list.clientWidth / 2 + active.link.offsetWidth / 2,
-          behavior: 'smooth',
-        });
-      }
-
-      if (gaugeFill) {
-        const box = descent.getBoundingClientRect();
-        const run = box.height - window.innerHeight * 0.5;
-        const done = run > 0 ? (line - box.top) / run : 0;
-        gaugeFill.parentElement?.style.setProperty(
-          '--fx-progress',
-          String(Math.min(1, Math.max(0, done))),
-        );
-      }
-
-      // the bar has no job once the closing blocks start
-      if (closers) {
-        bar.classList.toggle('is-off', closers.getBoundingClientRect().top <= line);
-      }
-    };
-
-    const onScroll = () => {
-      if (!ticking) {
-        ticking = true;
-        requestAnimationFrame(apply);
-      }
-    };
-    window.addEventListener('scroll', onScroll, { passive: true });
-    window.addEventListener('resize', onScroll, { passive: true });
-    apply();
-  }
-</script>

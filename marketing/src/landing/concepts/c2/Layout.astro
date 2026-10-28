@@ -1,8 +1,9 @@
 ---
 // Concept 2, the full face: the painting fills the first screen, the tagline, the name block, the label and the plate
 // sit on its dark foot, the thirty run under it. The stage is the base's (moment off: c2.ts runs it, so the tagline
-// over the painting stays as clear as the name). Below: the words, then the thirty by era as plain links.
+// over the painting stays as clear as the name). Below: the words, then the era descent with the thirty's portraits.
 import Stage from '../../Stage.astro';
+import FigureDescent from '../../../components/FigureDescent.astro';
 import { landingWords } from '../../words';
 import { portraitAlt } from '../../../lib/portraitCredit';
 import { byEra, DEFAULT_FIGURE, THIRTY, thumbSrcset, thumbUrl } from '../../thirty';
@@ -30,7 +31,7 @@ const leadParts = W.lead.split(/(?<=,)\s+/);
 const at = THIRTY.findIndex(f => f.id === DEFAULT_FIGURE);
 const nextName = THIRTY[(at + 1) % THIRTY.length]?.name[lang] ?? '';
 const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ?? '';
-// The list's anchor: the old figure list's addresses forward here (_redirects).
+// The descent's anchor: the old figure list's addresses forward here (_redirects).
 const listId = lang === 'de' ? 'alle' : 'all';
 ---
 <div class="c2">
@@ -98,24 +99,12 @@ const listId = lang === 'de' ? 'alle' : 'all';
     </div>
   </section>
 
-  <section class="c2-index" id={listId} aria-labelledby="c2-index-h">
-    <h2 class="c2-index__h" id="c2-index-h">{W.listHeading}</h2>
-    {eras.map(({ era, figures }) => (
-      <div class="c2-index__era">
-        <h3 class="c2-index__eraname">{era.name[lang]}, <span>{era.span[lang]}</span></h3>
-        <ul class="c2-index__list">
-          {figures.map(f => (
-            <li>
-              <a class="c2-index__link" href={f.href[lang]} data-landing-pick={f.id} data-c2-from="index">{f.name[lang]}</a>
-            </li>
-          ))}
-        </ul>
-      </div>
-    ))}
-  </section>
+  <FigureDescent lang={lang} anchor={listId} />
 </div>
 
 <script>
   import { installC2 } from './c2';
+  import { installDescent } from '../../../components/figureDescent';
   installC2();
+  installDescent();
 </script>

@@ -55,7 +55,6 @@ const words: LandingWords = {
     steam: 'Dampf und Tinte',
     modern: 'Moderne Stimmen',
   },
-  listHeading: 'Alle dreißig, nach Epochen',
   chatEnded: 'Agora Cosmica konzentriert sich jetzt ganz auf die kurzen Geschichten übers Leben. Den Chat gibt es nicht mehr.',
   close: 'Schließen',
   explainers: [
