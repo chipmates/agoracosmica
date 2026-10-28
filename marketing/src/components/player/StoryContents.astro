@@ -26,11 +26,12 @@ const P = playerStrings(lang);
 const W = factWords(lang);
 const stories = queue.entries.filter(e => e.n > 0);
 
-// One era for the whole life drops out of the year column; the hero's dates
-// and each row's spoken name carry it.
-const ERAS = [' AD', ' n. Chr.', ' BCE', ' BC', ' v. Chr.'];
+// One AD era for the whole life drops out of the year column; the hero's dates
+// and each row's spoken name carry it. An era before Christ stays on every row:
+// those years count down.
+const ERAS = [' AD', ' n. Chr.'];
 const era = ERAS.find(e => stories.length > 0 && stories.every(r => !/\d/.test(r.year ?? '') || (r.year ?? '').endsWith(e)));
-const yearShown = (year: string | undefined) => (year ? (era ? year.slice(0, -era.length) : year) : '');
+const yearShown = (year: string | undefined) => (year ? (era && year.endsWith(era) ? year.slice(0, -era.length) : year) : '');
 const de = lang === 'de';
 // Build-time words of the contents (placeholders for the writer, kept out of strings.ts: a change there renames a
 // chunk every page of the site loads). Where the stories' years do not follow the life's order, the lead names none.
