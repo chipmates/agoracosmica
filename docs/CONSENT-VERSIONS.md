@@ -15,11 +15,13 @@ Dates are commit dates from this repository's history. A version reaches visitor
 
 Written on 2026-10-14.
 
-**How it is shown.** At once on the landing page, and only there. A card fixed to the foot of the screen: full width on upright phones, a corner card on wide screens, centred in between. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. On short screens (at most 700 px high, phones turned sideways too) the fine print stands before the lead. Same words. The question, the age line, both answers, the links and the X stay in view. On phones, upright or turned sideways, the plate is opaque.
+**When it is asked.** From 14 October: at once on the landing page, and only there. Changed on 2026-10-26, with the same words and version, so earlier answers stand: no longer on arrival. On a figure's story page the card comes once a minute of a story has been heard, counting only audio that ran (a skip does not count). On a poem page it comes once the poem's last line is in view and the poem has had time to be read: two seconds a line, at least 8 and at most 45 seconds of the page in view. On any other page nobody is asked and the click ID is dropped at once. It asks once per visit.
+
+**How it is shown.** A card fixed to the foot of the screen: full width on upright phones, a corner card on wide screens, centred in between. It dims nothing, locks no scroll and traps no focus. On a short screen it takes at most about 55% of the height. The words scroll inside it. On short screens (at most 700 px high, phones turned sideways too) the fine print stands before the lead. Same words. The question, the age line, both answers, the links and the X stay in view. On phones, upright or turned sideways, the plate is opaque. On a story page it stands just above the player's dock and never covers it.
 
 **The X** (new). A no for this visit: the click ID is discarded, nothing is stored, nothing is sent to Google. It is not remembered, so the next arrival from an ad is asked again. Its accessible name: "Schließen. Das zählt als Nein." / "Close. This counts as no."
 
-**After any answer** (new) the click ID leaves the address bar. The `gclid` key stays, empty, so the anonymous source count still sees a reload as an arrival from an ad.
+**After any answer** (new) the click ID leaves the address bar. The `gclid` key stays, empty, so the anonymous source count still sees a reload as an arrival from an ad. From 2026-10-26 it leaves on arrival, before any answer, and waits in the page's memory until the card comes. A reload before then finds no click ID, so that visit is not asked.
 
 **What it says**, German:
 
