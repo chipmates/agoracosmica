@@ -1,7 +1,8 @@
 // The full face turns like a page: a sideways swipe on the hero, the two arrow buttons, or the arrow keys while focus
 // is in the hero put the next or previous of the thirty on the stage (era order, wrapping at the ends). The surface
-// keeps the browser's vertical pan (touch-action in c2.css), so the browser decides a vertical scroll and cancels our
-// pointer; a sideways start that ends mostly vertical is refused at release. A swipe never reaches the plate's click.
+// keeps the browser's vertical pan (touch-action in c2.css): a vertical start is the page's scroll, a sideways one is
+// held from the page's pan, and a sideways start that ends mostly vertical is refused at release. A swipe never
+// reaches the plate's click.
 
 import { stageFigureId, stageFigures, swapStage } from '../../stage';
 import { momentStill } from '../../dust';
@@ -23,7 +24,6 @@ type Dir = 1 | -1;
 
 interface Drag {
   id: number;
-  el: Element;
   x0: number;
   y0: number;
   t0: number;
@@ -135,48 +135,76 @@ export function turn(dir: Dir): boolean {
 }
 
 // ---- touch ----------------------------------------------------------------------------
+// Touch events, not pointer events: iOS lets the page's own pan begin on a sideways swipe's vertical drift (pan-y
+// allows it) and then cancels the pointer. A touch stream is not cut off that way, and a cancelled touchmove holds
+// that pan back.
 
-function onDown(e: PointerEvent): void {
-  if (e.pointerType === 'mouse' || !e.isPrimary || turning) return;
-  const target = e.target instanceof Element ? e.target : null;
-  if (!target || target.closest('[data-c2-rail]')) return;
-  const el = hero();
-  if (!el) return;
-  // a finger on the face, not on a control: a tap on the plate keeps the network for its story
-  if (!target.closest('a, button, summary')) warm(0);
-  drag = { id: e.pointerId, el, x0: e.clientX, y0: e.clientY, t0: e.timeStamp, axis: 'none', dx: 0, dy: 0, lastX: e.clientX, lastT: e.timeStamp, speed: 0 };
+/** A clear sideways lead inside the slop already holds the page's pan back (a vertical start never meets it). */
+const LEAD_MIN = 4;
+const LEAD = 2;
+
+function touchOf(e: TouchEvent, id: number): Touch | null {
+  for (const t of Array.from(e.changedTouches)) if (t.identifier === id) return t;
+  return null;
 }
 
-function onMove(e: PointerEvent): void {
+function release(): void {
+  const was = drag?.axis;
+  drag = null;
+  if (was === 'x') setMat(0, 1, momentStill() ? 0 : BACK_MS);
+}
+
+function onTouchStart(e: TouchEvent): void {
+  // a new touch is a new gesture: only the click left over from a swipe is swallowed
+  swallowUntil = 0;
+  // a second finger is a pinch, never a turn
+  if (e.touches.length > 1) {
+    release();
+    return;
+  }
+  drag = null;
+  const t = e.changedTouches[0];
+  const target = e.target instanceof Element ? e.target : null;
+  if (!t || turning || !target || target.closest('[data-c2-rail]') || !hero()) return;
+  // a finger on the face, not on a control: a tap on the plate keeps the network for its story
+  if (!target.closest('a, button, summary')) warm(0);
+  drag = { id: t.identifier, x0: t.clientX, y0: t.clientY, t0: e.timeStamp, axis: 'none', dx: 0, dy: 0, lastX: t.clientX, lastT: e.timeStamp, speed: 0 };
+}
+
+function onTouchMove(e: TouchEvent): void {
   const d = drag;
-  if (!d || e.pointerId !== d.id) return;
-  d.dx = e.clientX - d.x0;
-  d.dy = e.clientY - d.y0;
+  if (!d) return;
+  if (e.touches.length > 1) {
+    release();
+    return;
+  }
+  const t = touchOf(e, d.id);
+  if (!t) return;
+  d.dx = t.clientX - d.x0;
+  d.dy = t.clientY - d.y0;
   const dt = e.timeStamp - d.lastT;
-  if (dt > 0) d.speed = (e.clientX - d.lastX) / dt;
-  d.lastX = e.clientX;
+  if (dt > 0) d.speed = (t.clientX - d.lastX) / dt;
+  d.lastX = t.clientX;
   d.lastT = e.timeStamp;
   if (d.axis === 'none') {
-    if (Math.abs(d.dx) < SLOP && Math.abs(d.dy) < SLOP) return;
+    if (Math.abs(d.dx) < SLOP && Math.abs(d.dy) < SLOP) {
+      if (e.cancelable && Math.abs(d.dx) >= LEAD_MIN && Math.abs(d.dx) > Math.abs(d.dy) * LEAD) e.preventDefault();
+      return;
+    }
     d.axis = Math.abs(d.dx) > Math.abs(d.dy) * AXIS ? 'x' : 'y';
     if (d.axis === 'y') {
       drag = null;
       return;
     }
-    try {
-      d.el.setPointerCapture(d.id);
-    } catch {
-      // a synthetic or already released pointer
-    }
   }
-  if (d.axis !== 'x') return;
+  if (e.cancelable) e.preventDefault();
   const width = mat()?.getBoundingClientRect().width || window.innerWidth;
   setMat(d.dx, 1 - Math.min(0.55, Math.abs(d.dx) / width), 0);
 }
 
-function onUp(e: PointerEvent): void {
+function onTouchEnd(e: TouchEvent): void {
   const d = drag;
-  if (!d || e.pointerId !== d.id) return;
+  if (!d || !touchOf(e, d.id)) return;
   drag = null;
   if (d.axis !== 'x') return;
   // the click a touch may still send after a sideways move never plays a story
@@ -192,11 +220,22 @@ function onUp(e: PointerEvent): void {
   setMat(0, 1, momentStill() ? 0 : BACK_MS);
 }
 
-function onCancel(e: PointerEvent): void {
-  if (!drag || e.pointerId !== drag.id) return;
-  const was = drag.axis;
-  drag = null;
-  if (was === 'x') setMat(0, 1, momentStill() ? 0 : BACK_MS);
+function onTouchCancel(e: TouchEvent): void {
+  if (drag && touchOf(e, drag.id)) release();
+}
+
+const bound = new WeakSet<Element>();
+
+/** The touch listeners sit on the hero itself: a non-passive touchmove on the document would hold every page's scroll
+ * on this script; the router's soft page changes bring a new hero, bound again after its first swap. */
+function bindHero(): void {
+  const el = hero();
+  if (!el || bound.has(el)) return;
+  bound.add(el);
+  el.addEventListener('touchstart', onTouchStart, { passive: true });
+  el.addEventListener('touchmove', onTouchMove, { passive: false });
+  el.addEventListener('touchend', onTouchEnd);
+  el.addEventListener('touchcancel', onTouchCancel);
 }
 
 function onClickCapture(e: MouseEvent): void {
@@ -239,15 +278,8 @@ let installed = false;
 export function installSwipe(): void {
   if (installed) return;
   installed = true;
+  bindHero();
   // listeners on the document survive the router's soft page changes; each one asks for the hero first
-  document.addEventListener('pointerdown', e => {
-    // a new touch is a new gesture: only the click left over from a swipe is swallowed
-    swallowUntil = 0;
-    if (hero()?.contains(e.target as Node)) onDown(e);
-  });
-  document.addEventListener('pointermove', onMove);
-  document.addEventListener('pointerup', onUp);
-  document.addEventListener('pointercancel', onCancel);
   window.addEventListener('click', onClickCapture, true);
   document.addEventListener('click', onClick);
   document.addEventListener('keydown', onKey);
@@ -259,6 +291,7 @@ let lastDir: Dir | 0 = 0;
 
 /** Called after every swap: the arrows' names follow the stage; after a turn, the next one the same way is warmed. */
 export function afterSwap(): void {
+  bindHero();
   labelArrows();
   if (lastDir) warm(lastDir);
   lastDir = 0;
