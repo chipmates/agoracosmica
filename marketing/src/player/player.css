@@ -1153,7 +1153,7 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 }
 .story-dock .story-dock__play:hover { background: var(--sp-disc-hover); }
 .story-dock .story-dock__play svg { width: 24px; height: 24px; }
-.story-dock__mid { flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: 44px 44px; }
+.story-dock__mid { position: relative; flex: 1 1 0; min-width: 0; display: grid; grid-template-rows: 44px 44px; }
 .story-dock__back, .story-dock__open { flex: none; border-radius: 50%; }
 .story-dock .story-dock__back svg, .story-dock .story-dock__open svg { fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
 .story-dock .story-dock__back { color: var(--sp-ink-2); }
@@ -1192,6 +1192,9 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
   color: var(--sp-ink);
   text-align: left;
 }
+/* the name and the story's number share a baseline; the number in the clock's quiet style */
+.story-dock__id { min-width: 0; display: flex; align-items: baseline; }
+.story-dock__n { flex: none; font-size: 0.8125rem; line-height: 20px; color: var(--sp-ink-2); font-variant-numeric: tabular-nums; white-space: pre; }
 .story-dock__name {
   min-width: 0;
   overflow: hidden;
@@ -1243,26 +1246,29 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 @media (prefers-reduced-motion: reduce) { .story-dock[data-status="loading"] .story-dock__play .sp-dots { animation: none; opacity: 0.25; } }
 .story-dock__moon { display: inline-flex; color: var(--sp-accent); }
 .story-dock__moon svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
-/* At a story's start the voice takes the line's left, in the label's face, the clock beside it; then the name and the
-   story. The voice stands over the name's place, which keeps its width underneath. */
+/* At a visit's first story the voice note stands in the pages' place, in the label's face, for its seconds; then the
+   pages. The note leaves in the first 200 ms, the pages come in the next 200 ms. A press on the pages shows them at once. */
 .story-dock__voice {
   position: absolute;
   left: 0;
   right: 0;
-  bottom: 6px;
+  top: 44px;
+  padding-top: 3px;
   font-size: 0.875rem;
   line-height: 20px;
   color: var(--sp-ink-2);
   white-space: nowrap;
   overflow: hidden;
+  text-overflow: clip;
   font-feature-settings: "ss05" 1;
   pointer-events: none;
 }
-.story-dock__voice, .story-dock__lead { transition: opacity 200ms ease 200ms, visibility 0s linear 200ms; }
-/* the leaving one fades in the first 200 ms, the coming one in the next 200 ms: never both on screen */
-.story-dock[data-voice="on"] .story-dock__lead,
+.story-dock__voice, .story-dock .sp-tmap--bar .sp-tmap__box { transition: opacity 200ms ease 200ms, visibility 0s linear 200ms; }
+.story-dock[data-voice="on"] .sp-tmap--bar:not(.is-dragging) .sp-tmap__box,
+.story-dock[data-voice="on"]:has(.sp-tmap.is-dragging) .story-dock__voice,
 .story-dock[data-voice="off"] .story-dock__voice { opacity: 0; visibility: hidden; transition: opacity 200ms ease, visibility 0s linear 200ms; }
-@media (prefers-reduced-motion: reduce) { .story-dock__voice, .story-dock__lead { transition-duration: 0s, 0s; } }
+.story-dock[data-voice="on"] .sp-tmap--bar:not(.is-dragging) .sp-tmap__box { visibility: visible; }
+@media (prefers-reduced-motion: reduce) { .story-dock__voice, .story-dock .sp-tmap--bar .sp-tmap__box { transition-duration: 0s, 0s; } }
 .story-dock__error { align-self: flex-end; padding-bottom: 2px; font-size: 0.75rem; line-height: 1.3; color: var(--color-warning, var(--sp-accent)); display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
 /* in the reading view, scrolled away from the voice: the way back takes the line */
 .story-dock__follow {
@@ -1289,9 +1295,16 @@ body:has(.pub-navbar__nav--open) .story-dock { visibility: hidden; }
 .story-dock__note p { margin: 0 0 4px; }
 .story-dock__note .story-dock__notek { color: var(--sp-ink); }
 
-/* A narrow phone gives the middle a little more: the coin a step smaller. */
+/* A narrow phone gives the middle a little more: the line's gaps closer and the name a step smaller (under 390 px), the
+   coin a step smaller (under 375 px), so the longest short name and "· 12" stand whole beside the time heard
+   (Schopenhauer at 360 and 375 px). */
+@media (max-width: 389.98px) {
+  .story-dock__line { gap: 8px; }
+  .story-dock__who { gap: 5px; }
+  .story-dock__name { font-size: 0.9375rem; }
+}
 @media (max-width: 374.98px) {
-  .story-dock .story-dock__play { width: 48px; height: 48px; margin-right: 10px; }
+  .story-dock .story-dock__play { width: 48px; height: 48px; margin-right: 8px; }
 }
 @media (min-width: 1024px) {
   .story-dock { padding-left: var(--sp-gutter); padding-right: var(--sp-gutter); }

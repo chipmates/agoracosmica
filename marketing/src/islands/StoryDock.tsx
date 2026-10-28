@@ -3,9 +3,11 @@
 // the client router persists, so it keeps playing while the visitor moves
 // between player pages. The page's own controls are plain HTML (page.ts).
 //
-// The bar is one row on every screen: the coin; a line that names the voice
-// for its first seconds, then who is playing; the pages of the story under it;
-// back one sentence; the caret to the open player, which holds everything else.
+// The bar is one row on every screen: the coin; a line that names who is
+// playing and the story's number from the first frame, with the clock; the
+// pages of the story under it (at a visit's first story, the voice note holds
+// their place for its seconds); back one sentence; the caret to the open
+// player, which holds everything else.
 
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
@@ -53,8 +55,24 @@ interface Label {
   expanded: string;
 }
 
-// How long the bar names the synthetic voice at each story's start, from its first sound; then the figure's name.
+// How long the bar shows the voice note at a visit's first story, from its first sound.
 const VOICE_MS = 6000;
+// The note shows once per browser session; where storage is refused it shows at every story.
+const NOTE_KEY = 'agc_voice_note';
+function noteShown(): boolean {
+  try {
+    return window.sessionStorage.getItem(NOTE_KEY) === '1';
+  } catch {
+    return false;
+  }
+}
+function markNoteShown(): void {
+  try {
+    window.sessionStorage.setItem(NOTE_KEY, '1');
+  } catch {
+    // refused: the next story shows it again
+  }
+}
 
 interface Props {
   /** The page's language, for the resume offer before any story plays. */
@@ -206,9 +224,11 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const halves = labelHalves(label.brief);
   const voiceWord = halves[halves.length - 1] ?? label.brief;
 
-  // Each story's start (a new item, or the same one again after the bar was closed) names the voice: in the bar from
-  // the load until VOICE_MS after the first sound, and once to a screen reader through the polite live region.
+  // Each story's start (a new item, or the same one again after the bar was closed) names the voice once to a screen
+  // reader through the polite live region. The bar shows the note only at a visit's first story: from the load until
+  // VOICE_MS after the first sound, in the pages' place (the label above Beginnen and the "i" carry it after that).
   const storyKey = loaded && state.queue && state.current !== null ? `${state.queue.slug}/${state.queue.lang}/${state.current}` : null;
+  const [noteKey, setNoteKey] = useState<string | null>(null);
   const [quietKey, setQuietKey] = useState<string | null>(null);
   const [live, setLive] = useState('');
   const timerKey = useRef<string | null>(null);
@@ -219,7 +239,14 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
       timerKey.current = null;
       setQuietKey(null);
       setLive('');
+      // the same story again after the bar closed is not a first story
+      setNoteKey(k => (k === null ? null : ''));
       return;
+    }
+    // the first story's note holds from the load; the session remembers it at once
+    if (noteKey === null && !noteShown()) {
+      markNoteShown();
+      setNoteKey(storyKey);
     }
     if (state.status !== 'playing' || timerKey.current === storyKey || quietKey === storyKey) return;
     timerKey.current = storyKey;
@@ -231,9 +258,13 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
       setQuietKey(storyKey);
       setLive('');
     }, VOICE_MS);
-  }, [storyKey, state.status, quietKey, voiceWord]);
+  }, [storyKey, state.status, quietKey, noteKey, voiceWord]);
   useEffect(() => () => window.clearTimeout(timer.current), []);
-  const voiceOn = storyKey !== null && quietKey !== storyKey;
+  // Storage refused: every story is a first story.
+  useEffect(() => {
+    if (storyKey !== null && noteKey !== null && noteKey !== storyKey && !noteShown()) setNoteKey(storyKey);
+  }, [storyKey, noteKey]);
+  const voiceOn = storyKey !== null && noteKey === storyKey && quietKey !== storyKey;
   useEffect(() => {
     if (!noteOpen) return;
     const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setNoteOpen(false); };
@@ -241,40 +272,31 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     return () => document.removeEventListener('keydown', close);
   }, [noteOpen]);
 
-  // The name on the line: the full one where it fits whole beside the "i" and the clock, else the short one; where even
-  // that is cut (a long name past minute ten at 360 px), the clock keeps only the time heard (the open player has both).
+  // The line names the figure by its short name, the story's number after it (the introduction has none). Where the
+  // name, the number and the "i" do not fit beside the whole clock (a long name past minute ten at 360 px), the clock
+  // keeps only the time heard (the open player has both).
   const fullName = state.queue?.name ?? '';
-  const shortName = (state.queue && readShort(shortNames, state.queue.figureId, storyLang)) || fullName;
+  const shownName = (state.queue && readShort(shortNames, state.queue.figureId, storyLang)) || fullName;
   const wholeClock = `${clockLabel(state.time)} / ${clockLabel(state.duration)}`;
   const leadEl = useRef<HTMLDivElement | null>(null);
   const whoRef = useRef<HTMLButtonElement | null>(null);
   const nameRef = useRef<HTMLSpanElement | null>(null);
   const clockRef = useRef<HTMLSpanElement | null>(null);
   const probeRef = useRef<HTMLSpanElement | null>(null);
-  const voiceRef = useRef<HTMLSpanElement | null>(null);
-  const [fitted, setFitted] = useState<'full' | 'short' | 'bare'>('full');
-  // The voice note's seconds: the clock beside it, the time heard alone where the note and the whole clock do not fit.
-  const [voiceBare, setVoiceBare] = useState(false);
+  const [bare, setBare] = useState(false);
   const fit = useCallback(() => {
     const lead = leadEl.current;
     const who = whoRef.current;
     const name = nameRef.current;
     const clockEl = clockRef.current;
     const probe = probeRef.current;
-    if (!lead || !who || !name || !clockEl || !probe || !fullName) return;
+    if (!lead || !who || !name || !clockEl || !probe || !shownName) return;
     const extra = who.getBoundingClientRect().width - name.getBoundingClientRect().width;
     // The room as if the whole clock stood there (a hidden copy, in the clock's tabular digits), whichever clock stands
     // now, so the choice never flips back and forth.
     const room = lead.clientWidth - 1 - (probe.getBoundingClientRect().width - clockEl.getBoundingClientRect().width);
-    setFitted(textWidth(fullName, name) + extra <= room ? 'full' : textWidth(shortName, name) + extra <= room ? 'short' : 'bare');
-    const voice = voiceRef.current;
-    if (voice) {
-      // the note's own text box (the span is stretched over the line, so its box is not the text's)
-      const r = document.createRange();
-      r.selectNodeContents(voice);
-      setVoiceBare(r.getBoundingClientRect().width > room);
-    }
-  }, [fullName, shortName]);
+    setBare(textWidth(shownName, name) + extra > room);
+  }, [shownName]);
   const leadObserver = useRef<ResizeObserver | null>(null);
   const leadRef = useCallback((el: HTMLDivElement | null) => {
     leadObserver.current?.disconnect();
@@ -284,11 +306,10 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     leadObserver.current = new ResizeObserver(fit);
     leadObserver.current.observe(el);
   }, [fit]);
-  useBeforePaint(fit, [fit, wholeClock.length, voiceWord]);
+  useBeforePaint(fit, [fit, wholeClock.length, state.current]);
   useEffect(() => {
     void document.fonts?.ready.then(fit);
   }, [fit]);
-  const shownName = fitted === 'full' ? fullName : shortName;
 
   const gesture = useOpenGesture(() => openSheet('player'));
 
@@ -361,7 +382,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const inReader = state.readerOpen && state.readerN === current;
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
-  const clock = (voiceOn ? voiceBare : fitted === 'bare') ? clockLabel(state.time) : wholeClock;
+  const clock = bare ? clockLabel(state.time) : wholeClock;
 
   // While the sleep timer runs, a small moon by the clock; its words go with the caret's name.
   const sleepOn = typeof state.sleep === 'number' ? s.sleepLeft(clockLabel(Math.ceil(state.sleepLeft))) : state.sleep === 'end' ? s.sleepToEnd : '';
@@ -377,9 +398,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
       aria-label={s.sentenceBack}>{Icon.again}</button>
   );
 
-  // The line: the voice for its seconds, then who is playing (the name and its "i"), the story where it fits; the clock
-  // from the first frame.
-  // In the reading view, scrolled away from the voice, the way back takes the line.
+  // The line: who is playing and the story's number (one button with the "i"), the story's title where it fits whole;
+  // the clock from the first frame. In the reading view, scrolled away from the voice, the way back takes the line.
   const line = inReader && state.away ? (
     <button type="button" className="story-dock__follow" onClick={() => setAway(false)} data-dir={state.awayDir}>
       {state.awayDir === 'down' ? Icon.toDown : Icon.toUp}
@@ -389,13 +409,15 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     <span className="story-dock__error" role="status">{s.error}</span>
   ) : (
     <>
-      {/* the voice note and the name share the clock's left: one leaves before the other comes */}
       <div className="story-dock__left">
-        <span ref={voiceRef} className="story-dock__voice" aria-hidden={!voiceOn}>{voiceWord}</span>
         <div ref={leadRef} className="story-dock__lead">
           <button ref={whoRef} type="button" className="story-dock__who" aria-expanded={noteOpen} aria-controls="story-dock-note"
-            aria-label={`${fullName}, ${label.title}`} onClick={() => setNoteOpen(v => !v)}>
-            <span ref={nameRef} className="story-dock__name">{shownName}</span>
+            aria-label={[fullName, current > 0 ? s.storyN(current) : '', label.title].filter(Boolean).join(', ')}
+            onClick={() => setNoteOpen(v => !v)}>
+            <span className="story-dock__id">
+              <span ref={nameRef} className="story-dock__name">{shownName}</span>
+              {current > 0 && <span className="story-dock__n">{`${LIST_SEP}${current}`}</span>}
+            </span>
             <span className="sp-label__i" aria-hidden="true">i</span>
           </button>
           <span className="story-dock__title">{title}</span>
@@ -439,6 +461,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
           </button>
           <div className="story-dock__mid">
             <div className="story-dock__line">{line}</div>
+            {/* a visit's first story: the voice note stands in the pages' place for its seconds */}
+            <span className="story-dock__voice" aria-hidden="true">{voiceWord}</span>
             <Suspense fallback={plainPages}>
               <BarMap state={state} queue={queue} seekTo={seekTo} />
             </Suspense>

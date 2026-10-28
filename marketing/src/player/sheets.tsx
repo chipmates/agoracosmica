@@ -119,13 +119,13 @@ function Head({ title, kicker, s, titleRef }: { title: string; kicker?: string; 
 
 // ---- the full player ---------------------------------------------------------
 
-// No label line here: the bar says it at each story's start and the lock screen carries it. The bar names the figure,
-// not the story: here name and story meet.
+// No label line here: the bar says it at a visit's first story and the lock screen carries it. The bar names the figure
+// and the story's number: here the full title ("3 · title") under the figure's whole name.
 function PlayerSheet({ state, queue, s, w, titleRef, home }: { state: PlayerState; queue: StoryQueue; s: PlayerStrings; w: FactWords; titleRef: RefObject<HTMLHeadingElement>; home: string | null }) {
   const current = state.current ?? 0;
   const entry = queue.entries.find(e => e.n === current);
-  const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
-  const kicker = [queue.name, current === 0 ? '' : s.storyN(current), entry?.year && current > 0 ? s.approxYear(entry.year) : ''].filter(Boolean).join(LIST_SEP);
+  const title = current === 0 ? s.introTitle : `${current}${LIST_SEP}${entry?.title ?? s.storyN(current)}`;
+  const kicker = [queue.name, entry?.year && current > 0 ? s.approxYear(entry.year) : ''].filter(Boolean).join(LIST_SEP);
   const stories = queue.entries.filter(e => e.n > 0).length;
   const playing = state.status === 'playing' || state.status === 'loading';
   const seekRef = useRef<HTMLInputElement | null>(null);
