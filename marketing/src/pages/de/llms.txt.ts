@@ -41,11 +41,11 @@ export const GET: APIRoute = () => {
   lines.push('# Agora Cosmica');
   lines.push('');
   lines.push(
-    '> Agora Cosmica ist eine gemeinnützige Open-Source-Lern-App, in der du mit KI-"Echos" von 30 Menschen aus der Geschichte sprichst, quer durch Philosophie, Wissenschaft, Kunst und Aktivismus. Jedes Echo ist im eigenen Werk verankert, mit faktengeprüften Biografien und vertonten Texten. AGPL-3.0, entwickelt von der ChipMates gGmbH. Keine Tracking-Cookies, kein Profiling. Englisch und Deutsch.',
+    '> Kurze Geschichten aus dem Leben von 30 Menschen, von Platon bis Frida Kahlo, frei nacherzählt. Die Fakten stammen aus den Quellen, die Szenen sind erdacht. Geschrieben in Mensch-KI-Zusammenarbeit, gelesen von einer synthetischen Stimme. Die Porträts sind KI-Bilder. Non-Profit und Open Source. AGPL-3.0, entwickelt von der ChipMates gGmbH. Keine Tracking-Cookies, kein Profiling. Englisch und Deutsch.',
   );
   lines.push('');
   lines.push(
-    'Jede Person hat eine faktengeprüfte Biografie und Kernlehren, vertonte Audios und ein KI-"Echo", das in ihrem Werk verankert ist und mit dem du sprechen kannst. Jede Personen- und Themenseite ist ohne Anmeldung frei lesbar.',
+    'Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist. Kein Konto, keine Anmeldung. Die Geschichten kannst du kostenlos hören und lesen.',
   );
   lines.push('');
 
@@ -55,9 +55,6 @@ export const GET: APIRoute = () => {
   );
   lines.push(
     'Jede Biografie ist faktengeprüft, und die zugrunde liegenden Faktenchecks stehen auf den Personenseiten.',
-  );
-  lines.push(
-    'Die Anweisungsprofile, die jedes Echo verankern, kommen von einem öffentlichen CDN, nicht versteckt in der App.',
   );
   lines.push('Die gesamte App ist Open Source unter AGPL-3.0, die Methode ist also nachprüfbar.');
   lines.push(

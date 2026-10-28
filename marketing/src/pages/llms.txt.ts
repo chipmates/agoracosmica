@@ -41,11 +41,11 @@ export const GET: APIRoute = () => {
   lines.push('# Agora Cosmica');
   lines.push('');
   lines.push(
-    '> Agora Cosmica is an open source, nonprofit education app where you talk with AI "Echoes" of 30 thinkers from history, across philosophy, science, art, and activism. Each is grounded in their own work, with fact-checked biographies and narrated audio. AGPL-3.0, built by ChipMates gGmbH. No tracking cookies, no profiling. English and German.',
+    '> Short stories from the lives of 30 people, from Plato to Frida Kahlo, freely retold. The facts come from the sources, the scenes are imagined. Written in human-AI collaboration, read by a synthetic voice. The portraits are AI images. Nonprofit and open source. AGPL-3.0, built by ChipMates gGmbH. No tracking cookies, no profiling. English and German.',
   );
   lines.push('');
   lines.push(
-    'Each figure has a fact-checked biography and core teachings, narrated audio, and an AI "Echo" grounded in their work that you can talk to. Every figure and theme page is free to read with no signup.',
+    "Each story is a moment that taught them something about life. Each story's facts say what is documented and what is recreated. No account and no signup. The stories are free to hear and to read.",
   );
   lines.push('');
 
@@ -55,9 +55,6 @@ export const GET: APIRoute = () => {
   );
   lines.push(
     'Every biography is fact-checked, and the source factchecks are published on the figure pages.',
-  );
-  lines.push(
-    'The instruction profiles that ground each Echo are served from a public CDN, not hidden behind the app.',
   );
   lines.push('The full app is open source under AGPL-3.0, so the method is auditable.');
   lines.push(
