@@ -50,9 +50,9 @@ const schemas = [
   organizationSchema(),
   agoraCosmicaSchema(),
   articleSchema({
-    title: 'Wie wir die KI-Echos bauen, belegen und faktenprüfen',
+    title: 'Wie die Geschichten in Mensch-KI-Zusammenarbeit geschrieben und an den Quellen geprüft werden',
     description:
-      'Unsere Methodik und redaktionellen Standards: wie jedes KI-Echo aus Primärwerken gebaut, belegt und faktengeprüft wird, und wo die Grenzen liegen.',
+      'Unsere Methodik und redaktionellen Standards: wie jede Geschichte in Mensch-KI-Zusammenarbeit nach Primärwerken geschrieben, an den Quellen geprüft und vor der Veröffentlichung gegengelesen wird, und wo die Grenzen liegen.',
     url,
     lang,
     image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
@@ -62,14 +62,14 @@ const schemas = [
   faqSchema(faq, url),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/de/` },
-    { name: 'Wie wir die Echos bauen', url },
+    { name: 'Wie die Geschichten entstehen', url },
   ]),
 ];
 ---
 <Public
-  title="Wie wir die Echos bauen"
-  fullTitle="Methodik: Wie wir KI-Echos bauen, belegen und prüfen"
-  description="Wie Agora Cosmica seine KI-Echos baut: ein quellenbewusstes Stimmprofil aus Primärwerken, ein öffentlicher Faktencheck pro Mensch und Open-Source-Code. Ehrlich über die Grenzen."
+  title="Wie die Geschichten entstehen"
+  fullTitle="Methodik: Wie die Geschichten in Mensch-KI-Zusammenarbeit geschrieben und an den Quellen geprüft werden"
+  description="Wie Agora Cosmica seine Geschichten macht: in Mensch-KI-Zusammenarbeit nach Primärwerken und Briefen geschrieben, an den Quellen geprüft, vor der Veröffentlichung gegengelesen, von einer synthetischen Stimme vorgelesen, mit Open-Source-Code. Ehrlich über die Grenzen."
   canonicalPath={canonicalPath}
   lang={lang}
   ogType="article"

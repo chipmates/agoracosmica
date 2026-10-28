@@ -48,9 +48,9 @@ const schemas = [
   organizationSchema(),
   agoraCosmicaSchema(),
   articleSchema({
-    title: 'How we build, source, and fact-check the AI Echoes',
+    title: 'How the stories are written as a human-AI collaboration and fact-checked',
     description:
-      'Our methodology and editorial standards: how each AI Echo is built from primary works, sourced, and fact-checked, and where the limits are.',
+      'Our methodology and editorial standards: how each story is written as a human-AI collaboration from primary works, fact-checked against the sources and reviewed before publishing, and where the limits are.',
     url,
     lang,
     image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
@@ -60,14 +60,14 @@ const schemas = [
   faqSchema(faq, url),
   breadcrumbSchema([
     { name: t('breadcrumbs.home'), url: `${SITE_URL}/` },
-    { name: 'How we build the Echoes', url },
+    { name: 'How the stories are made', url },
   ]),
 ];
 ---
 <Public
-  title="How We Build the Echoes"
-  fullTitle="Methodology: How We Build, Source, and Fact-Check Echoes"
-  description="How Agora Cosmica builds its AI Echoes: a source-aware voice profile from primary works, a public factcheck per figure, and open-source code. Honest about the limits."
+  title="How the Stories Are Made"
+  fullTitle="Methodology: How the Stories Are Written as a Human-AI Collaboration and Fact-Checked"
+  description="How Agora Cosmica makes its stories: written as a human-AI collaboration from primary works and letters, fact-checked against the sources, reviewed before publishing, read by a synthetic voice, with open-source code. Honest about the limits."
   canonicalPath="/methodology"
   lang={lang}
   ogType="article"
