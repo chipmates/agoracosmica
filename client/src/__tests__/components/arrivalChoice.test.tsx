@@ -7,7 +7,7 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, fireEvent, act } from '@testing-library/react';
 
 const CLICK = 'TESTCLICKID0001';
-const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
+const YES = JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() });
 const CONTROLLER = '../../../../marketing/src/player/controller';
 const AD_KEYS = /^(agc_gclid|agc_listened_seconds|agc_listened_pending|agc_conv_fired_.*)$/;
 
@@ -609,22 +609,22 @@ describe('heard seconds', () => {
 
 describe('ArrivalChoice after a year', () => {
   it('asks again when the stored answer is older than 365 days', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.2.0', timestamp: Date.now() - 366 * 86_400_000 }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.3.0', timestamp: Date.now() - 366 * 86_400_000 }));
     const { container } = await arriveAndListen();
     expect(shownCard(container)).not.toBeNull();
   });
   it('does not ask within the year', async () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.2.0', timestamp: Date.now() - 100 * 86_400_000 }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version: '1.3.0', timestamp: Date.now() - 100 * 86_400_000 }));
     const { container } = await arriveAndListen();
     expect(card(container)).toBeNull();
   });
 });
 
 describe('ArrivalChoice copy and version', () => {
-  it('names each step, the year, the footer switch, and links Google’s page', async () => {
+  it('names what Google learns, the year, the footer switch, and links Google’s page', async () => {
     const { container } = await arriveAndListen();
     const fine = container.querySelector('.agc-consent__fine')!.textContent!;
-    expect(fine).toContain('this yes, opening the app, listening, starting a conversation, a third message, a council');
+    expect(fine.startsWith('A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30 seconds. ')).toBe(true);
     expect(fine).toContain('for a year');
     expect(fine).toContain('at the foot of every page');
     const google = Array.from(container.querySelectorAll('a')).find((a) => a.textContent === 'How Google uses this')!;
@@ -634,20 +634,31 @@ describe('ArrivalChoice copy and version', () => {
 
   it('speaks German, with the same three links', async () => {
     const { container } = await arriveAndListen(`/de/figures/marcus-aurelius/?gclid=${CLICK}`, 'de');
-    expect(container.querySelector('.agc-consent__fine')!.textContent).toContain('diesem Ja, dem Öffnen der App');
+    expect(container.querySelector('.agc-consent__fine')!.textContent!.startsWith(
+      'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. '
+    )).toBe(true);
     const labels = Array.from(container.querySelectorAll('.agc-consent__link')).map((a) => a.textContent);
     expect(labels).toEqual(['Code ansehen', 'Datenschutzerklärung', 'Wie Google das nutzt']);
   });
 
-  it('names the Google account, the USA and no personalised ads right after the steps', async () => {
+  it('names the Google account, the USA and no personalised ads right after what Google learns', async () => {
     const en = (await arriveAndListen()).container;
     expect(en.querySelector('.agc-consent__fine')!.textContent).toContain(
-      'a council. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you.'
+      'for 30 seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you.'
     );
     const de = (await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
     expect(de.querySelector('.agc-consent__fine')!.textContent).toContain(
-      'einem Council. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich.'
+      'zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich.'
     );
+  });
+
+  it('names none of the app\'s steps in either language (1.3.0)', async () => {
+    const steps = /Council|\bGesprächs?\b|third message|dritten Nachricht|Öffnen der App|in the app|in der App|conversation/i;
+    for (const lang of ['en', 'de'] as const) {
+      const { container, unmount } = await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, lang);
+      expect(card(container)!.textContent, lang).not.toMatch(steps);
+      unmount();
+    }
   });
 
   it('carries the age line on its own, between the words and the answers', async () => {
@@ -726,7 +737,7 @@ describe('ArrivalChoice close control', () => {
 
   // 1.1.0 is the card before the Google account and USA sentence.
   it('asks again when the stored yes was given under the earlier text', async () => {
-    for (const version of ['1.1.0', '1.0.0']) {
+    for (const version of ['1.2.0', '1.1.0', '1.0.0']) {
       localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version, timestamp: Date.now() }));
       const { container, unmount } = await arriveAndListen();
       expect(shownCard(container)).not.toBeNull();
@@ -736,7 +747,7 @@ describe('ArrivalChoice close control', () => {
   });
 
   it('does not ask again after a no given under the earlier text', async () => {
-    for (const version of ['1.1.0', '1.0.0']) {
+    for (const version of ['1.2.0', '1.1.0', '1.0.0']) {
       localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: false, version, timestamp: Date.now() }));
       const { container, unmount } = await arriveAndListen();
       expect(card(container)).toBeNull();

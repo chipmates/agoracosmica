@@ -11,6 +11,38 @@ Dates are commit dates from this repository's history. A version reaches visitor
 - Any answer older than 12 months is removed and the card asks again (from 2026-09-28, commit `1c693642`; before that an answer had no time limit).
 - Visitors from paid ads (`p=1` in the address) are never asked and never have a click ID kept.
 
+## 1.3.0, from 28 October 2026
+
+Written on 2026-10-28.
+
+**What changed from 1.2.0.** Only the list of steps on the card. The app's chat ends with this version, so of the steps 1.2.0 named only two still send anything: the yes itself and 30 seconds of listening. The first sentence of the fine print became two sentences, what a yes sends and what Google learns from it. Every other word of the card stays as in 1.2.0. With it, a click on a Start Exploring button sends no conversion any more ([`marketing/public/agc-public.js`](../marketing/public/agc-public.js)), and the worker refuses every step but these two ([`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts)). **Re-ask:** every 1.2.0 yes is asked again. A no stays a no.
+
+**When it is asked.** As under 1.2.0 from 2026-10-26.
+
+**How it is shown.** As under 1.2.0.
+
+**What it says**, German:
+
+> Eine Frage zu dieser Anzeige
+> **Dürfen wir deinen Besuch für Google zählen?**
+> Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.
+> Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.
+> Bist du unter 16, sag bitte Nein.
+> [Ja, zählen] [Nein, nicht zählen]
+> Code ansehen · Datenschutzerklärung · Wie Google das nutzt
+
+English:
+
+> One question about this ad
+> **May we count your visit for Google?**
+> We’re a small nonprofit, and Google gives us these ads for free. Counted visits help them reach more people searching for the same thing.
+> A yes sends Google the ad’s click ID. That way Google sees the ad brought you to us, and whether you listened for 30 seconds. Google can link it to your Google account and may process it in the USA. We don’t allow it for personalised ads. Nothing else about you. Your browser remembers your answer for a year. You can turn this off anytime under “Ad measurement” at the foot of every page. Either way, the whole library stays open.
+> If you’re under 16, please say no.
+> [Yes, count it] [No, don’t count it]
+> See the code · Privacy policy · How Google uses this
+
+The privacy pages changed with it, so the card and the page it links to say the same: the click ID goes to Google at most twice (the yes, and once 30 seconds of audio have been heard in total, seconds heard before the answer included), a returning visitor whose yes still holds is not asked again and sends the new click ID at most once, the question may come at once or later in the visit, the click ID leaves the address as soon as the page has read it, and the yes is withdrawn with the "Ad measurement" link at the foot of every page.
+
 ## 1.2.0, live from 14 October 2026
 
 Written on 2026-10-14.

@@ -9,7 +9,7 @@ import { onProductionHost, mayPostTo, PRODUCTION_HOSTS } from '../../utils/produ
 
 const WORKER = 'https://llm.agoracosmica.org';
 const CLICK = 'TESTCLICKID0001';
-const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
+const YES = JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() });
 
 const ELSEWHERE = [
   'http://localhost:3000/',

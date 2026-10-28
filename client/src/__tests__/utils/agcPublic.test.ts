@@ -141,7 +141,7 @@ describe('agc-public.js: counting stores nothing', () => {
 
 describe('agc-public.js: the ad click ID', () => {
   const CLICK = 'TESTCLICKID0001';
-  const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
+  const YES = JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() });
   const conversions = () => fetches.filter((f) => f.url.endsWith('/api/conversions'));
 
   it('stores nothing on a grant landing without an answer', () => {
@@ -158,14 +158,26 @@ describe('agc-public.js: the ad click ID', () => {
     getItem.mockRestore();
   });
 
-  it('stores the click ID when a yes is on record, and the CTA reports it', () => {
+  it('stores the click ID when a yes is on record, and a Start Exploring click sends Google nothing', async () => {
     localStorage.setItem('agc_ad_consent', YES);
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
-    click(door({ 'data-agc-cta': 'start-exploring', 'data-agc-figure': 'aurelius' }));
-    expect(conversions()).toHaveLength(1);
-    expect(conversions()[0].body.gclid).toBe(CLICK);
-    expect(conversions()[0].body.event).toBe('start_exploring');
+    click(door({ 'data-agc-cta': 'start-exploring', 'data-agc-figure': 'aurelius', 'data-agc-door': 'hero' }));
+    await new Promise((r) => setTimeout(r, 0));
+    // 1.3.0 names the yes and 30 seconds of listening: an entry door is neither.
+    expect(conversions()).toHaveLength(0);
+    expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_'))).toEqual([]);
+    // The intent for the app and the anonymous click count stay.
+    expect(sessionStorage.getItem('agc_intended_figure')).toBe('aurelius');
+    const cta = beacons.filter((b) => b.body.step === 'cta_click');
+    expect(cta).toHaveLength(1);
+    expect(cta[0].body.mode).toBe('hero');
+  });
+
+  it('carries the 1.3.0 version: a 1.2.0 yes no longer keeps the click ID', () => {
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() }));
+    loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
+    expect(storageKeys(sessionStorage)).toEqual([]);
   });
 
   it('on a paid landing drops an old click ID despite an old yes, and sends nothing', async () => {
@@ -527,7 +539,7 @@ describe('agc-public.js: the 12-month memory', () => {
   const CLICK = 'TESTCLICKID0001';
   const DAY = 24 * 60 * 60 * 1000;
   it('stores no click ID under a yes older than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() - 366 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() - 366 * DAY }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
@@ -537,7 +549,7 @@ describe('agc-public.js: the 12-month memory', () => {
     expect(storageKeys(sessionStorage)).toEqual([]);
   });
   it('stores it under a yes younger than a year', () => {
-    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() - 300 * DAY }));
+    localStorage.setItem('agc_ad_consent', JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() - 300 * DAY }));
     loadPage(`/marcus-aurelius/?gclid=${CLICK}`);
     expect(sessionStorage.getItem('agc_gclid')).toBe(CLICK);
   });
@@ -671,7 +683,7 @@ describe('agc-public.js: one reading of p=1 with a gclid', () => {
 });
 
 describe('agc-public.js: only the production hosts post', () => {
-  const YES = JSON.stringify({ granted: true, version: '1.2.0', timestamp: Date.now() });
+  const YES = JSON.stringify({ granted: true, version: '1.3.0', timestamp: Date.now() });
 
   async function visitAndUse(): Promise<HTMLAnchorElement> {
     localStorage.setItem('agc_ad_consent', YES);
@@ -703,7 +715,7 @@ describe('agc-public.js: only the production hosts post', () => {
       serveFrom(host);
       await visitAndUse();
       expect(fetches.filter((f) => f.url.endsWith('/v1/page'))).toHaveLength(2);
-      expect(fetches.filter((f) => f.url.endsWith('/api/conversions'))).toHaveLength(1);
+      expect(fetches.filter((f) => f.url.endsWith('/api/conversions'))).toHaveLength(0);
       const steps = beacons.map((b) => b.body.step);
       expect(steps).toEqual(expect.arrayContaining(['paid_arrival', 'cta_click', 'audio_play']));
     });

@@ -11,13 +11,13 @@
 //   - Count a read on the reading pages (thirty visible seconds, or a scroll
 //     past the middle of the text), once per page load
 //   - Count the first play of an audio element in the page, once per page load
-//   - Click handlers on [data-agc-cta] elements (entry intent)
+//   - Click handlers on [data-agc-cta] elements (entry intent and an
+//     anonymous click count)
 //   - Mobile burger menu toggle in the navbar
 //
-// A conversion leaves these pages only after the visitor's yes: the Start
-// Exploring click below and the consent card's own report of the yes. A
-// browser marked as one of ours (?probe=1) sends none.
-// Nothing at all is sent from a page served off the production hosts.
+// This script sends no conversion: the consent card's islands report the two
+// steps its words name (the yes and 30 seconds of listening), only after a
+// yes. Nothing at all is sent from a page served off the production hosts.
 (function () {
   'use strict';
 
@@ -38,7 +38,7 @@
   // Keep in sync with AD_CONSENT_VERSION in client/src/utils/public/
   // gclidCapture.ts: a grant recorded under an older consent version no longer
   // covers the current scope, so it must not authorize sends.
-  var AD_CONSENT_VERSION = '1.2.0';
+  var AD_CONSENT_VERSION = '1.3.0';
   // Same 12-month memory as gclidCapture.ts: an older answer counts as none.
   var AD_CONSENT_MAX_AGE_MS = 365 * 24 * 60 * 60 * 1000;
   var AD_CONSENT_SKEW_MS = 24 * 60 * 60 * 1000;
@@ -61,12 +61,11 @@
     catch (e) { return undefined; }
   }
 
-  var CONV_URL = 'https://llm.agoracosmica.org/api/conversions';
   var FUNNEL_URL = 'https://llm.agoracosmica.org/v1/funnel';
   var PAGE_URL = 'https://llm.agoracosmica.org/v1/page';
 
-  // The worker URLs above are production's, so a count or a conversion leaves
-  // only a page served from the production site: a local or preview build of
+  // The worker URLs above are production's, so a count leaves only a page
+  // served from the production site: a local or preview build of
   // these pages sends nothing. The worker's ALLOWED_ORIGINS names these hosts.
   var PRODUCTION_HOSTS = ['agoracosmica.org', 'www.agoracosmica.org'];
   function onProductionHost() {
@@ -121,44 +120,6 @@
     } catch (e) { return false; }
   }
 
-  // Fire a Google Ads conversion from the marketing pages, but ONLY after the
-  // visitor opted in to ad measurement and only for grant arrivals (a gclid is
-  // present and it is not the paid split). This is the re-added start_exploring
-  // signal: unlike the version removed in 1.1.2, it now requires an explicit
-  // opt-in, so the bare gclid alone never sends anything.
-  function fireConversion(event, metadata) {
-    if (!onProductionHost()) return;
-    if (hasPaidParam()) return; // paid: never forward
-    if (!adConsentGranted()) return; // no opt-in: nothing sent, nothing looked up
-    var gclid;
-    try { gclid = sessionStorage.getItem(SS_GCLID); } catch (e) { return; }
-    if (!gclid) return;
-    if (probeField()) return; // our own test browsers send Google nothing
-    try {
-      var firedKey = 'agc_conv_fired_' + event;
-      if (sessionStorage.getItem(firedKey)) return;
-      sessionStorage.setItem(firedKey, '1');
-    } catch (e) { /* worker dedups via order_id */ }
-    try {
-      var body = { gclid: gclid, event: event, timestamp: Date.now() };
-      if (metadata) {
-        for (var k in metadata) {
-          if (Object.prototype.hasOwnProperty.call(metadata, k)) body[k] = metadata[k];
-        }
-      }
-      // Absolute worker URL on purpose. agoracosmica.org has no /api/* route, so
-      // a relative path falls through the SPA fallback (/* /index.html 200) and
-      // the conversion never reaches the worker. CSP connect-src allows
-      // https://*.agoracosmica.org and the worker CORS allows this origin.
-      fetch(CONV_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body),
-        keepalive: true,
-      }).catch(function () { /* never surface */ });
-    } catch (e) { /* same posture */ }
-  }
-
   function persistIntent(opts) {
     try {
       if (opts.lang) localStorage.setItem(LS_LANG, opts.lang);
@@ -176,8 +137,9 @@
     return docLang.indexOf('de') === 0 ? 'de' : 'en';
   }
 
-  // One keyless funnel row. Absolute worker URL on purpose (agoracosmica.org
-  // has no /v1/* route, see the conversion fetch above). sendBeacon survives a
+  // One keyless funnel row. Absolute worker URL on purpose: agoracosmica.org
+  // has no /v1/* route, so a relative path would fall through the SPA fallback
+  // (/* /index.html 200) and never reach the worker. sendBeacon survives a
   // navigation that follows the count, and text/plain keeps it a simple CORS
   // request so no preflight gets lost on the way out.
   function postFunnel(payload) {
@@ -196,8 +158,8 @@
   }
 
   // Anonymous funnel counter: how many visitors click Start Exploring at all
-  // (cta_click / homepage page-views = the CTA rate). Unlike the conversion
-  // above it is keyless and unconditional: no gclid, no user dimension, same
+  // (cta_click / homepage page-views = the CTA rate). Keyless and
+  // unconditional: no gclid, no user dimension, same
   // privacy posture as the /v1/page beacon. One-shot per page load, held in
   // page memory: counting writes nothing to the browser's storage.
   // Door names are a fixed vocabulary of page positions, not anything about the
@@ -575,16 +537,8 @@
     var councilId = target.getAttribute('data-agc-council') || undefined;
     var lang = document.documentElement.lang || 'en';
     persistIntent({ figureId: figureId, councilId: councilId, lang: lang });
-    // Re-added start_exploring, now consent-gated. Fires on any Start Exploring
-    // CTA (navbar, hero, sticky, figure, theme) for an opted-in grant visitor.
-    // This catches returning consenters whose remembered choice means the
-    // landing prompt never re-shows. Deduped with the prompt's own Accept fire.
-    // figureId only: the worker's conversion route reads no council field, so
-    // sending one is dead payload. The council intent still reaches the app
-    // through persistIntent above.
-    var metadata = {};
-    if (figureId) metadata.figureId = figureId;
-    fireConversion('start_exploring', Object.keys(metadata).length ? metadata : undefined);
+    // No conversion here: the card's words name only the yes and 30 seconds
+    // of listening, so a click on an entry door sends Google nothing.
     sendCtaFunnelBeacon(target.getAttribute('data-agc-door') || '');
   });
 
