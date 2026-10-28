@@ -27,18 +27,22 @@ const IMAGES: Record<PlayerLang, { word: string; note: string }> = {
   de: { word: 'KI-Bilder', note: 'Die Porträts sind KI-Bilder.' },
 };
 
+// The helper's last fragment, which the stories' pages leave out of the note.
+const PURPOSE: Record<PlayerLang, string> = { en: ' Educational purpose.', de: ' Bildungszweck.' };
+
 function read(file: unknown, lang: PlayerLang, portraits: boolean): StoryLabel {
   const t = (file as HelperFile).audioLibrary.welcome.sections.transparency;
   const halves = t.brief.split(' · ');
   const withImages = [...halves.slice(0, -1), IMAGES[lang].word, ...halves.slice(-1)].join(' · ');
+  const note = t.expanded.endsWith(PURPOSE[lang]) ? t.expanded.slice(0, -PURPOSE[lang].length) : t.expanded;
   // the images' sentence follows the first one, which names the making and the voice
-  const cut = t.expanded.indexOf('. ');
+  const cut = note.indexOf('. ');
   const expanded = cut < 0
-    ? `${t.expanded} ${IMAGES[lang].note}`
-    : `${t.expanded.slice(0, cut + 1)} ${IMAGES[lang].note} ${t.expanded.slice(cut + 2)}`;
+    ? `${note} ${IMAGES[lang].note}`
+    : `${note.slice(0, cut + 1)} ${IMAGES[lang].note} ${note.slice(cut + 2)}`;
   return portraits
     ? { title: t.title, brief: withImages, expanded, lock: withImages }
-    : { title: t.title, brief: t.brief, expanded: t.expanded, lock: withImages };
+    : { title: t.title, brief: t.brief, expanded: note, lock: withImages };
 }
 
 const LABELS: Record<PlayerLang, Record<'with' | 'without', StoryLabel>> = {
