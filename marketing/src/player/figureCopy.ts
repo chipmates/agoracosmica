@@ -149,6 +149,17 @@ const DEEP_LINKS: Record<string, Record<PlayerLang, DeepLink[]>> = {
       { href: '/de/stoizismus/', label: 'Stoizismus, was er ist und wie man ihn übt →' },
     ],
   },
+  blake: {
+    en: [
+      { href: '/figures/william-blake/poems/', label: "Read William Blake's poems →" },
+      { href: '/figures/william-blake/poems/the-lamb/', label: 'Read The Lamb →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/the-tyger/', label: 'Read The Tyger →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/london/', label: 'Read London →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/a-poison-tree/', label: 'Read A Poison Tree →', under: 'Which William Blake poems should I read first?' },
+      { href: '/figures/william-blake/poems/london/', label: 'Read London, the whole poem →', under: "What are Blake's mind-forged manacles?" },
+    ],
+    de: [],
+  },
   campbell: {
     en: [{ href: '/the-heros-journey/', label: "The hero's journey, from call to return →" }],
     de: [{ href: '/de/heldenreise/', label: 'Die Heldenreise, vom Ruf bis zur Rückkehr →' }],
