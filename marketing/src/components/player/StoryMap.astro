@@ -339,11 +339,15 @@ const capWidth = (part: string, less: number) => [...part].reduce((s, ch) => s +
 // at the name's tracking still sets whole; a longer one still breaks inside.
 const tightName = mapName.toUpperCase().split(/\s+/).some(word => word.split(/(?<=-)/).some(part => capWidth(part, 0) > 216));
 const LESS = tightName ? 0.76 : 0;
+// A word still wider than a line at that tracking: the name's size steps down by 0.05 (to 0.75 at most) until the word
+// sets whole; a class per step, as the pages carry no inline style.
+const widestPart = Math.max(0, ...mapName.toUpperCase().split(/\s+/).flatMap(word => word.split(/(?<=-)/)).map(part => capWidth(part, LESS)));
+const FIT = widestPart > 216 ? Math.max(0.75, Math.floor((216 / widestPart) * 20) / 20) : 1;
 const nameLines = (() => {
   let lines = 0; let len = 0;
   // a line breaks at a space or after a hyphen; a word longer than a line breaks anywhere
   for (const word of mapName.toUpperCase().split(/\s+/).filter(Boolean)) word.split(/(?<=-)/).forEach((part, k) => {
-    const w = capWidth(part, LESS); const sp = k ? 0 : 6.32 - LESS;
+    const w = capWidth(part, LESS) * FIT; const sp = k ? 0 : (6.32 - LESS) * FIT;
     if (len && len + sp + w <= 216) { len += sp + w; return; }
     lines += Math.max(1, Math.ceil(w / 216)); len = w % 216 || 216;
   });
@@ -423,7 +427,7 @@ const mapNoteLoose = lang === 'de'
         })}
       </svg>
       <div class="sp-atlas__cartouche">
-        <h3 class:list={['sp-atlas__name', tightName && 'sp-atlas__name--tight']} id="sp-map-title">{mapName}</h3>
+        <h3 class:list={['sp-atlas__name', tightName && 'sp-atlas__name--tight', FIT < 1 && `sp-atlas__name--fit sp-atlas__name--fit-${Math.round(FIT * 100)}`]} id="sp-map-title">{mapName}</h3>
         <p class="sp-atlas__epithet">{P.mapBy(queue.name)}</p>
       </div>
     </div>
