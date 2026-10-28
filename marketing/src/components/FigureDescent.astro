@@ -1,9 +1,11 @@
 ---
-// The era descent on the front, under the hero: a sticky era bar with five
-// anchors, then the five bands, newest birth year first, each portrait a link
-// to that figure's page. Every anchor, link and word is server rendered, so
-// the whole thing works with JS off. The one script sets the active chip, the
-// depth readout and the gauge.
+// The era descent on the front, under the hero: its intro, then the list
+// itself (the section the anchor lands on): a sticky era bar with five
+// anchors and the five bands, newest birth year first, each portrait a link
+// to that figure's page. The intro stands above the anchor so a visitor sent
+// to the list lands on its faces. Every anchor, link and word is server
+// rendered, so the whole thing works with JS off. The one script sets the
+// active chip, the depth readout and the gauge.
 //
 // Deliberately NOT taken from the prototype this harvests: the entry gate,
 // smooth-scroll library, scroll pinning framework, ambient audio, custom
@@ -58,6 +60,15 @@ const bands = STRATA.map(s => {
   };
 });
 ---
+<div class="fx-lead">
+  <div class="fx-wrap">
+    <div class="fx-intro">
+      <p class="fx-eyebrow" id="fx-front-h">{ui.descentHeading}</p>
+      <p class="fx-intro__text">{intro}</p>
+    </div>
+  </div>
+</div>
+
 <section class="fx-front" id={anchor} aria-labelledby="fx-front-h">
 <nav class="fx-bar" id="fx-bar" aria-label={ui.navAria}>
   <div class="fx-bar__inner">
@@ -81,11 +92,6 @@ const bands = STRATA.map(s => {
 
 <div class="fx-descent" id="fx-descent">
   <div class="fx-wrap">
-    <div class="fx-intro">
-      <p class="fx-eyebrow" id="fx-front-h">{ui.descentHeading}</p>
-      <p class="fx-intro__text">{intro}</p>
-    </div>
-
     {bands.map(b => (
       <section class="fx-stratum" id={b.id} aria-labelledby={`${b.id}-name`}>
         <div class="fx-plate">

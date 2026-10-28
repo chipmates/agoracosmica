@@ -16,6 +16,22 @@
 /* No smooth scroll: an era jump on this page can cross ten thousand pixels,
    and a browse hub has to land you on a person at once. */
 
+/* The list's own anchor lands with its era bar right under the site navbar:
+   the root's padding is made for the bands under the bar, less the bar. */
+.fx-front { scroll-margin-top: calc(-1 * (var(--fx-bar) + 1.25rem)); }
+
+/* ── the intro, above the list ────────────────────────────────────────── */
+
+.fx-lead {
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: var(--bg-primary);
+  padding: 2.75rem 0 2.25rem;
+}
+.fx-lead .fx-intro { margin: 0; }
+
 /* ── the era bar ──────────────────────────────────────────────────────── */
 
 .fx-bar {
@@ -151,7 +167,7 @@
       var(--bg-void) 52%,
       var(--bg-void) 88%,
       transparent 100%);
-  padding: 2.75rem 0 3.25rem;
+  padding: 0.75rem 0 3.25rem;
 }
 .fx-wrap {
   max-width: 1120px;
@@ -388,13 +404,22 @@
   }
 }
 @media (max-width: 860px) {
-  .fx-descent { padding: 2rem 0 3rem; }
+  .fx-lead { padding: 2rem 0 1.75rem; }
+  .fx-descent { padding: 0.25rem 0 3rem; }
   .fx-wrap { padding: 0 1.1rem; }
+  /* one column: the band's name and years, its people, then its words, so a
+     visitor sent to the list meets faces in the first screen */
   .fx-stratum {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 1.4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
     padding: 1.9rem 0 2.2rem 2.6rem;
   }
+  .fx-plate { display: contents; }
+  .fx-voices { order: 1; }
+  .fx-caption, .fx-era { order: 2; }
+  .fx-caption { margin-top: 1.1rem; }
+  .fx-era { margin-bottom: 0; }
   .fx-stratum::before { left: 0.6rem; }
   .fx-stratum::after { left: calc(0.6rem - 3px); top: 2.2rem; }
   .fx-voice { grid-template-columns: 48px minmax(0, 1fr); gap: 0.75rem; }
