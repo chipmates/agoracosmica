@@ -296,6 +296,11 @@
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 20%, transparent);
     padding-top: 1.5rem;
   }
+  /* the invitation's own bottom rule already parts the two; a second rule left an empty band */
+  .esy-invite + .esy-sources {
+    border-top: 0;
+    padding-top: 0;
+  }
   .esy-sources p {
     color: var(--text-secondary);
     font-size: var(--text-sm);
