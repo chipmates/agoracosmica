@@ -59,7 +59,8 @@ const shortMonths = (s: string, lang: PlayerLang) =>
 const hasMonth = (s: string, lang: PlayerLang) => MONTHS[lang].some(([full]) => new RegExp(`\\b${full}\\b`).test(s));
 
 export interface YearSet {
-  /** The small lines over the year ("um", "Herbst", "17. Dez.", "Früh-" / "sommer"). */
+  /** The small lines over the year ("um", "Herbst", "17. Dez.", "Früh-" / "sommer"); a field without a year sets its
+   * words here, in the year's place. */
   pre: string[];
   /** The year or the decade, large; empty where the field holds no year. */
   main: string;
@@ -72,8 +73,6 @@ export interface YearSet {
   tight: boolean;
   /** A month's name stood in a line too wide for the column. */
   monthTooWide: boolean;
-  /** A field without a year in figures, at the front of the row's line ("Späte Laufbahn"). */
-  lead: string;
 }
 
 const ERA = /\s+(v\. Chr\.|n\. Chr\.|BCE|BC|AD|CE)$/;
@@ -97,8 +96,9 @@ export function yearSet(year: string, lang: PlayerLang, short = false): YearSet 
   const note = remark ? columnLines(months(remark)) : [];
   const m = s.match(/(?<!\d)(\d{3,4})(er|s)?(?!\d)/);
   if (!m) {
-    return { pre: [], main: '', post: [], note: [], decade: false, tight: false, monthTooWide: false,
-      lead: year.replace(/;\s*/g, ', ') };
+    const words = months([s, era].filter(Boolean).join(' '));
+    return { pre: columnLines(words), main: '', post: [], note, decade: false, tight: false,
+      monthTooWide: smallWidth(words) > COLUMN && hasMonth(words, lang) };
   }
   const main = m[1]! + (m[2] ?? '');
   const decade = !!m[2];
@@ -122,13 +122,16 @@ export function yearSet(year: string, lang: PlayerLang, short = false): YearSet 
   post = months(post);
   const monthTooWide = [pre, post].some(t => smallWidth(t) > COLUMN && hasMonth(t, lang));
   return { pre: pre ? columnLines(pre) : [], main, post: post ? columnLines(post) : [], note, decade,
-    tight: bigWidth(main, decade) > COLUMN + 1, monthTooWide, lead: '' };
+    tight: bigWidth(main, decade) > COLUMN + 1, monthTooWide };
 }
+
+// A period named without a year, as a year for the life's order only (never shown).
+const PERIOD_YEARS: [RegExp, number][] = [[/Ersten Weltkrieg|\bWWI\b|First World War/, 1918]];
 
 /** The year as a number for the life's order, a year before Christ below zero; NaN where there is none. */
 export function yearValue(year: string | undefined): number {
   const y = (year ?? '').match(/(?<!\d)(\d{3,4})(?!\d)/);
-  if (!y) return NaN;
+  if (!y) return PERIOD_YEARS.find(([re]) => re.test(year ?? ''))?.[1] ?? NaN;
   return /v\. Chr\.|\bBCE?\b/.test(year ?? '') ? -Number(y[1]) : Number(y[1]);
 }
 

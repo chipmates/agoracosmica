@@ -77,11 +77,10 @@ const lead = tocLead(ageBound(stories[0]?.age, lang, 'first', rough), ageBound(s
       const details = intro
         ? [r.minutes ? P.minutes(r.minutes) : '']
         : [r.year ? P.approxYear(r.year) : '', place, age, r.minutes ? P.minutes(r.minutes) : ''];
-      // the row's line: a field without a year, the place, the age, the minutes (a date stays whole in its column);
-      // ranges kept whole
+      // the row's line: the place, the age, the minutes (the date stays whole in its column); ranges kept whole
       const subParts = intro
         ? (r.minutes ? [{ cls: '', text: P.introRowSub(r.minutes) }] : [])
-        : [{ cls: 'sp-row__when', text: y?.lead ?? '' }, { cls: 'sp-row__place', text: place }, { cls: 'sp-row__age', text: age },
+        : [{ cls: 'sp-row__place', text: place }, { cls: 'sp-row__age', text: age },
           { cls: '', text: r.minutes ? P.minutes(r.minutes) : '' }].filter(x => x.text);
       return (
         <li class:list={['sp-row', intro && 'sp-row--intro']} id={`idea-${r.n}`} data-n={r.n}>
@@ -101,6 +100,8 @@ const lead = tocLead(ageBound(stories[0]?.age, lang, 'first', rough), ageBound(s
                 <>{y.pre.map((t, i) => <span class={`sp-row__approx${closeOver(y.pre, i)}`}>{t}</span>)}{plain && !y.tight
                   ? y.main
                   : <span class:list={[y.decade && 'sp-row__decade', y.tight && 'sp-row__tight']}>{y.main}</span>}{y.post.map((t, i) => <span class={`sp-row__yearto${i > 0 ? ' sp-row__line' : ''}`}>{t}</span>)}{y.note.map((t, i) => <span class={`sp-row__yearnote${i > 0 ? ' sp-row__line' : ''}`}>{t}</span>)}</>
+              ) : y ? (
+                <>{y.pre.map(t => <span class="sp-row__approx sp-row__period">{t}</span>)}{y.note.map((t, i) => <span class={`sp-row__yearnote${i > 0 ? ' sp-row__line' : ''}`}>{t}</span>)}</>
               ) : null}
             </span>
             <span class="sp-row__body">
