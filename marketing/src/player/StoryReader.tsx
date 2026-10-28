@@ -510,6 +510,9 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     );
   };
 
+  // Back lands where the view opened: on the figure's own page that is the figure, anywhere else the page stays (Close).
+  const onOwnPage = typeof window === 'undefined' || window.location.pathname.replace(/\/?$/, '/') === home;
+
   // The two ways out: in the bar all the way, and again at the end in full words; the page change keeps the voice.
   const storyCount = queue.entries.filter(e => e.n > 0).length;
   const ways = (
@@ -533,9 +536,10 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     >
       <div className="story-reader__bar">
         <div className="story-reader__bar-in">
-          <button ref={backRef} type="button" className="story-btn story-reader__back" onClick={closeReader} aria-label={s.backToAria(queue.name)}>
-            {Icon.back}
-            <span>{queue.name}</span>
+          <button ref={backRef} type="button" className="story-btn story-reader__back" onClick={closeReader}
+            aria-label={onOwnPage ? s.backToAria(queue.name) : s.close}>
+            {onOwnPage ? Icon.back : Icon.close}
+            <span>{onOwnPage ? queue.name : s.close}</span>
           </button>
           <a className="story-btn story-reader__way" href={`${home}#stories`} onClick={leaveReader}>
             {Icon.list}
