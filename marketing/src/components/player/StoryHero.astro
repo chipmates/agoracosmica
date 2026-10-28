@@ -9,7 +9,7 @@ import { numberWord } from '../../lib/figureWorld';
 import { VOICE_DESC_ID, playerStrings } from '../../player/strings';
 import LabelItems from './LabelItems.astro';
 import { storyLabel } from '../../player/label';
-import { keepCompounds, keepRanges } from '../../player/storyFields';
+import { keepCompounds, keepRanges, metaShown } from '../../player/storyFields';
 import { heroLine, ownWords } from '../../player/figureCopy';
 import type { PlayerLang } from '../../player/strings';
 import type { StoryQueue } from '../../player/types';
@@ -39,7 +39,7 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
   <div class="sp-hero__id">
     <div class="sp-hero__names">
       <h1 class="sp-hero__name" id="sp-name">{name}</h1>
-      {meta && <p class="sp-hero__meta">{keepRanges(meta).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>}
+      {meta && <p class="sp-hero__meta">{keepRanges(metaShown(meta)).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>}
     </div>
     <figure class="sp-hero__portrait">
       <picture>

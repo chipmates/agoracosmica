@@ -146,6 +146,21 @@ export function periodShown(period: string): string {
   return period.replace(/\s*\([^()]*\)$/, '').trim();
 }
 
+/**
+ * The line under the name ("Category · dates") with its unbreakable joins: the category's last word and its dot are
+ * one piece, so a wrap puts the dot at the end of the line and the dates on the next; a qualifier keeps to its year
+ * ("ca. 1260"), an ordinal to its word ("5. Jahrhundert", "5th century"), "v. Chr." whole; keepRanges keeps the ranges.
+ */
+export function metaShown(meta: string): string {
+  const at = meta.lastIndexOf(' · ');
+  if (at < 0) return meta;
+  const dates = meta.slice(at + 3)
+    .replace(/(^|\s)(ca\.|c\.|um|etwa|roughly|about) (?=\d)/g, '$1$2\u00a0')
+    .replace(/(\d\.|\d(?:st|nd|rd|th)) (?=\p{L})/gu, '$1\u00a0')
+    .replace(/\b([vn])\. Chr\./g, '$1.\u00a0Chr.');
+  return `${meta.slice(0, at)}\u00a0· ${dates}`;
+}
+
 /** Whether a period's birth year is approximate ("ca. 1260-1327", "c. 5th century BCE", "Späte ..."). */
 export function approxBirth(period: string): boolean {
   return /^(ca\.|c\.|~|um |etwa |about |roughly |late |späte )/i.test(period.trim()) || /Jahrhundert|century/i.test(period);
