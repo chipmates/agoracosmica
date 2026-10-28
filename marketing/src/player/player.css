@@ -686,7 +686,16 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 .sp-row__decade.sp-row__tight { font-size: 0.62em; letter-spacing: 0; }
 /* a range of numbers or a hyphenated compound never breaks at its hyphen */
 .sp-nb { white-space: nowrap; }
-.sp-row__yearto { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-top: 3px; }
+.sp-row__yearto,
+.sp-row__yearnote { font-family: var(--font-ui); font-size: 0.6875rem; line-height: 1.1; letter-spacing: 0.02em; color: var(--sp-ink-3); margin-top: 3px; }
+/* a date's lines after the first under the year, before the last over it, sit close (storyFields.ts sets the lines) */
+.sp-row__approx.sp-row__line { margin-bottom: 0; }
+.sp-row__yearto.sp-row__line,
+.sp-row__yearnote.sp-row__line { margin-top: 0; }
+/* a remark after a span's end or the era stands a little apart from it */
+.sp-row__yearto + .sp-row__yearnote { margin-top: 6px; }
+/* a story without a year: its period's words stand in the year's place */
+.sp-row__period { margin-bottom: 0; color: var(--sp-accent); }
 .sp-row__scroll { width: 26px; height: 26px; fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round; }
 .sp-row__body { min-width: 0; }
 .sp-row__title { display: block; font-family: var(--font-content); font-size: 1.1875rem; line-height: 1.22; color: var(--sp-ink); text-wrap: pretty; }
