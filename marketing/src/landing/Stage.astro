@@ -3,7 +3,8 @@
 // pictures and the voice; the portrait's own alt names it an AI image, no chip on the painting), and the figure page's
 // own plate on that figure's queue (the introduction, then story 1). Complete in markup; stage.ts swaps any of the
 // thirty in place. One stage per page: the plate reads the first queue script.
-import { VOICE_DESC_ID, labelHalves, playerStrings } from '../player/strings';
+import { VOICE_DESC_ID, playerStrings } from '../player/strings';
+import LabelItems from '../components/player/LabelItems.astro';
 import { landingWords } from './words';
 import { DEFAULT_FIGURE, LONG_NAME, MAIN_SIZES, scriptJson, stageFigure, stagePayload } from './thirty';
 import type { LandingLang } from './thirty';
@@ -45,7 +46,6 @@ const {
 
 const W = landingWords(lang);
 const P = playerStrings(lang);
-const halves = labelHalves(W.label);
 const f = stageFigure(firstId, lang);
 const intro = f.queue.entries.find(e => e.n === 0);
 const first = f.queue.entries[0];
@@ -94,11 +94,8 @@ const templates = {
     <details class="story-label sp-label ls-label">
       <summary>
         <span class="sp-label__i" aria-hidden="true">i</span>
-        {/* each half's dot stands before it and is clipped where the half starts a line (landing.css), so a dot never
-            ends a line; the dots are for the eye, a hidden comma parts the items for a screen reader */}
-        <span class="sp-label__brief ls-label__brief">{halves.map((half, i) => (
-          <span class="sp-label__half ls-label__half"><span class="ls-label__dot" aria-hidden="true">·</span>{half.replace(/\u00a0·$/, '')}{i < halves.length - 1 && <span class="sp-sr">,</span>}</span>
-        ))}</span>
+        {/* the same items as on the figure pages: a dot stays with the item before it */}
+        <span class="sp-label__brief"><LabelItems brief={W.label} half="sp-label__half" sr="sp-sr" /></span>
       </summary>
       <p>{W.note}</p>
     </details>
