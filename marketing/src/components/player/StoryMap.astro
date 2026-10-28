@@ -334,11 +334,16 @@ const { VIA_Y, viaX, at, numbers, segments, numberAt, introPick, nextAt } = layo
 const CAP: Record<string, number> = { A: 13.5, B: 12.74, C: 13.95, D: 14.35, E: 12.71, F: 12.07, G: 14.47, H: 15.21, I: 7.88,
   J: 7.69, K: 14.09, L: 12.16, M: 17.57, N: 14.77, O: 14.89, P: 12.17, Q: 14.89, R: 13.33, S: 11.29, T: 13.65, U: 13.95,
   V: 13.15, W: 18.75, X: 14.15, Y: 12.96, Z: 12.46, 'Ä': 13.5, 'Ö': 14.89, 'Ü': 13.95, '-': 9.26, "'": 5.51 };
+const capWidth = (part: string, less: number) => [...part].reduce((s, ch) => s + (CAP[ch] ?? 15) - less, 0);
+// A word wider than a line takes the tighter tracking (0.09em, 0.76 px less a capital), so a word up to about 228 px
+// at the name's tracking still sets whole; a longer one still breaks inside.
+const tightName = mapName.toUpperCase().split(/\s+/).some(word => word.split(/(?<=-)/).some(part => capWidth(part, 0) > 216));
+const LESS = tightName ? 0.76 : 0;
 const nameLines = (() => {
   let lines = 0; let len = 0;
   // a line breaks at a space or after a hyphen; a word longer than a line breaks anywhere
   for (const word of mapName.toUpperCase().split(/\s+/).filter(Boolean)) word.split(/(?<=-)/).forEach((part, k) => {
-    const w = [...part].reduce((s, ch) => s + (CAP[ch] ?? 15), 0); const sp = k ? 0 : 6.32;
+    const w = capWidth(part, LESS); const sp = k ? 0 : 6.32 - LESS;
     if (len && len + sp + w <= 216) { len += sp + w; return; }
     lines += Math.max(1, Math.ceil(w / 216)); len = w % 216 || 216;
   });
@@ -418,7 +423,7 @@ const mapNoteLoose = lang === 'de'
         })}
       </svg>
       <div class="sp-atlas__cartouche">
-        <h3 class="sp-atlas__name" id="sp-map-title">{mapName}</h3>
+        <h3 class:list={['sp-atlas__name', tightName && 'sp-atlas__name--tight']} id="sp-map-title">{mapName}</h3>
         <p class="sp-atlas__epithet">{P.mapBy(queue.name)}</p>
       </div>
     </div>
