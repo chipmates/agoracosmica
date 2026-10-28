@@ -348,7 +348,10 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         </div>
       )}
       <p class="ed-invite__more">
-        <a class="pub-textlink" href="/figures/emily-dickinson/">Read more about Emily Dickinson</a>
+        <a class="ed-invite__more-link" href="/figures/emily-dickinson/"><span class="pub-textlink">Read more about Emily Dickinson</span></a><span class="ed-invite__more-item">
+          <span class="ed-invite__sep" aria-hidden="true">·</span>
+          <a class="ed-invite__more-link" href="/poems/"><span class="pub-textlink">Poems to read</span></a>
+        </span>
       </p>
     </aside>
 
@@ -692,9 +695,31 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
   .ed-invite__reassure + .ed-invite__reassure {
     margin-top: 0.15rem;
   }
+  /* As the essay pages' invite: 44px targets around the unchanged text links,
+     the margins taking back the height they add to the line. */
   .ed-invite__more {
-    margin: 1.4rem 0 0;
+    margin: calc(1.4rem - 8px) 0 -8px;
     font-size: 0.9rem;
+  }
+  .ed-invite__more-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+    text-decoration: none;
+  }
+  .ed-invite__more-link:hover .pub-textlink,
+  .ed-invite__more-link:focus-visible .pub-textlink {
+    color: var(--gold-hover);
+    border-bottom-color: var(--gold-hover);
+  }
+  /* The separator travels with the link after it, so a wrapped line never ends on one. */
+  .ed-invite__more-item {
+    display: inline-flex;
+    align-items: baseline;
+  }
+  .ed-invite__sep {
+    color: var(--text-tertiary);
+    margin: 0 0.55rem;
   }
 
   /* Sources note */
