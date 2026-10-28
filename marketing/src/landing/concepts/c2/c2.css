@@ -159,7 +159,8 @@
 .c2-hero .ls-name { color: var(--sp-n-ink); font-size: clamp(2rem, 9vw, 2.5rem); }
 .c2-hero .ls-name[data-long] { font-size: clamp(1.5rem, 6.6vw, 2rem); }
 .c2-hero .ls-meta { color: var(--sp-n-ink-2); }
-.c2-hero .ls-line { color: var(--sp-n-ink); font-size: 1.125rem; margin-top: 0.35rem; }
+/* balanced, so a short last word never stands alone under a full line ("hinterfragen." at 360 px) */
+.c2-hero .ls-line { color: var(--sp-n-ink); font-size: 1.125rem; margin-top: 0.35rem; text-wrap: balance; }
 .c2-hero .ls-label { margin-top: 0.25rem; }
 .c2-hero .ls-plate-wrap { margin-top: 0; }
 .c2-hero .ls-links { margin-top: 0; }
