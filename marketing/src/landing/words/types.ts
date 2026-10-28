@@ -29,6 +29,8 @@ export interface LandingWords {
   eras: Record<string, string>;
   /** The heading over the thirty by era, as plain links. */
   listHeading: string;
+  /** The explainers that stay (D-171), linked from the footer by their own pages' headings. */
+  explainers: Array<{ href: string; label: string }>;
   /** The row of thirty's accessible name. */
   rowLabel: string;
   /** The two buttons that turn the stage to the next or previous figure, with the name they lead to. */

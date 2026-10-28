@@ -56,6 +56,12 @@ const words: LandingWords = {
     modern: 'Moderne Stimmen',
   },
   listHeading: 'Alle dreißig, nach Epochen',
+  explainers: [
+    { href: '/de/stoizismus/', label: 'Was ist Stoizismus?' },
+    { href: '/de/heldenreise/', label: 'Die Heldenreise' },
+    { href: '/de/figures/plato/hoehlengleichnis/', label: 'Das Höhlengleichnis' },
+    { href: '/de/figures/plato/ideenlehre/', label: 'Die Ideenlehre' },
+  ],
   rowLabel: 'Die dreißig',
   turnNext: name => `Weiter zu ${name}`,
   turnPrevious: name => `Zurück zu ${name}`,

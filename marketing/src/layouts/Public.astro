@@ -57,6 +57,8 @@ interface Props {
   /** The landing's redesign: its own tagline in the bar and the footer, no Echoes link. */
   tagline?: string;
   echoesLink?: boolean;
+  /** The landing's redesign: the bar and the footer link only the pages that stay, plus these explainers. */
+  trimmedChrome?: { explainers: Array<{ href: string; label: string }> };
 }
 
 const props = Astro.props;
@@ -90,11 +92,18 @@ const revealSticky = isHome || props.heroReveal === true;
         altDe={props.altDe}
         storyPage={props.storyPage === true}
         tagline={props.tagline}
+        trimmed={props.trimmedChrome !== undefined}
       />
       <main class="pub-main" id="main-content" data-agc-read={props.reading === true ? '' : undefined}>
         <slot />
       </main>
-      <Footer lang={props.lang} tagline={props.tagline} echoesLink={props.echoesLink} />
+      <Footer
+        lang={props.lang}
+        tagline={props.tagline}
+        echoesLink={props.echoesLink}
+        trimmed={props.trimmedChrome !== undefined}
+        explainers={props.trimmedChrome?.explainers}
+      />
     </div>
     <!-- Mobile-only sticky CTA. On mobile the navbar CTA sits inside the
          hamburger, so this keeps a visible app entry at the bottom. Hidden on

@@ -10,9 +10,12 @@ interface Props {
   tagline?: string;
   /** Off: no "why we call them Echoes" link (the method page's link stays). */
   echoesLink?: boolean;
+  /** The stories' chrome (the landing's redesign): only the pages that stay, with the explainers that stay. */
+  trimmed?: boolean;
+  explainers?: Array<{ href: string; label: string }>;
 }
 
-const { lang, tagline, echoesLink = true } = Astro.props;
+const { lang, tagline, echoesLink = true, trimmed = false, explainers = [] } = Astro.props;
 const t = getT(lang);
 
 // The museum's name stays English in every language; its descriptor always stands beside it.
@@ -28,15 +31,20 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
 
     <div class="pub-footer__links">
       <div class="pub-footer__col">
-        <a href={publicUrl(lang, '/figures')}>{t('nav.figures')}</a>
-        <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>
-        <a href={publicUrl(lang, '/audio')}>{t('nav.audio')}</a>
+        {!trimmed && <a href={publicUrl(lang, '/figures')}>{t('nav.figures')}</a>}
+        {!trimmed && <a href={publicUrl(lang, '/themes')}>{t('nav.themes')}</a>}
+        {!trimmed && <a href={publicUrl(lang, '/audio')}>{t('nav.audio')}</a>}
         <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
-        {echoesLink && <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>}
+        {echoesLink && !trimmed && <a href={publicUrl(lang, '/echoes')}>{t('nav.whyEchoes')}</a>}
         <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
-        <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>
+        {!trimmed && <a href={publicUrl(lang, '/open-source-philosophy-app')}>{lang === 'de' ? 'Open-Source-App' : 'Open source app'}</a>}
         <a href={lang === 'de' ? '/de/about/#kontakt' : '/about/#contact'}>{t('nav.contact')}</a>
       </div>
+      {explainers.length > 0 && (
+        <div class="pub-footer__col">
+          {explainers.map(x => <a href={x.href}>{x.label}</a>)}
+        </div>
+      )}
       <div class="pub-footer__col">
         <a href="/impressum/">{t('footer.impressum')}</a>
         <a href={lang === 'en' ? '/privacy/' : '/datenschutz/'}>{t('footer.datenschutz')}</a>

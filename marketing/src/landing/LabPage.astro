@@ -36,6 +36,7 @@ const dockLabel = newChrome
   storyPage
   tagline={newChrome ? W.tagline : undefined}
   echoesLink={!newChrome}
+  trimmedChrome={newChrome ? { explainers: W.explainers } : undefined}
 >
   <PlayerHead slot="head" figurePage />
   <div class="story-page landing-lab">

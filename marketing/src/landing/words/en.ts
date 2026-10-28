@@ -56,6 +56,10 @@ const words: LandingWords = {
     modern: 'Modern Voices',
   },
   listHeading: 'All thirty, by era',
+  explainers: [
+    { href: '/stoicism/', label: 'What Is Stoicism?' },
+    { href: '/the-heros-journey/', label: "The Hero's Journey" },
+  ],
   rowLabel: 'The thirty',
   turnNext: name => `Next: ${name}`,
   turnPrevious: name => `Previous: ${name}`,
