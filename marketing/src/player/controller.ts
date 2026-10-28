@@ -66,6 +66,7 @@ let state: PlayerState = {
   resume: null,
   readerOpen: false,
   readerN: null,
+  readerQueue: null,
   dismissed: false,
   done: [],
   endCard: null,
@@ -331,7 +332,7 @@ function startStory(queue: StoryQueue, n: number, startAt: number): void {
   updateMetadata();
 }
 
-function sameQueue(a: StoryQueue | null, b: StoryQueue | null): boolean {
+export function sameQueue(a: StoryQueue | null, b: StoryQueue | null): boolean {
   return !!a && !!b && a.figureId === b.figureId && a.lang === b.lang;
 }
 
@@ -464,18 +465,20 @@ export function setAutoNext(on: boolean): void {
   }
 }
 
-export function openReader(n: number): void {
-  if (!state.queue && !readPageQueue()) return;
-  setState({ readerOpen: true, readerN: n, sheet: state.sheet === 'facts' ? state.sheet : null, away: false });
+/** Open item n of the given figure, by default the page's (else the playing one's). */
+export function openReader(n: number, queue?: StoryQueue | null): void {
+  const shown = queue ?? readPageQueue() ?? state.queue;
+  if (!shown) return;
+  setState({ readerOpen: true, readerN: n, readerQueue: shown, sheet: state.sheet === 'facts' ? state.sheet : null, away: false });
 }
 
 export function closeReader(): void {
-  setState({ readerOpen: false, readerN: null, away: false, sheet: state.sheet === 'player' ? state.sheet : null });
+  setState({ readerOpen: false, readerN: null, readerQueue: null, away: false, sheet: state.sheet === 'player' ? state.sheet : null });
 }
 
 /** Kept for the islands that call it: open shows the playing item. */
 export function setReaderOpen(open: boolean): void {
-  if (open && state.current !== null) openReader(state.current);
+  if (open && state.current !== null) openReader(state.current, state.queue);
   else if (!open) closeReader();
 }
 
@@ -497,7 +500,7 @@ export function dismiss(): void {
   audio?.pause();
   saveProgress(true);
   stopEndTimer();
-  setState({ dismissed: true, readerOpen: false, readerN: null, resume: null, sheet: null, endCard: null, sleep: 'off', sleepLeft: 0 });
+  setState({ dismissed: true, readerOpen: false, readerN: null, readerQueue: null, resume: null, sheet: null, endCard: null, sleep: 'off', sleepLeft: 0 });
   offerResumeForPage();
   updatePositionState();
 }
@@ -787,6 +790,10 @@ export function installPlayer(): void {
   document.addEventListener('astro:page-load', () => {
     loadForPage();
     offerResumeForPage();
+  });
+  // The reading view belongs to the page it opened over: any page change, a link or the browser's back, closes it.
+  document.addEventListener('astro:before-swap', () => {
+    if (state.readerOpen) closeReader();
   });
   document.addEventListener('astro:after-swap', applyStoredTheme);
   applyStoredTheme();

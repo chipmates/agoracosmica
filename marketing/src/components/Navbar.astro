@@ -4,7 +4,7 @@
 
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
-import { publicUrl, stripLangPrefix } from '../lib/urls';
+import { figureListUrl, publicUrl, stripLangPrefix } from '../lib/urls';
 
 interface Props {
   lang: Lang;
@@ -36,8 +36,9 @@ const langSwitchUrl = crossSlugTwin
     ? (otherLang === 'de' ? '/de/' : '/')
     : publicUrl(otherLang, stripLangPrefix(currentPath));
 
-// Only the pages that stay: the figure list, the themes and the audio page went (their addresses forward).
+// The front's list of the thirty first, then the pages that stay (the themes and the audio page forward).
 const navLinks = [
+  { to: figureListUrl(lang), label: t('nav.allFigures') },
   { to: publicUrl(lang, '/about'), label: t('nav.about') },
   { to: publicUrl(lang, lang === 'de' ? '/about/#kontakt' : '/about/#contact'), label: t('nav.contact') },
 ];

@@ -554,6 +554,12 @@
         if (firstLink) firstLink.focus();
       }
     });
+    // The front's own list is a same-page jump, which leaves no page load to close the panel.
+    nav.addEventListener('click', function (e) {
+      if (!e.target.closest || !e.target.closest('a')) return;
+      nav.classList.remove('pub-navbar__nav--open');
+      burger.setAttribute('aria-expanded', 'false');
+    });
     // Escape closes the open panel and returns focus to the burger button.
     document.addEventListener('keydown', function (e) {
       if (e.key !== 'Escape') return;

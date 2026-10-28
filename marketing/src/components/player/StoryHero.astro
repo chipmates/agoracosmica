@@ -91,18 +91,14 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
       <button type="button" class="sp-textlink" data-story-play data-story-n={first?.n ?? 0} data-story-from="0" data-door="hero_start_over" aria-describedby={VOICE_DESC_ID}>{P.startOver}</button>
     </p>
   </div>
-  <p class="sp-hero__links">
-    <button type="button" class="sp-textlink" data-story-read={first?.n ?? 0} data-door="hero_read">
-      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.6C9.7 5 6.6 4.7 3.5 5.6v12.8c3.1-.9 6.2-.6 8.5 1M12 6.6c2.3-1.6 5.4-1.9 8.5-1v12.8c-3.1-.9-6.2-.6-8.5 1M12 6.6v12.8" /></svg>
-      <span>{P.readInstead}</span>
-    </button>
-    {own && (
+  {own && (
+    <p class="sp-hero__links">
       <a class="sp-textlink sp-textlink--own" href={own.href} data-door="hero_own_words">
         <span>{own.label}{own.note && <span class="sp-textlink__note">{own.note}</span>}</span>
       </a>
-    )}
-  </p>
-  {/* the label closes the first screen, under the links: away from the picture and the words, still before any play */}
+    </p>
+  )}
+  {/* the label closes the first screen, under the play card: away from the picture and the words, still before any play */}
   <details class="story-label sp-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>

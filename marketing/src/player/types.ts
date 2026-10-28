@@ -83,6 +83,8 @@ export interface PlayerState {
   readerOpen: boolean;
   /** The item the reading view shows. */
   readerN: number | null;
+  /** Whose item it shows: after a soft page change the page's figure can differ from the playing one. */
+  readerQueue: StoryQueue | null;
   /** The visitor ended playback; the next tap on a story opens the dock again. */
   dismissed: boolean;
   /** Items heard or read to the end in this browser, for the figure in the queue or on the page. */

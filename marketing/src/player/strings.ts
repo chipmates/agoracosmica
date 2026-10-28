@@ -16,6 +16,8 @@ export interface PlayerStrings {
   /** The story door under a poem: its heading and the link to the figure page. English takes 's after a final s too (the site's "Aurelius's"). */
   doorTitle: (name: string, countWord: string) => string;
   allStories: (countWord: string) => string;
+  /** The front's list of the thirty, as the menu names it. */
+  allFigures: string;
   /** The credit under the hero portrait: short, so it never outweighs the picture. */
   portraitNote: string;
   /** The plate: what a tap does, then what plays. */
@@ -171,6 +173,7 @@ const en: PlayerStrings = {
   retellingNote: () => `A retelling in the first person.`,
   doorTitle: (name, word) => `${name}'s life, told in ${word} stories`,
   allStories: word => `All ${word} stories`,
+  allFigures: 'All 30 figures',
   portraitNote: PORTRAIT_CREDIT.en,
   begin: 'Begin',
   // The line wraps at its comma (no-break spaces hold the rest), never with a dot at a line's end.
@@ -302,6 +305,7 @@ const de: PlayerStrings = {
   retellingNote: () => `Eine Nacherzählung in der Ich-Form.`,
   doorTitle: (name, word) => `Das Leben von ${name} in ${word} Geschichten`,
   allStories: word => `Alle ${word} Geschichten`,
+  allFigures: 'Alle 30 Menschen',
   portraitNote: PORTRAIT_CREDIT.de,
   begin: 'Beginnen',
   beginSub: m => `Einführung (${m} Min.), dann Geschichte 1`,

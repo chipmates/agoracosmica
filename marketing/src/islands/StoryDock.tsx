@@ -17,8 +17,10 @@ import {
   getState,
   installPlayer,
   listenNow,
+  openReader,
   openSheet,
   readPageQueue,
+  sameQueue,
   seekTo,
   setAway,
   voicePosition,
@@ -89,6 +91,19 @@ const SERVER_STATE: PlayerState = getState();
 /** The figure page a queue belongs to, as a path. */
 function figurePath(lang: PlayerLang, slug: string): string {
   return `${lang === 'de' ? '/de' : ''}/figures/${slug}/`;
+}
+
+/** The front's list of the thirty (lib/urls' figureListUrl, kept out of this bundle). */
+function listPath(lang: PlayerLang): string {
+  return lang === 'de' ? '/de/#alle' : '/#all';
+}
+
+/** The bar's expand: the playing story's reading view, and from inside it the full player. */
+function expandDock(): void {
+  const now = getState();
+  if (now.current === null || !now.queue) return;
+  if (now.readerOpen && now.readerN === now.current && sameQueue(now.readerQueue, now.queue)) openSheet('player');
+  else openReader(now.current, now.queue);
 }
 
 function currentPath(): string {
@@ -173,7 +188,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   // A press or a focus on a story control, or a story playing, fetches the reader's parts ahead of their first use.
   useEffect(() => {
     const intent = (e: Event) => {
-      if (e.target instanceof Element && e.target.closest('[data-story-read], [data-story-saved-open], [data-story-hero-plate], .sp-act, .story-dock')) warm();
+      if (e.target instanceof Element && e.target.closest('[data-story-play], [data-story-read], [data-story-saved-open], .sp-act, .story-dock')) warm();
     };
     document.addEventListener('pointerdown', intent, true);
     document.addEventListener('focusin', intent, true);
@@ -315,7 +330,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     void document.fonts?.ready.then(fit);
   }, [fit]);
 
-  const gesture = useOpenGesture(() => openSheet('player'));
+  const gesture = useOpenGesture(expandDock);
 
   // The live region speaks at a start; the hidden word is the description every start control points at, so the label
   // is heard with the button, before any sound.
@@ -328,7 +343,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   // One offer at a time: where the page's plate offers the kept point, the bar stays down.
   const plateOffers = typeof document !== 'undefined' && document.querySelector('[data-story-hero-plate]') !== null;
   const offer = !loaded && state.resume !== null && !plateOffers;
-  const readerQueue = state.readerOpen ? readPageQueue() ?? state.queue : null;
+  const readerQueue = state.readerOpen ? state.readerQueue : null;
 
   // A bar outside the router (the poem door) lives and dies with its page: a link away would stop the story.
   const routed = typeof document !== 'undefined' && document.querySelector('[data-astro-transition-persist="story-dock"]') !== null;
@@ -341,7 +356,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
         <Suspense fallback={null}>
           <StoryReader state={state} queue={readerQueue} n={state.readerN} label={labels[readerQueue.lang]}
             factsWord={facts[readerQueue.lang].facts} documentedWord={facts[readerQueue.lang].documented}
-            recreatedWord={facts[readerQueue.lang].recreated} />
+            recreatedWord={facts[readerQueue.lang].recreated}
+            home={figurePath(readerQueue.lang, readerQueue.slug)} selection={listPath(readerQueue.lang)} />
         </Suspense>
       )}
       {state.sheet && (
@@ -383,7 +399,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
-  const inReader = state.readerOpen && state.readerN === current;
+  const inReader = state.readerOpen && state.readerN === current && sameQueue(state.readerQueue, queue);
   const card = state.endCard;
   const nextEntry = card ? queue.entries.find(e => e.n === card.next) : undefined;
   const clock = bare ? clockLabel(state.time) : wholeClock;
@@ -474,8 +490,8 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
           <Suspense fallback={plainBack}>
             <BarBack state={state} queue={queue} s={s} />
           </Suspense>
-          <button type="button" className="story-btn story-dock__open" onClick={() => openSheet('player')}
-            aria-label={`${s.openPlayer}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
+          <button type="button" className="story-btn story-dock__open" onClick={expandDock}
+            aria-label={`${inReader ? s.openPlayer : s.readAlong}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
             {Icon.up}
           </button>
         </div>

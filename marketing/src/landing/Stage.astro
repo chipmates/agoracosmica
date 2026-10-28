@@ -133,15 +133,9 @@ const templates = {
     <Fragment>
       {/* play stays here (a phone plays only from the tap itself); the figure's page is one clear button away */}
       <a class="ls-allbtn" href={f.href} data-stage-all data-door="home_all">{W.allStories(storyCount)}</a>
-      <p class="sp-hero__links ls-links">
-        <button type="button" class="sp-textlink" data-story-read={first?.n ?? 0} data-door="home_read">
-          <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M12 6.6C9.7 5 6.6 4.7 3.5 5.6v12.8c3.1-.9 6.2-.6 8.5 1M12 6.6c2.3-1.6 5.4-1.9 8.5-1v12.8c-3.1-.9-6.2-.6-8.5 1M12 6.6v12.8" /></svg>
-          <span>{P.readInstead}</span>
-        </button>
-      </p>
     </Fragment>
   )}
-  {/* the label closes the first screen, under the links: away from the picture, still before any play */}
+  {/* the label closes the first screen, under the figure's button: away from the picture, still before any play */}
   <details class="story-label sp-label ls-label">
     <summary>
       <span class="sp-label__i" aria-hidden="true">i</span>

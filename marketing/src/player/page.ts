@@ -16,6 +16,7 @@ import {
   playStory,
   readPageQueue,
   readProgress,
+  sameQueue,
   subscribe,
 } from './controller';
 import { LIST_SEP, clockLabel, playerStrings } from './strings';
@@ -23,10 +24,6 @@ import { showToast } from './toast';
 import type { PlayerState, StoryQueue } from './types';
 
 const DESKTOP = '(min-width: 1024px)';
-
-function sameQueue(a: StoryQueue | null, b: StoryQueue | null): boolean {
-  return !!a && !!b && a.figureId === b.figureId && a.lang === b.lang;
-}
 
 function setText(el: Element | null | undefined, text: string): void {
   if (el && el.textContent !== text) el.textContent = text;
@@ -382,6 +379,12 @@ function selectStar(n: number): void {
 }
 
 /** The dock rises under the thumb: the control just pressed, with the whole row or map card around it, moves up out of its way. */
+/** A tap that starts the voice opens its reading view in the same tap (the text follows the voice). */
+function readAlong(): void {
+  const now = getState();
+  if (now.current !== null && now.queue) openReader(now.current, now.queue);
+}
+
 function keepPressedInView(el: HTMLElement): void {
   const block = el.closest<HTMLElement>('.sp-row.is-open, [data-story-mapsel]') ?? el;
   let frames = 0;
@@ -426,14 +429,16 @@ function onClick(e: MouseEvent): void {
     e.preventDefault();
     const dockWasUp = state.current !== null && !state.dismissed;
     const action = plateAction(state, queue);
+    const pausing = action.kind === 'toggle' && (state.status === 'playing' || state.status === 'loading');
     if (action.kind === 'next') {
       listenNow();
     } else if (action.kind === 'toggle') {
-      if (state.status === 'playing' || state.status === 'loading') pause();
+      if (pausing) pause();
       else play();
     } else {
       playStory(queue, action.n, action.from);
     }
+    if (!pausing) readAlong();
     if (!dockWasUp) keepPressedInView(plate);
     return;
   }
@@ -443,8 +448,12 @@ function onClick(e: MouseEvent): void {
     if (!queue.entries.some(entry => entry.n === n)) return;
     e.preventDefault();
     const dockWasUp = state.current !== null && !state.dismissed;
+    // playStory toggles the item already playing: that tap pauses and stays on the page
+    const pausing = playBtn.dataset.storyFrom === undefined && state.current === n && sameQueue(state.queue, queue)
+      && (state.status === 'playing' || state.status === 'loading');
     if (playBtn.dataset.storyFrom !== undefined) playFrom(queue, n, Number(playBtn.dataset.storyFrom) || 0);
     else playStory(queue, n);
+    if (!pausing) readAlong();
     if (!dockWasUp) keepPressedInView(playBtn);
     return;
   }
@@ -457,7 +466,7 @@ function onClick(e: MouseEvent): void {
   const read = target.closest<HTMLElement>('[data-story-read]');
   if (read) {
     e.preventDefault();
-    openReader(Number(read.dataset.storyRead));
+    openReader(Number(read.dataset.storyRead), queue);
     return;
   }
   const facts = target.closest<HTMLElement>('[data-story-facts]');

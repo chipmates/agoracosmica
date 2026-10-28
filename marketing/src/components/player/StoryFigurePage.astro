@@ -22,7 +22,7 @@ import StoryHero from './StoryHero.astro';
 import StoryContents from './StoryContents.astro';
 import StoryMap from './StoryMap.astro';
 import { getT } from '../../i18n';
-import { publicUrl } from '../../lib/urls';
+import { figureListUrl, publicUrl } from '../../lib/urls';
 import { getSeedsFor } from '../../lib/seeds';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
@@ -187,6 +187,7 @@ const note = storyNote(figureId, lang, figure.name);
     <FigureShadow figureId={figureId} lang={lang} />
     <SourcesBlock figureId={figureId} lang={lang} />
     <EchoNote variant="figure" name={figure.name} lang={lang} note={note} />
+    <a class="sp-backall" href={figureListUrl(lang)}>{t('nav.allFigures')}</a>
   </div>
   {/* Never rendered: the reference keeps the shared figure components' styles in
       the chunk the other figure pages load, so their build stays as on main. */}

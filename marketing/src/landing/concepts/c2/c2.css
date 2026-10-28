@@ -168,8 +168,8 @@
 /* balanced, so a short last word never stands alone under a full line ("hinterfragen." at 360 px) */
 .c2-hero .ls-line { color: var(--sp-n-ink); font-size: 1.125rem; margin-top: 0.35rem; text-wrap: balance; }
 .c2-hero .ls-label { margin-top: 0.25rem; }
-.c2-hero .ls-plate-wrap { margin-top: 0; }
-.c2-hero .ls-links { margin-top: 0; }
+/* a clear gap between the line and the play box, on every width */
+.c2-hero .ls-plate-wrap { margin-top: 1rem; }
 
 .c2-intro {
   margin: 1.5rem 0 0;
@@ -320,6 +320,7 @@
   .c2-hero .ls-name { font-size: 3rem; }
   .c2-hero .ls-name[data-long] { font-size: 2.5rem; }
   .c2-hero .ls-line { font-size: 1.25rem; }
+  .c2-hero .ls-plate-wrap { margin-top: 1.25rem; }
   .c2-rail__lead { margin: 0 0 6px; font-size: 1rem; }
   .c2-rail__scroll { overflow: visible; padding: 0; }
   .c2-rail__eras { flex-wrap: wrap; width: auto; row-gap: 4px; column-gap: 8px; }

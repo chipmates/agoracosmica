@@ -433,13 +433,12 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   color: var(--sp-ink-2);
   text-wrap: pretty;
 }
-/* A short phone screen: the name a step smaller and the gaps tighter, so the label under the links stays on the first
-   screen; taller screens keep the sizes above. */
+/* A short phone screen: the name a step smaller and the gaps tighter, so the label under the play card stays on the
+   first screen; taller screens keep the sizes above. */
 @media (max-height: 700px) and (max-width: 1023.98px) {
   .sp-hero__name { font-size: 2.25rem; margin: 0.25rem 0; }
   .sp-hero__line { margin: 0.5rem 0 0.375rem; }
   .sp-hero__note { margin-bottom: 0.25rem; }
-  .sp-hero .sp-plate-wrap { margin-top: 0.25rem; }
   .sp-hero .sp-hero__links { margin-top: 0; }
   /* links that take a second row (the own words) would push the label off: it sits right under the play card */
   .sp-hero:has(.sp-textlink--own) { display: flex; flex-direction: column; }
@@ -455,6 +454,11 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 
 /* The plate: its disc becomes the player, its words the state. */
 .sp-plate-wrap { margin-top: 0.375rem; }
+/* a clear gap between the note and the play box, on every width (the note's own line height adds a little) */
+.sp-hero .sp-plate-wrap { margin-top: 0.875rem; }
+@media (min-width: 1024px) {
+  .sp-hero .sp-plate-wrap { margin-top: 1.125rem; }
+}
 .sp-plate {
   display: flex;
   align-items: center;
@@ -1073,6 +1077,35 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
 /* The related cards' credit in the page's own ink, as the portrait's credit, in both lights. */
 .story-page .ai-credit { color: var(--sp-ink-3); }
 .story-page .pub-echo-note { font-style: normal; opacity: 1; color: var(--sp-ink-3); border-left-color: var(--sp-hair-strong); }
+/* The way back to the thirty at the page's end: the front's figure button, its chevron turned back. */
+.story-page .sp-backall {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 460px;
+  min-height: 48px;
+  padding: 0 16px;
+  font-family: var(--font-ui);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--sp-accent);
+  text-decoration: none;
+  background: var(--sp-plate);
+  border: 1px solid var(--sp-hair-strong);
+  border-radius: 6px;
+  transition: border-color var(--transition-fast, 150ms ease), background-color var(--transition-fast, 150ms ease);
+}
+.story-page .sp-backall::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-top: 2px solid currentColor;
+  border-right: 2px solid currentColor;
+  transform: rotate(-135deg);
+}
+.story-page .sp-backall:hover { border-color: var(--sp-accent); background: var(--sp-plate-hover); }
+.story-page .sp-backall:focus-visible { outline: 2px solid var(--sp-focus); outline-offset: 2px; }
 
 /* "Listen to the story" under a concept answer: a small disc and its name. */
 .story-play--hear {
@@ -1962,6 +1995,9 @@ html:has(.story-reader) { overflow: hidden; }
 .story-reader__lives { list-style: none; margin: 4px 0 0; padding: 0; }
 .story-reader__lives a { display: inline-flex; align-items: center; min-height: 44px; font-family: var(--font-content); font-size: 1.125rem; color: var(--sp-accent); }
 .story-reader__share { margin: 18px 0 0; }
+/* the two ways out of the reading view, under the title and again at the end */
+.story-reader__ways { display: flex; flex-wrap: wrap; column-gap: 22px; margin: 8px 0 0; }
+.story-reader__end .story-reader__ways { margin-top: 14px; }
 .story-reader .sp-act__disc svg { fill: currentColor; stroke: none; }
 .story-reader .sp-act > svg { fill: none; }
 @media (min-width: 1024px) {

@@ -18,6 +18,7 @@ import {
   playFrom,
   playStory,
   readProgress,
+  sameQueue,
   saveSentence,
   removeSaved,
   seekTo,
@@ -47,6 +48,9 @@ interface Props {
   factsWord: string;
   documentedWord: string;
   recreatedWord: string;
+  /** The figure's page and the front's list of the thirty: the two ways out. */
+  home: string;
+  selection: string;
 }
 
 const LINE_HEIGHT = { tight: 1.45, normal: 1.62, airy: 1.85 } as const;
@@ -77,7 +81,7 @@ function useWide(): boolean {
   return wide;
 }
 
-export default function StoryReader({ state, queue, n, label, factsWord, documentedWord, recreatedWord }: Props) {
+export default function StoryReader({ state, queue, n, label, factsWord, documentedWord, recreatedWord, home, selection }: Props) {
   const s = playerStrings(queue.lang);
   const display = useSyncExternalStore(subscribeDisplay, getDisplay, () => SERVER_DISPLAY);
   const wide = useWide();
@@ -97,7 +101,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const programmaticUntil = useRef(0);
   const lit = useRef<{ w: number; si: number; bi: number | null }>({ w: -1, si: -1, bi: null });
 
-  const here = state.current === n && !state.dismissed;
+  const here = state.current === n && !state.dismissed && sameQueue(state.queue, queue);
   const playingHere = here && (state.status === 'playing' || state.status === 'loading');
   const entry = queue.entries.find(e => e.n === n);
 
@@ -140,12 +144,13 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   // ---- the reader follows the voice into the next story ----
   const nowCurrent = state.current;
   const nowDismissed = state.dismissed;
+  const nowOwn = sameQueue(state.queue, queue);
   const prevCurrent = useRef(nowCurrent);
   useEffect(() => {
     const before = prevCurrent.current;
     prevCurrent.current = nowCurrent;
-    if (before === n && nowCurrent !== null && nowCurrent === n + 1 && !nowDismissed) openReader(nowCurrent);
-  }, [nowCurrent, nowDismissed, n]);
+    if (before === n && nowCurrent !== null && nowCurrent === n + 1 && !nowDismissed && nowOwn) openReader(nowCurrent, queue);
+  }, [nowCurrent, nowDismissed, nowOwn, n, queue]);
 
   // ---- display settings onto the page ----
   useLayoutEffect(() => {
@@ -488,6 +493,15 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     );
   };
 
+  // Two ways out, under the title and again at the end; a link's page change goes on with the voice.
+  const storyCount = queue.entries.filter(e => e.n > 0).length;
+  const ways = (
+    <p className="story-reader__ways">
+      <a className="sp-linkbtn" href={`${home}#stories`} onClick={closeReader}>{s.allStories(String(storyCount))}</a>
+      <a className="sp-linkbtn" href={selection} onClick={closeReader}>{s.allFigures}</a>
+    </p>
+  );
+
   return (
     <section
       ref={readerRef}
@@ -557,6 +571,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                 </span>
               </button>
             )}
+            {ways}
           </header>
           <div className="story-reader__orn" aria-hidden="true">
             <svg viewBox="0 0 12 12" focusable="false"><path d="M6 0l1.3 4.7L12 6l-4.7 1.3L6 12l-1.3-4.7L0 6l4.7-1.3z" /></svg>
@@ -614,7 +629,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                         <span className="sp-act__s">{nextEntry.minutes ? s.minutes(nextEntry.minutes) : ''}</span>
                       </span>
                     </button>
-                    <button type="button" className="sp-act" onClick={() => openReader(nextEntry.n)}>
+                    <button type="button" className="sp-act" onClick={() => openReader(nextEntry.n, queue)}>
                       {Icon.book}<span>{s.read}</span>
                     </button>
                   </div>
@@ -624,11 +639,12 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                   <p className="story-reader__nextk">{s.afterLast}</p>
                   <ul className="story-reader__lives">
                     {queue.related!.slice(0, 2).map(life => (
-                      <li key={life.href}><a href={life.href}>{life.name}</a></li>
+                      <li key={life.href}><a href={life.href} onClick={closeReader}>{life.name}</a></li>
                     ))}
                   </ul>
                 </div>
               )}
+              {ways}
               <p className="story-reader__share">
                 <button type="button" className="sp-linkbtn" onClick={() => shareStory(queue, n)}>{Icon.share}<span>{s.shareStory}</span></button>
               </p>

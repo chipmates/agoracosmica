@@ -54,7 +54,7 @@ interface Props {
 }
 
 export default function Sheets({ state, facts, wide, home }: Props) {
-  const queue = state.sheet === 'player' ? state.queue : readPageQueue() ?? state.queue;
+  const queue = state.sheet === 'player' ? state.queue : (state.readerOpen ? state.readerQueue : null) ?? readPageQueue() ?? state.queue;
   const titleRef = useRef<HTMLHeadingElement | null>(null);
   const opener = useRef<Element | null>(null);
   const kind = state.sheet;
@@ -198,7 +198,7 @@ function PlayerSheet({ state, queue, s, w, titleRef, home }: { state: PlayerStat
           </div>
         </div>
         <div className="sp-fp__links">
-          <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); openReader(current); }}>{Icon.book}<span>{s.read}</span></button>
+          <button type="button" className="sp-linkbtn" onClick={() => { closeSheet(); openReader(current, queue); }}>{Icon.book}<span>{s.read}</span></button>
           <button type="button" className="sp-linkbtn" onClick={() => openSheet('facts', current)}>{Icon.checkCircle}<span>{w.facts}</span></button>
           {home && stories > 0 && <a className="sp-linkbtn" href={home} onClick={closeSheet}><span>{s.allStories(String(stories))}</span></a>}
           <button type="button" className="sp-linkbtn sp-linkbtn--quiet" onClick={dismiss}>{s.stopAll}</button>

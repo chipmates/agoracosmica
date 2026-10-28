@@ -54,6 +54,12 @@ function bindMenu(): void {
     burger.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) nav.querySelector<HTMLElement>('a')?.focus();
   });
+  // The front's own list is a same-page jump, which leaves no page load to close the panel.
+  nav.addEventListener('click', e => {
+    if (!(e.target instanceof Element) || !e.target.closest('a')) return;
+    nav.classList.remove(MENU_OPEN);
+    burger.setAttribute('aria-expanded', 'false');
+  });
 }
 
 function onMenuEscape(e: KeyboardEvent): void {

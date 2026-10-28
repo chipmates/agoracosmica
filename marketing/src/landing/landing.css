@@ -88,7 +88,6 @@
 }
 .ls-label { margin-top: 0.375rem; }
 .ls-plate-wrap { margin-top: 0.25rem; }
-.ls-links { margin-top: 0.125rem; }
 /* the front's plate a step smaller than the figure page's: the face above keeps the room */
 .ls-plate { min-height: 72px; gap: 12px; padding: 8px 12px 8px 8px; }
 .ls-plate .sp-disc { width: 56px; height: 56px; }
