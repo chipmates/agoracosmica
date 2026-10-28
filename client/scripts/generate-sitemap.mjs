@@ -209,7 +209,7 @@ if (isIndexable(readingPages.meditations)) {
 urls.push(url('/de/figures/plato/hoehlengleichnis', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/hoehlengleichnis.astro')));
 urls.push(url('/de/figures/plato/ideenlehre', '0.6', gitLastModified('marketing/src/pages/de/figures/plato/ideenlehre.astro')));
 
-// Cross-slug pairs (the explainers, the method page, the terms). Unlike every
+// Cross-slug pairs (the explainers, the terms). Unlike every
 // pair above, these EN/DE twins use DIFFERENT slugs, so the standard url()/deUrl() helpers (which
 // assume a /de prefix of the same slug) cannot express their hreflang block.
 // crossPair() emits both pages of a pair, each listing the SAME alternate set
@@ -238,15 +238,6 @@ const STOICISM_MOD = gitLastModified(
   'marketing/src/pages/de/stoizismus.astro',
 );
 urls.push(...crossPair('/stoicism', '/de/stoizismus', '0.7', STOICISM_MOD));
-
-// Methodology / editorial-standards page (trust + E-E-A-T). Cross-slug EN/DE
-// twin (/methodology vs /de/methodik), so crossPair() like the hubs.
-const METHODOLOGY_MOD = gitLastModified(
-  'marketing/src/pages/methodology.astro',
-  'marketing/src/pages/de/methodik.astro',
-  'marketing/src/components/MethodologyContent.astro',
-);
-urls.push(...crossPair('/methodology', '/de/methodik', '0.6', METHODOLOGY_MOD));
 
 // Legal pages (German only, no hreflang pairs, no /de/ prefix)
 urls.push(url('/impressum', '0.3', LEGAL_MOD['/impressum']));

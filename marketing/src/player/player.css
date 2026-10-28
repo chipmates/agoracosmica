@@ -1058,7 +1058,6 @@ body:has(.story-page) .pub-navbar__lang { min-width: 44px; }
   max-width: 36em;
 }
 .story-page .fig-concepts { gap: 2.5rem; }
-.story-page .pub-figure__methodlink { margin: -1.75rem 0 0; font-size: 0.9375rem; }
 .story-page .pub-figure__hublink { margin: 0.5rem 0 0; }
 .story-page .fig-related { margin-top: 0.6rem; }
 .story-page .fig-related__title {

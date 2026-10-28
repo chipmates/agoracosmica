@@ -196,7 +196,6 @@ const S = de
       related: 'Menschen, die hier immer wieder auftauchen',
       themes: 'Große Fragen, die dieses Werk berührt',
       voice: 'Wie dieses Echo klingt',
-      method: 'Wie wir diese Echos bauen und prüfen',
       poemsLink: 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift (auf Englisch) →',
       beginLead: 'Du wählst, wo es losgeht. Die Geschichte oder deine eigene Frage.',
     }
@@ -205,7 +204,6 @@ const S = de
       related: 'People who keep coming up here',
       themes: 'The big questions this work touches',
       voice: 'How this Echo sounds',
-      method: 'How we build and fact-check these Echoes',
       poemsLink: 'Read her poems grouped by theme, in her own hand →',
       beginLead: 'You choose where it starts. The story, or your own question.',
     };
@@ -245,10 +243,6 @@ if (figure.essence) {
   )}
 
   <FigureQA figureId={figureId} lang={lang} />
-
-  <p class="pub-section__text pub-figure__methodlink">
-    <a class="pub-textlink" href={de ? '/de/methodik/' : '/methodology/'}>{S.method}</a>
-  </p>
 
   <FigureSixWays figureId={figureId} figureName={figure.name} lang={lang} />
 
@@ -456,9 +450,6 @@ if (figure.essence) {
     color: var(--gold-deep);
   }
   .pub-figure__hublink { margin: 0.5rem 0 0; }
-  /* The method link belongs to the honesty capsule above it, not to the
-     section below, so it climbs back up into that block's own spacing. */
-  .pub-figure__methodlink { margin: -2rem 0 3rem; font-size: 0.95rem; }
   /* Related-figures rows: horizontal card variant (a class, not an inline
      style, so the strict CSP style-src needs no 'unsafe-inline'). */
   .pub-figure-card.pub-figure-card--row {

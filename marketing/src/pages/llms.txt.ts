@@ -86,7 +86,6 @@ export const GET: APIRoute = () => {
   lines.push('## Key pages');
   lines.push(`- [Home](${SITE_URL}/)`);
   lines.push(`- [About](${SITE_URL}/about/)`);
-  lines.push(`- [Methodology: how we build the Echoes](${SITE_URL}/methodology/): how each AI Echo is built from primary works, sourced, and fact-checked, with a public factcheck per figure and open-source code.`);
   lines.push(`- [Full text index (llms-full.txt)](${SITE_URL}/llms-full.txt): every figure's full description and all question-and-answer pairs.`);
   lines.push('- [Source code (GitHub)](https://github.com/chipmates/agoracosmica)');
   lines.push('');

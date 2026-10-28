@@ -73,13 +73,11 @@ const aboutLinks = links.filter(link => !sectionLinks.includes(link));
 const S = de
   ? {
       deeper: 'Zu einem Thema tiefer:',
-      method: 'Wie wir die Fakten prüfen',
       related: 'Menschen, die hier immer wieder auftauchen',
       themes: 'Große Fragen, die dieses Werk berührt',
     }
   : {
       deeper: 'Go deeper on one thing:',
-      method: 'How we check the facts',
       related: 'People who keep coming up here',
       themes: 'The big questions this work touches',
     };
@@ -106,7 +104,6 @@ const relatedLives = relatedFigureIds.slice(0, 2).flatMap(relId => {
 const queue = buildStoryQueue(figureId, slug, figure.name, lang, relatedLives);
 const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
 // The figure template's hub line stays off: its target still promises the chat.
-const methodHref = de ? '/de/methodik/' : '/methodology/';
 const note = storyNote(figureId, lang, figure.name);
 ---
 <div class="pub-figure story-page">
@@ -141,9 +138,6 @@ const note = storyNote(figureId, lang, figure.name);
 
   <div class="sp-more">
     <FigureQA figureId={figureId} lang={lang} />
-    <p class="pub-section__text pub-figure__methodlink">
-      <a class="pub-textlink" href={methodHref}>{S.method}</a>
-    </p>
 
     <FigureConcepts figureId={figureId} slug={slug} lang={lang} links={sectionLinks} player />
 
@@ -192,9 +186,7 @@ const note = storyNote(figureId, lang, figure.name);
 
     <FigureShadow figureId={figureId} lang={lang} />
     <SourcesBlock figureId={figureId} lang={lang} />
-    {note
-      ? <EchoNote variant="figure" name={figure.name} lang={lang} note={note} link={{ href: methodHref, label: `${S.method} →` }} />
-      : <EchoNote variant="figure" name={figure.name} lang={lang} />}
+    <EchoNote variant="figure" name={figure.name} lang={lang} note={note} />
   </div>
   {/* Never rendered: the reference keeps the shared figure components' styles in
       the chunk the other figure pages load, so their build stays as on main. */}

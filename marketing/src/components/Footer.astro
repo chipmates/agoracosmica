@@ -27,10 +27,9 @@ const museumLabel = lang === 'de' ? 'Museum of Ages, ein digitales Museum' : 'Mu
     </div>
 
     <div class:list={['pub-footer__links', { 'pub-footer__links--four': explainers.length > 0 }]}>
-      {/* Only the pages that stay: the figure list, themes, audio, Echo and the app page went (they forward). */}
+      {/* Only the pages that stay: the figure list, themes, audio, Echo, the method page and the app page went (they forward). */}
       <div class="pub-footer__col">
         <a href={publicUrl(lang, '/about')}>{t('nav.about')}</a>
-        <a href={lang === 'de' ? '/de/methodik/' : '/methodology/'}>{lang === 'de' ? 'Methodik' : 'Methodology'}</a>
         <a href={lang === 'de' ? '/de/about/#kontakt' : '/about/#contact'}>{t('nav.contact')}</a>
       </div>
       {explainers.length > 0 && (

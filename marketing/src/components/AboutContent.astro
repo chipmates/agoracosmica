@@ -65,7 +65,6 @@ const barriers = (['barrierGeographic', 'barrierAcademic', 'barrierAge', 'barrie
 const figures = getFiguresCatalog(lang);
 const figureMap = new Map(figures.map(f => [f.id, f]));
 
-const methodologyHref = isDe ? '/de/methodik/' : '/methodology/';
 const contactAnchor = isDe ? 'kontakt' : 'contact';
 const contactAnchorAlt = isDe ? 'contact' : 'kontakt';
 const country = isDe ? 'Deutschland' : 'Germany';
@@ -186,10 +185,6 @@ const museum = isDe
         </a>
       </p>
     </div>
-    <p class="pub-section__text pub-about-trustlinks">
-      {t('about.trustLinksLead')}{' '}
-      <a class="pub-textlink" href={methodologyHref}>{t('about.methodologyLink')}</a>
-    </p>
     <h3 class="pub-about-sub">{t('about.voiceCredits.title')}</h3>
     <p class="pub-section__text">{t('about.voiceCredits.body')}</p>
   </section>
@@ -265,7 +260,6 @@ const museum = isDe
     margin: 2rem 0 0.85rem;
   }
 
-  .pub-about-trustlinks,
   .pub-about-legalnote {
     margin-top: 1.4rem;
   }
