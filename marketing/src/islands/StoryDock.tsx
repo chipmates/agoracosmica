@@ -6,8 +6,9 @@
 // The bar is one row on every screen: the coin; a line that names who is
 // playing and the story's number from the first frame, with the clock; the
 // pages of the story under it (at a visit's first story, the voice note holds
-// their place for its seconds); back one sentence; the caret to the open
-// player, which holds everything else.
+// their place for its seconds); back one sentence; Read, the way back into the
+// text while it is closed; the caret to the open player, which holds
+// everything else.
 
 import { Suspense, lazy, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from 'react';
 import type { MouseEvent as ReactMouseEvent, PointerEvent as ReactPointerEvent } from 'react';
@@ -98,12 +99,16 @@ function listPath(lang: PlayerLang): string {
   return lang === 'de' ? '/de/#alle' : '/#all';
 }
 
-/** The bar's expand: the playing story's reading view, and from inside it the full player. */
+/** The bar's caret: the full player, never the text (the bar's Read opens that). */
 function expandDock(): void {
+  if (getState().current === null) return;
+  openSheet('player');
+}
+
+/** The bar's Read: the playing story's text. */
+function readPlaying(): void {
   const now = getState();
-  if (now.current === null || !now.queue) return;
-  if (now.readerOpen && now.readerN === now.current && sameQueue(now.readerQueue, now.queue)) openSheet('player');
-  else openReader(now.current, now.queue);
+  if (now.current !== null && now.queue) openReader(now.current, now.queue);
 }
 
 /** The end card's "Listen now" plays a story: its reading view opens with it, as from the page (not by the poem door). */
@@ -497,8 +502,14 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
           <Suspense fallback={plainBack}>
             <BarBack state={state} queue={queue} s={s} />
           </Suspense>
+          {!inReader && (
+            <button type="button" className="story-btn story-dock__read" onClick={readPlaying} aria-label={`${s.read}: ${title}`}>
+              {Icon.book}
+              <span>{s.read}</span>
+            </button>
+          )}
           <button type="button" className="story-btn story-dock__open" onClick={expandDock}
-            aria-label={`${inReader ? s.openPlayer : s.readAlong}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
+            aria-label={`${s.openPlayer}: ${title}${sleepOn ? `${LIST_SEP}${s.sleepAria(sleepOn)}` : ''}`}>
             {Icon.up}
           </button>
         </div>
