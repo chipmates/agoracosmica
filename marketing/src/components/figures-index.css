@@ -12,6 +12,8 @@
   --fx-navbar: 64px;
   --fx-bar: 52px;
   scroll-padding-top: calc(var(--fx-navbar) + var(--fx-bar) + 1.25rem);
+  /* a link scrolled to (a tap, a tab) stays clear of the player bar */
+  scroll-padding-bottom: var(--sp-dock-h, 0px);
 }
 /* No smooth scroll: an era jump on this page can cross ten thousand pixels,
    and a browse hub has to land you on a person at once. */
