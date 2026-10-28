@@ -25,9 +25,10 @@ const dockLabel = {
 };
 const home = lang === 'de' ? `${SITE_URL}/de/` : `${SITE_URL}/`;
 // Markup says what the page shows: the thirty it lists (oldest first), the site and its makers, in the head's words.
+// The makers' shared slogan names the chat, which has ended, so it stays out here (undefined drops from the JSON).
 const schemas = [
   { ...agoraCosmicaSchema(), description: W.description, slogan: W.tagline },
-  organizationSchema(),
+  { ...organizationSchema(), slogan: undefined },
   { ...webSiteSchema(), description: W.tagline },
   itemListSchema(THIRTY.map(f => ({ name: f.name[lang], url: canonicalUrl(f.href[lang]) }))),
   breadcrumbSchema([{ name: 'Agora Cosmica', url: home }]),
