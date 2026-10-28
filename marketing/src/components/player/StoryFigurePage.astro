@@ -26,7 +26,6 @@ import { publicUrl } from '../../lib/urls';
 import { getSeedsFor } from '../../lib/seeds';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
-import { figureThemes } from '@client/data/public/figureSeo';
 import { getFigureQA } from '@client/data/public/figureQA';
 import { dickinsonPoemsFaqEn, dickinsonPoemsFaqDe } from '../../lib/dickinsonPoemsFaq';
 import { getFigurePageContent } from '@client/data/public/figurePageContent';
@@ -106,7 +105,6 @@ const relatedLives = relatedFigureIds.slice(0, 2).flatMap(relId => {
 });
 const queue = buildStoryQueue(figureId, slug, figure.name, lang, relatedLives);
 const queueJson = JSON.stringify(queue).replace(/</g, '\\u003c');
-const themesForFigure = figureThemes[figureId] ?? [];
 // The figure template's hub line stays off: its target still promises the chat.
 const methodHref = de ? '/de/methodik/' : '/methodology/';
 const note = storyNote(figureId, lang, figure.name);
@@ -191,19 +189,6 @@ const note = storyNote(figureId, lang, figure.name);
       )}
     </FigureLattice>
 
-    {themesForFigure.length > 0 && (
-      <section class="pub-section fig-themes">
-        <h2 class="pub-section__title">{S.themes}</h2>
-        <div class="pub-grid pub-grid--3">
-          {themesForFigure.map(themeId => (
-            <a href={publicUrl(lang, `/themes/${themeId}`)} class="pub-theme-card">
-              <h3 class="pub-theme-card__name">{t(`themes.${themeId}.name`)}</h3>
-              <p class="pub-theme-card__tagline">{t(`themes.${themeId}.tagline`)}</p>
-            </a>
-          ))}
-        </div>
-      </section>
-    )}
 
     <FigureShadow figureId={figureId} lang={lang} />
     <SourcesBlock figureId={figureId} lang={lang} />

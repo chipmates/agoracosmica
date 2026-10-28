@@ -146,7 +146,7 @@ export function agoraCosmicaSchema(): Record<string, unknown> {
     url: SITE_URL,
     logo: ORG_LOGO,
     description:
-      'A nonprofit, open source education platform. Listen to life stories, learn from teachings, and talk with 30 figures from history, in English and German.',
+      'Short stories from the lives of 30 people, from Plato to Frida Kahlo, freely retold. Nonprofit and open source.',
     slogan: 'Short stories about life',
     sameAs: [
       'https://github.com/chipmates/agoracosmica',
@@ -162,7 +162,7 @@ export function webSiteSchema(): Record<string, unknown> {
     '@id': `${SITE_URL}/#website`,
     name: 'Agora Cosmica',
     url: SITE_URL,
-    description: 'A Living Library You Can Talk To',
+    description: 'Short stories about life',
     publisher: { '@id': AGORA_ID },
     inLanguage: ['en', 'de'],
   };
