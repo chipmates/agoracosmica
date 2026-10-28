@@ -4,8 +4,13 @@
 // dock too, so a listener can open them without the story stopping.
 
 import { poemsByPoet } from '../data/poems/index.mjs';
+import { figureSlugToId } from '@client/data/public/slugMap';
 
-export const STORY_PLAYER_SLUGS: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart'];
+const LIVE: readonly string[] = ['marcus-aurelius', 'joseph-campbell', 'emily-dickinson', 'meister-eckhart'];
+
+// The fit check (scripts/check-player-fit.mjs) builds every figure on the player into its own folder, so a figure's
+// page is checked before it is listed above; a plain build never sets the flag.
+export const STORY_PLAYER_SLUGS: readonly string[] = process.env.PLAYER_FIT_ALL === '1' ? Object.keys(figureSlugToId) : LIVE;
 
 /** Pages outside the figure template that keep the dock alive, by path. */
 export const STORY_PLAYER_COMPANIONS: Readonly<Record<string, readonly string[]>> = {
