@@ -17,9 +17,9 @@ Written on 2026-10-28.
 
 **What changed from 1.2.0.** Only the list of steps on the card. The app's chat ends with this version, so of the steps 1.2.0 named only two still send anything: the yes itself and 30 seconds of listening. The first sentence of the fine print became two sentences, what a yes sends and what Google learns from it. Every other word of the card stays as in 1.2.0. With it, a click on a Start Exploring button sends no conversion any more ([`marketing/public/agc-public.js`](../marketing/public/agc-public.js)), and the worker refuses every step but these two ([`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts)). **Re-ask:** every 1.2.0 yes is asked again. A no stays a no.
 
-**When it is asked.** As under 1.2.0 from 2026-10-26.
+**When it is asked.** At one of two moments, drawn at random for each page load that arrives with a click ID and no answer on record, half and half, with the same words in both. At once: on any page, as 1.2.0 asked from 14 October. Later: on a figure's story page once a minute of a story has been heard, on a poem page once the poem is read, on any other page not at all, as 1.2.0 was changed to ask on 2026-10-26. The draw lives in the page's memory and nothing is stored for it. It rides on our own anonymous counts of the question and of the listening, never to Google ([MEASUREMENT.md](MEASUREMENT.md), [`marketing/src/islands/ArrivalChoice.tsx`](../marketing/src/islands/ArrivalChoice.tsx)). The click ID leaves the address on arrival in both, so a reload is not asked.
 
-**How it is shown.** As under 1.2.0.
+**How it is shown.** As under 1.2.0. On a story page the card stands at the foot of the screen until the player's dock appears with the first story, then just above the dock.
 
 **What it says**, German:
 
