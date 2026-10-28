@@ -239,11 +239,15 @@ function layout(intro: Pt | null, FIT_H: number, words: Words) {
   // last each star's "next" tag: off every number (its own too), the name, the marks; nearer its own ring than any
   // other star's; beside the ring first, on the side away from the plate's right edge (the app's 62 % rule), then
   // round the ring; where no spot is clear the tag stands under the map instead
+  // (the earlier next rule too: another star's number and the introduction's name keep a figure beside and a line
+  // above and below, and the tag stands nearer its own ring than any of them)
   const tagHard = (i: number, a: Box) => {
     let bad = clearOfMarks(i, a, 24 + MARGIN) + numBoxes.filter(b => hits(a, grow(b, MARGIN))).length;
     if (nameBox && hits(a, grow(nameBox, MARGIN))) bad++;
     const own = toPoint(a, at[i]![0], at[i]![1]) - 24;
     if (at.some(([x, y], j) => j !== i && toPoint(a, x, y) - 20 <= own)) bad++;
+    const others = [...numberBox.filter((b, j): b is Box => !!b && j !== i), ...(nameBox && i !== introAt ? [nameBox] : [])];
+    for (const b of others) if (hits(a, grow(b, 4.5, 13.5)) || gap(a, b) <= own + 0.5) bad++;
     return bad;
   };
   const tagBox = (i: number, c: Spot): Box => {
