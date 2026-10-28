@@ -146,9 +146,12 @@
 }
 .fx-bar.is-off { visibility: hidden; }
 
+/* the five names need about 743 px: under 1024 the label and the depth make room for them */
+@media (max-width: 1023px) {
+  .fx-bar__label, .fx-bar__depth { display: none; }
+}
 @media (max-width: 860px) {
   .fx-bar__inner { padding: 0 0.9rem; gap: 0.6rem; }
-  .fx-bar__label, .fx-bar__depth { display: none; }
 }
 
 /* ── the descent ──────────────────────────────────────────────────────── */
