@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Harriet Tubman?',
-        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Interviews mit ihr und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Harriet Tubman lebte von etwa 1822 bis 1913. Von ihr gibt es keine Aufnahme, und fast alles, was wir in ihren Worten haben, haben die Menschen aufgeschrieben, die mit ihr gesprochen haben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Interviews mit ihr und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Harriet Tubman lebte von etwa 1822 bis 1913. Von ihr gibt es keine Aufnahme, und fast alles, was wir in ihren Worten haben, stammt aus Interviews, die andere aufgeschrieben haben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

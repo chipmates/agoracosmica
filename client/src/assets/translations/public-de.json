@@ -351,8 +351,8 @@
     "valueOpenness": "Offenheit: Gemeinnützig. Open Source. Für die Gemeinschaft gebaut.",
     "valueTransformation": "Wandlung: Was innen wächst, wirkt nach außen.",
     "whyTitle": "Warum es das gibt",
-    "whyP1": "Die Gedanken, die Menschen am meisten helfen, sind oft am schwersten zu erreichen. Sie stehen in Büchern, die dir niemand in die Hand drückt, in Kursen, die Geld kosten, in Sätzen, die für andere Fachleute geschrieben sind. Wir finden, das ist verkehrt herum. Also haben wir 30 Menschen aus Philosophie, Wissenschaft, Glaube, Kunst und Aktivismus ausgewählt und ihr Leben und ihr Denken in kurze Geschichten gefasst.",
-    "whyP2": "Für uns ist es ein Erfolg an dem Tag, an dem du über uns hinauswächst. Von unseren kurzen Geschichten zu den echten Büchern. Von einer Geschichte, die mit KI geschrieben wurde, zu einem Menschen, der lehrt. Von Neugier zum eigenen Studium. Darum geht es.",
+    "whyP1": "Die Gedanken, die Menschen am meisten helfen, sind oft am schwersten zu erreichen. Sie stehen in Büchern, die dir niemand in die Hand drückt, in Kursen, die Geld kosten, in Sätzen, die für andere Fachleute geschrieben sind. Wir finden, das ist verkehrt herum. Also haben wir 30 Menschen aus Philosophie, Wissenschaft, Glauben, Kunst und Aktivismus ausgewählt und ihr Leben und ihr Denken in kurze Geschichten gefasst.",
+    "whyP2": "Für uns ist es ein Erfolg an dem Tag, an dem du über uns hinauswächst. Von unseren kurzen Geschichten zu den echten Büchern. Von einer Geschichte, die mit KI geschrieben wurde, zu einem Menschen, von dem du lernst. Von Neugier zum eigenen Studium. Darum geht es.",
     "barriersTitle": "Was normalerweise im Weg steht",
     "barriersIntro": "Die Ideen bemerkenswerter Menschen der Geschichte gehören allen.",
     "barrierGeographic": "Geografisch: Weltweit verfügbar, rund um die Uhr.",
@@ -393,7 +393,7 @@
     "echoesLink": "Warum wir sie Echos nennen",
     "voiceCredits": {
       "title": "Sprachtechnologie",
-      "body": "Die deutsche Sprachsynthese verwendet Qwen3-TTS als primäre Engine, mit F5-TTS von SWivid et al. (MIT-Code) als Overflow-Tier. Das deutsche Fine-Tuning für F5-TTS stammt von hvoss-techfak (CC-BY-NC-4.0), trainiert auf Mozilla Common Voice 19.0 (CC-BY-4.0) und dem Emilia-Datensatz. Die englische Sprachsynthese verwendet Kokoro von hexgrad. Die Live-Transkription nutzt faster-whisper, eine CTranslate2-Portierung von OpenAIs Whisper, ausgeliefert über Speaches."
+      "body": "Die Geschichten und die Einführungen werden von synthetischen Stimmen gelesen, erzeugt mit ElevenLabs, einem kommerziellen Dienst für Sprachsynthese. Die Lesung von Emily Dickinsons Gedicht auf ihrer Gedichtseite entstand auf dieselbe Weise. Von keiner der dreißig Figuren gibt es eine Aufnahme, in der sie diese Worte liest."
     },
     "contactTitle": "Kontakt",
     "contactP1": "Wir stehen am Anfang, und wir werden Fehler machen. Wenn wir zu stark vereinfachen, etwas falsch darstellen oder das Wesentliche verfehlen, schreib uns. Wir bauen das nicht für dich, sondern mit dir.",

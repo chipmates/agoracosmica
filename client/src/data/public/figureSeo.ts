@@ -96,12 +96,12 @@ export const figureSeo: Record<string, FigureSeoData> = {
   },
   dickinson: {
     en: {
-      description: "Who Emily Dickinson was: nearly 1,800 poems, almost none published, a life in Amherst. Read her poems, hear her story in twelve chapters, ask her Echo.",
+      description: "Who Emily Dickinson was: nearly 1,800 poems, almost none published, a life in Amherst. Read her poems, then hear her life in twelve short stories.",
       teachingsHeading: "Emily Dickinson on Solitude, Perception, and Mystery",
       seoTitle: "Emily Dickinson - Poetry & Solitude | Agora Cosmica",
     },
     de: {
-      description: "Wer Emily Dickinson war: fast 1.800 Gedichte, kaum eines veröffentlicht, ein Leben in Amherst. Ihre Geschichte in zwölf Kapiteln und ihre Gedichte im Original.",
+      description: "Wer Emily Dickinson war: fast 1.800 Gedichte, kaum eines veröffentlicht, ein Leben in Amherst. Ihr Leben in zwölf kurzen Geschichten und ihre Gedichte im Original.",
       teachingsHeading: "Emily Dickinson über Einsamkeit, Wahrnehmung und Mysterium",
       seoTitle: "Emily Dickinson - Dichtung & Einsamkeit | Agora Cosmica",
     },

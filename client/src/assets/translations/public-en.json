@@ -354,7 +354,7 @@
     "doTitle": "What you can do here",
     "doP1": "30 remarkable people from history, each life told in the first person in a set of short stories. From Marcus Aurelius to Frida Kahlo, from Rumi to Virginia Woolf. The stories draw on what these people wrote, on their documented lives, and on the ideas they spent their lives developing.",
     "doP2": "Every story is written with AI from primary works, historical context, and sources we cross-check, and we review it before it is published. The words are a retelling. The source material underneath is not. Where a story goes past the documented record, the factcheck says so.",
-    "doP3": "Every story can be heard, read by a synthetic voice, or read as text. No account needed.",
+    "doP3": "You can listen to every story, read aloud by a synthetic voice, or read it yourself as text. No account needed.",
     "howItWorks": {
       "subtitle": "Every person here comes with six ways in. Pick the one that fits your evening.",
       "story": "Listen to a 12-chapter narrated life story. Every story is fact-checked and covers the moments that shaped their thinking.",
@@ -385,7 +385,7 @@
     "echoesLink": "Why we call them Echoes",
     "voiceCredits": {
       "title": "Voice technology",
-      "body": "German voice synthesis uses Qwen3-TTS as the primary engine, with F5-TTS by SWivid et al. (MIT code) as the overflow tier. The F5-TTS German fine-tuning is by hvoss-techfak (CC-BY-NC-4.0), trained on Mozilla Common Voice 19.0 (CC-BY-4.0) and the Emilia dataset. English voice synthesis uses Kokoro by hexgrad. Live transcription uses faster-whisper, a CTranslate2 port of OpenAI's Whisper, served via Speaches."
+      "body": "The stories and the introductions are read by synthetic voices made with ElevenLabs, a commercial text-to-speech service. The reading of Emily Dickinson's poem on her poems page was made the same way. No recording of any of the thirty reading these words exists."
     },
     "contactTitle": "Contact",
     "contactP1": "We are early in this, and we will get things wrong. When we oversimplify, misrepresent, or miss the point, tell us. We are not building this for you, we are building it with you.",
