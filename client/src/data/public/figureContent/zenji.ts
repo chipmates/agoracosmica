@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Dōgen Zenji speaking?',
-        a: "No. This is an Echo of Dōgen Zenji. It is an AI voice built from his own writings, and it stays an interpretation, not a recording. He lived from 1200 to 1253 and no recording of him exists. Use it as a way into his practice, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his writings and the later accounts of his life. A synthetic voice reads them. Not a recording. Never his own words. Dōgen Zenji lived from 1200 to 1253. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Dōgen Zenji?',
-        a: "Nein. Das hier ist ein Echo von Dōgen Zenji. Es ist eine KI-Stimme, gebaut aus seinen eigenen Schriften, und sie bleibt eine Deutung, keine Aufnahme. Er lebte von 1200 bis 1253, und Aufnahmen von ihm gibt es nicht. Nimm es als Weg in seine Übung, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Schriften und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Dōgen Zenji lebte von 1200 bis 1253. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

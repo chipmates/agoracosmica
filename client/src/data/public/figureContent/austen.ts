@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Jane Austen speaking?',
-        a: 'No. This is an Echo of Jane Austen. It is an AI voice built from her novels and her documented life, and it stays an interpretation, not a recording. The real writer lived from 1775 to 1817, and no recording of her exists. Use it as a way into her books, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her novels, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Jane Austen lived from 1775 to 1817. No recording of her exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Jane Austen?',
-        a: 'Nein. Das hier ist ein Echo von Jane Austen. Es ist eine KI-Stimme, gebaut aus ihren Romanen und ihrem belegten Leben, und sie bleibt eine Deutung, keine Aufnahme. Die echte Schriftstellerin lebte von 1775 bis 1817, und von ihr gibt es keine Aufnahme. Nimm es als Weg in ihre Bücher, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Romanen, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Jane Austen lebte von 1775 bis 1817. Von ihr gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

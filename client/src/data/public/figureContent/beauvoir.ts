@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Simone de Beauvoir speaking?',
-        a: 'No. This is an Echo of Simone de Beauvoir. It is an AI voice built from her documented writings, and it stays an interpretation, not a recording. The real woman lived from 1908 to 1986 and no recording of her is used here. Use it as a way into her ideas, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her memoirs, The Second Sex and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Simone de Beauvoir lived from 1908 to 1986. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Simone de Beauvoir?',
-        a: 'Nein. Das hier ist ein Echo von Simone de Beauvoir. Es ist eine KI-Stimme, gebaut aus ihren überlieferten Schriften, und sie bleibt eine Deutung, keine Aufnahme. Die echte Frau lebte von 1908 bis 1986, und hier wird keine Tonaufnahme von ihr verwendet. Nimm es als Weg in ihre Ideen, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Memoiren, „Das andere Geschlecht“ und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Simone de Beauvoir lebte von 1908 bis 1986. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

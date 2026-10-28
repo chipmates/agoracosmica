@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Ada Lovelace speaking?',
-        a: 'No. This is an Echo of Ada Lovelace. It is an AI voice built from her documented writing, above all the 1843 Notes, and it stays an interpretation, not a recording. She lived from 1815 to 1852, and no recording of her exists. Use it as a way into her ideas, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her Notes of 1843, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Ada Lovelace lived from 1815 to 1852. No recording of her exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Ada Lovelace?',
-        a: 'Nein. Das hier ist ein Echo von Ada Lovelace. Es ist eine KI-Stimme, gebaut aus ihren überlieferten Schriften, vor allem den Anmerkungen von 1843, und sie bleibt eine Deutung, keine Aufnahme. Sie lebte von 1815 bis 1852, und es gibt keine Aufnahme von ihr. Nimm es als Weg in ihre Ideen, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Notes von 1843, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Ada Lovelace lebte von 1815 bis 1852. Von ihr gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

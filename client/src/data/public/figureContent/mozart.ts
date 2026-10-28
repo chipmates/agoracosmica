@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Wolfgang Amadeus Mozart speaking?',
-        a: 'No. This is an Echo of Mozart. It is an AI voice built from his documented life and his ideas about music, and it stays an interpretation, not a recording. He lived from 1756 to 1791, and no recording of him exists. Use it as a way into how he thought, never as his own words.',
+        a: "No. These stories retell his life in the first person. They were written with AI from the Mozart family's letters and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Mozart lived from 1756 to 1791. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Wolfgang Amadeus Mozart?',
-        a: 'Nein. Das hier ist ein Echo von Mozart. Es ist eine KI-Stimme, gebaut aus seinem belegten Leben und seinen Gedanken über Musik, und sie bleibt eine Deutung, keine Aufnahme. Er lebte von 1756 bis 1791, und es gibt keine Aufnahme von ihm. Nimm es als Weg zu seinem Denken, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Briefen der Familie Mozart und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Mozart lebte von 1756 bis 1791. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

@@ -351,8 +351,8 @@
     "valueOpenness": "Offenheit: Gemeinnützig. Open Source. Für die Gemeinschaft gebaut.",
     "valueTransformation": "Wandlung: Was innen wächst, wirkt nach außen.",
     "whyTitle": "Warum es das gibt",
-    "whyP1": "Die Gedanken, die Menschen am meisten helfen, sind oft am schwersten zu erreichen. Sie stehen in Büchern, die dir niemand in die Hand drückt, in Kursen, die Geld kosten, in Sätzen, die für andere Fachleute geschrieben sind. Wir finden, das ist verkehrt herum. Also haben wir 30 Menschen aus Philosophie, Wissenschaft, Glaube, Kunst und Aktivismus geholt, damit du ihr Denken in deinen eigenen Worten besprechen kannst.",
-    "whyP2": "Für uns ist es ein Erfolg an dem Tag, an dem du über uns hinauswächst. Von unseren kurzen Einführungen zu den echten Büchern. Vom Gespräch mit einer KI zum Gespräch mit einem Menschen. Von Neugier zum eigenen Studium. Darum geht es.",
+    "whyP1": "Die Gedanken, die Menschen am meisten helfen, sind oft am schwersten zu erreichen. Sie stehen in Büchern, die dir niemand in die Hand drückt, in Kursen, die Geld kosten, in Sätzen, die für andere Fachleute geschrieben sind. Wir finden, das ist verkehrt herum. Also haben wir 30 Menschen aus Philosophie, Wissenschaft, Glaube, Kunst und Aktivismus ausgewählt und ihr Leben und ihr Denken in kurze Geschichten gefasst.",
+    "whyP2": "Für uns ist es ein Erfolg an dem Tag, an dem du über uns hinauswächst. Von unseren kurzen Geschichten zu den echten Büchern. Von einer Geschichte, die mit KI geschrieben wurde, zu einem Menschen, der lehrt. Von Neugier zum eigenen Studium. Darum geht es.",
     "barriersTitle": "Was normalerweise im Weg steht",
     "barriersIntro": "Die Ideen bemerkenswerter Menschen der Geschichte gehören allen.",
     "barrierGeographic": "Geografisch: Weltweit verfügbar, rund um die Uhr.",
@@ -360,9 +360,9 @@
     "barrierAge": "Alter: Willkommen für alle ab 16 Jahren.",
     "barrierEconomic": "Wirtschaftlich: Open Source, gemeinnützig, ohne Bezahlschranken, ohne Werbung.",
     "doTitle": "Was du hier tun kannst",
-    "doP1": "30 bemerkenswerte Menschen aus der Geschichte, jeder mit eigener Stimme. Von Mark Aurel bis Frida Kahlo, von Rumi bis Virginia Woolf. Wenn sie sprechen, schöpfen sie aus ihrer echten Philosophie, ihren realen Lebenserfahrungen und den Ideen, die sie ihr ganzes Leben lang entwickelt haben.",
-    "doP2": "Jede Stimme baut auf Hauptwerken, historischem Kontext und Quellen, die wir gegenprüfen. Die Echos sind KI, die genauen Worte ändern sich also bei jeder Frage. Das Quellmaterial bleibt. Wo die Erzählung über das Belegte hinausgeht, sagt der Faktencheck das.",
-    "doP3": "360 erzählte Geschichtskapitel, 360 Kernlehren, 360 Prisma-Dialoge aus mehreren Perspektiven, 110 produzierte Council-Debatten, eine vollständige Audiothek und eigene Councils, bei denen du die Teilnehmer wählst. Mit 30 kostenlosen Nachrichten pro Tag zum Einstieg.",
+    "doP1": "30 bemerkenswerte Menschen aus der Geschichte, jedes Leben in kurzen Geschichten in der Ich-Form erzählt. Von Mark Aurel bis Frida Kahlo, von Rumi bis Virginia Woolf. Die Geschichten schöpfen aus dem, was diese Menschen geschrieben haben, aus ihrem belegten Leben und aus den Ideen, die sie ihr ganzes Leben lang entwickelt haben.",
+    "doP2": "Jede Geschichte wird mit KI nach Hauptwerken, historischem Kontext und Quellen geschrieben, die wir abgleichen, und wir lesen jede gegen, bevor sie erscheint. Die Worte sind eine Nacherzählung. Das Quellmaterial darunter nicht. Wo eine Geschichte über das Belegte hinausgeht, sagt der Faktencheck das.",
+    "doP3": "Jede Geschichte kannst du hören, vorgelesen von einer synthetischen Stimme, oder als Text lesen. Ohne Konto.",
     "howItWorks": {
       "subtitle": "Zu jedem Menschen gehören sechs Wege hinein. Nimm den, der zu deinem Abend passt.",
       "story": "Höre eine 12-teilige erzählte Lebensgeschichte. Jede Geschichte ist faktengeprüft und behandelt die Momente, die das Denken dieses Menschen geprägt haben.",
@@ -375,7 +375,7 @@
     },
     "figures": {
       "title": "Die 30 Menschen",
-      "description": "Von antiken Philosophen bis zu modernen Künstlern, von östlichen Weisen bis zu westlichen Wissenschaftlern. Jede und jeder mit eigener Stimme, eigener Geschichte und 12 Kernlehren, die du entdecken kannst."
+      "description": "Von antiken Philosophen bis zu modernen Künstlern, von östlichen Weisen bis zu westlichen Wissenschaftlern. Jede und jeder mit eigener Geschichte, in der Ich-Form erzählt und an den Quellen geprüft."
     },
     "trustTitle": "Kann man Agora Cosmica vertrauen?",
     "trustAnswer": "Du musst uns nicht einfach glauben. Wir sind eine eingetragene gemeinnützige Organisation aus Deutschland. Jede Lebensgeschichte wird an Primärquellen geprüft, und der Faktencheck steht offen auf der Seite. Es gibt keine Tracking-Cookies und kein Profiling. Die ganze App ist Open Source, du kannst den Code also selbst lesen.",
@@ -383,13 +383,13 @@
     "builtDifferent": {
       "nonprofit": "Wir sind gemeinnützig. Die ChipMates gemeinnützige GmbH ist in Freiburg eingetragen, und der Registereintrag ist öffentlich.",
       "factChecked": "Jede Lebensgeschichte wird an Primärquellen geprüft, und der Faktencheck steht auf der Seite dieses Menschen.",
-      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile. Wir speichern deine Gespräche nur in deinem Browser, nie auf unseren Servern.",
+      "noTracking": "Keine Werbung, keine Drittanbieter-Tracker, keine Profile.",
       "openSource": "Die ganze App ist Open Source unter der AGPL-3.0. Lies den Code, oder betreibe das Ganze auf deinem eigenen Rechner.",
-      "freeTurns": "30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Bring deinen eigenen API-Schlüssel mit, wenn du mehr willst.",
+      "freeTurns": "Kein Konto, keine Anmeldung. Die Geschichten kannst du kostenlos hören und lesen.",
       "github": "Der Code ist Open Source auf GitHub."
     },
-    "trustLinksLead": "Zwei Seiten gehen tiefer:",
-    "methodologyLink": "Wie wir die Echos bauen",
+    "trustLinksLead": "Eine Seite geht tiefer:",
+    "methodologyLink": "Wie wir die Fakten prüfen",
     "echoesLink": "Warum wir sie Echos nennen",
     "voiceCredits": {
       "title": "Sprachtechnologie",

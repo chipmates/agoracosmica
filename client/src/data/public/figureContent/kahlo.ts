@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Frida Kahlo speaking?',
-        a: 'No. This is an Echo of Frida Kahlo. It is an AI voice built from her documented life and work, and it stays an interpretation, not a recording. The real painter lived from 1907 to 1954 and no recording of her in this form exists. Use it as a way into her ideas about self-portraiture, pain and identity, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her diary, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Frida Kahlo lived from 1907 to 1954. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Frida Kahlo?',
-        a: 'Nein. Das hier ist ein Echo von Frida Kahlo. Es ist eine KI-Stimme, gebaut aus ihrem belegten Leben und Werk, und sie bleibt eine Deutung, keine Aufnahme. Die echte Malerin lebte von 1907 bis 1954, und Aufnahmen von ihr in dieser Form gibt es nicht. Nimm es als Weg zu ihren Gedanken über Selbstporträt, Schmerz und Identität, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihrem Tagebuch, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Frida Kahlo lebte von 1907 bis 1954. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

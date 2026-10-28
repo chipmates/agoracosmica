@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Johann Wolfgang von Goethe speaking?',
-        a: 'No. This is an Echo of Goethe. It is an AI voice built from his documented writings on nature, colour, and poetry, and it stays an interpretation, not a recording. The real man lived from 1749 to 1832 and no audio of him exists. Use it as a way into his ideas, never as his own words.',
+        a: "No. These stories retell his life in the first person. They were written with AI from his writings, his letters and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Goethe lived from 1749 to 1832. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Johann Wolfgang von Goethe?',
-        a: 'Nein. Das hier ist ein Echo von Goethe. Es ist eine KI-Stimme, gebaut aus seinen überlieferten Schriften zu Natur, Farbe und Dichtung, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1749 bis 1832, und es gibt keine Tonaufnahme von ihm. Nimm es als Weg in seine Ideen, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Schriften, seinen Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Goethe lebte von 1749 bis 1832. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

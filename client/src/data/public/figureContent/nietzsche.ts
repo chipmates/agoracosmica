@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Friedrich Nietzsche speaking?',
-        a: 'No. This is an Echo of Friedrich Nietzsche. It is an AI voice built from what he actually wrote, and it stays an interpretation, not a recording. The real man lived from 1844 to 1900 and no audio of him exists. Use it as a way into his ideas, never as his own words.',
+        a: "No. These stories retell his life in the first person. They were written with AI from his books, his letters and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Friedrich Nietzsche lived from 1844 to 1900. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Friedrich Nietzsche?',
-        a: 'Nein. Das hier ist ein Echo von Friedrich Nietzsche. Es ist eine KI-Stimme, gebaut aus dem, was er wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1844 bis 1900, und es gibt keine Tonaufnahme von ihm. Nimm es als Weg in seine Ideen, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Büchern, seinen Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Friedrich Nietzsche lebte von 1844 bis 1900. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

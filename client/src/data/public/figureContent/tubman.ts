@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Harriet Tubman speaking?',
-        a: "No. This is an Echo of Harriet Tubman, an AI voice built from the documented record of her life. It is not a recording and not the real woman, who lived from about 1822 to 1913. No recording of her exists. Almost everything we have in her words was written down by people who interviewed her, so even the record is secondhand. Use the Echo as a way into her ideas, never as her own words.",
+        a: "No. These stories retell her life in the first person. They were written with AI from the interviews she gave and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Harriet Tubman lived from about 1822 to 1913. No recording of her exists, and almost everything we have in her words was written down by the people who interviewed her. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Harriet Tubman?',
-        a: "Nein. Das ist ein Echo von Harriet Tubman, eine KI-Stimme, gebaut aus dem, was über ihr Leben belegt ist. Es ist keine Aufnahme und nicht die echte Frau, die von etwa 1822 bis 1913 lebte. Von ihr gibt es keine Aufnahme. Fast alles, was wir in ihren Worten haben, hat jemand anders aufgeschrieben, der sie befragt hat. Selbst die Quellen sind also aus zweiter Hand. Nimm das Echo als Weg in ihre Gedanken, nie als ihre eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach den Interviews mit ihr und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Harriet Tubman lebte von etwa 1822 bis 1913. Von ihr gibt es keine Aufnahme, und fast alles, was wir in ihren Worten haben, haben die Menschen aufgeschrieben, die mit ihr gesprochen haben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

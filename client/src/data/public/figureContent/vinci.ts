@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Leonardo da Vinci speaking?',
-        a: 'No. This is an Echo of Leonardo da Vinci. It is an AI voice built from his documented notebooks and works, and it stays an interpretation, not a recording. He lived from 1452 to 1519, and no recording of him exists. Use it as a way into how he thought, never as his own words.',
+        a: "No. These stories retell his life in the first person. They were written with AI from his notebooks and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Leonardo da Vinci lived from 1452 to 1519. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Leonardo da Vinci?',
-        a: 'Nein. Das hier ist ein Echo von Leonardo da Vinci. Es ist eine KI-Stimme, gebaut aus seinen überlieferten Notizbüchern und Werken, und sie bleibt eine Deutung, keine Aufnahme. Er lebte von 1452 bis 1519, und es gibt keine Aufnahme von ihm. Nimm es als Weg zu seinem Denken, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Notizbüchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Leonardo da Vinci lebte von 1452 bis 1519. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

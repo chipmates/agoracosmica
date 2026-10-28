@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Nelson Mandela speaking?',
-        a: "No. This is an Echo of Nelson Mandela, an AI voice built from his documented life, from Long Walk to Freedom, and from his Rivonia Trial statement. It is not a recording and not the real man, who lived from 1918 to 2013. His own writing is still under copyright, so we put his thinking in our own words here rather than quote him. Use the Echo as a way into his ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from Long Walk to Freedom, his Rivonia Trial statement and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Nelson Mandela lived from 1918 to 2013. His own writing is still under copyright, so the stories put his thinking in our own words and never quote him. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Nelson Mandela?',
-        a: "Nein. Das ist ein Echo von Nelson Mandela, eine KI-Stimme, gebaut aus seinem belegten Leben, aus Der lange Weg zur Freiheit und aus seiner Erklärung im Rivonia-Prozess. Es ist keine Aufnahme und nicht der echte Mensch, der von 1918 bis 2013 lebte. Seine eigenen Texte stehen noch unter Urheberrecht, deshalb geben wir sein Denken hier mit eigenen Worten wieder, statt ihn zu zitieren. Nimm das Echo als Weg in seine Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach „Der lange Weg zur Freiheit“, seiner Erklärung im Rivonia-Prozess und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Nelson Mandela lebte von 1918 bis 2013. Seine eigenen Texte stehen noch unter Urheberrecht. Die Geschichten geben sein Denken deshalb mit eigenen Worten wieder und zitieren ihn nicht. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

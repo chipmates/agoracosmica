@@ -21,7 +21,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Laozi speaking?',
-        a: "No. This is an Echo of Laozi. It is an AI voice built from the Tao Te Ching, and it stays an interpretation, not a recording. No recording of him exists, and whether he lived at all is debated. Use it as a way into the ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from the Daodejing and the earliest account of his life. A synthetic voice reads them. Not a recording. Never his own words. No recording of him exists, and whether he lived at all is debated. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -41,7 +41,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Laozi?',
-        a: "Nein. Das hier ist ein Echo von Laozi. Es ist eine KI-Stimme, gebaut aus dem Tao Te King, und sie bleibt eine Deutung, keine Aufnahme. Aufnahmen von ihm gibt es nicht, und ob er überhaupt gelebt hat, ist umstritten. Nimm es als Weg in die Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach dem Daodejing und dem frühesten Bericht über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Von ihm gibt es keine Aufnahme, und ob er überhaupt gelebt hat, ist umstritten. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

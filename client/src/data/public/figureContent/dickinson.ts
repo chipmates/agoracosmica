@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Emily Dickinson speaking?',
-        a: 'No. This is an Echo of Emily Dickinson. It is an AI voice built from what she actually wrote, and it stays an interpretation, not a recording. The real poet lived from 1830 to 1886, and no recording of her speaks here. Use it as a way into her poems, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her poems, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Emily Dickinson lived from 1830 to 1886. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Emily Dickinson?',
-        a: 'Nein. Das hier ist ein Echo von Emily Dickinson. Es ist eine KI-Stimme, gebaut aus dem, was sie wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Die echte Dichterin lebte von 1830 bis 1886, und hier spricht keine Tonaufnahme von ihr. Nimm es als Weg in ihre Gedichte, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Gedichten, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Emily Dickinson lebte von 1830 bis 1886. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

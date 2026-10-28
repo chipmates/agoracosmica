@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Joseph Campbell speaking?',
-        a: 'No. This is an Echo of Joseph Campbell. It is an AI voice built from his documented work on comparative mythology, and it stays an interpretation, not a recording. He lived from 1904 to 1987, and no recording of him speaks here. His books are still in copyright, so what you get is our reading of his ideas, never his pages.',
+        a: "No. These stories retell his life in the first person. They were written with AI from his books and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Joseph Campbell lived from 1904 to 1987. His books are still in copyright, so the stories give our reading of his ideas, never his pages. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Joseph Campbell?',
-        a: 'Nein. Das hier ist ein Echo von Joseph Campbell. Es ist eine KI-Stimme, gebaut aus seiner belegten Arbeit zur vergleichenden Mythologie, und sie bleibt eine Deutung, keine Aufnahme. Er lebte von 1904 bis 1987, und hier spricht keine Tonaufnahme von ihm. Seine Bücher stehen noch unter Urheberrecht. Du bekommst hier also unsere Lesart seiner Gedanken, nie seine Seiten.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Büchern und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Joseph Campbell lebte von 1904 bis 1987. Seine Bücher stehen noch unter Urheberrecht. Die Geschichten geben also unsere Lesart seiner Gedanken wieder, nie seine Seiten. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

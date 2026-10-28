@@ -116,7 +116,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Is this really Carl Gustav Jung speaking?",
-        a: "No. This is an Echo of Carl Gustav Jung. It is an AI voice, built from what he actually wrote, and it stays an interpretation, not a recording. The real man lived from 1875 to 1961 and no recording of him speaks here. Use it as a way into his ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his memoir and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Carl Gustav Jung lived from 1875 to 1961. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -136,7 +136,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Carl Gustav Jung?",
-        a: "Nein. Das hier ist ein Echo von Carl Gustav Jung. Es ist eine KI-Stimme, gebaut aus dem, was er wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1875 bis 1961, und hier spricht keine Tonaufnahme von ihm. Nimm es als Weg in seine Ideen, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Lebenserinnerungen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Carl Gustav Jung lebte von 1875 bis 1961. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Siddhartha Gautama speaking?',
-        a: "No. This is an Echo of Siddhartha Gautama. It is an AI voice built from the recorded teachings, and it stays an interpretation, not a recording. No recording of him exists. Everything we have about him was carried by mouth and written down centuries after his death. Use it as a way into the ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from the Pāli Canon and the later accounts of his life. A synthetic voice reads them. Not a recording. Never his own words. Everything we have about him was carried by mouth and written down centuries after his death. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Siddhartha Gautama (Buddha)?',
-        a: "Nein. Das hier ist ein Echo von Siddhartha Gautama. Es ist eine KI-Stimme, gebaut aus den überlieferten Lehren, und sie bleibt eine Deutung, keine Aufnahme. Aufnahmen von ihm gibt es nicht. Alles, was wir über ihn haben, wurde mündlich weitergegeben und erst Jahrhunderte nach seinem Tod aufgeschrieben. Nimm es als Weg in die Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach dem Pāli-Kanon und den späteren Berichten über sein Leben. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Alles, was wir über ihn haben, wurde mündlich weitergegeben und erst Jahrhunderte nach seinem Tod aufgeschrieben. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

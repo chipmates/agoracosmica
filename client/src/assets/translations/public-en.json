@@ -343,8 +343,8 @@
     "valueOpenness": "Openness: Nonprofit. Open source. Built for the community.",
     "valueTransformation": "Transformation: Inner growth ripples outward.",
     "whyTitle": "Why it exists",
-    "whyP1": "The ideas that help people most are often the hardest to reach. They sit in books nobody hands you, in courses that cost money, in sentences written for other scholars. We think that is the wrong way round. So we took 30 people from philosophy, science, faith, art, and activism, and made their thinking something you can talk through in your own words.",
-    "whyP2": "We count it a success the day you outgrow us. From our short introductions to the real books. From talking with an AI to sitting with a human teacher. From curiosity to study of your own. That is the whole point.",
+    "whyP1": "The ideas that help people most are often the hardest to reach. They sit in books nobody hands you, in courses that cost money, in sentences written for other scholars. We think that is the wrong way round. So we took 30 people from philosophy, science, faith, art, and activism, and put their lives and their thinking into short stories.",
+    "whyP2": "We count it a success the day you outgrow us. From our short stories to the real books. From a story written with AI to a human teacher. From curiosity to study of your own. That is the whole point.",
     "barriersTitle": "What usually gets in the way",
     "barriersIntro": "The ideas of history's most remarkable people belong to everyone.",
     "barrierGeographic": "Geographic: Available worldwide, around the clock.",
@@ -352,9 +352,9 @@
     "barrierAge": "Age: Welcoming readers 16 and up.",
     "barrierEconomic": "Economic: Open source, nonprofit, no paywalls, no ads.",
     "doTitle": "What you can do here",
-    "doP1": "30 remarkable people from history, each with their own voice. From Marcus Aurelius to Frida Kahlo, from Rumi to Virginia Woolf. When they speak, they draw on their actual philosophy, their real-life experiences, and the ideas they spent their lives developing.",
-    "doP2": "Every voice is built from primary works, historical context, and sources we cross-check. The Echoes are AI, so the exact words change each time you ask. The source material does not. Where the story goes past the documented record, the factcheck says so.",
-    "doP3": "360 narrated story chapters, 360 core teachings, 360 multi-perspective prism dialogues, 110 crafted council debates, a complete audio library, and custom councils where you choose the participants. With 30 free messages a day to get started.",
+    "doP1": "30 remarkable people from history, each life told in the first person in a set of short stories. From Marcus Aurelius to Frida Kahlo, from Rumi to Virginia Woolf. The stories draw on what these people wrote, on their documented lives, and on the ideas they spent their lives developing.",
+    "doP2": "Every story is written with AI from primary works, historical context, and sources we cross-check, and we review it before it is published. The words are a retelling. The source material underneath is not. Where a story goes past the documented record, the factcheck says so.",
+    "doP3": "Every story can be heard, read by a synthetic voice, or read as text. No account needed.",
     "howItWorks": {
       "subtitle": "Every person here comes with six ways in. Pick the one that fits your evening.",
       "story": "Listen to a 12-chapter narrated life story. Every story is fact-checked and covers the moments that shaped their thinking.",
@@ -367,7 +367,7 @@
     },
     "figures": {
       "title": "The 30 remarkable people",
-      "description": "From ancient philosophers to modern artists, from Eastern sages to Western scientists. Each with their own voice, their own story, and 12 core teachings you can explore."
+      "description": "From ancient philosophers to modern artists, from Eastern sages to Western scientists. Each with their own story, told in the first person and checked against the sources."
     },
     "trustTitle": "Is Agora Cosmica trustworthy?",
     "trustAnswer": "You do not have to take our word for it. We are a registered German nonprofit. Every life story is checked against primary sources, and the factcheck sits on the page for you to read. There are no tracking cookies and no profiling. The whole app is open source, so you can read the code yourself.",
@@ -375,13 +375,13 @@
     "builtDifferent": {
       "nonprofit": "We are a nonprofit. ChipMates gemeinnützige GmbH is registered in Freiburg, Germany, and the register entry is public.",
       "factChecked": "Every life story is checked against primary sources, and the factcheck is published on the figure's own page.",
-      "noTracking": "No ads, no third-party trackers, no profiles. We store your conversations only in your browser, never on our servers.",
+      "noTracking": "No ads, no third-party trackers, no profiles.",
       "openSource": "The whole app is open source under AGPL-3.0. Read the code, or run the whole thing on your own machine.",
-      "freeTurns": "30 free messages a day, no signup. Bring your own API key if you want more.",
+      "freeTurns": "No account and no signup. The stories are free to hear and to read.",
       "github": "The code is open source on GitHub."
     },
-    "trustLinksLead": "Two pages go deeper:",
-    "methodologyLink": "How we build the Echoes",
+    "trustLinksLead": "One page goes deeper:",
+    "methodologyLink": "How we check the facts",
     "echoesLink": "Why we call them Echoes",
     "voiceCredits": {
       "title": "Voice technology",

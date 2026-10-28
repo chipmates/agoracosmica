@@ -32,50 +32,50 @@ const en = {
   crumb: 'How we build the Echoes',
   eyebrow: 'Methodology and editorial standards',
   h1: 'How we build, source, and fact-check the AI Echoes',
-  tagline: 'Source-aware by design. Honest about what is documented and what is recreated.',
+  tagline: 'Written from the sources. Honest about what is documented and what is recreated.',
 
   briefTitle: 'In brief',
   brief:
-    'Every figure in Agora Cosmica is an AI Echo. We distill a voice profile from the figure’s own primary works and their documented life, ground the conversation in that material, and ship a public factcheck for every figure that separates what is documented from what we recreated for the story. The Echo is an educational interpretation, openly labeled, never a recording and never the real person. The instruction profiles and the factchecks are public, and the whole codebase is open source, so you do not have to take our word for any of it.',
+    'Every figure in Agora Cosmica is told in short stories, in the first person. We write each story with AI from the figure\'s own primary works and their documented life, review it before it is published, and ship a public factcheck for every figure that separates what is documented from what we recreated for the story. A synthetic voice reads the stories. They are a retelling, openly labeled, never a recording and never the person\'s own words. The factchecks are public and the whole codebase is open source, so you do not have to take our word for any of it.',
 
-  buildTitle: 'How we build an Echo',
+  buildTitle: 'How a story is made',
   buildParas: [
-    'We start with the person, not a persona. For each figure we read their primary works, the books, letters, and texts they actually wrote, alongside their documented life from standard biographies and scholarship. From that we distill a voice profile: how they reasoned, the ideas they returned to, the way they spoke. The voice profile is the recipe the model follows in a conversation. It is not a transcript of anything the person said.',
-    'What comes out is an AI Echo: an educational interpretation grounded in the source material. It is openly an Echo every time it speaks, never presented as a recording and never as the real person. No recordings of these figures talking to you exist. The synthesized audio is the figure’s Echo voice, a voice we give them, clearly separated from the original daguerreotypes, manuscripts, and writings that the work draws on. The portraits are AI-generated images, not photographs.',
-    'A conversation is only one of the ways to learn here, meant for thinking an idea through. Most of what a figure offers is crafted ahead of time: a narrated life story, twelve core teachings, multi-voice dialogues. The live conversation sits alongside those, and it is built to send you onward to the primary texts, not to keep you talking.',
+    'We start with the person, not a persona. For each figure we read their primary works, the books, letters, and texts they actually wrote, alongside their documented life from standard biographies and scholarship. From that we choose the moments the stories tell: the turns in a life, what the person made of them, the ideas they kept returning to.',
+    'Then we write each story with AI, in the first person, from that material. A story is a retelling: it stages scenes, gives the person lines, and fills gaps the record leaves. Before it is published we read it against the sources, and the factcheck records where it went beyond them.',
+    'A synthetic voice reads every story. It is a voice we gave the figure, not a recording of the person. No recording of any of these people reading these words exists. The portraits are images made with AI, not photographs.',
   ],
 
   sourcingTitle: 'Where the material comes from',
   sourcingLead:
-    'The source of the words matters more than any single sentence. Because an Echo is AI-rendered, what it says will vary from one conversation to the next. The material underneath it does not. Four things make that material checkable.',
+    'The source of the words matters more than any single sentence. A story is a retelling, so its sentences are ours. The material underneath them is not. Four things make that material checkable.',
   sourcing: [
-    { label: 'Primary works', text: 'Each figure is anchored in their own writing, the texts they actually produced. The voice and ideas come from there first, before any modern summary.' },
-    { label: 'A public factcheck', text: 'Every figure ships with a factcheck that lists what is historically documented and what was recreated for the narrative, shadow chapters included. It is published on the figure’s page, not hidden.' },
-    { label: 'Open instruction profiles', text: 'The instruction profiles that ground each Echo are served from a public CDN, not locked inside the app. They are our signature on the method, and anyone can fetch and read them.' },
-    { label: 'Open-source code', text: 'The whole platform is open source under AGPL-3.0. The way an Echo is assembled, sourced, and screened is in the repository for anyone to inspect.' },
+    { label: 'Primary works', text: 'Each figure is anchored in their own writing, the texts they actually produced. The stories\' voice and ideas come from there first, before any modern summary.' },
+    { label: 'A public factcheck', text: 'Every figure ships with a factcheck that lists what is historically documented and what was recreated for the narrative, the harder parts of the life included. It is published on the figure\'s page, not hidden.' },
+    { label: 'A review before publishing', text: 'We read each story against its sources before it is published. What is staged rather than documented goes into the factcheck as recreated.' },
+    { label: 'Open-source code', text: 'The whole platform is open source under AGPL-3.0. The code that builds the pages and shows each story\'s facts is in the repository for anyone to inspect.' },
   ],
 
   factcheckTitle: 'How the fact-checking works',
   factcheckParas: [
-    'Every figure has a public factcheck, and it is specific. For each narrated chapter it names what is documented (dates, people, places, events drawn from the record) and what we recreated (a scene we staged, a line of dialogue, a sensory detail). Where the prose goes beyond the documented record, the factcheck says so plainly, and it labels the kind: an invented detail, a composite scene, a paraphrased source, a compressed timeline.',
+    'Every figure has a public factcheck, and it is specific. For each story it names what is documented (dates, people, places, events drawn from the record) and what we recreated (a scene we staged, a line of dialogue, a sensory detail). Where the prose goes beyond the documented record, the factcheck says so plainly, and it labels the kind: an invented detail, a composite scene, a paraphrased source, a compressed timeline.',
     'It does not flatter the figure. The factcheck includes a shadow section that records the harder parts of a life, the contradictions and the failures, because these were real and contradictory people. The aim is not a monument. It is an honest account you can check against the sources we list, which name the primary texts and the scholarship behind each figure.',
     'This is the same obligation a careful historian takes on: reconstruct where you must, and disclose where you did. The factcheck is where we disclose it.',
   ],
 
-  limitsTitle: 'What an Echo can and cannot do',
+  limitsTitle: 'What a story can and cannot do',
   limitsParas: [
-    'An Echo can be wrong. It is generated live, and no human reviews a sentence before it reaches you. It can misremember a date, blur a source, or state something with more confidence than the record supports. That is the honest limit of this medium, and we would rather name it than paper over it.',
-    'So treat an Echo as a learning companion, not an authority. It is a doorway into a body of work, useful for thinking out loud and finding where to look next. When something matters, verify it: open the figure’s factcheck, read the primary text it points to, and follow the sources. The best outcome is that you outgrow the Echo and go to the originals.',
+    'A story can be wrong. It is written with AI and we read it before it goes out, but the record is thin in places, and a retelling fills the gaps with staged scenes and invented lines. A date can slip, a source can blur, a sentence can sound more certain than the record is. That is the honest limit of this form, and we would rather name it than paper over it.',
+    'So treat a story as a way in, not an authority. It is a doorway into a life and a body of work, good for seeing how an idea grew out of a life. When something matters, verify it: open the story\'s facts, read the primary text they point to, and follow the sources. The best outcome is that you outgrow the stories and go to the originals.',
     'If you find something we got wrong, tell us at agoracosmica@chipmates.ai. We will fix it, and the fix is public like everything else.',
   ],
 
   trustTitle: 'Why you can trust the method',
   trustLead: 'You do not have to trust us. You can check. Four things hold the method accountable.',
   trust: [
-    { label: 'Nonprofit', text: 'Agora Cosmica is built by ChipMates gemeinnützige GmbH, a small German nonprofit. No one shares in the profits, and there are no engagement targets. A longer conversation earns us nothing and even costs us, so nothing here is tuned to keep you hooked.' },
-    { label: 'Open source', text: 'The whole platform is open source under AGPL-3.0. The sourcing, the safety screening, and the privacy claims are all in the code, so the method is auditable rather than asserted.' },
-    { label: 'No profiling', text: 'No tracking cookies, no third-party analytics, no profiles of who you are. Your chat history lives only in your browser, encrypted, and is never stored on our servers. Bring your own model key and it stays in your browser.' },
-    { label: 'EU-hosted', text: 'Live speech runs on our own GPU server in Germany, and the rest of the audio is served from EU hosting. You can also run the whole thing on your own machine.' },
+    { label: 'Nonprofit', text: 'Agora Cosmica is built by ChipMates gemeinnützige GmbH, a small German nonprofit. No one shares in the profits, and there are no engagement targets. Nothing here is tuned to keep you listening longer than you want to.' },
+    { label: 'Open source', text: 'The whole platform is open source under AGPL-3.0. The code and the factchecks are public, so the method is auditable rather than asserted.' },
+    { label: 'No profiling', text: 'No tracking cookies, no third-party analytics, no profiles of who you are.' },
+    { label: 'EU-hosted', text: 'The audio is served from EU hosting, and you can run the whole thing on your own machine.' },
   ],
 
   faqTitle: 'Questions people ask',
@@ -96,50 +96,50 @@ const de = {
   crumb: 'Wie wir die Echos bauen',
   eyebrow: 'Methodik und redaktionelle Standards',
   h1: 'Wie wir die KI-Echos bauen, belegen und faktenprüfen',
-  tagline: 'Quellenbewusst gebaut. Ehrlich darüber, was belegt und was nachgebildet ist.',
+  tagline: 'Nach den Quellen geschrieben. Ehrlich darüber, was belegt und was nachgestellt ist.',
 
   briefTitle: 'Kurz gesagt',
   brief:
-    'Jede Persönlichkeit in Agora Cosmica ist ein KI-Echo. Wir destillieren ein Stimmprofil aus den eigenen Primärwerken eines Menschen und seinem dokumentierten Leben, verankern das Gespräch in diesem Material und liefern zu jeder Persönlichkeit einen öffentlichen Faktencheck, der das Belegte vom Nachempfundenen trennt. Das Echo ist eine pädagogische Deutung, offen gekennzeichnet, nie eine Aufnahme und nie die echte Person. Die Anweisungsprofile und die Faktenchecks sind öffentlich, und der gesamte Code ist Open Source, du musst uns also nichts davon glauben.',
+    'Jeder Mensch in Agora Cosmica wird in kurzen Geschichten erzählt, in der Ich-Form. Wir schreiben jede Geschichte mit KI nach den eigenen Primärwerken dieses Menschen und seinem dokumentierten Leben, lesen sie gegen, bevor sie erscheint, und liefern zu jedem Menschen einen öffentlichen Faktencheck, der das Belegte von dem trennt, was wir für die Geschichte nachgestellt haben. Eine synthetische Stimme liest die Geschichten vor. Sie sind eine Nacherzählung, offen gekennzeichnet, nie eine Aufnahme und nie die eigenen Worte dieses Menschen. Die Faktenchecks sind öffentlich, und der gesamte Code ist Open Source, du musst uns also nichts davon glauben.',
 
-  buildTitle: 'Wie wir ein Echo bauen',
+  buildTitle: 'Wie eine Geschichte entsteht',
   buildParas: [
-    'Wir beginnen beim Menschen, nicht bei einer Rolle. Für jede Persönlichkeit lesen wir die Primärwerke, also die Bücher, Briefe und Texte, die sie tatsächlich geschrieben hat, dazu das dokumentierte Leben aus anerkannten Biografien und der Forschung. Daraus destillieren wir ein Stimmprofil: wie dieser Mensch dachte, zu welchen Ideen er zurückkehrte, wie er sprach. Das Stimmprofil ist das Rezept, dem das Modell im Gespräch folgt. Es ist keine Mitschrift von irgendetwas, das die Person gesagt hat.',
-    'Heraus kommt ein KI-Echo: eine pädagogische Deutung, verankert im Quellmaterial. Es ist jedes Mal offen ein Echo, wenn es spricht, nie als Aufnahme ausgegeben und nie als die echte Person. Aufnahmen, in denen diese Menschen mit dir sprechen, existieren nicht. Das synthetisierte Audio ist die Echo-Stimme dieses Menschen, eine Stimme, die wir ihm geben, klar getrennt von den Originalen, den Daguerreotypien, Manuskripten und Schriften, auf die sich die Arbeit stützt. Die Porträts sind KI-erzeugte Bilder, keine Fotografien.',
-    'Ein Gespräch ist nur einer der Lernwege hier, gedacht, um einen Gedanken durchzudenken. Das meiste, was eine Persönlichkeit bietet, ist im Voraus gestaltet: eine erzählte Lebensgeschichte, zwölf Kernlehren, mehrstimmige Dialoge. Das Live-Gespräch steht daneben, und es ist gebaut, dich weiter zu den Primärtexten zu schicken, nicht dich im Reden zu halten.',
+    'Wir beginnen beim Menschen, nicht bei einer Rolle. Für jeden lesen wir die Primärwerke, also die Bücher, Briefe und Texte, die er tatsächlich geschrieben hat, dazu das dokumentierte Leben aus anerkannten Biografien und der Forschung. Daraus wählen wir die Momente, die die Geschichten erzählen: die Wendungen eines Lebens, was der Mensch daraus gemacht hat, die Ideen, zu denen er immer wieder zurückkam.',
+    'Dann schreiben wir jede Geschichte mit KI aus diesem Material, in der Ich-Form. Eine Geschichte ist eine Nacherzählung: Sie stellt Szenen nach, legt dem Menschen Sätze in den Mund und füllt Lücken, die die Quellen lassen. Bevor sie erscheint, lesen wir sie gegen die Quellen, und der Faktencheck hält fest, wo sie darüber hinausgeht.',
+    'Eine synthetische Stimme liest jede Geschichte vor. Es ist eine Stimme, die wir dem Menschen gegeben haben, keine Aufnahme von ihm. Von keinem dieser Menschen gibt es eine Aufnahme, in der er diese Worte liest. Die Porträts sind mit KI erzeugte Bilder, keine Fotografien.',
   ],
 
   sourcingTitle: 'Woher das Material kommt',
   sourcingLead:
-    'Die Quelle der Worte wiegt schwerer als jeder einzelne Satz. Weil ein Echo KI-erzeugt ist, variiert das Gesagte von Gespräch zu Gespräch. Das Material darunter nicht. Vier Dinge machen dieses Material nachprüfbar.',
+    'Die Quelle der Worte wiegt schwerer als jeder einzelne Satz. Eine Geschichte ist eine Nacherzählung, ihre Sätze sind also unsere. Das Material darunter nicht. Vier Dinge machen dieses Material nachprüfbar.',
   sourcing: [
-    { label: 'Primärwerke', text: 'Jede Persönlichkeit ist in ihrem eigenen Werk verankert, in den Texten, die sie tatsächlich hervorgebracht hat. Stimme und Ideen kommen zuerst von dort, vor jeder modernen Zusammenfassung.' },
-    { label: 'Ein öffentlicher Faktencheck', text: 'Zu jeder Persönlichkeit gehört ein Faktencheck, der auflistet, was historisch belegt und was für die Erzählung nachgebildet ist, Schattenkapitel eingeschlossen. Er steht auf der Personenseite, nicht versteckt.' },
-    { label: 'Offene Anweisungsprofile', text: 'Die Anweisungsprofile, die jedes Echo verankern, kommen von einem öffentlichen CDN, nicht eingeschlossen in der App. Sie sind unsere Signatur unter der Methode, und alle können sie abrufen und lesen.' },
-    { label: 'Open-Source-Code', text: 'Die ganze Plattform ist Open Source unter der AGPL-3.0. Wie ein Echo zusammengesetzt, belegt und geprüft wird, liegt im Repository für alle einsehbar.' },
+    { label: 'Primärwerke', text: 'Jeder Mensch hier ist in seinem eigenen Werk verankert, in den Texten, die er tatsächlich hervorgebracht hat. Stimme und Ideen der Geschichten kommen zuerst von dort, vor jeder modernen Zusammenfassung.' },
+    { label: 'Ein öffentlicher Faktencheck', text: 'Zu jedem Menschen gehört ein Faktencheck, der auflistet, was historisch belegt und was für die Erzählung nachgestellt ist, die schwereren Seiten des Lebens eingeschlossen. Er steht auf der Seite dieses Menschen, nicht versteckt.' },
+    { label: 'Eine Prüfung vor der Veröffentlichung', text: 'Wir lesen jede Geschichte gegen ihre Quellen, bevor sie erscheint. Was nachgestellt und nicht belegt ist, steht im Faktencheck als nachgestellt.' },
+    { label: 'Open-Source-Code', text: 'Die ganze Plattform ist Open Source unter der AGPL-3.0. Der Code, der die Seiten baut und die Fakten zu jeder Geschichte zeigt, liegt im Repository für alle einsehbar.' },
   ],
 
   factcheckTitle: 'Wie die Faktenprüfung funktioniert',
   factcheckParas: [
-    'Jede Persönlichkeit hat einen öffentlichen Faktencheck, und er ist genau. Für jedes erzählte Kapitel benennt er, was belegt ist (Daten, Menschen, Orte, Ereignisse aus dem Quellbestand) und was wir nachgebildet haben (eine inszenierte Szene, eine Zeile Dialog, ein sinnliches Detail). Wo der Text über das Dokumentierte hinausgeht, sagt der Faktencheck es klar und kennzeichnet die Art: ein erfundenes Detail, eine zusammengesetzte Szene, eine paraphrasierte Quelle, eine verdichtete Zeitlinie.',
+    'Jeder Mensch hier hat einen öffentlichen Faktencheck, und er ist genau. Für jede Geschichte benennt er, was belegt ist (Daten, Menschen, Orte, Ereignisse aus dem Quellbestand) und was wir nachgestellt haben (eine inszenierte Szene, eine Zeile Dialog, ein sinnliches Detail). Wo der Text über das Dokumentierte hinausgeht, sagt der Faktencheck es klar und kennzeichnet die Art: ein erfundenes Detail, eine zusammengesetzte Szene, eine paraphrasierte Quelle, eine verdichtete Zeitlinie.',
     'Er beschönigt den Menschen nicht. Der Faktencheck enthält einen Schattenteil, der die schwereren Seiten eines Lebens festhält, die Widersprüche und das Scheitern, denn das waren echte und widersprüchliche Menschen. Das Ziel ist kein Denkmal. Es ist eine ehrliche Darstellung, die du gegen die Quellen prüfen kannst, die wir nennen, und die die Primärtexte und die Forschung hinter jeder Persönlichkeit auflisten.',
     'Das ist dieselbe Verpflichtung, die eine sorgfältige Geschichtsschreibung eingeht: rekonstruiere, wo du musst, und lege offen, wo du es getan hast. Im Faktencheck legen wir es offen.',
   ],
 
-  limitsTitle: 'Was ein Echo kann und was nicht',
+  limitsTitle: 'Was eine Geschichte kann und was nicht',
   limitsParas: [
-    'Ein Echo kann sich irren. Es entsteht live, und kein Mensch liest einen Satz, bevor er dich erreicht. Es kann ein Datum verwechseln, eine Quelle verwischen oder etwas mit mehr Sicherheit sagen, als der Quellbestand hergibt. Das ist die ehrliche Grenze dieses Mediums, und wir nennen sie lieber, als sie zu kaschieren.',
-    'Behandle ein Echo also als Lernbegleiter, nicht als Autorität. Es ist eine Tür in ein Werk, gut zum lauten Nachdenken und um zu finden, wo man als Nächstes nachschaut. Wenn etwas wichtig ist, prüf es: öffne den Faktencheck der Persönlichkeit, lies den Primärtext, auf den er verweist, und folge den Quellen. Das beste Ergebnis ist, dass du dem Echo entwächst und zu den Originalen gehst.',
+    'Eine Geschichte kann sich irren. Sie ist mit KI geschrieben, und wir lesen sie, bevor sie erscheint, aber die Quellen sind an manchen Stellen dünn, und eine Nacherzählung füllt die Lücken mit nachgestellten Szenen und erfundenen Sätzen. Ein Datum kann verrutschen, eine Quelle verwischen, ein Satz sicherer klingen, als der Quellbestand hergibt. Das ist die ehrliche Grenze dieser Form, und wir nennen sie lieber, als sie zu kaschieren.',
+    'Nimm eine Geschichte also als Weg hinein, nicht als Autorität. Sie ist eine Tür in ein Leben und ein Werk, gut, um zu sehen, wie eine Idee aus einem Leben gewachsen ist. Wenn etwas wichtig ist, prüf es: Öffne die Fakten zur Geschichte, lies den Primärtext, auf den sie verweisen, und folge den Quellen. Das beste Ergebnis ist, dass du den Geschichten entwächst und zu den Originalen gehst.',
     'Wenn du etwas findest, das wir falsch haben, schreib uns an agoracosmica@chipmates.ai. Wir korrigieren es, und die Korrektur ist öffentlich wie alles andere.',
   ],
 
   trustTitle: 'Warum du der Methode vertrauen kannst',
   trustLead: 'Du musst uns nicht vertrauen. Du kannst nachsehen. Vier Dinge halten die Methode in der Verantwortung.',
   trust: [
-    { label: 'Gemeinnützig', text: 'Agora Cosmica wird von der ChipMates gemeinnützigen GmbH gebaut, einer kleinen gemeinnützigen Organisation aus Deutschland. Niemand ist am Gewinn beteiligt, und es gibt keine Engagement-Ziele. Ein längeres Gespräch bringt uns nichts ein und kostet uns sogar etwas, nichts hier ist also darauf getrimmt, dich zu fesseln.' },
-    { label: 'Open Source', text: 'Die ganze Plattform ist Open Source unter der AGPL-3.0. Die Quellen, die Sicherheitsprüfung und die Datenschutzversprechen stehen alle im Code, die Methode ist also nachprüfbar statt nur behauptet.' },
-    { label: 'Kein Profiling', text: 'Keine Tracking-Cookies, keine Analyse durch Dritte, keine Profile darüber, wer du bist. Deine Gesprächsverläufe liegen nur in deinem Browser, verschlüsselt, und werden nie auf unseren Servern gespeichert. Bringst du deinen eigenen Schlüssel mit, bleibt er in deinem Browser.' },
-    { label: 'In der EU gehostet', text: 'Live gesprochene Sprache läuft auf unserem eigenen GPU-Server in Deutschland, das übrige Audio kommt von Servern in der EU. Du kannst das Ganze auch auf deinem eigenen Rechner betreiben.' },
+    { label: 'Gemeinnützig', text: 'Agora Cosmica wird von der ChipMates gemeinnützigen GmbH gebaut, einer kleinen gemeinnützigen Organisation aus Deutschland. Niemand ist am Gewinn beteiligt, und es gibt keine Engagement-Ziele. Nichts hier ist darauf getrimmt, dich länger hören zu lassen, als du willst.' },
+    { label: 'Open Source', text: 'Die ganze Plattform ist Open Source unter der AGPL-3.0. Code und Faktenchecks sind öffentlich, die Methode ist also nachprüfbar statt nur behauptet.' },
+    { label: 'Kein Profiling', text: 'Keine Tracking-Cookies, keine Analyse durch Dritte, keine Profile darüber, wer du bist.' },
+    { label: 'In der EU gehostet', text: 'Das Audio kommt von Servern in der EU, und du kannst das Ganze auch auf deinem eigenen Rechner betreiben.' },
   ],
 
   faqTitle: 'Fragen, die Menschen uns stellen',

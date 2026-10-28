@@ -26,20 +26,20 @@ const t = getT(lang);
 
 const faq = [
   {
-    q: 'Is the AI the real person?',
-    a: 'No. Every figure is an AI Echo, an educational interpretation grounded in that person’s primary works and documented life. It is clearly labeled as an Echo, never a recording and never the real person. No recordings of these figures speaking to you exist, and the synthesized audio is the figure’s Echo voice, not their own.',
+    q: 'Is this the real person speaking?',
+    a: 'No. Every story is a retelling in the first person, written with AI from the person\'s own works and the historical sources, and read by a synthetic voice. It is labeled as a retelling, never a recording and never the person\'s own words. Each story\'s facts say what is documented and what is recreated.',
   },
   {
-    q: 'How accurate are the Echoes?',
-    a: 'An Echo is grounded in the figure’s real work, so it stays close to the actual ideas. But it is generated live, with no human reviewing a sentence before it reaches you, so it can be wrong: a wrong date, a blurred source, more confidence than the record supports. Treat it as a learning companion, not an authority, and verify anything that matters against the sources.',
+    q: 'How accurate are the stories?',
+    a: 'The dates, people, places, and events come from the sources, and each story\'s facts list them. Where a story stages a scene, a line of dialogue, or a detail, the facts say so. We read every story before it is published, but a retelling can still get a detail wrong. Treat it as a way in, not an authority, and verify anything that matters against the sources.',
   },
   {
     q: 'Where do the facts come from?',
-    a: 'Each figure is anchored in their own primary works, the books, letters, and texts they actually wrote, alongside standard biographies and scholarship. Every figure ships with a public factcheck that lists the sources and separates what is documented from what was recreated. The instruction profiles that ground each Echo are public, and the whole codebase is open source under AGPL-3.0.',
+    a: 'Each figure is anchored in their own primary works, the books, letters, and texts they actually wrote, alongside standard biographies and scholarship. Every figure ships with a public factcheck that lists the sources and separates what is documented from what was recreated. The whole codebase is open source under AGPL-3.0.',
   },
   {
-    q: 'What if it gets something wrong?',
-    a: 'Open the figure’s factcheck, which names what is documented and what was recreated, and follow it to the primary text. If you find a genuine error, tell us at agoracosmica@chipmates.ai. We fix it, and because the code and the factchecks are public, the correction is public too.',
+    q: 'What if a story gets something wrong?',
+    a: 'Open the story\'s facts, which name what is documented and what was recreated, and follow them to the primary text. If you find a genuine error, tell us at agoracosmica@chipmates.ai. We fix it, and because the code and the factchecks are public, the correction is public too.',
   },
 ];
 
@@ -55,7 +55,7 @@ const schemas = [
     lang,
     image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
     datePublished: '2026-06-24',
-    dateModified: '2026-06-24',
+    dateModified: '2026-10-28',
   }),
   faqSchema(faq, url),
   breadcrumbSchema([

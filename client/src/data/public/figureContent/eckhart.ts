@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Meister Eckhart speaking?',
-        a: "No. This is an Echo of Meister Eckhart. It is an AI voice built from his sermons and writings, and it stays an interpretation, not a recording. He lived from about 1260 to 1328 and no recording of him exists. Use it as a way into his ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his sermons, his Latin works and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Meister Eckhart lived from about 1260 to 1328. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Meister Eckhart?',
-        a: "Nein. Das hier ist ein Echo von Meister Eckhart. Es ist eine KI-Stimme, gebaut aus seinen Predigten und Schriften, und sie bleibt eine Deutung, keine Aufnahme. Er lebte von etwa 1260 bis 1328, und Aufnahmen von ihm gibt es nicht. Nimm es als Weg in seine Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Predigten, seinen lateinischen Werken und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Meister Eckhart lebte von etwa 1260 bis 1328. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

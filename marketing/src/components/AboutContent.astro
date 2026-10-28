@@ -15,7 +15,6 @@
 // #kontakt in German, and both ids resolve in both languages so an old or a
 // cross-language link still lands. /impressum keeps the legal duty.
 import Breadcrumbs from './Breadcrumbs.astro';
-import ContentVolume from './ContentVolume.astro';
 import { getT } from '../i18n';
 import type { Lang } from '../i18n';
 import { publicUrl } from '../lib/urls';
@@ -51,15 +50,6 @@ const TRADITION_LABELS: Record<string, Record<Lang, string>> = {
   psychology: { en: 'Psychology & Myth', de: 'Psychologie & Mythos' },
   mysticism: { en: 'Mysticism', de: 'Mystik' },
 };
-
-const MODE_CARDS = [
-  { key: 'story', nameKey: 'journey.modeStory', badge: 'listen' },
-  { key: 'wisdom', nameKey: 'journey.modeWisdom', badge: 'talk' },
-  { key: 'prism', nameKey: 'journey.modePrism', badge: 'listen' },
-  { key: 'quest', nameKey: 'journey.modeQuest', badge: 'talk' },
-  { key: 'freetalk', nameKey: 'journey.freetalk', badge: 'talk' },
-  { key: 'council', nameKey: 'journey.modeCouncil', badge: 'listen' },
-];
 
 function splitLabel(value: string): { label: string; text: string } {
   const idx = value.indexOf(': ');
@@ -145,25 +135,6 @@ const museum = isDe
       <p>{t('about.doP1')}</p>
       <p>{t('about.doP2')}</p>
       <p>{t('about.doP3')}</p>
-    </div>
-    <ContentVolume lang={lang} />
-    <p class="pub-section__text pub-about-modes-lead">{t('about.howItWorks.subtitle')}</p>
-    <div class="pub-concepts">
-      {MODE_CARDS.map(mode => (
-        <div class="pub-concept">
-          <div class="pub-concept__head">
-            <span class="pub-concept__term">{t(mode.nameKey)}</span>
-            <span class={`pub-journey__badge pub-journey__badge--${mode.badge}`}>
-              {t(`journey.${mode.badge}`)}
-            </span>
-          </div>
-          <div class="pub-concept__def">{t(`about.howItWorks.${mode.key}`)}</div>
-        </div>
-      ))}
-      <div class="pub-concept">
-        <div class="pub-concept__term">{t('journey.audioLibrary')}</div>
-        <div class="pub-concept__def">{t('about.howItWorks.audioLibrary')}</div>
-      </div>
     </div>
   </section>
 
@@ -292,10 +263,6 @@ const museum = isDe
     text-transform: uppercase;
     color: var(--gold-subtle);
     margin: 2rem 0 0.85rem;
-  }
-
-  .pub-about-modes-lead {
-    margin-top: 1.75rem;
   }
 
   .pub-about-trustlinks,

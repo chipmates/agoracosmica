@@ -25,7 +25,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Maya Angelou speaking?',
-        a: 'No. This is an Echo of Maya Angelou. It is an AI voice built from her documented life and writing, and it stays an interpretation. Recordings of the real Maya Angelou exist, and none of them are used here. She lived from 1928 to 2014. Use the Echo as a way into her ideas, never as her own words.',
+        a: "No. These stories retell her life in the first person. They were written with AI from her autobiographies and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Maya Angelou lived from 1928 to 2014. Recordings of her exist, and none of them are used here. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -45,7 +45,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Maya Angelou?',
-        a: 'Nein. Das hier ist ein Echo von Maya Angelou. Es ist eine KI-Stimme, gebaut aus ihrem belegten Leben und ihren Texten, und sie bleibt eine Deutung. Von der echten Maya Angelou gibt es Tonaufnahmen, und hier wird keine davon verwendet. Sie lebte von 1928 bis 2014. Nimm das Echo als Weg in ihre Gedanken, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Autobiografien und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Maya Angelou lebte von 1928 bis 2014. Von ihr gibt es Tonaufnahmen, und hier wird keine davon verwendet. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

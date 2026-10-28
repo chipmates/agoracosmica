@@ -25,7 +25,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Virginia Woolf speaking?',
-        a: "No. This is an Echo of Virginia Woolf. It is an AI voice built from what she actually wrote, and it stays an interpretation, not a recording. The real writer lived from 1882 to 1941, and no recording of her speaks here. Use it as a way into Modern Fiction and A Room of One's Own, never as her own words.",
+        a: "No. These stories retell her life in the first person. They were written with AI from her diaries, her letters and the historical sources. A synthetic voice reads them. Not a recording. Never her own words. Virginia Woolf lived from 1882 to 1941. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -45,7 +45,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Virginia Woolf?',
-        a: 'Nein. Das hier ist ein Echo von Virginia Woolf. Es ist eine KI-Stimme, gebaut aus dem, was sie wirklich geschrieben hat, und sie bleibt eine Deutung, keine Aufnahme. Die echte Schriftstellerin lebte von 1882 bis 1941, und hier spricht keine Tonaufnahme von ihr. Nimm es als Weg in Modern Fiction und Ein Zimmer für sich allein, nie als ihre eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen ihr Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach ihren Tagebüchern, ihren Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie ihre eigenen Worte. Virginia Woolf lebte von 1882 bis 1941. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

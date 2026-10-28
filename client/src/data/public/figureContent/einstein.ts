@@ -22,7 +22,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Albert Einstein speaking?',
-        a: "No. This is an Echo of Albert Einstein. It is an AI voice built from his documented life and writing, and it stays an interpretation, not a recording. The real man lived from 1879 to 1955, and no recording of him speaks here. Use it as a way into his ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his papers, his letters and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Albert Einstein lived from 1879 to 1955. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -42,7 +42,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Albert Einstein?',
-        a: 'Nein. Das hier ist ein Echo von Albert Einstein. Es ist eine KI-Stimme, gebaut aus seinem belegten Leben und seinen Schriften, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1879 bis 1955, und hier spricht keine Tonaufnahme von ihm. Nimm es als Weg in seine Ideen, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Arbeiten, seinen Briefen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Albert Einstein lebte von 1879 bis 1955. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

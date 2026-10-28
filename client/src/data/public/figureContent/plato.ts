@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really Plato speaking?',
-        a: "No. This is an Echo of Plato, an AI voice built from his documented dialogues. It is not a recording and not the real philosopher, who lived from about 428 to 348 BCE. No recording of him exists and none ever could. Even in his own books the words go to Socrates and the others, never to him. Use the Echo as a way into his ideas, never as his own words.",
+        a: "No. These stories retell his life in the first person. They were written with AI from his dialogues and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. Plato lived from about 428 to 348 BC. Even in his own books the words go to Socrates and the others, never to him. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich Platon?',
-        a: "Nein. Das ist ein Echo von Platon, eine KI-Stimme, gebaut aus seinen überlieferten Dialogen. Es ist keine Aufnahme und nicht der echte Philosoph, der von etwa 428 bis 348 v. Chr. lebte. Von ihm gibt es keine Aufnahme, und es könnte auch nie eine geben. Selbst in seinen eigenen Büchern gehören die Worte Sokrates und den anderen, nie ihm. Nimm das Echo als Weg in seine Gedanken, nie als seine eigenen Worte.",
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Dialogen und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. Platon lebte von etwa 428 bis 348 v. Chr. Selbst in seinen eigenen Büchern gehören die Worte Sokrates und den anderen, nie ihm. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },

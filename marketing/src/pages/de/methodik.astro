@@ -27,20 +27,20 @@ const t = getT(lang);
 
 const faq = [
   {
-    q: 'Ist die KI die echte Person?',
-    a: 'Nein. Jede Persönlichkeit ist ein KI-Echo, eine pädagogische Deutung, verankert in den Primärwerken und im dokumentierten Leben dieses Menschen. Es ist klar als Echo gekennzeichnet, nie eine Aufnahme und nie die echte Person. Aufnahmen, in denen diese Menschen mit dir sprechen, existieren nicht, und das synthetisierte Audio ist die Echo-Stimme dieses Menschen, nicht seine eigene.',
+    q: 'Spricht hier die echte Person?',
+    a: 'Nein. Jede Geschichte ist eine Nacherzählung in der Ich-Form, mit KI nach den eigenen Werken dieses Menschen und den historischen Quellen geschrieben und von einer synthetischen Stimme vorgelesen. Sie ist als Nacherzählung gekennzeichnet, nie eine Aufnahme und nie die eigenen Worte dieses Menschen. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.',
   },
   {
-    q: 'Wie genau sind die Echos?',
-    a: 'Ein Echo ist im echten Werk der Persönlichkeit verankert, bleibt also nah an den wirklichen Ideen. Aber es entsteht live, ohne dass ein Mensch einen Satz liest, bevor er dich erreicht, es kann sich also irren: ein falsches Datum, eine verwischte Quelle, mehr Sicherheit, als der Quellbestand hergibt. Behandle es als Lernbegleiter, nicht als Autorität, und prüf alles Wichtige gegen die Quellen.',
+    q: 'Wie genau sind die Geschichten?',
+    a: 'Daten, Menschen, Orte und Ereignisse kommen aus den Quellen, und die Fakten zu jeder Geschichte führen sie auf. Wo eine Geschichte eine Szene, eine Zeile Dialog oder ein Detail nachstellt, sagen die Fakten das. Wir lesen jede Geschichte gegen, bevor sie erscheint, aber eine Nacherzählung kann ein Detail trotzdem falsch haben. Nimm sie als Weg hinein, nicht als Autorität, und prüf alles Wichtige gegen die Quellen.',
   },
   {
     q: 'Woher kommen die Fakten?',
-    a: 'Jede Persönlichkeit ist in ihren eigenen Primärwerken verankert, in den Büchern, Briefen und Texten, die sie tatsächlich geschrieben hat, dazu anerkannte Biografien und Forschung. Zu jeder Persönlichkeit gehört ein öffentlicher Faktencheck, der die Quellen auflistet und das Belegte vom Nachgebildeten trennt. Die Anweisungsprofile, die jedes Echo verankern, sind öffentlich, und der gesamte Code ist Open Source unter der AGPL-3.0.',
+    a: 'Jeder Mensch hier ist in seinen eigenen Primärwerken verankert, in den Büchern, Briefen und Texten, die er tatsächlich geschrieben hat, dazu anerkannte Biografien und Forschung. Zu jedem gehört ein öffentlicher Faktencheck, der die Quellen auflistet und das Belegte vom Nachgestellten trennt. Der gesamte Code ist Open Source unter der AGPL-3.0.',
   },
   {
-    q: 'Was, wenn etwas falsch ist?',
-    a: 'Öffne den Faktencheck der Persönlichkeit, der benennt, was belegt und was nachgebildet ist, und folge ihm zum Primärtext. Wenn du einen echten Fehler findest, schreib uns an agoracosmica@chipmates.ai. Wir korrigieren ihn, und weil Code und Faktenchecks öffentlich sind, ist auch die Korrektur öffentlich.',
+    q: 'Was, wenn eine Geschichte etwas falsch hat?',
+    a: 'Öffne die Fakten zur Geschichte, die benennen, was belegt und was nachgestellt ist, und folge ihnen zum Primärtext. Wenn du einen echten Fehler findest, schreib uns an agoracosmica@chipmates.ai. Wir korrigieren ihn, und weil Code und Faktenchecks öffentlich sind, ist auch die Korrektur öffentlich.',
   },
 ];
 
@@ -57,7 +57,7 @@ const schemas = [
     lang,
     image: `${MEDIA_URL}/images/ui/og-default/1200.webp`,
     datePublished: '2026-06-24',
-    dateModified: '2026-06-24',
+    dateModified: '2026-10-28',
   }),
   faqSchema(faq, url),
   breadcrumbSchema([

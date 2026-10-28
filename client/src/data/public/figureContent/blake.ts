@@ -23,7 +23,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Is this really William Blake speaking?',
-        a: 'No. This is an Echo of William Blake. It is an AI voice built from what he actually wrote and printed, and it stays an interpretation, not a recording. The real man lived from 1757 to 1827, and no recording of him exists. Use it as a way into the poems, never as his own words.',
+        a: "No. These stories retell his life in the first person. They were written with AI from his poems and the historical sources. A synthetic voice reads them. Not a recording. Never his own words. William Blake lived from 1757 to 1827. No recording of him exists. Each story's facts say what is documented and what is recreated.",
       },
     },
     de: {
@@ -43,7 +43,7 @@ export const fragment: FigureFragment = {
       ],
       disclosure: {
         q: 'Spricht hier wirklich William Blake?',
-        a: 'Nein. Das hier ist ein Echo von William Blake. Es ist eine KI-Stimme, gebaut aus dem, was er wirklich geschrieben und gedruckt hat, und sie bleibt eine Deutung, keine Aufnahme. Der echte Mensch lebte von 1757 bis 1827, und von ihm gibt es keine Aufnahme. Nimm es als Weg in seine Gedichte, nie als seine eigenen Worte.',
+        a: "Nein. Diese Geschichten erzählen sein Leben in der Ich-Form nach. Geschrieben wurden sie mit KI nach seinen Gedichten und den historischen Quellen. Eine synthetische Stimme liest sie vor. Keine Aufnahme. Nie seine eigenen Worte. William Blake lebte von 1757 bis 1827. Von ihm gibt es keine Aufnahme. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist.",
       },
     },
   },
