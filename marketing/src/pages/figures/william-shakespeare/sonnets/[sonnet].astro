@@ -3,6 +3,9 @@
 // Quarto numbers them, so /sonnets/18/ is the page for Sonnet 18.
 
 import PoemPage from '../../../../components/PoemPage.astro';
+import PlayerHead from '../../../../components/player/PlayerHead.astro';
+import PlayerDock from '../../../../components/player/PlayerDock.astro';
+import { isStoryCompanionPath } from '../../../../player/pages';
 import { poemsByPoet } from '../../../../data/poems/index.mjs';
 
 export function getStaticPaths() {
@@ -13,5 +16,10 @@ export function getStaticPaths() {
 }
 
 const { poem } = Astro.props;
+// A companion page of a story player figure: the dock keeps playing here.
+const storyDock = isStoryCompanionPath(Astro.url.pathname);
 ---
-<PoemPage poem={poem} />
+<PoemPage poem={poem}>
+  {storyDock && <PlayerHead slot="head" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" />}
+</PoemPage>
