@@ -38,8 +38,15 @@ const W = landingWords(lang);
     color: var(--sp-ink-2);
   }
   .landing-ended__in[hidden] { display: none; }
+  /* a desktop: on the hero's text column (c2: 1200px centred, 16px in), not the page's narrower one, and clear of
+     the hero's lift (-0.75rem) */
+  @media (min-width: 1024px) {
+    .landing-ended { margin-inline: calc(50% - 50vw); }
+    .landing-ended__in { margin: 0.25rem 0 1rem max(16px, calc(50vw - 584px)); }
+  }
+  /* the close mark follows the line's end, where a short line leaves the box half empty */
   .landing-ended__line {
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     margin: 0;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
     font-size: 0.875rem;
