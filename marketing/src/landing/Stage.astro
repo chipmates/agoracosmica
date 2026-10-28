@@ -89,23 +89,25 @@ const templates = {
         decoding="async"
       />
     </div>
+    {/* the label is the next thing after the painting in the page's order: the note stands against the picture it
+        explains, never on it */}
+    <details class="story-label sp-label ls-label">
+      <summary>
+        <span class="sp-label__i" aria-hidden="true">i</span>
+        {/* each half's dot stands before it and is clipped where the half starts a line (landing.css), so a dot never
+            ends a line; the dots are for the eye, a hidden comma parts the items for a screen reader */}
+        <span class="sp-label__brief ls-label__brief">{halves.map((half, i) => (
+          <span class="sp-label__half ls-label__half"><span class="ls-label__dot" aria-hidden="true">·</span>{half.replace(/\u00a0·$/, '')}{i < halves.length - 1 && <span class="sp-sr">,</span>}</span>
+        ))}</span>
+      </summary>
+      <p>{W.note}</p>
+    </details>
     <figcaption class="ls-card__names">
       <Name class="ls-name" id="ls-name" tabindex="-1" data-stage-name data-long={f.name.length > LONG_NAME ? '' : undefined}>{f.name}</Name>
       <p class="ls-meta" data-stage-meta>{f.meta}</p>
       <p class="ls-line" data-stage-line>{f.line}</p>
     </figcaption>
   </figure>
-
-  <details class="story-label sp-label ls-label">
-    <summary>
-      <span class="sp-label__i" aria-hidden="true">i</span>
-      {/* the dot between the halves is drawn by landing.css, so it never ends a line */}
-      <span class="sp-label__brief ls-label__brief">{halves.map(half => (
-        <span class="sp-label__half ls-label__half">{half.replace(/\u00a0·$/, '')}</span>
-      ))}</span>
-    </summary>
-    <p>{W.note}</p>
-  </details>
 
   <div class="sp-plate-wrap ls-plate-wrap">
     <button

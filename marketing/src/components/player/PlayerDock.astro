@@ -14,10 +14,12 @@ interface Props {
   persist?: boolean;
   /** A page's own label words (the landing's), both languages; the app's label where none is given. */
   label?: Record<PlayerLang, { brief?: string; expanded?: string }>;
+  /** Whether the page shows an AI portrait: the bar's and the reader's label name the images only then. */
+  portraits?: boolean;
 }
 
-const { lang, persist = true, label } = Astro.props;
-const own = (l: PlayerLang) => ({ ...storyLabel(l), ...label?.[l] });
+const { lang, persist = true, label, portraits = true } = Astro.props;
+const own = (l: PlayerLang) => ({ ...storyLabel(l, portraits), ...label?.[l] });
 const labels = { en: own('en'), de: own('de') };
 // The app's own words for the facts, both languages: the dock outlives a language switch.
 const facts = { en: factWords('en'), de: factWords('de') };

@@ -45,6 +45,7 @@ function warm(): void {
 }
 import { Icon } from '../player/icons';
 import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from '../player/strings';
+import { LabelItems } from '../player/LabelItems';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -53,7 +54,7 @@ interface Label {
   title: string;
   brief: string;
   expanded: string;
-  /** The lock screen's line: the voice and the making, not the images. */
+  /** The lock screen's line: the making, the images and the voice (its artwork is the portrait). */
   lock: string;
 }
 
@@ -481,9 +482,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
           </button>
         </div>
         <div className="story-dock__note" id="story-dock-note" hidden={!noteOpen}>
-          <p className="story-dock__notek">{halves.map((half, i) => (
-            <span key={i}>{i > 0 ? ' ' : ''}<span className="sp-label__half">{half}</span></span>
-          ))}</p>
+          <p className="story-dock__notek"><LabelItems brief={label.brief} /></p>
           <p>{label.expanded}</p>
         </div>
       </div>

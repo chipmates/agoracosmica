@@ -92,7 +92,7 @@
 .ls-label__brief { display: flex; flex-wrap: wrap; min-width: 0; overflow: hidden; }
 .ls-label__half { margin: 0 0.9em 0 -0.9em; }
 .ls-label__half:last-child { margin-right: 0; }
-.ls-label__half::before { content: '·'; display: inline-block; width: 0.9em; text-align: center; }
+.ls-label__dot { display: inline-block; width: 0.9em; text-align: center; }
 .ls-plate-wrap { margin-top: 0.25rem; }
 .ls-links { margin-top: 0.125rem; }
 

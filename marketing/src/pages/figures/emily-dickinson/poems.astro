@@ -300,7 +300,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
               </details>
               {/* The door sits under the first poem: a reader who came for a
                   poem meets one before the offer of her stories. */}
-              {ti === 0 && i === 0 && <StoryDoor figureId="dickinson" slug="emily-dickinson" lang={lang} />}
+              {ti === 0 && i === 0 && <StoryDoor figureId="dickinson" slug="emily-dickinson" lang={lang} portraits={false} />}
             </Fragment>
           ))}
         </div>
@@ -363,7 +363,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     </footer>
   </div>
   {storyDock && <PlayerHead slot="head" />}
-  <PlayerDock slot="dock" lang={lang} persist={storyDock} />
+  <PlayerDock slot="dock" lang={lang} persist={storyDock} portraits={false} />
 </Public>
 
 <style>

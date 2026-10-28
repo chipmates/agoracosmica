@@ -6,6 +6,7 @@
 // on every other marketing surface.
 
 import StaticImage from './StaticImage.astro';
+import AiLabel from './AiLabel.astro';
 import './portrait-credit.css';
 import { portraitAlt as creditAlt } from '../lib/portraitCredit';
 import { getFigureById } from '@client/data/public/figuresCatalog';
@@ -40,6 +41,8 @@ const freeNote =
     : 'No account needed. Listen or read.';
 ---
 <aside class="esy-invite">
+  {/* the page's AI line again, before the portrait, for a reader who lands mid-page */}
+  {figureId && <AiLabel lang={lang} class="esy-invite__label" />}
   {figureId && (
     <div class="esy-invite__portrait">
       <StaticImage figureId={figureId} type="thumbnail" alt={alt} loading="lazy" width={96} height={96} />
@@ -72,6 +75,10 @@ const freeNote =
     padding: 2.25rem 1.5rem;
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
     border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
+  }
+  /* outweighs the label's own margin (ai-label.css), so it centres over the portrait */
+  .esy-invite .esy-invite__label {
+    margin: 0 auto 0.75rem;
   }
   .esy-invite__portrait {
     width: 72px;
