@@ -48,8 +48,8 @@ const de = lang === 'de';
 // Dickinson's poems capsule: the head's FAQ schema (player/figurePage.ts) holds these questions, so the page shows them.
 const poemsFaq = figureId === 'dickinson' ? (de ? dickinsonPoemsFaqDe : dickinsonPoemsFaqEn) : null;
 const poemsLink = de
-  ? 'Lies ihre Gedichte nach Thema, in ihrer eigenen Handschrift (auf Englisch) →'
-  : 'Read her poems grouped by theme, in her own hand →';
+  ? 'Ihre Gedichte nach Themen, in ihrer eigenen Handschrift, auf Englisch →'
+  : 'Her poems by theme, in her own hand →';
 const P = playerStrings(lang);
 const figure = getFigureById(figureId, lang);
 if (!figure) throw new Error(`Unknown figure: ${figureId}`);
