@@ -264,7 +264,10 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   useEffect(() => {
     if (storyKey !== null && noteKey !== null && noteKey !== storyKey && !noteShown()) setNoteKey(storyKey);
   }, [storyKey, noteKey]);
-  const voiceOn = storyKey !== null && noteKey === storyKey && quietKey !== storyKey;
+  // Read in the render as well, so a first story's first painted frame already holds the note: the effects above
+  // land after a paint in Chromium, which showed the pages for a frame first.
+  const noteDue = storyKey !== null && noteKey !== storyKey && !noteShown();
+  const voiceOn = storyKey !== null && quietKey !== storyKey && (noteKey === storyKey || noteDue);
   useEffect(() => {
     if (!noteOpen) return;
     const close = (e: KeyboardEvent) => { if (e.key === 'Escape') setNoteOpen(false); };
