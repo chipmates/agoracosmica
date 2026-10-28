@@ -58,14 +58,6 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
   </div>
   <p class="sp-hero__line">{heroLine(figureId, lang, leadAnswer)}</p>
   <p class="sp-hero__note">{keepCompounds(P.heroNote(numberWord(storyCount, lang), !!queue.she)).map(p => (p.keep ? <span class="sp-nb">{p.text}</span> : p.text))}</p>
-  <details class="story-label sp-label">
-    <summary>
-      <span class="sp-label__i" aria-hidden="true">i</span>
-      {/* the label breaks at its middle dots; an item wider than the line (200 % text) at its hyphens */}
-      <span class="sp-label__brief"><LabelItems brief={label.brief} half="sp-label__half" sr="sp-sr" /></span>
-    </summary>
-    <p>{label.expanded}</p>
-  </details>
 
   <div class="sp-plate-wrap">
     <button
@@ -110,4 +102,13 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
       </a>
     )}
   </p>
+  {/* the label closes the first screen, under the links: away from the picture and the words, still before any play */}
+  <details class="story-label sp-label">
+    <summary>
+      <span class="sp-label__i" aria-hidden="true">i</span>
+      {/* the label breaks at its middle dots; an item wider than the line (200 % text) at its hyphens */}
+      <span class="sp-label__brief"><LabelItems brief={label.brief} half="sp-label__half" sr="sp-sr" /></span>
+    </summary>
+    <p>{label.expanded}</p>
+  </details>
 </section>

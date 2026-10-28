@@ -89,16 +89,6 @@ const templates = {
         decoding="async"
       />
     </div>
-    {/* the label is the next thing after the painting in the page's order: the note stands against the picture it
-        explains, never on it */}
-    <details class="story-label sp-label ls-label">
-      <summary>
-        <span class="sp-label__i" aria-hidden="true">i</span>
-        {/* the same items as on the figure pages: a dot stays with the item before it */}
-        <span class="sp-label__brief"><LabelItems brief={W.label} half="sp-label__half" sr="sp-sr" /></span>
-      </summary>
-      <p>{W.note}</p>
-    </details>
     <figcaption class="ls-card__names">
       <Name class="ls-name" id="ls-name" tabindex="-1" data-stage-name data-long={f.name.length > LONG_NAME ? '' : undefined}>{f.name}</Name>
       <p class="ls-meta" data-stage-meta>{f.meta}</p>
@@ -148,6 +138,14 @@ const templates = {
       <a class="sp-textlink" href={f.href} data-stage-all data-door="home_all">{W.allStories(storyCount)}</a>
     </p>
   )}
+  {/* the label closes the first screen, under the links: away from the picture, still before any play */}
+  <details class="story-label sp-label ls-label">
+    <summary>
+      <span class="sp-label__i" aria-hidden="true">i</span>
+      <span class="sp-label__brief"><LabelItems brief={W.label} half="sp-label__half" sr="sp-sr" /></span>
+    </summary>
+    <p>{W.note}</p>
+  </details>
   <p class="sp-sr" aria-live="polite" data-stage-live></p>
 </section>
 

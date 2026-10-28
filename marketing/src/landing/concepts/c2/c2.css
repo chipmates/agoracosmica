@@ -45,12 +45,10 @@
 .c2-stage { order: 2; }
 .c2-rail { order: 3; }
 .c2-intro { order: 4; }
-/* a phone: the stage's parts join this column, so the label (next after the painting in the page's order) stands
-   first under the painting, before the tagline; everything else keeps its place */
+/* a phone: the stage's parts join this column in their page order */
 @media (max-width: 1023px) {
   .c2-hero .ls-stage.c2-stage, .c2-hero .ls-card { display: contents; }
   .c2-hero .ls-stage.c2-stage > *, .c2-hero .ls-card > * { order: 2; }
-  .c2-hero .ls-card > .ls-label { order: 0; margin: 0 0 0.25rem; }
 }
 
 /* the painting leaves the card: it lies under the whole hero and fades into the night at its foot */
