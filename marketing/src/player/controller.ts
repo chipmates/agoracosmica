@@ -21,6 +21,7 @@ import { trackHeardSeconds } from '../utils/heardSeconds';
 import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
 import { applyStoredTheme } from './theme';
+import type { PlayerLang } from './strings';
 import type { PlayerState, ResumePoint, SavedSentence, SheetKind, SleepChoice, StoryQueue } from './types';
 
 // The worker's mode allow-list (llm-proxy routes/playback.ts) has no
@@ -465,15 +466,48 @@ export function setAutoNext(on: boolean): void {
   }
 }
 
-/** Open item n of the given figure, by default the page's (else the playing one's). */
+function showReader(n: number, queue: StoryQueue): void {
+  setState({ readerOpen: true, readerN: n, readerQueue: queue, sheet: state.sheet === 'facts' ? state.sheet : null, away: false });
+}
+
+function hideReader(): void {
+  if (!state.readerOpen) return;
+  setState({ readerOpen: false, readerN: null, readerQueue: null, away: false, sheet: state.sheet === 'player' ? state.sheet : null });
+}
+
+/** Open item n of the given figure, by default the page's (else the playing one's). The view gets its own step in
+ *  history, so the browser's Back closes it. */
 export function openReader(n: number, queue?: StoryQueue | null): void {
   const shown = queue ?? readPageQueue() ?? state.queue;
   if (!shown) return;
-  setState({ readerOpen: true, readerN: n, readerQueue: shown, sheet: state.sheet === 'facts' ? state.sheet : null, away: false });
+  showReader(n, shown);
+  writeStep(n, shown);
 }
 
+/** The view's own close (its back control, Escape): the view's step leaves history with it. */
 export function closeReader(): void {
-  setState({ readerOpen: false, readerN: null, readerQueue: null, away: false, sheet: state.sheet === 'player' ? state.sheet : null });
+  const wasOpen = state.readerOpen;
+  hideReader();
+  if (wasOpen) dropStep();
+}
+
+/** The view closes for a way out of it (a link, a page change): its step stays, so Back opens it again at its place. */
+export function leaveReader(): void {
+  if (!state.readerOpen) return;
+  const st = entryState();
+  const step = stepOf(st);
+  if (step && step.doc === docMark) {
+    const box = document.querySelector('.story-reader__scroll');
+    history.replaceState({ ...st, [STEP_KEY]: { ...step, top: box ? Math.round(box.scrollTop) : 0 } }, '');
+  }
+  hideReader();
+}
+
+/** Where the view reopened from history stood: taken once, by the view, when its text is in. */
+export function takeReaderTop(): number | null {
+  const top = pendingTop;
+  pendingTop = null;
+  return top;
 }
 
 /** Kept for the islands that call it: open shows the playing item. */
@@ -500,10 +534,12 @@ export function closeSheet(): void {
 
 /** Stop playback: the story stops, its kept place stays. */
 export function dismiss(): void {
+  const wasOpen = state.readerOpen;
   audio?.pause();
   saveProgress(true);
   stopEndTimer();
   setState({ dismissed: true, readerOpen: false, readerN: null, readerQueue: null, resume: null, sheet: null, endCard: null, sleep: 'off', sleepLeft: 0 });
+  if (wasOpen) dropStep();
   offerResumeForPage();
   updatePositionState();
 }
@@ -774,6 +810,159 @@ function updatePositionState(force = false): void {
   }
 }
 
+// ---- the reading view's step in history ---------------------------------------
+// Opening the view adds one entry on the same address over the entry it opened on (its base). Back from the step
+// closes the view; Back to the step from where its links led opens it again. A traverse between a step and its base
+// is the same page: it is answered in place, with no fetch, no swap and no scroll.
+
+interface ReaderStep {
+  n: number;
+  figureId: string;
+  lang: PlayerLang;
+  /** The document that wrote the step: a soft page change brings a new one. */
+  doc: string;
+  /** The text's scroll when a way out left it. */
+  top?: number | undefined;
+}
+
+const STEP_KEY = 'storyReader';
+const BASE_KEY = 'storyReaderBase';
+
+let docMark = '';
+let popping = false;
+let pendingTop: number | null = null;
+
+function newDocMark(): void {
+  docMark = Math.random().toString(36).slice(2, 10);
+}
+
+function entryState(): Record<string, unknown> {
+  const st: unknown = history.state;
+  return st && typeof st === 'object' ? (st as Record<string, unknown>) : {};
+}
+
+function stepOf(st: unknown): ReaderStep | null {
+  const v = st && typeof st === 'object' ? (st as Record<string, unknown>)[STEP_KEY] : null;
+  if (!v || typeof v !== 'object') return null;
+  const s = v as ReaderStep;
+  return Number.isInteger(s.n) && typeof s.figureId === 'string' && FIGURE_ID_RE.test(s.figureId)
+    && (s.lang === 'en' || s.lang === 'de') && typeof s.doc === 'string' ? s : null;
+}
+
+/** The view's entry: a new one over the page's, or the open view's own rewritten for another item. */
+function writeStep(n: number, queue: StoryQueue): void {
+  const st = entryState();
+  const step: ReaderStep = { n, figureId: queue.figureId, lang: queue.lang, doc: docMark };
+  if (stepOf(st)) {
+    history.replaceState({ ...st, [STEP_KEY]: step }, '');
+    return;
+  }
+  const at = { scrollX: window.scrollX, scrollY: window.scrollY };
+  history.replaceState({ ...st, ...at, [BASE_KEY]: docMark }, '');
+  // The step keeps the base's fields (the router's index, the stage's figure): the router's next own entry counts on
+  // from both, and its direction stays right.
+  const rest = { ...st };
+  delete rest[BASE_KEY];
+  history.pushState({ ...rest, ...at, [STEP_KEY]: step }, '');
+}
+
+function dropStep(): void {
+  if (popping || stepOf(history.state)?.doc !== docMark) return;
+  popping = true;
+  // a traverse the browser never ran must not hold the next close
+  window.setTimeout(() => { popping = false; }, 2000);
+  history.back();
+}
+
+function restoreStep(step: ReaderStep): void {
+  if (state.readerOpen && state.readerN === step.n && state.readerQueue?.figureId === step.figureId) return;
+  const queue = [readPageQueue(), state.queue].find(q => q && q.figureId === step.figureId && q.lang === step.lang) ?? null;
+  if (!queue) return;
+  pendingTop = typeof step.top === 'number' && step.top > 0 ? step.top : null;
+  showReader(step.n, queue);
+}
+
+/** A step this document now shows takes its mark, and the view opens. */
+function adoptStep(st: Record<string, unknown>, step: ReaderStep): void {
+  if (step.doc !== docMark) history.replaceState({ ...st, [STEP_KEY]: { ...step, doc: docMark } }, '');
+  restoreStep(step);
+}
+
+/** A page that arrives on a step (a soft change back to it, a load from the page cache or the network) opens the view. */
+function restoreFromEntry(): void {
+  const st = entryState();
+  const step = stepOf(st);
+  if (step && !state.readerOpen) adoptStep(st, step);
+}
+
+const routed = (): boolean => !!document.querySelector('[name="astro-view-transitions-enabled"]');
+
+function onPopState(): void {
+  const st = entryState();
+  const step = stepOf(st);
+  // Back onto the step's base: the router scrolls to the entry's own numbers, so they become the page's place now
+  // (the same object the router holds for this traverse).
+  if (st[BASE_KEY] === docMark && (state.readerOpen || popping)) {
+    st.scrollX = window.scrollX;
+    st.scrollY = window.scrollY;
+  }
+  if (popping) {
+    popping = false;
+    // the view was opened again before its old step had left: it gets a new one
+    if (!step && state.readerOpen && state.readerN !== null && state.readerQueue) writeStep(state.readerN, state.readerQueue);
+    return;
+  }
+  if (step) {
+    // under the router a step of another document waits for the router: its swap, or its traverse in place below
+    if (step.doc === docMark) restoreStep(step);
+    else if (!routed()) adoptStep(st, step);
+    return;
+  }
+  hideReader();
+}
+
+type TraverseEvent = Event & { navigationType?: string; from?: URL; to?: URL; loader?: () => Promise<void>; signal?: AbortSignal };
+
+/** The router's traverse between a step and its base: answered in place. The router's loader is held until its next
+ *  navigation aborts it, so nothing is fetched, swapped, scrolled or announced. Window capture runs before the
+ *  stage's and the router glue's listeners (this module is evaluated before theirs install). */
+function onBeforePreparation(e: Event): void {
+  const ev = e as TraverseEvent;
+  if (ev.navigationType !== 'traverse') return;
+  const st = entryState();
+  const step = stepOf(st);
+  const base = st[BASE_KEY];
+  if (!step && typeof base !== 'string') return;
+  const own = step ? step.doc === docMark : base === docMark;
+  const samePage = !!ev.from && !!ev.to && ev.from.pathname === ev.to.pathname && ev.from.search === ev.to.search;
+  if (!own && !samePage) return;
+  // on the front, an entry of another portrait is the stage's to answer
+  const mark = st.landingStage;
+  if (typeof mark === 'string' && mark !== document.querySelector<HTMLElement>('[data-landing-stage]')?.dataset.figure) return;
+  e.stopImmediatePropagation();
+  // a step a reload left behind is this page's now
+  if (step && !own) adoptStep(st, step);
+  const signal = ev.signal;
+  ev.loader = () => new Promise<void>(done => {
+    signal?.addEventListener('abort', () => {
+      ev.preventDefault();
+      done();
+    }, { once: true });
+  });
+}
+
+function installHistory(): void {
+  newDocMark();
+  window.addEventListener('popstate', onPopState);
+  window.addEventListener('astro:before-preparation', onBeforePreparation, true);
+  document.addEventListener('astro:after-swap', newDocMark);
+  window.addEventListener('pageshow', e => {
+    if (e.persisted) restoreFromEntry();
+  });
+}
+
+if (typeof window !== 'undefined' && typeof history !== 'undefined') installHistory();
+
 // ---- start --------------------------------------------------------------
 
 let installed = false;
@@ -793,10 +982,11 @@ export function installPlayer(): void {
   document.addEventListener('astro:page-load', () => {
     loadForPage();
     offerResumeForPage();
+    restoreFromEntry();
   });
-  // The reading view belongs to the page it opened over: any page change, a link or the browser's back, closes it.
+  // The reading view belongs to the page it opened over: any page change closes it, and its step stays for Back.
   document.addEventListener('astro:before-swap', () => {
-    if (state.readerOpen) closeReader();
+    if (state.readerOpen) leaveReader();
   });
   document.addEventListener('astro:after-swap', applyStoredTheme);
   applyStoredTheme();
@@ -804,4 +994,5 @@ export function installPlayer(): void {
   window.addEventListener('pagehide', () => saveProgress(true));
   installRouterGlue(() => state.current !== null && !state.dismissed);
   offerResumeForPage();
+  restoreFromEntry();
 }

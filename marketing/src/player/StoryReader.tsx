@@ -13,6 +13,7 @@ import {
   closeReader,
   KEEP_EVENT,
   getState,
+  leaveReader,
   markRead,
   openReader,
   openSheet,
@@ -25,6 +26,7 @@ import {
   seekTo,
   setAway,
   stepRate,
+  takeReaderTop,
   togglePlay,
 } from './controller';
 import { loadFacts, loadText, loadTiming, shownFact } from './content';
@@ -70,8 +72,9 @@ function roman(n: number): string {
   return out;
 }
 
+// The view renders only in the browser: its first frame already has the desktop's size, so a place set on it holds.
 function useWide(): boolean {
-  const [wide, setWide] = useState(false);
+  const [wide, setWide] = useState(() => typeof window !== 'undefined' && window.matchMedia('(min-width: 1024px)').matches);
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
     const update = () => setWide(mq.matches);
@@ -346,6 +349,13 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     return () => io.disconnect();
   }, [blocks, n]);
 
+  // ---- reopened from history: the text where the visitor left it ----
+  useEffect(() => {
+    if (!model) return;
+    const top = takeReaderTop();
+    if (top !== null && scrollRef.current) scrollRef.current.scrollTop = top;
+  }, [model]);
+
   // ---- a saved sentence to show ----
   useEffect(() => {
     if (!model) return;
@@ -504,8 +514,8 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   const storyCount = queue.entries.filter(e => e.n > 0).length;
   const ways = (
     <p className="story-reader__ways">
-      <a className="sp-linkbtn" href={`${home}#stories`} onClick={closeReader}>{s.allStories(String(storyCount))}</a>
-      <a className="sp-linkbtn" href={selection} onClick={closeReader}>{s.allFigures}</a>
+      <a className="sp-linkbtn" href={`${home}#stories`} onClick={leaveReader}>{s.allStories(String(storyCount))}</a>
+      <a className="sp-linkbtn" href={selection} onClick={leaveReader}>{s.allFigures}</a>
     </p>
   );
 
@@ -527,11 +537,11 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
             {Icon.back}
             <span>{queue.name}</span>
           </button>
-          <a className="story-btn story-reader__way" href={`${home}#stories`} onClick={closeReader}>
+          <a className="story-btn story-reader__way" href={`${home}#stories`} onClick={leaveReader}>
             {Icon.list}
             <span>{s.storiesWay(String(storyCount))}</span>
           </a>
-          <a className="story-btn story-reader__way" href={selection} onClick={closeReader}>
+          <a className="story-btn story-reader__way" href={selection} onClick={leaveReader}>
             {Icon.people}
             <span>{s.figuresWay}</span>
           </a>
@@ -653,7 +663,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
                   <p className="story-reader__nextk">{s.afterLast}</p>
                   <ul className="story-reader__lives">
                     {queue.related!.slice(0, 2).map(life => (
-                      <li key={life.href}><a href={life.href} onClick={closeReader}>{life.name}</a></li>
+                      <li key={life.href}><a href={life.href} onClick={leaveReader}>{life.name}</a></li>
                     ))}
                   </ul>
                 </div>
