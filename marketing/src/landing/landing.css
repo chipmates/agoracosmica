@@ -34,20 +34,6 @@
 @media (prefers-reduced-motion: reduce) { .ls-card__img[data-moment-hold] { animation: none; } }
 @keyframes ls-show { from { opacity: 0; } to { opacity: 1; } }
 
-.ls-card__credit {
-  position: absolute;
-  top: 8px;
-  right: 8px;
-  padding: 1px 6px;
-  border-radius: 3px;
-  background: color-mix(in srgb, var(--sp-n-void) 62%, transparent);
-  font-family: var(--font-ui);
-  font-size: 0.6875rem;
-  line-height: 1.43;
-  color: var(--sp-n-ink);
-  /* the serifed capital I, so "KI" and "AI" never read as "Kl" and "Al" */
-  font-feature-settings: "ss05" 1;
-}
 .ls-card__names { margin: 0; }
 .ls-stage--overlay .ls-card__names {
   position: absolute;

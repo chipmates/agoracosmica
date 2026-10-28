@@ -7,8 +7,9 @@ const words: LandingWords = {
   description:
     'Short stories from the lives of 30 people, from Plato to Frida Kahlo, freely retold. Nonprofit and open source.',
   lead: 'Thirty lives, freely retold.',
+  label: 'Human-AI collaboration · AI images · Synthetic voice',
   note:
-    'Real lives, freely retold: the facts come from the sources, the scenes are imagined. Written in human-AI collaboration, read by a synthetic voice.',
+    'Real lives, freely retold: the facts come from the sources, the scenes are imagined. Written in human-AI collaboration, read by a synthetic voice. The portraits are AI images.',
   intro:
     'From Plato to Frida Kahlo, each story is a moment that taught them something about life.',
   choose: 'Pick someone who makes you curious.',

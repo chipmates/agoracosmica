@@ -21,7 +21,9 @@ const W = landingWords(lang);
 const name = title ? `${title} · ${W.lab.title}` : W.lab.title;
 // The landing's head and the note behind its "i" (the stage's and the bar's) come from its own words.
 const words = { en: landingWords('en'), de: landingWords('de') };
-const dockLabel = newChrome ? { en: { expanded: words.en.note }, de: { expanded: words.de.note } } : undefined;
+const dockLabel = newChrome
+  ? { en: { brief: words.en.label, expanded: words.en.note }, de: { brief: words.de.label, expanded: words.de.note } }
+  : undefined;
 ---
 <Public
   title={newChrome ? W.pageTitle : name}

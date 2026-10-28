@@ -1,10 +1,9 @@
 ---
-// The stage: one figure's painted portrait in a card with its name block and one line, the AI-image credit, the
-// stories' label, and the figure page's own plate on that figure's queue (the introduction, then story 1). Complete
-// in markup; stage.ts swaps any of the thirty in place. One stage per page: the plate reads the first queue script.
-import PortraitCredit from '../components/PortraitCredit.astro';
+// The stage: one figure's painted portrait in a card with its name block and one line, the label (the writing, the
+// pictures and the voice; the portrait's own alt names it an AI image, no chip on the painting), and the figure page's
+// own plate on that figure's queue (the introduction, then story 1). Complete in markup; stage.ts swaps any of the
+// thirty in place. One stage per page: the plate reads the first queue script.
 import { VOICE_DESC_ID, labelHalves, playerStrings } from '../player/strings';
-import { storyLabel } from '../player/label';
 import { landingWords } from './words';
 import { DEFAULT_FIGURE, LONG_NAME, MAIN_SIZES, scriptJson, stageFigure, stagePayload } from './thirty';
 import type { LandingLang } from './thirty';
@@ -46,8 +45,7 @@ const {
 
 const W = landingWords(lang);
 const P = playerStrings(lang);
-const label = storyLabel(lang);
-const halves = labelHalves(label.brief);
+const halves = labelHalves(W.label);
 const f = stageFigure(firstId, lang);
 const intro = f.queue.entries.find(e => e.n === 0);
 const first = f.queue.entries[0];
@@ -91,7 +89,6 @@ const templates = {
         decoding="async"
       />
     </div>
-    <PortraitCredit lang={lang} class="ls-card__credit" />
     <figcaption class="ls-card__names">
       <Name class="ls-name" id="ls-name" tabindex="-1" data-stage-name data-long={f.name.length > LONG_NAME ? '' : undefined}>{f.name}</Name>
       <p class="ls-meta" data-stage-meta>{f.meta}</p>

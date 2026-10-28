@@ -89,14 +89,6 @@
 @media (prefers-reduced-motion: reduce) { .c2-hero .ls-card__img { animation: none; } }
 @keyframes c2-show { from { opacity: 0; } to { opacity: 1; } }
 
-.c2-hero .ls-card__credit {
-  top: 10px;
-  right: 12px;
-  z-index: 1;
-  /* a bright painting (Mozart's, Austen's) stays behind a darker chip than the card's */
-  background: color-mix(in srgb, var(--sp-n-void) 84%, transparent);
-}
-
 /* ---- the two arrows: the same turn as a swipe, for a mouse and for anyone who does not know to swipe ---------- */
 .c2-turn {
   position: absolute;
@@ -271,11 +263,6 @@
   .c2-rail__eras { gap: 8px; }
   .c2-pick { width: 68px; }
 }
-.c2-rail__credit {
-  margin: 2px 16px 0 20px;
-  text-align: left;
-  color: var(--sp-n-ink-3);
-}
 
 /* ---- the thirty by era, as plain links ------------------------------------------------------------------- */
 .c2-index { margin: 3rem 0 0; max-width: 46rem; }
@@ -366,6 +353,5 @@
   .c2-rail__eraname { padding-top: 5px; }
   .c2-pick { width: auto; min-width: 64px; padding: 4px 4px 2px; gap: 4px; }
   .c2-pick img { width: 50px; height: 50px; }
-  .c2-rail__credit { margin: 4px 0 0 4px; }
   .c2-index { margin-top: 3.5rem; }
 }

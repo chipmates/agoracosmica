@@ -7,8 +7,9 @@ const words: LandingWords = {
   description:
     'Kurze Geschichten aus dem Leben von 30 Menschen, von Platon bis Frida Kahlo, frei nacherzählt. Non-Profit und Open Source.',
   lead: 'Dreißig Leben, frei nacherzählt.',
+  label: 'Mensch-KI-Zusammenarbeit · KI-Bilder · Synthetische Stimme',
   note:
-    'Echte Leben, frei nacherzählt: Die Fakten stammen aus den Quellen, die Szenen sind erdacht. Geschrieben in Mensch-KI-Zusammenarbeit, gelesen von einer synthetischen Stimme.',
+    'Echte Leben, frei nacherzählt: Die Fakten stammen aus den Quellen, die Szenen sind erdacht. Geschrieben in Mensch-KI-Zusammenarbeit, gelesen von einer synthetischen Stimme. Die Porträts sind KI-Bilder.',
   intro:
     'Von Platon bis Frida Kahlo: Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt.',
   choose: 'Wähl jemanden, der dich neugierig macht.',

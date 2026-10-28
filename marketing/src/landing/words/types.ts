@@ -9,6 +9,8 @@ export interface LandingWords {
   description: string;
   /** The one sentence under the tagline on the hero: who the stories are about and how they are told. */
   lead: string;
+  /** The label line above Beginnen, its parts split at " · ": the writing, the pictures, the voice (the voice last). */
+  label: string;
   /** The note behind the label's "i" (on the stage and the bar's "i"): what is real, what is made, and by whom. */
   note: string;
   /** W2: what each story holds (it never opens with the tagline's words, and the lead already says how they are told). */

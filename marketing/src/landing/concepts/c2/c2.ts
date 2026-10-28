@@ -26,7 +26,7 @@ function runOnHero(freeze: number | null, beats: Beats = 'face+line'): void {
   const root = hero();
   const image = root?.querySelector<HTMLImageElement>('[data-stage-img]');
   if (!root || !image) return;
-  const keep = Array.from(root.querySelectorAll<HTMLElement>('[data-c2-keep], [data-stage-name], [data-stage-meta], .ls-card__credit'));
+  const keep = Array.from(root.querySelectorAll<HTMLElement>('[data-c2-keep], [data-stage-name], [data-stage-meta]'));
   // the dust leads from this painting's own measured eyes
   const shown = stageFigures().find(f => f.id === stageFigureId());
   runMoment({

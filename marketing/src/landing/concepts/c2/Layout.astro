@@ -3,8 +3,8 @@
 // sit on its dark foot, the thirty run under it. The stage is the base's (moment off: c2.ts runs it, so the tagline
 // over the painting stays as clear as the name). Below: the words, then the thirty by era as plain links.
 import Stage from '../../Stage.astro';
-import PortraitCredit from '../../../components/PortraitCredit.astro';
 import { landingWords } from '../../words';
+import { portraitAlt } from '../../../lib/portraitCredit';
 import { byEra, DEFAULT_FIGURE, THIRTY, thumbSrcset, thumbUrl } from '../../thirty';
 import type { LandingLang } from '../../thirty';
 import './c2.css';
@@ -72,17 +72,18 @@ const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ??
                         data-c2-from="rail"
                         aria-current={f.id === DEFAULT_FIGURE ? 'true' : undefined}
                       >
+                        {/* the link's name is the portrait's alt ("Name, KI-Bild"); the short name under it is seen */}
                         <img
                           src={thumbUrl(f.id, 160)}
                           srcset={thumbSrcset(f.id)}
                           sizes="64px"
-                          alt=""
+                          alt={portraitAlt(f.name[lang], lang)}
                           width="64"
                           height="64"
                           loading="lazy"
                           decoding="async"
                         />
-                        <span class="c2-pick__name">{railName(f)}</span>
+                        <span class="c2-pick__name" aria-hidden="true">{railName(f)}</span>
                       </a>
                     </li>
                   ))}
@@ -91,7 +92,6 @@ const prevName = THIRTY[(at - 1 + THIRTY.length) % THIRTY.length]?.name[lang] ??
             ))}
           </ol>
         </div>
-        <PortraitCredit lang={lang} heard class="c2-rail__credit" />
       </nav>
     </div>
   </section>
