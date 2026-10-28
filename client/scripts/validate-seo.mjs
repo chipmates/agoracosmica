@@ -146,8 +146,8 @@ for (const f of files) {
   //     pages survive as crawlable TEXT and markup, so a refactor that pushes
   //     the list or the label JS-only fails the deploy.
   const HOMEPAGE_TERMS = {
-    'index.html': ['Short stories about life', 'Human-AI collaboration', 'AI images', 'Synthetic voice', 'All thirty, by era'],
-    'de/index.html': ['Kurze Geschichten übers Leben', 'Mensch-KI-Zusammenarbeit', 'KI-Bilder', 'Synthetische Stimme', 'Alle dreißig, nach Epochen'],
+    'index.html': ['Short stories about life', 'Human-AI collaboration', 'AI images', 'Synthetic voice', 'The descent through time'],
+    'de/index.html': ['Kurze Geschichten übers Leben', 'Mensch-KI-Zusammenarbeit', 'KI-Bilder', 'Synthetische Stimme', 'Der Abstieg durch die Zeit'],
   };
   if (HOMEPAGE_TERMS[rel]) {
     for (const term of HOMEPAGE_TERMS[rel])
