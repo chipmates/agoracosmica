@@ -12,7 +12,8 @@ export interface StoryLabel {
   /** The label line, the images named in its middle. */
   brief: string;
   expanded: string;
-  /** The helper's own two halves, voice first on the lock screen. */
+  /** The whole line, the images named on every page: the lock screen's artwork is the portrait (reversed there, the
+   * voice first). */
   lock: string;
 }
 
@@ -36,8 +37,8 @@ function read(file: unknown, lang: PlayerLang, portraits: boolean): StoryLabel {
     ? `${t.expanded} ${IMAGES[lang].note}`
     : `${t.expanded.slice(0, cut + 1)} ${IMAGES[lang].note} ${t.expanded.slice(cut + 2)}`;
   return portraits
-    ? { title: t.title, brief: withImages, expanded, lock: t.brief }
-    : { title: t.title, brief: t.brief, expanded: t.expanded, lock: t.brief };
+    ? { title: t.title, brief: withImages, expanded, lock: withImages }
+    : { title: t.title, brief: t.brief, expanded: t.expanded, lock: withImages };
 }
 
 const LABELS: Record<PlayerLang, Record<'with' | 'without', StoryLabel>> = {

@@ -53,7 +53,7 @@ interface Label {
   title: string;
   brief: string;
   expanded: string;
-  /** The lock screen's line: the voice and the making, not the images. */
+  /** The lock screen's line: the making, the images and the voice (its artwork is the portrait). */
   lock: string;
 }
 
