@@ -70,12 +70,15 @@ const lead = tocLead(ageBound(stories[0]?.age, lang, 'first', rough), ageBound(s
       const intro = r.n === 0;
       const y = intro ? null : yearOf.get(r.n)!;
       const plain = /^~?\s*\d{1,4}$/.test(yearShown(r.year));
+      // a line over the year sits close to the next one, a line under it to the one before
+      const closeOver = (lines: string[], i: number) => (i < lines.length - 1 ? ' sp-row__line' : '');
       const place = r.place ? placeShown(r.place) : '';
       const age = r.age ? ageAt(r.age) : '';
       const details = intro
         ? [r.minutes ? P.minutes(r.minutes) : '']
         : [r.year ? P.approxYear(r.year) : '', place, age, r.minutes ? P.minutes(r.minutes) : ''];
-      // the row's line: what the year column cannot hold, the place, the age, the minutes; ranges kept whole
+      // the row's line: a field without a year, the place, the age, the minutes (a date stays whole in its column);
+      // ranges kept whole
       const subParts = intro
         ? (r.minutes ? [{ cls: '', text: P.introRowSub(r.minutes) }] : [])
         : [{ cls: 'sp-row__when', text: y?.lead ?? '' }, { cls: 'sp-row__place', text: place }, { cls: 'sp-row__age', text: age },
@@ -95,9 +98,9 @@ const lead = tocLead(ageBound(stories[0]?.age, lang, 'first', rough), ageBound(s
               {intro ? (
                 <svg class="sp-row__scroll" viewBox="0 0 24 24" focusable="false"><path d="M7 4h11v13a3 3 0 0 1-3 3H6" /><path d="M7 4a2.5 2.5 0 0 0-2.5 2.5V8H7" /><path d="M6 20a3 3 0 0 0 3-3v-1H3v1a3 3 0 0 0 3 3z" /><path d="M10 8.5h5M10 12h5" /></svg>
               ) : y && y.main ? (
-                <>{y.pre && <span class="sp-row__approx">{y.pre}</span>}{plain && !y.tight
+                <>{y.pre.map((t, i) => <span class={`sp-row__approx${closeOver(y.pre, i)}`}>{t}</span>)}{plain && !y.tight
                   ? y.main
-                  : <span class:list={[y.decade && 'sp-row__decade', y.tight && 'sp-row__tight']}>{y.main}</span>}{y.post && <span class="sp-row__yearto">{y.post}</span>}</>
+                  : <span class:list={[y.decade && 'sp-row__decade', y.tight && 'sp-row__tight']}>{y.main}</span>}{y.post.map((t, i) => <span class={`sp-row__yearto${i > 0 ? ' sp-row__line' : ''}`}>{t}</span>)}{y.note.map((t, i) => <span class={`sp-row__yearnote${i > 0 ? ' sp-row__line' : ''}`}>{t}</span>)}</>
               ) : null}
             </span>
             <span class="sp-row__body">

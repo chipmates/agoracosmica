@@ -11,7 +11,7 @@ const SMALL: Record<string, number> = {
   'ä': 6.55, 'ö': 7.02, 'ü': 6.96, 'ß': 7.12, A: 7.15, B: 7.49, C: 7.28, D: 7.26, E: 6.42, F: 6.16, G: 7.48, H: 7.44,
   I: 2.91, J: 6.49, K: 6.93, L: 6.22, M: 9.74, N: 7.52, O: 7.58, P: 6.83, Q: 7.58, R: 7.17, S: 6.97, T: 6.69, U: 7.55,
   V: 7.03, W: 9.85, X: 7.23, Y: 6.93, Z: 6.57, 'Ä': 7.15, 'Ö': 7.58, 'Ü': 7.55, ' ': 3.05, '.': 3, ',': 2.99,
-  '-': 5.22, '/': 4.29, '+': 7.04, '(': 4.39, ')': 4.36,
+  '-': 5.22, '/': 4.29, '+': 7.04, '(': 4.39, ')': 4.36, '\u00a0': 3.05,
 };
 const BIG: Record<string, number> = {
   '0': 15.36, '1': 10.08, '2': 13.9, '3': 13.3, '4': 13.97, '5': 13.13, '6': 14.16, '7': 11.83, '8': 14.28, '9': 14.19,
@@ -20,6 +20,32 @@ const BIG: Record<string, number> = {
 // The column is 54 px on a phone; a line keeps a px clear on each side.
 const COLUMN = 52;
 const smallWidth = (s: string) => [...s].reduce((w, ch) => w + (SMALL[ch] ?? 7.6), 0);
+// Where a compound wider than the column may break: after its first part.
+const JOINTS = /^(Früh|Spät|ange|child)(\p{Ll}{3,}[,.]?)$/u;
+
+/**
+ * A small text as the column's lines, each one inside the column: words fill a line; a word wider than the column
+ * breaks at its own hyphen, else at a compound's joint (with a hyphen); a word just over the column (inside the
+ * 54 px cell, "Londoner") stands alone.
+ */
+function columnLines(text: string): string[] {
+  const words = text.split(/ +/).filter(Boolean).flatMap(word => {
+    if (smallWidth(word) <= COLUMN) return [word];
+    const hy = word.match(/^(.+?-)(\p{L}.*)$/u);
+    if (hy) return [hy[1]!, hy[2]!];
+    const joint = word.match(JOINTS);
+    if (joint) return [`${joint[1]}-`, joint[2]!];
+    return [word];
+  });
+  const lines: string[] = [];
+  for (const word of words) {
+    const last = lines[lines.length - 1];
+    // a part broken at a hyphen never takes the next word onto its line
+    if (last !== undefined && !last.endsWith('-') && smallWidth(`${last} ${word}`) <= COLUMN) lines[lines.length - 1] = `${last} ${word}`;
+    else lines.push(word);
+  }
+  return lines;
+}
 const bigWidth = (s: string, decade: boolean) => [...s].reduce((w, ch) => w + (BIG[ch] ?? 14), 0) * (decade ? 0.7 : 1);
 
 const MONTHS: Record<PlayerLang, [string, string][]> = {
@@ -33,41 +59,46 @@ const shortMonths = (s: string, lang: PlayerLang) =>
 const hasMonth = (s: string, lang: PlayerLang) => MONTHS[lang].some(([full]) => new RegExp(`\\b${full}\\b`).test(s));
 
 export interface YearSet {
-  /** The small line over the year ("um", "Herbst", "17. Dez."). */
-  pre: string;
+  /** The small lines over the year ("um", "Herbst", "17. Dez.", "Früh-" / "sommer"). */
+  pre: string[];
   /** The year or the decade, large; empty where the field holds no year. */
   main: string;
-  /** The small line under it ("bis 1779", "v. Chr."). */
-  post: string;
+  /** The small lines under it: a span's end, the era ("bis 1779", "v. Chr."). */
+  post: string[];
+  /** The field's remark in brackets, last ("einige Berichte" / "1934-35"). */
+  note: string[];
   decade: boolean;
   /** The large figure is wider than the column at its size: set a little tighter. */
   tight: boolean;
-  /** What the column cannot hold, at the front of the row's line ("Spätfrühling", "einige Berichte 1934-35"). */
-  lead: string;
   /** A month's name stood in a line too wide for the column. */
   monthTooWide: boolean;
+  /** A field without a year in figures, at the front of the row's line ("Späte Laufbahn"). */
+  lead: string;
 }
 
 const ERA = /\s+(v\. Chr\.|n\. Chr\.|BCE|BC|AD|CE)$/;
 
 /**
- * A year field as the column sets it: the first year large, the words before it on a small line above, a span's end
- * or the era on a small line below; a line too wide for the column moves to the row's line, a remark in brackets
- * too. `short` sets the months short (a page sets all its months short once one of them does not fit).
+ * A year field as the column sets it, every part of it in the column: the first year large, the words before it in
+ * small lines above, a span's end and the era in small lines below, a remark in brackets last; each line inside the
+ * column (columnLines). `short` sets the months short (a page sets all its months short once one of them does not fit).
  */
 export function yearSet(year: string, lang: PlayerLang, short = false): YearSet {
   const de = lang === 'de';
-  const to = (t: string) => (de ? `bis\u00a0${t}` : `to\u00a0${t}`);
+  const to = (t: string) => (de ? `bis ${t}` : `to ${t}`);
+  const months = (t: string) => (short ? shortMonths(t, lang) : t);
   let s = year.replace(/–/g, '-').trim();
   let remark = '';
   const br = s.match(/^(.*?)\s*\(([^()]*)\)$/);
   if (br) { s = br[1]!.trim(); remark = br[2]!.replace(/;\s*/g, ', '); }
   let era = '';
   const em = s.match(ERA);
-  if (em) { era = em[1]!; s = s.slice(0, em.index).trim(); }
+  if (em) { era = em[1]!.replace(' ', '\u00a0'); s = s.slice(0, em.index).trim(); }
+  const note = remark ? columnLines(months(remark)) : [];
   const m = s.match(/(?<!\d)(\d{3,4})(er|s)?(?!\d)/);
   if (!m) {
-    return { pre: '', main: '', post: '', decade: false, tight: false, lead: year.replace(/;\s*/g, ', '), monthTooWide: false };
+    return { pre: [], main: '', post: [], note: [], decade: false, tight: false, monthTooWide: false,
+      lead: year.replace(/;\s*/g, ', ') };
   }
   const main = m[1]! + (m[2] ?? '');
   const decade = !!m[2];
@@ -87,13 +118,11 @@ export function yearSet(year: string, lang: PlayerLang, short = false): YearSet 
   else if (second) post = to(second[1]!);
   else post = rest;
   if (era) post = post ? `${post} ${era}` : era;
-  if (short) { pre = shortMonths(pre, lang); post = shortMonths(post, lang); }
-  const lead: string[] = [];
-  let monthTooWide = false;
-  if (pre && smallWidth(pre) > COLUMN) { monthTooWide ||= hasMonth(pre, lang); lead.push(pre); pre = ''; }
-  if (post && smallWidth(post) > COLUMN) { monthTooWide ||= hasMonth(post, lang); lead.push(post); post = ''; }
-  if (remark) lead.push(remark);
-  return { pre, main, post, decade, tight: bigWidth(main, decade) > COLUMN + 1, lead: lead.join(' '), monthTooWide };
+  pre = months(pre);
+  post = months(post);
+  const monthTooWide = [pre, post].some(t => smallWidth(t) > COLUMN && hasMonth(t, lang));
+  return { pre: pre ? columnLines(pre) : [], main, post: post ? columnLines(post) : [], note, decade,
+    tight: bigWidth(main, decade) > COLUMN + 1, monthTooWide, lead: '' };
 }
 
 /** The year as a number for the life's order, a year before Christ below zero; NaN where there is none. */
