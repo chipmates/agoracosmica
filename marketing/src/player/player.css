@@ -1550,7 +1550,8 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 /* the bar's pages: the drawing at the top of its 44 px band, close under the line */
 .sp-tmap--bar .sp-tmap__box { height: 44px; align-items: flex-start; padding-top: 4px; box-sizing: border-box; }
 /* the bar's playhead: its head in the gap under the line's words (never on them), its stem down over the pages */
-.sp-tmap--bar .sp-tmap__head { top: 2px; height: 26px; margin-top: 0; }
+/* the stem stands in a 2 px channel of the bar's ground, so neither lit nor unlit lines touch it */
+.sp-tmap--bar .sp-tmap__head { top: 2px; height: 26px; margin-top: 0; box-shadow: 0 0 0 2px var(--sp-void); }
 .sp-tmap--bar.is-dragging .sp-tmap__head { height: 34px; margin-top: 0; }
 .sp-tmap--bar .sp-tmap__head::before { top: -2px; }
 .sp-tmap--bar .sp-tmap__dot { bottom: 12px; }
@@ -1588,9 +1589,9 @@ body:has(.story-dock) .public-page { padding-bottom: calc(var(--story-dock-space
 .sp-tmap__when { display: flex; align-items: baseline; gap: 10px; font-size: 0.8125rem; font-weight: 600; color: var(--sp-accent); font-variant-numeric: tabular-nums; }
 .sp-tmap__scene { font-weight: 400; color: var(--sp-ink-3); }
 .sp-tmap__line {
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
+  /* two lines at most, cut between words by the script (WholeWords) */
+  display: block;
+  max-height: calc(2 * 1.35em);
   overflow: hidden;
   margin-top: 3px;
   font-family: var(--font-content);

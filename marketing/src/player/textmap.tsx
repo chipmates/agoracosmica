@@ -3,7 +3,7 @@
 // dragged: the bubble names the time, the scene and the sentence the voice will start from, and letting go starts
 // there. The native range stays underneath for keys and screen readers.
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import type { KeyboardEvent as ReactKeyboardEvent, PointerEvent as ReactPointerEvent } from 'react';
 import { loadText, loadTiming } from './content';
 import { seekTo as seekVoice, skipBack, voicePosition } from './controller';
@@ -174,14 +174,28 @@ function placePage(el: HTMLElement | null, seg: MapSegment, last: boolean, durat
   el.style.setProperty('--sp-last', `${Math.round((seg.lines[seg.lines.length - 1] ?? 0.6) * 100)}%`);
 }
 
-/** A page under 2 % of the story (a closing line) is drawn as part of the page before it: a sliver reads as a glitch. */
-function drawnSegments(segs: MapSegment[], duration: number): MapSegment[] {
+/** The narrowest page drawn, in px: a narrower one (a closing paragraph) reads as a dotted glyph, not a page. */
+const MIN_PAGE_PX = 14;
+
+/** A page narrower than MIN_PAGE_PX as drawn (under 2 % of the story until the drawing's width is known) is drawn as
+ * part of the page before it, the first one as part of the page after it. Time, scenes and the bubble keep every
+ * segment. */
+function drawnSegments(all: MapSegment[], duration: number, px: number): MapSegment[] {
+  if (duration <= 0) return all;
+  // the map may have been built with the catalog's rounder length: the last page ends at the voice's real end
+  const segs = all.map((seg, i) => ({ ...seg, end: i === all.length - 1 ? duration : Math.min(seg.end, duration) }));
+  const narrow = (seg: MapSegment, last: boolean) => {
+    const share = (seg.end - seg.start) / duration;
+    return px > 0 ? share * px - (last ? 0 : PAGE_GAP) < MIN_PAGE_PX : share < 0.02;
+  };
   const out: MapSegment[] = [];
-  for (const seg of segs) {
+  segs.forEach((seg, i) => {
     const prev = out[out.length - 1];
-    if (prev && duration > 0 && (seg.end - seg.start) / duration < 0.02) out[out.length - 1] = { ...prev, end: seg.end };
+    if (prev && narrow(seg, i === segs.length - 1)) out[out.length - 1] = { ...prev, end: seg.end };
     else out.push(seg);
-  }
+  });
+  const [a, b] = out;
+  if (a && b && narrow(a, false)) out.splice(0, 2, { ...a, end: b.end });
   return out;
 }
 
@@ -193,22 +207,84 @@ interface DrawProps {
 
 /** The drawing alone: each page four lines (2 px every 6 px, the last one short), the heard part lit, a clip. */
 export function TextMapDrawing({ map, duration, className = '' }: DrawProps) {
-  const segs = map ? drawnSegments(map.segments, duration) : flatSegments(duration);
+  // the drawing's width decides which pages are too narrow to draw on their own
+  const [px, setPx] = useState(0);
+  const rootRef = useRef<HTMLSpanElement | null>(null);
+  useEffect(() => {
+    const el = rootRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    const ro = new ResizeObserver(() => setPx(Math.round(el.getBoundingClientRect().width)));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+  const segs = map ? drawnSegments(map.segments, duration, px) : flatSegments(duration);
   const pages = segs.map((seg, i) => (
     <span key={i} className="sp-page" ref={el => placePage(el, seg, i === segs.length - 1, duration)} />
   ));
   return (
-    <span className={`sp-pages ${className}`} aria-hidden="true" data-tmap-drawing="">
-      <span className="sp-pages__layer">{pages}</span>
+    <span ref={rootRef} className={`sp-pages ${className}`} aria-hidden="true" data-tmap-drawing="">
+      <span className="sp-pages__layer" data-tmap-unheard="">{pages}</span>
       <span className="sp-pages__layer sp-pages__layer--heard" data-tmap-heard="">{pages}</span>
     </span>
   );
 }
 
-/** Set the drawing's heard share: a clip on the lit layer. */
+/** The lit part ends this far left of the playhead (the bar's stem stands in a channel of the ground as wide), and shows
+ * only once it is MIN_LIT px long: short lit stubs beside the stem read as a comb. */
+const HEARD_GAP = 3;
+const MIN_LIT = 5;
+
+/** Set the drawing's heard share: a clip on the lit layer, ending HEARD_GAP px before the playhead, and the unlit layer
+ * shown only after it, so nothing but whole lit lines stands left of the stem. */
 export function setHeard(root: Element | null, share: number): void {
-  const right = (1 - Math.max(0, Math.min(1, share))) * 100;
-  root?.querySelectorAll<HTMLElement>('[data-tmap-heard]').forEach(el => el.style.setProperty('clip-path', `inset(0 ${right.toFixed(2)}% 0 0)`));
+  root?.querySelectorAll<HTMLElement>('[data-tmap-drawing]').forEach(d => {
+    const w = d.getBoundingClientRect().width;
+    const at = Math.max(0, Math.min(1, share)) * w;
+    const lit = at - HEARD_GAP;
+    d.querySelector<HTMLElement>('[data-tmap-heard]')?.style.setProperty('clip-path', `inset(0 ${(lit < MIN_LIT ? w : w - lit).toFixed(1)}px 0 0)`);
+    d.querySelector<HTMLElement>('[data-tmap-unheard]')?.style.setProperty('clip-path', `inset(0 0 0 ${at.toFixed(1)}px)`);
+  });
+}
+
+/** A sentence in two lines at most, cut only between words, with "…" after the last whole word. */
+function WholeWords({ text, className }: { text: string; className: string }) {
+  const ref = useRef<HTMLSpanElement | null>(null);
+  const fit = useCallback(() => {
+    const el = ref.current;
+    if (!el) return;
+    el.textContent = text;
+    const lh = parseFloat(getComputedStyle(el).lineHeight) || 20;
+    const fits = () => el.scrollHeight <= lh * 2 + 1;
+    if (fits()) return;
+    const words = text.split(/\s+/);
+    const cut = (k: number) => `${words.slice(0, k).join(' ').replace(/[,;:.!?\u2013\u2014-]+$/, '')}\u2026`;
+    let lo = 1;
+    let hi = words.length - 1;
+    while (lo < hi) {
+      const mid = Math.ceil((lo + hi) / 2);
+      el.textContent = cut(mid);
+      if (fits()) lo = mid;
+      else hi = mid - 1;
+    }
+    el.textContent = cut(lo);
+  }, [text]);
+  useLayoutEffect(fit, [fit]);
+  // the bubble takes its width after the first frame (a phone's full width): measured again then
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+    let w = 0;
+    const ro = new ResizeObserver(() => {
+      const now = Math.round(el.getBoundingClientRect().width);
+      if (now !== w) {
+        w = now;
+        fit();
+      }
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, [fit]);
+  return <span ref={ref} className={className} />;
 }
 
 /** One step by sentence (held: by paragraph); back from well inside a sentence replays it from its start. */
@@ -380,7 +456,7 @@ export function TextMap({ state, queue, map, where, seekTo }: MapProps) {
             {clockLabel(target ? target.start : drag.t)}
             {seg?.scene ? <span className="sp-tmap__scene">{s.mapScene(seg.scene)}</span> : null}
           </span>
-          {target && <span className="sp-tmap__line">{target.text}</span>}
+          {target && <WholeWords className="sp-tmap__line" text={target.text} />}
         </div>
       )}
     </div>
