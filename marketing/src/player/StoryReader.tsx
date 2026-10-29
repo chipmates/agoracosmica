@@ -145,7 +145,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     backRef.current?.focus({ preventScroll: true });
   }, []);
 
-  // ---- the reader follows the voice into the next story ----
+  // ---- the reader follows the voice into the story it moves to: the next, the one before, or any picked ----
   const nowCurrent = state.current;
   const nowDismissed = state.dismissed;
   const nowOwn = sameQueue(state.queue, queue);
@@ -153,7 +153,7 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   useEffect(() => {
     const before = prevCurrent.current;
     prevCurrent.current = nowCurrent;
-    if (before === n && nowCurrent !== null && nowCurrent === n + 1 && !nowDismissed && nowOwn) openReader(nowCurrent, queue);
+    if (before === n && nowCurrent !== null && nowCurrent !== n && !nowDismissed && nowOwn) openReader(nowCurrent, queue);
   }, [nowCurrent, nowDismissed, nowOwn, n, queue]);
 
   // ---- display settings onto the page ----
