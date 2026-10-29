@@ -21,7 +21,10 @@ import {
   noteEngagedListenSeconds,
 } from './funnelBeacon';
 
-const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL || '';
+// The public pages build without the app's env, and agoracosmica.org has no
+// /v1/* route, so a production build without the variable names the worker.
+const API_BASE = import.meta.env.VITE_FREE_TIER_API_URL
+  || (import.meta.env.DEV ? '' : 'https://llm.agoracosmica.org');
 
 export type PlaybackContentType = 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
 export type PlaybackEvent =
