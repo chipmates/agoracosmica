@@ -81,15 +81,19 @@ const { href, label, at, en } = Astro.props;
     outline: 2px solid var(--gold-hover);
     outline-offset: 2px;
   }
-  /* No script needed (the CSP allows none inline): the English footer's link
-     carries #en, and the marker's :target swaps the two links. */
+  /* No script needed (the CSP allows none inline): an English link carries #en,
+     or #en-<section> for a section, and the [data-en-mark] marker's :target swaps
+     the two links. :has reaches the top link too when the marker stands below it;
+     the sibling rule is the fallback for browsers without :has. */
   .pub-back__link--en {
     display: none;
   }
-  :global(#en:target) ~ .pub-back .pub-back__link--en {
+  :global([data-en-mark]:target) ~ .pub-back .pub-back__link--en,
+  :global(:has(> [data-en-mark]:target)) > .pub-back .pub-back__link--en {
     display: inline-flex;
   }
-  :global(#en:target) ~ .pub-back .pub-back__link[data-back-link] {
+  :global([data-en-mark]:target) ~ .pub-back .pub-back__link[data-back-link],
+  :global(:has(> [data-en-mark]:target)) > .pub-back .pub-back__link[data-back-link] {
     display: none;
   }
 </style>

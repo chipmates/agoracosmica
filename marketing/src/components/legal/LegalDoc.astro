@@ -14,12 +14,13 @@ const { title, lastUpdated, lang = 'de' } = Astro.props;
 const isEn = lang === 'en';
 const t = getT(lang);
 const home = publicUrl(lang, '/');
-// A German-only page opened from an English page (its link ends in #en) leads back to the English front.
+// A German-only page opened from an English page leads back to the English front: the link ends in #en,
+// or in #en-<section> where it points at a section, and the page carries a [data-en-mark] marker by that id.
 const en = isEn ? undefined : { href: publicUrl('en', '/'), label: getT('en')('breadcrumbs.home') };
 const fromEn = isEn ? '#en' : '';
 ---
 <article class="legal-doc">
-  {en && <span id="en" hidden></span>}
+  {en && <span id="en" hidden data-en-mark></span>}
   <BackLink at="top" href={home} label={t('breadcrumbs.home')} en={en} />
   <header class="legal-doc__header">
     <h1 class="legal-doc__title">{title}</h1>
@@ -43,6 +44,15 @@ const fromEn = isEn ? '#en' : '';
 </article>
 
 <style>
+  /* A jump to a section, or to the English marker right before it, lands clear of the sticky bar. */
+  .legal-doc :global(.legal-doc__en-mark) {
+    display: block;
+    height: 0;
+  }
+  .legal-doc :global(.legal-doc__en-mark),
+  .legal-doc :global(section[id]) {
+    scroll-margin-top: 5rem;
+  }
   /* The links at the end are 44px targets; the rows' gap lives inside them now. */
   .legal-doc__footer-links {
     row-gap: 0;
