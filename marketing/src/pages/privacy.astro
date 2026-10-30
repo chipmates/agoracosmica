@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Privacy Policy';
-const lastUpdated = 'Last updated: 28 October 2026';
+const lastUpdated = 'Last updated: 30 October 2026';
 const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Agora Cosmica platform. GDPR-compliant information on data processing, processors, and the rights of data subjects.';
 ---
 <Public
@@ -332,10 +332,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         Recipient: Google Ireland Limited and Google LLC (USA). A transfer to the USA can take place. Google is certified under the EU-US Data Privacy Framework. How Google uses data from partner sites: <a href="https://business.safety.google/privacy">https://business.safety.google/privacy</a>.
       </p>
       <p>
-        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. Google keeps the data according to its own retention rules for advertising data.
+        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. To prevent abuse, when steps are sent our server also keeps a hash of your IP address, made with a secret key, together with how many steps came from it in the same hour. Both are stored apart from this record and expire after at most one hour and two minutes. Google keeps the data according to its own retention rules for advertising data.
       </p>
       <p>
-        <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent.
+        <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent. The hash of your IP address that our server keeps when steps are sent rests not on your consent but on our legitimate interest in protecting the measurement from floods of reports (Art. 6(1)(f) GDPR), as described under "Reach measurement".
       </p>
     </section>
 
@@ -354,7 +354,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         No count contains an IP address, a user ID or anything you typed. We build no profiles, and we do not recognize a browser from one visit to the next for counting. The counts are kept for 90 days.
       </p>
       <p>
-        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
+        To prevent abuse, when counts arrive our server keeps a hash of your IP address, made with a secret key, together with how many counts of one kind came from it in the same hour. Both are stored apart from the counts and expire after at most one hour and two minutes.
+      </p>
+      <p>
+        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). We process the hash of your IP address on the basis of our legitimate interest in protecting the counting and our server from floods of reports (Art. 6(1)(f) GDPR). It is pseudonymised but still personal data, because with the key it could be traced back to an IP address. For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
       </p>
     </section>
 
