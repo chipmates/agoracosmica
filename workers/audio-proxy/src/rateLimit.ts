@@ -15,24 +15,10 @@
 
 import { RATE_LIMIT_CONFIG } from './config';
 import { corsHeaders } from './cors';
+import { endsWithWindow, utcDay, utcMinute, type CounterWindow } from './counterWindow';
 import type { Env, AudioRateLimitResult } from './types';
 
 // --- Helpers ---
-
-function getDateKey(): string {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-}
-
-function getMinuteKey(): string {
-  return String(Math.floor(Date.now() / 60_000));
-}
-
-function getDailyResetTime(): string {
-  const tomorrow = new Date();
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  tomorrow.setUTCHours(0, 0, 0, 0);
-  return tomorrow.toISOString();
-}
 
 function toHex16(buffer: ArrayBuffer): string {
   return Array.from(new Uint8Array(buffer).slice(0, 8))
@@ -89,11 +75,11 @@ async function incrementCounter(
   kv: KVNamespace,
   key: string,
   current: number,
-  ttl: number,
+  window: CounterWindow,
   kind: 'Daily' | 'Burst',
 ): Promise<void> {
   try {
-    await kv.put(key, String(current + 1), { expirationTtl: ttl });
+    await kv.put(key, String(current + 1), endsWithWindow(window));
   } catch {
     console.warn(`[rateLimit] ${kind} counter write failed, request served`);
   }
@@ -103,6 +89,8 @@ async function incrementCounter(
 
 interface LimitReading {
   result: AudioRateLimitResult;
+  day: CounterWindow;
+  minute: CounterWindow;
   dailyKey: string;
   burstKey: string;
   dailyCount: number;
@@ -113,13 +101,13 @@ interface LimitReading {
 async function readAudioLimit(request: Request, env: Env): Promise<LimitReading> {
   const ip = request.headers.get('CF-Connecting-IP') || '127.0.0.1';
   const hash = await hashIP(ip, env.IP_HASH_SALT);
-  const dateKey = getDateKey();
-  const minuteKey = getMinuteKey();
-  const resetsAt = getDailyResetTime();
+  const day = utcDay();
+  const minute = utcMinute();
+  const resetsAt = new Date(day.endMs).toISOString();
 
-  // KV keys
-  const dailyKey = `audio:ip:${hash}:${dateKey}`;
-  const burstKey = `audio:burst:${hash}:${minuteKey}`;
+  // KV keys, each named after the window it counts and ending with it
+  const dailyKey = `audio:ip:${hash}:${day.label}`;
+  const burstKey = `audio:burst:${hash}:${minute.label}`;
 
   // Read counters in parallel
   const [dailyCount, burstCount] = await Promise.all([
@@ -133,7 +121,7 @@ async function readAudioLimit(request: Request, env: Env): Promise<LimitReading>
     gpuLoad: 'green',
     resetsAt,
   };
-  const reading = { dailyKey, burstKey, dailyCount, burstCount };
+  const reading = { day, minute, dailyKey, burstKey, dailyCount, burstCount };
 
   // 1. Hard daily per-IP cap
   if (dailyCount >= RATE_LIMIT_CONFIG.DAILY_PER_IP) {
@@ -183,13 +171,13 @@ export async function checkAudioRateLimit(
   _language: string,
   _endpoint: 'tts' | 'stt'
 ): Promise<AudioRateLimitResult> {
-  const { result, dailyKey, burstKey, dailyCount, burstCount } = await readAudioLimit(request, env);
+  const { result, day, minute, dailyKey, burstKey, dailyCount, burstCount } = await readAudioLimit(request, env);
   if (!result.allowed) return result;
 
   // --- Allowed: increment counters ---
   await Promise.all([
-    incrementCounter(env.RATE_LIMITS, dailyKey, dailyCount, 86_400, 'Daily'),
-    incrementCounter(env.RATE_LIMITS, burstKey, burstCount, 120, 'Burst'),
+    incrementCounter(env.RATE_LIMITS, dailyKey, dailyCount, day, 'Daily'),
+    incrementCounter(env.RATE_LIMITS, burstKey, burstCount, minute, 'Burst'),
   ]);
 
   result.daily.used = dailyCount + 1;

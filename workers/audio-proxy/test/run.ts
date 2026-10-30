@@ -8,6 +8,8 @@ import { proxyWithFailoverFromBuffer } from '../src/proxy';
 import { getServers } from '../src/config';
 import { getAggregatedHealth } from '../src/health';
 import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
+import { EXPIRATION_FLOOR_SECONDS, endsWithWindow, utcDay, utcMinute } from '../src/counterWindow';
+import { handleStoryArchive } from '../src/storyArchive';
 import { corsHeaders, handlePreflight } from '../src/cors';
 import { drainBodyCapped, readBodyCapped } from '../src/bodyLimit';
 import worker from '../src/index';
@@ -385,6 +387,137 @@ async function main(): Promise<number> {
     assertEqual(puts.length, 2, 'daily and burst counters');
     assert(puts.every(key => key.includes(keyed)), 'both keys use the keyed hash');
     assert(puts.every(key => !key.includes('203.0.113.9')), 'no plain address in a key');
+  });
+
+  // -------------------------------------------------------------------------
+  // Counter windows: each address key names its UTC day or minute and expires
+  // with it, however often it is counted
+  // -------------------------------------------------------------------------
+
+  /** Run with Date.now held at one instant, so a counter's window is known. */
+  const atInstant = async <T>(ms: number, fn: () => Promise<T>): Promise<T> => {
+    const realNow = Date.now;
+    Date.now = () => ms;
+    try {
+      return await fn();
+    } finally {
+      Date.now = realNow;
+    }
+  };
+  type KvWrite = { key: string; options?: KVNamespacePutOptions };
+  const recordingKv = (): { kv: KVNamespace; writes: KvWrite[] } => {
+    const store = new Map<string, string>();
+    const writes: KvWrite[] = [];
+    const kv = {
+      get: async (key: string) => store.get(key) ?? null,
+      put: async (key: string, value: string, options?: KVNamespacePutOptions) => {
+        writes.push({ key, options });
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    return { kv, writes };
+  };
+  const DAY_END_S = Date.UTC(2026, 9, 31) / 1000;
+  /** A minute key's write: on its own minute, at least KV's floor ahead, at most the floor past its minute. */
+  const assertMinuteWrite = (write: KvWrite, prefix: string, now: number): void => {
+    const minute = Math.floor(now / 60_000);
+    assertEqual(write.key, `${prefix}:${minute}`, 'the minute key names its minute');
+    const expiration = write.options?.expiration ?? 0;
+    assert(expiration * 1000 - now >= 60_000, `${write.key}: ${expiration} is under KV's floor`);
+    assert(expiration <= (minute + 1) * 60 + EXPIRATION_FLOOR_SECONDS, `${write.key}: ${expiration} runs past the floor`);
+    assertEqual(write.options?.expirationTtl, undefined, `${write.key} has no TTL that a write renews`);
+  };
+
+  await test('the windows are UTC days and minutes, and an expiry never sits under KV\'s floor', () => {
+    const day = utcDay(Date.UTC(2026, 9, 30, 23, 59, 59, 999));
+    assertEqual(day.label, '2026-10-30', 'the last instant of a day');
+    assertEqual(day.endMs, Date.UTC(2026, 9, 31), 'the day ends at the next UTC midnight');
+    assertEqual(utcDay(Date.UTC(2026, 9, 31)).label, '2026-10-31', 'midnight opens the next day');
+    const at = Date.UTC(2026, 9, 30, 10, 15, 42);
+    const minute = utcMinute(at);
+    assertEqual(minute.label, String(Math.floor(at / 60_000)), 'the minute keeps its label');
+    assertEqual(minute.endMs, Date.UTC(2026, 9, 30, 10, 16), 'the minute ends at the next full minute');
+    assertEqual(endsWithWindow(day, Date.UTC(2026, 9, 30, 12)).expiration, DAY_END_S, 'mid-day: the day\'s end');
+    const checks: [typeof day, number][] = [[day, day.endMs - 120_000], [minute, minute.endMs - 60_000]];
+    for (const [window, from] of checks) {
+      for (let now = from; now < window.endMs; now += 250) {
+        const { expiration } = endsWithWindow(window, now);
+        assert(expiration * 1000 - now >= 60_000, `${window.label} at ${now}: ${expiration} is under KV's floor`);
+        assert(expiration <= window.endMs / 1000 + EXPIRATION_FLOOR_SECONDS, `${window.label} at ${now}: past the floor`);
+      }
+    }
+  });
+
+  await test('the speech counters name their window and expire at its end, however often renewed', async () => {
+    const { kv, writes } = recordingKv();
+    const env = { ...fakeEnv(), RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env;
+    const speech = () => new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+      method: 'POST', headers: { 'CF-Connecting-IP': '203.0.113.44' },
+    });
+    const keyed = await hmac('test-salt', 'audio-ratelimit:203.0.113.44');
+    const times = [Date.UTC(2026, 9, 30, 0, 0, 30), Date.UTC(2026, 9, 30, 0, 0, 45), Date.UTC(2026, 9, 30, 21, 40)];
+    for (const now of times) {
+      const result = await atInstant(now, () => checkAudioRateLimit(speech(), env, 'en', 'tts'));
+      assertEqual(result.allowed, true, 'allowed');
+    }
+    const daily = writes.filter(w => w.key.startsWith('audio:ip:'));
+    assertEqual(daily.length, 3, 'one daily write per request');
+    for (const write of daily) {
+      assertEqual(write.key, `audio:ip:${keyed}:2026-10-30`, 'the daily key names its day');
+      assertEqual(write.options?.expiration, DAY_END_S, 'and expires at the day\'s end');
+      assertEqual(write.options?.expirationTtl, undefined, 'no TTL that a write renews');
+    }
+    assertEqual(await kv.get(`audio:ip:${keyed}:2026-10-30`), '3', 'all three counted under one key');
+    const burst = writes.filter(w => w.key.startsWith('audio:burst:'));
+    assertEqual(burst.length, 3, 'one burst write per request');
+    burst.forEach((write, i) => assertMinuteWrite(write, `audio:burst:${keyed}`, times[i]));
+    assertEqual(await kv.get(`audio:burst:${keyed}:${Math.floor(times[0] / 60_000)}`), '2', 'one minute, one burst key');
+  });
+
+  await test('a speech counter written in its day\'s last seconds keeps KV\'s floor and its day', async () => {
+    const { kv, writes } = recordingKv();
+    const env = { ...fakeEnv(), RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env;
+    const now = Date.UTC(2026, 9, 30, 23, 59, 30);
+    await atInstant(now, () => checkAudioRateLimit(new Request('https://audio.agoracosmica.org/v1/audio/speech', {
+      method: 'POST', headers: { 'CF-Connecting-IP': '203.0.113.46' },
+    }), env, 'en', 'tts'));
+    const daily = writes.find(w => w.key.startsWith('audio:ip:'));
+    assert(daily?.key.endsWith(':2026-10-30'), `still the day it was counted in: ${daily?.key}`);
+    const expiration = daily?.options?.expiration ?? 0;
+    assert(expiration * 1000 - now >= 60_000, `${expiration} is under KV's floor`);
+    assert(expiration <= DAY_END_S + EXPIRATION_FLOOR_SECONDS, `${expiration} runs past the floor`);
+  });
+
+  await test('the archive quota keys name their window and expire at its end', async () => {
+    const { kv, writes } = recordingKv();
+    const env = {
+      ...fakeEnv(),
+      RATE_LIMITS: kv,
+      IP_HASH_SALT: 'test-salt',
+      STORY_BUCKET: { list: async () => ({ objects: [], truncated: false }) },
+      ANALYTICS: { writeDataPoint: () => {} },
+    } as unknown as Env;
+    const ctx = { waitUntil: () => {}, passThroughOnException: () => {} } as unknown as ExecutionContext;
+    const download = () => new Request('https://audio.agoracosmica.org/v1/audio/story-archive/socrates/en', {
+      headers: { 'CF-Connecting-IP': '203.0.113.45', Origin: 'https://agoracosmica.org' },
+    });
+    const times = [Date.UTC(2026, 9, 30, 8, 0, 10), Date.UTC(2026, 9, 30, 19, 30)];
+    for (const now of times) {
+      const res = await atInstant(now, () => handleStoryArchive(download(), env, ctx, 'socrates/en', 'DE'));
+      assertEqual(res.status, 404, 'counted, then nothing published to send');
+    }
+    const keyed = await hmac('test-salt', 'archive-ratelimit:203.0.113.45');
+    const days = writes.filter(w => w.key.startsWith('archive:day:'));
+    assertEqual(days.length, 2, `day writes: ${writes.map(w => w.key).join(', ')}`);
+    for (const write of days) {
+      assertEqual(write.key, `archive:day:${keyed}:2026-10-30`, 'the day key names its day');
+      assertEqual(write.options?.expiration, DAY_END_S, 'and expires at the day\'s end');
+      assertEqual(write.options?.expirationTtl, undefined, 'no TTL that a write renews');
+    }
+    assertEqual(await kv.get(`archive:day:${keyed}:2026-10-30`), '2', 'both downloads counted under one key');
+    const minutes = writes.filter(w => w.key.startsWith('archive:min:'));
+    assertEqual(minutes.length, 2, 'one minute write per download');
+    minutes.forEach((write, i) => assertMinuteWrite(write, `archive:min:${keyed}`, times[i]));
   });
 
   // -------------------------------------------------------------------------
