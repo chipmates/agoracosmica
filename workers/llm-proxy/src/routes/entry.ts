@@ -9,7 +9,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackEntry, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { trackEntry, readCountry, readDevice, readMark, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -66,7 +66,7 @@ export async function handleEntry(request: Request, env: Env): Promise<Response>
     language: lang,
     country: readCountry(request),
     device: readDevice(request),
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
   });
 
   return new Response(null, { status: 204 });

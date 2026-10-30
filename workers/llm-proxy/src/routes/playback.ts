@@ -10,7 +10,7 @@
 // playhead position, and there is no key tying a track's rows together.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPlayback, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackPlayback, readCountry, readDevice, readMark } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -138,7 +138,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     event,
     bucket: TERMINAL_EVENTS.has(event) ? bucket : 0,
     chapter,
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
   });
 
   return new Response(null, { status: 204 });

@@ -14,7 +14,7 @@ import { fallbackModel, resolveServing } from '../services/modelRouting';
 import { recordSpend, type TokenUsage } from '../services/spendGovernor';
 import { alertFallback, alertOutage, alertSpendCrossing } from '../services/telegram';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readMark } from '../utils/analytics';
 import type { Env, ChatMessage, CouncilRequest } from '../utils/types';
 
 const VALID_LANGUAGES = ['de', 'en', 'es', 'fr', 'it', 'pt', 'nl', 'pl', 'ja', 'ko', 'zh'];
@@ -228,7 +228,7 @@ export async function handleCouncil(request: Request, env: Env, ctx: ExecutionCo
       device,
       // The greeting/turn label belongs to chat rows only.
       kind: '',
-      probe: readProbe((body as Record<string, unknown>).probe),
+      probe: readMark(request, (body as Record<string, unknown>).probe),
     });
   }));
 

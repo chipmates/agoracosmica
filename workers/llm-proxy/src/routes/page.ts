@@ -6,7 +6,7 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPageView, readCountry, readDevice, readProbe, readLanding, readSource } from '../utils/analytics';
+import { trackPageView, readCountry, readDevice, readMark, readLanding, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -74,7 +74,7 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
     device: readDevice(request),
     landing: readLanding(payload.landing),
     source: readSource(payload.source),
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
   });
 
   return new Response(null, { status: 204 });

@@ -57,6 +57,8 @@ import { handlePlayback } from '../src/routes/playback';
 import { handleConversions } from '../src/routes/conversions';
 import { handleSignup } from '../src/routes/signup';
 import { signJWT } from '../src/utils/jwt';
+import { readMark } from '../src/utils/analytics';
+import { HOSTING_ASNS, RELAY_ASNS } from '../src/utils/hostingNetworks';
 import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
 
@@ -3245,6 +3247,102 @@ async function main(): Promise<number> {
     await giveBackSummary(env, keys);
     assertEqual(kv.puts.length, 0, 'KV writes');
     assertEqual(await summariesUsed(env), 0, 'summaries counted');
+  });
+
+  // -------------------------------------------------------------------------
+  // The automated mark: blob9 from the network a request came from
+  // -------------------------------------------------------------------------
+
+  // Node's Request has no cf; the edge sets it, so it is defined on the
+  // instance here the way the runtime hands it over.
+  const fromNetwork = (request: Request, asn?: unknown): Request => {
+    if (asn !== undefined) Object.defineProperty(request, 'cf', { value: { asn, country: 'US' } });
+    return request;
+  };
+  const LISTED = [
+    8075, 12876, 14061, 14618, 15169, 16276, 16509, 20473, 24940, 31898, 37963, 45090, 45102, 51167, 60781,
+    63949, 132203, 136907, 396982,
+  ];
+
+  await test('the hosting list is the closed list, and holds no relay network', () => {
+    assertEqual([...HOSTING_ASNS].sort((a, b) => a - b).join(','), LISTED.join(','), 'the listed networks');
+    for (const asn of RELAY_ASNS) assert(!HOSTING_ASNS.has(asn), `relay network ${asn} is on the hosting list`);
+    assertEqual(RELAY_ASNS.join(','), '13335,36183,20940,54113,714', 'the relay networks');
+  });
+
+  await test('a probe mark wins, a hosting network gives auto, anything else stays empty', () => {
+    const req = (asn?: unknown): Request =>
+      fromNetwork(new Request('https://example.invalid/v1/page', { method: 'POST' }), asn);
+    assertEqual(readMark(req(16509), 1), 'probe', 'a probe from a data centre stays a probe');
+    assertEqual(readMark(req(16509), undefined), 'auto', 'a data centre');
+    for (const asn of LISTED) assertEqual(readMark(req(asn), undefined), 'auto', `network ${asn}`);
+    for (const asn of RELAY_ASNS) assertEqual(readMark(req(asn), undefined), '', `relay network ${asn}`);
+    assertEqual(readMark(req(), undefined), '', 'no network known');
+    assertEqual(readMark(req(3320), undefined), '', 'a home network');
+    assertEqual(readMark(req('16509'), undefined), '', 'a number as text is not read');
+    assertEqual(readMark(req(16509), 'yes'), 'auto', 'an odd probe value is no probe');
+    assertEqual(readMark(req(), '1'), 'probe', 'a probe without a network');
+  });
+
+  const markedBeacon = async (
+    handler: (request: Request, env: Env) => Promise<Response>,
+    path: string,
+    payload: Record<string, unknown>,
+    asn?: unknown,
+  ) => {
+    analyticsRows.length = 0;
+    await handler(fromNetwork(new Request(`https://example.invalid${path}`, {
+      method: 'POST',
+      headers: { 'CF-Connecting-IP': '10.0.0.41' },
+      body: JSON.stringify(payload),
+    }), asn), fakeEnv());
+    return analyticsRows[0];
+  };
+
+  const BEACON_WRITERS: [string, (request: Request, env: Env) => Promise<Response>, string, Record<string, unknown>][] = [
+    ['page', handlePage, '/v1/page', { path: '/', language: 'en', landing: 1, source: 'direct' }],
+    ['playback', handlePlayback, '/v1/playback', { type: 'story', figureId: 'aurelius', mode: 'story', language: 'en', event: 'started' }],
+    ['entry', handleEntry, '/v1/entry', { path: '/app', language: 'en' }],
+    ['signup', handleSignup, '/v1/signup', { path: '/', language: 'en' }],
+    ['funnel', handleFunnel, '/v1/funnel', { step: 'cta_click', path: '/', language: 'en' }],
+    ['engaged', handleFunnel, '/v1/funnel', { step: 'engaged', mode: 'typed', language: 'en' }],
+    ['council_heard', handleFunnel, '/v1/funnel', { step: 'council_heard', language: 'en' }],
+    ['museum', handleFunnel, '/v1/funnel', { step: 'museum_arrival', wing: 'vinci', hold: 'upright', language: 'en' }],
+  ];
+
+  await test('every beacon row from a hosting network reads auto, a probe stays probe, a relay stays unmarked', async () => {
+    for (const [name, handler, path, payload] of BEACON_WRITERS) {
+      const auto = await markedBeacon(handler, path, payload, 16509);
+      assert(auto, `${name}: no row`);
+      assertEqual(auto.blobs[0], name === 'museum' ? 'museum_arrival' : name === 'funnel' ? 'cta_click' : name, `${name}: the row type`);
+      assertEqual(auto.blobs[8], 'auto', `${name}: marked auto`);
+      assert(!JSON.stringify(auto).includes('16509'), `${name}: the network number reached the row`);
+      assertEqual((await markedBeacon(handler, path, { ...payload, probe: 1 }, 16509)).blobs[8], 'probe', `${name}: a probe stays a probe`);
+      assertEqual((await markedBeacon(handler, path, payload, 714)).blobs[8], '', `${name}: a relay stays unmarked`);
+      assertEqual((await markedBeacon(handler, path, payload, 13335)).blobs[8], '', `${name}: a relay stays unmarked`);
+      assertEqual((await markedBeacon(handler, path, payload)).blobs[8], '', `${name}: no network, no mark`);
+    }
+  });
+
+  await test('chat, council and summary rows from a hosting network read auto, a probe stays probe', async () => {
+    for (const route of gated) {
+      const name = route.path.slice(4);
+      for (const [extra, asn, want] of [[{}, 16509, 'auto'], [{ probe: 1 }, 16509, 'probe'], [{}, 714, ''], [{}, undefined, '']] as const) {
+        stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+        analyticsRows.length = 0;
+        const env = fakeEnv();
+        const { ctx, pending } = fakeCtx();
+        const request = fromNetwork(await postJson(route.path, env, JSON.stringify({ ...route.base, ...extra })), asn);
+        const response = await route.handler(request, env, ctx);
+        assertEqual(response.status, 200, `${name}: status`);
+        await readAll(response.body!);
+        await Promise.all(pending);
+        const row = analyticsRows.find(r => r.blobs[0] === name);
+        assert(row, `${name}: no row`);
+        assertEqual(row!.blobs[8], want, `${name} from ${String(asn)} with ${JSON.stringify(extra)}`);
+      }
+    }
+    globalThis.fetch = realFetch;
   });
 
   // -------------------------------------------------------------------------

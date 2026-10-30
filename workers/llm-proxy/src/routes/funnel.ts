@@ -16,7 +16,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, trackMuseum, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { trackFunnel, trackMuseum, readCountry, readDevice, readMark, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -342,7 +342,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
       language: lang,
       country: readCountry(request),
       device: readDevice(request),
-      probe: readProbe(payload.probe),
+      probe: readMark(request, payload.probe),
     });
     return new Response(null, { status: 204 });
   }
@@ -402,7 +402,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     country: readCountry(request),
     device: readDevice(request),
     source: SOURCE_STEPS.has(step) ? readSource(payload.source) : '',
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
   });
 
   return new Response(null, { status: 204 });

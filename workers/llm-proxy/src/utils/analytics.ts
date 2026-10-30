@@ -4,6 +4,7 @@
 // dimension. See README "What we measure (and why)" for the full list.
 
 import type { Env } from './types';
+import { fromHostingNetwork } from './hostingNetworks';
 
 /**
  * Read the country code from request.cf (Cloudflare-derived, coarser than IP).
@@ -43,13 +44,33 @@ export function readDevice(request: Request): string {
  * in-house probing can be subtracted at query time. It is a constant, the
  * same string for every marked row, never an identifier and never varying
  * per visitor, so it adds no user dimension. Self-declared by the client on
- * purpose: the only thing a false claim buys is self-exclusion.
+ * purpose: the only thing a false claim buys is self-exclusion. AUTO_LABEL
+ * below is the slot's one other value.
  */
 export const PROBE_LABEL = 'probe';
 
 /** Read the probe marker off a beacon payload field. Anything else is ''. */
 export function readProbe(value: unknown): string {
   return (value === 1 || value === true || value === '1') ? PROBE_LABEL : '';
+}
+
+/**
+ * blob9's second constant: the request reached the edge from a hosting
+ * network (utils/hostingNetworks.ts), so the row is most likely automated. It
+ * is marked, never dropped, and readers leave it out beside probe rows. Only
+ * this word is written; the network number is compared and discarded.
+ */
+export const AUTO_LABEL = 'auto';
+
+/**
+ * The value of blob9 on every row that has the slot. A browser's own probe
+ * mark wins, then the hosting network, else ''. Every writer of blob9 takes
+ * it from here, so the rule is the same on every event type.
+ */
+export function readMark(request: Request, value: unknown): string {
+  const probe = readProbe(value);
+  if (probe) return probe;
+  return fromHostingNetwork(request) ? AUTO_LABEL : '';
 }
 
 /**
