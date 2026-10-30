@@ -19,7 +19,7 @@ const EXPECTED_HOSTNAMES = [
 ];
 
 // Sends the secret and the token only. siteverify's remoteip field is
-// optional, and leaving it out keeps the visitor's address from the request.
+// optional, and leaving it out keeps the visitor's address out of the request.
 export async function verifyTurnstileToken(
   token: string,
   secretKey: string,

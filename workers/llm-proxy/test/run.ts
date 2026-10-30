@@ -3138,7 +3138,7 @@ async function main(): Promise<number> {
     for (const ip of ['203.0.113.88', '2001:db8::88']) {
       const sent: { url: string; body: string; headers: string }[] = [];
       globalThis.fetch = (async (url: string, init: RequestInit) => {
-        sent.push({ url: String(url), body: String(init.body), headers: JSON.stringify(init.headers ?? {}) });
+        sent.push({ url: String(url), body: String(init.body), headers: JSON.stringify([...new Headers(init.headers ?? {})]) });
         return new Response(JSON.stringify({ success: true, hostname: 'agoracosmica.org' }), {
           status: 200, headers: { 'Content-Type': 'application/json' },
         });
@@ -3542,15 +3542,18 @@ async function main(): Promise<number> {
   await test('a give-back never outnumbers the reservations', async () => {
     const kv = auditedKv();
     const env = fakeEnv({ RATE_LIMITS: kv.kv });
-    const day = new Date().toISOString().slice(0, 10);
-    const keys = { key: `summary:sub:${IDENTITY}:${day}`, backKey: `summary:back:sub:${IDENTITY}:${day}`, day: utcDay() };
-    // One reservation on record, already given back, as when a parallel twin's counter write was lost.
-    await kv.kv.put(keys.key, '1');
-    await kv.kv.put(keys.backKey, '1');
-    kv.puts.length = 0;
-    await giveBackSummary(env, keys);
-    assertEqual(kv.puts.length, 0, 'KV writes');
-    assertEqual(await summariesUsed(env), 0, 'summaries counted');
+    // One instant for the keys, the give-back and the quota, so midnight cannot fall between them.
+    await atInstant(Date.UTC(2026, 9, 30, 12), async () => {
+      const day = utcDay();
+      const keys = { key: `summary:sub:${IDENTITY}:${day.label}`, backKey: `summary:back:sub:${IDENTITY}:${day.label}`, day };
+      // One reservation on record, already given back, as when a parallel twin's counter write was lost.
+      await kv.kv.put(keys.key, '1');
+      await kv.kv.put(keys.backKey, '1');
+      kv.puts.length = 0;
+      await giveBackSummary(env, keys);
+      assertEqual(kv.puts.length, 0, 'KV writes');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
+    });
   });
 
   // -------------------------------------------------------------------------

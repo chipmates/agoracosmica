@@ -3,7 +3,7 @@
 // The quota a visitor feels is keyed by JWT subject (UUID v4 from session.ts),
 // NOT by IP. This isolates each user/device into their own bucket regardless of
 // how many users share a public IP via CGNAT. The legacy IP-keyed counters
-// (`rate:ip:...`) are no longer written; existing keys TTL-expire in 24h.
+// (`rate:ip:...`) are no longer written or read.
 //
 // A far wider per-address ceiling sits beside it. Rotating the UUID resets the
 // per-identity bucket, so without this second bucket one machine could mint
@@ -70,8 +70,8 @@ function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
  *   - council (1/day): up to 2 sessions instead of 1. Noticeable but not exploitable for flooding.
  *   - summary (2/day): similar to council.
  *
- * Proper fix is Durable Objects (one DO per subject+endpoint+day → serialized execution,
- * true atomicity). Deferred post-launch — see PRODUCTION-ROADMAP.md.
+ * The proper fix is Durable Objects (one DO per subject+endpoint+day → serialized
+ * execution, true atomicity), not built yet.
  */
 export async function checkAndIncrementRateLimit(
   request: Request,
