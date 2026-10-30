@@ -3751,7 +3751,7 @@ async function loadAdGrants() {
   var paidOpts = { hero: true, sub: 'clicks that arrived with the paid parameter. reach only, never a conversion' };
   var landingOpts = { sub: 'pageviews that opened a visit, ' + shareText(landings, arrivalsExProbe) + ' of arrivals without probe and automated rows (' + fmt(arrivalsExProbe) + ')' };
   var autoOpts = { sub: 'landing pageviews from data-centre networks, ' + shareText(autoLandings, landings + autoLandings) + ' of all landings. not in the landings beside it' };
-  if (attrNs2.prevUsable) { paidOpts.delta = paidArrivalsPrev; landingOpts.delta = landingsPrev; autoOpts.delta = autoLandingsPrev; }
+  if (attrNs2.prevUsable) { paidOpts.delta = paidArrivalsPrev; landingOpts.delta = landingsPrev; autoOpts.delta = autoLandingsPrev; autoOpts.deltaInvert = true; }
   html += kpi('Paid Arrivals', paidArrivals, paidOpts);
   html += kpi('Landing Pageviews', landings, landingOpts);
   html += kpi('Automated (data-centre networks)', autoLandings, autoOpts);
