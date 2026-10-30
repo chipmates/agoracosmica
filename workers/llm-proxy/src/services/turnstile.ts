@@ -18,17 +18,15 @@ const EXPECTED_HOSTNAMES = [
   'www.agoracosmica.org',
 ];
 
+// Sends the secret and the token only. siteverify's remoteip field is
+// optional, and leaving it out keeps the visitor's address from the request.
 export async function verifyTurnstileToken(
   token: string,
   secretKey: string,
-  remoteIP?: string
 ): Promise<{ success: boolean; error?: string }> {
   const formData = new URLSearchParams();
   formData.append('secret', secretKey);
   formData.append('response', token);
-  if (remoteIP) {
-    formData.append('remoteip', remoteIP);
-  }
 
   const response = await fetch(TURNSTILE_VERIFY_URL, {
     method: 'POST',

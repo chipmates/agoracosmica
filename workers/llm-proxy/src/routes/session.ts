@@ -78,11 +78,7 @@ export async function handleSession(request: Request, env: Env): Promise<Respons
       );
     }
 
-    const verification = await verifyTurnstileToken(
-      turnstileToken,
-      env.TURNSTILE_SECRET_KEY,
-      ip
-    );
+    const verification = await verifyTurnstileToken(turnstileToken, env.TURNSTILE_SECRET_KEY);
 
     if (!verification.success) {
       return new Response(

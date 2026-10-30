@@ -2947,6 +2947,36 @@ async function main(): Promise<number> {
     assert(r.puts.every(key => !key.includes(KNOWN_ID)), 'no client-ID key written');
   });
 
+  await test('the Turnstile check sends the secret and the token, never the address', async () => {
+    for (const ip of ['203.0.113.88', '2001:db8::88']) {
+      const sent: { url: string; body: string; headers: string }[] = [];
+      globalThis.fetch = (async (url: string, init: RequestInit) => {
+        sent.push({ url: String(url), body: String(init.body), headers: JSON.stringify(init.headers ?? {}) });
+        return new Response(JSON.stringify({ success: true, hostname: 'agoracosmica.org' }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        });
+      }) as unknown as typeof fetch;
+      try {
+        const res = await handleSession(new Request('https://example.invalid/v1/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': ip },
+          body: JSON.stringify({ turnstileToken: 'a-solved-token', clientId: KNOWN_ID }),
+        }), fakeEnv({ TURNSTILE_SECRET_KEY: 'test-turnstile-secret' }));
+        assertEqual(res.status, 200, `${ip} status`);
+        assertEqual(sent.length, 1, `${ip} one siteverify call`);
+        assert(sent[0].url.endsWith('/turnstile/v0/siteverify'), `${ip} siteverify url: ${sent[0].url}`);
+        const form = new URLSearchParams(sent[0].body);
+        assertEqual([...form.keys()].sort().join(','), 'response,secret', `${ip} the form fields`);
+        assertEqual(form.get('secret'), 'test-turnstile-secret', `${ip} the secret`);
+        assertEqual(form.get('response'), 'a-solved-token', `${ip} the token`);
+        assert(!decodeURIComponent(sent[0].body).includes(ip), `${ip} the address is in the body: ${sent[0].body}`);
+        assert(!sent[0].headers.includes(ip), `${ip} the address is in a header`);
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+    }
+  });
+
   // -------------------------------------------------------------------------
   // Conversion upload: one account only
   // -------------------------------------------------------------------------
