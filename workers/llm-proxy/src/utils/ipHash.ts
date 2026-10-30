@@ -30,3 +30,13 @@ export async function hashIp(ip: string, salt: string, scope: string): Promise<s
 export function readClientIp(request: Request): string | null {
   return request.headers.get('CF-Connecting-IP');
 }
+
+/**
+ * KV key for a beacon route's per-address flood brake. The scope carries the
+ * prefix, so one caller's keys on two routes never share a digest. Requests
+ * without an edge address share one bucket per route.
+ */
+export async function beaconLimitKey(request: Request, env: Env, prefix: string): Promise<string> {
+  const ip = readClientIp(request) || 'unknown';
+  return `${prefix}:${await hashIp(ip, ipHashSalt(env), `ratelimit:${prefix}`)}`;
+}

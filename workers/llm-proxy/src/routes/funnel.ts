@@ -19,6 +19,7 @@
 import { trackFunnel, trackMuseum, readCountry, readDevice, readMark, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
 
 interface FunnelPayload {
   step?: string;
@@ -279,8 +280,8 @@ const MAX_BUCKET = 5;
 // Rate limit: 200 funnel beacons per IP per hour. A single session emits
 // several funnel events (one per step), so the cap sits higher than entry's
 // 50. The museum's rows share it: a whole walk is about twenty rows, plus one
-// per work looked at. The plain IP appears only inside this short-lived KV key (1-hour TTL,
-// auto-deleted) and never in any stored analytics row.
+// per work looked at. The KV key holds a keyed hash of the address, never the
+// address (1-hour TTL), and never reaches an analytics row.
 const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 200;
 
@@ -319,8 +320,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `funnel_rl:${ip}`;
+  const rateLimitKey = await beaconLimitKey(request, env, 'funnel_rl');
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });

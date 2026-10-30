@@ -59,6 +59,7 @@ import { handleSignup } from '../src/routes/signup';
 import { signJWT } from '../src/utils/jwt';
 import { readMark } from '../src/utils/analytics';
 import { HOSTING_ASNS, RELAY_ASNS } from '../src/utils/hostingNetworks';
+import { hashIp } from '../src/utils/ipHash';
 import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
 
@@ -578,6 +579,91 @@ async function main(): Promise<number> {
     assert(over.retryAfterSeconds > 0 && over.retryAfterSeconds <= 3600, 'retry lands inside the hour');
     const elsewhere = await checkAndIncrementSessionRateLimit(fakeRequest('198.51.100.6'), env);
     assertEqual(elsewhere.allowed, true, 'a different address');
+  });
+
+  // -------------------------------------------------------------------------
+  // The beacon flood brakes: a keyed hash in the key, never the address
+  // -------------------------------------------------------------------------
+
+  const beaconRequest = (path: string, body: Record<string, unknown>, ip?: string): Request =>
+    new Request(`https://example.invalid${path}`, {
+      method: 'POST',
+      headers: ip ? { 'CF-Connecting-IP': ip, 'Content-Type': 'text/plain' } : { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body),
+    });
+
+  // One sender per braked route, each with a payload the route counts.
+  const BRAKED_ROUTES: { prefix: string; send: (env: Env, ip?: string) => Promise<Response> }[] = [
+    { prefix: 'funnel_rl', send: (env, ip) =>
+      handleFunnel(beaconRequest('/v1/funnel', { step: 'cta_click', path: '/', language: 'en' }, ip), env) },
+    { prefix: 'conv_rl', send: (env, ip) =>
+      handleConversions(beaconRequest('/api/conversions',
+        { gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now() }, ip), env, fakeCtx().ctx) },
+    { prefix: 'entry_rl', send: (env, ip) =>
+      handleEntry(beaconRequest('/v1/entry', { path: '/', language: 'en' }, ip), env) },
+    { prefix: 'page_rl', send: (env, ip) =>
+      handlePage(beaconRequest('/v1/page', { path: '/', language: 'en' }, ip), env) },
+    { prefix: 'pb_rl', send: (env, ip) =>
+      handlePlayback(beaconRequest('/v1/playback',
+        { type: 'story', event: 'started', figureId: 'socrates', language: 'en' }, ip), env) },
+    { prefix: 'signup_rl', send: (env, ip) =>
+      handleSignup(beaconRequest('/v1/signup', { path: '/', language: 'en' }, ip), env) },
+  ];
+  const BRAKE_SALT = 'test-ip-salt';
+  const brakeEnv = (kv: KVNamespace, salt = BRAKE_SALT): Env => fakeEnv({ RATE_LIMITS: kv, IP_HASH_SALT: salt });
+  const brakeKey = async (prefix: string, ip: string): Promise<string> =>
+    `${prefix}:${await hashIp(ip, BRAKE_SALT, `ratelimit:${prefix}`)}`;
+
+  await test('every beacon brake keys a keyed hash of the address, never the address', async () => {
+    const digests = new Set<string>();
+    for (const { prefix, send } of BRAKED_ROUTES) {
+      for (const ip of ['203.0.113.77', '2001:db8::77']) {
+        const kv = auditedKv();
+        const response = await send(brakeEnv(kv.kv), ip);
+        assert(response.status < 300, `${prefix} ${ip} answered ${response.status}`);
+        assertEqual(kv.puts.length, 1, `${prefix} ${ip} KV writes: ${kv.puts.join(', ')}`);
+        const key = kv.puts[0];
+        assert(!key.includes(ip), `${prefix} key holds the address: ${key}`);
+        assert(/^[0-9a-f]{32}$/.test(key.slice(prefix.length + 1)), `${prefix} digest shape: ${key}`);
+        assertEqual(key, await brakeKey(prefix, ip), `${prefix} ${ip} key`);
+        if (ip === '203.0.113.77') digests.add(key.slice(prefix.length + 1));
+        // Another secret, another key: the digest is made with the secret.
+        const other = auditedKv();
+        await send(brakeEnv(other.kv, 'another-salt'), ip);
+        assert(other.puts[0] !== key, `${prefix} ${ip} key does not depend on the secret`);
+      }
+    }
+    assertEqual(digests.size, BRAKED_ROUTES.length, 'one address, a different digest on every route');
+  });
+
+  await test('a beacon brake still counts one address and refuses it at the cap', async () => {
+    for (const { prefix, send } of BRAKED_ROUTES) {
+      const kv = auditedKv();
+      const env = brakeEnv(kv.kv);
+      await send(env, '203.0.113.78');
+      await send(env, '203.0.113.78');
+      const key = await brakeKey(prefix, '203.0.113.78');
+      assertEqual(await kv.kv.get(key), '2', `${prefix} counts both requests under one key`);
+      await send(env, '198.51.100.78');
+      assertEqual(new Set(kv.puts).size, 2, `${prefix} a second address gets its own key`);
+      await kv.kv.put(key, '1000000');
+      analyticsRows.length = 0;
+      const refused = await send(env, '203.0.113.78');
+      assert(analyticsRows.every(row => row.blobs[0] === 'ratelimit'), `${prefix} counted a beacon past its cap`);
+      if (prefix === 'conv_rl') assertEqual(refused.status, 429, 'conversions answers 429 past its cap');
+    }
+  });
+
+  await test('beacons without an edge address share one hashed bucket per route, as before', async () => {
+    for (const { prefix, send } of BRAKED_ROUTES) {
+      const kv = auditedKv();
+      const env = brakeEnv(kv.kv);
+      await send(env);
+      await send(env);
+      assertEqual(new Set(kv.puts).size, 1, `${prefix} one shared key: ${kv.puts.join(', ')}`);
+      assertEqual(await kv.kv.get(kv.puts[0]), '2', `${prefix} both requests counted`);
+      assert(/^[0-9a-f]{32}$/.test(kv.puts[0].slice(prefix.length + 1)), `${prefix} shared key shape: ${kv.puts[0]}`);
+    }
   });
 
   // -------------------------------------------------------------------------
@@ -2956,7 +3042,8 @@ async function main(): Promise<number> {
     assertEqual(counters.length, 0, `daily counter writes: ${counters.join(', ')}`);
     const records = kv.puts.filter(key => key.startsWith('conv:'));
     assertEqual(records.length, 0, `event record writes: ${records.join(', ')}`);
-    assertEqual(kv.puts.join(','), 'conv_rl:10.0.0.31', 'the only KV write');
+    assertEqual(kv.puts.length, 1, `KV writes: ${kv.puts.join(', ')}`);
+    assert(/^conv_rl:[0-9a-f]{32}$/.test(kv.puts[0]), `the only KV write is the hashed brake: ${kv.puts[0]}`);
     assertEqual(outbound.length, 0, 'outbound calls');
   });
 

@@ -10,6 +10,7 @@
 import { trackSignup, readCountry, readDevice, readMark } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
 
 interface SignupPayload {
   path?: string;
@@ -40,8 +41,7 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `signup_rl:${ip}`;
+  const rateLimitKey = await beaconLimitKey(request, env, 'signup_rl');
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });

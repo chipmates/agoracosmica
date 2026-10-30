@@ -13,6 +13,7 @@
 import { trackPlayback, readCountry, readDevice, readMark } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -83,10 +84,9 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     return new Response(null, { status: 204 });
   }
 
-  // Rate limit per IP. The plain IP appears only inside this short-lived KV
-  // key (1-hour TTL, auto-deleted) and never in any stored analytics row.
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `pb_rl:${ip}`;
+  // Rate limit per IP. The KV key holds a keyed hash of the address, never
+  // the address (1-hour TTL), and never reaches an analytics row.
+  const rateLimitKey = await beaconLimitKey(request, env, 'pb_rl');
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
