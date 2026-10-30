@@ -14,7 +14,8 @@ import { trackPlayback, readCountry, readDevice, readMark } from '../utils/analy
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
-import { endsWithWindow, utcHour } from '../utils/counterWindow';
+import { utcHour } from '../utils/counterWindow';
+import { putAddressCounter } from '../middleware/rateLimit';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -92,7 +93,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
+  await putAddressCounter(env, rateLimitKey, currentCount + 1, hour);
 
   // Sanitize optional fields against allowlists / patterns.
   const figureId = (typeof payload.figureId === 'string' && FIGURE_ID_RE.test(payload.figureId))

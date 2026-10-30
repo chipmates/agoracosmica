@@ -31,9 +31,21 @@ export function utcHour(now: number = Date.now()): CounterWindow {
 
 /**
  * Put options that end a counter with its window. In the window's last 70
- * seconds KV's floor wins and the key ends 70 seconds after the write: at most
- * that long past a window no later request reads.
+ * seconds KV's floor wins and the key ends 70 seconds after the write's whole
+ * second: for a write inside the window, at most 70 seconds past its end.
  */
 export function endsWithWindow(window: CounterWindow, now: number = Date.now()): { expiration: number } {
   return { expiration: Math.max(window.endMs / 1000, Math.ceil(now / 1000) + EXPIRATION_FLOOR_SECONDS) };
+}
+
+/**
+ * Write a counter with its window's expiry, or nothing once the window is over:
+ * the clock moves on across a request's reads, and a count that reaches its
+ * write after the end would land in a key no later request reads. A refused
+ * write throws, as KV's put does.
+ */
+export async function putForWindow(kv: KVNamespace, key: string, value: string, window: CounterWindow): Promise<void> {
+  const now = Date.now();
+  if (now >= window.endMs) return;
+  await kv.put(key, value, endsWithWindow(window, now));
 }

@@ -14,7 +14,7 @@
 
 import { RATE_LIMITS, getEffectiveLimit } from '../config';
 import { hashIp, ipHashSalt, readClientIp } from '../utils/ipHash';
-import { endsWithWindow, utcDay, utcHour, type CounterWindow } from '../utils/counterWindow';
+import { putForWindow, utcDay, utcHour, type CounterWindow } from '../utils/counterWindow';
 import type { Env, JWTPayload, RateLimitResult, EndpointRateLimitResult } from '../utils/types';
 
 /** KV key for one address bucket, or null when the edge supplied no address. */
@@ -35,27 +35,26 @@ function secondsUntil(isoTimestamp: string): number {
 /**
  * Write a brake counter without failing the request. KV refuses a second
  * write to one key within a second (a 429 that throws). A global key takes
- * every visitor's write and an address key every visitor behind one address
- * (a school, an office, a carrier's NAT); a missed increment only undercounts
- * the brake.
+ * every visitor's write and an address key every request from one address
+ * (a school, an office, a carrier's NAT, one page's beacons); a missed
+ * increment only undercounts the brake.
  */
-async function putBrakeCounter(
-  env: Env,
-  key: string,
-  value: number,
-  expiry: KVNamespacePutOptions,
-  kind: 'Global' | 'Address',
-): Promise<void> {
+async function putBrakeCounter(kind: 'Global' | 'Address', write: () => Promise<void>): Promise<void> {
   try {
-    await env.RATE_LIMITS.put(key, value.toString(), expiry);
+    await write();
   } catch {
     console.warn(`[RateLimit] ${kind} counter write failed, request served`);
   }
 }
 
+/** An address brake's count, in its window's key and ending with it. */
+export function putAddressCounter(env: Env, key: string, value: number, window: CounterWindow): Promise<void> {
+  return putBrakeCounter('Address', () => putForWindow(env.RATE_LIMITS, key, String(value), window));
+}
+
 /** A global key holds no identifier, so it keeps its renewed 24-hour TTL. */
 function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
-  return putBrakeCounter(env, key, value, { expirationTtl: 86400 }, 'Global');
+  return putBrakeCounter('Global', () => env.RATE_LIMITS.put(key, value.toString(), { expirationTtl: 86400 }));
 }
 
 /**
@@ -118,11 +117,10 @@ export async function checkAndIncrementRateLimit(
   const dailyCount = dailyUsed + 1;
   const globalCount = globalUsed + 1;
 
-  const expiry = endsWithWindow(day);
   await Promise.all([
-    env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), expiry),
+    putForWindow(env.RATE_LIMITS, dailyKey, dailyCount.toString(), day),
     putGlobalCounter(env, globalKey, globalCount),
-    ipKey ? putBrakeCounter(env, ipKey, ipUsed + 1, expiry, 'Address') : Promise.resolve(),
+    ipKey ? putAddressCounter(env, ipKey, ipUsed + 1, day) : Promise.resolve(),
   ]);
 
   return {
@@ -157,7 +155,7 @@ export async function checkAndIncrementSessionRateLimit(
   }
 
   const count = used + 1;
-  await putBrakeCounter(env, key, count, endsWithWindow(hour), 'Address');
+  await putAddressCounter(env, key, count, hour);
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
 
@@ -190,7 +188,7 @@ export async function checkAndIncrementCouncilRateLimit(
 
   const count = used + 1;
   await Promise.all([
-    env.RATE_LIMITS.put(councilKey, count.toString(), endsWithWindow(day)),
+    putForWindow(env.RATE_LIMITS, councilKey, count.toString(), day),
     putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
@@ -253,7 +251,7 @@ export async function checkAndIncrementSummaryRateLimit(
   }
 
   await Promise.all([
-    env.RATE_LIMITS.put(keys.key, String(reserved + 1), endsWithWindow(day)),
+    putForWindow(env.RATE_LIMITS, keys.key, String(reserved + 1), day),
     putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
@@ -284,7 +282,7 @@ export async function giveBackSummary(
       console.log('[RateLimit] Summary give-backs spent for today, the summary stays spent');
       return;
     }
-    await env.RATE_LIMITS.put(counted.backKey, String(back + 1), endsWithWindow(counted.day));
+    await putForWindow(env.RATE_LIMITS, counted.backKey, String(back + 1), counted.day);
   } catch (err) {
     const kind = err instanceof Error ? err.name : typeof err;
     console.warn(`[RateLimit] Summary give-back failed (${kind}), the summary stays spent`);

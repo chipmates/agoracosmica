@@ -10,7 +10,8 @@ import { trackPageView, readCountry, readDevice, readMark, readLanding, readSour
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
-import { endsWithWindow, utcHour } from '../utils/counterWindow';
+import { utcHour } from '../utils/counterWindow';
+import { putAddressCounter } from '../middleware/rateLimit';
 
 interface PagePayload {
   path?: string;
@@ -59,7 +60,7 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
+  await putAddressCounter(env, rateLimitKey, currentCount + 1, hour);
 
   const path = (typeof payload.path === 'string' && PATH_RE.test(payload.path))
     ? payload.path

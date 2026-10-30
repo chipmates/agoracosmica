@@ -15,7 +15,7 @@
 
 import { RATE_LIMIT_CONFIG } from './config';
 import { corsHeaders } from './cors';
-import { endsWithWindow, utcDay, utcMinute, type CounterWindow } from './counterWindow';
+import { putForWindow, utcDay, utcMinute, type CounterWindow } from './counterWindow';
 import type { Env, AudioRateLimitResult } from './types';
 
 // --- Helpers ---
@@ -79,7 +79,7 @@ async function incrementCounter(
   kind: 'Daily' | 'Burst',
 ): Promise<void> {
   try {
-    await kv.put(key, String(current + 1), endsWithWindow(window));
+    await putForWindow(kv, key, String(current + 1), window);
   } catch {
     console.warn(`[rateLimit] ${kind} counter write failed, request served`);
   }

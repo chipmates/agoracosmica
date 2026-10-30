@@ -853,6 +853,123 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('the expiry floor keeps 70 seconds in hand, ten more than KV\'s 60', () => {
+    const hour = utcHour(Date.UTC(2026, 9, 30, 10, 30));
+    const endS = hour.endMs / 1000;
+    assertEqual(endsWithWindow(hour, hour.endMs - 30_000).expiration, endS + 40, '30 s before the end: 70 s after the write');
+    assertEqual(endsWithWindow(hour, hour.endMs - 65_000).expiration, endS + 5, '65 s before the end: 70 s after the write');
+    assertEqual(endsWithWindow(hour, hour.endMs - 70_000).expiration, endS, '70 s before the end: the window\'s own end');
+  });
+
+  // -------------------------------------------------------------------------
+  // The boundary inside one request: the runtime's clock moves on across I/O,
+  // so a count read just before a window's end can reach its write after it
+  // -------------------------------------------------------------------------
+
+  /** Run `fn` against a KV whose every read moves the clock from `from` to `to`. */
+  const acrossBoundary = async (
+    from: number,
+    to: number,
+    fn: (kv: KVNamespace) => Promise<unknown>,
+  ): Promise<{ reads: string[]; writes: KvWrite[] }> => {
+    const store = new Map<string, string>();
+    const reads: string[] = [];
+    const writes: KvWrite[] = [];
+    let clock = from;
+    const kv = {
+      get: async (key: string) => {
+        reads.push(key);
+        clock = to;
+        return store.get(key) ?? null;
+      },
+      put: async (key: string, value: string, options?: KVNamespacePutOptions) => {
+        writes.push({ key, options });
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    const realNow = Date.now;
+    Date.now = () => clock;
+    try {
+      await fn(kv);
+    } finally {
+      Date.now = realNow;
+    }
+    return { reads, writes };
+  };
+
+  /** A count whose read and write sit in one window: the read key, at least KV's floor after the moved clock. */
+  const assertWrittenAsRead = (reads: string[], writes: KvWrite[], key: string, movedTo: number, endS: number): void => {
+    assert(reads.includes(key), `${key} was read: ${reads.join(', ')}`);
+    const write = writes.find(w => w.key === key);
+    assert(write, `the count goes to the key that was read, ${key}: ${writes.map(w => w.key).join(', ')}`);
+    const expiration = write?.options?.expiration ?? 0;
+    assert(expiration * 1000 >= movedTo + 60_000, `${key}: ${expiration} is under KV's floor from the moved clock`);
+    assert(expiration <= endS + EXPIRATION_FLOOR_SECONDS, `${key}: ${expiration} runs past the floor`);
+  };
+
+  const WINDOWED = /^(rate:sub|ipcap:chat|ipcap:session|council:sub|summary:sub|summary:back:sub):/;
+
+  const CROSS_IDENTITY = fakeIdentity('16161616-1616-4161-8161-161616161616');
+  const CROSS_IP = '203.0.113.51';
+  const BEFORE_MIDNIGHT = Date.UTC(2026, 9, 30, 23, 59, 59, 900);
+  const AFTER_MIDNIGHT = Date.UTC(2026, 9, 31, 0, 0, 0, 100);
+  const CROSSING_CHECKS: [string, (env: Env) => Promise<{ allowed: boolean }>][] = [
+    ['chat', env => checkAndIncrementRateLimit(fakeRequest(CROSS_IP), env, CROSS_IDENTITY)],
+    ['council', env => checkAndIncrementCouncilRateLimit(fakeRequest(), env, CROSS_IDENTITY)],
+    ['summary', env => checkAndIncrementSummaryRateLimit(fakeRequest(), env, CROSS_IDENTITY)],
+    ['session', env => checkAndIncrementSessionRateLimit(fakeRequest(CROSS_IP), env)],
+  ];
+
+  for (const [label, check] of CROSSING_CHECKS) {
+    await test(`a ${label} count read before its window's end and reaching the write after it writes nothing`, async () => {
+      let allowed = false;
+      const { reads, writes } = await acrossBoundary(BEFORE_MIDNIGHT, AFTER_MIDNIGHT, async kv => {
+        allowed = (await check(fakeEnv({ RATE_LIMITS: kv }))).allowed;
+      });
+      assertEqual(allowed, true, 'allowed');
+      const read = reads.filter(key => WINDOWED.test(key));
+      assert(read.length > 0 && read.every(key => key.endsWith(':2026-10-30') || key.endsWith(':2026-10-30T23')),
+        `read the window it began in: ${read.join(', ')}`);
+      assertEqual(writes.filter(w => WINDOWED.test(w.key)).map(w => w.key).join(', '), '', 'windowed writes');
+    });
+  }
+
+  await test('a give-back that passes its day check before midnight and reaches its write after it writes nothing', async () => {
+    const reserved = await atInstant(Date.UTC(2026, 9, 30, 23, 59, 50), () =>
+      checkAndIncrementSummaryRateLimit(fakeRequest(), fakeEnv(), CROSS_IDENTITY));
+    const givenBack = await acrossBoundary(BEFORE_MIDNIGHT, AFTER_MIDNIGHT, async kv => {
+      await kv.put(reserved.key, '1');
+      await giveBackSummary(fakeEnv({ RATE_LIMITS: kv }), reserved);
+    });
+    assert(givenBack.reads.includes(reserved.backKey), `the give-back read its day: ${givenBack.reads.join(', ')}`);
+    assertEqual(givenBack.writes.filter(w => w.key === reserved.backKey).length, 0, 'give-back writes');
+  });
+
+  await test('a chat count whose clock moves on inside its day is written to the key it read, KV\'s floor ahead', async () => {
+    const movedTo = Date.UTC(2026, 9, 30, 23, 59, 59, 900);
+    const { reads, writes } = await acrossBoundary(Date.UTC(2026, 9, 30, 23, 59, 58, 900), movedTo, kv =>
+      checkAndIncrementRateLimit(fakeRequest(CROSS_IP), fakeEnv({ RATE_LIMITS: kv }), CROSS_IDENTITY));
+    assertWrittenAsRead(reads, writes, `rate:sub:${CROSS_IDENTITY.sub}:2026-10-30`, movedTo, DAY_END_S);
+    assertWrittenAsRead(reads, writes, reads.find(key => key.startsWith('ipcap:chat:')) ?? '', movedTo, DAY_END_S);
+  });
+
+  await test('a beacon count read before the hour\'s end and reaching the write after it writes nothing, and the row is written', async () => {
+    const ip = '203.0.113.52';
+    const report = (kv: KVNamespace) => handleEntry(beaconRequest('/v1/entry', { path: '/', language: 'en' }, ip), brakeEnv(kv));
+    analyticsRows.length = 0;
+    let status = 0;
+    const crossed = await acrossBoundary(Date.UTC(2026, 9, 30, 10, 59, 59, 900), Date.UTC(2026, 9, 30, 11, 0, 0, 100),
+      async kv => { status = (await report(kv)).status; });
+    assertEqual(status, 204, 'status');
+    assert(crossed.reads.includes(await brakeKey('entry_rl', ip, '2026-10-30T10')), `the hour it began in: ${crossed.reads.join(', ')}`);
+    assertEqual(crossed.writes.map(w => w.key).join(', '), '', 'brake writes');
+    assertEqual(analyticsRows.filter(row => row.blobs[0] === 'entry').length, 1, 'the row was written');
+    const movedTo = Date.UTC(2026, 9, 30, 10, 59, 59, 900);
+    const inside = await acrossBoundary(Date.UTC(2026, 9, 30, 10, 59, 58, 900), movedTo, report);
+    assertWrittenAsRead(inside.reads, inside.writes, await brakeKey('entry_rl', ip, '2026-10-30T10'), movedTo,
+      Date.UTC(2026, 9, 30, 11) / 1000);
+  });
+
   // -------------------------------------------------------------------------
   // Quest award guard
   // -------------------------------------------------------------------------
@@ -2535,6 +2652,28 @@ async function main(): Promise<number> {
     assertEqual(threw, true, 'the per-visitor limit keeps its failure mode');
   });
 
+  await test('a refused per-visitor council write still fails the request, as before', async () => {
+    const env = fakeEnv({ RATE_LIMITS: refusingKv('council:sub:').kv });
+    let thrown = '';
+    try {
+      await checkAndIncrementCouncilRateLimit(fakeRequest(), env, fakeIdentity('99999999-9999-4999-8999-999999999998'));
+    } catch (err) {
+      thrown = (err as Error).message;
+    }
+    assertEqual(thrown, 'KV PUT failed: 429 Too Many Requests', 'the per-visitor council limit keeps its failure mode');
+  });
+
+  await test('a refused summary reservation still fails the request, as before', async () => {
+    const env = fakeEnv({ RATE_LIMITS: refusingKv('summary:sub:').kv });
+    let thrown = '';
+    try {
+      await checkAndIncrementSummaryRateLimit(fakeRequest(), env, fakeIdentity('99999999-9999-4999-8999-999999999997'));
+    } catch (err) {
+      thrown = (err as Error).message;
+    }
+    assertEqual(thrown, 'KV PUT failed: 429 Too Many Requests', 'the per-visitor summary reservation keeps its failure mode');
+  });
+
   // An address key is shared by everyone behind one address, so two allowed
   // requests from one school or office within a second collide on it.
   await test('a refused per-address write still serves the chat', async () => {
@@ -2596,6 +2735,67 @@ async function main(): Promise<number> {
     assertEqual(verified.length, 1, 'the Turnstile solve was still verified');
     assertEqual(warnings.filter(w => w.includes('[RateLimit] Address counter write failed')).length, 1, 'one fixed warning line');
   });
+
+  /** A KV that takes one write per key per second, by the worker's clock, and throws KV's 429 on a second. */
+  const oneWritePerSecondKv = (): { kv: KVNamespace; refused: string[] } => {
+    const store = new Map<string, string>();
+    const lastWrite = new Map<string, number>();
+    const refused: string[] = [];
+    const kv = {
+      get: async (key: string) => store.get(key) ?? null,
+      put: async (key: string, value: string) => {
+        const last = lastWrite.get(key);
+        if (last !== undefined && Date.now() - last < 1000) {
+          refused.push(key);
+          throw new Error('KV PUT failed: 429 Too Many Requests');
+        }
+        lastWrite.set(key, Date.now());
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    return { kv, refused };
+  };
+
+  // Each beacon route through the router, with the answer it gives and the row it writes.
+  const BEACON_REPORTS: { prefix: string; path: string; body: () => Record<string, unknown>; status: number; row: string }[] = [
+    { prefix: 'funnel_rl', path: '/v1/funnel',
+      body: () => ({ step: 'cta_click', path: '/', language: 'en' }), status: 204, row: 'cta_click' },
+    { prefix: 'conv_rl', path: '/api/conversions',
+      body: () => ({ gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now() }), status: 200, row: 'listened' },
+    { prefix: 'entry_rl', path: '/v1/entry', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'entry' },
+    { prefix: 'page_rl', path: '/v1/page', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'page' },
+    { prefix: 'pb_rl', path: '/v1/playback',
+      body: () => ({ type: 'story', event: 'started', figureId: 'socrates', language: 'en' }), status: 204, row: 'playback' },
+    { prefix: 'signup_rl', path: '/v1/signup', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'signup' },
+  ];
+
+  for (const route of BEACON_REPORTS) {
+    await test(`a second ${route.path} report from one address within a second is answered and its row written`, async () => {
+      const ip = '203.0.113.34';
+      const { kv, refused } = oneWritePerSecondKv();
+      const env = brakeEnv(kv);
+      const statuses: number[] = [];
+      analyticsRows.length = 0;
+      const warnings = await withWarnings(() => atInstant(MID_HOUR, async () => {
+        for (let i = 0; i < 2; i++) {
+          const { ctx, pending } = fakeCtx();
+          const response = await worker.fetch(beaconRequest(route.path, route.body(), ip), env, ctx);
+          statuses.push(response.status);
+          await Promise.all(pending);
+        }
+      }));
+      assertEqual(statuses.join(','), `${route.status},${route.status}`, `${route.prefix} statuses`);
+      assertEqual(refused.length, 1, `${route.prefix} the second brake write was refused`);
+      assertEqual(analyticsRows.filter(row => row.blobs[0] === route.row).length, 2, `${route.prefix} rows written`);
+      const key = await brakeKey(route.prefix, ip);
+      assertEqual(await kv.get(key), '1', `${route.prefix} the brake undercounts by the lost write`);
+      const lines = warnings.filter(w => w.includes('[RateLimit]'));
+      assertEqual(lines.length, 1, `${route.prefix} warning lines: ${warnings.join(' | ')}`);
+      for (const secret of [ip, key.split(':')[1], route.prefix, 'KV PUT failed']) {
+        assert(!lines[0].includes(secret), `${route.prefix} the line carries ${secret}: ${lines[0]}`);
+      }
+    });
+  }
 
   globalThis.fetch = realFetch;
 

@@ -5,7 +5,7 @@
 // show availability and download size before committing to ~400 MB.
 
 import { corsHeaders } from './cors';
-import { endsWithWindow, utcDay, utcMinute } from './counterWindow';
+import { putForWindow, utcDay, utcMinute, type CounterWindow } from './counterWindow';
 import { hashIP } from './rateLimit';
 import type { Env } from './types';
 import { streamZip, zipByteLength, type ZipEntry } from './zip';
@@ -215,11 +215,32 @@ async function withinQuota(request: Request, env: Env): Promise<boolean> {
   ]);
   if (used >= ARCHIVE_LIMITS.perDay || usedThisMinute >= ARCHIVE_LIMITS.perMinute) return false;
 
-  await Promise.all([
-    env.RATE_LIMITS.put(dayKey, String(used + 1), endsWithWindow(day)),
-    env.RATE_LIMITS.put(minuteKey, String(usedThisMinute + 1), endsWithWindow(minute)),
+  const written = await Promise.all([
+    putQuotaCounter(env.RATE_LIMITS, dayKey, used + 1, day, 'Day'),
+    putQuotaCounter(env.RATE_LIMITS, minuteKey, usedThisMinute + 1, minute, 'Minute'),
   ]);
-  return true;
+  return written.every(Boolean);
+}
+
+/**
+ * Write a quota counter, false when KV refuses it. KV refuses a second write
+ * to one key within a second (a 429 that throws), and a download whose count
+ * is lost is refused like one over the quota, so a burst cannot pass it.
+ */
+async function putQuotaCounter(
+  kv: KVNamespace,
+  key: string,
+  value: number,
+  window: CounterWindow,
+  kind: 'Day' | 'Minute',
+): Promise<boolean> {
+  try {
+    await putForWindow(kv, key, String(value), window);
+    return true;
+  } catch {
+    console.warn(`[archive] ${kind} counter write failed, download refused`);
+    return false;
+  }
 }
 
 async function readCounter(kv: KVNamespace, key: string): Promise<number> {
