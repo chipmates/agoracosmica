@@ -1112,13 +1112,13 @@ const LAUNCH_EPOCH_SECONDS = __LAUNCH_EPOCH_SECONDS__;
 const NS2_LIVE_DATE = '2026-09-01';
 const NS2_LIVE_MS = Date.parse(NS2_LIVE_DATE + 'T00:00:00Z');
 
-// Rows whose in-house probe marker is set are the owner's own testing. The
-// events carrying this marker (engaged, playback, page, paid_arrival) are
-// filtered on it here, matching internal/ops/stats-pull.mjs exactly so the
-// dashboard and the Monday pull can never disagree. The older counters on the
-// same tabs predate the filter and are NOT deflated, so the two are not
-// directly comparable.
-const NOT_PROBE = "blob9 != 'probe'";
+// Rows whose in-house probe marker is set are the owner's own testing, and
+// rows marked auto came from a hosting network, most likely a machine. Both
+// are left out together wherever this filter stands, matching the Monday
+// pull's filter exactly so the two can never disagree. A row without either
+// word passes. The older counters on the same tabs predate the filter and are
+// NOT deflated, so the two are not directly comparable.
+const NOT_PROBE = "(blob9 != 'probe' AND blob9 != 'auto')";
 
 // Coarse listened-time buckets (double1 on a terminal playback row). Index 0
 // is 0-14s, which the ex-zero filter cannot separate from an unwritten slot,
@@ -2498,7 +2498,7 @@ async function loadOverview() {
   html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split by design' });
   // Standing note on what the v2 number can and cannot mean yet. Partial-window
   // and no-previous-period cases are spelled out rather than left to the reader.
-  var ns2Note = 'North Star v2 counts sessions, one row per tab per arm, and is probe filtered. ' +
+  var ns2Note = 'North Star v2 counts sessions, one row per tab per arm, and leaves out probe and automated rows. ' +
     'Conversations (v1) counts chat messages and is not probe filtered, so the two are different populations and must not be divided into each other. ';
   if (ns2.partial) {
     ns2Note += 'The beacon went live ' + NS2_LIVE_DATE + ', so only about ' + Math.max(1, Math.round(ns2.coveredDays)) +
@@ -3162,7 +3162,7 @@ async function loadProduct() {
   // marker instead, exactly as the funnel and ladder stages do.
   var awaitTerminal = 'awaiting first terminal row. beacon live since ' + NS2_LIVE_DATE;
   html += '<div class="grid">';
-  html += kpi('Tracks Started', listenStarted, { hero: true, sub: 'story and teaching first-plays, probe filtered' });
+  html += kpi('Tracks Started', listenStarted, { hero: true, sub: 'story and teaching first-plays, probe and automated rows out' });
   html += kpi('Audio Finishes', audioFinishes === 0 ? '--' : audioFinishes, {
     sub: audioFinishes === 0 ? awaitTerminal : 'terminal row carrying a listened bucket, all content types',
   });
@@ -3564,6 +3564,11 @@ async function loadAdGrants() {
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
     { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    // --- Automated landings, r[41..42] (APPENDED): the landing rows the filter
+    // above leaves out for their network, current and previous period. Batch
+    // total after these: 43 of the 64 cap. ---
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND blob9 = 'auto' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND blob9 = 'auto' AND timestamp " + prevRange(), dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -3602,6 +3607,7 @@ async function loadAdGrants() {
   var paidArrivals = val(r[36]), paidArrivalsPrev = val(r[37]);
   var landings = val(r[38]), landingsPrev = val(r[39]);
   var arrivalsExProbe = val(r[40]);
+  var autoLandings = val(r[41]), autoLandingsPrev = val(r[42]);
 
   // A decision is a yes or a no. Closing the card is not an answer, so it stays
   // out of the decisions denominator and gets its own share instead.
@@ -3735,17 +3741,20 @@ async function loadAdGrants() {
   var attrHint = 'Paid arrivals count a pageview whose landing URL carried the paid parameter. Only a fresh navigation counts, never a reload or a restored tab. Earlier rows counted those too, so the series steps down where that rule shipped. That is reach, and only reach: paid campaigns are deliberately not tracked for conversions, so nothing here says what a paid click went on to do, and no conversion number for paid exists anywhere on this dashboard. ' +
     'Landing pageviews are the pageviews that opened a visit, decided from the referrer of the document itself with nothing stored. ' +
     'Rows written before either flag shipped carry an empty slot, which reads as not known to be one rather than as not one, so any window reaching back that far undercounts both. ' +
-    'Both counters are probe filtered while Raw Visits above is not, so the two must not be divided into each other.';
+    'Both counters leave out probe rows and automated rows while Raw Visits above keeps them, so the two must not be divided into each other. ' +
+    'Automated landings are the landing pageviews whose beacon came from a hosting or cloud network, marked at the edge from the network alone. They are counted beside the landings and never inside them. Rows written before the mark shipped carry none, so a window reaching back before it holds them among the landings.';
   if (!attrNs2.prevUsable) {
     attrHint += ' Both flags went live ' + NS2_LIVE_DATE + ' and the previous period ends before that, so no delta is shown against a window that could hold nothing.';
   }
   html += '<div class="hint-banner">' + attrHint + '</div>';
   html += '<div class="grid">';
   var paidOpts = { hero: true, sub: 'clicks that arrived with the paid parameter. reach only, never a conversion' };
-  var landingOpts = { sub: 'pageviews that opened a visit, ' + shareText(landings, arrivalsExProbe) + ' of probe-filtered arrivals (' + fmt(arrivalsExProbe) + ')' };
-  if (attrNs2.prevUsable) { paidOpts.delta = paidArrivalsPrev; landingOpts.delta = landingsPrev; }
+  var landingOpts = { sub: 'pageviews that opened a visit, ' + shareText(landings, arrivalsExProbe) + ' of arrivals without probe and automated rows (' + fmt(arrivalsExProbe) + ')' };
+  var autoOpts = { sub: 'landing pageviews from data-centre networks, ' + shareText(autoLandings, landings + autoLandings) + ' of all landings. not in the landings beside it' };
+  if (attrNs2.prevUsable) { paidOpts.delta = paidArrivalsPrev; landingOpts.delta = landingsPrev; autoOpts.delta = autoLandingsPrev; }
   html += kpi('Paid Arrivals', paidArrivals, paidOpts);
   html += kpi('Landing Pageviews', landings, landingOpts);
+  html += kpi('Automated (data-centre networks)', autoLandings, autoOpts);
   html += '<div class="card"><div class="kpi-label">Paid, honestly</div><div style="margin-top:8px;font-size:0.8125rem;color:var(--tx2);line-height:1.5">The paid counter exists so paid reach can be read as a number without any of it being attached to a person. Judge paid on the Google Ads console, where the spend lives, and judge the product on the funnel, never by joining the two here.</div></div>';
   html += '</div>';
 
@@ -4171,9 +4180,9 @@ var TR_FAMILIES = [
   { key: 'forum', label: 'Forums', words: ['forum'] },
   { key: 'social', label: 'Social and mail', words: ['social', 'mail'] },
   { key: 'other', label: 'Other links', words: ['code', 'edu', 'wiki', 'news', 'award', 'assistant', 'referral'] },
-  { key: 'inside', label: 'From the site', words: [''] },
+  { key: 'inside', label: 'From the site', words: ['', 'reload'] },
 ];
-var TR_WORDS = { direct: 'Direct', search: 'Search', ad_grant: 'Ad, grant', ad_paid: 'Ad, paid', ad_forum: 'Ad in a forum', forum: 'Forum post', code: 'Code sites', edu: 'Schools', wiki: 'Wikis', news: 'News', mail: 'Mail', award: 'Awards, galleries', assistant: 'AI assistants', social: 'Social', referral: 'Other sites', '': 'From the site' };
+var TR_WORDS = { direct: 'Direct', search: 'Search', ad_grant: 'Ad, grant', ad_paid: 'Ad, paid', ad_forum: 'Ad in a forum', forum: 'Forum post', code: 'Code sites', edu: 'Schools', wiki: 'Wikis', news: 'News', mail: 'Mail', award: 'Awards, galleries', assistant: 'AI assistants', social: 'Social', referral: 'Other sites', reload: 'Reloads', '': 'From the site' };
 var TR_COUNT_KINDS = { home: 'Front page', leonardo: 'Leonardo', inventions: 'Inventions', statement: 'About the museum', privacy: 'Privacy', imprint: 'Legal notice' };
 var TR_HOLDS = { upright: 'Upright', sideways: 'Sideways', wide: 'Wide' };
 var TR_DEVICES = { phone: 'Phone', tablet: 'Tablet', desktop: 'Desktop' };
@@ -5124,7 +5133,7 @@ function trSources() {
   var spanText = useToday ? 'today so far' : span.length === 28 ? 'the last 28 full days' : 'the ' + span.length + ' full day' + (span.length > 1 ? 's' : '') + ' since ' + trShort(span[0]);
   var table = musTable(['Source', 'Page arrivals', 'Walks opened', 'Uses', 'Uses per walk'], rows, [1]);
   return '<div class="card card-full tr-card">' + head + chart +
-    '<div class="mus-cap">One word per visit, worked out when the visit begins. A walk opened from a page of the site after the first one carries no word and counts as From the site. A faded bar is a week the count does not cover whole.</div>' +
+    '<div class="mus-cap">One word per visit, worked out when the visit begins. A walk opened from a page of the site after the first one carries no word and counts as From the site. A page loaded again from its own address, as on a reload, carries the word reload and counts there too. A faded bar is a week the count does not cover whole.</div>' +
     '<div class="kpi-label" style="margin-top:16px">Every source, ' + spanText + '</div>' + table +
     '<div class="mus-cap">Uses are the count&rsquo;s museum_use: the second stop or the first close look. The third stop carries no source word, so real uses by source cannot be read. Under ' + TR_FLOOR + ' walks a rate is left out and the plain figures stand.</div></div>';
 }

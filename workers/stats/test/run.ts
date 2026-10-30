@@ -8,6 +8,7 @@
 import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
 import { handleMuseum } from '../src/museum';
+import { DASHBOARD_HTML } from '../src/dashboard';
 import type { Env } from '../src/types';
 import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
@@ -24,6 +25,10 @@ async function test(name: string, fn: () => Promise<void>): Promise<void> {
 
 function assertEqual(actual: unknown, expected: unknown, message: string): void {
   if (actual !== expected) throw new Error(`${message} (expected ${String(expected)}, got ${String(actual)})`);
+}
+
+function assert(condition: unknown, message: string): void {
+  if (!condition) throw new Error(message);
 }
 
 const env = { CF_API_TOKEN: 'test-token', CF_ACCOUNT_ID: 'test-account', ACCESS_TEAM_DOMAIN: TEAM_DOMAIN, ACCESS_AUD: AUD } as unknown as Env;
@@ -365,6 +370,47 @@ async function main(): Promise<void> {
     const trends = (await (await handleMuseum(new Request('https://stats.example/api/museum/trends'), museumEnv, fetcher)).json()) as { stops: { ids: string[]; days: Array<number[] | null> } };
     assertEqual(JSON.stringify(trends.stops.ids), JSON.stringify(['picture-room', 'flight', 'works', 'other']), 'the trends\' stop ids');
     assertEqual(JSON.stringify(trends.stops.days[trends.stops.days.length - 1]), JSON.stringify([5, 4, 0, 5]), 'today\'s stops');
+  });
+
+  // The dashboard's script, as the worker serves it. tsc does not see inside the template string, so it is parsed
+  // here and its filters are read off the text.
+  const servedScript = (): string => {
+    const html = DASHBOARD_HTML.replace(/__LAUNCH_EPOCH_SECONDS__/g, '0');
+    return html.slice(html.indexOf('<script>') + '<script>'.length, html.indexOf('</script>'));
+  };
+
+  await test('dashboard: the served script parses', async () => {
+    new Function(servedScript());
+  });
+
+  await test('dashboard: every probe filter also leaves out automated rows, and a row without a word passes', async () => {
+    const script = servedScript();
+    const def = /const NOT_PROBE = "([^"]*)";/.exec(script);
+    assertEqual(def && def[1], "(blob9 != 'probe' AND blob9 != 'auto')", 'the filter');
+    // No second, older filter beside it.
+    assertEqual((script.match(/blob9\s*(!=|<>|NOT IN)\s*\(?\s*'probe'/g) || []).length, 1, 'probe filters in the script');
+    // Every use stands between two ANDs, so no OR can open it.
+    const uses = script.split('NOT_PROBE').length - 1;
+    const anded = script.split('AND " + NOT_PROBE + " AND ').length - 1;
+    assertEqual(anded, uses - 1, 'uses of the filter between two ANDs (all but its definition)');
+    assert(uses > 20, 'the filter is used');
+  });
+
+  await test('dashboard: the automated landings stand beside the landings, inside the batch cap', async () => {
+    const script = servedScript();
+    assertEqual((script.match(/blob1 = 'page' AND blob8 = 'landing' AND blob9 = 'auto'/g) || []).length, 2, 'current and previous period');
+    assert(script.includes("kpi('Automated (data-centre networks)', autoLandings, autoOpts)"), 'the visible line');
+    assert(script.indexOf("kpi('Landing Pageviews'") < script.indexOf("kpi('Automated (data-centre networks)'"), 'beside the landings');
+    for (const batch of script.split('var queries = [').slice(1)) {
+      const queries = batch.slice(0, batch.indexOf('\n  ];')).split('{ sql:').length - 1;
+      assert(queries <= 64, `a batch of ${queries} queries`);
+    }
+  });
+
+  await test('dashboard: the museum\'s source groups know the reload word', async () => {
+    const script = servedScript();
+    assert(script.includes("{ key: 'inside', label: 'From the site', words: ['', 'reload'] }"), 'reload sits with From the site');
+    assert(/var TR_WORDS = \{[^\n]*\breload: 'Reloads'/.test(script), 'reload has its label');
   });
 
   const failed = results.filter((r) => r.error);
