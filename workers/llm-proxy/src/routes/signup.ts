@@ -11,6 +11,7 @@ import { trackSignup, readCountry, readDevice, readMark } from '../utils/analyti
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
+import { endsWithWindow, utcHour } from '../utils/counterWindow';
 
 interface SignupPayload {
   path?: string;
@@ -24,7 +25,6 @@ const VALID_LANGS = new Set(['en', 'de']);
 // Rate limit: 20 signup beacons per IP per hour. A signup is a one-time event
 // per user; a single IP rarely creates more than a handful of accounts
 // legitimately. Lower limit than entry because signup is rarer.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 20;
 
 export async function handleSignup(request: Request, env: Env): Promise<Response> {
@@ -41,12 +41,13 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const rateLimitKey = await beaconLimitKey(request, env, 'signup_rl');
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'signup_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
 
   const path = (typeof payload.path === 'string' && PATH_RE.test(payload.path))
     ? payload.path

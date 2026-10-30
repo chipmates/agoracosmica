@@ -5,6 +5,7 @@
 
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
+import { endsWithWindow, utcHour } from '../utils/counterWindow';
 import { forwardConversionToGoogleAds } from '../services/googleAdsCapi';
 import { trackRateLimit, readCountry, readDevice } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
@@ -33,7 +34,6 @@ const VALID_EVENTS = new Set<ConversionEvent>(['start_exploring', 'listened']);
 // client-deduped), so 500/hr supports a NATted network (school, office,
 // conference WiFi, carrier-grade NAT) without false positives. Abuse
 // protection still bounded since each excess request gets 429.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 500;
 
 export async function handleConversions(
@@ -84,7 +84,8 @@ export async function handleConversions(
   const arm = typeof payload.arm === 'string' && CARD_ARMS.has(payload.arm) ? payload.arm : '';
 
   // Rate limiting
-  const rateLimitKey = await beaconLimitKey(request, env, 'conv_rl');
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'conv_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     // Track the hit so the dashboard sees when this fires. Fire-and-forget
@@ -92,7 +93,7 @@ export async function handleConversions(
     trackRateLimit(env, 'conversions', 'conversions', readCountry(request), readDevice(request));
     return Response.json({ error: 'Rate limited' }, { status: 429 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
 
   // Write to Analytics Engine (for stats dashboard SQL queries). The gclid is
   // never written here — it goes only to Google Ads for attribution. Keeping

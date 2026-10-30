@@ -14,6 +14,7 @@ import { trackPlayback, readCountry, readDevice, readMark } from '../utils/analy
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
+import { endsWithWindow, utcHour } from '../utils/counterWindow';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -60,7 +61,6 @@ const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
 
 // Rate limit: 200 playback beacons per IP per hour. Generous since a single
 // listening session can easily hit 12+ tracks.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 200;
 
 export async function handlePlayback(request: Request, env: Env): Promise<Response> {
@@ -85,13 +85,14 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
   }
 
   // Rate limit per IP. The KV key holds a keyed hash of the address, never
-  // the address (1-hour TTL), and never reaches an analytics row.
-  const rateLimitKey = await beaconLimitKey(request, env, 'pb_rl');
+  // the address, ends with its UTC clock hour, and never reaches an analytics row.
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'pb_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
 
   // Sanitize optional fields against allowlists / patterns.
   const figureId = (typeof payload.figureId === 'string' && FIGURE_ID_RE.test(payload.figureId))

@@ -20,6 +20,7 @@ import { trackFunnel, trackMuseum, readCountry, readDevice, readMark, readSource
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
+import { endsWithWindow, utcHour } from '../utils/counterWindow';
 
 interface FunnelPayload {
   step?: string;
@@ -281,8 +282,7 @@ const MAX_BUCKET = 5;
 // several funnel events (one per step), so the cap sits higher than entry's
 // 50. The museum's rows share it: a whole walk is about twenty rows, plus one
 // per work looked at. The KV key holds a keyed hash of the address, never the
-// address (1-hour TTL), and never reaches an analytics row.
-const RATE_LIMIT_WINDOW = 3600;
+// address, ends with its UTC clock hour, and never reaches an analytics row.
 const RATE_LIMIT_MAX = 200;
 
 export async function handleFunnel(request: Request, env: Env): Promise<Response> {
@@ -320,12 +320,13 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const rateLimitKey = await beaconLimitKey(request, env, 'funnel_rl');
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'funnel_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
 
   const lang = (typeof payload.language === 'string') && VALID_LANGS.has(payload.language.slice(0, 2).toLowerCase())
     ? payload.language.slice(0, 2).toLowerCase()

@@ -10,6 +10,7 @@ import { trackPageView, readCountry, readDevice, readMark, readLanding, readSour
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 import { beaconLimitKey } from '../utils/ipHash';
+import { endsWithWindow, utcHour } from '../utils/counterWindow';
 
 interface PagePayload {
   path?: string;
@@ -33,7 +34,6 @@ const VALID_LANGS = new Set(['en', 'de']);
 
 // Rate limit: 100 page beacons per IP per hour. A real user generates 1-10
 // hard page loads per session; this caps abuse without blocking real use.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 100;
 
 export async function handlePage(request: Request, env: Env): Promise<Response> {
@@ -52,13 +52,14 @@ export async function handlePage(request: Request, env: Env): Promise<Response> 
   }
 
   // Rate limit per IP. The KV key holds a keyed hash of the address, never
-  // the address (1-hour TTL), and never reaches an analytics row.
-  const rateLimitKey = await beaconLimitKey(request, env, 'page_rl');
+  // the address, ends with its UTC clock hour, and never reaches an analytics row.
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'page_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), endsWithWindow(hour));
 
   const path = (typeof payload.path === 'string' && PATH_RE.test(payload.path))
     ? payload.path

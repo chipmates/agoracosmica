@@ -8,26 +8,14 @@
 // A far wider per-address ceiling sits beside it. Rotating the UUID resets the
 // per-identity bucket, so without this second bucket one machine could mint
 // identities all day. Addresses are hashed, never stored (see utils/ipHash.ts).
+//
+// Every key that holds an identity or an address hash names its UTC day or
+// clock hour and expires with it (utils/counterWindow.ts).
 
 import { RATE_LIMITS, getEffectiveLimit } from '../config';
 import { hashIp, ipHashSalt, readClientIp } from '../utils/ipHash';
+import { endsWithWindow, utcDay, utcHour, type CounterWindow } from '../utils/counterWindow';
 import type { Env, JWTPayload, RateLimitResult, EndpointRateLimitResult } from '../utils/types';
-
-function getDateKey(): string {
-  return new Date().toISOString().slice(0, 10); // YYYY-MM-DD
-}
-
-/** Fixed clock-hour window, UTC. Matches the daily key's granularity one level down. */
-function getHourKey(): string {
-  return new Date().toISOString().slice(0, 13); // YYYY-MM-DDTHH
-}
-
-function getHourlyResetTime(): string {
-  const next = new Date();
-  next.setUTCMinutes(0, 0, 0);
-  next.setUTCHours(next.getUTCHours() + 1);
-  return next.toISOString();
-}
 
 /** KV key for one address bucket, or null when the edge supplied no address. */
 async function ipCounterKey(request: Request, env: Env, prefix: string, window: string): Promise<string | null> {
@@ -36,11 +24,8 @@ async function ipCounterKey(request: Request, env: Env, prefix: string, window: 
   return `${prefix}:${await hashIp(ip, ipHashSalt(env), 'ratelimit')}:${window}`;
 }
 
-function getDailyResetTime(): string {
-  const tomorrow = new Date();
-  tomorrow.setUTCDate(tomorrow.getUTCDate() + 1);
-  tomorrow.setUTCHours(0, 0, 0, 0);
-  return tomorrow.toISOString();
+function resetTime(window: CounterWindow): string {
+  return new Date(window.endMs).toISOString();
 }
 
 function secondsUntil(isoTimestamp: string): number {
@@ -58,18 +43,19 @@ async function putBrakeCounter(
   env: Env,
   key: string,
   value: number,
-  ttlSeconds: number,
+  expiry: KVNamespacePutOptions,
   kind: 'Global' | 'Address',
 ): Promise<void> {
   try {
-    await env.RATE_LIMITS.put(key, value.toString(), { expirationTtl: ttlSeconds });
+    await env.RATE_LIMITS.put(key, value.toString(), expiry);
   } catch {
     console.warn(`[RateLimit] ${kind} counter write failed, request served`);
   }
 }
 
+/** A global key holds no identifier, so it keeps its renewed 24-hour TTL. */
 function putGlobalCounter(env: Env, key: string, value: number): Promise<void> {
-  return putBrakeCounter(env, key, value, 86400, 'Global');
+  return putBrakeCounter(env, key, value, { expirationTtl: 86400 }, 'Global');
 }
 
 /**
@@ -93,11 +79,11 @@ export async function checkAndIncrementRateLimit(
   payload: JWTPayload,
 ): Promise<RateLimitResult> {
   const subject = payload.sub;
-  const dateKey = getDateKey();
+  const day = utcDay();
 
-  const dailyKey = `rate:sub:${subject}:${dateKey}`;
-  const globalKey = `global:${dateKey}`;
-  const ipKey = await ipCounterKey(request, env, 'ipcap:chat', dateKey);
+  const dailyKey = `rate:sub:${subject}:${day.label}`;
+  const globalKey = `global:${day.label}`;
+  const ipKey = await ipCounterKey(request, env, 'ipcap:chat', day.label);
 
   const [dailyStr, globalStr, ipStr] = await Promise.all([
     env.RATE_LIMITS.get(dailyKey),
@@ -109,7 +95,7 @@ export async function checkAndIncrementRateLimit(
   const globalUsed = globalStr ? parseInt(globalStr, 10) || 0 : 0;
   const ipUsed = ipStr ? parseInt(ipStr, 10) || 0 : 0;
   const dailyLimit = getEffectiveLimit(env, 'chat');
-  const resetsAt = getDailyResetTime();
+  const resetsAt = resetTime(day);
   const retryAfterSeconds = secondsUntil(resetsAt);
 
   const overPerIdentity = dailyUsed >= dailyLimit;
@@ -132,10 +118,11 @@ export async function checkAndIncrementRateLimit(
   const dailyCount = dailyUsed + 1;
   const globalCount = globalUsed + 1;
 
+  const expiry = endsWithWindow(day);
   await Promise.all([
-    env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), { expirationTtl: 86400 }),
+    env.RATE_LIMITS.put(dailyKey, dailyCount.toString(), expiry),
     putGlobalCounter(env, globalKey, globalCount),
-    ipKey ? putBrakeCounter(env, ipKey, ipUsed + 1, 86400, 'Address') : Promise.resolve(),
+    ipKey ? putBrakeCounter(env, ipKey, ipUsed + 1, expiry, 'Address') : Promise.resolve(),
   ]);
 
   return {
@@ -155,12 +142,12 @@ export async function checkAndIncrementSessionRateLimit(
   request: Request,
   env: Env,
 ): Promise<EndpointRateLimitResult> {
-  const hourKey = getHourKey();
+  const hour = utcHour();
   const limit = RATE_LIMITS.SESSION_HOURLY_PER_IP;
-  const resetsAt = getHourlyResetTime();
+  const resetsAt = resetTime(hour);
   const retryAfterSeconds = secondsUntil(resetsAt);
 
-  const key = await ipCounterKey(request, env, 'ipcap:session', hourKey);
+  const key = await ipCounterKey(request, env, 'ipcap:session', hour.label);
   if (!key) return { allowed: true, used: 0, limit, resetsAt, retryAfterSeconds };
 
   const raw = await env.RATE_LIMITS.get(key);
@@ -170,7 +157,7 @@ export async function checkAndIncrementSessionRateLimit(
   }
 
   const count = used + 1;
-  await putBrakeCounter(env, key, count, 3600, 'Address');
+  await putBrakeCounter(env, key, count, endsWithWindow(hour), 'Address');
   return { allowed: true, used: count, limit, resetsAt, retryAfterSeconds };
 }
 
@@ -180,11 +167,11 @@ export async function checkAndIncrementCouncilRateLimit(
   payload: JWTPayload,
 ): Promise<EndpointRateLimitResult> {
   const subject = payload.sub;
-  const dateKey = getDateKey();
-  const councilKey = `council:sub:${subject}:${dateKey}`;
-  const globalKey = `global:council:${dateKey}`;
+  const day = utcDay();
+  const councilKey = `council:sub:${subject}:${day.label}`;
+  const globalKey = `global:council:${day.label}`;
   const limit = getEffectiveLimit(env, 'council');
-  const resetsAt = getDailyResetTime();
+  const resetsAt = resetTime(day);
   const retryAfterSeconds = secondsUntil(resetsAt);
 
   const [countStr, globalStr] = await Promise.all([
@@ -203,7 +190,7 @@ export async function checkAndIncrementCouncilRateLimit(
 
   const count = used + 1;
   await Promise.all([
-    env.RATE_LIMITS.put(councilKey, count.toString(), { expirationTtl: 86400 }),
+    env.RATE_LIMITS.put(councilKey, count.toString(), endsWithWindow(day)),
     putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
@@ -222,19 +209,21 @@ export const SUMMARY_GIVEBACKS_DAILY = 2;
  * reservation) and the give-back key only ever rises (each summary given
  * back), so neither writer can overwrite the other's count.
  */
-function summaryKeys(subject: string, dateKey: string): { key: string; backKey: string } {
+function summaryKeys(subject: string, day: CounterWindow): { key: string; backKey: string; day: CounterWindow } {
   return {
-    key: `summary:sub:${subject}:${dateKey}`,
-    backKey: `summary:back:sub:${subject}:${dateKey}`,
+    key: `summary:sub:${subject}:${day.label}`,
+    backKey: `summary:back:sub:${subject}:${day.label}`,
+    day,
   };
 }
 
 const readCount = (raw: string | null): number => (raw ? parseInt(raw, 10) || 0 : 0);
 
-/** A summary check's result, with the visitor's keys for giving the summary back. */
+/** A summary check's result, with the visitor's keys and their day for giving the summary back. */
 export interface SummaryRateLimitResult extends EndpointRateLimitResult {
   key: string;
   backKey: string;
+  day: CounterWindow;
 }
 
 export async function checkAndIncrementSummaryRateLimit(
@@ -242,11 +231,11 @@ export async function checkAndIncrementSummaryRateLimit(
   env: Env,
   payload: JWTPayload,
 ): Promise<SummaryRateLimitResult> {
-  const dateKey = getDateKey();
-  const keys = summaryKeys(payload.sub, dateKey);
-  const globalKey = `global:summary:${dateKey}`;
+  const day = utcDay();
+  const keys = summaryKeys(payload.sub, day);
+  const globalKey = `global:summary:${day.label}`;
   const limit = getEffectiveLimit(env, 'summary');
-  const resetsAt = getDailyResetTime();
+  const resetsAt = resetTime(day);
   const retryAfterSeconds = secondsUntil(resetsAt);
 
   const [countStr, backStr, globalStr] = await Promise.all([
@@ -264,7 +253,7 @@ export async function checkAndIncrementSummaryRateLimit(
   }
 
   await Promise.all([
-    env.RATE_LIMITS.put(keys.key, String(reserved + 1), { expirationTtl: 86400 }),
+    env.RATE_LIMITS.put(keys.key, String(reserved + 1), endsWithWindow(day)),
     putGlobalCounter(env, globalKey, globalUsed + 1),
   ]);
 
@@ -276,12 +265,14 @@ export async function checkAndIncrementSummaryRateLimit(
  * identity has give-backs left today; past them the summary stays spent. A
  * refused write is logged by its kind and that summary stays spent. The
  * global brake keeps its count: the model may have read the history before
- * the visitor left.
+ * the visitor left. Once the reservation's day is over nothing reads its keys
+ * again, so nothing is written.
  */
 export async function giveBackSummary(
   env: Env,
-  counted: Pick<SummaryRateLimitResult, 'key' | 'backKey'>,
+  counted: Pick<SummaryRateLimitResult, 'key' | 'backKey' | 'day'>,
 ): Promise<void> {
+  if (Date.now() >= counted.day.endMs) return;
   try {
     const [countStr, backStr] = await Promise.all([
       env.RATE_LIMITS.get(counted.key),
@@ -293,7 +284,7 @@ export async function giveBackSummary(
       console.log('[RateLimit] Summary give-backs spent for today, the summary stays spent');
       return;
     }
-    await env.RATE_LIMITS.put(counted.backKey, String(back + 1), { expirationTtl: 86400 });
+    await env.RATE_LIMITS.put(counted.backKey, String(back + 1), endsWithWindow(counted.day));
   } catch (err) {
     const kind = err instanceof Error ? err.name : typeof err;
     console.warn(`[RateLimit] Summary give-back failed (${kind}), the summary stays spent`);
@@ -314,13 +305,13 @@ export async function getQuota(
   summary: { used: number; limit: number };
 }> {
   const subject = payload.sub;
-  const dateKey = getDateKey();
-  const resetsAt = getDailyResetTime();
-  const summary = summaryKeys(subject, dateKey);
+  const day = utcDay();
+  const resetsAt = resetTime(day);
+  const summary = summaryKeys(subject, day);
 
   const [dailyStr, councilStr, summaryStr, summaryBackStr] = await Promise.all([
-    env.RATE_LIMITS.get(`rate:sub:${subject}:${dateKey}`),
-    env.RATE_LIMITS.get(`council:sub:${subject}:${dateKey}`),
+    env.RATE_LIMITS.get(`rate:sub:${subject}:${day.label}`),
+    env.RATE_LIMITS.get(`council:sub:${subject}:${day.label}`),
     env.RATE_LIMITS.get(summary.key),
     env.RATE_LIMITS.get(summary.backKey),
   ]);
