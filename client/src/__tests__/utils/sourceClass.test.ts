@@ -54,6 +54,29 @@ describe('sourceClass ad parameters', () => {
   it('ignores an unparsable landing URL and falls through to the referrer', () => {
     expect(sourceClass('not a url', 'https://www.bing.com/')).toBe('search');
   });
+
+  it('labels a gbraid or wbraid without a gclid or p=1 as the grant', () => {
+    for (const key of ['gbraid', 'wbraid']) {
+      expect(sourceClass(`${LANDING}?${key}=0AAAAA`, '')).toBe('ad_google_grant');
+      expect(sourceClass(`${LANDING}?${key}=0AAAAA`, 'https://www.google.com/')).toBe('ad_google_grant');
+      // Presence only: an empty key reads the same as a filled one.
+      expect(sourceClass(`${LANDING}?${key}=`, '')).toBe('ad_google_grant');
+      expect(sourceClass(`${LANDING}?${key}=anything-at-all`, '')).toBe('ad_google_grant');
+    }
+    expect(sourceClass(`${LANDING}?gbraid=0A&wbraid=0B`, '')).toBe('ad_google_grant');
+  });
+
+  it('keeps p=1 and Reddit ahead of gbraid and wbraid', () => {
+    expect(sourceClass(`${LANDING}?p=1&gbraid=0AAAAA`, '')).toBe('ad_google_paid');
+    expect(sourceClass(`${LANDING}?wbraid=0AAAAA&p=1`, 'https://www.google.de/')).toBe('ad_google_paid');
+    expect(sourceClass(`${LANDING}?gclid=Cj0&gbraid=0AAAAA`, '')).toBe('ad_google_grant');
+    expect(sourceClass(`${LANDING}?utm_source=reddit&gbraid=0AAAAA`, '')).toBe('ad_reddit');
+  });
+
+  it('reads a lookalike of gbraid as no ad parameter', () => {
+    expect(sourceClass(`${LANDING}?gbraid_x=1`, '')).toBe('direct');
+    expect(sourceClass(`${LANDING}?xwbraid=1`, '')).toBe('direct');
+  });
 });
 
 describe('sourceClass referrer classes', () => {
@@ -425,6 +448,14 @@ describe('the marketing twin in agc-public.js', () => {
     [LANDING, 'https://lobste.rs/s/abc'],
     [LANDING, 'https://en.wikipedia.org/wiki/Stoicism'],
     [LANDING, 'https://alternativeto.net/software/abc/'],
+    // gbraid and wbraid against every rule they meet.
+    [`${LANDING}?gbraid=0AAAAA`, ''],
+    [`${LANDING}?wbraid=0AAAAA`, 'https://www.google.com/'],
+    [`${LANDING}?gbraid=`, ''],
+    [`${LANDING}?p=1&gbraid=0AAAAA`, ''],
+    [`${LANDING}?gclid=Cj0&wbraid=0AAAAA`, ''],
+    [`${LANDING}?utm_source=reddit&gbraid=0AAAAA`, ''],
+    [`${LANDING}?gbraid_x=1`, ''],
   ];
 
   // A case list can only catch a host it happens to name, so the lists

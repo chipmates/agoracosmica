@@ -269,6 +269,8 @@
   // Reddit's markers first, since a Reddit ad link can carry p=1 too. Then
   // p=1, the marker we set on paid final URLs, decides, not the accounts'
   // auto-tagging: p=1 with a gclid is paid, as the paid counter reads it.
+  // gbraid and wbraid stand in for a gclid on some iOS clicks: only the grant
+  // account auto-tags, so either one without p=1 is the grant.
   function adClass(landingUrl) {
     var params;
     try { params = new URL(landingUrl).searchParams; }
@@ -277,6 +279,7 @@
     if (utmSource === 'reddit' || params.has('rdt_cid')) return 'ad_reddit';
     if (params.get('p') === '1') return 'ad_google_paid';
     if (params.has('gclid')) return 'ad_google_grant';
+    if (params.has('gbraid') || params.has('wbraid')) return 'ad_google_grant';
     return undefined;
   }
 
