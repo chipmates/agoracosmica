@@ -1,22 +1,31 @@
-import { TIMEOUTS } from './config';
 import { handlePreflight, corsHeaders } from './cors';
-import { selectServers, refreshHealth, getAggregatedHealth } from './health';
-import {
-  bodyTooLarge, bodyUnreadable, declaresMoreThan, drainBodyCapped, readBodyCapped, readJsonCapped,
-  SESSION_END_MAX_BODY_BYTES, STT_MAX_BODY_BYTES,
-} from './bodyLimit';
-import { proxyWithFailoverFromBuffer } from './proxy';
-import { checkAudioRateLimit, peekAudioRateLimit, buildRateLimitResponse } from './rateLimit';
 import { handleStoryArchive } from './storyArchive';
-import { buildKokoroFallbackBody } from './ttsEngine';
-import type { AudioRateLimitResult, Env } from './types';
+import type { Env } from './types';
 
 const STORY_ARCHIVE_PREFIX = '/v1/audio/story-archive/';
+
+/**
+ * The live voice routes, by the name the audio dataset counts them under. The
+ * speech server is retired: each answers 410 with no upstream call, so a
+ * stale client gets a clean refusal instead of a timeout.
+ */
+const GONE_ROUTES = new Map<string, string>([
+  ['/v1/audio/speech', 'speech'],
+  ['/v1/audio/transcriptions', 'transcriptions'],
+  ['/v1/audio/session/end', 'session-end'],
+]);
 
 function readCountry(request: Request): string {
   const country = (request as Request & { cf?: { country?: string } }).cf?.country;
   if (typeof country === 'string' && country.length === 2) return country;
   return 'XX';
+}
+
+function json(body: unknown, status: number, request: Request, env: Env): Response {
+  return new Response(JSON.stringify(body), {
+    status,
+    headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
+  });
 }
 
 const router = {
@@ -33,25 +42,13 @@ const router = {
 
     // Worker health (static)
     if (path === '/health' && request.method === 'GET') {
-      return new Response(JSON.stringify({ status: 'ok', worker: 'agora-cosmica-audio' }), {
-        headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
-      });
+      return json({ status: 'ok', worker: 'agora-cosmica-audio' }, 200, request, env);
     }
 
-    // Aggregated server health. Refreshes inline when stale, so it must sit
-    // above the fire-and-forget refresh below or both would probe at once.
+    // No speech server is left to probe, so this says so without asking anyone.
     if (path === '/v1/audio/health' && request.method === 'GET') {
-      const res = await getAggregatedHealth(env);
-      // Add CORS headers
-      const headers = new Headers(res.headers);
-      for (const [k, v] of Object.entries(corsHeaders(request, env))) {
-        headers.set(k, v);
-      }
-      return new Response(res.body, { status: res.status, headers });
+      return json({ status: 'retired', servers: {} }, 200, request, env);
     }
-
-    // Keep the snapshot warm off the critical path of the audio routes
-    ctx.waitUntil(refreshHealth(env));
 
     // Story archive — streams one figure + language as a ZIP straight from R2.
     // HEAD serves the same headers for the client's availability + size probe.
@@ -68,218 +65,22 @@ const router = {
       );
     }
 
-    // TTS proxy (GPU-aware rate limiting)
-    if (path === '/v1/audio/speech' && request.method === 'POST') {
-      const startMs = Date.now();
-
-      // Size gate BEFORE buffering: this route is unauthenticated and buffers
-      // the full body below, so an oversized (or length-less chunked) body
-      // must be rejected up front. TTS payloads are small JSON; 64KB is ample.
-      const declaredBytes = parseInt(request.headers.get('Content-Length') || '', 10);
-      if (!Number.isFinite(declaredBytes) || declaredBytes > 64 * 1024) {
-        return new Response(JSON.stringify({ error: 'Request body too large' }), {
-          status: 413,
-          headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
-        });
-      }
-
-      // Buffer body once (needed for: language extraction + failover retry)
-      let bodyBuffer: ArrayBuffer;
-      try {
-        bodyBuffer = await request.arrayBuffer();
-      } catch {
-        return bodyUnreadable(request, env);
-      }
-
-      // Extract language and model from request body for tier-aware limiting
-      let language = 'English';
-      let model = 'unknown';
-      let parsedBody: Record<string, unknown> | null = null;
-      try {
-        parsedBody = JSON.parse(new TextDecoder().decode(bodyBuffer)) as Record<string, unknown>;
-        if (parsedBody.language === 'German') language = 'German';
-        if (typeof parsedBody.model === 'string') model = parsedBody.model;
-      } catch { /* default to English on parse failure */ }
-
-      // Load-test bypass: authenticated calls that match LOAD_TEST_BYPASS_KEY
-      // skip rate limiting. Single-source load tests would otherwise trip the
-      // per-IP limiter long before they reach infrastructure capacity. Key is
-      // set via `wrangler secret put LOAD_TEST_BYPASS_KEY`.
-      const loadTestAuth = request.headers.get('X-Load-Test-Auth');
-      const skipRateLimit = !!env.LOAD_TEST_BYPASS_KEY && loadTestAuth === env.LOAD_TEST_BYPASS_KEY;
-
-      if (!skipRateLimit) {
-        // GPU-aware rate limit check
-        const rateResult = await checkAudioRateLimit(request, env, language, 'tts');
-        if (!rateResult.allowed) {
-          // Track rate limit event (fire-and-forget)
-          const rlCountry = readCountry(request);
-          ctx.waitUntil(Promise.resolve().then(() => {
-            env.ANALYTICS.writeDataPoint({
-              blobs: [language === 'German' ? 'de' : 'en', model, '', rateResult.code || 'unknown', 'ratelimit', '', rlCountry],
-              doubles: [0],
-              indexes: ['ratelimit'],
-            });
-          }));
-          return buildRateLimitResponse(rateResult, request, env);
-        }
-      }
-
-      const sessionId = request.headers.get('X-Session-Id');
-      const [primary, fallback] = await selectServers(env, sessionId);
-      // English on a Qwen voice can be re-asked as Kokoro when no origin serves
-      // it, so a Qwen outage costs the timbre rather than the audio.
-      const kokoroFallbackBody = buildKokoroFallbackBody(parsedBody);
-      const response = await proxyWithFailoverFromBuffer(
-        bodyBuffer, request, primary, fallback, env, TIMEOUTS.TTS, kokoroFallbackBody,
-      );
-
-      // Anonymous analytics (fire-and-forget, never blocks response)
-      const server = response.headers.get('X-Audio-Server') || 'unknown';
-      const upstreamModel = response.headers.get('x-model') || model;
-      const engineFallback = response.headers.get('X-TTS-Engine-Fallback') ? 'engine-fallback' : '';
+    // The body is never read: the answer does not depend on it.
+    const gone = GONE_ROUTES.get(path);
+    if (gone && request.method === 'POST') {
       const country = readCountry(request);
       ctx.waitUntil(Promise.resolve().then(() => {
         env.ANALYTICS.writeDataPoint({
-          blobs: [
-            language === 'German' ? 'de' : 'en',
-            upstreamModel,
-            server,
-            String(response.status),
-            'speech',
-            engineFallback,
-            country,
-          ],
-          doubles: [Date.now() - startMs],
-          indexes: [language === 'German' ? 'de' : 'en'],
+          blobs: ['any', '', '', '410', gone, '', country],
+          doubles: [0],
+          indexes: ['gone'],
         });
       }));
-
-      return response;
-    }
-
-    // Session-end beacon (LT-11) — fire-and-forget eviction of a session cache
-    // entry so the gateway can free the Qwen admission slot immediately
-    // instead of waiting for 3600s TTL. Client calls this when user clicks
-    // "Lieber Text lesen" in the ProcessingLoader. Unauthenticated — worst
-    // case is random UUIDs = no-op eviction. Never blocks or errors upstream.
-    if (path === '/v1/audio/session/end' && request.method === 'POST') {
-      let sessionId: string | null = null;
-      try {
-        const read = await readJsonCapped(request, SESSION_END_MAX_BODY_BYTES);
-        if (!read.ok) return bodyTooLarge(request, env);
-        const body = read.body as { session_id?: string };
-        sessionId = typeof body.session_id === 'string' ? body.session_id : null;
-      } catch {
-        // Malformed JSON → still 204. Beacon is idempotent.
-      }
-
-      if (sessionId) {
-        // Route to the gateway that actually holds this session's cache entry
-        // (UUID-hash determines origin). If the request fails for any reason,
-        // we still return 204 — the session simply expires on TTL like before.
-        const [primary] = await selectServers(env, sessionId);
-        ctx.waitUntil(
-          (async () => {
-            try {
-              const beaconHeaders: Record<string, string> = {
-                'Content-Type': 'application/json',
-                Authorization: `Bearer ${env.AUDIO_API_KEY}`,
-              };
-              if (env.ORIGIN_VERIFY_KEY) {
-                beaconHeaders['X-Origin-Verify'] = env.ORIGIN_VERIFY_KEY;
-              }
-              await fetch(`${primary.url}/v1/audio/session/end`, {
-                method: 'POST',
-                headers: beaconHeaders,
-                body: JSON.stringify({ session_id: sessionId }),
-                signal: AbortSignal.timeout(3000),
-              });
-            } catch {
-              /* beacon failures silent — TTL handles eviction as fallback */
-            }
-          })(),
-        );
-      }
-
-      return new Response(null, {
-        status: 204,
-        headers: corsHeaders(request, env),
-      });
-    }
-
-    // STT proxy (rate limiting, no language extraction needed)
-    if (path === '/v1/audio/transcriptions' && request.method === 'POST') {
-      const startMs = Date.now();
-
-      // Load-test bypass: see TTS endpoint above for rationale.
-      const sttLoadTestAuth = request.headers.get('X-Load-Test-Auth');
-      const sttSkipRateLimit = !!env.LOAD_TEST_BYPASS_KEY && sttLoadTestAuth === env.LOAD_TEST_BYPASS_KEY;
-
-      const refuseStt = (rateResult: AudioRateLimitResult): Response => {
-        const sttRlCountry = readCountry(request);
-        ctx.waitUntil(Promise.resolve().then(() => {
-          env.ANALYTICS.writeDataPoint({
-            blobs: ['any', 'whisper', '', rateResult.code || 'unknown', 'ratelimit', '', sttRlCountry],
-            doubles: [0],
-            indexes: ['ratelimit'],
-          });
-        }));
-        return buildRateLimitResponse(rateResult, request, env);
-      };
-
-      // Before the upload is kept: a declared size over the cap, then a
-      // visitor already at a limit, whose upload is drained unkept before the
-      // 429. Neither moves a counter.
-      if (declaresMoreThan(request, STT_MAX_BODY_BYTES)) return bodyTooLarge(request, env);
-      if (!sttSkipRateLimit) {
-        const early = await peekAudioRateLimit(request, env);
-        if (!early.allowed) {
-          await drainBodyCapped(request, STT_MAX_BODY_BYTES);
-          return refuseStt(early);
-        }
-      }
-
-      // Size gate before any counter moves. This route is unauthenticated and
-      // the body is buffered for the failover retry, so the read is capped.
-      let sttBody: ArrayBuffer | null;
-      try {
-        sttBody = await readBodyCapped(request, STT_MAX_BODY_BYTES);
-      } catch {
-        return bodyUnreadable(request, env);
-      }
-      if (!sttBody) return bodyTooLarge(request, env);
-
-      // The counting check runs after the read, so an upload that is too
-      // large or breaks off is never counted.
-      if (!sttSkipRateLimit) {
-        const rateResult = await checkAudioRateLimit(request, env, 'English', 'stt');
-        if (!rateResult.allowed) return refuseStt(rateResult);
-      }
-
-      const sttSessionId = request.headers.get('X-Session-Id');
-      const [primary, fallback] = await selectServers(env, sttSessionId);
-      const response = await proxyWithFailoverFromBuffer(sttBody, request, primary, fallback, env, TIMEOUTS.STT);
-
-      // Anonymous analytics (fire-and-forget)
-      const server = response.headers.get('X-Audio-Server') || 'unknown';
-      const sttCountry = readCountry(request);
-      ctx.waitUntil(Promise.resolve().then(() => {
-        env.ANALYTICS.writeDataPoint({
-          blobs: ['any', 'whisper', server, String(response.status), 'transcriptions', '', sttCountry],
-          doubles: [Date.now() - startMs],
-          indexes: ['stt'],
-        });
-      }));
-
-      return response;
+      return json({ error: 'gone' }, 410, request, env);
     }
 
     // 404 — no wildcard proxying
-    return new Response(JSON.stringify({ error: 'Not found' }), {
-      status: 404,
-      headers: { 'Content-Type': 'application/json', ...corsHeaders(request, env) },
-    });
+    return json({ error: 'Not found' }, 404, request, env);
   },
 };
 

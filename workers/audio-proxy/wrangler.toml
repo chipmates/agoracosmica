@@ -1,5 +1,5 @@
-# Cloudflare Worker: Audio Proxy with a health check
-# Routes TTS/STT requests to one GEX130 server (FSN1, Falkenstein)
+# Cloudflare Worker: the story archive. The live voice routes (speech,
+# transcriptions, session end) answer 410: the speech server is retired.
 
 name = "agora-cosmica-audio"
 main = "src/index.ts"
@@ -7,7 +7,8 @@ compatibility_date = "2025-01-06"
 workers_dev = false
 preview_urls = false
 
-# KV Namespace for health cache
+# KV Namespace for the old health cache. Nothing reads it any more; it goes
+# with the worker.
 [[kv_namespaces]]
 binding = "HEALTH_CACHE"
 id = "d038eefec57840488a3e316037949b03"
@@ -28,20 +29,15 @@ bucket_name = "agora-cosmica"
 # Environment Variables
 [vars]
 ALLOWED_ORIGINS = "https://agoracosmica.org,https://www.agoracosmica.org"
-SERVER_FSN1_URL = "https://fsn1.agoracosmica.org"
-# NBG1 retired: an empty URL hands its share to FSN1 (one server since Oct 2026).
+# Both speech servers are retired. Nothing reads these; they stay empty.
+SERVER_FSN1_URL = ""
 SERVER_NBG1_URL = ""
 
 # Secrets (set via wrangler secret put):
-# - AUDIO_API_KEY      (Bearer token for the GEX130 server)
-# - ORIGIN_VERIFY_KEY  (X-Origin-Verify header injected on every upstream call;
-#                       nginx on FSN1 rejects requests missing/wrong value.
-#                       Defense against direct-to-origin abuse with leaked AUDIO_API_KEY.
-#                       Generate: openssl rand -hex 32)
-# - LOAD_TEST_BYPASS_KEY  (optional; if set, X-Load-Test-Auth header skips rate limits)
-# - IP_HASH_SALT  (openssl rand -hex 32) — HMAC key for the rate limiter's address
-#                 hash. Set it before deploying; unset, the limiter falls back to
+# - IP_HASH_SALT  (openssl rand -hex 32) — HMAC key for the archive quota's address
+#                 hash. Set it before deploying; unset, the quota falls back to
 #                 an unkeyed hash and logs one warning per isolate.
+# No longer read: AUDIO_API_KEY, ORIGIN_VERIFY_KEY, LOAD_TEST_BYPASS_KEY.
 
 # Routes
 [[routes]]
@@ -57,6 +53,7 @@ command = ""
 
 # Analytics Engine for anonymous usage tracking (STATS-1/3)
 # Zero PII: only language, model, server, status, latency. "Ohne Tracking" compliant.
+# The 410s of the retired voice routes are counted here too (blob4 "410").
 [[analytics_engine_datasets]]
 binding = "ANALYTICS"
 dataset = "agora_audio"

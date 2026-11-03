@@ -3,15 +3,10 @@
 // No framework: each case throws on failure and the runner reports the tally,
 // so the suite runs anywhere tsx does. Same shape as the llm-proxy suite.
 
-import { buildKokoroFallbackBody, QWEN_EN_TO_KOKORO } from '../src/ttsEngine';
-import { proxyWithFailoverFromBuffer } from '../src/proxy';
-import { getServers } from '../src/config';
-import { getAggregatedHealth } from '../src/health';
-import { checkAudioRateLimit, hashIP } from '../src/rateLimit';
+import { hashIP } from '../src/rateLimit';
 import { corsHeaders, handlePreflight } from '../src/cors';
-import { drainBodyCapped, readBodyCapped } from '../src/bodyLimit';
 import worker from '../src/index';
-import type { Env, ServerInfo } from '../src/types';
+import type { Env } from '../src/types';
 
 // ---------------------------------------------------------------------------
 // Harness
@@ -40,297 +35,221 @@ function assertEqual(actual: unknown, expected: unknown, message: string): void 
 // Fakes
 // ---------------------------------------------------------------------------
 
+const ORIGIN = 'https://agoracosmica.org';
+
 function fakeEnv(): Env {
-  return {
-    AUDIO_API_KEY: 'test-key',
-    ALLOWED_ORIGINS: 'https://agoracosmica.org',
-    SERVER_FSN1_URL: 'https://fsn1.example',
-    SERVER_NBG1_URL: 'https://nbg1.example',
-  } as unknown as Env;
-}
-
-const FSN1: ServerInfo = { id: 'fsn1', url: 'https://fsn1.example', health: null };
-const NBG1: ServerInfo = { id: 'nbg1', url: 'https://nbg1.example', health: null };
-
-function speechRequest(): Request {
-  return new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org' },
-  });
-}
-
-function encode(body: unknown): ArrayBuffer {
-  const bytes = new TextEncoder().encode(JSON.stringify(body));
-  return bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
-}
-
-function decodeVoice(init: RequestInit | undefined): string {
-  const raw = new TextDecoder().decode(init?.body as ArrayBuffer);
-  return (JSON.parse(raw) as { voice?: string }).voice ?? '';
-}
-
-interface UpstreamCall {
-  url: string;
-  voice: string;
+  return { ALLOWED_ORIGINS: ORIGIN } as unknown as Env;
 }
 
 /**
- * Stubs global fetch. `handler` answers per attempt; anything it throws becomes
- * a network failure, which is what a dead origin looks like from the worker.
+ * The worker with every outside call recorded: fetch, both KV stores, R2 and
+ * the analytics points. Any fetch throws as well, so a call cannot pass as an
+ * answer. The env still carries the old server settings, so a worker that
+ * would call a server finds an address to call.
  */
-function stubFetch(
-  handler: (call: UpstreamCall) => Response,
-): { calls: UpstreamCall[]; restore: () => void } {
-  const calls: UpstreamCall[] = [];
+const harness = (servers: { fsn1: string; nbg1: string } = { fsn1: 'https://fsn1.example', nbg1: '' }) => {
+  const fetched: string[] = [];
+  const kvTouched: string[] = [];
+  const points: AnalyticsEngineDataPoint[] = [];
+  const kv = (name: string) => ({
+    get: async (key: string) => { kvTouched.push(`${name} get ${key}`); return null; },
+    put: async (key: string) => { kvTouched.push(`${name} put ${key}`); },
+  }) as unknown as KVNamespace;
+  const env = {
+    ...fakeEnv(),
+    SERVER_FSN1_URL: servers.fsn1,
+    SERVER_NBG1_URL: servers.nbg1,
+    AUDIO_API_KEY: 'test-key',
+    ORIGIN_VERIFY_KEY: 'test-origin-key',
+    IP_HASH_SALT: 'test-salt',
+    HEALTH_CACHE: kv('health'),
+    RATE_LIMITS: kv('limits'),
+    STORY_BUCKET: { list: async () => ({ objects: [], truncated: false }) },
+    ANALYTICS: { writeDataPoint: (point: AnalyticsEngineDataPoint) => { points.push(point); } },
+  } as unknown as Env;
+  const pending: Promise<unknown>[] = [];
+  const ctx = {
+    waitUntil: (work: Promise<unknown>) => { pending.push(work); },
+    passThroughOnException: () => {},
+  } as unknown as ExecutionContext;
   const original = globalThis.fetch;
-  globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-    const call = { url: String(input), voice: decodeVoice(init) };
-    calls.push(call);
-    return handler(call);
+  globalThis.fetch = (async (input: RequestInfo | URL) => {
+    fetched.push(String(input instanceof Request ? input.url : input));
+    throw new Error('no outbound call is allowed');
   }) as typeof fetch;
-  return { calls, restore: () => { globalThis.fetch = original; } };
-}
+  const settle = () => Promise.allSettled(pending);
+  const restore = () => { globalThis.fetch = original; };
+  return { env, ctx, fetched, kvTouched, points, settle, restore };
+};
 
-const OK = () => new Response('audio', { status: 200, headers: { 'content-type': 'audio/webm' } });
-const DOWN = () => new Response('qwen unavailable', { status: 503 });
+/** A 2 MiB body that hands out a chunk only when the worker reads one. */
+const countedBody = () => {
+  let pulled = 0;
+  const stream = new ReadableStream<Uint8Array>({
+    pull(controller) {
+      if (pulled >= 2) { controller.close(); return; }
+      pulled++;
+      controller.enqueue(new Uint8Array(1024 * 1024));
+    },
+  }, { highWaterMark: 0 });
+  return { stream, pulled: () => pulled };
+};
 
-// ---------------------------------------------------------------------------
-// Fallback body construction
-// ---------------------------------------------------------------------------
+const post = (path: string, body: BodyInit | null, origin = ORIGIN): Request => new Request(`https://audio.agoracosmica.org${path}`, {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json', Origin: origin,
+    'CF-Connecting-IP': '203.0.113.9', 'X-Session-Id': '0f8e2b7a-3c1d-4e5f-9a6b-7c8d9e0f1a2b',
+  },
+  body,
+  // Node needs this for a streamed body; the Workers runtime ignores it.
+  ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
+} as RequestInit);
+
+const get = (path: string, method = 'GET'): Request => new Request(`https://audio.agoracosmica.org${path}`, {
+  method, headers: { Origin: ORIGIN, 'CF-Connecting-IP': '203.0.113.9' },
+});
+
+/** The retired voice routes and the name each is counted under. */
+const GONE: { path: string; counted: string }[] = [
+  { path: '/v1/audio/speech', counted: 'speech' },
+  { path: '/v1/audio/transcriptions', counted: 'transcriptions' },
+  { path: '/v1/audio/session/end', counted: 'session-end' },
+];
 
 async function main(): Promise<number> {
-  await test('English Qwen voice maps to its Kokoro counterpart', () => {
-    const body = buildKokoroFallbackBody({ input: 'hello', voice: 'en_lyra', language: 'English' });
-    assert(body !== null, 'expected a fallback body');
-    const parsed = JSON.parse(new TextDecoder().decode(body!)) as Record<string, unknown>;
-    assertEqual(parsed.voice, QWEN_EN_TO_KOKORO.en_lyra, 'voice rewritten');
-    assertEqual(parsed.input, 'hello', 'text preserved');
-    assertEqual(parsed.language, 'English', 'language preserved');
-  });
-
-  await test('two origins stay two', () => {
-    const s = getServers(fakeEnv());
-    assertEqual(s.fsn1.url, 'https://fsn1.example', 'fsn1 kept');
-    assertEqual(s.nbg1.url, 'https://nbg1.example', 'nbg1 kept');
-  });
-
-  await test('an empty origin hands both slots to the one left', () => {
-    const noNbg1 = getServers({ ...fakeEnv(), SERVER_NBG1_URL: '' } as Env);
-    assertEqual(noNbg1.nbg1.url, 'https://fsn1.example', 'nbg1 slot goes to fsn1');
-    assertEqual(noNbg1.nbg1.id, 'fsn1', 'labelled by the server that answers');
-    const noFsn1 = getServers({ ...fakeEnv(), SERVER_FSN1_URL: '' } as Env);
-    assertEqual(noFsn1.fsn1.url, 'https://nbg1.example', 'fsn1 slot goes to nbg1');
-    assertEqual(noFsn1.fsn1.id, 'nbg1', 'labelled by the server that answers');
-  });
-
-  await test('one origin in both slots is asked once, not twice', async () => {
-    const calls: string[] = [];
-    const realFetch = globalThis.fetch;
-    globalThis.fetch = (async (input: RequestInfo | URL) => {
-      calls.push(String(input));
-      return new Response('down', { status: 503 });
-    }) as typeof fetch;
-    try {
-      const res = await proxyWithFailoverFromBuffer(encode({ input: 'hi' }), speechRequest(), FSN1, FSN1, fakeEnv(), 1000);
-      assertEqual(res.status, 502, 'both-down answer');
-      assertEqual(calls.length, 1, 'a single upstream call');
-    } finally {
-      globalThis.fetch = realFetch;
-    }
-  });
-
-  await test('one origin left reports one server, not a healthy second box', async () => {
-    const kv = new Map<string, string>();
-    const env = {
-      ...fakeEnv(),
-      SERVER_NBG1_URL: '',
-      HEALTH_CACHE: { get: async (k: string) => kv.get(k) ?? null, put: async (k: string, v: string) => { kv.set(k, v); } },
-    } as unknown as Env;
-    const calls: string[] = [];
-    const realFetch = globalThis.fetch;
-    globalThis.fetch = (async (input: RequestInfo | URL) => {
-      calls.push(String(input));
-      return new Response(JSON.stringify({ gpu_slots: { available: 2, max: 4 } }), { status: 200 });
-    }) as typeof fetch;
-    try {
-      const body = (await (await getAggregatedHealth(env)).json()) as { servers: Record<string, { status: string }> };
-      assertEqual(Object.keys(body.servers).join(','), 'fsn1', 'only the server that answers');
-      assertEqual(body.servers.fsn1.status, 'healthy', 'fsn1 healthy');
-      assertEqual(calls.length, 1, 'probed once');
-    } finally {
-      globalThis.fetch = realFetch;
-    }
-  });
-
-  await test('every mapped Qwen voice has a non-empty Kokoro id', () => {
-    for (const [qwen, kokoro] of Object.entries(QWEN_EN_TO_KOKORO)) {
-      assert(kokoro.length > 0, `${qwen} has no counterpart`);
-      assert(!kokoro.startsWith('en_'), `${qwen} maps to another Qwen id`);
-    }
-  });
-
-  await test('the whole council-capable cast is mapped', () => {
-    const cast = [
-      'en_lyra', 'en_andromeda', 'en_astra', 'en_vega', 'en_ceres',
-      'en_solaris', 'en_phoenix', 'en_hyperion', 'en_umbra', 'en_corvus',
-    ];
-    for (const id of cast) {
-      assert(QWEN_EN_TO_KOKORO[id], `${id} has no fallback, a council would lose it`);
-    }
-    assertEqual(Object.keys(QWEN_EN_TO_KOKORO).length, cast.length, 'no stray entries');
-  });
-
-  await test('distinct Qwen voices degrade to distinct Kokoro voices', () => {
-    // A council seats up to 4 figures. If two of them collapsed onto one Kokoro
-    // voice during an outage the transcript would stop being followable.
-    const targets = Object.values(QWEN_EN_TO_KOKORO);
-    assertEqual(new Set(targets).size, targets.length, 'two Qwen voices share a Kokoro voice');
-  });
-
-  await test('German never degrades', () => {
-    const body = buildKokoroFallbackBody({ input: 'hallo', voice: 'en_lyra', language: 'German' });
-    assertEqual(body, null, 'German must not fall back');
-  });
-
-  await test('a Kokoro request has nothing to degrade to', () => {
-    assertEqual(buildKokoroFallbackBody({ voice: 'af_heart', language: 'English' }), null, 'no fallback');
-  });
-
-  await test('an unknown Qwen voice has no fallback', () => {
-    assertEqual(buildKokoroFallbackBody({ voice: 'en_unmapped', language: 'English' }), null, 'no fallback');
-  });
-
-  await test('an unparsed body has no fallback', () => {
-    assertEqual(buildKokoroFallbackBody(null), null, 'no fallback');
-  });
-
   // -------------------------------------------------------------------------
-  // Failover + degrade path
+  // The retired voice routes: 410 at once, with CORS, and nothing called
   // -------------------------------------------------------------------------
 
-  await test('a healthy Qwen request never reaches the fallback', async () => {
-    const stub = stubFetch(OK);
-    try {
-      const body = encode({ input: 'hi', voice: 'en_lyra', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_lyra', language: 'English' }),
-      );
-      assertEqual(res.status, 200, 'primary answered');
-      assertEqual(stub.calls.length, 1, 'one upstream call');
-      assertEqual(stub.calls[0].voice, 'en_lyra', 'original voice kept');
-      assertEqual(res.headers.get('X-TTS-Engine-Fallback'), null, 'no fallback marker');
-    } finally {
-      stub.restore();
-    }
-  });
-
-  await test('the second origin is tried before the engine falls back', async () => {
-    const stub = stubFetch((call) => (call.url.startsWith('https://fsn1') ? DOWN() : OK()));
-    try {
-      const body = encode({ input: 'hi', voice: 'en_solaris', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_solaris', language: 'English' }),
-      );
-      assertEqual(res.status, 200, 'nbg1 answered');
-      assertEqual(res.headers.get('X-Audio-Server'), 'nbg1', 'served by the second origin');
-      assertEqual(stub.calls.length, 2, 'two upstream calls');
-      assert(stub.calls.every((c) => c.voice === 'en_solaris'), 'Qwen voice kept on both attempts');
-    } finally {
-      stub.restore();
-    }
-  });
-
-  await test('Qwen down on both origins retries as Kokoro', async () => {
-    const stub = stubFetch((call) => (call.voice.startsWith('en_') ? DOWN() : OK()));
-    try {
-      const body = encode({ input: 'hi', voice: 'en_lyra', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_lyra', language: 'English' }),
-      );
-      assertEqual(res.status, 200, 'the visitor still gets audio');
-      assertEqual(res.headers.get('X-TTS-Engine-Fallback'), 'kokoro', 'fallback marked');
-      assertEqual(stub.calls.length, 3, 'two Qwen attempts then one Kokoro');
-      assertEqual(stub.calls[2].voice, QWEN_EN_TO_KOKORO.en_lyra, 'retried with the Kokoro voice');
-    } finally {
-      stub.restore();
-    }
-  });
-
-  await test('the Kokoro retry itself fails over to the second origin', async () => {
-    const stub = stubFetch((call) => {
-      if (call.voice.startsWith('en_')) return DOWN();
-      return call.url.startsWith('https://fsn1') ? DOWN() : OK();
+  for (const route of GONE) {
+    await test(`POST ${route.path} answers 410 at once, with CORS, and calls nothing`, async () => {
+      const h = harness();
+      try {
+        const body = countedBody();
+        const request = post(route.path, body.stream);
+        const res = await worker.fetch(request, h.env, h.ctx);
+        await h.settle();
+        assertEqual(res.status, 410, 'status');
+        assertEqual(await res.text(), '{"error":"gone"}', 'body');
+        assertEqual(res.headers.get('Content-Type'), 'application/json', 'content type');
+        for (const [name, value] of Object.entries(corsHeaders(request, h.env))) {
+          assertEqual(res.headers.get(name), value, `CORS header ${name}`);
+        }
+        assertEqual(res.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS on the 410');
+        assertEqual(h.fetched.length, 0, `upstream calls: ${h.fetched.join(', ')}`);
+        assertEqual(h.kvTouched.length, 0, `KV reads and writes: ${h.kvTouched.join(', ')}`);
+        assertEqual(body.pulled(), 0, 'body chunks read');
+      } finally {
+        h.restore();
+      }
     });
+
+    await test(`POST ${route.path}: each 410 is counted once in the audio dataset`, async () => {
+      const h = harness();
+      try {
+        await worker.fetch(post(route.path, '{"input":"hello"}'), h.env, h.ctx);
+        await h.settle();
+        assertEqual(h.points.length, 1, 'data points');
+        const blobs = h.points[0].blobs ?? [];
+        assertEqual(blobs[3], '410', 'status blob');
+        assertEqual(blobs[4], route.counted, 'route blob');
+        assertEqual(h.fetched.length, 0, 'upstream calls');
+      } finally {
+        h.restore();
+      }
+    });
+  }
+
+  await test('a voice route asked from another site gets the 410 without CORS', async () => {
+    const h = harness();
     try {
-      const body = encode({ input: 'hi', voice: 'en_lyra', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_lyra', language: 'English' }),
-      );
-      assertEqual(res.status, 200, 'nbg1 served the Kokoro retry');
-      assertEqual(res.headers.get('X-Audio-Server'), 'nbg1', 'second origin');
-      assertEqual(stub.calls.length, 4, 'two Qwen attempts then two Kokoro attempts');
+      const res = await worker.fetch(post('/v1/audio/speech', '{}', 'https://evil.example'), h.env, h.ctx);
+      await h.settle();
+      assertEqual(res.status, 410, 'status');
+      assertEqual(res.headers.get('Access-Control-Allow-Origin'), null, 'no ACAO');
+      assertEqual(h.fetched.length, 0, 'upstream calls');
     } finally {
-      stub.restore();
+      h.restore();
     }
   });
 
-  await test('a whole fleet outage still answers 502', async () => {
-    const stub = stubFetch(DOWN);
+  await test('a voice route asked with another method keeps its 404', async () => {
+    const h = harness();
     try {
-      const body = encode({ input: 'hi', voice: 'en_lyra', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_lyra', language: 'English' }),
-      );
-      assertEqual(res.status, 502, 'both stacks gone');
-      assertEqual(stub.calls.length, 4, 'four attempts before giving up');
+      for (const route of GONE) {
+        const res = await worker.fetch(get(route.path), h.env, h.ctx);
+        assertEqual(res.status, 404, `GET ${route.path}`);
+      }
+      await h.settle();
+      assertEqual(h.fetched.length, 0, 'upstream calls');
     } finally {
-      stub.restore();
-    }
-  });
-
-  await test('without a degraded body the failover behaves exactly as before', async () => {
-    const stub = stubFetch(DOWN);
-    try {
-      const body = encode({ input: 'hi', voice: 'af_heart', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000, null,
-      );
-      assertEqual(res.status, 502, 'both origins failed');
-      assertEqual(stub.calls.length, 2, 'no extra attempts');
-    } finally {
-      stub.restore();
-    }
-  });
-
-  await test('a network failure counts as a dead origin', async () => {
-    const original = globalThis.fetch;
-    const seen: string[] = [];
-    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-      const voice = decodeVoice(init);
-      seen.push(voice);
-      if (voice.startsWith('en_')) throw new Error('connection reset');
-      return OK();
-    }) as typeof fetch;
-    try {
-      const body = encode({ input: 'hi', voice: 'en_solaris', language: 'English' });
-      const res = await proxyWithFailoverFromBuffer(
-        body, speechRequest(), FSN1, NBG1, fakeEnv(), 5000,
-        buildKokoroFallbackBody({ input: 'hi', voice: 'en_solaris', language: 'English' }),
-      );
-      assertEqual(res.status, 200, 'Kokoro answered after two dropped connections');
-      assertEqual(seen.length, 3, 'two Qwen attempts then one Kokoro');
-    } finally {
-      globalThis.fetch = original;
+      h.restore();
     }
   });
 
   // -------------------------------------------------------------------------
-  // The rate limiter's address hash: keyed with the worker secret
+  // Health: no server is probed, on any route
+  // -------------------------------------------------------------------------
+
+  await test('/v1/audio/health answers without probing any server', async () => {
+    const h = harness();
+    try {
+      const res = await worker.fetch(get('/v1/audio/health'), h.env, h.ctx);
+      await h.settle();
+      assertEqual(res.status, 200, 'status');
+      assertEqual(await res.text(), '{"status":"retired","servers":{}}', 'body');
+      assertEqual(res.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS');
+      assertEqual(h.fetched.length, 0, `probes: ${h.fetched.join(', ')}`);
+      assertEqual(h.kvTouched.length, 0, `KV reads and writes: ${h.kvTouched.join(', ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('/health keeps the worker\'s own static answer', async () => {
+    const h = harness();
+    try {
+      const res = await worker.fetch(get('/health'), h.env, h.ctx);
+      await h.settle();
+      assertEqual(res.status, 200, 'status');
+      assertEqual(await res.text(), '{"status":"ok","worker":"agora-cosmica-audio"}', 'body');
+      assertEqual(h.fetched.length, 0, 'probes');
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('an archive request starts no server probe', async () => {
+    const h = harness();
+    try {
+      const res = await worker.fetch(get('/v1/audio/story-archive/vinci/en', 'HEAD'), h.env, h.ctx);
+      await h.settle();
+      assertEqual(res.status, 404, 'an unpublished archive, as before');
+      assertEqual(h.fetched.length, 0, `probes: ${h.fetched.join(', ')}`);
+      assertEqual(h.kvTouched.filter((k) => k.startsWith('health')).length, 0, 'health cache reads and writes');
+    } finally {
+      h.restore();
+    }
+  });
+
+  await test('with both server URLs empty, as deployed, no route makes a call', async () => {
+    const h = harness({ fsn1: '', nbg1: '' });
+    try {
+      const requests = [
+        ...GONE.map((route) => post(route.path, '{"session_id":"0f8e2b7a-3c1d-4e5f-9a6b-7c8d9e0f1a2b"}')),
+        get('/v1/audio/health'), get('/health'), get('/v1/audio/story-archive/vinci/en', 'HEAD'), get('/nowhere'),
+      ];
+      for (const request of requests) await worker.fetch(request, h.env, h.ctx);
+      await h.settle();
+      assertEqual(h.fetched.length, 0, `calls: ${h.fetched.join(', ')}`);
+    } finally {
+      h.restore();
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // The archive quota's address hash: keyed with the worker secret
   // -------------------------------------------------------------------------
 
   const hex16 = (buffer: ArrayBuffer) => Array.from(new Uint8Array(buffer).slice(0, 8))
@@ -369,405 +288,12 @@ async function main(): Promise<number> {
     assert(!warnings[0].includes('203.0.113.9'), 'the address is not logged');
   });
 
-  await test('the limiter\'s counter keys carry the keyed hash', async () => {
-    const puts: string[] = [];
-    const kv = {
-      get: async () => null,
-      put: async (key: string) => { puts.push(key); },
-    } as unknown as KVNamespace;
-    const env = { ...fakeEnv(), RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env;
-    const req = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-      method: 'POST', headers: { 'CF-Connecting-IP': '203.0.113.9' },
-    });
-    const result = await checkAudioRateLimit(req, env, 'en', 'tts');
-    assertEqual(result.allowed, true, 'allowed');
-    const keyed = await hmac('test-salt', 'audio-ratelimit:203.0.113.9');
-    assertEqual(puts.length, 2, 'daily and burst counters');
-    assert(puts.every(key => key.includes(keyed)), 'both keys use the keyed hash');
-    assert(puts.every(key => !key.includes('203.0.113.9')), 'no plain address in a key');
-  });
-
   // -------------------------------------------------------------------------
-  // STT size gate: before any counter moves, and a bounded read behind it
+  // A fault inside the worker: a 500 with CORS and one line naming its kind
   // -------------------------------------------------------------------------
 
-  // The gate's contract, written out so the suite also runs against a tree
-  // that predates the gate.
-  const STT_LIMIT = 15 * 1024 * 1024;
-
-  /** The worker with recorded counter writes and upstream calls. */
-  const sttHarness = () => {
-    const puts: string[] = [];
-    const rateLimits = {
-      get: async () => null,
-      put: async (key: string) => { puts.push(key); },
-    } as unknown as KVNamespace;
-    // A fresh snapshot, so the health refresh never probes the origins.
-    const healthCache = {
-      get: async () => JSON.stringify({ fsn1: null, nbg1: null, updatedAt: Date.now() }),
-      put: async () => {},
-    } as unknown as KVNamespace;
-    const env = {
-      ...fakeEnv(),
-      RATE_LIMITS: rateLimits,
-      HEALTH_CACHE: healthCache,
-      ANALYTICS: { writeDataPoint: () => {} },
-    } as unknown as Env;
-    const pending: Promise<unknown>[] = [];
-    const ctx = {
-      waitUntil: (work: Promise<unknown>) => { pending.push(work); },
-      passThroughOnException: () => {},
-    } as unknown as ExecutionContext;
-    const upstream: { url: string; bytes: number }[] = [];
-    const original = globalThis.fetch;
-    globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
-      upstream.push({ url: String(input), bytes: (init?.body as ArrayBuffer | undefined)?.byteLength ?? 0 });
-      return new Response(JSON.stringify({ text: 'hello' }), { status: 200, headers: { 'content-type': 'application/json' } });
-    }) as typeof fetch;
-    const restore = () => { globalThis.fetch = original; };
-    return { env, ctx, pending, puts, upstream, restore };
-  };
-
-  const upload = (
-    body: Uint8Array | ReadableStream<Uint8Array>,
-    headers: Record<string, string> = {},
-  ): Request => new Request('https://audio.agoracosmica.org/v1/audio/transcriptions', {
-    method: 'POST',
-    headers: { 'Content-Type': 'audio/webm', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': '203.0.113.9', ...headers },
-    body,
-    // Node needs this for a streamed body; the Workers runtime ignores it.
-    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
-  } as RequestInit);
-
-  const chunkedUpload = (bytes: number): ReadableStream<Uint8Array> => new ReadableStream<Uint8Array>({
-    start(controller) {
-      for (let sent = 0; sent < bytes; sent += 1024 * 1024) {
-        controller.enqueue(new Uint8Array(Math.min(1024 * 1024, bytes - sent)));
-      }
-      controller.close();
-    },
-  });
-
-  await test('an upload one byte over the limit gets a 413 before any counter moves', async () => {
-    const h = sttHarness();
-    try {
-      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT + 1), { 'Content-Length': String(STT_LIMIT + 1) }), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the refusal');
-      assertEqual(typeof (await res.json() as { error?: string }).error, 'string', 'the usual error shape');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('an upload at the limit is forwarded whole', async () => {
-    const h = sttHarness();
-    try {
-      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT), { 'Content-Length': String(STT_LIMIT) }), h.env, h.ctx);
-      assertEqual(res.status, 200, 'status');
-      assertEqual(h.puts.length, 2, 'daily and burst counters');
-      assertEqual(h.upstream.length, 1, 'one upstream call');
-      assertEqual(h.upstream[0].bytes, STT_LIMIT, 'bytes forwarded');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a chunked upload over the limit is stopped by the bounded read', async () => {
-    const h = sttHarness();
-    try {
-      const res = await worker.fetch(upload(chunkedUpload(STT_LIMIT + 1)), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a chunked upload under the limit is forwarded whole', async () => {
-    const h = sttHarness();
-    try {
-      const res = await worker.fetch(upload(chunkedUpload(3 * 1024 * 1024 + 5)), h.env, h.ctx);
-      assertEqual(res.status, 200, 'status');
-      assertEqual(h.upstream[0].bytes, 3 * 1024 * 1024 + 5, 'bytes forwarded');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('an upload larger than its declared length is still stopped at the limit', async () => {
-    const h = sttHarness();
-    try {
-      const res = await worker.fetch(upload(new Uint8Array(STT_LIMIT + 1), { 'Content-Length': '1000' }), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // STT order: a visitor at a limit is refused before the upload is read
-  // -------------------------------------------------------------------------
-
-  /** The STT harness with one counter already at its limit, and every KV read recorded. */
-  const limitedHarness = (counter: 'daily' | 'burst' | 'none') => {
-    const h = sttHarness();
-    const reads: string[] = [];
-    const readsAtPull: number[] = [];
-    const putsAtPull: number[] = [];
-    let pulledNow = () => 0;
-    const kv = {
-      get: async (key: string) => {
-        reads.push(key);
-        readsAtPull.push(pulledNow());
-        if (counter === 'daily' && key.startsWith('audio:ip:')) return '500';
-        if (counter === 'burst' && key.startsWith('audio:burst:')) return '60';
-        return null;
-      },
-      put: async (key: string) => { h.puts.push(key); putsAtPull.push(pulledNow()); },
-    } as unknown as KVNamespace;
-    const env = { ...h.env, RATE_LIMITS: kv } as Env;
-    return { ...h, env, reads, readsAtPull, putsAtPull, watch: (pulled: () => number) => { pulledNow = pulled; } };
-  };
-
-  /** An upload of `chunks` MiB that hands out a chunk only when the worker reads one. */
-  const countedUpload = (chunks: number) => {
-    let pulled = 0;
-    let ended = false;
-    let cancelled = false;
-    const stream = new ReadableStream<Uint8Array>({
-      pull(controller) {
-        if (pulled >= chunks) { ended = true; controller.close(); return; }
-        pulled++;
-        controller.enqueue(new Uint8Array(1024 * 1024));
-      },
-      cancel() { cancelled = true; },
-    }, { highWaterMark: 0 });
-    return { stream, pulled: () => pulled, ended: () => ended, cancelled: () => cancelled };
-  };
-
-  for (const counter of ['daily', 'burst'] as const) {
-    await test(`a visitor at the ${counter} limit is refused before the upload is read`, async () => {
-      const h = limitedHarness(counter);
-      try {
-        const body = countedUpload(4);
-        h.watch(body.pulled);
-        const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
-        assertEqual(res.status, 429, 'status');
-        assertEqual((await res.json() as { code?: string }).code, `${counter}_limit`, 'refusal code');
-        assertEqual(h.reads.length, 2, 'counter reads');
-        assert(h.readsAtPull.every(at => at === 0), `chunks read when the counters were read: ${h.readsAtPull.join(', ')}`);
-        assertEqual(h.puts.length, 0, 'counter writes');
-        assertEqual(h.upstream.length, 0, 'upstream calls');
-        await Promise.all(h.pending);
-      } finally {
-        h.restore();
-      }
-    });
-
-    // Answering before the upload is consumed cost a reused HTTP/1.1
-    // connection its next request in local workerd.
-    await test(`a visitor at the ${counter} limit has the upload drained to its end before the 429`, async () => {
-      const h = limitedHarness(counter);
-      try {
-        const body = countedUpload(4);
-        const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
-        assertEqual(res.status, 429, 'status');
-        assertEqual(body.pulled(), 4, 'upload chunks read');
-        assertEqual(body.ended(), true, 'the upload was read to its end');
-        assertEqual(h.puts.length, 0, 'counter writes');
-        assertEqual(h.upstream.length, 0, 'upstream calls');
-        await Promise.all(h.pending);
-      } finally {
-        h.restore();
-      }
-    });
-  }
-
-  await test('a capped visitor\'s chunked upload is drained only up to the limit', async () => {
-    const h = limitedHarness('daily');
-    try {
-      const body = countedUpload(STT_LIMIT / (1024 * 1024) + 5);
-      const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
-      assertEqual(res.status, 429, 'status');
-      assertEqual(body.pulled(), STT_LIMIT / (1024 * 1024) + 1, 'upload chunks read');
-      assertEqual(body.cancelled(), true, 'the rest was cancelled');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a capped visitor whose upload breaks off during the drain still gets the 429', async () => {
-    const h = limitedHarness('burst');
-    try {
-      let reads = 0;
-      const broken = new ReadableStream<Uint8Array>({
-        pull(c) {
-          if (reads++ === 0) c.enqueue(new Uint8Array(1024));
-          else c.error(new Error('the upload broke off'));
-        },
-      });
-      const res = await worker.fetch(upload(broken), h.env, h.ctx);
-      assertEqual(res.status, 429, 'status');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // A stalled upload from a capped visitor: the drain stops after its bound and
-  // the 429 goes out. Tests guard with a real timer of their own, so a drain
-  // without a bound fails instead of hanging the suite.
-  const realSetTimeout = globalThis.setTimeout;
-  const realClearTimeout = globalThis.clearTimeout;
-  const within = <T>(ms: number, work: Promise<T>): Promise<T | 'hung'> => {
-    let timer: ReturnType<typeof setTimeout> | undefined;
-    const hung = new Promise<'hung'>((resolve) => { timer = realSetTimeout(() => resolve('hung'), ms); });
-    return Promise.race([work, hung]).finally(() => realClearTimeout(timer ?? null));
-  };
-
-  /** An upload that sends one chunk and then nothing, with the visitor still connected. */
-  const stalledUpload = () => {
-    let reads = 0;
-    let cancelled = false;
-    const stream = new ReadableStream<Uint8Array>({
-      pull(c) {
-        if (reads++ === 0) c.enqueue(new Uint8Array(64 * 1024));
-        return new Promise<void>(() => {});
-      },
-      cancel() { cancelled = true; },
-    }, { highWaterMark: 0 });
-    return { stream, cancelled: () => cancelled };
-  };
-
-  await test('a stalled drain stops at its bound and cancels the upload', async () => {
-    const upload1 = stalledUpload();
-    const started = Date.now();
-    const outcome = await within(2000, drainBodyCapped(upload(upload1.stream), STT_LIMIT, 50));
-    assert(outcome !== 'hung', 'the drain was still waiting after 2 s');
-    assert(Date.now() - started >= 45, `stopped before its bound: ${Date.now() - started} ms`);
-    assertEqual(upload1.cancelled(), true, 'the upload was cancelled');
-  });
-
-  await test('a capped visitor whose upload stalls gets the 429 with CORS once the drain\'s bound passes', async () => {
-    const h = limitedHarness('daily');
-    // The route's bound is long; run its timers fast.
-    globalThis.setTimeout = ((fn: () => void, ms?: number) =>
-      realSetTimeout(fn, (ms ?? 0) >= 1000 ? 20 : ms ?? 0)) as typeof setTimeout;
-    try {
-      const stalled = stalledUpload();
-      const res = await within(2000, worker.fetch(upload(stalled.stream), h.env, h.ctx));
-      assert(res !== 'hung', 'no answer while the upload stalls');
-      const answer = res as Response;
-      assertEqual(answer.status, 429, 'status');
-      assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
-      assertEqual((await answer.json() as { code?: string }).code, 'daily_limit', 'refusal code');
-      assertEqual(stalled.cancelled(), true, 'the upload was cancelled');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      globalThis.setTimeout = realSetTimeout;
-      h.restore();
-    }
-  });
-
-  await test('a drain that ends before its bound leaves no timer behind', async () => {
-    const pending: number[] = [];
-    globalThis.setTimeout = ((fn: () => void, ms?: number) => {
-      const id = realSetTimeout(fn, ms ?? 0);
-      pending.push(Number(id));
-      return id;
-    }) as typeof setTimeout;
-    const cleared: number[] = [];
-    globalThis.clearTimeout = ((id?: ReturnType<typeof setTimeout>) => {
-      cleared.push(Number(id));
-      realClearTimeout(id ?? null);
-    }) as typeof clearTimeout;
-    try {
-      await drainBodyCapped(upload(chunkedUpload(3 * 1024 * 1024)), STT_LIMIT);
-    } finally {
-      globalThis.setTimeout = realSetTimeout;
-      globalThis.clearTimeout = realClearTimeout;
-    }
-    assert(pending.every(id => cleared.includes(id)), `timers left running: ${pending.filter(id => !cleared.includes(id)).length}`);
-  });
-
-  await test('a declared oversized upload from a visitor at a limit still gets the 413, before any counter is read', async () => {
-    const h = limitedHarness('daily');
-    try {
-      const res = await worker.fetch(upload(new Uint8Array(16), { 'Content-Length': String(STT_LIMIT + 1) }), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(h.reads.length, 0, 'counter reads');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('an allowed upload is counted once, after the whole upload was read', async () => {
-    const h = limitedHarness('none');
-    try {
-      const body = countedUpload(3);
-      h.watch(body.pulled);
-      const res = await worker.fetch(upload(body.stream), h.env, h.ctx);
-      assertEqual(res.status, 200, 'status');
-      assertEqual(h.puts.length, 2, 'daily and burst counters');
-      assert(h.putsAtPull.every(at => at === 3), `chunks read when the counters moved: ${h.putsAtPull.join(', ')}`);
-      assertEqual(h.upstream[0].bytes, 3 * 1024 * 1024, 'bytes forwarded');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('an upload that breaks off moves no counter', async () => {
-    const h = limitedHarness('none');
-    try {
-      let reads = 0;
-      const broken = new ReadableStream<Uint8Array>({
-        pull(c) {
-          if (reads++ === 0) c.enqueue(new Uint8Array(1024));
-          else c.error(new Error('the upload broke off'));
-        },
-      });
-      await worker.fetch(upload(broken), h.env, h.ctx).then(() => undefined, () => undefined);
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // A broken upload: a quiet 400 with CORS, never an uncaught exception
-  // -------------------------------------------------------------------------
-
-  /** An upload that hands out `first` (if any), then breaks off the way a visitor who leaves does. */
-  const brokenUpload = (first: Uint8Array | null): ReadableStream<Uint8Array> => {
-    let reads = 0;
-    return new ReadableStream<Uint8Array>({
-      pull(c) {
-        if (reads++ === 0 && first) c.enqueue(first);
-        else c.error(new Error('the upload broke off'));
-      },
-    });
-  };
+  const FAULT_IP = '203.0.113.47';
+  const FAULT_SENTINEL = 'sentinel_fault_6d1';
 
   /** Run `fn` and return every console.error line it caused. */
   const errorLines = async (fn: () => Promise<void>): Promise<string[]> => {
@@ -782,421 +308,53 @@ async function main(): Promise<number> {
     return lines;
   };
 
-  const brokenCases: { label: string; first: Uint8Array | null; headers: Record<string, string> }[] = [
-    { label: 'before its first byte', first: null, headers: {} },
-    { label: 'after one chunk', first: new Uint8Array(1024), headers: {} },
-    { label: 'under a declared length', first: new Uint8Array(64 * 1024), headers: { 'Content-Length': String(5 * 1024 * 1024) } },
-  ];
-  for (const broken of brokenCases) {
-    await test(`an STT upload that breaks off ${broken.label} gets a quiet 400 with CORS`, async () => {
-      const h = limitedHarness('none');
-      try {
-        let res: Response | null = null;
-        const logged = await errorLines(async () => {
-          res = await worker.fetch(upload(brokenUpload(broken.first), broken.headers), h.env, h.ctx);
-          await Promise.all(h.pending);
-        });
-        const answer = res as unknown as Response;
-        assertEqual(answer.status, 400, 'status');
-        assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
-        assertEqual(typeof (await answer.json() as { error?: string }).error, 'string', 'the usual error shape');
-        assertEqual(h.puts.length, 0, 'counter writes');
-        assertEqual(h.upstream.length, 0, 'upstream calls');
-        assertEqual(logged.length, 0, `error lines: ${logged.join(' | ')}`);
-      } finally {
-        h.restore();
-      }
-    });
-  }
-
-  await test('a speech request whose upload breaks off gets a quiet 400 with CORS', async () => {
-    const h = limitedHarness('none');
-    try {
-      const request = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', Origin: 'https://agoracosmica.org',
-          'CF-Connecting-IP': '203.0.113.9', 'Content-Length': '2048',
-        },
-        body: brokenUpload(new TextEncoder().encode('{"input":"hel')),
-        duplex: 'half',
-      } as RequestInit);
-      let res: Response | null = null;
-      const logged = await errorLines(async () => {
-        res = await worker.fetch(request, h.env, h.ctx);
-        await Promise.all(h.pending);
-      });
-      const answer = res as unknown as Response;
-      assertEqual(answer.status, 400, 'status');
-      assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      assertEqual(h.upstream.length, 0, 'upstream calls');
-      assertEqual(logged.length, 0, `error lines: ${logged.join(' | ')}`);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // Body reads in 64 KiB steps, however small the chunks an upload arrives in
-  // -------------------------------------------------------------------------
-
-  /**
-   * A body that behaves like workerd's own request streams, as measured in
-   * local workerd: the default reader hands out one HTTP chunk per read, and
-   * the BYOB reader's readAtLeast fills at least its minimum unless the body
-   * ends first, then answers an empty read with done. The bytes follow a
-   * pattern, so order and content can be checked.
-   */
-  const nativeBody = (bytes: number, chunk = 1) => {
-    let sent = 0;
-    const stats = { defaultReads: 0, stepReads: 0, cancelled: false };
-    const fill = (view: Uint8Array) => {
-      for (let i = 0; i < view.byteLength; i++) view[i] = (sent + i) % 251;
-      sent += view.byteLength;
-    };
-    const body = {
-      getReader(options?: { mode?: string }) {
-        if (options?.mode === 'byob') {
-          return {
-            async readAtLeast(_min: number, view: Uint8Array) {
-              stats.stepReads++;
-              const out = new Uint8Array(view.buffer, view.byteOffset, Math.min(view.byteLength, bytes - sent));
-              fill(out);
-              return { value: out, done: out.byteLength === 0 };
-            },
-            async cancel() { stats.cancelled = true; },
-            releaseLock() {},
-          };
-        }
-        return {
-          async read() {
-            stats.defaultReads++;
-            if (sent >= bytes) return { value: undefined, done: true };
-            const out = new Uint8Array(Math.min(chunk, bytes - sent));
-            fill(out);
-            return { value: out, done: false };
-          },
-          async cancel() { stats.cancelled = true; },
-          releaseLock() {},
-        };
-      },
-    };
-    return { body: body as unknown as ReadableStream<Uint8Array>, stats, sent: () => sent };
-  };
-
-  const withBody = (request: Request, body: ReadableStream<Uint8Array>): Request =>
-    Object.defineProperty(request, 'body', { value: body });
-
-  const bodylessUpload = (headers: Record<string, string> = {}): Request =>
-    new Request('https://audio.agoracosmica.org/v1/audio/transcriptions', {
-      method: 'POST',
-      headers: { 'Content-Type': 'audio/webm', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': '203.0.113.9', ...headers },
-    });
-
-  const inPattern = (bytes: Uint8Array): boolean => bytes.every((b, i) => b === i % 251);
-
-  /** One read per 64 KiB step, a shorter last step, and the empty read that ends it. */
-  const stepReadsFor = (bytes: number) => Math.floor(bytes / 65536) + (bytes % 65536 ? 1 : 0) + 1;
-
-  await test('a runtime body in 1-byte chunks is read in 64 KiB steps, bytes intact', async () => {
-    const size = 256 * 1024 + 5;
-    const source = nativeBody(size);
-    const out = await readBodyCapped(withBody(bodylessUpload(), source.body), STT_LIMIT);
-    assert(out !== null, 'read refused');
-    const bytes = new Uint8Array(out!);
-    assertEqual(bytes.byteLength, size, 'bytes read');
-    assert(inPattern(bytes), 'bytes out of order or changed');
-    assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
-    assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
-  });
-
-  for (const size of [0, 1, 65535, 65536, 65537, 131072]) {
-    await test(`a runtime body of ${size} bytes reads back whole`, async () => {
-      const source = nativeBody(size, 4096);
-      const out = await readBodyCapped(withBody(bodylessUpload(), source.body), STT_LIMIT);
-      assert(out !== null, 'read refused');
-      assertEqual(out!.byteLength, size, 'bytes read');
-      assert(inPattern(new Uint8Array(out!)), 'bytes out of order or changed');
-    });
-  }
-
-  await test('a runtime body keeps its cap to the byte', async () => {
-    const at = await readBodyCapped(withBody(bodylessUpload(), nativeBody(65536, 4096).body), 65536);
-    assertEqual(at?.byteLength, 65536, 'a body at the cap is read');
-    const over = nativeBody(65537, 4096);
-    assertEqual(await readBodyCapped(withBody(bodylessUpload(), over.body), 65536), null, 'one byte over is refused');
-    assertEqual(over.stats.cancelled, true, 'the rest was cancelled');
-  });
-
-  await test('an allowed STT upload in 1-byte chunks is forwarded whole after one read per 64 KiB', async () => {
-    const h = limitedHarness('none');
-    try {
-      const size = 256 * 1024 + 1;
-      const source = nativeBody(size);
-      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
-      assertEqual(res.status, 200, 'status');
-      assertEqual(h.upstream[0]?.bytes, size, 'bytes forwarded');
-      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
-      assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a capped visitor\'s upload in 1-byte chunks is drained in 64 KiB steps', async () => {
-    const h = limitedHarness('daily');
-    try {
-      const size = 256 * 1024 + 1;
-      const source = nativeBody(size);
-      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
-      assertEqual(res.status, 429, 'status');
-      assertEqual(source.sent(), size, 'drained to its end');
-      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
-      assertEqual(source.stats.stepReads, stepReadsFor(size), 'step reads');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a runtime upload past the cap gets the 413 after one read per 64 KiB', async () => {
-    const h = limitedHarness('none');
-    try {
-      const source = nativeBody(STT_LIMIT + 1, 64 * 1024);
-      const res = await worker.fetch(withBody(bodylessUpload(), source.body), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(source.stats.cancelled, true, 'the rest was cancelled');
-      assertEqual(source.stats.defaultReads, 0, 'one-chunk reads');
-      assertEqual(source.stats.stepReads, STT_LIMIT / 65536 + 1, 'step reads');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // Any other stream is copied into step-sized pieces as it is read, so a kept
-  // piece never holds on to the chunk it came from.
-  await test('a test stream that reuses one chunk buffer is copied as it is read', async () => {
-    const shared = new Uint8Array(1);
-    let i = 0;
-    const stream = new ReadableStream<Uint8Array>({
-      pull(c) {
-        if (i === 4000) { c.close(); return; }
-        shared[0] = i++ % 251;
-        c.enqueue(shared);
-      },
-    }, { highWaterMark: 0 });
-    const out = await readBodyCapped(upload(stream), STT_LIMIT);
-    assert(out !== null, 'read refused');
-    assertEqual(out!.byteLength, 4000, 'bytes read');
-    assert(inPattern(new Uint8Array(out!)), 'a kept chunk changed after it was read');
-  });
-
-  await test('a test stream that takes more than one read per KiB of the cap is refused like an oversized body', async () => {
-    const tiny = (count: number) => {
-      let sent = 0;
-      let cancelled = false;
-      const stream = new ReadableStream<Uint8Array>({
-        pull(c) {
-          if (sent === count) { c.close(); return; }
-          sent++;
-          c.enqueue(new Uint8Array(1));
-        },
-        cancel() { cancelled = true; },
-      }, { highWaterMark: 0 });
-      return { stream, cancelled: () => cancelled };
-    };
-    // 1,023 chunks and the read that finds the end: the 1,024 reads a small cap allows.
-    const within = await readBodyCapped(upload(tiny(1023).stream), 16 * 1024);
-    assertEqual(within?.byteLength, 1023, 'a body read in 1,024 reads');
-    const many = tiny(1024);
-    assertEqual((await readBodyCapped(upload(many.stream), 16 * 1024))?.byteLength ?? null, null, 'a 1,025th read is refused');
-    assertEqual(many.cancelled(), true, 'the rest was cancelled');
-    const h = limitedHarness('none');
-    try {
-      const res = await worker.fetch(upload(tiny(STT_LIMIT / 1024).stream), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status on the STT route');
-      assertEqual(h.puts.length, 0, 'counter writes');
-      await Promise.all(h.pending);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // A refused counter write: KV takes one write per key per second, and a
-  // council fires seven speech chunks at once from one address
-  // -------------------------------------------------------------------------
-
-  const REFUSED_IP = '203.0.113.48';
-
-  /** The worker with a counter store that refuses every write under `prefix`. */
-  const refusingHarness = (prefix: string) => {
-    const h = sttHarness();
-    const kv = {
-      get: async () => null,
-      put: async (key: string) => {
-        if (key.startsWith(prefix)) throw new Error('KV PUT failed: 429 Too Many Requests');
-        h.puts.push(key);
-      },
-    } as unknown as KVNamespace;
-    return { ...h, env: { ...h.env, RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env };
-  };
-
-  /** Run `fn` and return every console.warn line it caused. */
-  const warnLines = async (fn: () => Promise<void>): Promise<string[]> => {
-    const lines: string[] = [];
-    const realWarn = console.warn;
-    console.warn = (...args: unknown[]) => { lines.push(args.map(String).join(' ')); };
-    try {
-      await fn();
-    } finally {
-      console.warn = realWarn;
-    }
-    return lines;
-  };
-
-  const speechAt = (ip: string) => new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': ip, 'Content-Length': '40' },
-    body: JSON.stringify({ input: 'Hello there.', voice: 'af_heart' }).padEnd(40, ' '),
-  });
-
-  const refusedRoutes: { label: string; request: () => Request }[] = [
-    { label: 'speech', request: () => speechAt(REFUSED_IP) },
-    { label: 'transcriptions', request: () => upload(new Uint8Array(1000), { 'CF-Connecting-IP': REFUSED_IP, 'Content-Length': '1000' }) },
-  ];
-
-  for (const route of refusedRoutes) {
-    await test(`a refused counter write still serves the ${route.label} request`, async () => {
-      const h = refusingHarness('audio:');
-      try {
-        let res: Response | null = null;
-        const warned = await warnLines(async () => {
-          res = await worker.fetch(route.request(), h.env, h.ctx).catch(() => null);
-          await Promise.all(h.pending);
-        });
-        assert(res !== null, 'the refused write was thrown out of fetch');
-        const answer = res as unknown as Response;
-        assertEqual(answer.status, 200, 'status');
-        assertEqual(h.upstream.length, 1, 'upstream calls');
-        const lines = warned.filter(w => w.includes('[rateLimit]'));
-        assertEqual(lines.length, 2, `one line per refused write: ${warned.join(' | ')}`);
-        const hash = await hashIP(REFUSED_IP, 'test-salt');
-        for (const line of lines) {
-          for (const secret of [REFUSED_IP, hash, 'audio:', 'KV PUT failed']) {
-            assert(!line.includes(secret), `the line carries ${secret}: ${line}`);
-          }
-        }
-      } finally {
-        h.restore();
-      }
-    });
-  }
-
-  await test('a refused burst write still writes the daily counter', async () => {
-    const h = refusingHarness('audio:burst:');
-    try {
-      const warned = await warnLines(async () => {
-        const res = await worker.fetch(speechAt(REFUSED_IP), h.env, h.ctx).catch(() => null);
-        assertEqual(res?.status, 200, 'status');
-        await Promise.all(h.pending);
-      });
-      assert(h.puts.some(key => key.startsWith('audio:ip:')), 'the daily counter was written');
-      assertEqual(warned.filter(w => w.includes('[rateLimit] Burst')).length, 1, `one burst line: ${warned.join(' | ')}`);
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a refused daily write still writes the burst counter and keeps the count', async () => {
-    const h = refusingHarness('audio:ip:');
-    try {
-      const req = new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-        method: 'POST', headers: { 'CF-Connecting-IP': REFUSED_IP },
-      });
-      const warned = await warnLines(async () => {
-        const result = await checkAudioRateLimit(req, h.env, 'English', 'tts').catch(() => null);
-        assertEqual(result?.allowed, true, 'allowed');
-        assertEqual(result?.daily.used, 1, 'the visitor\'s count as read plus this one');
-      });
-      assert(h.puts.some(key => key.startsWith('audio:burst:')), 'the burst counter was written');
-      assertEqual(warned.filter(w => w.includes('[rateLimit] Daily')).length, 1, `one daily line: ${warned.join(' | ')}`);
-    } finally {
-      h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // A fault inside the worker: a 500 with CORS and one line naming its kind
-  // -------------------------------------------------------------------------
-
-  const FAULT_IP = '203.0.113.47';
-  const FAULT_SENTINEL = 'sentinel_fault_6d1';
-
-  /** The worker with a counter store whose reads throw `thrown`. */
+  /** The worker with a quota store whose reads throw `thrown`. */
   const faultHarness = (thrown: unknown) => {
-    const h = sttHarness();
+    const h = harness();
     const kv = {
       get: async () => { throw thrown; },
-      put: async (key: string) => { h.puts.push(key); },
+      put: async () => {},
     } as unknown as KVNamespace;
-    return { ...h, env: { ...h.env, RATE_LIMITS: kv, IP_HASH_SALT: 'test-salt' } as Env };
+    return { ...h, env: { ...h.env, RATE_LIMITS: kv } as Env };
   };
 
-  const faultRoutes: { label: string; request: () => Request }[] = [
-    {
-      label: 'speech',
-      request: () => new Request('https://audio.agoracosmica.org/v1/audio/speech', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', 'CF-Connecting-IP': FAULT_IP, 'Content-Length': '40' },
-        body: JSON.stringify({ input: 'Hello there.', voice: 'af_heart' }).padEnd(40, ' '),
-      }),
-    },
-    {
-      label: 'transcriptions',
-      request: () => upload(new Uint8Array(1000), { 'CF-Connecting-IP': FAULT_IP, 'Content-Length': '1000' }),
-    },
-  ];
+  const archiveDownload = () => new Request('https://audio.agoracosmica.org/v1/audio/story-archive/vinci/en', {
+    headers: { Origin: ORIGIN, 'CF-Connecting-IP': FAULT_IP },
+  });
 
-  for (const route of faultRoutes) {
-    await test(`a fault on the ${route.label} route gets a 500 with CORS, logged by its kind only`, async () => {
-      const h = faultHarness(new Error(`KV GET failed: ${FAULT_SENTINEL} ${FAULT_IP}`));
-      try {
-        let res: Response | null = null;
-        const logged = await errorLines(async () => {
-          res = await worker.fetch(route.request(), h.env, h.ctx).catch(() => null);
-          await Promise.all(h.pending);
-        });
-        assert(res !== null, 'the fault was thrown out of fetch');
-        const answer = res as unknown as Response;
-        assertEqual(answer.status, 500, 'status');
-        assertEqual(answer.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the answer');
-        assertEqual(typeof (await answer.json() as { error?: string }).error, 'string', 'the usual error shape');
-        assertEqual(logged.length, 1, `error lines: ${logged.join(' | ')}`);
-        assert(logged[0].includes('Error'), `the kind is named: ${logged[0]}`);
-        const hash = await hashIP(FAULT_IP, 'test-salt');
-        for (const secret of [FAULT_SENTINEL, FAULT_IP, hash, 'KV GET failed']) {
-          assert(!logged[0].includes(secret), `the line carries ${secret}: ${logged[0]}`);
-        }
-        assertEqual(h.upstream.length, 0, 'upstream calls');
-      } finally {
-        h.restore();
+  await test('a fault on the archive route gets a 500 with CORS, logged by its kind and route only', async () => {
+    const h = faultHarness(new Error(`KV GET failed: ${FAULT_SENTINEL} ${FAULT_IP}`));
+    try {
+      let res: Response | null = null;
+      const logged = await errorLines(async () => {
+        res = await worker.fetch(archiveDownload(), h.env, h.ctx).catch(() => null);
+        await h.settle();
+      });
+      assert(res !== null, 'the fault was thrown out of fetch');
+      const answer = res as unknown as Response;
+      assertEqual(answer.status, 500, 'status');
+      assertEqual(answer.headers.get('Access-Control-Allow-Origin'), ORIGIN, 'CORS on the answer');
+      assertEqual(typeof (await answer.json() as { error?: string }).error, 'string', 'the usual error shape');
+      assertEqual(logged.length, 1, `error lines: ${logged.join(' | ')}`);
+      assert(logged[0].includes('Error'), `the kind is named: ${logged[0]}`);
+      assert(logged[0].includes('/v1/audio/story-archive/'), `the route is named: ${logged[0]}`);
+      const hash = await hashIP(FAULT_IP, 'test-salt', 'archive-ratelimit');
+      for (const secret of [FAULT_SENTINEL, FAULT_IP, hash, 'KV GET failed', 'vinci']) {
+        assert(!logged[0].includes(secret), `the line carries ${secret}: ${logged[0]}`);
       }
-    });
-  }
+      assertEqual(h.fetched.length, 0, 'upstream calls');
+    } finally {
+      h.restore();
+    }
+  });
 
   await test('a thrown value that is not an Error is named by its type', async () => {
     const h = faultHarness(`${FAULT_SENTINEL} as a bare string`);
     try {
       let res: Response | null = null;
       const logged = await errorLines(async () => {
-        res = await worker.fetch(faultRoutes[0].request(), h.env, h.ctx).catch(() => null);
-        await Promise.all(h.pending);
+        res = await worker.fetch(archiveDownload(), h.env, h.ctx).catch(() => null);
+        await h.settle();
       });
       assert(res !== null, 'the fault was thrown out of fetch');
       assertEqual((res as unknown as Response).status, 500, 'status');
@@ -1205,99 +363,6 @@ async function main(): Promise<number> {
       assert(!logged[0].includes(FAULT_SENTINEL), `the value stays out of the log: ${logged[0]}`);
     } finally {
       h.restore();
-    }
-  });
-
-  // -------------------------------------------------------------------------
-  // Session-end beacon: a bounded read, the route's own answer otherwise
-  // -------------------------------------------------------------------------
-
-  // The cap's contract, written out so the suite also runs against a tree that predates it.
-  const SESSION_END_LIMIT = 16 * 1024;
-  const SESSION_ID = '0f8e2b7a-3c1d-4e5f-9a6b-7c8d9e0f1a2b';
-
-  /** A session-end body padded with an ignored field to exactly `bytes` bytes. */
-  const sessionEndBody = (bytes: number): Uint8Array => {
-    const bare = JSON.stringify({ session_id: SESSION_ID, pad: '' });
-    const encoded = new TextEncoder().encode(JSON.stringify({ session_id: SESSION_ID, pad: 'x'.repeat(bytes - bare.length) }));
-    assertEqual(encoded.length, bytes, 'padded body size');
-    return encoded;
-  };
-
-  const sessionEnd = (
-    body: string | Uint8Array | ReadableStream<Uint8Array>,
-    headers: Record<string, string> = {},
-  ): Request => new Request('https://audio.agoracosmica.org/v1/audio/session/end', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Origin: 'https://agoracosmica.org', ...headers },
-    body,
-    ...(body instanceof ReadableStream ? { duplex: 'half' } : {}),
-  } as RequestInit);
-
-  const evictions = (h: ReturnType<typeof sttHarness>) => h.upstream.filter(call => call.url.endsWith('/v1/audio/session/end'));
-
-  await test('a session-end beacon one byte over its cap gets a 413, and nothing is sent on', async () => {
-    const h = sttHarness();
-    try {
-      const body = sessionEndBody(SESSION_END_LIMIT + 1);
-      const res = await worker.fetch(sessionEnd(body, { 'Content-Length': String(body.length) }), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      assertEqual(res.headers.get('Access-Control-Allow-Origin'), 'https://agoracosmica.org', 'CORS on the refusal');
-      assertEqual((await res.json() as { error?: string }).error, 'Request body too large', 'the usual error shape');
-      await Promise.all(h.pending);
-      assertEqual(evictions(h).length, 0, 'eviction calls');
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a chunked session-end beacon over its cap is stopped by the bounded read', async () => {
-    const h = sttHarness();
-    try {
-      const bytes = sessionEndBody(SESSION_END_LIMIT + 1);
-      const stream = new ReadableStream<Uint8Array>({ start(c) { c.enqueue(bytes); c.close(); } });
-      const res = await worker.fetch(sessionEnd(stream), h.env, h.ctx);
-      assertEqual(res.status, 413, 'status');
-      await Promise.all(h.pending);
-      assertEqual(evictions(h).length, 0, 'eviction calls');
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a session-end beacon at its cap still evicts its session', async () => {
-    const h = sttHarness();
-    try {
-      const body = sessionEndBody(SESSION_END_LIMIT);
-      const res = await worker.fetch(sessionEnd(body, { 'Content-Length': String(body.length) }), h.env, h.ctx);
-      assertEqual(res.status, 204, 'status');
-      await Promise.all(h.pending);
-      assertEqual(evictions(h).length, 1, 'eviction calls');
-    } finally {
-      h.restore();
-    }
-  });
-
-  await test('a bad or broken session-end beacon still gets its quiet 204', async () => {
-    const broken = (): ReadableStream<Uint8Array> => {
-      let reads = 0;
-      return new ReadableStream<Uint8Array>({
-        pull(c) {
-          if (reads++ === 0) c.enqueue(new TextEncoder().encode('{"session_id":"0f8e'));
-          else c.error(new Error('the upload broke off'));
-        },
-      });
-    };
-    for (const body of ['{"session_id":', 'null', broken()]) {
-      const h = sttHarness();
-      try {
-        const res = await worker.fetch(sessionEnd(body), h.env, h.ctx);
-        assertEqual(res.status, 204, 'status');
-        await Promise.all(h.pending);
-        assertEqual(evictions(h).length, 0, 'eviction calls');
-      } finally {
-        h.restore();
-      }
     }
   });
 
