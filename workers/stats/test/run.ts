@@ -367,6 +367,27 @@ async function main(): Promise<void> {
     assertEqual(JSON.stringify(trends.stops.days[trends.stops.days.length - 1]), JSON.stringify([5, 4, 0, 5]), 'today\'s stops');
   });
 
+  // The speech server panel: an empty URL is never asked, and with none left the answer says so.
+
+  const serverStats = () => new Request('https://stats.example/api/server-stats', { headers: { 'Cf-Access-Jwt-Assertion': TOKEN } });
+  const serverEnv = (fsn1: string | undefined, nbg1: string | undefined) =>
+    ({ ...env, SERVER_FSN1_URL: fsn1, SERVER_NBG1_URL: nbg1, AUDIO_API_KEY: 'test-key', ORIGIN_VERIFY_KEY: 'test-origin-key' }) as unknown as Env;
+
+  await test('/api/server-stats: with no server URL it asks nothing and says no server is configured', async () => {
+    for (const [fsn1, nbg1] of [['', ''], [undefined, undefined]] as const) {
+      const { response, fetched } = await withStubbedFetch(() => worker.fetch(serverStats(), serverEnv(fsn1, nbg1)));
+      assertEqual(fetched.length, 0, `calls with ${JSON.stringify([fsn1, nbg1])}: ${fetched.join(', ')}`);
+      assertEqual(response.status, 200, 'status');
+      assertEqual(await response.text(), '{"configured":[],"message":"No speech server is configured."}', 'answer');
+    }
+  });
+
+  await test('/api/server-stats: a configured URL is still the only one asked', async () => {
+    const { response, fetched } = await withStubbedFetch(() => worker.fetch(serverStats(), serverEnv('https://fsn1.example', '')));
+    assertEqual(fetched.join(', '), 'https://fsn1.example/v1/server/stats', 'calls');
+    assertEqual(Object.keys((await response.json()) as Record<string, unknown>).join(','), 'fsn1', 'answer keys');
+  });
+
   const failed = results.filter((r) => r.error);
   for (const r of failed) console.error(`FAIL ${r.name}: ${r.error}`);
   console.log(`${results.length - failed.length}/${results.length} passed`);

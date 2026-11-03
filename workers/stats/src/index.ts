@@ -196,6 +196,17 @@ async function handleBatchQuery(request: Request, env: Env): Promise<Response> {
 // --- Server stats (with 5s cache) ---
 
 async function handleServerStats(env: Env): Promise<Response> {
+  // An empty URL marks a retired server: it is left out, not reported as down.
+  const configured = (
+    [['fsn1', env.SERVER_FSN1_URL], ['nbg1', env.SERVER_NBG1_URL]] as const
+  ).filter(([, url]) => Boolean(url));
+  if (configured.length === 0) {
+    return Response.json(
+      { configured: [], message: 'No speech server is configured.' },
+      { headers: { 'Cache-Control': 'no-cache' } },
+    );
+  }
+
   const now = Date.now();
   if (serverCache.data && now - serverCache.at < SERVER_CACHE_TTL) {
     return Response.json(serverCache.data, {
@@ -228,10 +239,6 @@ async function handleServerStats(env: Env): Promise<Response> {
     }
   }
 
-  // An empty URL marks a retired server: it is left out, not reported as down.
-  const configured = (
-    [['fsn1', env.SERVER_FSN1_URL], ['nbg1', env.SERVER_NBG1_URL]] as const
-  ).filter(([, url]) => Boolean(url));
   const results = await Promise.all(configured.map(([id, url]) => fetchServer(url, id)));
   const data = Object.fromEntries(configured.map(([id], i) => [id, results[i]]));
   serverCache = { data, at: now };
