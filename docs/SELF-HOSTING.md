@@ -68,7 +68,7 @@ Local Mode has three independent toggles in Settings: speech, transcription, and
 
 > **What changed:** microphone audio and the voice you hear now stay on your machine. Your chat text still goes to OpenRouter (or wherever the LLM is set) until the next step.
 
-**English speech on a self-host instance is Kokoro, and only Kokoro.** The hosted site defaults English to Qwen3-TTS with Kokoro as the alternative, and the published image matrix has no English Qwen image. So with the TTS toggle on, the app pins English to Kokoro and freezes the engine choice in Settings. Ten Kokoro voices, five per gender. German runs the other way round: Qwen3-TTS is the only engine there, and the next section sets it up.
+**English speech on a self-host instance is Kokoro, and only Kokoro.** The hosted site used Qwen3-TTS for English, with Kokoro as the alternative, until its live speech was retired in November 2026. The published image matrix has no English Qwen image, so with the TTS toggle on, the app pins English to Kokoro and freezes the engine choice in Settings. Ten Kokoro voices, five per gender. German runs the other way round: Qwen3-TTS is the only engine there, and the next section sets it up.
 
 ### German speech (optional)
 

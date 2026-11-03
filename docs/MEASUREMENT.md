@@ -121,7 +121,8 @@ All analytics writes are in:
 
 - [`workers/llm-proxy/src/utils/analytics.ts`](../workers/llm-proxy/src/utils/analytics.ts): chat, council, summary, session, playback, page, entry, signup, funnel-step, routing and rate-limit events
 - [`workers/llm-proxy/src/routes/funnel.ts`](../workers/llm-proxy/src/routes/funnel.ts): the server-side allowlist of funnel steps, outcomes and buckets. A step that is not on that list writes no row
-- [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts): speech (TTS) and transcription (STT) events
+- [`workers/audio-proxy/src/index.ts`](../workers/audio-proxy/src/index.ts): refused calls to the retired voice routes (speech, transcription, session end), each a 410
+- [`workers/audio-proxy/src/storyArchive.ts`](../workers/audio-proxy/src/storyArchive.ts): story archive downloads
 
 Country values come from `request.cf.country` (a 2-letter ISO code), never from a stored address.
 

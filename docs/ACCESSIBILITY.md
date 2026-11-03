@@ -80,7 +80,7 @@ The layout is built mobile first and shifts at three widths that recur through t
 
 ## Audio
 
-Everything pre-recorded has its text. Live speech shows the same text it speaks.
+Everything pre-recorded has its text. While the chat ran, live speech showed the same text it spoke.
 
 | Content | Text form |
 |---|---|

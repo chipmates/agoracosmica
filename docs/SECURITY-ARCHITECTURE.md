@@ -1,6 +1,6 @@
 # Security and privacy architecture
 
-This document is for a reader who wants to check what Agora Cosmica does with data before trusting it: which data exists, where each request goes, who processes it, and what the design does not protect. The client and worker claims are verifiable against the AGPL-3.0 source in this repository. The server-side ones (speech servers, edge configuration) are described together with how we verify them.
+This document is for a reader who wants to check what Agora Cosmica does with data before trusting it: which data exists, where each request goes, who processes it, and what the design does not protect. The client and worker claims are verifiable against the AGPL-3.0 source in this repository. The server-side ones (the edge configuration) are described together with how we verify them.
 
 For vulnerability reporting and the disclosure policy, see [SECURITY.md](../SECURITY.md).
 
@@ -44,10 +44,11 @@ Per GDPR Article 28 transparency, the processors that can touch user data are:
 |---|---|---|
 | **Cloudflare** | Edge hosting (Pages, Workers), object storage (R2), the bot check (Turnstile), aggregate counters (Analytics Engine) | EU edge, R2 in Western Europe |
 | **Nebius** | Free-tier inference: DeepSeek V4 Pro as the primary model, Qwen3-235B as the fallback | United Kingdom (EU adequacy decision) for the primary, Finland for the fallback, each called through its region's own API host with the provider's published region for the model checked before each request |
-| **Hetzner** | Our own GPU server for live speech: Qwen3-TTS for English and German, Kokoro selectable for English, faster-whisper for speech-to-text | Germany (Falkenstein) |
 | **OpenRouter** | Gateway for your own key, on that route only | US company. The route is pinned to one model and asks for zero data retention by default |
 
 The recorded catalog is rendered by a third-party speech vendor before release, never with user data, so nothing a visitor does reaches it.
+
+Live speech and speech-to-text ran on our own GPU server at Hetzner in Germany (Falkenstein) until November 2026. That server is retired. The audio worker's voice routes now answer 410 Gone without calling anything.
 
 ---
 
@@ -58,7 +59,6 @@ The diagram in [the README](../README.md#what-the-code-does-with-your-data) show
 - **Browser to Cloudflare Workers**: TLS only. A worker sees the request and holds no per-request log of it.
 - **Workers to inference**: free-tier chat is forwarded to Nebius without being persisted. Requests on your own key never pass through a worker: the browser calls OpenRouter directly (see the key path below). Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation, including what was written before, pass through a worker as in the free mode.
 - **Workers to R2**: internal Cloudflare network. The audio worker reads recorded audio out of the bucket, and the browser fetches the rest from the media host.
-- **Workers to the speech server**: TLS with two-token edge auth (see edge protections).
 - **Your own key**: browser to OpenRouter directly. Our servers never see it. If OpenRouter rejects the key, nothing goes to the free tier on its own: the app asks first. Only if OpenRouter rejects your key and you agree in the app to continue on the daily free quota does that conversation, including what was written before, pass through our servers as in the free mode.
 
 ---
@@ -117,12 +117,6 @@ The quota is keyed to identity so that everyone behind one carrier address keeps
 - **Cloudflare Workers** terminate TLS, validate tokens, screen content, rate-limit, and proxy.
 - **Origin addresses stay hidden** behind Cloudflare. Probing the apex resolves to a Cloudflare edge address.
 
-### Origin layer (speech server)
-
-- **Two-token edge auth** on the Hetzner nginx: a request must carry both `X-Origin-Verify` (a worker-stamped secret, set per environment) and `X-Admin-Token` (operator only). Anything missing either header is rejected with 401.
-- **Plaintext port 8800 is closed.** All traffic is TLS on 443, or TLS inside the worker.
-- Together this holds even if a worker bearer token leaks.
-
 ### Internal services
 
 - **Cloudflare Access** gates the stats worker endpoints (`/api/query`, `/api/query-batch`). Only authenticated operators can read aggregates.
@@ -149,7 +143,6 @@ The quota is keyed to identity so that everyone behind one carrier address keeps
 | Beacon and conversion flood brakes | 1h | Stops a flood on the anonymous counter routes. The only place a plain address appears, and it never reaches analytics |
 | Safety screening events | 90 days | Pseudonymized content moderation review |
 | Community tally record (keyed hash of the browser's ID, voting power, completed figures, last seen) | 12 months after last seen | Each browser counts once in the community total |
-| Audio server health snapshot | 2 min | Speech server health, refreshed at most every 15 seconds |
 
 ### Recorded content (Cloudflare R2)
 
@@ -159,7 +152,7 @@ Stories, council dialogues, prism dialogues, forewords and figure portraits live
 
 ## Zero data retention
 
-A daily cron audit (`zdr-audit.sh` on the GPU server) verifies that no conversation, audio, or text is kept past its serving window. Recent runs are logged to `/opt/agora/logs/zdr-audit.log`.
+While the GPU server ran live speech, a daily cron audit on it (`zdr-audit.sh`) checked that no conversation, audio, or text was kept past its serving window. The server is retired, and the workers that remain keep no conversation content (see [what we collect](#what-we-collect)).
 
 ---
 
@@ -173,7 +166,6 @@ A daily cron audit (`zdr-audit.sh` on the GPU server) verifies that no conversat
 | **Prompt injection** | Server-side prompt assembly, sanitized user input |
 | **API key theft** | AES-256-GCM under a non-extractable device key, stored only on the device, sent only to OpenRouter |
 | **Rate-limit abuse** | KV check-and-increment, counters per identity and per hashed address, a global daily cap |
-| **Direct-to-origin abuse** | Two-token edge auth on the Hetzner nginx |
 | **Stats worker exposure** | Cloudflare Access gates `/api/query*` |
 | **Content manipulation** | A closed list of 30 figures, a closed list of chapters, a response length cap |
 | **Denial of service** | Cloudflare in front of every surface |

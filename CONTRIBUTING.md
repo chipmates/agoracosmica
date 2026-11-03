@@ -46,7 +46,7 @@ pnpm dev                          # wrangler dev on port 8788
 
 The bot check is skipped for loopback while `TURNSTILE_SECRET_KEY` stays empty in `.dev.vars`.
 
-Live speech: `VITE_AUDIO_API_URL` in `client/.env` is where the speech route goes. `client/.env.example` shows the production gateway, which answers a local dev server (its rate limits apply). Local Mode in Settings is the other way. It points chat, voice and transcription at servers on your own machine, the ones the [self-hosting guide](docs/SELF-HOSTING.md) describes.
+Live speech: `VITE_AUDIO_API_URL` in `client/.env` is where the speech route goes. The production gateway in `client/.env.example` answers its voice routes with 410 since the speech server was retired in November 2026. Local Mode in Settings is the way to hear speech locally. It points chat, voice and transcription at servers on your own machine, the ones the [self-hosting guide](docs/SELF-HOSTING.md) describes.
 
 ## Before a PR
 

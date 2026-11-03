@@ -11,6 +11,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Removed
 
 - **Agora Cosmica now focuses on its short stories about life. The chat has ended.** The chat's code stays in the repository until it is removed.
+- **Live speech and speech-to-text are retired, and so is the GPU server that ran them.** The audio worker answers 410 Gone on its voice routes without calling anything, and its audio health route reports the server as retired. Story downloads work as before. The security, compliance and architecture docs no longer list it as a processor or in scope.
 
 ### Changed
 

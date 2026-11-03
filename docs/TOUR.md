@@ -75,7 +75,7 @@ Everything orbits one figure at a time. Four chapters build on each other (Story
 
 <p align="center">
   <img src="../.github/assets/tour/12-voice-settings.webp" alt="Voice settings: the engine choice between Qwen and Kokoro, and five female voices with Preview and Select buttons" width="100%" /><br/>
-  <em>English speech runs on Qwen3-TTS by default with five voices per gender, and Kokoro stays selectable. Both run on our own servers.</em>
+  <em>English speech ran on Qwen3-TTS by default with five voices per gender, and Kokoro was selectable. Both ran on our own server until November 2026.</em>
 </p>
 
 ## On a phone
