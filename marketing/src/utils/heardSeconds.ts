@@ -136,6 +136,32 @@ export function cardArm(): CardArm | null {
   return heldArm;
 }
 
+// ---- the landing's labels ---------------------------------------------------
+
+export interface LandingLabels {
+  source?: string;
+  kind?: string;
+}
+
+/**
+ * The landing's source class and kind of page, as agc-public.js holds them on
+ * the window of a page load that opened the visit; none on any other. Read at
+ * each send: that script is deferred and may run after an island mounts.
+ */
+export function landingLabels(): LandingLabels {
+  try {
+    const held = (window as unknown as { __agcLanding?: unknown }).__agcLanding;
+    if (!held || typeof held !== 'object') return {};
+    const { source, kind } = held as Record<string, unknown>;
+    return {
+      source: typeof source === 'string' ? source : undefined,
+      kind: typeof kind === 'string' ? kind : undefined,
+    };
+  } catch {
+    return {};
+  }
+}
+
 // ---- the seconds ----------------------------------------------------------
 
 let heardSeconds = 0;

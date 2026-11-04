@@ -8,6 +8,8 @@
 //   - Fire the anonymous page-load beacon (/v1/page), flagged when the pageview
 //     opened the visit and carrying the source class of that arrival, plus the
 //     paid-arrival counter on a fresh navigation to a paid landing URL
+//   - Hold a landing's source class and kind of page in page memory for the
+//     story counts
 //   - Count a read on the reading pages (thirty visible seconds, or a scroll
 //     past the middle of the text), once per page load
 //   - Count the first play of an audio element in the page, once per page load
@@ -319,10 +321,32 @@
     } catch (e) { return false; }
   }
 
+  // The kind of page a visit began on, a closed list read off the site's
+  // routes: the front, a figure's own page, a page of poems or one poem (the
+  // poems index, a poet's poems or sonnets), and other for every other page.
+  var FIGURE_PATH = /^\/(?:de\/)?figures\/[a-z0-9-]+\/?$/;
+  var POEM_PATH = /^\/(?:poems|figures\/[a-z0-9-]+\/(?:poems|sonnets)(?:\/[a-z0-9-]+)?)\/?$/;
+  function landingKind(pathname) {
+    if (pathname === '/' || pathname === '/de/' || pathname === '/de') return 'front';
+    if (POEM_PATH.test(pathname)) return 'poem';
+    if (FIGURE_PATH.test(pathname)) return 'figure';
+    return 'other';
+  }
+
   // The source class rides on landings only: an internal navigation has no
   // arrival to describe, and the referrer of one is our own page.
   var LANDING = isLandingPageview();
   var ARRIVAL_CLASS = LANDING ? sourceClass(window.location.href, document.referrer) : undefined;
+
+  // The landing's class and kind for the story counts (src/utils/listenCounts.ts),
+  // in this window's memory only: the player's page changes in place keep the
+  // window, every full page load starts a new one, and one that did not open
+  // the visit holds none.
+  try {
+    window.__agcLanding = LANDING
+      ? Object.freeze({ source: ARRIVAL_CLASS, kind: landingKind(window.location.pathname) })
+      : undefined;
+  } catch (e) { /* nothing held */ }
 
   // On a landing page the app doors carry the class into the app in the
   // link's fragment (#src=search): a fragment never travels with a request,

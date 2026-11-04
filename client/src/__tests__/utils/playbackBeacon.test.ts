@@ -142,6 +142,55 @@ describe('listen tracker', () => {
 
 // council_heard and engaged are one-shot per page load, so every case here
 // starts from a fresh page (a fresh module registry).
+describe('the story player\'s labels', () => {
+  beforeEach(() => {
+    sent.length = 0;
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-09-01T10:00:00Z'));
+  });
+  afterEach(() => vi.useRealTimers());
+
+  it('ride on every row of a labelled track, start to end, and a bare track sends none', async () => {
+    const { sendPlaybackBeacon } = await import('../../utils/playbackBeacon');
+    const labelled = { ...ctx, chapter: 1, version: 'lu2', source: 'assistant', kind: 'figure' };
+    sendPlaybackBeacon({ ...labelled, event: 'started', language: 'en' });
+    const key = listenTrackKey(labelled, 'https://media/labelled.webm');
+    noteListenPlay(key, labelled);
+    for (let t = 10; t <= 100; t += 10) {
+      vi.advanceTimersByTime(10000);
+      noteListenProgress(key, t, 100);
+    }
+    noteListenEnded(key, 100, 100);
+    const rows = sent as Array<Record<string, unknown>>;
+    expect(rows.map((r) => r.event)).toEqual(['started', 'progress_25', 'progress_50', 'progress_75', 'completed']);
+    for (const r of rows) expect([r.version, r.source, r.kind]).toEqual(['lu2', 'assistant', 'figure']);
+    sent.length = 0;
+    const bare = listenTrackKey(ctx, 'https://media/bare.webm');
+    noteListenPlay(bare, ctx);
+    vi.advanceTimersByTime(10000);
+    noteListenProgress(bare, 30, 100);
+    expect(sent.length).toBeGreaterThan(0);
+    for (const r of sent as Array<Record<string, unknown>>) expect(['version', 'source', 'kind'].filter((k) => k in r)).toEqual([]);
+  });
+
+  it('the player labels the introduction as story 0 and each story by its text', async () => {
+    const win = window as unknown as { __agcLanding?: unknown };
+    vi.resetModules();
+    const { listenContext } = await import('../../../../marketing/src/player/controller');
+    const queue = { figureId: 'rumi', slug: 'rumi', lang: 'en' as const, name: 'Rumi', artwork: '', entries: [] };
+    try {
+      win.__agcLanding = Object.freeze({ source: 'search', kind: 'poem' });
+      expect(listenContext(queue, 0)).toEqual({ type: 'foreword', figureId: 'rumi', mode: 'foreword', chapter: 0, version: 'orig', source: 'search', kind: 'poem' });
+      expect(listenContext(queue, 1)).toEqual({ type: 'story', figureId: 'rumi', mode: 'story', chapter: 1, version: 'lu2', source: 'search', kind: 'poem' });
+      expect(listenContext(queue, 2)).toMatchObject({ chapter: 2, version: 'orig' });
+      win.__agcLanding = undefined;
+      expect(listenContext(queue, 1)).toEqual({ type: 'story', figureId: 'rumi', mode: 'story', chapter: 1, version: 'lu2', source: undefined, kind: undefined });
+    } finally {
+      delete win.__agcLanding;
+    }
+  });
+});
+
 describe('council listening', () => {
   beforeEach(() => {
     sent.length = 0;

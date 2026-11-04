@@ -17,9 +17,10 @@ import {
   noteListenProgress,
   sendPlaybackBeacon,
 } from '@client/utils/playbackBeacon';
-import { trackHeardSeconds } from '../utils/heardSeconds';
+import { landingLabels, trackHeardSeconds } from '../utils/heardSeconds';
 import { installRouterGlue } from './routerGlue';
 import { playerStrings } from './strings';
+import { textVersion } from './textVersions';
 import { applyStoredTheme } from './theme';
 import type { PlayerLang } from './strings';
 import type { PlayerState, ResumePoint, SavedSentence, SheetKind, SleepChoice, StoryQueue } from './types';
@@ -122,10 +123,12 @@ function sourceFor(queue: StoryQueue, n: number): string {
   return pickFormat() === 'webm' ? webm : webm.replace(/\.webm$/, '.mp3');
 }
 
-function listenContext(queue: StoryQueue, n: number) {
+/** A track's labels on every listen row, the text's version and the landing's two among them. */
+export function listenContext(queue: StoryQueue, n: number) {
+  const labels = { version: textVersion(queue.figureId, n), ...landingLabels() };
   return n === 0
-    ? { type: 'foreword' as const, figureId: queue.figureId, mode: 'foreword', chapter: 0 }
-    : { type: 'story' as const, figureId: queue.figureId, mode: PLAYBACK_MODE, chapter: n };
+    ? { type: 'foreword' as const, figureId: queue.figureId, mode: 'foreword', chapter: 0, ...labels }
+    : { type: 'story' as const, figureId: queue.figureId, mode: PLAYBACK_MODE, chapter: n, ...labels };
 }
 
 /** The tracker's key: the webm address names the track whatever format plays. */

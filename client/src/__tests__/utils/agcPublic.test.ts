@@ -622,6 +622,121 @@ describe('agc-public.js: the source class on the app doors', () => {
   });
 });
 
+describe('agc-public.js: the landing\'s labels for the story counts', () => {
+  const win = window as unknown as { __agcLanding?: { source?: string; kind?: string } };
+  function setReferrer(value: string) {
+    Object.defineProperty(document, 'referrer', { value, configurable: true });
+  }
+  afterEach(() => {
+    setReferrer('');
+    delete win.__agcLanding;
+  });
+  const pageRow = () => fetches.find((f) => f.url.endsWith('/v1/page'))!.body;
+
+  it('holds the class of a landing from each of the sixteen, the same class its page row carries', () => {
+    const cases: Array<[string, string, string]> = [
+      ['/?gclid=TESTCLICKID0001', 'https://www.google.com/', 'ad_google_grant'],
+      ['/?p=1', 'https://www.google.com/', 'ad_google_paid'],
+      ['/?utm_source=reddit&p=1', '', 'ad_reddit'],
+      ['/', 'https://www.google.de/', 'search'],
+      ['/', 'https://www.bing.com/', 'search'],
+      ['/', 'https://chatgpt.com/', 'assistant'],
+      ['/', 'https://canvas.instructure.com/', 'edu'],
+      ['/', 'https://mail.google.com/', 'mail'],
+      ['/', 'https://discord.com/', 'messenger'],
+      ['/', 'https://github.com/', 'code'],
+      ['/', 'https://news.ycombinator.com/', 'news'],
+      ['/', 'https://en.wikipedia.org/', 'wiki'],
+      ['/', 'https://alternativeto.net/', 'directory'],
+      ['/', 'https://www.reddit.com/', 'reddit'],
+      ['/', 'https://t.co/', 'social'],
+      ['/', 'https://example.org/', 'referral'],
+      ['/', '', 'direct'],
+    ];
+    for (const [url, referrer, cls] of cases) {
+      fetches = [];
+      setReferrer(referrer);
+      loadPage(url);
+      expect(win.__agcLanding, `${url} from ${referrer || 'nowhere'}`).toEqual({ source: cls, kind: 'front' });
+      expect(pageRow().source).toBe(cls);
+      expect(pageRow().landing).toBe(1);
+    }
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+
+  it('names the kind of page every route of the site opens on', async () => {
+    const { poems, readingPages, POEM_INDEX_PATH, poets } = await import('../../../../marketing/src/data/poems/index.mjs');
+    const { figureSlugToId } = await import('../../data/public/slugMap');
+    const want: Array<[string, string]> = [
+      ['/', 'front'], ['/de/', 'front'],
+      [`${POEM_INDEX_PATH}/`, 'poem'], [readingPages.rumi.path, 'poem'], [`${readingPages.rumi.path}/`, 'poem'],
+      ...Object.values(poets as Record<string, { collectionPath: string }>).map((p): [string, string] => [p.collectionPath, 'poem']),
+      ...(poems as Array<{ path: string }>).map((p): [string, string] => [p.path, 'poem']),
+      ...Object.keys(figureSlugToId).flatMap((slug): Array<[string, string]> => [[`/figures/${slug}/`, 'figure'], [`/de/figures/${slug}/`, 'figure']]),
+      ['/figures/marcus-aurelius/meditations/', 'other'], ['/figures/william-shakespeare/quotes/', 'other'],
+      ['/stoicism/', 'other'], ['/de/stoizismus/', 'other'], ['/the-heros-journey/', 'other'], ['/de/heldenreise/', 'other'],
+      ['/de/figures/plato/hoehlengleichnis/', 'other'], ['/de/figures/plato/ideenlehre/', 'other'],
+      ['/about/', 'other'], ['/de/about/', 'other'], ['/privacy/', 'other'], ['/impressum/', 'other'], ['/app/', 'other'],
+    ];
+    expect((poems as unknown[]).length).toBeGreaterThan(20);
+    for (const [path, kind] of want) {
+      loadPage(path);
+      expect(win.__agcLanding?.kind, path).toBe(kind);
+    }
+  });
+
+  it('holds nothing on a page reached from our own site', () => {
+    setReferrer(`${window.location.origin}/poems/`);
+    loadPage('/figures/emily-dickinson/');
+    expect(win.__agcLanding).toBeUndefined();
+    expect(pageRow().landing).toBeUndefined();
+    expect(pageRow().source).toBeUndefined();
+  });
+
+  it('rides on the story rows of the landing\'s page load, also after a change in place, and on none after a full load', async () => {
+    let state = { queue: { figureId: 'dickinson', lang: 'en' }, current: 0 as number | null, status: 'playing', time: 0, readerOpen: false };
+    const listeners = new Set<() => void>();
+    const source = {
+      subscribe: (l: () => void) => { listeners.add(l); return () => listeners.delete(l); },
+      getState: () => state,
+    };
+    const set = (patch: Partial<typeof state>) => { state = { ...state, ...patch }; listeners.forEach((l) => l()); };
+    const listen = (seconds: number) => { for (let i = 0; i < seconds * 4; i++) set({ time: state.time + 0.25 }); };
+    const rows: Record<string, unknown>[] = [];
+
+    setReferrer('https://www.google.com/');
+    loadPage('/figures/emily-dickinson/poems/hope-is-the-thing-with-feathers/');
+    vi.resetModules();
+    const first = await import('../../../../marketing/src/utils/listenCounts');
+    const stop = first.watchListens(source, (row) => rows.push(row));
+    listen(31);
+    expect(rows).toEqual([
+      { step: 'story_started', figureId: 'dickinson', language: 'en', mode: undefined, version: 'orig', source: 'search', kind: 'poem' },
+      { step: 'story_heard', figureId: 'dickinson', language: 'en', mode: undefined, version: 'orig', source: 'search', kind: 'poem' },
+    ]);
+    // The player's router moves in place: a new address, the same window, the script not run again.
+    window.history.pushState({}, '', '/figures/emily-dickinson/');
+    set({ current: 1, time: 0 });
+    listen(31);
+    expect(rows.slice(2).map((r) => [r.step, r.source, r.kind])).toEqual([['story_started', 'search', 'poem'], ['story_heard', 'search', 'poem']]);
+    stop();
+
+    // A normal link: a full page load whose referrer is our own page.
+    rows.length = 0;
+    setReferrer(`${window.location.origin}/figures/emily-dickinson/`);
+    loadPage('/figures/marcus-aurelius/');
+    vi.resetModules();
+    const second = await import('../../../../marketing/src/utils/listenCounts');
+    state = { queue: { figureId: 'aurelius', lang: 'en' }, current: 1, status: 'playing', time: 0, readerOpen: false };
+    second.watchListens(source, (row) => rows.push(row))();
+    expect(rows.map((r) => [r.step, r.source, r.kind, r.version])).toEqual([['story_started', undefined, undefined, 'lu2']]);
+    expect(JSON.parse(JSON.stringify(rows[0]))).toEqual({ step: 'story_started', figureId: 'aurelius', language: 'en', version: 'lu2' });
+    expect(storageKeys(sessionStorage)).toEqual([]);
+    expect(storageKeys(localStorage)).toEqual([]);
+  });
+});
+
 describe('agc-public.js: grant, paid and Reddit ads', () => {
   const pageSource = () => fetches.find((f) => f.url.endsWith('/v1/page'))!.body.source;
 

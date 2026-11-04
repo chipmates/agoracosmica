@@ -1086,7 +1086,7 @@ describe('the story counts', () => {
     await mountAt('/de/figures/marcus-aurelius/', 'de');
     await hear(29);
     await new Promise((r) => setTimeout(r, 0));
-    expect(stories()).toEqual([{ step: 'story_started', figureId: 'aurelius', language: 'en' }]);
+    expect(stories()).toEqual([{ step: 'story_started', figureId: 'aurelius', language: 'en', version: 'lu2' }]);
     await hear(1);
     await new Promise((r) => setTimeout(r, 0));
     expect(stories().map((r) => r.step)).toEqual(['story_started', 'story_heard']);
@@ -1133,6 +1133,46 @@ describe('the story counts', () => {
     await hear(10);
     await new Promise((r) => setTimeout(r, 0));
     expect(stories().map((r) => r.step)).toEqual(['story_started', 'story_heard']);
+  });
+
+  it('carry the landing\'s labels held for the page load, also after a page change in place, and none after a full load', async () => {
+    const win = window as unknown as { __agcLanding?: unknown };
+    try {
+      // As agc-public.js holds them on the window of a landing from a search page onto a poem.
+      win.__agcLanding = Object.freeze({ source: 'search', kind: 'poem' });
+      const first = await mountAt('/figures/emily-dickinson/poems/');
+      await hear(31, 'dickinson');
+      await new Promise((r) => setTimeout(r, 0));
+      expect(stories()).toEqual([
+        { step: 'story_started', figureId: 'dickinson', language: 'en', version: 'orig', source: 'search', kind: 'poem' },
+        { step: 'story_heard', figureId: 'dickinson', language: 'en', version: 'orig', source: 'search', kind: 'poem' },
+      ]);
+      // The player's router: same window, same modules, a new address and the island again.
+      first.unmount();
+      window.history.pushState({}, '', '/figures/emily-dickinson/');
+      const { default: ArrivalChoice } = await import('../../../../marketing/src/islands/ArrivalChoice');
+      await act(async () => { render(<ArrivalChoice lang="en" />); });
+      await act(async () => { player.set({ current: 2, time: 0, status: 'playing' }); });
+      await hear(31, 'dickinson');
+      await new Promise((r) => setTimeout(r, 0));
+      expect(stories().slice(2).map((r) => [r.step, r.source, r.kind])).toEqual([
+        ['story_started', 'search', 'poem'], ['story_heard', 'search', 'poem'],
+      ]);
+      // A full page load that did not open the visit: the script holds nothing there.
+      sent = [];
+      win.__agcLanding = undefined;
+      await mountAt('/figures/marcus-aurelius/');
+      await hear(31);
+      await new Promise((r) => setTimeout(r, 0));
+      expect(stories()).toEqual([
+        { step: 'story_started', figureId: 'aurelius', language: 'en', version: 'lu2' },
+        { step: 'story_heard', figureId: 'aurelius', language: 'en', version: 'lu2' },
+      ]);
+      expect(storageKeys(sessionStorage)).toEqual([]);
+      expect(storageKeys(localStorage)).toEqual([]);
+    } finally {
+      delete win.__agcLanding;
+    }
   });
 
   it('send nothing on a page without the player', async () => {

@@ -50,6 +50,14 @@ interface PlaybackPayload {
    * about who is listening, only which piece of content was played.
    */
   chapter?: number;
+  /**
+   * The public story player's three labels: the version of the story's text,
+   * and the landing's source class and kind of page when the page load opened
+   * the visit. The app sends none of them.
+   */
+  version?: string;
+  source?: string;
+  kind?: string;
 }
 
 /**
@@ -104,6 +112,9 @@ export function sendPlaybackBeacon(
       language: payload.language,
       bucket: payload.bucket,
       chapter: payload.chapter,
+      version: payload.version,
+      source: payload.source,
+      kind: payload.kind,
       probe: probeField(),
     });
 
@@ -195,6 +206,10 @@ interface ListenContext {
   mode?: string;
   /** Chapter ordinal, on story tracks. See PlaybackPayload.chapter. */
   chapter?: number;
+  /** See PlaybackPayload: the story player's labels, fixed for the page load. */
+  version?: string;
+  source?: string;
+  kind?: string;
 }
 
 interface TrackListen {
@@ -253,6 +268,9 @@ function emit(state: TrackListen, event: PlaybackEvent, transport: PlaybackTrans
       mode: state.ctx.mode,
       language: detectCurrentLanguage(),
       chapter: state.ctx.chapter,
+      version: state.ctx.version,
+      source: state.ctx.source,
+      kind: state.ctx.kind,
       // Only the terminal events carry a bucket; the worker pins the rest to 0.
       bucket: event === 'completed' || event === 'ended' ? listenBucket(state.played) : undefined,
     },
