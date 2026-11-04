@@ -154,7 +154,7 @@ export function guardCountSql(sql: string, dataset: string, rules: GuardRules = 
   for (const item of topLevel(sel[1])) {
     let m: RegExpExecArray | null;
     if (item === DAY_BUCKET + ' AS d') { day = true; keys.push('d'); }
-    else if ((m = /^blob([1-9]) AS ([a-z])$/.exec(item))) { blobs++; keys.push(m[2]); }
+    else if ((m = /^blob([1-9]|1[0-9]|20) AS ([a-z])$/.exec(item))) { blobs++; keys.push(m[2]); }
     else if (/^SUM\(_sample_interval\) AS [a-z]$/.test(item)) total = true;
     else return 'a selected column that is neither the day, a field nor a total';
   }

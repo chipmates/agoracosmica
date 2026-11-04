@@ -7,6 +7,10 @@
 // The row (llm-proxy analytics): blob1 step, blob2 figure or path, blob3
 // source class on page rows, blob4 language, blob6 device class, blob7
 // country, blob8 'landing' on a visit's first page, blob9 the house mark.
+// The story steps add the landing's source class in blob8, its kind of page in
+// blob10 and the text's version in blob11; the story player's playback rows
+// (blob1 'playback', blob5 'story' or 'foreword', blob8 the event, blob10 the
+// story number) add the same three in blob11, blob12 and blob13.
 //
 // No launch floor here: the row window (92 days) starts long after launch.
 
@@ -28,6 +32,15 @@ export const AGORA_GUARD: GuardRules = {
 export const DAILY_METRICS = ['story_started', 'story_heard', 'read', 'audio_play', 'page_arrival'] as const;
 const STORY_STEPS = ['story_started', 'story_heard'];
 const LANG_STEPS = ['story_started', 'story_heard', 'read', 'audio_play'];
+const PLAYBACK_EVENTS = ['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'ended'];
+const PLAYER_TRACKS = "blob1 = 'playback' AND blob5 IN ('story', 'foreword')";
+
+// The three listen labels: where each sits on the story steps and on the player's playback rows.
+export const LISTEN_LABELS = [
+  { name: 'source', story: 'blob8', playback: 'blob11' },
+  { name: 'kind', story: 'blob10', playback: 'blob12' },
+  { name: 'version', story: 'blob11', playback: 'blob13' },
+] as const;
 
 const quoted = (list: readonly string[]) => '(' + list.map((v) => "'" + v + "'").join(', ') + ')';
 
@@ -51,6 +64,9 @@ export function agoraQuestions(): AgoraQuestion[] {
     question('landings', [['blob3', 'k']], '(' + rowsOf(METRICS.landing) + ')'),
     question('figures', [['blob1', 's'], ['blob2', 'k']], 'blob1 IN ' + quoted(STORY_STEPS)),
     question('langs', [['blob1', 's'], ['blob4', 'k']], 'blob1 IN ' + quoted(LANG_STEPS)),
+    ...LISTEN_LABELS.map((l) => question('story_' + l.name, [['blob1', 's'], [l.story, 'k']], 'blob1 IN ' + quoted(STORY_STEPS))),
+    // A playback row's event is its blob8.
+    ...LISTEN_LABELS.map((l) => question('playback_' + l.name, [['blob8', 's'], [l.playback, 'k']], PLAYER_TRACKS)),
   ];
 }
 
@@ -72,6 +88,10 @@ export interface AgoraCountAnswer {
   // Weekly cells from the Monday in weeks, by step and figure, and by step and language.
   figures?: WeeklyUse;
   langs?: WeeklyUse;
+  // Every listen row by label (source, kind, version), weekly cells as above: the story steps by step, the player's
+  // playback rows (introduction and stories) by event. '' holds rows without the label: a story in a page load that
+  // did not open the visit (no source or kind), and every row written before the labels.
+  listens?: { story: Record<string, WeeklyUse>; playback: Record<string, WeeklyUse>; blank: string };
   gaps?: string[];
 }
 
@@ -166,6 +186,11 @@ export async function buildAgoraCount(env: Env, fetcher: Fetcher, now: number): 
     landings: columns('landings', 'k'),
     figures: split('figures', STORY_STEPS),
     langs: split('langs', LANG_STEPS),
+    listens: {
+      story: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('story_' + l.name, STORY_STEPS)])),
+      playback: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('playback_' + l.name, PLAYBACK_EVENTS)])),
+      blank: "'' is a listen in a page load that did not open the visit, or a row written before the labels",
+    },
     gaps,
   };
 }

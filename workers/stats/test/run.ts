@@ -416,6 +416,65 @@ async function main(): Promise<void> {
     forgetAgoraCount();
   });
 
+  await test('agora count: the listen labels split stories and playback by week, under the same guard', async () => {
+    const names = agoraQuestions().map((q) => q.name);
+    for (const n of ['story_source', 'story_kind', 'story_version', 'playback_source', 'playback_kind', 'playback_version']) {
+      assertEqual(names.includes(n), true, 'asks ' + n);
+    }
+    for (const q of agoraQuestions()) assertEqual(guardCountSql(q.sql, 'agora_llm', AGORA_GUARD), null, q.name);
+    const kind = agoraQuestions().find((q) => q.name === 'story_kind')!.sql;
+    assertEqual(kind.includes('blob10 AS k'), true, 'the kind is read from blob10');
+    assertEqual(guardCountSql(kind.replace('blob1 AS s, blob10 AS k', 'blob1 AS s, blob8 AS r, blob10 AS k').replace('GROUP BY d, s, k', 'GROUP BY d, s, r, k'), 'agora_llm', AGORA_GUARD), 'split by too many fields', 'three fields');
+    assertEqual(guardCountSql(kind.replace(" AND (blob9 != 'probe' AND blob9 != 'auto')", ''), 'agora_llm', AGORA_GUARD), 'probe rows not left out', 'no house filter');
+    assertEqual(guardCountSql(kind.replace(' GROUP BY', " AND blob7 = 'DE' GROUP BY"), 'agora_llm', AGORA_GUARD), 'a total narrowed by language, device class or country', 'narrowed by country');
+    assertEqual(guardCountSql(kind.replace('blob10 AS k', 'blob21 AS k'), 'agora_llm', AGORA_GUARD), 'a selected column that is neither the day, a field nor a total', 'no blob21');
+    // The museum's house mark sits in blob10: selecting it there still breaks its rule.
+    const museumSteps = countQuestions('museum_count')[0].sql;
+    assertEqual(guardCountSql(museumSteps.replace('blob1 AS s', 'blob10 AS s'), 'museum_count'), 'probe rows not left out', 'the museum mark is never a split');
+
+    forgetAgoraCount();
+    const now = Date.parse('2026-11-04T07:00:00Z');
+    const at = (d: string) => d + ' 00:00:00';
+    const answers: Record<string, Array<Record<string, unknown>>> = {
+      steps: [{ d: at('2026-10-26'), s: 'story_started', n: 12 }, { d: at('2026-11-03'), s: 'story_heard', n: 6 }],
+      story_source: [
+        { d: at('2026-10-26'), s: 'story_started', k: '', n: 9 }, { d: at('2026-11-02'), s: 'story_started', k: 'search', n: 3 },
+        { d: at('2026-11-03'), s: 'story_started', k: 'search', n: '4' }, { d: at('2026-11-03'), s: 'story_heard', k: 'assistant', n: 2 },
+      ],
+      story_kind: [{ d: at('2026-11-03'), s: 'story_started', k: 'poem', n: 6 }, { d: at('2026-11-03'), s: 'story_started', k: '', n: 1 }],
+      story_version: [{ d: at('2026-11-03'), s: 'story_heard', k: 'lu2', n: 5 }, { d: at('2026-11-03'), s: 'story_heard', k: 'orig', n: 1 }],
+      playback_source: [{ d: at('2026-11-03'), s: 'progress_25', k: 'search', n: 8 }, { d: at('2026-11-03'), s: 'not an event', k: 'search', n: 50 }],
+      playback_kind: [{ d: at('2026-11-03'), s: 'started', k: 'front', n: 2 }],
+      playback_version: [{ d: at('2026-11-04'), s: 'completed', k: 'lu2', n: 7 }],
+    };
+    const byName = new Map(agoraQuestions().map((q) => [q.sql, q.name]));
+    const fetcher = async (_url: string, init: RequestInit) => {
+      const name = byName.get(String(init.body));
+      if (!name) throw new Error('a question this module does not ask: ' + String(init.body));
+      return Response.json({ data: answers[name] || [] });
+    };
+    const agoraEnv = { CF_ACCOUNT_ID: '0123456789abcdef0123456789abcdef', CF_API_TOKEN: 'test-token' } as unknown as Env;
+    const body = (await (await handleAgoraCount(agoraEnv, fetcher, now)).json()) as {
+      state: string; gaps: string[];
+      listens: { blank: string; story: Record<string, { weeks: string[]; by: Record<string, Record<string, unknown[]>> }>; playback: Record<string, { weeks: string[]; by: Record<string, Record<string, unknown[]>> }> };
+    };
+    assertEqual(body.state, 'ok', 'state');
+    assertEqual(body.gaps.length, 0, 'gaps');
+    const src = body.listens.story.source;
+    assertEqual(JSON.stringify(src.weeks), JSON.stringify(['2026-10-26', '2026-11-02']), 'weeks from Monday');
+    assertEqual(JSON.stringify(src.by.story_started['']), JSON.stringify([9, '<5']), 'unlabelled starts are their own class');
+    assertEqual(JSON.stringify(src.by.story_started.search), JSON.stringify(['<5', 7]), 'a week of search starts, summed by day');
+    assertEqual(JSON.stringify(src.by.story_heard.assistant), JSON.stringify(['<5', '<5']), 'a cell under 5 is hidden');
+    assertEqual(JSON.stringify(body.listens.story.kind.by.story_started.poem), JSON.stringify(['<5', 6]), 'starts by landing kind');
+    assertEqual(JSON.stringify(body.listens.story.version.by.story_heard), JSON.stringify({ lu2: ['<5', 5], orig: ['<5', '<5'] }), 'heard by text version');
+    assertEqual(JSON.stringify(body.listens.playback.source.by.progress_25.search), JSON.stringify(['<5', 8]), 'quarters by source');
+    assertEqual(Object.keys(body.listens.playback.source.by).includes('not an event'), false, 'only the six events');
+    assertEqual(JSON.stringify(body.listens.playback.version.by.completed.lu2), JSON.stringify(['<5', 7]), 'today is counted, partial');
+    assertEqual(JSON.stringify(body.listens.playback.kind.by.started.front), JSON.stringify(['<5', '<5']), 'a small playback cell is hidden');
+    assertEqual(body.listens.blank.length > 0, true, 'the answer says what the blank class is');
+    forgetAgoraCount();
+  });
+
   await test('agora count: a refused token says so and asks nothing more; without an account it asks nothing', async () => {
     forgetAgoraCount();
     let asked = 0;
