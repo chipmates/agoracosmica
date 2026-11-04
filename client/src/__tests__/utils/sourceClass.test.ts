@@ -233,6 +233,13 @@ describe('sourceClass referrer classes', () => {
     }
   });
 
+  it('labels the Gmail app on Android as mail, not search', () => {
+    expect(sourceClass(LANDING, 'android-app://com.google.android.gm/')).toBe('mail');
+    expect(sourceClass(LANDING, 'android-app://com.google.android.gm')).toBe('mail');
+    // The Google app stays search.
+    expect(sourceClass(LANDING, 'android-app://com.google.android.googlequicksearchbox/')).toBe('search');
+  });
+
   it('labels chat apps as messenger', () => {
     for (const referrer of [
       'https://discord.com/channels/1/2',
@@ -470,6 +477,8 @@ describe('the marketing twin in agc-public.js', () => {
     [`${LANDING}?p=1&gbraid=0AAA`, ''],
     [`${LANDING}?wbraid=CjkK&utm_source=reddit`, ''],
     [`${LANDING}?xgbraid=1`, ''],
+    [LANDING, 'android-app://com.google.android.gm/'],
+    [LANDING, 'android-app://com.google.android.googlequicksearchbox/'],
   ];
 
   // A case list can only catch a host it happens to name, so the lists

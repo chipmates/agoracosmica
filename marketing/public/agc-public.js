@@ -212,6 +212,9 @@
       'outlook.office365.com', 'mail.yahoo.com', 'mail.proton.me',
       'navigator.gmx.net', 'navigator.web.de', 'mail.zoho.com', 'substack.com',
       'beehiiv.com', 'mailchi.mp', 'buttondown.email', 'buttondown.com',
+      // The Gmail app on Android, whose referrer host the Google search
+      // pattern would otherwise take.
+      'com.google.android.gm',
     ],
     messenger: [
       'discord.com', 'discordapp.com', 'web.whatsapp.com', 'web.telegram.org',
