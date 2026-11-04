@@ -32,6 +32,8 @@ const storyCount = queue.entries.filter(e => e.n > 0).length;
 const countWord = numberWord(storyCount, lang);
 const idleWhat = intro?.minutes && first ? P.beginSubWith(intro.minutes, first.title) : first?.title ?? '';
 const label = storyLabel(lang, portraits);
+// The poem pages are English only: the German player is the German figure page, named in its own language.
+const germanWay = lang === 'en' ? { href: publicUrl('de', `/figures/${slug}/`), text: 'Die Geschichten auf Deutsch' } : null;
 ---
 <aside class="sp-door" aria-labelledby="sp-door-title" data-nosnippet>
   <script is:inline type="application/json" data-story-door-queue set:html={queueJson} />
@@ -83,5 +85,8 @@ const label = storyLabel(lang, portraits);
       <span>{P.readInstead}</span>
     </button>
     <a class="sp-textlink" href={publicUrl(lang, `/figures/${slug}/`)} data-door="poem_all_stories">{P.allStories(countWord)}</a>
+    {germanWay && (
+      <a class="sp-textlink" href={germanWay.href} lang="de" hreflang="de" data-door="poem_german">{germanWay.text}</a>
+    )}
   </p>
 </aside>
