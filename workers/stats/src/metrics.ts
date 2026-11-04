@@ -44,6 +44,9 @@ export interface Metric {
   event: string;
   also?: string;
   definition: string;
+  // The first UTC day the row was written; a window before it has no counted days.
+  // The museum's metrics count from the count's own first day.
+  since?: string;
 }
 
 // The rows a metric counts, without the house filter (every query adds it).
@@ -55,32 +58,32 @@ export function rowsOf(m: Metric): string {
 export const METRICS: Record<string, Metric> = {
   story_heard: {
     name: 'story_heard', side: 'agora', label: 'stories heard', dataset: 'agora_llm',
-    event: 'story_heard',
+    event: 'story_heard', since: '2026-10-28',
     definition: '30 seconds of a story heard, once per story and page load',
   },
   story_started: {
     name: 'story_started', side: 'agora', label: 'stories started', dataset: 'agora_llm',
-    event: 'story_started',
+    event: 'story_started', since: '2026-10-28',
     definition: "a story's first play in a page load",
   },
   read: {
     name: 'read', side: 'agora', label: 'reads', dataset: 'agora_llm',
-    event: 'read',
+    event: 'read', since: '2026-10-21',
     definition: 'a reading page held 30 visible seconds or scrolled past its middle, once per page load',
   },
   audio_play: {
     name: 'audio_play', side: 'agora', label: 'audio plays', dataset: 'agora_llm',
-    event: 'audio_play',
+    event: 'audio_play', since: '2026-10-21',
     definition: 'the first play of an in-page audio player, once per page load',
   },
   page_arrival: {
     name: 'page_arrival', side: 'agora', label: 'page arrivals', dataset: 'agora_llm',
-    event: 'page',
+    event: 'page', since: '2026-05-06',
     definition: 'a page of the site opened',
   },
   landing: {
     name: 'landing', side: 'agora', label: 'landings', dataset: 'agora_llm',
-    event: 'page', also: "blob8 = 'landing'",
+    event: 'page', also: "blob8 = 'landing'", since: '2026-05-06',
     definition: 'the first page of a visit; blob3 holds its source class',
   },
   real_use: {
