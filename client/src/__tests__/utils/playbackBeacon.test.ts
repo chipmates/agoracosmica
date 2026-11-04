@@ -176,7 +176,7 @@ describe('the story player\'s labels', () => {
   it('a reading row says its way, and the tracker\'s listen rows never do', async () => {
     const { sendPlaybackBeacon } = await import('../../utils/playbackBeacon');
     sendPlaybackBeacon({ ...ctx, chapter: 1, version: 'lu2', source: 'search', kind: 'poem', way: 'read', event: 'skimmed', language: 'de' });
-    expect(sent.at(-1)).toMatchObject({ event: 'skimmed', way: 'read', version: 'lu2', source: 'search', kind: 'poem', language: 'de' });
+    expect(sent[sent.length - 1]).toMatchObject({ event: 'skimmed', way: 'read', version: 'lu2', source: 'search', kind: 'poem', language: 'de' });
     sent.length = 0;
     const labelled = { ...ctx, chapter: 2, version: 'orig', source: 'search', kind: 'poem' };
     const key = listenTrackKey(labelled, 'https://media/way.webm');
