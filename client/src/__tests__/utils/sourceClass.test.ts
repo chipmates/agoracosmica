@@ -188,6 +188,32 @@ describe('sourceClass referrer classes', () => {
     }
   });
 
+  it('labels the German education server as edu', () => {
+    expect(sourceClass(LANDING, 'https://www.bildungsserver.de/schule/geschichte.html')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://bildungsserver.de/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://mybildungsserver.de/')).toBe('referral');
+  });
+
+  it('labels WirLernenOnline as edu', () => {
+    expect(sourceClass(LANDING, 'https://wirlernenonline.de/fachportal/geschichte/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://www.wirlernenonline.de/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://wirlernenonline.de.example.net/')).toBe('referral');
+  });
+
+  it('labels ZUM and its subdomains as edu', () => {
+    expect(sourceClass(LANDING, 'https://zum.de/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://www.zum.de/portal/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://unterrichten.zum.de/wiki/Philosophie')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://wiki.zum.de/wiki/Hauptseite')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://forum.de/')).toBe('referral');
+  });
+
+  it('labels the Historical Association as edu', () => {
+    expect(sourceClass(LANDING, 'https://www.history.org.uk/primary/resource/1')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://history.org.uk/')).toBe('edu');
+    expect(sourceClass(LANDING, 'https://ancienthistory.org.uk/')).toBe('referral');
+  });
+
   it('labels schools and universities by the shape of their name', () => {
     for (const referrer of [
       'https://harvard.edu/',
@@ -479,6 +505,10 @@ describe('the marketing twin in agc-public.js', () => {
     [`${LANDING}?xgbraid=1`, ''],
     [LANDING, 'android-app://com.google.android.gm/'],
     [LANDING, 'android-app://com.google.android.googlequicksearchbox/'],
+    [LANDING, 'https://www.bildungsserver.de/'],
+    [LANDING, 'https://wirlernenonline.de/'],
+    [LANDING, 'https://unterrichten.zum.de/wiki/Philosophie'],
+    [LANDING, 'https://www.history.org.uk/'],
   ];
 
   // A case list can only catch a host it happens to name, so the lists

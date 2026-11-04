@@ -51,6 +51,7 @@ export const HOST_LISTS = {
     'd2l.com', 'moodlecloud.com', 'classroom.google.com', 'edmodo.com',
     'seesaw.me', 'clever.com', 'itslearning.com', 'padlet.com',
     'mebis.bycs.de', 'lernraum-berlin.de', 'schul.cloud', 'iserv.de',
+    'bildungsserver.de', 'wirlernenonline.de', 'zum.de', 'history.org.uk',
   ],
   mail: [
     'mail.google.com', 'outlook.live.com', 'outlook.office.com',
