@@ -9,6 +9,8 @@ import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
 import { handleMuseum } from '../src/museum';
 import { AGORA_GUARD, agoraQuestions, forgetAgoraCount, handleAgoraCount } from '../src/agora-count';
+import { verdict } from '../src/verdict';
+import VECTORS from './verdict-vectors.json';
 import type { Env } from '../src/types';
 import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
@@ -428,6 +430,21 @@ async function main(): Promise<void> {
     assertEqual(unset.state, 'unset', 'unset state');
     assertEqual(asked, 0, 'asked without an account');
     forgetAgoraCount();
+  });
+
+  // The week verdict: the shared vectors, which the weekly pull runs against what it loads too.
+
+  await test('verdict: every shared vector gives its word, its test and its p', async () => {
+    const vectors = (VECTORS as { vectors: Array<Record<string, unknown>> }).vectors;
+    assertEqual(vectors.length >= 10, true, 'vectors read');
+    for (const v of vectors) {
+      const name = JSON.stringify([v.a, v.b, v.history || '']);
+      const got = verdict({ a: v.a as number, b: v.b as number, daysA: v.daysA as number | undefined, daysB: v.daysB as number | undefined, history: v.history as number[] | undefined });
+      assertEqual(got.word, v.word, name + ' word');
+      assertEqual(got.test, v.test, name + ' test');
+      if (typeof v.p === 'number') assertEqual(Math.abs((got.p as number) - v.p) / v.p < 0.01, true, name + ' p ' + got.p);
+      if (typeof v.pMax === 'number') assertEqual((got.p as number) < v.pMax, true, name + ' p ' + got.p);
+    }
   });
 
   // Stop ids come from request paths: only the walk's own stops keep their name.

@@ -1,0 +1,19 @@
+{
+  "about": "Shared vectors for the week verdict (src/verdict.ts). p is the exact two-sided binomial p on a + b, rounded; pMax bounds a p too small to round.",
+  "vectors": [
+    { "a": 18, "b": 21, "word": "within noise", "test": "two counts", "p": 0.749 },
+    { "a": 18, "b": 40, "word": "down", "test": "two counts", "p": 0.0054 },
+    { "a": 372, "b": 589, "word": "down", "test": "two counts", "pMax": 0.0001 },
+    { "a": 47, "b": 36, "word": "within noise", "test": "two counts", "p": 0.272 },
+    { "a": 30, "b": 15, "word": "up", "test": "two counts", "p": 0.0357 },
+    { "a": 9, "b": 11, "word": "within noise", "test": "two counts", "p": 0.824 },
+    { "a": 9, "b": 10, "word": "too few to call", "test": "none" },
+    { "a": 36, "b": 0, "daysA": 7, "daysB": 0, "word": "no verdict", "test": "none" },
+    { "a": 40, "b": 30, "daysA": 7, "daysB": 5, "word": "no verdict", "test": "none" },
+    { "a": 55, "b": 40, "word": "within noise", "test": "two counts", "p": 0.151 },
+    { "a": 55, "b": 40, "history": [40, 44, 38, 42, 41, 39, 43, 40], "word": "up", "test": "process band" },
+    { "a": 45, "b": 40, "history": [40, 44, 38, 42, 41, 39, 43, 40], "word": "within noise", "test": "process band" },
+    { "a": 30, "b": 40, "history": [40, 44, 38, 42, 41, 39, 43, 40], "word": "down", "test": "process band" },
+    { "a": 30, "b": 40, "history": [44, 38, 42, 41, 39, 43, 40], "word": "within noise", "test": "two counts", "p": 0.282 }
+  ]
+}
