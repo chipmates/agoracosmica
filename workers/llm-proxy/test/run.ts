@@ -2557,10 +2557,10 @@ async function main(): Promise<number> {
       }
       const bare = await funnelBeacon({ step, figureId: 'rumi', language: 'en' });
       assertEqual(bare.blobs.length, 11, `${step} without labels still has its eleven slots`);
-      assertEqual(bare.blobs[7] + bare.blobs[9] + bare.blobs[10], '', `${step} without labels stores three blanks`);
+      assertEqual([bare.blobs[7], bare.blobs[9], bare.blobs[10]].join(''), '', `${step} without labels stores three blanks`);
       for (const odd of ['https://www.google.com/', '/figures/rumi/poems/', 'Poem', 'v2', 'lu3', 1, true, { kind: 'poem' }]) {
         const row = await funnelBeacon({ step, figureId: 'rumi', language: 'en', source: odd, kind: odd, version: odd });
-        assertEqual(row.blobs[7] + row.blobs[9] + row.blobs[10], '', `${step} blanks ${JSON.stringify(odd)}`);
+        assertEqual([row.blobs[7], row.blobs[9], row.blobs[10]].join(''), '', `${step} blanks ${JSON.stringify(odd)}`);
       }
     }
     for (const step of ['read', 'audio_play', 'cta_click', 'figure_selected', 'engaged', 'first_turn']) {
