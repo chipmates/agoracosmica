@@ -25,6 +25,7 @@ const BEHIND_ACCESS: Record<string, string> = {
   'GET /api/museum/hours': 'one day of those totals by hour',
   'GET /api/museum/trends': 'those totals day by day',
   'GET /api/museum/count': "the museum's own count, fixed questions",
+  'GET /api/agora/count': "Agora's count, fixed questions",
 };
 
 // ---------------------------------------------------------------------------

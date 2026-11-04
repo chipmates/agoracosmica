@@ -7,6 +7,7 @@ import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
 import { DASHBOARD_HTML } from './dashboard';
 import { handleMuseum } from './museum';
 import { handleMuseumCount, countDatasetOf } from './museum-count';
+import { handleAgoraCount } from './agora-count';
 import { readJsonCapped } from './bodyLimit';
 import { accessRefusal, accessDenied } from './access';
 import { dashboardPolicy } from './policy';
@@ -37,6 +38,7 @@ export const ROUTES: readonly Route[] = [
   { method: 'GET', path: '/api/museum/hours', handle: handleMuseum },
   { method: 'GET', path: '/api/museum/trends', handle: handleMuseum },
   { method: 'GET', path: '/api/museum/count', handle: (_request, env) => handleMuseumCount(env) },
+  { method: 'GET', path: '/api/agora/count', handle: (_request, env) => handleAgoraCount(env) },
 ];
 
 export default {

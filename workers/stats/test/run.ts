@@ -8,6 +8,7 @@
 import worker from '../src/index';
 import { countQuestions, guardCountSql, handleMuseumCount } from '../src/museum-count';
 import { handleMuseum } from '../src/museum';
+import { AGORA_GUARD, agoraQuestions, forgetAgoraCount, handleAgoraCount } from '../src/agora-count';
 import type { Env } from '../src/types';
 import { AUD, CERTS_URL, TEAM_DOMAIN, certsAnswer, makeSigner, signToken, type Signer } from './accessToken';
 
@@ -346,6 +347,87 @@ async function main(): Promise<void> {
     same(body.sources.real, { '': [2, 1, 0], search: [0, 2, 0], ad_grant: [0, 1, 0], forum: [0, 0, 1] }, 'third stops by word');
     same(body.sources.walks, { search: [10, 8, 0], '': [4, 0, 0] }, 'arrivals by word');
     same(body.sources.uses, { search: [3, 2, 0] }, 'uses by word');
+  });
+
+  // Agora's count: fixed questions behind the same guard, daily totals, weekly cells under 5 hidden.
+
+  await test('agora count: every question keeps the guard; a narrowed or unfiltered question is refused', async () => {
+    for (const q of agoraQuestions()) assertEqual(guardCountSql(q.sql, 'agora_llm', AGORA_GUARD), null, q.name);
+    const steps = agoraQuestions()[0].sql;
+    assertEqual(guardCountSql(steps.replace(" AND (blob9 != 'probe' AND blob9 != 'auto')", ''), 'agora_llm', AGORA_GUARD), 'probe rows not left out', 'no house filter');
+    assertEqual(guardCountSql(steps.replace(' GROUP BY', " AND blob4 = 'de' GROUP BY"), 'agora_llm', AGORA_GUARD), 'a total narrowed by language, device class or country', 'narrowed');
+    assertEqual(guardCountSql(steps.replace('SUM(_sample_interval)', 'COUNT()'), 'agora_llm', AGORA_GUARD), 'not a total', 'a row count');
+  });
+
+  await test('agora count: saved engine answers become daily totals per metric, landings by source and weekly cells', async () => {
+    forgetAgoraCount();
+    const now = Date.parse('2026-11-04T07:00:00Z');
+    const at = (d: string) => d + ' 00:00:00';
+    // Shaped like the engine's answers: numbers may come back as strings.
+    const answers: Record<string, Array<Record<string, unknown>>> = {
+      steps: [
+        { d: at('2026-10-26'), s: 'story_started', n: 9 }, { d: at('2026-10-26'), s: 'story_heard', n: '4' },
+        { d: at('2026-10-26'), s: 'page', n: 300 }, { d: at('2026-10-27'), s: 'read', n: 31 },
+        { d: at('2026-11-02'), s: 'story_heard', n: 2 }, { d: at('2026-11-04'), s: 'audio_play', n: 1 },
+      ],
+      landings: [
+        { d: at('2026-10-26'), k: 'direct', n: 200 }, { d: at('2026-10-26'), k: 'ad_google_grant', n: 40 },
+        { d: at('2026-10-27'), k: '', n: 3 }, { d: at('2026-10-27'), k: 'not a <word>', n: 7 },
+      ],
+      figures: [
+        { d: at('2026-10-26'), s: 'story_started', k: 'seneca', n: 6 }, { d: at('2026-10-27'), s: 'story_started', k: 'seneca', n: 1 },
+        { d: at('2026-10-26'), s: 'story_heard', k: 'seneca', n: 4 }, { d: at('2026-11-02'), s: 'story_heard', k: 'rumi', n: 2 },
+      ],
+      langs: [{ d: at('2026-10-27'), s: 'read', k: 'en', n: 31 }, { d: at('2026-10-26'), s: 'story_started', k: 'de', n: 3 }],
+    };
+    const byName = new Map(agoraQuestions().map((q) => [q.sql, q.name]));
+    const asked: string[] = [];
+    const fetcher = async (url: string, init: RequestInit) => {
+      const name = byName.get(String(init.body));
+      if (!name) throw new Error('a question this module does not ask: ' + String(init.body));
+      assertEqual(url, 'https://api.cloudflare.com/client/v4/accounts/0123456789abcdef0123456789abcdef/analytics_engine/sql', 'engine address');
+      asked.push(name);
+      return Response.json({ data: answers[name] || [] });
+    };
+    const agoraEnv = { CF_ACCOUNT_ID: '0123456789abcdef0123456789abcdef', CF_API_TOKEN: 'test-token' } as unknown as Env;
+    const response = await handleAgoraCount(agoraEnv, fetcher, now);
+    assertEqual(response.status, 200, 'status');
+    const body = (await response.json()) as {
+      state: string; first: string; days: string[]; gaps: string[]; daily: Record<string, number[]>;
+      landings: Record<string, number[]>; figures: { weeks: string[]; by: Record<string, Record<string, Array<number | string>>> };
+      langs: { weeks: string[]; by: Record<string, Record<string, Array<number | string>>> };
+    };
+    assertEqual(body.state, 'ok', 'state');
+    assertEqual(asked.length, agoraQuestions().length, 'questions asked');
+    assertEqual(body.gaps.length, 0, 'gaps');
+    assertEqual(body.first, '2026-10-26', 'first day');
+    assertEqual(body.days.length, 10, 'days to today');
+    assertEqual(JSON.stringify(Object.keys(body.daily)), JSON.stringify(['story_started', 'story_heard', 'read', 'audio_play', 'page_arrival']), 'metrics');
+    assertEqual(JSON.stringify(body.daily.story_heard), JSON.stringify([4, 0, 0, 0, 0, 0, 0, 2, 0, 0]), 'stories heard by day');
+    assertEqual(JSON.stringify(body.daily.page_arrival.slice(0, 2)), JSON.stringify([300, 0]), 'page arrivals by day');
+    assertEqual(JSON.stringify(body.daily.audio_play), JSON.stringify([0, 0, 0, 0, 0, 0, 0, 0, 0, 1]), 'audio plays, today partial');
+    assertEqual(JSON.stringify(Object.keys(body.landings).sort()), JSON.stringify(['', 'ad_google_grant', 'direct']), 'a source that is not a plain word is dropped');
+    assertEqual(JSON.stringify(body.figures.weeks), JSON.stringify(['2026-10-26', '2026-11-02']), 'weeks from Monday');
+    assertEqual(JSON.stringify(body.figures.by.story_started.seneca), JSON.stringify([7, '<5']), 'a cell under 5 is hidden');
+    assertEqual(JSON.stringify(body.figures.by.story_heard), JSON.stringify({ seneca: ['<5', '<5'], rumi: ['<5', '<5'] }), 'heard by figure');
+    assertEqual(JSON.stringify(body.langs.by.read.en), JSON.stringify([31, '<5']), 'reads by language');
+    forgetAgoraCount();
+  });
+
+  await test('agora count: a refused token says so and asks nothing more; without an account it asks nothing', async () => {
+    forgetAgoraCount();
+    let asked = 0;
+    const refused = async () => { asked++; return new Response('no', { status: 403 }); };
+    const agoraEnv = { CF_ACCOUNT_ID: '0123456789abcdef0123456789abcdef', CF_API_TOKEN: 'test-token' } as unknown as Env;
+    const body = (await (await handleAgoraCount(agoraEnv, refused, Date.now())).json()) as { state: string };
+    assertEqual(body.state, 'refused', 'state');
+    assertEqual(asked, 1, 'questions asked');
+    forgetAgoraCount();
+    asked = 0;
+    const unset = (await (await handleAgoraCount({ CF_ACCOUNT_ID: 'test-account', CF_API_TOKEN: 'x' } as unknown as Env, refused, Date.now())).json()) as { state: string };
+    assertEqual(unset.state, 'unset', 'unset state');
+    assertEqual(asked, 0, 'asked without an account');
+    forgetAgoraCount();
   });
 
   // Stop ids come from request paths: only the walk's own stops keep their name.

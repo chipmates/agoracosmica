@@ -10,7 +10,7 @@
 
 import type { Env } from './types';
 import type { Fetcher } from './museum';
-import { DAY_BUCKET, METRICS, MUSEUM_HOUSE_ROWS_OUT, WEIGHTED_COUNT } from './metrics';
+import { DAY_BUCKET, METRICS, MUSEUM_HOUSE_ROWS_OUT, WEIGHTED_COUNT, rowsOf } from './metrics';
 
 const DAY_MS = 86400 * 1000;
 // Analytics Engine keeps rows three months.
@@ -35,7 +35,7 @@ function question(dataset: string, name: string, fields: Field[], where: string)
 }
 
 // A real use is a walk that reaches its third stop.
-const THIRD_STOP = '(' + METRICS.real_use.where + ')';
+const THIRD_STOP = '(' + rowsOf(METRICS.real_use) + ')';
 const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR " + THIRD_STOP + ')';
 
 // The animal pages' kinds, as the site's build writes them (site/functions/_count/lists.js). A new animal page
@@ -110,9 +110,16 @@ function topLevel(list: string): string[] {
   return out;
 }
 
+// What differs between the datasets a count route reads: its house filter, the
+// field that filter reads, and the fields that may split a total but never narrow it.
+export interface GuardRules { house: string; marker: string; narrow: RegExp; narrowWhat: string }
+export const MUSEUM_GUARD: GuardRules = {
+  house: NOT_PROBE, marker: 'blob10', narrow: /\bblob[4589]\b/, narrowWhat: 'language, hold, device class or country',
+};
+
 // Null when a question keeps the count's rules, else the rule it breaks.
 // Every question of this module is checked here before it is sent.
-export function guardCountSql(sql: string, dataset: string): string | null {
+export function guardCountSql(sql: string, dataset: string, rules: GuardRules = MUSEUM_GUARD): string | null {
   const s = sql.replace(/\s+/g, ' ').trim();
   const up = s.toUpperCase();
   if (!/^SELECT /.test(up)) return 'not a SELECT';
@@ -121,7 +128,9 @@ export function guardCountSql(sql: string, dataset: string): string | null {
   if (/\b(JOIN|UNION|WITH|ARRAY|INTERSECT|EXCEPT|LATERAL)\b/.test(up)) return 'rows joined or combined';
   if ((up.match(/\bFROM\b/g) || []).length !== 1 || s.indexOf(' FROM ' + dataset + ' WHERE ') < 0) return 'not the count dataset alone';
   if (s.indexOf(" WHERE timestamp > NOW() - INTERVAL '") < 0) return 'no time window';
-  if (s.indexOf(' AND ' + NOT_PROBE) < 0 || (s.match(/blob10/g) || []).length !== 1) return 'probe rows not left out';
+  const marker = new RegExp('\\b' + rules.marker + '\\b', 'g');
+  const markers = (rules.house.match(marker) || []).length;
+  if (s.indexOf(' AND ' + rules.house) < 0 || (s.match(marker) || []).length !== markers) return 'probe rows not left out';
   // An OR outside brackets would let rows past the probe filter.
   const where = / WHERE (.+?) GROUP BY /i.exec(s);
   let flat = where ? where[1] : '';
@@ -129,7 +138,7 @@ export function guardCountSql(sql: string, dataset: string): string | null {
   if (!where || /\bOR\b/i.test(flat)) return 'probe rows not left out';
   // Language, hold, device class and country may split a total, never narrow one: a filter on them is a finer cell
   // than the split the field count allows.
-  if (/\bblob[4589]\b/.test(where[1])) return 'a total narrowed by language, hold, device class or country';
+  if (rules.narrow.test(where[1])) return 'a total narrowed by ' + rules.narrowWhat;
   if (/\bindex\d|\bdouble\d|\bCOUNT\s*\(|\bDISTINCT\b|\buniq|\bany\s*\(|\bgroupArray|\bargM|\btopK|\bmin\s*\(|\bmax\s*\(/i.test(s)) return 'not a total';
   if (/\b(HOUR|MINUTE|SECOND|toHour|toMinute|toSecond|toStartOfHour|toStartOfMinute|toStartOfFiveMinutes|toStartOfFifteenMinutes|toUnixTimestamp|toRelative|formatDateTime|toDateTime)\b/i.test(s)) return 'finer than a day';
   // The time may stand only in the day bucket and in the window.

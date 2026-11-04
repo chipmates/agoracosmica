@@ -40,59 +40,69 @@ export interface Metric {
   side: 'agora' | 'museum';
   label: string;
   dataset: string;
-  // The rows it counts, without the house filter (added by every query).
-  where: string;
+  // The row's step (blob1), and any further condition on its fields.
+  event: string;
+  also?: string;
   definition: string;
+}
+
+// The rows a metric counts, without the house filter (every query adds it).
+export function rowsOf(m: Metric): string {
+  return "blob1 = '" + m.event + "'" + (m.also ? ' AND ' + m.also : '');
 }
 
 // The numbers the weekly pull leads with and the count routes answer.
 export const METRICS: Record<string, Metric> = {
   story_heard: {
     name: 'story_heard', side: 'agora', label: 'stories heard', dataset: 'agora_llm',
-    where: "blob1 = 'story_heard'",
+    event: 'story_heard',
     definition: '30 seconds of a story heard, once per story and page load',
   },
   story_started: {
     name: 'story_started', side: 'agora', label: 'stories started', dataset: 'agora_llm',
-    where: "blob1 = 'story_started'",
+    event: 'story_started',
     definition: "a story's first play in a page load",
   },
   read: {
     name: 'read', side: 'agora', label: 'reads', dataset: 'agora_llm',
-    where: "blob1 = 'read'",
+    event: 'read',
     definition: 'a reading page held 30 visible seconds or scrolled past its middle, once per page load',
   },
   audio_play: {
     name: 'audio_play', side: 'agora', label: 'audio plays', dataset: 'agora_llm',
-    where: "blob1 = 'audio_play'",
+    event: 'audio_play',
     definition: 'the first play of an in-page audio player, once per page load',
   },
   page_arrival: {
     name: 'page_arrival', side: 'agora', label: 'page arrivals', dataset: 'agora_llm',
-    where: "blob1 = 'page'",
+    event: 'page',
     definition: 'a page of the site opened',
   },
   landing: {
     name: 'landing', side: 'agora', label: 'landings', dataset: 'agora_llm',
-    where: "blob1 = 'page' AND blob8 = 'landing'",
+    event: 'page', also: "blob8 = 'landing'",
     definition: 'the first page of a visit; blob3 holds its source class',
   },
   real_use: {
     name: 'real_use', side: 'museum', label: 'real uses', dataset: 'museum_count',
-    where: "blob1 = 'museum_stop' AND blob3 = '3'",
+    event: 'museum_stop', also: "blob3 = '3'",
     definition: 'a walk that reaches its third stop',
   },
   use: {
     name: 'use', side: 'museum', label: 'uses', dataset: 'museum_count',
-    where: "blob1 = 'museum_use'",
+    event: 'museum_use',
     definition: 'a walk that reaches its second stop or a first close look',
   },
   walk_arrival: {
     name: 'walk_arrival', side: 'museum', label: 'walk arrivals', dataset: 'museum_count',
-    where: "blob1 = 'museum_arrival'",
+    event: 'museum_arrival',
     definition: "the walk's page opened",
   },
 };
+
+// No distinct count is sent anywhere: a distinct count cannot be weighted.
+// The museum page's "different visitors" is Cloudflare's own estimate for the
+// zone, read through its GraphQL API (museum.ts), not a count of our rows.
 
 // Where each museum metric sits in the museum count's answer (museum-count.ts).
 export const MUSEUM_COUNT_SERIES: Record<string, { group: 'steps' | 'stops'; key: string }> = {
@@ -141,7 +151,7 @@ export function metricSql(m: Metric, w: Window, split: Array<[field: string, ali
   const fields = split.map(([f, a]) => f + ' AS ' + a);
   const select = fields.concat([WEIGHTED_COUNT + ' AS c']).join(', ');
   const group = split.length ? ' GROUP BY ' + split.map(([, a]) => a).join(', ') + ' ORDER BY c DESC' : '';
-  return 'SELECT ' + select + ' FROM ' + m.dataset + ' WHERE ' + houseFilterOf(m.dataset) + ' AND (' + m.where + ') AND ' + windowSql(w) + group;
+  return 'SELECT ' + select + ' FROM ' + m.dataset + ' WHERE ' + houseFilterOf(m.dataset) + ' AND (' + rowsOf(m) + ') AND ' + windowSql(w) + group;
 }
 
 // --- The rule every query keeps ---
