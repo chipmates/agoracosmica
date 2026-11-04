@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, FC, MouseEvent, KeyboardEvent } from 'react';
 import { useSwipeable } from 'react-swipeable';
 import { getHistoricalFigures, type TranslatedFigure } from '../api/figures';
+import { levelUp2First } from '../api/levelUpStories';
 import { CategoryTab, ActionButton, CloseButton } from './Button';
 import { BookOpen, Check, Sparkle, Play, Pause } from "@phosphor-icons/react";
 import OptimizedImage from './OptimizedImage';
@@ -51,7 +52,8 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
   
   // Get the figures with translations for the current language
   // Initialize synchronously so findInitialIndex has data on first render
-  const [translatedFigures, setTranslatedFigures] = useState<TranslatedFigure[]>(() => getHistoricalFigures(language));
+  // Level Up 2 figures lead each category; ordered here so every index below agrees
+  const [translatedFigures, setTranslatedFigures] = useState<TranslatedFigure[]>(() => levelUp2First(getHistoricalFigures(language)));
 
   // Find which category the selected figure belongs to. Category is now carried
   // on each figure (single source in api/figures.ts), so resolve it by id.
@@ -62,7 +64,7 @@ const FigureCarousel: FC<FigureCarouselProps> = ({
 
   // Update translated figures when language changes
   useEffect(() => {
-    setTranslatedFigures(getHistoricalFigures(language));
+    setTranslatedFigures(levelUp2First(getHistoricalFigures(language)));
   }, [language]);
   
   // Find the index of the selected figure within its category
