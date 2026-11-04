@@ -33,7 +33,7 @@ export const DASHBOARD_HTML = `<!DOCTYPE html>
   --s-story: #E6BC5C;
   --tx: #D2D2D2;
   --tx2: #CACACA;
-  --dim: #8A8A8A;
+  --dim: #A4A4A4;
   --src-direct: var(--tx2);
   --src-search: var(--s-prism);
   --src-ads: var(--gold);
