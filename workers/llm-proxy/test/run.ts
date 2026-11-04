@@ -2615,6 +2615,50 @@ async function main(): Promise<number> {
     }
   });
 
+  await test('a reading row is the listen row\'s shape under its own name, with the way in blob14', async () => {
+    for (const [type, mode, chapter] of [['foreword', 'foreword', 0], ['story', 'story', 3]] as Array<[string, string, number]>) {
+      for (const event of ['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'skimmed']) {
+        const row = await playbackBeacon({
+          type, event, way: 'read', figureId: 'dickinson', mode, language: 'de', chapter, bucket: 4,
+          source: 'search', kind: 'poem', version: 'orig', gclid: 'TESTCLICKID0001',
+        });
+        assert(row !== undefined, `${type} ${event} wrote no row`);
+        assertEqual(row.blobs.length, 14, `${type} ${event}: fourteen slots`);
+        assertEqual(row.blobs[0], 'reading', 'its own name in blob1');
+        assertEqual(row.indexes[0], 'reading', 'and in the index');
+        assertEqual(row.blobs[4], type, 'the type is blob5');
+        assertEqual(row.blobs[7], event, 'the event is blob8');
+        assertEqual(row.blobs[9], String(chapter), 'the story number is blob10');
+        assertEqual([row.blobs[10], row.blobs[11], row.blobs[12]].join('/'), 'search/poem/orig', 'the three labels');
+        assertEqual(row.blobs[13], 'read', 'the way is blob14');
+        assertEqual(row.doubles[0], 0, 'no time leaves the reader');
+        assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
+      }
+    }
+    for (const bad of [
+      { type: 'story', event: 'ended', way: 'read' },
+      { type: 'story', event: 'made_up', way: 'read' },
+      { type: 'story', way: 'read' },
+      { type: 'teaching', event: 'started', way: 'read' },
+      { type: 'story', event: 'skimmed' },
+      { type: 'story', event: 'skimmed', way: 'listen' },
+    ]) {
+      const row = await playbackBeacon({ ...bad, figureId: 'rumi', language: 'en', chapter: 1 });
+      assertEqual(row, undefined, `nothing written for ${JSON.stringify(bad)}`);
+    }
+  });
+
+  await test('listen rows are unchanged by the reader: no way, no fourteenth slot, their own name', async () => {
+    for (const way of [undefined, 'listen', 'READ', 1]) {
+      const row = await playbackBeacon({ type: 'story', event: 'progress_50', way, figureId: 'rumi', mode: 'story', language: 'en', chapter: 1, source: 'search', kind: 'poem', version: 'lu2' });
+      assertEqual(row.blobs[0], 'playback', `${JSON.stringify(way)}: a listen row`);
+      assertEqual(row.blobs.length, 13, `${JSON.stringify(way)}: thirteen slots`);
+      assertEqual(row.indexes[0], 'playback', 'indexed as playback');
+    }
+    const terminal = await playbackBeacon({ type: 'story', event: 'completed', figureId: 'rumi', language: 'en', chapter: 1, bucket: 3 });
+    assertEqual(terminal.doubles[0], 3, 'a listen end keeps its bucket');
+  });
+
   await test('a step outside the allowlist writes nothing at all', async () => {
     for (const step of ['ask_listen', 'ask_listen_failed', 'ask_listen_resume', '', 'made_up_step']) {
       const row = await funnelBeacon({ step, figureId: 'aurelius', mode: 'story', language: 'en' });

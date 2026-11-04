@@ -16,7 +16,7 @@ import type { Env } from '../utils/types';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
-  event?: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'ended';
+  event?: 'started' | 'progress_25' | 'progress_50' | 'progress_75' | 'completed' | 'ended' | 'skimmed';
   figureId?: string;
   mode?: string;
   language?: string;
@@ -27,6 +27,8 @@ interface PlaybackPayload {
   version?: unknown;
   source?: unknown;
   kind?: unknown;
+  // 'read' on the public story reader's rows; listening sends none.
+  way?: unknown;
 }
 
 const VALID_TYPES = new Set(['story', 'teaching', 'prism', 'council', 'foreword']);
@@ -61,6 +63,13 @@ const VALID_MODES = new Set(['story', 'wisdom', 'prism', 'quest', 'freetalk', 'c
 const VALID_LANGS = new Set(['en', 'de']);
 // The story player's two track types: their rows carry its three labels.
 const LABELLED_TYPES = new Set(['story', 'foreword']);
+
+// Reading a story in the public reader, counted in the shape of listening: it
+// started, each quarter of the text was read, and the end, or 'skimmed' for an
+// end reached faster than it can be read. Each step passed a reading-time floor
+// in the browser. These rows go under their own name ('reading'), so every
+// count of listening ('playback' rows) stays as it was.
+const READ_EVENTS = new Set(['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'skimmed']);
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
 
 // Rate limit: 200 playback beacons per IP per hour. Generous since a single
@@ -88,6 +97,14 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
   if (!VALID_TYPES.has(payload.type)) {
     return new Response(null, { status: 204 });
   }
+  // A reading row is the reader's whole closed shape, or nothing; a skim is never a listen.
+  const reading = payload.way === 'read';
+  if (reading && (!LABELLED_TYPES.has(payload.type) || typeof payload.event !== 'string' || !READ_EVENTS.has(payload.event))) {
+    return new Response(null, { status: 204 });
+  }
+  if (!reading && payload.event === 'skimmed') {
+    return new Response(null, { status: 204 });
+  }
 
   // Rate limit per IP. The plain IP appears only inside this short-lived KV
   // key (1-hour TTL, auto-deleted) and never in any stored analytics row.
@@ -112,7 +129,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
 
   // Default to 'completed' for backward compat with clients on the previous
   // schema; new clients always send the event explicitly.
-  const event = (typeof payload.event === 'string' && VALID_EVENTS.has(payload.event))
+  const event = (typeof payload.event === 'string' && (reading ? READ_EVENTS : VALID_EVENTS).has(payload.event))
     ? payload.event
     : 'completed';
 
@@ -142,10 +159,12 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     country: readCountry(request),
     device: readDevice(request),
     event,
-    bucket: TERMINAL_EVENTS.has(event) ? bucket : 0,
+    // Reading sends no time at all: the seconds stay in the browser.
+    bucket: !reading && TERMINAL_EVENTS.has(event) ? bucket : 0,
     chapter,
     probe: readProbe(payload.probe),
     labels: LABELLED_TYPES.has(payload.type) ? readListenLabels(payload) : undefined,
+    way: reading ? 'read' : undefined,
   });
 
   return new Response(null, { status: 204 });

@@ -34,6 +34,11 @@ const STORY_STEPS = ['story_started', 'story_heard'];
 const LANG_STEPS = ['story_started', 'story_heard', 'read', 'audio_play'];
 const PLAYBACK_EVENTS = ['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'ended'];
 const PLAYER_TRACKS = "blob1 = 'playback' AND blob5 IN ('story', 'foreword')";
+// The public reader's rows: the playback shape under blob1 'reading', blob14 'read'. A 'playback' row is listening.
+const READER_TRACKS = "blob1 = 'reading' AND blob5 IN ('story', 'foreword')";
+const READ_EVENTS = ['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'skimmed'];
+const BOTH_WAYS = "blob1 IN ('playback', 'reading') AND blob5 IN ('story', 'foreword')";
+const WAY_OF: Record<string, string> = { playback: 'listen', reading: 'read' };
 
 // The three listen labels: where each sits on the story steps and on the player's playback rows.
 export const LISTEN_LABELS = [
@@ -67,6 +72,9 @@ export function agoraQuestions(): AgoraQuestion[] {
     ...LISTEN_LABELS.map((l) => question('story_' + l.name, [['blob1', 's'], [l.story, 'k']], 'blob1 IN ' + quoted(STORY_STEPS))),
     // A playback row's event is its blob8.
     ...LISTEN_LABELS.map((l) => question('playback_' + l.name, [['blob8', 's'], [l.playback, 'k']], PLAYER_TRACKS)),
+    // The quarters by way: each event of the player's tracks, listened ('playback') or read ('reading').
+    question('ways', [['blob8', 's'], ['blob1', 'k']], BOTH_WAYS),
+    ...LISTEN_LABELS.map((l) => question('reading_' + l.name, [['blob8', 's'], [l.playback, 'k']], READER_TRACKS)),
   ];
 }
 
@@ -93,6 +101,9 @@ export interface AgoraCountAnswer {
   // did not open the visit (no source or kind), every row written before the labels, and on playback rows a listen
   // in the app.
   listens?: { story: Record<string, WeeklyUse>; playback: Record<string, WeeklyUse>; blank: string };
+  // The story reader counted like listening: every event of the player's tracks by way ('listen', 'read'), and the
+  // reading rows by label as playback is above. 'skimmed' is reading's own: an end reached faster than it reads.
+  reads?: { ways: WeeklyUse; labels: Record<string, WeeklyUse> };
   gaps?: string[];
 }
 
@@ -172,6 +183,16 @@ export async function buildAgoraCount(env: Env, fetcher: Fetcher, now: number): 
   const byStep = columns('steps', 's');
   const daily: Record<string, number[]> = {};
   for (const m of DAILY_METRICS) daily[m] = byStep[METRICS[m].event] || days.map(() => 0);
+  // The 'ways' answer names its rows by blob1; the cells say the way.
+  const byWay = () => {
+    const per: Record<string, Series> = {};
+    for (const step of [...PLAYBACK_EVENTS, 'skimmed']) {
+      const raw = columns('ways', 'k', (r) => r.s === step);
+      per[step] = {};
+      for (const [name, way] of Object.entries(WAY_OF)) if (raw[name]) per[step][way] = raw[name];
+    }
+    return weekly(days, per);
+  };
   const split = (name: string, steps: string[]) => {
     const per: Record<string, Series> = {};
     for (const step of steps) per[step] = columns(name, 'k', (r) => r.s === step);
@@ -191,6 +212,10 @@ export async function buildAgoraCount(env: Env, fetcher: Fetcher, now: number): 
       story: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('story_' + l.name, STORY_STEPS)])),
       playback: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('playback_' + l.name, PLAYBACK_EVENTS)])),
       blank: "'' is a listen in a page load that did not open the visit, a row written before the labels, or, on playback rows, a listen in the app",
+    },
+    reads: {
+      ways: byWay(),
+      labels: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('reading_' + l.name, READ_EVENTS)])),
     },
     gaps,
   };

@@ -224,6 +224,11 @@ export function trackSession(
  * only: the landing's source class, its kind of page, and the version of the
  * story's text, each '' when not known. Every other playback row keeps ten.
  *
+ * With way 'read' (the public story reader) the row is named 'reading' in
+ * blob1 and in the index, and blob14 holds the way, 'read': reading in the
+ * shape of listening, kept apart from every listening count. 'playback' rows,
+ * which have no blob14, are listening.
+ *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
  * Treat empty blob8 as 'completed' in queries (the only event type that
  * existed before the started/completed split).
@@ -242,11 +247,13 @@ export function trackPlayback(
     chapter: string;
     probe: string;
     labels?: ListenLabels;
+    way?: 'read';
   }
 ): void {
   try {
+    const name = data.way === 'read' ? 'reading' : 'playback';
     const blobs = [
-      'playback',
+      name,
       data.figureId,
       data.mode,
       data.language,
@@ -258,10 +265,11 @@ export function trackPlayback(
       data.chapter,
     ];
     if (data.labels) blobs.push(data.labels.source, data.labels.kind, data.labels.version);
+    if (data.way === 'read') blobs.push('read');
     env.ANALYTICS.writeDataPoint({
       blobs,
       doubles: [data.bucket],
-      indexes: ['playback'],
+      indexes: [name],
     });
   } catch {
     // Analytics must never break the request path

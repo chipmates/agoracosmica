@@ -475,6 +475,45 @@ async function main(): Promise<void> {
     forgetAgoraCount();
   });
 
+  await test('agora count: the player\'s quarters by way, listened or read, under the same guard', async () => {
+    const qs = agoraQuestions();
+    const ways = qs.find((q) => q.name === 'ways')!;
+    for (const q of qs) assertEqual(guardCountSql(q.sql, 'agora_llm', AGORA_GUARD), null, q.name);
+    assertEqual(ways.sql.includes("blob1 IN ('playback', 'reading') AND blob5 IN ('story', 'foreword')"), true, 'both ways, the player\'s tracks only');
+    for (const n of ['reading_source', 'reading_kind', 'reading_version']) {
+      assertEqual(qs.find((q) => q.name === n)!.sql.includes("blob1 = 'reading'"), true, n + ' reads the reading rows');
+    }
+    for (const n of ['playback_source', 'playback_kind', 'playback_version']) {
+      assertEqual(qs.find((q) => q.name === n)!.sql.includes("blob1 = 'playback' AND"), true, n + ' still reads listening only');
+    }
+    forgetAgoraCount();
+    const now = Date.parse('2026-11-04T07:00:00Z');
+    const at = (d: string) => d + ' 00:00:00';
+    const answers: Record<string, Array<Record<string, unknown>>> = {
+      steps: [{ d: at('2026-11-02'), s: 'story_started', n: 3 }],
+      ways: [
+        { d: at('2026-11-02'), s: 'progress_25', k: 'playback', n: 9 }, { d: at('2026-11-03'), s: 'progress_25', k: 'reading', n: 6 },
+        { d: at('2026-11-03'), s: 'completed', k: 'reading', n: 2 }, { d: at('2026-11-03'), s: 'skimmed', k: 'reading', n: 7 },
+        { d: at('2026-11-03'), s: 'started', k: 'something', n: 50 },
+      ],
+      reading_kind: [{ d: at('2026-11-03'), s: 'progress_25', k: 'poem', n: 5 }],
+    };
+    const byName = new Map(qs.map((q) => [q.sql, q.name]));
+    const fetcher = async (_url: string, init: RequestInit) => Response.json({ data: answers[byName.get(String(init.body)) || ''] || [] });
+    const agoraEnv = { CF_ACCOUNT_ID: '0123456789abcdef0123456789abcdef', CF_API_TOKEN: 'test-token' } as unknown as Env;
+    const body = (await (await handleAgoraCount(agoraEnv, fetcher, now)).json()) as {
+      state: string; reads: { ways: { weeks: string[]; by: Record<string, Record<string, unknown[]>> }; labels: Record<string, { by: Record<string, Record<string, unknown[]>> }> };
+    };
+    assertEqual(body.state, 'ok', 'state');
+    assertEqual(JSON.stringify(body.reads.ways.weeks), JSON.stringify(['2026-11-02']), 'one week');
+    assertEqual(JSON.stringify(body.reads.ways.by.progress_25), JSON.stringify({ listen: [9], read: [6] }), 'a quarter, listened and read side by side');
+    assertEqual(JSON.stringify(body.reads.ways.by.completed), JSON.stringify({ read: ['<5'] }), 'a small cell is hidden');
+    assertEqual(JSON.stringify(body.reads.ways.by.skimmed), JSON.stringify({ read: [7] }), 'skims are reading\'s own');
+    assertEqual(JSON.stringify(body.reads.ways.by.started), JSON.stringify({}), 'a row name that is no way is dropped');
+    assertEqual(JSON.stringify(body.reads.labels.kind.by.progress_25.poem), JSON.stringify([5]), 'reading by landing kind');
+    forgetAgoraCount();
+  });
+
   await test('agora count: a refused token says so and asks nothing more; without an account it asks nothing', async () => {
     forgetAgoraCount();
     let asked = 0;
