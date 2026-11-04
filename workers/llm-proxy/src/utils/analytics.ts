@@ -87,6 +87,45 @@ export function readSource(value: unknown): string {
 }
 
 /**
+ * The kind of page a visit began on, on the story player's listen rows: the
+ * front, a figure's own page, a page of poems or one poem, or any other page.
+ * Worked out in the browser from the landing's path, which never leaves it.
+ */
+export const LANDING_KINDS = new Set(['front', 'figure', 'poem', 'other']);
+
+/** Read the landing kind off a beacon payload field. Anything else is ''. */
+export function readLandingKind(value: unknown): string {
+  return (typeof value === 'string' && LANDING_KINDS.has(value)) ? value : '';
+}
+
+/**
+ * The version of a story's text on the story player's listen rows: 'orig', or
+ * 'lu2' for a text rewritten in the second level-up pass. A label on the
+ * content, like the chapter; a later revision adds its tag here.
+ */
+export const TEXT_VERSIONS = new Set(['orig', 'lu2']);
+
+/** Read the text version off a beacon payload field. Anything else is ''. */
+export function readTextVersion(value: unknown): string {
+  return (typeof value === 'string' && TEXT_VERSIONS.has(value)) ? value : '';
+}
+
+/** The story player's three labels on a listen row, each from its closed list or ''. */
+export interface ListenLabels {
+  source: string;
+  kind: string;
+  version: string;
+}
+
+export function readListenLabels(payload: { source?: unknown; kind?: unknown; version?: unknown }): ListenLabels {
+  return {
+    source: readSource(payload.source),
+    kind: readLandingKind(payload.kind),
+    version: readTextVersion(payload.version),
+  };
+}
+
+/**
  * Track an LLM proxy event (chat/council/summary).
  * dataset: agora_llm
  * blobs: [endpoint, figureId, mode, language, status, device, country, kind, probe]
@@ -168,7 +207,7 @@ export function trackSession(
  * rate and funnel over time.
  *
  * dataset: agora_llm
- * blobs: ['playback', figureId, mode, language, type, device, country, event, probe, chapter]
+ * blobs: ['playback', figureId, mode, language, type, device, country, event, probe, chapter, (source, kind, version)]
  * doubles: [bucket]  — a coarse bucket INDEX of the seconds actually listened
  *                      (0 = 0-14s, 1 = 15-59s, 2 = 60-179s, 3 = 180-599s,
  *                      4 = 600-1799s, 5 = 1800s+), written on the terminal
@@ -180,6 +219,10 @@ export function trackSession(
  * ranked per chapter and not only per figure. It is a content label from the
  * catalog, bounded by the route, and empty on every content type that has no
  * chapters and on every row written before the label existed.
+ *
+ * blob11 to blob13, on the story player's rows (types story and foreword)
+ * only: the landing's source class, its kind of page, and the version of the
+ * story's text, each '' when not known. Every other playback row keeps ten.
  *
  * Backward compat: rows written before 2026-05-08 evening have empty blob8.
  * Treat empty blob8 as 'completed' in queries (the only event type that
@@ -198,22 +241,25 @@ export function trackPlayback(
     bucket: number;
     chapter: string;
     probe: string;
+    labels?: ListenLabels;
   }
 ): void {
   try {
+    const blobs = [
+      'playback',
+      data.figureId,
+      data.mode,
+      data.language,
+      data.type,
+      data.device,
+      data.country,
+      data.event,
+      data.probe,
+      data.chapter,
+    ];
+    if (data.labels) blobs.push(data.labels.source, data.labels.kind, data.labels.version);
     env.ANALYTICS.writeDataPoint({
-      blobs: [
-        'playback',
-        data.figureId,
-        data.mode,
-        data.language,
-        data.type,
-        data.device,
-        data.country,
-        data.event,
-        data.probe,
-        data.chapter,
-      ],
+      blobs,
       doubles: [data.bucket],
       indexes: ['playback'],
     });
@@ -340,7 +386,7 @@ export function trackSignup(
  * mode_selected count every occurrence (volume counters, same row shape).
  *
  * dataset: agora_llm
- * blobs: [step, figureId|path|'', mode|arm|'', language, outcome, device, country, '', probe]
+ * blobs: [step, figureId|path|'', mode|arm|'', language, outcome, device, country, source|'', probe, (kind, version)]
  * doubles: [bucket]  — a coarse bucket INDEX (cinematic dwell 0-3,
  *                      first_reply reply-time 0-4, chat_depth 0-3), never raw
  *                      milliseconds and never a per-chat message count
@@ -353,7 +399,10 @@ export function trackSignup(
  * event types). blob8 carries the landing's source class on the two first-chat
  * steps (first_turn, first_turn_prefilled) and the two real-use steps
  * (engaged, council_heard) when the visit came in through a door on its
- * landing page, and stays empty everywhere else.
+ * landing page, and on the two story steps (story_started, story_heard) when
+ * the story played in the page load that opened the visit; empty everywhere
+ * else. The story steps alone add blob10, the landing's kind of page, and
+ * blob11, the version of the story's text; every other funnel row keeps nine.
  */
 export function trackFunnel(
   env: Env,
@@ -368,21 +417,25 @@ export function trackFunnel(
     device: string;
     source: string;
     probe: string;
+    // The story steps only: the landing's kind of page and the text's version.
+    story?: { kind: string; version: string };
   }
 ): void {
   try {
+    const blobs = [
+      data.step,
+      data.ref,
+      data.mode,
+      data.language,
+      data.outcome,
+      data.device,
+      data.country,
+      data.source,
+      data.probe,
+    ];
+    if (data.story) blobs.push(data.story.kind, data.story.version);
     env.ANALYTICS.writeDataPoint({
-      blobs: [
-        data.step,
-        data.ref,
-        data.mode,
-        data.language,
-        data.outcome,
-        data.device,
-        data.country,
-        data.source,
-        data.probe,
-      ],
+      blobs,
       doubles: [data.bucket],
       indexes: [data.step],
     });

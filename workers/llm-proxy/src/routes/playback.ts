@@ -10,7 +10,7 @@
 // playhead position, and there is no key tying a track's rows together.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPlayback, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackPlayback, readCountry, readDevice, readListenLabels, readProbe } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -23,6 +23,10 @@ interface PlaybackPayload {
   bucket?: number;
   chapter?: number;
   probe?: unknown;
+  // The story player's labels: the text's version, the landing's class and kind.
+  version?: unknown;
+  source?: unknown;
+  kind?: unknown;
 }
 
 const VALID_TYPES = new Set(['story', 'teaching', 'prism', 'council', 'foreword']);
@@ -55,6 +59,8 @@ const MAX_BUCKET = 5;
 const MAX_CHAPTER = 99;
 const VALID_MODES = new Set(['story', 'wisdom', 'prism', 'quest', 'freetalk', 'council', 'foreword']);
 const VALID_LANGS = new Set(['en', 'de']);
+// The story player's two track types: their rows carry its three labels.
+const LABELLED_TYPES = new Set(['story', 'foreword']);
 const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
 
 // Rate limit: 200 playback beacons per IP per hour. Generous since a single
@@ -139,6 +145,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     bucket: TERMINAL_EVENTS.has(event) ? bucket : 0,
     chapter,
     probe: readProbe(payload.probe),
+    labels: LABELLED_TYPES.has(payload.type) ? readListenLabels(payload) : undefined,
   });
 
   return new Response(null, { status: 204 });

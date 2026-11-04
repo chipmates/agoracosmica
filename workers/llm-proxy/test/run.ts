@@ -2509,21 +2509,23 @@ async function main(): Promise<number> {
     }
   });
 
-  await test('a story started and a story heard are the figure, the language and the arm, nothing else', async () => {
+  await test('a story started and a story heard are the figure, the language, the arm and the three listen labels', async () => {
     for (const step of ['story_started', 'story_heard']) {
       for (const mode of ['arrival', 'later', undefined]) {
         const row = await funnelBeacon({
           step, figureId: 'aurelius', language: 'de', mode, path: '/de/figures/marcus-aurelius/',
-          outcome: 'watched', bucket: 4, source: 'ad_google_grant', gclid: 'TESTCLICKID0001',
+          outcome: 'watched', bucket: 4, source: 'ad_google_grant', kind: 'poem', version: 'lu2', gclid: 'TESTCLICKID0001',
         });
         assert(row !== undefined, `${step} wrote no row`);
-        assertEqual(row.blobs.length, 9, 'the nine funnel slots');
+        assertEqual(row.blobs.length, 11, 'the nine funnel slots, the kind and the version');
         assertEqual(row.blobs[0], step, 'the step is blob1');
         assertEqual(row.blobs[1], 'aurelius', 'the figure, never the path');
         assertEqual(row.blobs[2], mode ?? '', 'the arm, or blank for a visitor without one');
         assertEqual(row.blobs[3], 'de', 'the language is blob4');
         assertEqual(row.blobs[4], '200', 'the outcome is pinned');
-        assertEqual(row.blobs[7], '', 'no source class');
+        assertEqual(row.blobs[7], 'ad_google_grant', 'the source class is blob8');
+        assertEqual(row.blobs[9], 'poem', 'the landing kind is blob10');
+        assertEqual(row.blobs[10], 'lu2', 'the text version is blob11');
         assertEqual(row.doubles[0], 0, 'no bucket');
         assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
       }
@@ -2535,6 +2537,81 @@ async function main(): Promise<number> {
       assertEqual(pathOnly.blobs[1], '', `${step} never stores a path`);
       const marked = await funnelBeacon({ step, figureId: 'rumi', language: 'en', probe: 1 });
       assertEqual(marked.blobs[8], 'probe', `${step} keeps the marker`);
+    }
+  });
+
+  await test('the story steps keep each listen label from its closed list, and nothing else', async () => {
+    for (const step of ['story_started', 'story_heard']) {
+      for (const source of ['ad_google_grant', 'ad_google_paid', 'ad_reddit', 'search', 'assistant', 'edu', 'mail',
+        'messenger', 'code', 'news', 'wiki', 'directory', 'reddit', 'social', 'referral', 'direct']) {
+        const row = await funnelBeacon({ step, figureId: 'rumi', language: 'en', source });
+        assertEqual(row.blobs[7], source, `${step} keeps ${source}`);
+      }
+      for (const kind of ['front', 'figure', 'poem', 'other']) {
+        const row = await funnelBeacon({ step, figureId: 'rumi', language: 'en', kind });
+        assertEqual(row.blobs[9], kind, `${step} keeps the kind ${kind}`);
+      }
+      for (const version of ['orig', 'lu2']) {
+        const row = await funnelBeacon({ step, figureId: 'rumi', language: 'en', version });
+        assertEqual(row.blobs[10], version, `${step} keeps the version ${version}`);
+      }
+      const bare = await funnelBeacon({ step, figureId: 'rumi', language: 'en' });
+      assertEqual(bare.blobs.length, 11, `${step} without labels still has its eleven slots`);
+      assertEqual(bare.blobs[7] + bare.blobs[9] + bare.blobs[10], '', `${step} without labels stores three blanks`);
+      for (const odd of ['https://www.google.com/', '/figures/rumi/poems/', 'Poem', 'v2', 'lu3', 1, true, { kind: 'poem' }]) {
+        const row = await funnelBeacon({ step, figureId: 'rumi', language: 'en', source: odd, kind: odd, version: odd });
+        assertEqual(row.blobs[7] + row.blobs[9] + row.blobs[10], '', `${step} blanks ${JSON.stringify(odd)}`);
+      }
+    }
+    for (const step of ['read', 'audio_play', 'cta_click', 'figure_selected', 'engaged', 'first_turn']) {
+      const row = await funnelBeacon({ step, path: '/poems/', figureId: 'rumi', mode: 'typed', language: 'en', kind: 'poem', version: 'lu2' });
+      assertEqual(row.blobs.length, 9, `${step} keeps nine slots`);
+      assert(!row.blobs.includes('lu2') && !row.blobs.includes('poem'), `${step} carries no kind and no version`);
+    }
+  });
+
+  const playbackBeacon = async (payload: Record<string, unknown>) => {
+    analyticsRows.length = 0;
+    await handlePlayback(
+      new Request('https://example.invalid/v1/playback', {
+        method: 'POST',
+        headers: { 'CF-Connecting-IP': '10.0.0.11' },
+        body: JSON.stringify(payload),
+      }),
+      fakeEnv(),
+    );
+    return analyticsRows[0];
+  };
+
+  await test('the story player\'s playback rows carry the three listen labels in blob11 to blob13', async () => {
+    const tracks: Array<[string, string, number]> = [['foreword', 'foreword', 0], ['story', 'story', 1]];
+    for (const [type, mode, chapter] of tracks) {
+      for (const event of ['started', 'progress_25', 'progress_50', 'progress_75', 'completed', 'ended']) {
+        const row = await playbackBeacon({
+          type, event, figureId: 'rumi', mode, language: 'en', chapter, bucket: 2,
+          source: 'search', kind: 'poem', version: chapter === 0 ? 'orig' : 'lu2', gclid: 'TESTCLICKID0001',
+        });
+        assert(row !== undefined, `${type} ${event} wrote no row`);
+        assertEqual(row.blobs.length, 13, `${type} ${event}: thirteen slots`);
+        assertEqual(row.blobs[0], 'playback', 'blob1');
+        assertEqual(row.blobs[4], type, 'the type is blob5');
+        assertEqual(row.blobs[7], event, 'the event is blob8');
+        assertEqual(row.blobs[9], String(chapter), 'the story number is blob10, the introduction 0');
+        assertEqual(row.blobs[10], 'search', 'the source class is blob11');
+        assertEqual(row.blobs[11], 'poem', 'the landing kind is blob12');
+        assertEqual(row.blobs[12], chapter === 0 ? 'orig' : 'lu2', 'the text version is blob13');
+        assertEqual(JSON.stringify(row).includes('TESTCLICKID0001'), false, 'no click id');
+      }
+      const bare = await playbackBeacon({ type, event: 'started', figureId: 'rumi', mode, language: 'en', chapter });
+      assertEqual(bare.blobs.length, 13, `${type} without labels keeps thirteen slots`);
+      assertEqual(bare.blobs.slice(10).join(''), '', `${type} without labels stores three blanks`);
+      const odd = await playbackBeacon({ type, event: 'started', figureId: 'rumi', language: 'en', source: 'google.com', kind: '/poems/', version: 'v9' });
+      assertEqual(odd.blobs.slice(10).join(''), '', `${type} blanks values off the lists`);
+    }
+    for (const type of ['teaching', 'prism', 'council']) {
+      const row = await playbackBeacon({ type, event: 'started', figureId: 'rumi', language: 'en', source: 'search', kind: 'poem', version: 'lu2' });
+      assertEqual(row.blobs.length, 10, `${type} keeps its ten slots`);
+      assert(!row.blobs.includes('search') && !row.blobs.includes('lu2'), `${type} carries no labels`);
     }
   });
 

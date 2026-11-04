@@ -16,7 +16,7 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, trackMuseum, readCountry, readDevice, readProbe, readSource } from '../utils/analytics';
+import { trackFunnel, trackMuseum, readCountry, readDevice, readListenLabels, readProbe, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
 
@@ -30,6 +30,9 @@ interface FunnelPayload {
   bucket?: number;
   // The landing's source class, kept on SOURCE_STEPS only.
   source?: unknown;
+  // The landing's kind of page and the story text's version, story steps only.
+  kind?: unknown;
+  version?: unknown;
   probe?: unknown;
   // The museum's fields, read on the museum_* steps only.
   wing?: unknown;
@@ -61,8 +64,9 @@ const ARM_STEPS = ['ad_consent_arm'] as const;
 
 // The story player's two listen counts, for every visitor: a story started
 // (its first play in a page load) and a story heard for 30 seconds (once per
-// story per page load). The row is the figure, never the path, and for a
-// grant arrival the card's arm in the label slot.
+// story per page load). The row is the figure, never the path, the version of
+// the story's text, for a grant arrival the card's arm in the label slot, and
+// in the page load that opened the visit its source class and kind of page.
 const STORY_STEPS = ['story_started', 'story_heard'] as const;
 const STORY_STEP_SET = new Set<string>(STORY_STEPS);
 
@@ -268,8 +272,8 @@ const MODE_RE = /^[a-z_]{1,40}$/;
 const VALID_LANGS = new Set(['en', 'de']);
 
 // The steps that may carry the landing's source class (blob8): the first
-// chat, and the two real-use steps.
-const SOURCE_STEPS = new Set(['first_turn', 'first_turn_prefilled', 'engaged', 'council_heard']);
+// chat, the two real-use steps and the two story steps.
+const SOURCE_STEPS = new Set(['first_turn', 'first_turn_prefilled', 'engaged', 'council_heard', ...STORY_STEPS]);
 
 // Coarse bucket index ceiling (cinematic dwell and the consent time-to-answer
 // set use 0-3, the first_reply reply-time set uses 0-4; the ceiling keeps one
@@ -385,6 +389,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
   if (timedCounter && outBucket > CONSENT_MAX_BUCKET) outBucket = 0;
   if (dimensionless || story) outBucket = 0;
   const figure = (typeof payload.figureId === 'string' && FIGURE_RE.test(payload.figureId)) ? payload.figureId : '';
+  const labels = readListenLabels(payload);
 
   trackFunnel(env, {
     step,
@@ -403,6 +408,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     device: readDevice(request),
     source: SOURCE_STEPS.has(step) ? readSource(payload.source) : '',
     probe: readProbe(payload.probe),
+    story: story ? { kind: labels.kind, version: labels.version } : undefined,
   });
 
   return new Response(null, { status: 204 });
