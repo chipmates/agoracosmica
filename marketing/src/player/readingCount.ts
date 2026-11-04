@@ -1,8 +1,8 @@
 // Reading a story counted in the shape of listening to it: started, each quarter of the text, and the end, plus one
 // 'skimmed' row for a text whose end was reached too fast. A quarter counts once its words were on screen, in a
 // visible tab, for at least the time its words take at the ceiling rate below (time on screen shared among the
-// quarters in view), and its last word has come into view. The clock stands while the story plays in the reader
-// (that is listening). Everything lives in page memory.
+// quarters in view), and its last word has come into view. The clock stands while the story is in the player (that
+// is listening). Everything lives in page memory.
 
 import type { PlaybackEvent } from '@client/utils/playbackBeacon';
 import type { PlayerLang } from './strings';
@@ -33,7 +33,7 @@ export interface ReadingOptions {
   measure: () => QuarterView[];
   /** The tab is visible. */
   visible: () => boolean;
-  /** The story plays in the reader: its time is listening's. */
+  /** The story is in the player (playing, paused or ended): its time is listening's. */
   listening: () => boolean;
   send: (event: PlaybackEvent | 'skimmed') => void;
   now?: () => number;

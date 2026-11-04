@@ -148,7 +148,7 @@ describe('reading a story', () => {
     expect(sent).toEqual(['started', 'progress_25', 'progress_50']);
   });
 
-  it('a hidden tab and a story playing in the reader add no time', () => {
+  it('a hidden tab and a story in the player add no time', () => {
     const r = reader();
     r.show(0, true);
     r.hide(true);

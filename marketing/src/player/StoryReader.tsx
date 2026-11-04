@@ -353,8 +353,9 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
   }, [blocks, n]);
 
   // ---- reading counted in the shape of listening (readingCount.ts) ----
-  const listeningHere = useRef(playingHere);
-  listeningHere.current = playingHere;
+  // While this story is the player's (playing, paused, on its end card, ended) its time is listening, not reading.
+  const listeningHere = useRef(here);
+  listeningHere.current = here;
   useEffect(() => {
     const box = scrollRef.current;
     const body = bodyRef.current;
