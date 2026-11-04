@@ -173,6 +173,20 @@ describe('the story player\'s labels', () => {
     for (const r of sent as Array<Record<string, unknown>>) expect(['version', 'source', 'kind'].filter((k) => k in r)).toEqual([]);
   });
 
+  it('a reading row says its way, and the tracker\'s listen rows never do', async () => {
+    const { sendPlaybackBeacon } = await import('../../utils/playbackBeacon');
+    sendPlaybackBeacon({ ...ctx, chapter: 1, version: 'lu2', source: 'search', kind: 'poem', way: 'read', event: 'skimmed', language: 'de' });
+    expect(sent.at(-1)).toMatchObject({ event: 'skimmed', way: 'read', version: 'lu2', source: 'search', kind: 'poem', language: 'de' });
+    sent.length = 0;
+    const labelled = { ...ctx, chapter: 2, version: 'orig', source: 'search', kind: 'poem' };
+    const key = listenTrackKey(labelled, 'https://media/way.webm');
+    noteListenPlay(key, labelled);
+    vi.advanceTimersByTime(10000);
+    noteListenProgress(key, 60, 100);
+    expect(sent.length).toBeGreaterThan(0);
+    for (const r of sent as Array<Record<string, unknown>>) expect('way' in r).toBe(false);
+  });
+
   it('the player labels the introduction as story 0 and each story by its text', async () => {
     const win = window as unknown as { __agcLanding?: unknown };
     vi.resetModules();

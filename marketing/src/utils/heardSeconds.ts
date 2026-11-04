@@ -153,10 +153,10 @@ export function landingLabels(): LandingLabels {
     const held = (window as unknown as { __agcLanding?: unknown }).__agcLanding;
     if (!held || typeof held !== 'object') return {};
     const { source, kind } = held as Record<string, unknown>;
-    return {
-      source: typeof source === 'string' ? source : undefined,
-      kind: typeof kind === 'string' ? kind : undefined,
-    };
+    const labels: LandingLabels = {};
+    if (typeof source === 'string') labels.source = source;
+    if (typeof kind === 'string') labels.kind = kind;
+    return labels;
   } catch {
     return {};
   }

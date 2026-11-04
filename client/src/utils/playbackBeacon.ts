@@ -33,7 +33,9 @@ export type PlaybackEvent =
   | 'progress_50'
   | 'progress_75'
   | 'completed'
-  | 'ended';
+  | 'ended'
+  // Reading only: the end of a text reached faster than it can be read.
+  | 'skimmed';
 
 interface PlaybackPayload {
   type: PlaybackContentType;
@@ -58,6 +60,8 @@ interface PlaybackPayload {
   version?: string;
   source?: string;
   kind?: string;
+  /** 'read' for the public story reader's rows; listening sends none. */
+  way?: 'read';
 }
 
 /**
@@ -115,6 +119,7 @@ export function sendPlaybackBeacon(
       version: payload.version,
       source: payload.source,
       kind: payload.kind,
+      way: payload.way,
       probe: probeField(),
     });
 

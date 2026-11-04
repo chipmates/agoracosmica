@@ -14,6 +14,7 @@ import {
   KEEP_EVENT,
   getState,
   leaveReader,
+  listenContext,
   markRead,
   openReader,
   openSheet,
@@ -30,6 +31,8 @@ import {
   togglePlay,
 } from './controller';
 import { loadFacts, loadText, loadTiming, shownFact } from './content';
+import { sendPlaybackBeacon } from '@client/utils/playbackBeacon';
+import { createReadingCount, domQuarters, quarterWords } from './readingCount';
 import { shownWords } from './quotes';
 import type { FactEntry, StoryTiming, TextBlock } from './content';
 import { blockAt, buildModel, paragraphStep, sentenceStart, wordAt } from './readalong';
@@ -348,6 +351,41 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     io.observe(end);
     return () => io.disconnect();
   }, [blocks, n]);
+
+  // ---- reading counted in the shape of listening (readingCount.ts) ----
+  const listeningHere = useRef(playingHere);
+  listeningHere.current = playingHere;
+  useEffect(() => {
+    const box = scrollRef.current;
+    const body = bodyRef.current;
+    if (!model || !box || !body) return;
+    const total = model.words.length;
+    const ctx = { ...listenContext(queue, n), way: 'read' as const };
+    const count = createReadingCount({
+      key: `${queue.figureId}/${queue.lang}/${n}`,
+      words: quarterWords(total),
+      lang: queue.lang,
+      measure: domQuarters(box, body, total),
+      visible: () => document.visibilityState !== 'hidden',
+      listening: () => listeningHere.current,
+      send: event => sendPlaybackBeacon({ ...ctx, event, language: queue.lang }, event === 'skimmed' ? 'beacon' : 'fetch'),
+    });
+    const timer = window.setInterval(() => count.tick(), 1000);
+    const onVisibility = () => {
+      if (document.visibilityState === 'hidden') count.flush();
+    };
+    const onPageHide = () => count.flush();
+    document.addEventListener('visibilitychange', onVisibility);
+    window.addEventListener('pagehide', onPageHide);
+    return () => {
+      window.clearInterval(timer);
+      document.removeEventListener('visibilitychange', onVisibility);
+      window.removeEventListener('pagehide', onPageHide);
+      count.flush();
+    };
+    // the queue's figure and language name the content; its object may be rebuilt
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [model, queue.figureId, queue.lang, n]);
 
   // ---- reopened from history: the text where the visitor left it ----
   useEffect(() => {
