@@ -29,7 +29,7 @@ export function closeGermanQuotes(text: string): string {
     for (let j = i + 1; j < text.length; j += 1) {
       const c = text[j]!;
       if (c === '„' || c === '‚' || (c === '\n' && at(j + 1) === '\n')) return false;
-      if (c === '"') return at(j - 1) === "'" && j - 1 > i;
+      if (c === '"' || c === '“') return at(j - 1) === "'" && j - 1 > i;
     }
     return false;
   };
@@ -37,6 +37,11 @@ export function closeGermanQuotes(text: string): string {
     const c = text[i]!;
     if (c === '„') stack.push('D');
     else if (c === '‚') stack.push('S');
+    else if (c === '“') {
+      // a closer already in its German form ends its „ like a straight one
+      const k = nearest('D');
+      if (k >= 0) stack.length = k;
+    }
     else if (c === '"') {
       if (opener(i)) {
         stack.push('d');
