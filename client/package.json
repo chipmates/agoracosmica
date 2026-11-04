@@ -27,7 +27,6 @@
     "@vitest/coverage-v8": "^4.1.12",
     "@vitest/ui": "^4.1.12",
     "eslint": "^9.39.5",
-    "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.1.1",
     "fake-indexeddb": "^6.2.5",
     "globals": "^17.14.0",
@@ -83,7 +82,8 @@
       "vite": "^7.3.7",
       "js-yaml": "^4.3.2",
       "@babel/core": "^7.29.6",
-      "browserslist": "^4.28.7"
+      "browserslist": "^4.28.7",
+      "minimatch": "^11.0.1"
     }
   }
 }

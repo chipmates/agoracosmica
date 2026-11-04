@@ -1,4 +1,3 @@
-const react = require('eslint-plugin-react');
 const reactHooks = require('eslint-plugin-react-hooks');
 const globals = require('globals');
 const tsParser = require('@typescript-eslint/parser');
@@ -30,8 +29,9 @@ module.exports = [
   },
   {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
+    // No eslint-plugin-react: five of its rules call minimatch as a function,
+    // which the minimatch ^11 override in package.json breaks.
     plugins: {
-      react: react,
       // The source already carries 17 react-hooks/exhaustive-deps disable
       // comments, so the rules were meant to run. Without the plugin ESLint
       // reports each of those lines as an unknown-rule error instead.
@@ -58,8 +58,6 @@ module.exports = [
       },
     },
     rules: {
-      // Add your rules here
-      'react/prop-types': 'off',
       // React ships rules-of-hooks as an error. It stays a warning until the
       // conditional-hook findings it surfaced are cleared, so turning the
       // rules on does not make lint fail on code nobody has looked at yet.
@@ -96,11 +94,6 @@ module.exports = [
           ]
         }
       ],
-    },
-    settings: {
-      react: {
-        version: 'detect',
-      },
     },
   },
   {
