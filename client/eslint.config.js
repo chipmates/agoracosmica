@@ -22,6 +22,13 @@ module.exports = [
     ],
   },
   {
+    // ESLint 9 warns on unused disable comments by default, ESLint 8 did not.
+    // Off keeps the warning count where it was; the stale comments are separate work.
+    linterOptions: {
+      reportUnusedDisableDirectives: 'off',
+    },
+  },
+  {
     files: ['**/*.{js,jsx,mjs,cjs,ts,tsx}'],
     plugins: {
       react: react,
