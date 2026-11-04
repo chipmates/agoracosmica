@@ -110,11 +110,11 @@ export function createReadingCount(o: ReadingOptions): ReadingCount {
 }
 
 /**
- * The view of the reader's four quarters, read off the word spans (`[data-wi]`) at each quarter's first and last
- * word, against the scroll box.
+ * The view of the reader's four quarters, read off the words the page shows (an introduction's heading is set apart
+ * and has none), at each quarter's first and last word, against the scroll box.
  */
-export function domQuarters(box: HTMLElement, body: HTMLElement, total: number): () => QuarterView[] {
-  const words = quarterWords(total);
+export function domQuarters(box: HTMLElement, spans: readonly HTMLElement[]): () => QuarterView[] {
+  const words = quarterWords(spans.length);
   const firsts: number[] = [];
   words.reduce((at, w) => {
     firsts.push(at);
@@ -123,8 +123,9 @@ export function domQuarters(box: HTMLElement, body: HTMLElement, total: number):
   return () => {
     const view = box.getBoundingClientRect();
     return words.map((w, q) => {
-      const first = body.querySelector(`[data-wi="${firsts[q]}"]`)?.getBoundingClientRect();
-      const lastWord = body.querySelector(`[data-wi="${firsts[q]! + w - 1}"]`)?.getBoundingClientRect();
+      const at = firsts[q] ?? 0;
+      const first = spans[at]?.getBoundingClientRect();
+      const lastWord = spans[at + w - 1]?.getBoundingClientRect();
       if (!first || !lastWord || w === 0) return { inView: false, reached: false };
       return {
         inView: first.top < view.bottom && lastWord.bottom > view.top,

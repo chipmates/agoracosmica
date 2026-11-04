@@ -5,6 +5,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import {
   READ_CEILING_WPM,
   createReadingCount,
+  domQuarters,
   quarterFloor,
   quarterWords,
 } from '../../../../marketing/src/player/readingCount';
@@ -161,5 +162,26 @@ describe('reading a story', () => {
     const second = open();
     for (let i = 0; i < 20; i++) { clock += 1000; second.tick(); }
     expect(sent).toEqual(['started', 'progress_25']);
+  });
+});
+
+describe('the view of the quarters in the page', () => {
+  it('reads each quarter off the words the page shows, against the scroll box', () => {
+    const rect = (top: number, bottom: number) => ({ top, bottom, left: 0, right: 10, width: 10, height: bottom - top, x: 0, y: top }) as DOMRect;
+    const box = document.createElement('div');
+    box.getBoundingClientRect = () => rect(100, 500);
+    // Eight shown words, two a quarter, one every 100 px from y = 0: the box shows y 100 to 500.
+    const spans = Array.from({ length: 8 }, (_, i) => {
+      const el = document.createElement('span');
+      el.getBoundingClientRect = () => rect(i * 100, i * 100 + 20);
+      return el;
+    });
+    expect(domQuarters(box, spans)()).toEqual([
+      { inView: true, reached: true },
+      { inView: true, reached: true },
+      { inView: true, reached: false },
+      { inView: false, reached: false },
+    ]);
+    expect(domQuarters(box, [])()).toEqual([0, 1, 2, 3].map(() => ({ inView: false, reached: false })));
   });
 });

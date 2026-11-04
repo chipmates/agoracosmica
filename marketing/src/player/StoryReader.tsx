@@ -359,13 +359,14 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
     const box = scrollRef.current;
     const body = bodyRef.current;
     if (!model || !box || !body) return;
-    const total = model.words.length;
+    const spans = Array.from(body.querySelectorAll<HTMLElement>('.w[data-wi]'));
+    const total = spans.length;
     const ctx = { ...listenContext(queue, n), way: 'read' as const };
     const count = createReadingCount({
       key: `${queue.figureId}/${queue.lang}/${n}`,
       words: quarterWords(total),
       lang: queue.lang,
-      measure: domQuarters(box, body, total),
+      measure: domQuarters(box, spans),
       visible: () => document.visibilityState !== 'hidden',
       listening: () => listeningHere.current,
       send: event => sendPlaybackBeacon({ ...ctx, event, language: queue.lang }, event === 'skimmed' ? 'beacon' : 'fetch'),
