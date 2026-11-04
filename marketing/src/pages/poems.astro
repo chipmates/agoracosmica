@@ -10,11 +10,25 @@ import { breadcrumbSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL, figureListUrl } from '../lib/urls';
 import { getT } from '../i18n';
 import { poems, poemSections, poets, POEM_PAGES_INDEXABLE } from '../data/poems/index.mjs';
+import { getFigureById } from '@client/data/public/figuresCatalog';
+import { numberWord } from '../lib/figureWorld';
+import { buildStoryQueue } from '../player/queue';
+import { playerStrings } from '../player/strings';
 
 const lang = 'en' as const;
 const t = getT(lang);
 const PAGE_PATH = '/poems';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
+
+// Several poets share this page, so no one player fits: each poet with a poem here gets a link to the figure page,
+// named by the story door's own title.
+const storyWays = [...new Set(poems.map(poem => poem.poet))].map(id => {
+  const poet = poets[id];
+  const slug = poet.figurePath.split('/').filter(Boolean).pop() ?? '';
+  const name = getFigureById(poet.id, lang)?.name ?? poet.name;
+  const count = buildStoryQueue(poet.id, slug, name, lang).entries.filter(e => e.n > 0).length;
+  return { href: poet.figurePath, text: playerStrings(lang).doorTitle(name, numberWord(count, lang)) };
+});
 
 const metaTitle = 'Poems to Read: Short, Famous, by Theme';
 const metaDescription =
@@ -85,22 +99,36 @@ const schemas = [
       ))}
     </nav>
 
-    {poemSections.map(section => (
-      <section class="pi-section">
-        <h2 class="pi-section__title" id={section.id}>{section.title}</h2>
-        <p class="pi-section__blurb">{section.blurb}</p>
-        <ul class="pi-list">
-          {section.poems.map(poem => (
-            <li class="pi-item">
-              <a class="pi-item__title" href={poem.path}>{poem.title}</a>
-              <span class="pi-item__poet">{poets[poem.poet].name}</span>
-              {poem.firstLine !== poem.title && (
-                <span class="pi-item__line">{poem.firstLine}</span>
-              )}
-            </li>
-          ))}
-        </ul>
-      </section>
+    {poemSections.map((section, si) => (
+      <Fragment>
+        <section class="pi-section">
+          <h2 class="pi-section__title" id={section.id}>{section.title}</h2>
+          <p class="pi-section__blurb">{section.blurb}</p>
+          <ul class="pi-list">
+            {section.poems.map(poem => (
+              <li class="pi-item">
+                <a class="pi-item__title" href={poem.path}>{poem.title}</a>
+                <span class="pi-item__poet">{poets[poem.poet].name}</span>
+                {poem.firstLine !== poem.title && (
+                  <span class="pi-item__line">{poem.firstLine}</span>
+                )}
+              </li>
+            ))}
+          </ul>
+        </section>
+        {si === 0 && (
+          <aside class="pi-section pi-stories" aria-labelledby="pi-stories">
+            <h2 class="pi-section__title" id="pi-stories">Their lives, told as stories</h2>
+            <ul class="pi-list">
+              {storyWays.map(way => (
+                <li class="pi-item">
+                  <a class="pi-item__title" href={way.href}>{way.text}</a>
+                </li>
+              ))}
+            </ul>
+          </aside>
+        )}
+      </Fragment>
     ))}
 
     <BackLink at="end" href={figureListUrl(lang)} label={t('nav.allFigures')} />
@@ -186,6 +214,10 @@ const schemas = [
     margin: 0 0 0.5rem;
     line-height: 1.25;
     scroll-margin-top: 5rem;
+  }
+  /* No blurb under this heading: the list keeps the air a blurb leaves. */
+  .pi-stories .pi-list {
+    margin-top: 1.25rem;
   }
   .pi-section__blurb {
     color: var(--text-secondary);
