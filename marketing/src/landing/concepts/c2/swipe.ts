@@ -1,5 +1,5 @@
 // The full face turns like a page: a sideways swipe on the hero, the two arrow buttons, or the arrow keys while focus
-// is in the hero put the next or previous of the thirty on the stage (era order, wrapping at the ends). The surface
+// is in the hero put the next or previous of the thirty on the stage (TURN order, wrapping at the ends). The surface
 // keeps the browser's vertical pan (touch-action in c2.css): a vertical start is the page's scroll, a sideways one is
 // held from the page's pan, and a sideways start that ends mostly vertical is refused at release. A swipe never
 // reaches the plate's click.

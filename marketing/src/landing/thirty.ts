@@ -2,6 +2,7 @@
 // the sizes the layouts draw, and the queue the figure page's plate plays. Build time only: queues read the content
 // tree. A page hands the browser its language's records through `stagePayload` (StageData.astro).
 
+import { levelUp2First } from '@client/api/levelUpStories';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import { figureIdToSlug } from '@client/data/public/slugMap';
 import { getPublicImageSrcSet, getPublicImageUrl } from '@client/utils/public/publicMediaUrl';
@@ -142,6 +143,13 @@ export function figure(id: string): Figure {
   return f;
 }
 
+/** The hero's turn order: the figure it opens on, then the lives with a Level Up 2 story, then the rest, each in era
+ * order. The rail and the descent keep the era order. */
+export const TURN: readonly Figure[] = [
+  figure(DEFAULT_FIGURE),
+  ...levelUp2First(THIRTY.filter(f => f.id !== DEFAULT_FIGURE)),
+];
+
 /** The thirty grouped by era, oldest era first, each era oldest first. */
 export function byEra(): { era: Era; figures: Figure[] }[] {
   return [...ERAS].reverse().map(era => ({ era, figures: THIRTY.filter(f => f.era.id === era.id) }));
@@ -241,7 +249,7 @@ export function stageFigure(id: string, lang: LandingLang): StageFigure {
 }
 
 export function stagePayload(lang: LandingLang, first: string = DEFAULT_FIGURE): StagePayload {
-  return { lang, first, figures: THIRTY.map(f => stageFigure(f.id, lang)) };
+  return { lang, first, figures: TURN.map(f => stageFigure(f.id, lang)) };
 }
 
 /** JSON for a `<script type="application/json">`, safe against a closing tag in any string. */
