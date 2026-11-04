@@ -1,5 +1,6 @@
-// One definition of every counted number. The dashboard's queries, the count
-// routes and the weekly pull all read this file, so a number is defined once.
+// One definition of every counted number. The count routes and the scripts
+// that query this worker (the weekly pull) read this file, so a number is
+// defined once.
 //
 // This file imports nothing and uses only syntax that type stripping can
 // erase, so scripts outside the Worker can load it as plain JavaScript.
@@ -104,8 +105,8 @@ export const METRICS: Record<string, Metric> = {
 };
 
 // No distinct count is sent anywhere: a distinct count cannot be weighted.
-// The museum page's "different visitors" is Cloudflare's own estimate for the
-// zone, read through its GraphQL API (museum.ts), not a count of our rows.
+// The museum's "different visitors" (/api/museum) is Cloudflare's own estimate
+// for the zone, read through its GraphQL API (museum.ts), not a count of our rows.
 
 // Where each museum metric sits in the museum count's answer (museum-count.ts).
 export const MUSEUM_COUNT_SERIES: Record<string, { group: 'steps' | 'stops'; key: string }> = {
@@ -160,7 +161,7 @@ export function metricSql(m: Metric, w: Window, split: Array<[field: string, ali
 // --- The rule every query keeps ---
 
 // Null when a query counts at the sample weight and keeps the house rows out,
-// else the rule it breaks. A query that reads no dataset (the page's filler
+// else the rule it breaks. A query that reads no dataset (a filler
 // "SELECT 1") breaks neither.
 export function houseRuleBreak(sql: string): string | null {
   const s = sql.replace(/\s+/g, ' ').trim();

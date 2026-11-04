@@ -20,17 +20,15 @@ export interface Env {
    */
   ORIGIN_VERIFY_KEY?: string;
   /**
-   * Unix epoch (seconds) of public launch. When set to a non-zero value, all
-   * Analytics Engine queries are floored at this timestamp and the dashboard
-   * renders a "Stats since: <date>" label under the sidebar brand. Defaults
-   * to "0" (no floor, no label) — matches behavior before the launch-floor
-   * feature was added.
+   * Unix epoch (seconds) of public launch. When set to a non-zero value, every
+   * query through /api/query and /api/query-batch is floored at this timestamp.
+   * "0" means no floor.
    */
   LAUNCH_EPOCH_SECONDS?: string;
   /**
-   * Museum of Ages panel. A read-only token for the museum's zone (Zone,
+   * The /api/museum routes. A read-only token for the museum's zone (Zone,
    * Analytics, Read, that one zone) and the zone's tag, both secrets. With
-   * either one missing the panel says it is not set up and asks nothing.
+   * either one missing the routes answer that it is not set up and ask nothing.
    */
   MUSEUM_CF_API_TOKEN?: string;
   MUSEUM_ZONE_TAG?: string;
@@ -43,9 +41,9 @@ export interface Env {
   /** The walk's stops in their order, comma separated, as the film's files name them. */
   MUSEUM_WALK_STOPS?: string;
   /**
-   * Marks and aims for the museum's trend charts, a secret holding JSON:
+   * Marks and aims returned by /api/museum/trends, a secret holding JSON:
    * {"events":[{"day":"YYYY-MM-DD","label":"..."}],"aims":[{"metric":"real","per":"week","value":15,"label":"..."}]}.
-   * Never in the repository. Without it the charts carry no marks.
+   * Never in the repository. Without it the answer carries no notes.
    */
   MUSEUM_TREND_NOTES?: string;
   /** The Analytics Engine dataset the museum's own count writes to. */

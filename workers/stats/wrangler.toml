@@ -1,5 +1,5 @@
-# Cloudflare Worker — Internal Analytics Dashboard (STATS-2)
-# Serves HTML dashboard, queries Analytics Engine SQL API
+# Cloudflare Worker: internal analytics data routes (no page)
+# Queries the Analytics Engine SQL API for scripts
 # Protected by Cloudflare Access (configure in CF dashboard)
 
 name = "agora-cosmica-stats"
@@ -10,16 +10,16 @@ preview_urls = false
 
 # Environment Variables
 [vars]
-# Both speech servers are retired: with the URLs empty the server panel asks
+# Both speech servers are retired: with the URLs empty /api/server-stats asks
 # nothing and says that no server is configured.
 SERVER_FSN1_URL = ""
 SERVER_NBG1_URL = ""
-# Unix epoch (seconds) of public launch. When > 0, every Analytics Engine query
-# is floored at this timestamp and the sidebar shows "Stats since: <date>".
-# Leave at "0" to disable (shows full AE history, no label).
+# Unix epoch (seconds) of public launch. When > 0, every query through
+# /api/query and /api/query-batch is floored at this timestamp.
+# Leave at "0" to disable (full AE history).
 # Set 2026-05-06 05:18:40 UTC — public launch.
 LAUNCH_EPOCH_SECONDS = "1778044720"
-# Museum of Ages panel: Cloudflare's own totals for the museum's zone.
+# The /api/museum routes: Cloudflare's own totals for the museum's zone.
 # The day it opened (UTC), its languages (the root language first), and the
 # walk's stops in their order, as the film's files name them.
 MUSEUM_HOST = "museumofages.org"
@@ -30,15 +30,15 @@ MUSEUM_WALK_STOPS = "picture-room,picture-room-lisa,picture-room-west,flight,wor
 MUSEUM_COUNT_DATASET = "museum_count"
 
 # Secrets (set via wrangler secret put):
-# - MUSEUM_TREND_NOTES  (JSON with the trend charts' marks and aims; optional,
-#                        never in this file)
+# - MUSEUM_TREND_NOTES  (JSON with the marks and aims /api/museum/trends
+#                        returns; optional, never in this file)
 # - MUSEUM_COUNT_ACCOUNT_ID, MUSEUM_COUNT_API_TOKEN (only if the museum's
 #                        Pages project is in another account: that account's
 #                        ID and a token with Account Analytics Read there)
 # - MUSEUM_CF_API_TOKEN (read-only token for the museum's zone: Zone,
 #                        Analytics, Read, that one zone and nothing else)
-# - MUSEUM_ZONE_TAG     (the museum zone's ID; without both the panel says
-#                        it is not set up and asks Cloudflare nothing)
+# - MUSEUM_ZONE_TAG     (the museum zone's ID; without both the routes say
+#                        it is not set up and ask Cloudflare nothing)
 # - CF_API_TOKEN       (API token with Analytics Engine read permission)
 # - CF_ACCOUNT_ID      (Cloudflare account ID for Analytics Engine queries)
 # - AUDIO_API_KEY, ORIGIN_VERIFY_KEY (sent only to a configured speech server;

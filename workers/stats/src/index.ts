@@ -1,21 +1,19 @@
-// Agora Cosmica — Internal Analytics Dashboard (V2)
-// Serves a self-contained HTML dashboard that queries CF Analytics Engine SQL API.
+// Agora Cosmica stats worker: internal data routes over the CF Analytics Engine
+// SQL API, for scripts; it serves no page.
 // Every request must carry a valid Cloudflare Access JWT (access.ts) before any
 // route runs; the Access policy in the dashboard is the first gate, this the second.
 
 import type { Env, BatchQueryRequest, ServerStatsCache } from './types';
-import { DASHBOARD_HTML } from './dashboard';
 import { handleMuseum } from './museum';
 import { handleMuseumCount, countDatasetOf } from './museum-count';
 import { handleAgoraCount } from './agora-count';
 import { readJsonCapped } from './bodyLimit';
 import { accessRefusal, accessDenied } from './access';
-import { dashboardPolicy } from './policy';
 
 const VERSION = '2.0';
 const SERVER_CACHE_TTL = 5000;
-// The dashboard's largest batch holds about 10 KB of SQL, and a batch takes at
-// most 64 queries; 1 MiB leaves room for longer questions from scripts.
+// A batch takes at most 64 queries; 1 MiB leaves room for long questions
+// from scripts.
 const MAX_QUERY_BODY_BYTES = 1024 * 1024;
 
 let serverCache: ServerStatsCache = { data: null, at: 0 };
@@ -29,7 +27,6 @@ export interface Route {
 // Every pair the worker answers; anything else is a 404, and only behind the
 // Access check. test/routeAccess.ts lists each one.
 export const ROUTES: readonly Route[] = [
-  { method: 'GET', path: '/', handle: serveDashboard },
   { method: 'GET', path: '/health', handle: handleHealth },
   { method: 'POST', path: '/api/query', handle: handleQuery },
   { method: 'POST', path: '/api/query-batch', handle: handleBatchQuery },
@@ -59,23 +56,6 @@ async function handleHealth(): Promise<Response> {
   return Response.json({ status: 'ok', version: VERSION });
 }
 
-// The dashboard. LAUNCH_EPOCH_SECONDS is filled in at render time; String() of
-// parseInt keeps it a valid integer literal inside the inline script.
-async function serveDashboard(_request: Request, env: Env): Promise<Response> {
-  const launchEpoch = String(parseInt(env.LAUNCH_EPOCH_SECONDS || '0', 10) || 0);
-  const html = DASHBOARD_HTML.replace(/__LAUNCH_EPOCH_SECONDS__/g, launchEpoch);
-  return new Response(html, {
-    headers: {
-      'Content-Type': 'text/html; charset=utf-8',
-      'Cache-Control': 'no-cache',
-      'Content-Security-Policy': await dashboardPolicy(html),
-      'X-Content-Type-Options': 'nosniff',
-      'Referrer-Policy': 'no-referrer',
-      'X-Dashboard-Version': VERSION,
-    },
-  });
-}
-
 // --- Single query ---
 
 async function queryAnalyticsEngine(sql: string, env: Env): Promise<Response> {
@@ -92,9 +72,9 @@ async function queryAnalyticsEngine(sql: string, env: Env): Promise<Response> {
   );
 }
 
-// Floor every dashboard SQL query at the launch epoch so pre-launch test data
-// is excluded. The dashboard's queries are all flat (single top-level WHERE,
-// no subqueries), so injecting after the first WHERE keyword is safe.
+// Floor every query through /api/query and /api/query-batch at the launch
+// epoch so pre-launch test data is excluded. Injecting after the first WHERE
+// keyword assumes a flat query (one top-level WHERE, no subqueries).
 function applyLaunchFloor(sql: string, env: Env): string {
   const epoch = parseInt(env.LAUNCH_EPOCH_SECONDS || '0', 10);
   if (!epoch) return sql;

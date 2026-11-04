@@ -16,7 +16,6 @@ import { AUD, CERTS_URL, ISSUER, TEAM_DOMAIN, makeSigner, serviceClaims, signTok
 
 /** Behind the Access JWT, every one. */
 const BEHIND_ACCESS: Record<string, string> = {
-  'GET /': 'the dashboard page',
   'GET /health': 'the version check',
   'POST /api/query': 'one SELECT against Analytics Engine',
   'POST /api/query-batch': 'up to 64 SELECTs against Analytics Engine',
@@ -170,19 +169,17 @@ async function main(): Promise<number> {
     });
   }
 
-  await test('GET / serves the dashboard under its policy', async () => {
-    const request = new Request('https://stats.example.invalid/', { headers: { 'Cf-Access-Jwt-Assertion': person } });
-    const response = await worker.fetch(request, baseEnv as unknown as Env);
-    assertEqual(response.status, 200, 'status');
-    assert((response.headers.get('Content-Type') || '').startsWith('text/html'), 'an HTML answer');
-    const csp = response.headers.get('Content-Security-Policy') || '';
-    for (const part of ["default-src 'none'", "frame-ancestors 'none'", "base-uri 'none'", "form-action 'none'", "connect-src 'self'"]) {
-      assert(csp.indexOf(part) >= 0, `the policy holds ${part}: ${csp}`);
+  // The worker serves no page: / is an unknown path like any other, behind Access first.
+  await test('GET / serves no page: 403 without a token, the plain 404 with one, no call made', async () => {
+    const refused = await call('GET', '/', null);
+    assertEqual(refused.status, 403, 'status without a token');
+    assertEqual(refused.text, '', 'body without a token');
+    for (const [label, token] of [['person', person], ['service token', service]]) {
+      const got = await call('GET', '/', token);
+      assertEqual(got.status, 404, `${label}: status`);
+      assertEqual(got.text, JSON.stringify({ error: 'Not found' }), `${label}: body`);
+      assertEqual(got.calls.length, 0, `${label}: calls`);
     }
-    assert(/script-src 'sha256-[A-Za-z0-9+/]{43}='(;|$)/.test(csp), `the script by its hash alone: ${csp}`);
-    assert(csp.indexOf('unsafe-inline') === csp.indexOf("style-src-attr 'unsafe-inline'") + "style-src-attr '".length, `unsafe-inline only for style attributes: ${csp}`);
-    const html = await response.text();
-    assert(!/\son[a-z]+\s*=\s*["']/i.test(html.replace(/<script>[\s\S]*?<\/script>/g, '')), 'no inline event handler in the markup');
   });
 
   await test('a pair outside the table: 403 without a token, 404 with one', async () => {
