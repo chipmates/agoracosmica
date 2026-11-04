@@ -1,6 +1,8 @@
 // Agora Cosmica — Dashboard HTML Template (V2)
 // Self-contained: all CSS + JS + HTML inline. Zero external deps except Google Fonts.
 
+import { HOUSE_ROWS_OUT, WEIGHTED_COUNT, weightedMean } from './metrics';
+
 export const DASHBOARD_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1112,13 +1114,15 @@ const LAUNCH_EPOCH_SECONDS = __LAUNCH_EPOCH_SECONDS__;
 const NS2_LIVE_DATE = '2026-09-01';
 const NS2_LIVE_MS = Date.parse(NS2_LIVE_DATE + 'T00:00:00Z');
 
-// Rows whose in-house probe marker is set are the owner's own testing. The
-// events carrying this marker (engaged, playback, page, paid_arrival) are
-// filtered on it here, matching internal/ops/stats-pull.mjs exactly so the
-// dashboard and the Monday pull can never disagree. The older counters on the
-// same tabs predate the filter and are NOT deflated, so the two are not
-// directly comparable.
-const NOT_PROBE = "blob9 != 'probe'";
+// Every query counts at the sample weight and leaves the house rows out (rows
+// of a browser marked for our own testing, and rows from hosting networks).
+// Both strings come from the Worker's shared definitions (src/metrics.ts),
+// which the weekly pull reads too, so a count and its filter mean the same on
+// both sides. The page's windows roll (the last n days up to now) and the
+// pull's weeks are whole UTC days, so the two agree only over the same window.
+const NOT_PROBE = ${JSON.stringify(HOUSE_ROWS_OUT)};
+const WEIGHTED = ${JSON.stringify(WEIGHTED_COUNT)};
+const MEAN_DOUBLE1 = ${JSON.stringify(weightedMean('double1'))};
 
 // Coarse listened-time buckets (double1 on a terminal playback row). Index 0
 // is 0-14s, which the ex-zero filter cannot separate from an unwritten slot,
@@ -2190,126 +2194,126 @@ async function loadOverview() {
   var alertsEl = document.getElementById('alerts-overview');
 
   var queries = [
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'council' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'summary' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'council' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'summary' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // LLM errors (non-200 chat/council/summary)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 IN ('chat','council','summary') AND blob5 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Audio errors
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // Rate limits
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // Sparkline: sessions
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Sparkline: chats
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Sparkline: TTS
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
     // Hourly chat (for correlation chart)
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' HOUR) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + Math.min(S.range, 7) + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' HOUR) as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + Math.min(S.range, 7) + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Daily trend (for range > 1)
     S.range > 1
-      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
+      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
       : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
     // Top figure
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 1", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 1", dataset: 'agora_llm' },
     // Language split (for insight)
-    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as lang, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
     // Content STARTED by type — playback first-play events (blob8='started').
     // Filter intentional: matches the Engagement tab's "Content Started" KPI
     // exactly. Including completed events would over-count by the small number
     // of completions, breaking cross-tab consistency.
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as type, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
     // Top figures by content first-plays (same blob8='started' filter)
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND blob8 = 'started' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 8", dataset: 'agora_llm' },
     // Page arrivals (true visit count, fires on every cold load)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals previous period (for delta)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Entry: post-cinematic welcome step where consent is given + profile created
     // (welcome modal "Begin"). Since 2026-05-29 this fires AFTER consent, not at
     // the old login card, so windows straddling that date show a step, not a drop.
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'entry' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Page arrivals sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Funnel split: all distinct page paths with counts. Aggregated client-side
     // into marketing (Astro static figures/themes/about/contact, both langs) vs
     // app (React SPA). AE SQL does not support LIKE pattern matching, so we
     // group by path and classify in JS by prefix + exact-match lookup. The
     // landing flag (blob8) and the source class (blob3) ride along so the app's
     // loads can be split by where they came from, out of this one query.
-    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
     // Signups (total new-account beacons; distinct from gclid-gated profile_created)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'signup' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Content completed total (blob8='completed' OR legacy empty blob8 — see analytics.ts trackPlayback comment).
     // Parallel engagement endpoint alongside Chats — a sessioned user can do both.
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
     // Chat by mode (blob3 holds the mode for chat events). Breaks down chat
     // activity across the three interactive modes: seed_conversation (Wisdom),
     // challenge (Quest), free_conversation (Freetalk). MODE_LABELS maps raw → display.
-    { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as mode, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
     // Signups previous period — for the Pulse "new signups" delta.
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'signup' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // --- D1 period-over-period additions (APPENDED at the end; reads are
     // positional, so new queries must never be inserted mid-array). r[31..34]. ---
     // Entry previous period (funnel ghost bar)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'entry' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Page paths previous period (classified into marketing/app for the ghost)
-    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, blob8 as landing, blob3 as source, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND blob2 != '' AND timestamp " + prevRange() + " GROUP BY path, landing, source ORDER BY c DESC LIMIT 10000", dataset: 'agora_llm' },
     // Daily Conversations (chat) current + previous period for the ghost trend line
     S.range > 1
-      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
+      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' }
       : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
     S.range > 1
-      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp " + prevRange() + " GROUP BY t ORDER BY t", dataset: 'agora_llm' }
+      ? { sql: "SELECT toStartOfInterval(timestamp, INTERVAL '1' DAY) as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp " + prevRange() + " GROUP BY t ORDER BY t", dataset: 'agora_llm' }
       : { sql: "SELECT 1 as c", dataset: 'agora_llm' },
     // --- Wave-1 funnel additions (APPENDED at the end; reads are positional,
     // so new queries must never be inserted mid-array). r[35..44]: one
     // current + previous pair per step, queried by blob1 like entry/signup.
     // Batch total after these: 45 of the 64 cap. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cta_click' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cta_click' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_start' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_start' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_end' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'cinematic_end' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'welcome_shown' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'welcome_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_turn' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cta_click' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cta_click' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cinematic_start' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cinematic_start' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cinematic_end' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'cinematic_end' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'welcome_shown' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'welcome_shown' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_turn' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_turn' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // --- Wave-2 first_reply additions (APPENDED at the end; reads are
     // positional, so new queries must never be inserted mid-array). r[45..48]:
     // success (blob5='200') current + previous for the funnel stage and its
     // ghost, error (blob5='error') current + previous for the reply-success
     // caption. Batch total after these: 49 of the 64 cap. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'first_reply' AND blob5 = 'error' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_reply' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_reply' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_reply' AND blob5 = 'error' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'first_reply' AND blob5 = 'error' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // --- Device split (blob6, live 2026-07-07). r[49..50], APPENDED at the end
     // so existing positional reads never shift. Arrivals + conversations by
     // device class, for the visit-share vs conversation-share card beside the
     // funnel (does mobile underconvert). Batch total after these: 51 of 64. ---
-    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as device, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as device, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 IN ('chat','council','summary') AND blob5 = '200' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
     // --- North Star v2, engaged sessions (APPENDED at the end; reads are
     // positional, so new queries must never be inserted mid-array). r[51..53].
     // A tab that typed a first message or crossed the listening threshold emits
     // one row with its arm, then a second 'both' row if the other arm follows.
     // The session total is therefore typed + listened, never the raw row count.
-    // Same SQL as internal/ops/stats-pull.mjs 'engaged_arms', probe filter
-    // included, so the dashboard and the Monday pull cannot drift.
+    // The house filter and the weighted count are the shared ones, as in
+    // every query of this page.
     // Batch total after these: 54 of the 64 cap. ---
-    { sql: "SELECT blob3 as arm, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY arm", dataset: 'agora_llm' },
-    { sql: "SELECT blob3 as arm, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp " + prevRange() + " GROUP BY arm", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'engaged' AND blob3 IN ('typed','listened') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as arm, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY arm", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as arm, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'engaged' AND " + NOT_PROBE + " AND timestamp " + prevRange() + " GROUP BY arm", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'engaged' AND blob3 IN ('typed','listened') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -2498,8 +2502,8 @@ async function loadOverview() {
   html += kpi('Raw Visits', arrivals, { sub: 'mixed: ads + bots, no source split by design' });
   // Standing note on what the v2 number can and cannot mean yet. Partial-window
   // and no-previous-period cases are spelled out rather than left to the reader.
-  var ns2Note = 'North Star v2 counts sessions, one row per tab per arm, and is probe filtered. ' +
-    'Conversations (v1) counts chat messages and is not probe filtered, so the two are different populations and must not be divided into each other. ';
+  var ns2Note = 'North Star v2 counts sessions, one row per tab per arm. ' +
+    'Conversations (v1) counts chat messages, so the two are different populations and must not be divided into each other. Both leave out our own test rows and rows from hosting networks. ';
   if (ns2.partial) {
     ns2Note += 'The beacon went live ' + NS2_LIVE_DATE + ', so only about ' + Math.max(1, Math.round(ns2.coveredDays)) +
       ' of the ' + S.range + ' days in this window can hold a row. The count is a floor, not a trend. ';
@@ -2840,62 +2844,62 @@ async function loadProduct() {
 
   var queries = [
     // Engagement KPIs
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'council' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'council' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'summary' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'summary' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'council' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'council' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'summary' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'summary' AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Sparklines
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'session' AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Figure popularity
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Mode distribution
-    { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as mode, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
     // Language split
-    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as lang, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
     // Figure x Mode
-    { sql: "SELECT blob2 as figure, blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure, mode ORDER BY c DESC LIMIT 15", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, blob3 as mode, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure, mode ORDER BY c DESC LIMIT 15", dataset: 'agora_llm' },
     // Chat activity timeline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'chat' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Audio KPIs
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp " + prevRange(), dataset: 'agora_audio' },
     // Sparkline TTS
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
     // Avg TTS latency
-    { sql: "SELECT AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND blob4 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + MEAN_DOUBLE1 + " as avg_ms FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND blob4 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // Audio errors
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // TTS models
-    { sql: "SELECT blob2 as model, COUNT() as c, AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob2 as model, " + WEIGHTED + " as c, " + MEAN_DOUBLE1 + " as avg_ms FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
     // Server distribution — TTS-only so it sums to the TTS Requests count.
     // STT (small relative volume) has its own counter; combining was producing
     // mismatched totals (e.g. 67 vs 60) in adjacent panels.
-    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob3 as server, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio language split
-    { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob1 as lang, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
     // Rate limits
-    { sql: "SELECT blob3 as reason, COUNT() as c FROM agora_llm WHERE blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob3 as reason, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as reason, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
     // Content completions by type — playback beacons (event='completed' or empty for legacy rows)
-    { sql: "SELECT blob5 as type, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as type, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY type ORDER BY c DESC", dataset: 'agora_llm' },
     // Content completions by figure
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // Content completions by language
-    { sql: "SELECT blob4 as lang, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as lang, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_llm' },
     // Completions sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // Total completions previous period for delta
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND (blob8 = '' OR blob8 = 'completed') AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // Started events — total + sparkline (Phase 1 Option 1)
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'playback' AND blob8 = 'started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // --- Wave-2 organic-pick additions (APPENDED at the end; reads are
     // positional, so new queries must never be inserted mid-array). r[34..35].
     // Batch total after these: 36 of the 64 cap. The gclid CONVERSION rows
@@ -2903,38 +2907,36 @@ async function loadProduct() {
     // the blob3 != '' guard keeps them out of the mode mix. No conversion is
     // named 'figure_selected', so that query needs no such guard. ---
     // Organic mode picks (funnel mode_selected, per-occurrence) by mode
-    { sql: "SELECT blob3 as mode, COUNT() as c FROM agora_llm WHERE blob1 = 'mode_selected' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob3 as mode, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'mode_selected' AND blob3 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY mode ORDER BY c DESC", dataset: 'agora_llm' },
     // Organic figure picks (funnel figure_selected, per-occurrence), top 10
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'figure_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'figure_selected' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // --- Listening lifecycle, r[36..42] (APPENDED at the end; reads are
-    // positional, so new queries must never be inserted mid-array). Every
-    // definition here is copied from internal/ops/stats-pull.mjs so the
-    // dashboard and the Monday pull cannot disagree:
-    //   lifecycle + per-figure  = story and teaching only, probe filtered
+    // positional, so new queries must never be inserted mid-array). The
+    // definitions are the weekly pull's:
+    //   lifecycle + per-figure  = story and teaching only
     //   audio finish            = completed AND double1 > 0 (a terminal row
     //                             carrying a listened bucket), ALL content
     //                             types, which is the Monday pull's definition
     //   buckets                 = terminal rows with a bucket above zero
     // blob10 is the chapter ordinal on story rows. It is empty on rows written
     // before the label shipped, which reads as unlabelled, never as chapter 0.
-    { sql: "SELECT blob8 as state, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob5 IN ('story','teaching') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY state ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT double1 as bucket, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 IN ('completed','ended') AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY bucket ORDER BY bucket ASC", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
-    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
-    // --- Free-tier bot check, r[43..48]. Per-occurrence counters, NOT probe
-    // filtered, matching the Monday pull (the turnstile steps are queried raw
-    // there too). turnstile_token_aged is kept out of the failure family on
+    { sql: "SELECT blob8 as state, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob5 IN ('story','teaching') AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY state ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT double1 as bucket, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 IN ('completed','ended') AND double1 > 0 AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY bucket ORDER BY bucket ASC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 IN ('story','teaching') AND blob2 != '' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'started' AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 > 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
+    // --- Free-tier bot check, r[43..48]. Per-occurrence counters, house rows
+    // out like every query here. turnstile_token_aged is kept out of the failure family on
     // purpose: it is a token expiring after a check already succeeded.
     // Batch total after these: 49 of the 64 cap. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_interactive' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_solved' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_token_aged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_failed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob5 as outcome, COUNT() as c FROM agora_llm WHERE blob1 = 'turnstile_abandoned' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_started' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_interactive' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_solved' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_token_aged' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as outcome, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_failed' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob5 as outcome, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'turnstile_abandoned' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY outcome ORDER BY c DESC", dataset: 'agora_llm' },
     // --- Spend governor, r[49..52] (APPENDED at the end; reads are positional,
     // so new queries must never be inserted mid-array). Governor rows are
     // written server side and carry no probe slot at all, so there is nothing
@@ -2943,16 +2945,16 @@ async function loadProduct() {
     // The third query carries no window on purpose: "has this counter ever
     // written a row" is the only thing that tells an honest zero apart from a
     // governor that is not armed yet. Batch total after these: 53 of the 64 cap.
-    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' AND timestamp " + prevRange() + " GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as event, COUNT() as c FROM agora_llm WHERE blob1 = 'governor' GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT timestamp as t, blob2 as event, blob3 as endpoint, blob4 as model, double1 as spend FROM agora_llm WHERE blob1 = 'governor' ORDER BY timestamp DESC LIMIT 1", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as event, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'governor' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as event, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'governor' AND timestamp " + prevRange() + " GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as event, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'governor' GROUP BY event ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT timestamp as t, blob2 as event, blob3 as endpoint, blob4 as model, double1 as spend FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'governor' ORDER BY timestamp DESC LIMIT 1", dataset: 'agora_llm' },
     // --- Story completions, r[53..54] (APPENDED at the end). The other producer
     // of 'completed': the once-per-browser mark a story gets when its text is
     // read to the end or its audio ends, with no listened bucket (double1 = 0).
     // It is the Monday pull's finish_mode, cut to stories. Batch total: 55 of 64. ---
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob10 as chapter, COUNT() as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob10 as chapter, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'playback' AND blob8 = 'completed' AND double1 = 0 AND blob5 = 'story' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY chapter ORDER BY c DESC LIMIT 20", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);
@@ -3354,33 +3356,33 @@ async function loadAudio() {
 
   var queries = [
     // TTS volume (current + previous)
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp " + prevRange(), dataset: 'agora_audio' },
     // STT volume (current + previous)
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp " + prevRange(), dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp " + prevRange(), dataset: 'agora_audio' },
     // TTS sparkline
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
     // Avg TTS latency
-    { sql: "SELECT AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND blob4 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + MEAN_DOUBLE1 + " as avg_ms FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND blob4 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // Audio errors
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 IN ('speech','transcriptions') AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
     // TTS models
-    { sql: "SELECT blob2 as model, COUNT() as c, AVG(double1) as avg_ms FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob2 as model, " + WEIGHTED + " as c, " + MEAN_DOUBLE1 + " as avg_ms FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY model ORDER BY c DESC", dataset: 'agora_audio' },
     // Server distribution — TTS-only so it sums to the TTS Requests count.
     // STT (small relative volume) has its own counter; combining was producing
     // mismatched totals (e.g. 67 vs 60) in adjacent panels.
-    { sql: "SELECT blob3 as server, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob3 as server, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY server ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio language split
-    { sql: "SELECT blob1 as lang, COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob1 as lang, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY lang ORDER BY c DESC", dataset: 'agora_audio' },
     // Audio rate limits
-    { sql: "SELECT blob4 as reason, COUNT() as c FROM agora_audio WHERE blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
+    { sql: "SELECT blob4 as reason, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'ratelimit' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY reason ORDER BY c DESC", dataset: 'agora_audio' },
     // --- STT parity + error split (APPENDED; reads positional). r[11..13].
     // TTS errors, STT errors (so "Audio Errors" can name the split), and an STT
     // volume trend so STT is not the only pipeline with no time series. ---
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'speech' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_audio WHERE blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'speech' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND blob4 != '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_audio' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_audio WHERE " + NOT_PROBE + " AND blob5 = 'transcriptions' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_audio' },
   ];
 
   var r = await batch(queries);
@@ -3505,51 +3507,51 @@ async function loadAdGrants() {
   var queries = [
     // --- Engagement ladder, r[0..11]. Four depths in ladder order, each as
     // current + previous (delta) + sparkline. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'start_exploring' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'start_exploring' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'listened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'listened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'dialogue_started' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'dialogue_started' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'conversation_deepened' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'conversation_deepened' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // --- Off-ladder conversions, r[12..17]. Same three-query shape. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, COUNT() as c FROM agora_llm WHERE index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'profile_created' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'profile_created' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'council_engaged' AND blob5 = '' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT toStartOfInterval(timestamp, INTERVAL " + sparkBucket() + ") as t, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 = 'council_engaged' AND blob5 = '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY t ORDER BY t", dataset: 'agora_llm' },
     // --- Figures, r[18]. Blended across every conversion that can carry a
     // figureId. conversation_deepened never does, so it is absent by design. ---
-    { sql: "SELECT blob2 as figure, COUNT() as c FROM agora_llm WHERE index1 IN ('listened','dialogue_started','council_engaged','start_exploring') AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as figure, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND index1 IN ('listened','dialogue_started','council_engaged','start_exploring') AND blob5 = '' AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY figure ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // --- Ad consent prompt, r[19..26]. Anonymous counters, current + previous
     // for every step so both rates can show a percentage-point change. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_declined' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_dismissed' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
     // --- Consent breakdowns, r[27..30]. Seen and accepted by page path
     // (blob2) and by interface language (blob4): where does the question work. ---
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob2 as path, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
-    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
-    { sql: "SELECT blob4 as language, COUNT() as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob2 as path, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob2 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY path ORDER BY c DESC LIMIT 12", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_shown' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob4 as language, " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'ad_consent_accepted' AND " + NOT_PROBE + " AND blob4 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY language ORDER BY c DESC", dataset: 'agora_llm' },
     // --- Traffic, r[31..35]. Volume and geography only, no source split. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob7 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
-    { sql: "SELECT blob7 as country, COUNT() as c FROM agora_llm WHERE blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT blob7 as country, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND blob7 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
+    { sql: "SELECT blob7 as country, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 IN ('chat','council','summary') AND blob5 = '200' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY country ORDER BY c DESC LIMIT 10", dataset: 'agora_llm' },
     // blob6 != '' drops the pre-device untagged rows, mirroring the country panels.
-    { sql: "SELECT blob6 as device, COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
+    { sql: "SELECT blob6 as device, " + WEIGHTED + " as c FROM agora_llm WHERE " + NOT_PROBE + " AND blob1 = 'page' AND blob6 != '' AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY GROUP BY device ORDER BY c DESC", dataset: 'agora_llm' },
     // --- Attribution counters, r[36..40] (APPENDED at the end; reads are
     // positional, so new queries must never be inserted mid-array). Same SQL as
     // the Monday pull's paid_arrivals and landings, probe filter included.
@@ -3559,11 +3561,11 @@ async function loadAdGrants() {
     // ex-probe arrivals count is the matching denominator for the landing
     // share (Raw Visits above is raw, so the two must not be divided).
     // Batch total after these: 41 of the 64 cap. ---
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
-    { sql: "SELECT COUNT() as c FROM agora_llm WHERE blob1 = 'page' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'paid_arrival' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'page' AND blob8 = 'landing' AND " + NOT_PROBE + " AND timestamp " + prevRange(), dataset: 'agora_llm' },
+    { sql: "SELECT " + WEIGHTED + " as c FROM agora_llm WHERE blob1 = 'page' AND " + NOT_PROBE + " AND timestamp > NOW() - INTERVAL '" + iv() + "' DAY", dataset: 'agora_llm' },
   ];
 
   var r = await batch(queries);

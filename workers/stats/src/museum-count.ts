@@ -10,12 +10,12 @@
 
 import type { Env } from './types';
 import type { Fetcher } from './museum';
+import { DAY_BUCKET, METRICS, MUSEUM_HOUSE_ROWS_OUT, WEIGHTED_COUNT } from './metrics';
 
 const DAY_MS = 86400 * 1000;
 // Analytics Engine keeps rows three months.
 export const COUNT_WINDOW_DAYS = 92;
-const DAY_BUCKET = "toStartOfInterval(timestamp, INTERVAL '1' DAY)";
-const NOT_PROBE = "blob10 != 'probe'";
+const NOT_PROBE = MUSEUM_HOUSE_ROWS_OUT;
 // A query may split by day and by at most this many of the row's fields.
 const MAX_FIELDS = 2;
 
@@ -28,14 +28,14 @@ function question(dataset: string, name: string, fields: Field[], where: string)
   const group = fields.map((f) => f[1]).join(', ');
   return {
     name,
-    sql: 'SELECT ' + DAY_BUCKET + ' AS d, ' + select + ', SUM(_sample_interval) AS n FROM ' + dataset +
+    sql: 'SELECT ' + DAY_BUCKET + ' AS d, ' + select + ', ' + WEIGHTED_COUNT + ' AS n FROM ' + dataset +
       " WHERE timestamp > NOW() - INTERVAL '" + COUNT_WINDOW_DAYS + "' DAY AND " + NOT_PROBE + (where ? ' AND ' + where : '') +
       ' GROUP BY d, ' + group + ' ORDER BY d',
   };
 }
 
 // A real use is a walk that reaches its third stop.
-const THIRD_STOP = "(blob1 = 'museum_stop' AND blob3 = '3')";
+const THIRD_STOP = '(' + METRICS.real_use.where + ')';
 const WALK_AND_REAL = "(blob1 = 'museum_arrival' OR " + THIRD_STOP + ')';
 
 // The animal pages' kinds, as the site's build writes them (site/functions/_count/lists.js). A new animal page
