@@ -1,13 +1,14 @@
 // Reading a story counted in the shape of listening to it: started, each quarter of the text, and the end, plus one
 // 'skimmed' row for a text whose end was reached too fast. A quarter counts once its words were on screen, in a
-// visible tab, for at least the time its words take at the ceiling rate below, and its last word has come into
-// view. The clock stands while the story plays in the reader (that is listening). Everything lives in page memory.
+// visible tab, for at least the time its words take at the ceiling rate below (time on screen shared among the
+// quarters in view), and its last word has come into view. The clock stands while the story plays in the reader
+// (that is listening). Everything lives in page memory.
 
 import type { PlaybackEvent } from '@client/utils/playbackBeacon';
 import type { PlayerLang } from './strings';
 
 // Words a minute no reader passes and still reads: 600 in English (the mean is about 240, Brysbaert 2019), German
-// scaled by the same paper's silent rates for the two languages (260 against 236 words a minute).
+// scaled by the same paper's silent reading rates (Table 5): German 260, English 236, so 600 x 260 / 236 = 661.
 export const READ_CEILING_WPM: Readonly<Record<PlayerLang, number>> = { en: 600, de: Math.round((600 * 260) / 236) };
 
 const QUARTER_EVENTS: readonly PlaybackEvent[] = ['progress_25', 'progress_50', 'progress_75', 'completed'];
@@ -39,7 +40,7 @@ export interface ReadingOptions {
 }
 
 export interface ReadingCount {
-  /** Add the time since the last tick to every quarter in view, and send what passed. */
+  /** Share the time since the last tick among the quarters in view, and send what passed. */
   tick(): void;
   /** The reading may be over (the reader closes, the page hides): an end reached too fast says so, once. */
   flush(): void;
@@ -86,13 +87,15 @@ export function createReadingCount(o: ReadingOptions): ReadingCount {
       last = t;
       if (!o.visible() || o.listening()) return;
       const view = o.measure();
-      if (!view.some(v => v.inView)) return;
+      const shown = view.filter(v => v.inView).length;
+      if (shown === 0) return;
       if (!state.started) {
         state.started = true;
         o.send('started');
       }
+      // One moment on screen is credited once, shared among the quarters it shows.
       view.forEach((v, q) => {
-        if (v.inView) seconds[q] = (seconds[q] ?? 0) + slice;
+        if (v.inView) seconds[q] = (seconds[q] ?? 0) + slice / shown;
         if (v.reached) reached[q] = true;
         if (!passed[q] && reached[q] && seconds[q]! >= floors[q]!) {
           passed[q] = true;

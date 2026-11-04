@@ -1,5 +1,6 @@
 // The story reader's count: a quarter passes only after its words were on screen, in a visible tab, for the time
-// they take at the ceiling rate, and once its last word came into view; an end reached faster sends one 'skimmed'.
+// they take at the ceiling rate (one moment shared among the quarters in view), and once its last word came into
+// view; an end reached faster sends one 'skimmed'.
 
 import { describe, it, expect, beforeEach } from 'vitest';
 import {
@@ -37,6 +38,10 @@ function reader(total = 1900, lang: 'en' | 'de' = 'en') {
     show(q: number, end = false) {
       view = view.map((v, i) => ({ inView: i === q, reached: v.reached || i < q || (i === q && end) }));
     },
+    /** The screen shows quarters `from` to `to` at once, the last one's last word reached when `end` is true. */
+    showSpan(from: number, to: number, end = false) {
+      view = view.map((v, i) => ({ inView: i >= from && i <= to, reached: v.reached || i < to || (i === to && end) }));
+    },
     hide: (h: boolean) => { visible = !h; },
     listen: (l: boolean) => { listening = l; },
     /** `seconds` of wall time in one-second ticks. */
@@ -55,7 +60,7 @@ beforeEach(() => {
 });
 
 describe('the floors', () => {
-  it('600 words a minute in English, German scaled by the silent rates 260 to 236', () => {
+  it('600 words a minute in English, German scaled by the silent rates, German 260 to English 236', () => {
     expect(READ_CEILING_WPM.en).toBe(600);
     expect(READ_CEILING_WPM.de).toBe(661);
     expect(quarterWords(1900)).toEqual([475, 475, 475, 475]);
@@ -115,6 +120,32 @@ describe('reading a story', () => {
     de.show(0, true);
     de.wait(44);
     expect(sent).toEqual(['started', 'progress_25']);
+  });
+
+  it('a whole text on one screen: the end only after the whole text\'s floor', () => {
+    const r = reader();
+    r.showSpan(0, 3, true);
+    r.wait(189);
+    expect(sent).toEqual(['started']);
+    r.wait(1);
+    expect(sent).toEqual(['started', 'progress_25', 'progress_50', 'progress_75', 'completed']);
+  });
+
+  it('a quarter\'s end and the next one\'s start on one screen share its time', () => {
+    const r = reader();
+    r.showSpan(0, 1);
+    r.wait(60);
+    expect(sent).toEqual(['started']);
+    r.show(0, true);
+    r.wait(17);
+    expect(sent).toEqual(['started']);
+    r.wait(1);
+    expect(sent).toEqual(['started', 'progress_25']);
+    r.show(1, true);
+    r.wait(17);
+    expect(sent).toEqual(['started', 'progress_25']);
+    r.wait(1);
+    expect(sent).toEqual(['started', 'progress_25', 'progress_50']);
   });
 
   it('a hidden tab and a story playing in the reader add no time', () => {
