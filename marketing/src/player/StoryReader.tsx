@@ -385,9 +385,9 @@ export default function StoryReader({ state, queue, n, label, factsWord, documen
       window.removeEventListener('pagehide', onPageHide);
       count.flush();
     };
-    // the queue's figure and language name the content; its object may be rebuilt
+    // the text and the queue's figure and language name the count: a timing file landing later rebuilds only the model
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [model, queue.figureId, queue.lang, n]);
+  }, [blocks, queue.figureId, queue.lang, n]);
 
   // ---- reopened from history: the text where the visitor left it ----
   useEffect(() => {

@@ -1,6 +1,6 @@
 // The story reader's reading count, rendered: while the reader's story is the player's story (playing, paused on
 // its end card, or ended) its time is listening and no reading row is sent; the resume offer is not the player's
-// story.
+// story; a timing file that lands after the text does not end the reading.
 
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, act, cleanup } from '@testing-library/react';
@@ -146,5 +146,23 @@ describe('the reader counts reading only while its story is not in the player', 
     await wait(60);
     r.unmount();
     expect(reading()).toEqual([]);
+  });
+
+  it('a timing file that lands after the text sends no skimmed while the text is read', async () => {
+    h.holdTiming = true;
+    const r = render(view(BASE, 1));
+    await settle();
+    await wait(3);
+    expect(reading()).toEqual(['1:started']);
+    await act(async () => {
+      h.timing?.({});
+      for (let i = 0; i < 5; i++) await Promise.resolve();
+    });
+    await wait(1);
+    expect(reading()).toEqual(['1:started']);
+    await wait(37);
+    expect(reading()).toEqual(['1:started', '1:progress_25', '1:progress_50', '1:progress_75', '1:completed']);
+    r.unmount();
+    expect(reading()).toHaveLength(5);
   });
 });
