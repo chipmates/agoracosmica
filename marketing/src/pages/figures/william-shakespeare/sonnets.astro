@@ -17,6 +17,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
+import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -138,14 +139,22 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
       </p>
       <div class="esy-poemlist">
         {SONNETS.map((s, i) => (
-          <details class="esy-poem" open={i === 0}>
-            <summary class="esy-poem__summary">{s.num} · {s.firstLine}</summary>
-            <p class="esy-poem__intro">{s.intro}</p>
-            <div class="esy-poem__text">{POEMS[s.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
-            <p class="esy-poem__own">
-              <a class="pub-textlink" href={OWN_PAGE[s.key]}>Open this sonnet on its own page</a>
-            </p>
-          </details>
+          <Fragment>
+            <details class="esy-poem" open={i === 0}>
+              <summary class="esy-poem__summary">{s.num} · {s.firstLine}</summary>
+              <p class="esy-poem__intro">{s.intro}</p>
+              <div class="esy-poem__text">{POEMS[s.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
+              <p class="esy-poem__own">
+                <a class="pub-textlink" href={OWN_PAGE[s.key]}>Open this sonnet on its own page</a>
+              </p>
+            </details>
+            {/* Under the first sonnet: a reader who came for a poem meets one
+                before the offer of his stories. The invite below shows his AI
+                portrait, so the label names the images. */}
+            {i === 0 && storyDock && (
+              <StoryDoor figureId="shakespeare" slug="william-shakespeare" lang={lang} portraits={true} />
+            )}
+          </Fragment>
         ))}
       </div>
     </section>

@@ -20,7 +20,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
-import PoemDoor from '../../../components/PoemDoor.astro';
+import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -30,9 +30,6 @@ import { poemsByPoet } from '../../../data/poems/index.mjs';
 const lang = 'en' as const;
 // The way back names the figure page by its own heading.
 const parentName = getFigureById('blake', lang)!.name;
-// Slot 4 of the app's ask contract is this page's own question: the door skips
-// the mode choice and opens Free Talk about the poem the visitor just read.
-const DOOR_HREF = '/app?figure=william-blake&lang=en&ask=f:blake:4';
 const PAGE_PATH = '/figures/william-blake/poems';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -130,14 +127,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
       </p>
     </header>
 
-    <PoemDoor
-      at="hero"
-      href={DOOR_HREF}
-      buttonLabel="Ask his Echo about it"
-      figureId="blake"
-      shapedBy="his real work"
-    />
-
     {GROUPS.map((group, gi) => (
       <section class="esy-section" id={group.id}>
         <h2 class="esy-h2">{group.title}</h2>
@@ -153,14 +142,11 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
                   <a class="pub-textlink" href={OWN_PAGE[p.key]}>Open this poem on its own page</a>
                 </p>
               </details>
-              {gi === 0 && i === 0 && (
-                <PoemDoor
-                  at="after-first-poem"
-                  href={DOOR_HREF}
-                  buttonLabel="Ask his Echo about it"
-                  figureId="blake"
-                  shapedBy="his real work"
-                />
+              {/* Under the first poem: a reader who came for a poem meets one
+                  before the offer of his stories. The invite below shows his
+                  AI portrait, so the label names the images. */}
+              {gi === 0 && i === 0 && storyDock && (
+                <StoryDoor figureId="blake" slug="william-blake" lang={lang} portraits={true} />
               )}
             </Fragment>
           ))}

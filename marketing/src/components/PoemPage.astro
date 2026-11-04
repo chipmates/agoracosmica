@@ -1,17 +1,18 @@
 ---
-// One hosted poem on a page of its own: the text open at the top, the door in
-// view, everything else quiet underneath. Shared by the Dickinson, Blake and
+// One hosted poem on a page of its own: the text open at the top, the story
+// door under it, everything else quiet underneath. Shared by the Dickinson, Blake and
 // Shakespeare routes, which each pass one record from the poem data module.
 // The texts are quoted primary source: rendered from the data, never edited.
 
 import Public from '../layouts/Public.astro';
 import Breadcrumbs from './Breadcrumbs.astro';
-import PoemDoor from './PoemDoor.astro';
+import StoryDoor from './player/StoryDoor.astro';
 import BackLink from './BackLink.astro';
 import { figureImage } from '../lib/figureImages';
 import { breadcrumbSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../lib/urls';
 import { poets, poemsByPoet, isIndexable } from '../data/poems/index.mjs';
+import { isStoryCompanionPath } from '../player/pages';
 
 interface Props {
   /** One record from the poem data module. */
@@ -41,6 +42,9 @@ const poet = poets[poem.poet];
 const lang = 'en' as const;
 
 const PAGE_PATH = poem.path.replace(/\/$/, '');
+// The door needs the player the route puts in the head; the slug is the figure page's own.
+const storyDoor = isStoryCompanionPath(Astro.url.pathname);
+const figureSlug = poet.figurePath.split('/').filter(Boolean).pop() ?? '';
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 const MS = 'https://media.agoracosmica.org/images/dickinson';
 
@@ -152,13 +156,8 @@ const schemas = [
       </p>
     )}
 
-    <PoemDoor
-      at="hero"
-      href={poet.door.href}
-      buttonLabel={poet.door.label}
-      figureId={poet.id}
-      shapedBy={poet.door.shapedBy}
-    />
+    {/* No portrait on this page, so the label leaves the images out. */}
+    {storyDoor && <StoryDoor figureId={poet.id} slug={figureSlug} lang={lang} portraits={false} />}
 
     <nav class="pm-nav" aria-label={`More by ${poet.name}`}>
       <p class="pm-nav__all">

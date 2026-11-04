@@ -21,7 +21,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
-import PoemDoor from '../../../components/PoemDoor.astro';
+import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -30,9 +30,6 @@ import { isIndexable, readingPages } from '../../../data/poems/index.mjs';
 const lang = 'en' as const;
 // The way back names the figure page by its own heading.
 const parentName = getFigureById('rumi', lang)!.name;
-// Slot 4 of the app's ask contract is this page's own question: the door skips
-// the mode choice and opens Free Talk about the poem the visitor just read.
-const DOOR_HREF = '/app?figure=rumi&lang=en&ask=f:rumi:4';
 const PAGE_PATH = readingPages.rumi.path;
 const PAGE_URL = canonicalUrl(PAGE_PATH);
 
@@ -209,14 +206,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
       </p>
     </header>
 
-    <PoemDoor
-      at="hero"
-      href={DOOR_HREF}
-      buttonLabel="Ask his Echo about it"
-      figureId="rumi"
-      shapedBy="his real work"
-    />
-
     <section class="esy-section">
       <h2 class="esy-h2">About this translation</h2>
       <p class="esy-p">
@@ -246,14 +235,11 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
               <p class="esy-poem__intro">{p.intro}</p>
               <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
             </details>
-            {i === 0 && (
-              <PoemDoor
-                at="after-first-poem"
-                href={DOOR_HREF}
-                buttonLabel="Ask his Echo about it"
-                figureId="rumi"
-                shapedBy="his real work"
-              />
+            {/* Under the first passage: a reader who came for a poem meets one
+                before the offer of his stories. The invite below shows his AI
+                portrait, so the label names the images. */}
+            {i === 0 && storyDock && (
+              <StoryDoor figureId="rumi" slug="rumi" lang={lang} portraits={true} />
             )}
           </Fragment>
         ))}

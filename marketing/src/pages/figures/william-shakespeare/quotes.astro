@@ -15,6 +15,7 @@ import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
 import AiLabel from '../../../components/AiLabel.astro';
+import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { articleSchema, breadcrumbSchema } from '../../../lib/schemas';
 import { canonicalUrl, SITE_URL } from '../../../lib/urls';
@@ -138,32 +139,40 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
       </ul>
     </nav>
 
-    {quoteGroups.map((group) => (
-      <section class="esy-section sq-group" id={group.id}>
-        <h2 class="esy-h2">{group.title}</h2>
-        <p class="esy-p sq-group__blurb">{group.blurb}</p>
-        <div class="sq-list">
-          {group.quotes.map((q) => {
-            const w = where(q);
-            return (
-              <article class="sq-quote" id={q.id}>
-                <figure class="sq-quote__figure">
-                  <blockquote class="sq-quote__text">
-                    {q.prose
-                      ? <p class="sq-quote__prose">{q.lines.join(' ')}</p>
-                      : <p class="sq-quote__verse">{q.lines.map((line) => (<span class="sq-quote__line">{line}</span>))}</p>}
-                  </blockquote>
-                  <figcaption class="sq-quote__where"><cite class="sq-quote__work">{w.work}</cite>{w.rest}</figcaption>
-                </figure>
-                <p class="sq-quote__meaning">{q.meaning}</p>
-                {q.more && (
-                  <p class="sq-quote__more"><a class="pub-textlink" href={q.more.href}>{q.more.label}</a></p>
-                )}
-              </article>
-            );
-          })}
-        </div>
-      </section>
+    {quoteGroups.map((group, gi) => (
+      <Fragment>
+        <section class="esy-section sq-group" id={group.id}>
+          <h2 class="esy-h2">{group.title}</h2>
+          <p class="esy-p sq-group__blurb">{group.blurb}</p>
+          <div class="sq-list">
+            {group.quotes.map((q) => {
+              const w = where(q);
+              return (
+                <article class="sq-quote" id={q.id}>
+                  <figure class="sq-quote__figure">
+                    <blockquote class="sq-quote__text">
+                      {q.prose
+                        ? <p class="sq-quote__prose">{q.lines.join(' ')}</p>
+                        : <p class="sq-quote__verse">{q.lines.map((line) => (<span class="sq-quote__line">{line}</span>))}</p>}
+                    </blockquote>
+                    <figcaption class="sq-quote__where"><cite class="sq-quote__work">{w.work}</cite>{w.rest}</figcaption>
+                  </figure>
+                  <p class="sq-quote__meaning">{q.meaning}</p>
+                  {q.more && (
+                    <p class="sq-quote__more"><a class="pub-textlink" href={q.more.href}>{q.more.label}</a></p>
+                  )}
+                </article>
+              );
+            })}
+          </div>
+        </section>
+        {/* After the first group: a reader who came for a line meets several
+            before the offer of his stories. The invite below shows his AI
+            portrait, so the label names the images. */}
+        {gi === 0 && storyDock && (
+          <StoryDoor figureId="shakespeare" slug="william-shakespeare" lang={lang} portraits={true} />
+        )}
+      </Fragment>
     ))}
 
     <section class="esy-section sq-group" id={NEVER_ID}>
