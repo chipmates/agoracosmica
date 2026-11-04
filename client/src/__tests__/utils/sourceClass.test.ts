@@ -31,6 +31,44 @@ describe('sourceClass ad parameters', () => {
     expect(sourceClass(`${LANDING}?p=1&rdt_cid=abc123`, 'https://www.reddit.com/')).toBe('ad_reddit');
   });
 
+  // Google's iOS click ids, sent in place of a gclid on some paths.
+  it('labels a grant click from gbraid alone', () => {
+    expect(sourceClass(`${LANDING}?gbraid=0AAAAAoX`, '')).toBe('ad_google_grant');
+    expect(sourceClass(`${LANDING}?gbraid=0AAAAAoX`, 'https://www.google.com/')).toBe('ad_google_grant');
+    // Presence decides, never the value.
+    expect(sourceClass(`${LANDING}?gbraid=`, '')).toBe('ad_google_grant');
+  });
+
+  it('labels a grant click from wbraid alone', () => {
+    expect(sourceClass(`${LANDING}?wbraid=CjkKCQiA`, '')).toBe('ad_google_grant');
+    expect(sourceClass(`${LANDING}?wbraid=CjkKCQiA`, 'https://www.google.de/')).toBe('ad_google_grant');
+    expect(sourceClass(`${LANDING}?wbraid=`, '')).toBe('ad_google_grant');
+  });
+
+  it('labels gbraid or wbraid beside a gclid as the grant, as either alone', () => {
+    for (const braid of ['gbraid', 'wbraid']) {
+      expect(sourceClass(`${LANDING}?gclid=Cj0KCQiA&${braid}=0AAA`, '')).toBe('ad_google_grant');
+      expect(sourceClass(`${LANDING}?${braid}=0AAA&gclid=Cj0KCQiA`, '')).toBe('ad_google_grant');
+      // The gclid adds nothing: the same address without it is the grant too.
+      expect(sourceClass(`${LANDING}?${braid}=0AAA`, '')).toBe('ad_google_grant');
+    }
+  });
+
+  it('labels gbraid or wbraid with p=1 as paid', () => {
+    for (const braid of ['gbraid', 'wbraid']) {
+      expect(sourceClass(`${LANDING}?p=1&${braid}=0AAA`, '')).toBe('ad_google_paid');
+      expect(sourceClass(`${LANDING}?${braid}=0AAA&p=1`, 'https://www.google.com/')).toBe('ad_google_paid');
+      // p=1 is what makes it paid: the same address without it is the grant.
+      expect(sourceClass(`${LANDING}?${braid}=0AAA`, 'https://www.google.com/')).toBe('ad_google_grant');
+    }
+  });
+
+  it('matches the gbraid and wbraid keys whole', () => {
+    expect(sourceClass(`${LANDING}?xgbraid=1`, '')).toBe('direct');
+    expect(sourceClass(`${LANDING}?wbraids=1`, '')).toBe('direct');
+    expect(sourceClass(`${LANDING}?utm_content=gbraid`, '')).toBe('direct');
+  });
+
   it('never writes the value grant and paid used to share', () => {
     for (const query of ['?gclid=Cj0', '?gclid=', '?p=1', '?p=1&gclid=Cj0', '?utm_source=reddit&p=1']) {
       expect(sourceClass(`${LANDING}${query}`, 'https://www.google.com/')).not.toBe('ad_google');
@@ -425,6 +463,13 @@ describe('the marketing twin in agc-public.js', () => {
     [LANDING, 'https://lobste.rs/s/abc'],
     [LANDING, 'https://en.wikipedia.org/wiki/Stoicism'],
     [LANDING, 'https://alternativeto.net/software/abc/'],
+    [`${LANDING}?gbraid=0AAA`, ''],
+    [`${LANDING}?wbraid=CjkK`, 'https://www.google.com/'],
+    [`${LANDING}?gbraid=`, ''],
+    [`${LANDING}?gclid=Cj0&wbraid=CjkK`, ''],
+    [`${LANDING}?p=1&gbraid=0AAA`, ''],
+    [`${LANDING}?wbraid=CjkK&utm_source=reddit`, ''],
+    [`${LANDING}?xgbraid=1`, ''],
   ];
 
   // A case list can only catch a host it happens to name, so the lists
