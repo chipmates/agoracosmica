@@ -90,7 +90,8 @@ export interface AgoraCountAnswer {
   langs?: WeeklyUse;
   // Every listen row by label (source, kind, version), weekly cells as above: the story steps by step, the player's
   // playback rows (introduction and stories) by event. '' holds rows without the label: a story in a page load that
-  // did not open the visit (no source or kind), and every row written before the labels.
+  // did not open the visit (no source or kind), every row written before the labels, and on playback rows a listen
+  // in the app.
   listens?: { story: Record<string, WeeklyUse>; playback: Record<string, WeeklyUse>; blank: string };
   gaps?: string[];
 }
@@ -189,7 +190,7 @@ export async function buildAgoraCount(env: Env, fetcher: Fetcher, now: number): 
     listens: {
       story: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('story_' + l.name, STORY_STEPS)])),
       playback: Object.fromEntries(LISTEN_LABELS.map((l) => [l.name, split('playback_' + l.name, PLAYBACK_EVENTS)])),
-      blank: "'' is a listen in a page load that did not open the visit, or a row written before the labels",
+      blank: "'' is a listen in a page load that did not open the visit, a row written before the labels, or, on playback rows, a listen in the app",
     },
     gaps,
   };
