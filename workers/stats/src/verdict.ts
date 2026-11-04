@@ -1,8 +1,9 @@
 // The verdict word for a week's count against the week before.
 //
 // Under eight weeks of history: the exact two-sided test of two counts. If the
-// rate did not change, this week's count a, given the total a + b, is binomial
-// with p = 1/2; a change is called at 5%. From eight weeks on: a process band
+// rate per counted day did not change, this week's count a, given the total
+// a + b, is binomial with p0 = daysA / (daysA + daysB) (1/2 for two whole
+// weeks); a change is called at 5%. From eight weeks on: a process band
 // (an XmR chart): the mean of the last eight weeks, plus and minus 2.66 times
 // their mean moving range. Both assume the weeks differ by chance alone, and
 // our days swing more than that, so "up" or "down" means beyond chance, not
@@ -28,34 +29,32 @@ export const FLOOR = 20;
 export const BAND_WEEKS = 8;
 const XMR = 2.66;
 
-// P(X <= k) for X binomial(n, 1/2), summed in log space so large n cannot underflow.
-function lowerTail(k: number, n: number): number {
-  if (k < 0) return 0;
-  if (k >= n) return 1;
-  const logs: number[] = [];
-  let lp = -n * Math.LN2;
-  for (let i = 0; i <= k; i++) {
-    logs.push(lp);
-    lp += Math.log(n - i) - Math.log(i + 1);
-  }
-  const top = Math.max(...logs);
-  let sum = 0;
-  for (const l of logs) sum += Math.exp(l - top);
-  return Math.min(1, Math.exp(top) * sum);
-}
-
-// The exact two-sided p for two counts under one rate. With p = 1/2 the
-// distribution is symmetric, so twice the smaller tail is exact.
-export function twoCountP(a: number, b: number): number {
+// The exact two-sided p for two counts under one rate: every outcome of a + b
+// no likelier than a under binomial(a + b, p0) counts, summed in log space so
+// large counts cannot underflow. At p0 = 1/2 this is twice the smaller tail.
+export function twoCountP(a: number, b: number, p0 = 0.5): number {
   const n = a + b;
   if (n === 0) return 1;
-  return Math.min(1, 2 * lowerTail(Math.min(a, b), n));
+  const logs: number[] = [n * Math.log(1 - p0)];
+  const odds = Math.log(p0) - Math.log(1 - p0);
+  for (let k = 0; k < n; k++) logs.push(logs[k] + Math.log(n - k) - Math.log(k + 1) + odds);
+  let top = -Infinity;
+  for (const l of logs) if (l > top) top = l;
+  const seen = logs[a] + 1e-7;
+  let tail = 0;
+  let all = 0;
+  for (const l of logs) {
+    const e = Math.exp(l - top);
+    all += e;
+    if (l <= seen) tail += e;
+  }
+  return Math.min(1, tail / all);
 }
 
 export interface WeekInput {
   a: number;
   b: number;
-  // Counted days in each week (7 for a whole week); a week before with fewer gets no verdict.
+  // Counted days in each week (7 for a whole week); a week with none gets no verdict.
   daysA?: number;
   daysB?: number;
   // Whole weeks before this one, oldest first; the last is b.
@@ -67,10 +66,12 @@ export function verdict(input: WeekInput): Verdict {
   if (![a, b].every((x) => Number.isInteger(x) && x >= 0)) throw new Error('counts must be whole numbers');
   const daysA = input.daysA ?? 7;
   const daysB = input.daysB ?? 7;
-  if (daysB < daysA) return { word: 'no verdict', test: 'none', why: 'the week before had ' + daysB + ' counted days' };
+  if (daysA <= 0) return { word: 'no verdict', test: 'none', why: 'this week has no counted days' };
+  if (daysB <= 0) return { word: 'no verdict', test: 'none', why: 'the week before had no counted days' };
   if (a + b < FLOOR) return { word: 'too few to call', test: 'none', why: 'fewer than ' + FLOOR + ' in both weeks together' };
   const history = input.history || [];
-  if (history.length >= BAND_WEEKS) {
+  // The band holds whole weeks, so only a whole week is read against it.
+  if (daysA === 7 && history.length >= BAND_WEEKS) {
     const last = history.slice(-BAND_WEEKS);
     const mean = last.reduce((s, x) => s + x, 0) / last.length;
     let moving = 0;
@@ -80,7 +81,7 @@ export function verdict(input: WeekInput): Verdict {
     const word: VerdictWord = a > band.high ? 'up' : a < band.low ? 'down' : 'within noise';
     return { word, test: 'process band', band };
   }
-  const p = twoCountP(a, b);
-  const word: VerdictWord = p >= ALPHA ? 'within noise' : a > b ? 'up' : 'down';
+  const p = twoCountP(a, b, daysA / (daysA + daysB));
+  const word: VerdictWord = p >= ALPHA ? 'within noise' : a / daysA > b / daysB ? 'up' : 'down';
   return { word, test: 'two counts', p };
 }
