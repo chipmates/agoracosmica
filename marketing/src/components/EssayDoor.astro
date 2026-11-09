@@ -2,7 +2,7 @@
 // The first-screen door of the explainer and poetry pages, under the lead: the figure's portrait, the page's AI label
 // beside it, and the closing door's own button (same address, same words). The label stands before the portrait in
 // the markup, so a screen reader meets it first; on short screens the page's label under the title stands in for it
-// (the styles below). The click counts apart from the closing door by its place.
+// and the door shows the button alone (the styles below). The click counts apart from the closing door by its place.
 import StaticImage from './StaticImage.astro';
 import AiLabel from './AiLabel.astro';
 import './portrait-credit.css';
@@ -99,27 +99,25 @@ const alt = portraitAlt(getFigureById(figureId, lang)?.name ?? figureId, lang);
   .esy-hero .esy-hero__label {
     display: none;
   }
-  /* Short screens: where the door's label would end below the first screen on some page (measured per width band
-     in WebKit, whose leads run longest, plus 10 px), the label stands under the title, said once; the door keeps
-     the portrait beside the button. */
-  @media (max-width: 374px) and (max-height: 889px),
-    (min-width: 375px) and (max-width: 389px) and (max-height: 860px),
-    (min-width: 390px) and (max-width: 411px) and (max-height: 827px),
-    (min-width: 412px) and (max-width: 429px) and (max-height: 799px),
-    (min-width: 430px) and (max-width: 560px) and (max-height: 770px),
-    (min-width: 561px) and (max-height: 679px) {
+  /* Short screens: the tall layout only where the whole door row ends at least 56 px above the fold on every page
+     (room for a browser's bottom bar), measured per width band with the fonts loaded, Chromium and WebKit, at the
+     band's narrowest width. Elsewhere the label stands under the title, said once, and the door shows the button
+     alone, so no AI image stands below the label without a mark. */
+  @media (max-width: 374px) and (max-height: 1065px),
+    (min-width: 375px) and (max-width: 389px) and (max-height: 953px),
+    (min-width: 390px) and (max-width: 411px) and (max-height: 919px),
+    (min-width: 412px) and (max-width: 429px) and (max-height: 892px),
+    (min-width: 430px) and (max-width: 560px) and (max-height: 863px),
+    (min-width: 561px) and (max-height: 779px) {
     .esy-hero .esy-hero__label {
       display: block;
     }
-    .esy-door .esy-door__label {
+    .esy-door .esy-door__label,
+    .esy-door .esy-door__portrait {
       display: none;
     }
     .esy-door {
-      grid-template-areas: 'portrait button';
-    }
-    .esy-door__portrait {
-      align-self: center;
-      margin-top: 0;
+      grid-template-areas: 'button button';
     }
   }
 </style>
