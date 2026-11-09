@@ -16,9 +16,12 @@
 // coarse bucket index, never raw milliseconds. Disclosed in
 // docs/MEASUREMENT.md alongside the other event counters.
 
-import { trackFunnel, trackMuseum, readCountry, readDevice, readListenLabels, readProbe, readSource } from '../utils/analytics';
+import { trackFunnel, trackMuseum, readCountry, readDevice, readListenLabels, readMark, readSource } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
+import { utcHour } from '../utils/counterWindow';
+import { putAddressCounter } from '../middleware/rateLimit';
 
 interface FunnelPayload {
   step?: string;
@@ -283,9 +286,8 @@ const MAX_BUCKET = 5;
 // Rate limit: 200 funnel beacons per IP per hour. A single session emits
 // several funnel events (one per step), so the cap sits higher than entry's
 // 50. The museum's rows share it: a whole walk is about twenty rows, plus one
-// per work looked at. The plain IP appears only inside this short-lived KV key (1-hour TTL,
-// auto-deleted) and never in any stored analytics row.
-const RATE_LIMIT_WINDOW = 3600;
+// per work looked at. The KV key holds a keyed hash of the address, never the
+// address, ends with its UTC clock hour, and never reaches an analytics row.
 const RATE_LIMIT_MAX = 200;
 
 export async function handleFunnel(request: Request, env: Env): Promise<Response> {
@@ -323,13 +325,13 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `funnel_rl:${ip}`;
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'funnel_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await putAddressCounter(env, rateLimitKey, currentCount + 1, hour);
 
   const lang = (typeof payload.language === 'string') && VALID_LANGS.has(payload.language.slice(0, 2).toLowerCase())
     ? payload.language.slice(0, 2).toLowerCase()
@@ -346,7 +348,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
       language: lang,
       country: readCountry(request),
       device: readDevice(request),
-      probe: readProbe(payload.probe),
+      probe: readMark(request, payload.probe),
     });
     return new Response(null, { status: 204 });
   }
@@ -407,7 +409,7 @@ export async function handleFunnel(request: Request, env: Env): Promise<Response
     country: readCountry(request),
     device: readDevice(request),
     source: SOURCE_STEPS.has(step) ? readSource(payload.source) : '',
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
     story: story ? { kind: labels.kind, version: labels.version } : undefined,
   });
 

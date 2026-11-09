@@ -10,9 +10,12 @@
 // playhead position, and there is no key tying a track's rows together.
 // Same legal posture as the rest of analytics — see docs/MEASUREMENT.md.
 
-import { trackPlayback, readCountry, readDevice, readListenLabels, readProbe } from '../utils/analytics';
+import { trackPlayback, readCountry, readDevice, readListenLabels, readMark } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
+import { utcHour } from '../utils/counterWindow';
+import { putAddressCounter } from '../middleware/rateLimit';
 
 interface PlaybackPayload {
   type: 'story' | 'teaching' | 'prism' | 'council' | 'foreword';
@@ -74,7 +77,6 @@ const FIGURE_ID_RE = /^[a-z0-9-]{1,40}$/;
 
 // Rate limit: 200 playback beacons per IP per hour. Generous since a single
 // listening session can easily hit 12+ tracks.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 200;
 
 export async function handlePlayback(request: Request, env: Env): Promise<Response> {
@@ -106,15 +108,15 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     return new Response(null, { status: 204 });
   }
 
-  // Rate limit per IP. The plain IP appears only inside this short-lived KV
-  // key (1-hour TTL, auto-deleted) and never in any stored analytics row.
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `pb_rl:${ip}`;
+  // Rate limit per IP. The KV key holds a keyed hash of the address, never
+  // the address, ends with its UTC clock hour, and never reaches an analytics row.
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'pb_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await putAddressCounter(env, rateLimitKey, currentCount + 1, hour);
 
   // Sanitize optional fields against allowlists / patterns.
   const figureId = (typeof payload.figureId === 'string' && FIGURE_ID_RE.test(payload.figureId))
@@ -162,7 +164,7 @@ export async function handlePlayback(request: Request, env: Env): Promise<Respon
     // Reading sends no time at all: the seconds stay in the browser.
     bucket: !reading && TERMINAL_EVENTS.has(event) ? bucket : 0,
     chapter,
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
     labels: LABELLED_TYPES.has(payload.type) ? readListenLabels(payload) : undefined,
     way: reading ? 'read' : undefined,
   });

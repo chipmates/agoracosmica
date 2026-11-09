@@ -57,6 +57,10 @@ import { handlePlayback } from '../src/routes/playback';
 import { handleConversions } from '../src/routes/conversions';
 import { handleSignup } from '../src/routes/signup';
 import { signJWT } from '../src/utils/jwt';
+import { readMark } from '../src/utils/analytics';
+import { HOSTING_ASNS, RELAY_ASNS } from '../src/utils/hostingNetworks';
+import { hashIp } from '../src/utils/ipHash';
+import { EXPIRATION_FLOOR_SECONDS, endsWithWindow, utcDay, utcHour } from '../src/utils/counterWindow';
 import worker from '../src/index';
 import type { Env, JWTPayload } from '../src/utils/types';
 
@@ -91,15 +95,36 @@ function fakeKv(): KVNamespace {
   return auditedKv().kv;
 }
 
-/** A KV that also records every key written, so a read path can be proven read-only. */
-function auditedKv(): { kv: KVNamespace; puts: string[] } {
+interface KvWrite { key: string; options?: KVNamespacePutOptions }
+
+/**
+ * A KV that also records every key written, so a read path can be proven
+ * read-only, and each write's options, so an expiry can be read back.
+ */
+function auditedKv(): { kv: KVNamespace; puts: string[]; writes: KvWrite[] } {
   const store = new Map<string, string>();
   const puts: string[] = [];
+  const writes: KvWrite[] = [];
   const kv = {
     get: async (key: string) => store.get(key) ?? null,
-    put: async (key: string, value: string) => { puts.push(key); store.set(key, value); },
+    put: async (key: string, value: string, options?: KVNamespacePutOptions) => {
+      puts.push(key);
+      writes.push({ key, options });
+      store.set(key, value);
+    },
   } as unknown as KVNamespace;
-  return { kv, puts };
+  return { kv, puts, writes };
+}
+
+/** Run with Date.now held at one instant, so a counter's window is known. */
+async function atInstant<T>(ms: number, fn: () => Promise<T>): Promise<T> {
+  const realNow = Date.now;
+  Date.now = () => ms;
+  try {
+    return await fn();
+  } finally {
+    Date.now = realNow;
+  }
 }
 
 /** Collects the background work a route hands off, so a test can await it. */
@@ -576,6 +601,373 @@ async function main(): Promise<number> {
     assert(over.retryAfterSeconds > 0 && over.retryAfterSeconds <= 3600, 'retry lands inside the hour');
     const elsewhere = await checkAndIncrementSessionRateLimit(fakeRequest('198.51.100.6'), env);
     assertEqual(elsewhere.allowed, true, 'a different address');
+  });
+
+  // -------------------------------------------------------------------------
+  // Counter windows: a key holding an identity or an address hash names its
+  // UTC day or clock hour and expires at that window's end
+  // -------------------------------------------------------------------------
+
+  await test('the windows are UTC days and clock hours, and an expiry never sits under KV\'s floor', () => {
+    const start = utcDay(Date.UTC(2026, 9, 30, 0, 0, 0));
+    assertEqual(start.label, '2026-10-30', 'the first instant of a day');
+    assertEqual(start.endMs, Date.UTC(2026, 9, 31), 'the day ends at the next UTC midnight');
+    assertEqual(utcDay(Date.UTC(2026, 9, 30, 23, 59, 59, 999)).label, '2026-10-30', 'the last instant of a day');
+    assertEqual(utcDay(Date.UTC(2026, 11, 31, 23, 0)).endMs, Date.UTC(2027, 0, 1), 'the year turns');
+    const hour = utcHour(Date.UTC(2026, 9, 30, 10, 59, 59, 999));
+    assertEqual(hour.label, '2026-10-30T10', 'the last instant of an hour');
+    assertEqual(hour.endMs, Date.UTC(2026, 9, 30, 11), 'the hour ends at the next full hour');
+    assertEqual(utcHour(Date.UTC(2026, 9, 30, 11)).label, '2026-10-30T11', 'a full hour opens the next window');
+    for (const window of [start, hour]) {
+      const endS = window.endMs / 1000;
+      assertEqual(endsWithWindow(window, window.endMs - 3_600_000 + 1).expiration, endS, 'early in the window');
+      for (let now = window.endMs - 120_000; now < window.endMs; now += 250) {
+        const { expiration } = endsWithWindow(window, now);
+        assert(expiration * 1000 - now >= 60_000, `${window.label} at ${now}: ${expiration} is under KV's floor`);
+        assert(expiration <= endS + EXPIRATION_FLOOR_SECONDS, `${window.label} at ${now}: ${expiration} runs past the floor`);
+        if (window.endMs - now >= EXPIRATION_FLOOR_SECONDS * 1000) {
+          assertEqual(expiration, endS, `${window.label} at ${now}: the window's own end`);
+        }
+      }
+    }
+  });
+
+  const DAY_END_S = Date.UTC(2026, 9, 31) / 1000;
+  const expiresAt = (writes: KvWrite[], prefix: string): (number | undefined)[] =>
+    writes.filter(w => w.key.startsWith(prefix)).map(w => w.options?.expiration);
+  const assertWindowKeys = (writes: KvWrite[], prefix: string, count: number, endS = DAY_END_S, window = '2026-10-30'): void => {
+    const own = writes.filter(w => w.key.startsWith(prefix));
+    assertEqual(own.length, count, `${prefix} writes: ${writes.map(w => w.key).join(', ')}`);
+    for (const write of own) {
+      assert(write.key.endsWith(`:${window}`), `${write.key} names its window`);
+      assertEqual(write.options?.expiration, endS, `${write.key} expires at its window's end`);
+      assertEqual(write.options?.expirationTtl, undefined, `${write.key} has no TTL that a write renews`);
+    }
+  };
+
+  await test('the chat counters name their UTC day and expire at its end, however often renewed', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('12121212-1212-4121-8121-121212121212');
+    await atInstant(Date.UTC(2026, 9, 30, 0, 0, 30), () => checkAndIncrementRateLimit(fakeRequest('203.0.113.41'), env, identity));
+    const late = await atInstant(Date.UTC(2026, 9, 30, 21, 40), () =>
+      checkAndIncrementRateLimit(fakeRequest('203.0.113.41'), env, identity));
+    assertEqual(late.daily.used, 2, 'both requests counted under one key');
+    assertEqual(late.resetsAt, '2026-10-31T00:00:00.000Z', 'the reset is the window\'s end');
+    assertWindowKeys(kv.writes, `rate:sub:${identity.sub}:`, 2);
+    assertWindowKeys(kv.writes, 'ipcap:chat:', 2);
+    assert(kv.writes.every(w => !w.key.includes('203.0.113.41')), 'no key holds the address');
+    // The global brake holds no identifier and keeps its TTL.
+    assert(kv.writes.filter(w => w.key.startsWith('global:')).every(w => w.options?.expirationTtl === 86400), 'global TTL');
+  });
+
+  await test('the session ceiling names its clock hour and expires at its end, however often renewed', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    await atInstant(Date.UTC(2026, 9, 30, 10, 0, 10), () => checkAndIncrementSessionRateLimit(fakeRequest('203.0.113.42'), env));
+    const second = await atInstant(Date.UTC(2026, 9, 30, 10, 50), () =>
+      checkAndIncrementSessionRateLimit(fakeRequest('203.0.113.42'), env));
+    assertEqual(second.used, 2, 'both mints counted under one key');
+    assertEqual(second.resetsAt, '2026-10-30T11:00:00.000Z', 'the reset is the hour\'s end');
+    assertWindowKeys(kv.writes, 'ipcap:session:', 2, Date.UTC(2026, 9, 30, 11) / 1000, '2026-10-30T10');
+    const next = await atInstant(Date.UTC(2026, 9, 30, 11, 0, 10), () =>
+      checkAndIncrementSessionRateLimit(fakeRequest('203.0.113.42'), env));
+    assertEqual(next.used, 1, 'the next clock hour counts afresh');
+    assertEqual(expiresAt(kv.writes, 'ipcap:session:')[2], Date.UTC(2026, 9, 30, 12) / 1000, 'the next hour\'s end');
+  });
+
+  await test('the council and summary counters name their UTC day and expire at its end', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('13131313-1313-4131-8131-131313131313');
+    await atInstant(Date.UTC(2026, 9, 30, 9), () => checkAndIncrementCouncilRateLimit(fakeRequest(), env, identity));
+    assertWindowKeys(kv.writes, `council:sub:${identity.sub}:`, 1);
+    const reserved = await atInstant(Date.UTC(2026, 9, 30, 12), () =>
+      checkAndIncrementSummaryRateLimit(fakeRequest(), env, identity));
+    assertWindowKeys(kv.writes, `summary:sub:${identity.sub}:`, 1);
+    await atInstant(Date.UTC(2026, 9, 30, 12, 5), () => giveBackSummary(env, reserved));
+    assertWindowKeys(kv.writes, `summary:back:sub:${identity.sub}:`, 1);
+    assert(kv.writes.filter(w => w.key.startsWith('global:')).every(w => w.options?.expirationTtl === 86400), 'global TTL');
+  });
+
+  await test('a summary given back after its day is over writes nothing', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('14141414-1414-4141-8141-141414141414');
+    const reserved = await atInstant(Date.UTC(2026, 9, 30, 23, 59, 50), () =>
+      checkAndIncrementSummaryRateLimit(fakeRequest(), env, identity));
+    kv.writes.length = 0;
+    await atInstant(Date.UTC(2026, 9, 31, 0, 0, 10), () => giveBackSummary(env, reserved));
+    assertEqual(kv.writes.length, 0, `writes: ${kv.writes.map(w => w.key).join(', ')}`);
+  });
+
+  await test('a counter written in its window\'s last seconds keeps KV\'s floor and its window', async () => {
+    const kv = auditedKv();
+    const env = fakeEnv({ RATE_LIMITS: kv.kv });
+    const identity = fakeIdentity('15151515-1515-4151-8151-151515151515');
+    const now = Date.UTC(2026, 9, 30, 23, 59, 30);
+    await atInstant(now, async () => {
+      await checkAndIncrementRateLimit(fakeRequest('203.0.113.43'), env, identity);
+      await checkAndIncrementCouncilRateLimit(fakeRequest(), env, identity);
+      await checkAndIncrementSummaryRateLimit(fakeRequest(), env, identity);
+      await checkAndIncrementSessionRateLimit(fakeRequest('203.0.113.43'), env);
+    });
+    const identified = kv.writes.filter(w => !w.key.startsWith('global:'));
+    assertEqual(identified.length, 5, `writes: ${identified.map(w => w.key).join(', ')}`);
+    for (const write of identified) {
+      const expiration = write.options?.expiration ?? 0;
+      assert(write.key.endsWith(':2026-10-30') || write.key.endsWith(':2026-10-30T23'), `${write.key} keeps its window`);
+      assert(expiration * 1000 - now >= 60_000, `${write.key}: ${expiration} is under KV's floor`);
+      assert(expiration <= DAY_END_S + EXPIRATION_FLOOR_SECONDS, `${write.key}: ${expiration} runs past the floor`);
+    }
+  });
+
+  // -------------------------------------------------------------------------
+  // The beacon flood brakes: a keyed hash in the key, never the address
+  // -------------------------------------------------------------------------
+
+  const beaconRequest = (path: string, body: Record<string, unknown>, ip?: string): Request =>
+    new Request(`https://example.invalid${path}`, {
+      method: 'POST',
+      headers: ip ? { 'CF-Connecting-IP': ip, 'Content-Type': 'text/plain' } : { 'Content-Type': 'text/plain' },
+      body: JSON.stringify(body),
+    });
+
+  // One sender per braked route, each with a payload the route counts.
+  const BRAKED_ROUTES: { prefix: string; send: (env: Env, ip?: string) => Promise<Response> }[] = [
+    { prefix: 'funnel_rl', send: (env, ip) =>
+      handleFunnel(beaconRequest('/v1/funnel', { step: 'cta_click', path: '/', language: 'en' }, ip), env) },
+    { prefix: 'conv_rl', send: (env, ip) =>
+      handleConversions(beaconRequest('/api/conversions',
+        { gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now() }, ip), env, fakeCtx().ctx) },
+    { prefix: 'entry_rl', send: (env, ip) =>
+      handleEntry(beaconRequest('/v1/entry', { path: '/', language: 'en' }, ip), env) },
+    { prefix: 'page_rl', send: (env, ip) =>
+      handlePage(beaconRequest('/v1/page', { path: '/', language: 'en' }, ip), env) },
+    { prefix: 'pb_rl', send: (env, ip) =>
+      handlePlayback(beaconRequest('/v1/playback',
+        { type: 'story', event: 'started', figureId: 'socrates', language: 'en' }, ip), env) },
+    { prefix: 'signup_rl', send: (env, ip) =>
+      handleSignup(beaconRequest('/v1/signup', { path: '/', language: 'en' }, ip), env) },
+  ];
+  const BRAKE_SALT = 'test-ip-salt';
+  const brakeEnv = (kv: KVNamespace, salt = BRAKE_SALT): Env => fakeEnv({ RATE_LIMITS: kv, IP_HASH_SALT: salt });
+  // An instant well inside one UTC clock hour, so every brake key's window is known.
+  const MID_HOUR = Date.UTC(2026, 9, 30, 10, 15, 0);
+  const brakeKey = async (prefix: string, ip: string, hour = '2026-10-30T10'): Promise<string> =>
+    `${prefix}:${await hashIp(ip, BRAKE_SALT, `ratelimit:${prefix}`)}:${hour}`;
+  const brakeShape = (prefix: string): RegExp => new RegExp(`^${prefix}:[0-9a-f]{32}:\\d{4}-\\d{2}-\\d{2}T\\d{2}$`);
+
+  await test('every beacon brake keys a keyed hash of the address, never the address', async () => {
+    await atInstant(MID_HOUR, async () => {
+      const digests = new Set<string>();
+      for (const { prefix, send } of BRAKED_ROUTES) {
+        for (const ip of ['203.0.113.77', '2001:db8::77']) {
+          const kv = auditedKv();
+          const response = await send(brakeEnv(kv.kv), ip);
+          assert(response.status < 300, `${prefix} ${ip} answered ${response.status}`);
+          assertEqual(kv.puts.length, 1, `${prefix} ${ip} KV writes: ${kv.puts.join(', ')}`);
+          const key = kv.puts[0];
+          assert(!key.includes(ip), `${prefix} key holds the address: ${key}`);
+          assert(brakeShape(prefix).test(key), `${prefix} key shape: ${key}`);
+          assertEqual(key, await brakeKey(prefix, ip), `${prefix} ${ip} key`);
+          if (ip === '203.0.113.77') digests.add(key.split(':')[1]);
+          // Another secret, another key: the digest is made with the secret.
+          const other = auditedKv();
+          await send(brakeEnv(other.kv, 'another-salt'), ip);
+          assert(other.puts[0] !== key, `${prefix} ${ip} key does not depend on the secret`);
+        }
+      }
+      assertEqual(digests.size, BRAKED_ROUTES.length, 'one address, a different digest on every route');
+    });
+  });
+
+  await test('a beacon brake still counts one address and refuses it at the cap', async () => {
+    await atInstant(MID_HOUR, async () => {
+      for (const { prefix, send } of BRAKED_ROUTES) {
+        const kv = auditedKv();
+        const env = brakeEnv(kv.kv);
+        await send(env, '203.0.113.78');
+        await send(env, '203.0.113.78');
+        const key = await brakeKey(prefix, '203.0.113.78');
+        assertEqual(await kv.kv.get(key), '2', `${prefix} counts both requests under one key`);
+        await send(env, '198.51.100.78');
+        assertEqual(new Set(kv.puts).size, 2, `${prefix} a second address gets its own key`);
+        await kv.kv.put(key, '1000000');
+        analyticsRows.length = 0;
+        const refused = await send(env, '203.0.113.78');
+        assert(analyticsRows.every(row => row.blobs[0] === 'ratelimit'), `${prefix} counted a beacon past its cap`);
+        if (prefix === 'conv_rl') assertEqual(refused.status, 429, 'conversions answers 429 past its cap');
+      }
+    });
+  });
+
+  await test('beacons without an edge address share one hashed bucket per route, as before', async () => {
+    await atInstant(MID_HOUR, async () => {
+      for (const { prefix, send } of BRAKED_ROUTES) {
+        const kv = auditedKv();
+        const env = brakeEnv(kv.kv);
+        await send(env);
+        await send(env);
+        assertEqual(new Set(kv.puts).size, 1, `${prefix} one shared key: ${kv.puts.join(', ')}`);
+        assertEqual(await kv.kv.get(kv.puts[0]), '2', `${prefix} both requests counted`);
+        assert(brakeShape(prefix).test(kv.puts[0]), `${prefix} shared key shape: ${kv.puts[0]}`);
+      }
+    });
+  });
+
+  await test('every beacon brake names its clock hour and expires at its end, however often renewed', async () => {
+    const ip = '203.0.113.79';
+    for (const { prefix, send } of BRAKED_ROUTES) {
+      const kv = auditedKv();
+      const env = brakeEnv(kv.kv);
+      await atInstant(Date.UTC(2026, 9, 30, 10, 0, 5), () => send(env, ip));
+      await atInstant(Date.UTC(2026, 9, 30, 10, 45, 0), () => send(env, ip));
+      assertEqual(kv.writes.length, 2, `${prefix} writes: ${kv.puts.join(', ')}`);
+      for (const write of kv.writes) {
+        assertEqual(write.key, await brakeKey(prefix, ip), `${prefix} the key names its hour`);
+        assertEqual(write.options?.expiration, Date.UTC(2026, 9, 30, 11) / 1000, `${prefix} expires at the hour's end`);
+        assertEqual(write.options?.expirationTtl, undefined, `${prefix} no TTL that a write renews`);
+      }
+      assertEqual(await kv.kv.get(await brakeKey(prefix, ip)), '2', `${prefix} both counted under one key`);
+      // The next clock hour starts a fresh key with its own end.
+      await atInstant(Date.UTC(2026, 9, 30, 11, 0, 5), () => send(env, ip));
+      assertEqual(kv.writes[2].key, await brakeKey(prefix, ip, '2026-10-30T11'), `${prefix} the next hour's key`);
+      assertEqual(kv.writes[2].options?.expiration, Date.UTC(2026, 9, 30, 12) / 1000, `${prefix} the next hour's end`);
+    }
+  });
+
+  await test('a beacon brake written in its hour\'s last seconds keeps KV\'s floor and its hour', async () => {
+    const ip = '203.0.113.80';
+    const hourEnd = Date.UTC(2026, 9, 30, 11) / 1000;
+    for (const { prefix, send } of BRAKED_ROUTES) {
+      for (const now of [Date.UTC(2026, 9, 30, 10, 58, 50), Date.UTC(2026, 9, 30, 10, 59, 59, 900)]) {
+        const kv = auditedKv();
+        await atInstant(now, () => send(brakeEnv(kv.kv), ip));
+        const write = kv.writes[0];
+        assertEqual(write.key, await brakeKey(prefix, ip), `${prefix} still the hour it was counted in`);
+        const expiration = write.options?.expiration ?? 0;
+        assert(expiration * 1000 - now >= 60_000, `${prefix} ${expiration} is under KV's 60 s floor`);
+        assert(expiration <= hourEnd + EXPIRATION_FLOOR_SECONDS, `${prefix} ${expiration} runs past the floor's minute`);
+      }
+    }
+  });
+
+  await test('the expiry floor keeps 70 seconds in hand, ten more than KV\'s 60', () => {
+    const hour = utcHour(Date.UTC(2026, 9, 30, 10, 30));
+    const endS = hour.endMs / 1000;
+    assertEqual(endsWithWindow(hour, hour.endMs - 30_000).expiration, endS + 40, '30 s before the end: 70 s after the write');
+    assertEqual(endsWithWindow(hour, hour.endMs - 65_000).expiration, endS + 5, '65 s before the end: 70 s after the write');
+    assertEqual(endsWithWindow(hour, hour.endMs - 70_000).expiration, endS, '70 s before the end: the window\'s own end');
+  });
+
+  // -------------------------------------------------------------------------
+  // The boundary inside one request: the runtime's clock moves on across I/O,
+  // so a count read just before a window's end can reach its write after it
+  // -------------------------------------------------------------------------
+
+  /** Run `fn` against a KV whose every read moves the clock from `from` to `to`. */
+  const acrossBoundary = async (
+    from: number,
+    to: number,
+    fn: (kv: KVNamespace) => Promise<unknown>,
+  ): Promise<{ reads: string[]; writes: KvWrite[] }> => {
+    const store = new Map<string, string>();
+    const reads: string[] = [];
+    const writes: KvWrite[] = [];
+    let clock = from;
+    const kv = {
+      get: async (key: string) => {
+        reads.push(key);
+        clock = to;
+        return store.get(key) ?? null;
+      },
+      put: async (key: string, value: string, options?: KVNamespacePutOptions) => {
+        writes.push({ key, options });
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    const realNow = Date.now;
+    Date.now = () => clock;
+    try {
+      await fn(kv);
+    } finally {
+      Date.now = realNow;
+    }
+    return { reads, writes };
+  };
+
+  /** A count whose read and write sit in one window: the read key, at least KV's floor after the moved clock. */
+  const assertWrittenAsRead = (reads: string[], writes: KvWrite[], key: string, movedTo: number, endS: number): void => {
+    assert(reads.includes(key), `${key} was read: ${reads.join(', ')}`);
+    const write = writes.find(w => w.key === key);
+    assert(write, `the count goes to the key that was read, ${key}: ${writes.map(w => w.key).join(', ')}`);
+    const expiration = write?.options?.expiration ?? 0;
+    assert(expiration * 1000 >= movedTo + 60_000, `${key}: ${expiration} is under KV's floor from the moved clock`);
+    assert(expiration <= endS + EXPIRATION_FLOOR_SECONDS, `${key}: ${expiration} runs past the floor`);
+  };
+
+  const WINDOWED = /^(rate:sub|ipcap:chat|ipcap:session|council:sub|summary:sub|summary:back:sub):/;
+
+  const CROSS_IDENTITY = fakeIdentity('16161616-1616-4161-8161-161616161616');
+  const CROSS_IP = '203.0.113.51';
+  const BEFORE_MIDNIGHT = Date.UTC(2026, 9, 30, 23, 59, 59, 900);
+  const AFTER_MIDNIGHT = Date.UTC(2026, 9, 31, 0, 0, 0, 100);
+  const CROSSING_CHECKS: [string, (env: Env) => Promise<{ allowed: boolean }>][] = [
+    ['chat', env => checkAndIncrementRateLimit(fakeRequest(CROSS_IP), env, CROSS_IDENTITY)],
+    ['council', env => checkAndIncrementCouncilRateLimit(fakeRequest(), env, CROSS_IDENTITY)],
+    ['summary', env => checkAndIncrementSummaryRateLimit(fakeRequest(), env, CROSS_IDENTITY)],
+    ['session', env => checkAndIncrementSessionRateLimit(fakeRequest(CROSS_IP), env)],
+  ];
+
+  for (const [label, check] of CROSSING_CHECKS) {
+    await test(`a ${label} count read before its window's end and reaching the write after it writes nothing`, async () => {
+      let allowed = false;
+      const { reads, writes } = await acrossBoundary(BEFORE_MIDNIGHT, AFTER_MIDNIGHT, async kv => {
+        allowed = (await check(fakeEnv({ RATE_LIMITS: kv }))).allowed;
+      });
+      assertEqual(allowed, true, 'allowed');
+      const read = reads.filter(key => WINDOWED.test(key));
+      assert(read.length > 0 && read.every(key => key.endsWith(':2026-10-30') || key.endsWith(':2026-10-30T23')),
+        `read the window it began in: ${read.join(', ')}`);
+      assertEqual(writes.filter(w => WINDOWED.test(w.key)).map(w => w.key).join(', '), '', 'windowed writes');
+    });
+  }
+
+  await test('a give-back that passes its day check before midnight and reaches its write after it writes nothing', async () => {
+    const reserved = await atInstant(Date.UTC(2026, 9, 30, 23, 59, 50), () =>
+      checkAndIncrementSummaryRateLimit(fakeRequest(), fakeEnv(), CROSS_IDENTITY));
+    const givenBack = await acrossBoundary(BEFORE_MIDNIGHT, AFTER_MIDNIGHT, async kv => {
+      await kv.put(reserved.key, '1');
+      await giveBackSummary(fakeEnv({ RATE_LIMITS: kv }), reserved);
+    });
+    assert(givenBack.reads.includes(reserved.backKey), `the give-back read its day: ${givenBack.reads.join(', ')}`);
+    assertEqual(givenBack.writes.filter(w => w.key === reserved.backKey).length, 0, 'give-back writes');
+  });
+
+  await test('a chat count whose clock moves on inside its day is written to the key it read, KV\'s floor ahead', async () => {
+    const movedTo = Date.UTC(2026, 9, 30, 23, 59, 59, 900);
+    const { reads, writes } = await acrossBoundary(Date.UTC(2026, 9, 30, 23, 59, 58, 900), movedTo, kv =>
+      checkAndIncrementRateLimit(fakeRequest(CROSS_IP), fakeEnv({ RATE_LIMITS: kv }), CROSS_IDENTITY));
+    assertWrittenAsRead(reads, writes, `rate:sub:${CROSS_IDENTITY.sub}:2026-10-30`, movedTo, DAY_END_S);
+    assertWrittenAsRead(reads, writes, reads.find(key => key.startsWith('ipcap:chat:')) ?? '', movedTo, DAY_END_S);
+  });
+
+  await test('a beacon count read before the hour\'s end and reaching the write after it writes nothing, and the row is written', async () => {
+    const ip = '203.0.113.52';
+    const report = (kv: KVNamespace) => handleEntry(beaconRequest('/v1/entry', { path: '/', language: 'en' }, ip), brakeEnv(kv));
+    analyticsRows.length = 0;
+    let status = 0;
+    const crossed = await acrossBoundary(Date.UTC(2026, 9, 30, 10, 59, 59, 900), Date.UTC(2026, 9, 30, 11, 0, 0, 100),
+      async kv => { status = (await report(kv)).status; });
+    assertEqual(status, 204, 'status');
+    assert(crossed.reads.includes(await brakeKey('entry_rl', ip, '2026-10-30T10')), `the hour it began in: ${crossed.reads.join(', ')}`);
+    assertEqual(crossed.writes.map(w => w.key).join(', '), '', 'brake writes');
+    assertEqual(analyticsRows.filter(row => row.blobs[0] === 'entry').length, 1, 'the row was written');
+    const movedTo = Date.UTC(2026, 9, 30, 10, 59, 59, 900);
+    const inside = await acrossBoundary(Date.UTC(2026, 9, 30, 10, 59, 58, 900), movedTo, report);
+    assertWrittenAsRead(inside.reads, inside.writes, await brakeKey('entry_rl', ip, '2026-10-30T10'), movedTo,
+      Date.UTC(2026, 9, 30, 11) / 1000);
   });
 
   // -------------------------------------------------------------------------
@@ -2260,6 +2652,28 @@ async function main(): Promise<number> {
     assertEqual(threw, true, 'the per-visitor limit keeps its failure mode');
   });
 
+  await test('a refused per-visitor council write still fails the request, as before', async () => {
+    const env = fakeEnv({ RATE_LIMITS: refusingKv('council:sub:').kv });
+    let thrown = '';
+    try {
+      await checkAndIncrementCouncilRateLimit(fakeRequest(), env, fakeIdentity('99999999-9999-4999-8999-999999999998'));
+    } catch (err) {
+      thrown = (err as Error).message;
+    }
+    assertEqual(thrown, 'KV PUT failed: 429 Too Many Requests', 'the per-visitor council limit keeps its failure mode');
+  });
+
+  await test('a refused summary reservation still fails the request, as before', async () => {
+    const env = fakeEnv({ RATE_LIMITS: refusingKv('summary:sub:').kv });
+    let thrown = '';
+    try {
+      await checkAndIncrementSummaryRateLimit(fakeRequest(), env, fakeIdentity('99999999-9999-4999-8999-999999999997'));
+    } catch (err) {
+      thrown = (err as Error).message;
+    }
+    assertEqual(thrown, 'KV PUT failed: 429 Too Many Requests', 'the per-visitor summary reservation keeps its failure mode');
+  });
+
   // An address key is shared by everyone behind one address, so two allowed
   // requests from one school or office within a second collide on it.
   await test('a refused per-address write still serves the chat', async () => {
@@ -2321,6 +2735,67 @@ async function main(): Promise<number> {
     assertEqual(verified.length, 1, 'the Turnstile solve was still verified');
     assertEqual(warnings.filter(w => w.includes('[RateLimit] Address counter write failed')).length, 1, 'one fixed warning line');
   });
+
+  /** A KV that takes one write per key per second, by the worker's clock, and throws KV's 429 on a second. */
+  const oneWritePerSecondKv = (): { kv: KVNamespace; refused: string[] } => {
+    const store = new Map<string, string>();
+    const lastWrite = new Map<string, number>();
+    const refused: string[] = [];
+    const kv = {
+      get: async (key: string) => store.get(key) ?? null,
+      put: async (key: string, value: string) => {
+        const last = lastWrite.get(key);
+        if (last !== undefined && Date.now() - last < 1000) {
+          refused.push(key);
+          throw new Error('KV PUT failed: 429 Too Many Requests');
+        }
+        lastWrite.set(key, Date.now());
+        store.set(key, value);
+      },
+    } as unknown as KVNamespace;
+    return { kv, refused };
+  };
+
+  // Each beacon route through the router, with the answer it gives and the row it writes.
+  const BEACON_REPORTS: { prefix: string; path: string; body: () => Record<string, unknown>; status: number; row: string }[] = [
+    { prefix: 'funnel_rl', path: '/v1/funnel',
+      body: () => ({ step: 'cta_click', path: '/', language: 'en' }), status: 204, row: 'cta_click' },
+    { prefix: 'conv_rl', path: '/api/conversions',
+      body: () => ({ gclid: 'TESTCLICKID0001', event: 'listened', timestamp: Date.now() }), status: 200, row: 'listened' },
+    { prefix: 'entry_rl', path: '/v1/entry', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'entry' },
+    { prefix: 'page_rl', path: '/v1/page', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'page' },
+    { prefix: 'pb_rl', path: '/v1/playback',
+      body: () => ({ type: 'story', event: 'started', figureId: 'socrates', language: 'en' }), status: 204, row: 'playback' },
+    { prefix: 'signup_rl', path: '/v1/signup', body: () => ({ path: '/', language: 'en' }), status: 204, row: 'signup' },
+  ];
+
+  for (const route of BEACON_REPORTS) {
+    await test(`a second ${route.path} report from one address within a second is answered and its row written`, async () => {
+      const ip = '203.0.113.34';
+      const { kv, refused } = oneWritePerSecondKv();
+      const env = brakeEnv(kv);
+      const statuses: number[] = [];
+      analyticsRows.length = 0;
+      const warnings = await withWarnings(() => atInstant(MID_HOUR, async () => {
+        for (let i = 0; i < 2; i++) {
+          const { ctx, pending } = fakeCtx();
+          const response = await worker.fetch(beaconRequest(route.path, route.body(), ip), env, ctx);
+          statuses.push(response.status);
+          await Promise.all(pending);
+        }
+      }));
+      assertEqual(statuses.join(','), `${route.status},${route.status}`, `${route.prefix} statuses`);
+      assertEqual(refused.length, 1, `${route.prefix} the second brake write was refused`);
+      assertEqual(analyticsRows.filter(row => row.blobs[0] === route.row).length, 2, `${route.prefix} rows written`);
+      const key = await brakeKey(route.prefix, ip);
+      assertEqual(await kv.get(key), '1', `${route.prefix} the brake undercounts by the lost write`);
+      const lines = warnings.filter(w => w.includes('[RateLimit]'));
+      assertEqual(lines.length, 1, `${route.prefix} warning lines: ${warnings.join(' | ')}`);
+      for (const secret of [ip, key.split(':')[1], route.prefix, 'KV PUT failed']) {
+        assert(!lines[0].includes(secret), `${route.prefix} the line carries ${secret}: ${lines[0]}`);
+      }
+    });
+  }
 
   globalThis.fetch = realFetch;
 
@@ -2980,6 +3455,36 @@ async function main(): Promise<number> {
     assert(r.puts.every(key => !key.includes(KNOWN_ID)), 'no client-ID key written');
   });
 
+  await test('the Turnstile check sends the secret and the token, never the address', async () => {
+    for (const ip of ['203.0.113.88', '2001:db8::88']) {
+      const sent: { url: string; body: string; headers: string }[] = [];
+      globalThis.fetch = (async (url: string, init: RequestInit) => {
+        sent.push({ url: String(url), body: String(init.body), headers: JSON.stringify([...new Headers(init.headers ?? {})]) });
+        return new Response(JSON.stringify({ success: true, hostname: 'agoracosmica.org' }), {
+          status: 200, headers: { 'Content-Type': 'application/json' },
+        });
+      }) as unknown as typeof fetch;
+      try {
+        const res = await handleSession(new Request('https://example.invalid/v1/session', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'CF-Connecting-IP': ip },
+          body: JSON.stringify({ turnstileToken: 'a-solved-token', clientId: KNOWN_ID }),
+        }), fakeEnv({ TURNSTILE_SECRET_KEY: 'test-turnstile-secret' }));
+        assertEqual(res.status, 200, `${ip} status`);
+        assertEqual(sent.length, 1, `${ip} one siteverify call`);
+        assert(sent[0].url.endsWith('/turnstile/v0/siteverify'), `${ip} siteverify url: ${sent[0].url}`);
+        const form = new URLSearchParams(sent[0].body);
+        assertEqual([...form.keys()].sort().join(','), 'response,secret', `${ip} the form fields`);
+        assertEqual(form.get('secret'), 'test-turnstile-secret', `${ip} the secret`);
+        assertEqual(form.get('response'), 'a-solved-token', `${ip} the token`);
+        assert(!decodeURIComponent(sent[0].body).includes(ip), `${ip} the address is in the body: ${sent[0].body}`);
+        assert(!sent[0].headers.includes(ip), `${ip} the address is in a header`);
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+    }
+  });
+
   // -------------------------------------------------------------------------
   // Conversion upload: one account only
   // -------------------------------------------------------------------------
@@ -3075,7 +3580,8 @@ async function main(): Promise<number> {
     assertEqual(counters.length, 0, `daily counter writes: ${counters.join(', ')}`);
     const records = kv.puts.filter(key => key.startsWith('conv:'));
     assertEqual(records.length, 0, `event record writes: ${records.join(', ')}`);
-    assertEqual(kv.puts.join(','), 'conv_rl:10.0.0.31', 'the only KV write');
+    assertEqual(kv.puts.length, 1, `KV writes: ${kv.puts.join(', ')}`);
+    assert(/^conv_rl:[0-9a-f]{32}:\d{4}-\d{2}-\d{2}T\d{2}$/.test(kv.puts[0]), `the only KV write is the hashed brake: ${kv.puts[0]}`);
     assertEqual(outbound.length, 0, 'outbound calls');
   });
 
@@ -3357,15 +3863,114 @@ async function main(): Promise<number> {
   await test('a give-back never outnumbers the reservations', async () => {
     const kv = auditedKv();
     const env = fakeEnv({ RATE_LIMITS: kv.kv });
-    const day = new Date().toISOString().slice(0, 10);
-    const keys = { key: `summary:sub:${IDENTITY}:${day}`, backKey: `summary:back:sub:${IDENTITY}:${day}` };
-    // One reservation on record, already given back, as when a parallel twin's counter write was lost.
-    await kv.kv.put(keys.key, '1');
-    await kv.kv.put(keys.backKey, '1');
-    kv.puts.length = 0;
-    await giveBackSummary(env, keys);
-    assertEqual(kv.puts.length, 0, 'KV writes');
-    assertEqual(await summariesUsed(env), 0, 'summaries counted');
+    // One instant for the keys, the give-back and the quota, so midnight cannot fall between them.
+    await atInstant(Date.UTC(2026, 9, 30, 12), async () => {
+      const day = utcDay();
+      const keys = { key: `summary:sub:${IDENTITY}:${day.label}`, backKey: `summary:back:sub:${IDENTITY}:${day.label}`, day };
+      // One reservation on record, already given back, as when a parallel twin's counter write was lost.
+      await kv.kv.put(keys.key, '1');
+      await kv.kv.put(keys.backKey, '1');
+      kv.puts.length = 0;
+      await giveBackSummary(env, keys);
+      assertEqual(kv.puts.length, 0, 'KV writes');
+      assertEqual(await summariesUsed(env), 0, 'summaries counted');
+    });
+  });
+
+  // -------------------------------------------------------------------------
+  // The automated mark: blob9 from the network a request came from
+  // -------------------------------------------------------------------------
+
+  // Node's Request has no cf; the edge sets it, so it is defined on the
+  // instance here the way the runtime hands it over.
+  const fromNetwork = (request: Request, asn?: unknown): Request => {
+    if (asn !== undefined) Object.defineProperty(request, 'cf', { value: { asn, country: 'US' } });
+    return request;
+  };
+  const LISTED = [
+    8075, 12876, 14061, 14618, 15169, 16276, 16509, 20473, 24940, 31898, 37963, 45090, 45102, 51167, 60781,
+    63949, 132203, 136907, 396982,
+  ];
+
+  await test('the hosting list is the closed list, and holds no relay network', () => {
+    assertEqual([...HOSTING_ASNS].sort((a, b) => a - b).join(','), LISTED.join(','), 'the listed networks');
+    for (const asn of RELAY_ASNS) assert(!HOSTING_ASNS.has(asn), `relay network ${asn} is on the hosting list`);
+    assertEqual(RELAY_ASNS.join(','), '13335,36183,20940,54113,714', 'the relay networks');
+  });
+
+  await test('a probe mark wins, a hosting network gives auto, anything else stays empty', () => {
+    const req = (asn?: unknown): Request =>
+      fromNetwork(new Request('https://example.invalid/v1/page', { method: 'POST' }), asn);
+    assertEqual(readMark(req(16509), 1), 'probe', 'a probe from a data centre stays a probe');
+    assertEqual(readMark(req(16509), undefined), 'auto', 'a data centre');
+    for (const asn of LISTED) assertEqual(readMark(req(asn), undefined), 'auto', `network ${asn}`);
+    for (const asn of RELAY_ASNS) assertEqual(readMark(req(asn), undefined), '', `relay network ${asn}`);
+    assertEqual(readMark(req(), undefined), '', 'no network known');
+    assertEqual(readMark(req(3320), undefined), '', 'a home network');
+    assertEqual(readMark(req('16509'), undefined), '', 'a number as text is not read');
+    assertEqual(readMark(req(16509), 'yes'), 'auto', 'an odd probe value is no probe');
+    assertEqual(readMark(req(), '1'), 'probe', 'a probe without a network');
+  });
+
+  const markedBeacon = async (
+    handler: (request: Request, env: Env) => Promise<Response>,
+    path: string,
+    payload: Record<string, unknown>,
+    asn?: unknown,
+  ) => {
+    analyticsRows.length = 0;
+    await handler(fromNetwork(new Request(`https://example.invalid${path}`, {
+      method: 'POST',
+      headers: { 'CF-Connecting-IP': '10.0.0.41' },
+      body: JSON.stringify(payload),
+    }), asn), fakeEnv());
+    return analyticsRows[0];
+  };
+
+  const BEACON_WRITERS: [string, (request: Request, env: Env) => Promise<Response>, string, Record<string, unknown>][] = [
+    ['page', handlePage, '/v1/page', { path: '/', language: 'en', landing: 1, source: 'direct' }],
+    ['playback', handlePlayback, '/v1/playback', { type: 'story', figureId: 'aurelius', mode: 'story', language: 'en', event: 'started' }],
+    ['entry', handleEntry, '/v1/entry', { path: '/app', language: 'en' }],
+    ['signup', handleSignup, '/v1/signup', { path: '/', language: 'en' }],
+    ['funnel', handleFunnel, '/v1/funnel', { step: 'cta_click', path: '/', language: 'en' }],
+    ['engaged', handleFunnel, '/v1/funnel', { step: 'engaged', mode: 'typed', language: 'en' }],
+    ['council_heard', handleFunnel, '/v1/funnel', { step: 'council_heard', language: 'en' }],
+    ['museum', handleFunnel, '/v1/funnel', { step: 'museum_arrival', wing: 'vinci', hold: 'upright', language: 'en' }],
+  ];
+
+  await test('every beacon row from a hosting network reads auto, a probe stays probe, a relay stays unmarked', async () => {
+    for (const [name, handler, path, payload] of BEACON_WRITERS) {
+      const auto = await markedBeacon(handler, path, payload, 16509);
+      assert(auto, `${name}: no row`);
+      assertEqual(auto.blobs[0], name === 'museum' ? 'museum_arrival' : name === 'funnel' ? 'cta_click' : name, `${name}: the row type`);
+      assertEqual(auto.blobs[8], 'auto', `${name}: marked auto`);
+      assert(!JSON.stringify(auto).includes('16509'), `${name}: the network number reached the row`);
+      assertEqual((await markedBeacon(handler, path, { ...payload, probe: 1 }, 16509)).blobs[8], 'probe', `${name}: a probe stays a probe`);
+      assertEqual((await markedBeacon(handler, path, payload, 714)).blobs[8], '', `${name}: a relay stays unmarked`);
+      assertEqual((await markedBeacon(handler, path, payload, 13335)).blobs[8], '', `${name}: a relay stays unmarked`);
+      assertEqual((await markedBeacon(handler, path, payload)).blobs[8], '', `${name}: no network, no mark`);
+    }
+  });
+
+  await test('chat, council and summary rows from a hosting network read auto, a probe stays probe', async () => {
+    for (const route of gated) {
+      const name = route.path.slice(4);
+      for (const [extra, asn, want] of [[{}, 16509, 'auto'], [{ probe: 1 }, 16509, 'probe'], [{}, 714, ''], [{}, undefined, '']] as const) {
+        stubFetch(() => sseResponse([CONTENT_FRAME('hello'), DONE_FRAME]));
+        analyticsRows.length = 0;
+        const env = fakeEnv();
+        const { ctx, pending } = fakeCtx();
+        const request = fromNetwork(await postJson(route.path, env, JSON.stringify({ ...route.base, ...extra })), asn);
+        const response = await route.handler(request, env, ctx);
+        assertEqual(response.status, 200, `${name}: status`);
+        await readAll(response.body!);
+        await Promise.all(pending);
+        const row = analyticsRows.find(r => r.blobs[0] === name);
+        assert(row, `${name}: no row`);
+        assertEqual(row!.blobs[8], want, `${name} from ${String(asn)} with ${JSON.stringify(extra)}`);
+      }
+    }
+    globalThis.fetch = realFetch;
   });
 
   // -------------------------------------------------------------------------

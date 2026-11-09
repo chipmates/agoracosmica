@@ -7,9 +7,12 @@
 // Privacy: aggregate counter only. No user dimension. No IP retention.
 // Same legal posture as the rest of analytics.
 
-import { trackSignup, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackSignup, readCountry, readDevice, readMark } from '../utils/analytics';
 import { bodyTooLarge, readJsonCapped, BEACON_MAX_BODY_BYTES } from '../middleware/bodyLimit';
 import type { Env } from '../utils/types';
+import { beaconLimitKey } from '../utils/ipHash';
+import { utcHour } from '../utils/counterWindow';
+import { putAddressCounter } from '../middleware/rateLimit';
 
 interface SignupPayload {
   path?: string;
@@ -23,7 +26,6 @@ const VALID_LANGS = new Set(['en', 'de']);
 // Rate limit: 20 signup beacons per IP per hour. A signup is a one-time event
 // per user; a single IP rarely creates more than a handful of accounts
 // legitimately. Lower limit than entry because signup is rarer.
-const RATE_LIMIT_WINDOW = 3600;
 const RATE_LIMIT_MAX = 20;
 
 export async function handleSignup(request: Request, env: Env): Promise<Response> {
@@ -40,13 +42,13 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
     return new Response(null, { status: 204 });
   }
 
-  const ip = request.headers.get('CF-Connecting-IP') || 'unknown';
-  const rateLimitKey = `signup_rl:${ip}`;
+  const hour = utcHour();
+  const rateLimitKey = await beaconLimitKey(request, env, 'signup_rl', hour);
   const currentCount = parseInt(await env.RATE_LIMITS.get(rateLimitKey) || '0', 10);
   if (currentCount >= RATE_LIMIT_MAX) {
     return new Response(null, { status: 204 });
   }
-  await env.RATE_LIMITS.put(rateLimitKey, String(currentCount + 1), { expirationTtl: RATE_LIMIT_WINDOW });
+  await putAddressCounter(env, rateLimitKey, currentCount + 1, hour);
 
   const path = (typeof payload.path === 'string' && PATH_RE.test(payload.path))
     ? payload.path
@@ -60,7 +62,7 @@ export async function handleSignup(request: Request, env: Env): Promise<Response
     language: lang,
     country: readCountry(request),
     device: readDevice(request),
-    probe: readProbe(payload.probe),
+    probe: readMark(request, payload.probe),
   });
 
   return new Response(null, { status: 204 });

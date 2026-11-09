@@ -13,7 +13,7 @@ import { AWARD_RETRY_DIRECTIVE, createAwardGuardedStream } from '../services/awa
 import { screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackGovernor, trackLlmEvent, trackRateLimit, readCountry, readDevice, readMark } from '../utils/analytics';
 import type { ServingModel } from '../config';
 import type { TokenUsage } from '../services/spendGovernor';
 import type { Env, ToolDefinition } from '../utils/types';
@@ -64,7 +64,7 @@ export async function handleChat(request: Request, env: Env, ctx: ExecutionConte
   const kind = (typeof rawBody.kind === 'string' && VALID_CHAT_KINDS.has(rawBody.kind))
     ? rawBody.kind
     : '';
-  const probe = readProbe(rawBody.probe);
+  const probe = readMark(request, rawBody.probe);
   const carriedEntry = rawBody.entry === CARRIED_ENTRY;
   const aside = rawBody[ASIDE_FIELD] === true;
 

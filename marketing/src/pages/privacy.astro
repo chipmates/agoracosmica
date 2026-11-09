@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Privacy Policy';
-const lastUpdated = 'Last updated: 28 October 2026';
+const lastUpdated = 'Last updated: 9 November 2026';
 const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Agora Cosmica platform. GDPR-compliant information on data processing, processors, and the rights of data subjects.';
 ---
 <Public
@@ -208,7 +208,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <li>Cloudflare, Inc. (USA), processing predominantly in Europe. Purpose: API proxy, security (WAF, bot protection), rate limiting. The data processing agreement is available in the Cloudflare dashboard. EU Cloud Code of Conduct compliance mark.</li>
       </ul>
       <p><strong>Your own AI access (your own key or another AI server):</strong> If you add your own OpenRouter key, your browser sends your typed messages straight to OpenRouter, Inc. (USA), under your own OpenRouter account and its terms. These messages do not pass through our servers, and we do not see or receive them. There is one exception. If OpenRouter rejects your key and you agree in the app to continue on the daily free quota, the conversation concerned (with what was written before), a question to a council or a conversation to be summarized passes through our servers, as without your own key. Only what you said yes to passes through our servers as content. As in the free mode, the legal basis is then Art. 6(1)(b) GDPR (performance of a contract). Your key is stored only in your browser, encrypted. While the "Zero Data Retention" switch is on (the default), the app asks OpenRouter to route only to providers that keep no data. OpenRouter's privacy policy: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>. If you instead enter the address of another AI server in the settings, for example one you run yourself, your browser sends your typed messages straight to that server, under its operator's terms. These messages do not pass through our servers either. A key for that server is also stored only in your browser, encrypted. In both cases our speech server still turns spoken input into text and the responses into speech for reading aloud, except where you have connected your own speech services for this.</p>
-      <p><strong>Storage period:</strong> We do not store chat content on our servers. Each message passes through our server to the AI model, and the answer streams back to your browser. Our server logs record errors without message content. To enforce the daily free quota and protect the service, our servers keep the random browser ID and the IP address, or a hash of it made with a secret key, for at most 24 hours. When the content filter blocks a message, we keep a security record without the message text for up to 90 days: the time, the kind of block, the figure, the mode, the language and a hash of the IP address made with a secret key (pseudonymized). IP addresses never enter our analytics records.</p>
+      <p><strong>Storage period:</strong> We do not store chat content on our servers. Each message passes through our server to the AI model, and the answer streams back to your browser. Our server logs record errors without message content. To enforce the daily free quota and protect the service, our servers keep the random browser ID and the IP address, or a hash of it made with a secret key, for at most 24 hours and two minutes. When the content filter blocks a message, we keep a security record without the message text for up to 90 days: the time, the kind of block, the figure, the mode, the language and a hash of the IP address made with a secret key (pseudonymized). IP addresses never enter our analytics records.</p>
       <p><strong>Note:</strong> Please do not enter personal data (name, address, phone number, email, bank details) into the chat.</p>
     </section>
 
@@ -221,7 +221,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <li>For speech output, the text to be spoken is sent there, for example a figure's answer or a story. For speech input, your recording is sent there and turned into text.</li>
         <li>Both pass through our audio proxy at Cloudflare, which forwards them and stores nothing</li>
         <li>Texts and recordings are deleted right after processing. Your voice is not recorded or stored.</li>
-        <li>To prevent abuse, the proxy keeps a hash of your IP address, made with a secret key, for up to 24 hours</li>
+        <li>To prevent abuse, the proxy keeps a hash of your IP address, made with a secret key, for at most 24 hours and two minutes</li>
       </ul>
     </section>
 
@@ -332,10 +332,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         Recipient: Google Ireland Limited and Google LLC (USA). A transfer to the USA can take place. Google is certified under the EU-US Data Privacy Framework. How Google uses data from partner sites: <a href="https://business.safety.google/privacy">https://business.safety.google/privacy</a>.
       </p>
       <p>
-        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. Google keeps the data according to its own retention rules for advertising data.
+        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. To prevent abuse, when steps are sent our server also keeps a hash of your IP address, made with a secret key, together with how many steps came from it in the same hour. Both are stored apart from this record and expire after at most one hour and two minutes. Google keeps the data according to its own retention rules for advertising data.
       </p>
       <p>
-        <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent.
+        <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent. The hash of your IP address that our server keeps when steps are sent rests not on your consent but on our legitimate interest in protecting the measurement from floods of reports (Art. 6(1)(f) GDPR), as described under "Reach measurement".
       </p>
     </section>
 
@@ -348,10 +348,16 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         When a visit starts, the count also notes in one coarse word what kind of place the visitor came from, for example "search", "Google ad", "AI assistant" or "direct". The page works this out from the address of the page that linked here, which browsers normally pass along, or for an ad from its mark in the address you arrive at, and keeps only that word. The same word can also go with the counts for entering the app, for the first chat and for the first real use, when you come into the app through a link on our pages, or when you open the app itself as the first page of a visit. Real use means you typed a first message yourself, or heard two minutes or the first quarter of a story, a teaching or a council.
       </p>
       <p>
+        When a count comes from the network of a data centre or cloud provider, our server marks it with the word "auto". This lets us read counts that may come from programs in data centres apart from the rest. The count itself is kept. Counts from people who connect through such a network, for example some VPN services, carry this word too. To do this, the server compares the number of the network, which Cloudflare passes along with every connection, with a fixed list of such providers. It keeps only the word "auto". It does not store the network number, write it to a log or pass it on.
+      </p>
+      <p>
         No count contains an IP address, a user ID or anything you typed. We build no profiles, and we do not recognize a browser from one visit to the next for counting. The counts are kept for 90 days.
       </p>
       <p>
-        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
+        To prevent abuse, when counts arrive our server keeps a hash of your IP address, made with a secret key, together with how many counts of one kind came from it in the same hour. Both are stored apart from the counts and expire after at most one hour and two minutes.
+      </p>
+      <p>
+        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). We process the hash of your IP address on the basis of our legitimate interest in protecting the counting and our server from floods of reports (Art. 6(1)(f) GDPR). It is pseudonymised but still personal data, because with the key it could be traced back to an IP address. For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
       </p>
     </section>
 

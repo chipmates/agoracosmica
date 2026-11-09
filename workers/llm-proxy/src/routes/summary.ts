@@ -9,7 +9,7 @@ import { alertOutage } from '../services/telegram';
 import { isInjection, screenCouncilContent } from '../utils/contentScreen';
 import { createSafetyFilteredStream } from '../services/streamFilter';
 import { logComplianceEvent, getSeverity } from '../utils/complianceLog';
-import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readProbe } from '../utils/analytics';
+import { trackLlmEvent, trackRateLimit, readCountry, readDevice, readMark } from '../utils/analytics';
 import { VALID_FIGURES } from '../config';
 import type { Env } from '../utils/types';
 
@@ -284,7 +284,7 @@ export async function handleSummary(request: Request, env: Env, ctx: ExecutionCo
       device: readDevice(request),
       // The greeting/turn label belongs to chat rows only.
       kind: '',
-      probe: readProbe((body as Record<string, unknown>).probe),
+      probe: readMark(request, (body as Record<string, unknown>).probe),
     });
   };
 
