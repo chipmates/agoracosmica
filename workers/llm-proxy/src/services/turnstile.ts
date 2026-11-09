@@ -47,8 +47,9 @@ export async function verifyTurnstileToken(
     };
   }
 
-  // Validate hostname to prevent cross-site token reuse
-  if (result.hostname && !EXPECTED_HOSTNAMES.includes(result.hostname)) {
+  // Validate hostname to prevent cross-site token reuse. Siteverify names the
+  // hostname on every success (test keys: example.com), so none is a failure.
+  if (!result.hostname || !EXPECTED_HOSTNAMES.includes(result.hostname)) {
     return {
       success: false,
       error: 'Turnstile hostname mismatch',

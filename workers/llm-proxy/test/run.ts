@@ -56,6 +56,7 @@ import { handleSession } from '../src/routes/session';
 import { handlePlayback } from '../src/routes/playback';
 import { handleConversions } from '../src/routes/conversions';
 import { handleSignup } from '../src/routes/signup';
+import { verifyTurnstileToken } from '../src/services/turnstile';
 import { signJWT } from '../src/utils/jwt';
 import { readMark } from '../src/utils/analytics';
 import { HOSTING_ASNS, RELAY_ASNS } from '../src/utils/hostingNetworks';
@@ -3479,6 +3480,28 @@ async function main(): Promise<number> {
         assertEqual(form.get('response'), 'a-solved-token', `${ip} the token`);
         assert(!decodeURIComponent(sent[0].body).includes(ip), `${ip} the address is in the body: ${sent[0].body}`);
         assert(!sent[0].headers.includes(ip), `${ip} the address is in a header`);
+      } finally {
+        globalThis.fetch = realFetch;
+      }
+    }
+  });
+
+  await test('a Turnstile success passes only with one of our hostnames, and fails without one', async () => {
+    const cases: [Record<string, unknown>, boolean][] = [
+      [{ success: true, hostname: 'agoracosmica.org' }, true],
+      [{ success: true, hostname: 'www.agoracosmica.org' }, true],
+      [{ success: true }, false],
+      [{ success: true, hostname: '' }, false],
+      [{ success: true, hostname: 'example.com' }, false],
+      [{ success: true, hostname: 'agoracosmica.org.attacker.net' }, false],
+    ];
+    for (const [answer, passes] of cases) {
+      globalThis.fetch = (async () => new Response(JSON.stringify(answer), {
+        status: 200, headers: { 'Content-Type': 'application/json' },
+      })) as unknown as typeof fetch;
+      try {
+        const result = await verifyTurnstileToken('a-solved-token', 'test-turnstile-secret');
+        assertEqual(result.success, passes, JSON.stringify(answer));
       } finally {
         globalThis.fetch = realFetch;
       }
