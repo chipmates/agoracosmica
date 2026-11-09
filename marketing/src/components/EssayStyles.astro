@@ -26,8 +26,11 @@
     margin: 0 0 0.4rem;
     font-family: var(--font-ui, 'Space Grotesk', sans-serif);
   }
+  /* Libre Caslon ships one upright weight; a heading's default bold made the
+     browser fake one, which hollowed out the question mark's outline. */
   .esy-hero__title {
     font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular);
     font-size: clamp(2rem, 5vw, 2.9rem);
     line-height: 1.1;
     margin: 0 0 0.75rem;
@@ -47,6 +50,7 @@
   }
   .esy-h2 {
     font-family: var(--font-content, 'Libre Caslon Text', serif);
+    font-weight: var(--weight-regular);
     font-size: clamp(1.4rem, 3.5vw, 1.85rem);
     color: var(--gold-primary);
     margin: 0 0 1rem;
