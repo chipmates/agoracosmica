@@ -3,13 +3,10 @@
 // the Dickinson poems invite: one honest line about the Echo, one gold button,
 // the trust and free-tier reassure lines, then quiet follow-on links. The
 // conversion fire lives in PublicScript's data-agc-cta delegation, exactly as
-// on every other marketing surface.
+// on every other marketing surface. No portrait and no label here: both stand
+// once, in the first screen's door (EssayDoor), and this door's line says in
+// words how the stories are made and read.
 
-import StaticImage from './StaticImage.astro';
-import AiLabel from './AiLabel.astro';
-import './portrait-credit.css';
-import { portraitAlt as creditAlt } from '../lib/portraitCredit';
-import { getFigureById } from '@client/data/public/figuresCatalog';
 import type { Lang } from '../i18n';
 
 interface Props {
@@ -18,17 +15,13 @@ interface Props {
   line: string;
   href: string;
   buttonLabel: string;
-  /** Figure id for conversion metadata + the small portrait. Omit for generic doors. */
+  /** Figure id for conversion metadata. Omit for generic doors. */
   figureId?: string;
-  /** Accessible name for the portrait; required when figureId is set. */
-  portraitAlt?: string;
   /** Quiet follow-on links rendered under the reassure lines. */
   moreLinks?: { label: string; href: string }[];
 }
 
 const { lang, line, href, buttonLabel, figureId, moreLinks = [] } = Astro.props;
-// The alt is the name and the credit, as on every AI portrait; a page's own alt text is no longer used.
-const alt = figureId ? creditAlt(getFigureById(figureId, lang)?.name ?? figureId, lang) : '';
 
 const eyebrow = lang === 'de' ? 'Kurze Geschichten übers Leben' : 'Short stories about life';
 const trust =
@@ -41,13 +34,6 @@ const freeNote =
     : 'No account needed. Listen or read.';
 ---
 <aside class="esy-invite">
-  {/* the page's AI line again, before the portrait, for a reader who lands mid-page */}
-  {figureId && <AiLabel lang={lang} class="esy-invite__label" />}
-  {figureId && (
-    <div class="esy-invite__portrait">
-      <StaticImage figureId={figureId} type="thumbnail" alt={alt} loading="lazy" width={96} height={96} />
-    </div>
-  )}
   <p class="esy-invite__eyebrow">{eyebrow}</p>
   <p class="esy-invite__line">{line}</p>
   <a class="esy-invite__button pub-cta__button" href={href} data-agc-cta="start-exploring" data-agc-figure={figureId}>
@@ -75,22 +61,6 @@ const freeNote =
     padding: 2.25rem 1.5rem;
     border-top: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
     border-bottom: 1px solid color-mix(in srgb, var(--gold-subtle) 22%, transparent);
-  }
-  /* outweighs the label's own margin (ai-label.css), so it centres over the portrait */
-  .esy-invite .esy-invite__label {
-    margin: 0 auto 0.75rem;
-  }
-  .esy-invite__portrait {
-    width: 72px;
-    margin: 0 auto 1.1rem;
-  }
-  .esy-invite__portrait img {
-    display: block;
-    width: 72px;
-    height: 72px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 1px solid color-mix(in srgb, var(--gold-subtle) 40%, transparent);
   }
   .esy-invite__eyebrow {
     text-transform: uppercase;
