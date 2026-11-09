@@ -20,7 +20,7 @@ import BackLink from '../../../components/BackLink.astro';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
-import AiLabel from '../../../components/AiLabel.astro';
+import EssayDoor from '../../../components/EssayDoor.astro';
 import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
@@ -160,6 +160,8 @@ const schemas = [
 ];
 // A companion page of a story player figure: the dock keeps playing here.
 const storyDock = isStoryCompanionPath(Astro.url.pathname);
+// The story door's address and button words, the same in the first screen and at the close.
+const DOOR = { href: '/figures/rumi/', buttonLabel: 'Hear his life in stories', figureId: 'rumi' };
 ---
 <Public
   title={metaTitle}
@@ -195,7 +197,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">In early translation</p>
       <h1 class="esy-hero__title">Rumi</h1>
-      <AiLabel lang={lang} class="esy-hero__label" />
       <p class="esy-hero__lead">
         1207-1273 · the Persian world and Konya. Jalálu'd-dín Rúmí was a
         scholar of law who met a wandering dervish named Shams and became the
@@ -204,6 +205,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         selection from it, in an early public domain translation, each passage
         with a line of introduction.
       </p>
+      <EssayDoor lang={lang} href={DOOR.href} buttonLabel={DOOR.buttonLabel} figureId={DOOR.figureId} />
     </header>
 
     <section class="esy-section">
@@ -249,10 +251,9 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <EssayInvite
       lang={lang}
       line="You have just read Rumi in translation. On Agora Cosmica you can hear his life told in short stories, or read them at your own pace, and see where these lines came from. The stories are written as a human-AI collaboration from the sources, and read by a synthetic voice. A retelling, never the man himself."
-      href="/figures/rumi/"
-      buttonLabel="Hear his life in stories"
-      figureId="rumi"
-      portraitAlt="AI-generated portrait of Rumi"
+      href={DOOR.href}
+      buttonLabel={DOOR.buttonLabel}
+      figureId={DOOR.figureId}
       moreLinks={[
         { label: "Shakespeare's sonnets", href: '/figures/william-shakespeare/sonnets/' },
         { label: 'Poems to read', href: '/poems/' },

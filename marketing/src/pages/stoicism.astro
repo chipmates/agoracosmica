@@ -13,7 +13,7 @@ import Breadcrumbs from '../components/Breadcrumbs.astro';
 import BackLink from '../components/BackLink.astro';
 import EssayStyles from '../components/EssayStyles.astro';
 import EssayInvite from '../components/EssayInvite.astro';
-import AiLabel from '../components/AiLabel.astro';
+import EssayDoor from '../components/EssayDoor.astro';
 import { figureImage } from '../lib/figureImages';
 import { articleSchema, breadcrumbSchema, faqSchema } from '../lib/schemas';
 import { canonicalUrl, SITE_URL, figureListUrl } from '../lib/urls';
@@ -92,6 +92,8 @@ const schemas = [
 ];
 // A companion page of a story player figure: the dock keeps playing here.
 const storyDock = isStoryCompanionPath(Astro.url.pathname);
+// The story door's address and button words, the same in the first screen and at the close.
+const DOOR = { href: '/figures/marcus-aurelius/', buttonLabel: 'Hear the life of Marcus Aurelius', figureId: 'aurelius' };
 ---
 <Public
   title={metaTitle}
@@ -119,7 +121,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">A practice, not a pose</p>
       <h1 class="esy-hero__title">What Is Stoicism?</h1>
-      <AiLabel lang={lang} class="esy-hero__label" />
       <p class="esy-hero__lead">
         Stoicism is a school of philosophy from ancient Greece and Rome that
         teaches a simple, demanding idea: you do not control most of what
@@ -129,6 +130,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         Stoics built a set of daily practices that people still use, unchanged,
         two thousand years later.
       </p>
+      <EssayDoor lang={lang} href={DOOR.href} buttonLabel={DOOR.buttonLabel} figureId={DOOR.figureId} />
     </header>
 
     <section class="esy-section">
@@ -250,10 +252,9 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <EssayInvite
       lang={lang}
       line="On Agora Cosmica you can hear the life of Marcus Aurelius told in short stories, or read them at your own pace, and see where the teachings on this page came from. The stories are written as a human-AI collaboration from the sources, and read by a synthetic voice. A retelling, never the man himself."
-      href="/figures/marcus-aurelius/"
-      buttonLabel="Hear the life of Marcus Aurelius"
-      figureId="aurelius"
-      portraitAlt="AI-generated portrait of Marcus Aurelius"
+      href={DOOR.href}
+      buttonLabel={DOOR.buttonLabel}
+      figureId={DOOR.figureId}
       moreLinks={[
       ]}
     />

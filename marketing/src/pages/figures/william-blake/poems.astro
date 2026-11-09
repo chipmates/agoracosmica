@@ -19,7 +19,7 @@ import BackLink from '../../../components/BackLink.astro';
 import { getFigureById } from '@client/data/public/figuresCatalog';
 import EssayStyles from '../../../components/EssayStyles.astro';
 import EssayInvite from '../../../components/EssayInvite.astro';
-import AiLabel from '../../../components/AiLabel.astro';
+import EssayDoor from '../../../components/EssayDoor.astro';
 import StoryDoor from '../../../components/player/StoryDoor.astro';
 import { figureImage } from '../../../lib/figureImages';
 import { breadcrumbSchema } from '../../../lib/schemas';
@@ -83,6 +83,8 @@ const schemas = [
 ];
 // A companion page of a story player figure: the dock keeps playing here.
 const storyDock = isStoryCompanionPath(Astro.url.pathname);
+// The story door's address and button words, the same in the first screen and at the close.
+const DOOR = { href: '/figures/william-blake/', buttonLabel: 'Hear his life in stories', figureId: 'blake' };
 ---
 <Public
   title={metaTitle}
@@ -116,7 +118,6 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <header class="esy-hero">
       <p class="esy-hero__eyebrow">In his own words</p>
       <h1 class="esy-hero__title">William Blake's poems</h1>
-      <AiLabel lang={lang} class="esy-hero__label" />
       <p class="esy-hero__lead">
         1757-1827 · London. Engraver, painter, and poet, ignored in his own
         lifetime and unlike anyone before or since. He wrote his poems, etched
@@ -125,6 +126,7 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
         collections, the trusting songs of 1789 and the open-eyed ones of 1794,
         each with a short note on what it is doing.
       </p>
+      <EssayDoor lang={lang} href={DOOR.href} buttonLabel={DOOR.buttonLabel} figureId={DOOR.figureId} />
     </header>
 
     {GROUPS.map((group, gi) => (
@@ -157,10 +159,9 @@ const storyDock = isStoryCompanionPath(Astro.url.pathname);
     <EssayInvite
       lang={lang}
       line="You have just read Blake in his own words. On Agora Cosmica you can hear his life told in short stories, or read them at your own pace, and see where the poems came from. The stories are written as a human-AI collaboration from the sources, and read by a synthetic voice. A retelling, never the man himself."
-      href="/figures/william-blake/"
-      buttonLabel="Hear his life in stories"
-      figureId="blake"
-      portraitAlt="AI-generated portrait of William Blake"
+      href={DOOR.href}
+      buttonLabel={DOOR.buttonLabel}
+      figureId={DOOR.figureId}
       moreLinks={[
         { label: "Emily Dickinson's poems", href: '/figures/emily-dickinson/poems/' },
         { label: 'Poems to read', href: '/poems/' },
