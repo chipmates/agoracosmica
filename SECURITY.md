@@ -114,7 +114,7 @@ To save you time, these are the recurring ones:
 
 Each report we confirm gets credit in the published security advisory, in the release notes and in the acknowledgments below, unless you would rather stay anonymous. On request we also send a signed letter of acknowledgment for your portfolio.
 
-As a nonprofit we pay no bug bounties.
+As a nonprofit we pay no bug bounties and send no gifts.
 
 ---
 
