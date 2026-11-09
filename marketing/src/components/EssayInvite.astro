@@ -117,4 +117,12 @@ const freeNote =
     color: var(--text-tertiary);
     margin: 0 0.55rem;
   }
+  /* The plate's side padding left the longer button words no room on a phone; a still longer one wraps. */
+  @media (max-width: 560px) {
+    .esy-invite__button {
+      padding-left: 1rem;
+      padding-right: 1rem;
+      white-space: normal;
+    }
+  }
 </style>
