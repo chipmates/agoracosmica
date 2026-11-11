@@ -172,10 +172,10 @@ const DOOR = { href: '/figures/william-shakespeare/', buttonLabel: 'Hear his lif
           </div>
         </section>
         {/* After the first group: a reader who came for a line meets several
-            before the offer of his stories. The invite below shows his AI
-            portrait, so the label names the images. */}
+            before the offer of his stories. The player shows no picture,
+            so its label leaves the images out. */}
         {gi === 0 && storyDock && (
-          <StoryDoor figureId="shakespeare" slug="william-shakespeare" lang={lang} portraits={true} />
+          <StoryDoor figureId="shakespeare" slug="william-shakespeare" lang={lang} portraits={false} />
         )}
       </Fragment>
     ))}

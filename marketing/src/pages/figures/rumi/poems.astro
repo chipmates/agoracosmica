@@ -241,10 +241,10 @@ const DOOR = { href: '/figures/rumi/', buttonLabel: 'Hear his life in stories', 
               <div class="esy-poem__text">{POEMS[p.key].text.split('\n\n').map(stanza => (<div class="esy-poem__stanza">{stanza.split('\n').map(line => (<span class="esy-poem__line">{line}</span>))}</div>))}</div>
             </details>
             {/* Under the first passage: a reader who came for a poem meets one
-                before the offer of his stories. The invite below shows his AI
-                portrait, so the label names the images. */}
+                before the offer of his stories. The player shows no picture,
+                so its label leaves the images out. */}
             {i === 0 && storyDock && (
-              <StoryDoor figureId="rumi" slug="rumi" lang={lang} portraits={true} />
+              <StoryDoor figureId="rumi" slug="rumi" lang={lang} portraits={false} />
             )}
           </Fragment>
         ))}
