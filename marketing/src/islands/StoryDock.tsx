@@ -82,12 +82,26 @@ interface Props {
   /** The page's language, for the resume offer before any story plays. */
   lang: PlayerLang;
   labels: Record<PlayerLang, Label>;
+  /** The labels naming the images, used where a page's own cannot be read. */
+  fallback: Record<PlayerLang, Label>;
   facts: Record<PlayerLang, FactWords>;
   /** Short names for a bar too narrow for the full one: "id=English|German;...", only where they differ. */
   shortNames: string;
 }
 
 const SERVER_STATE: PlayerState = getState();
+
+/** The page's language and labels as PlayerDock writes them; null where anything is missing. */
+function readPageData(text: string): { lang: PlayerLang; labels: Record<PlayerLang, Label> } | null {
+  try {
+    const v = JSON.parse(text) as { lang?: unknown; labels?: Partial<Record<PlayerLang, Partial<Label>>> };
+    const whole = (l?: Partial<Label>) => !!l && [l.title, l.brief, l.expanded].every(x => typeof x === 'string' && x !== '');
+    if ((v.lang !== 'en' && v.lang !== 'de') || !whole(v.labels?.en) || !whole(v.labels?.de)) return null;
+    return { lang: v.lang, labels: v.labels as Record<PlayerLang, Label> };
+  } catch {
+    return null;
+  }
+}
 
 /** The figure page a queue belongs to, as a path. */
 function figurePath(lang: PlayerLang, slug: string): string {
@@ -171,14 +185,17 @@ function useOpenGesture(open: () => void) {
   return { onClick, onPointerDown, onPointerUp, onPointerCancel: () => { start.current = null; } };
 }
 
-export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
+export default function StoryDock({ lang, labels, fallback, facts, shortNames }: Props) {
   const state = useSyncExternalStore(subscribe, getState, () => SERVER_STATE);
   const [path, setPath] = useState(currentPath);
   const [wide, setWide] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
-  // The router keeps this island with the props of the page it first mounted on: the labels are the page's own, read
-  // from the element PlayerDock writes outside the kept mount, at mount and after every page change.
+  // The router keeps this island with the props of the page it first mounted on: the language and the labels are the
+  // page's own, read from the element PlayerDock writes right before this island's mount, at mount and after every
+  // page change. Missing or unreadable: the labels naming the images, never the previous page's.
   const [pageLabels, setPageLabels] = useState(labels);
+  const [pageLang, setPageLang] = useState(lang);
+  const slotRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     installPlayer();
@@ -186,27 +203,26 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   }, [labels]);
 
   useEffect(() => {
-    let last = JSON.stringify(labels);
+    let last: string | null = null;
     const read = () => {
-      const text = document.querySelector('script[data-story-dock-labels]')?.textContent ?? '';
-      if (!text || text === last) return;
-      try {
-        const next = JSON.parse(text) as Record<PlayerLang, Label>;
-        if (!next.en?.brief || !next.de?.brief) return;
-        last = text;
-        setPageLabels(next);
-      } catch {
-        // unreadable: the labels stay as they were
-      }
+      const el = slotRef.current?.closest('.story-dock-mount')?.previousElementSibling;
+      const text = el?.matches('script[data-story-dock-labels]') ? el.textContent ?? '' : '';
+      if (text !== '' && text === last) return;
+      last = text;
+      const page = readPageData(text);
+      setPageLabels(page ? page.labels : fallback);
+      setPageLang(page ? page.lang : document.documentElement.lang.toLowerCase().startsWith('de') ? 'de' : 'en');
     };
     read();
     document.addEventListener('astro:after-swap', read);
     return () => document.removeEventListener('astro:after-swap', read);
   }, []);
-  // The labels in use, on the mount, readable with no story loaded.
+  // The labels and language in use, on this island's mount, readable with no story loaded.
   useEffect(() => {
-    document.querySelector('.story-dock-mount')?.setAttribute('data-labels', JSON.stringify(pageLabels));
-  }, [pageLabels]);
+    const mount = slotRef.current?.closest('.story-dock-mount');
+    mount?.setAttribute('data-labels', JSON.stringify(pageLabels));
+    mount?.setAttribute('data-lang', pageLang);
+  }, [pageLabels, pageLang]);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -270,7 +286,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     return () => document.removeEventListener('astro:after-swap', publish);
   }, [publish]);
 
-  const storyLang: PlayerLang = state.queue?.lang ?? lang;
+  const storyLang: PlayerLang = state.queue?.lang ?? pageLang;
   const s = playerStrings(storyLang);
   const label = pageLabels[storyLang];
   const loaded = state.current !== null && !state.dismissed;
@@ -430,7 +446,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   );
 
   if (!loaded && !offer) {
-    return <div className="story-dock-slot">{liveRegion}{overlays}</div>;
+    return <div ref={slotRef} className="story-dock-slot">{liveRegion}{overlays}</div>;
   }
 
   if (offer && state.resume) {
@@ -438,7 +454,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     const title = readPageQueue()?.entries.find(e => e.n === point.n)?.title ?? s.storyN(point.n);
     const text = point.t > 0 ? s.continueAt(title, clockLabel(point.t)) : s.continueNext(title);
     return (
-      <div className="story-dock-slot">
+      <div ref={slotRef} className="story-dock-slot">
         {liveRegion}
         {overlays}
         <div ref={measureRef} className="story-dock story-dock--offer" role="region" aria-label={s.dockLabel}>
@@ -456,7 +472,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
 
   const queue = state.queue;
   const current = state.current;
-  if (!queue || current === null) return <div className="story-dock-slot">{liveRegion}{overlays}</div>;
+  if (!queue || current === null) return <div ref={slotRef} className="story-dock-slot">{liveRegion}{overlays}</div>;
   const entry = queue.entries.find(e => e.n === current);
   const title = current === 0 ? s.introTitle : entry?.title ?? s.storyN(current);
   const playing = state.status === 'playing' || state.status === 'loading';
@@ -515,7 +531,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   );
 
   return (
-    <div className="story-dock-slot">
+    <div ref={slotRef} className="story-dock-slot">
       {liveRegion}
       {overlays}
       <div ref={measureRef} className={card && nextEntry ? 'story-dock story-dock--end' : 'story-dock'} role="region"

@@ -35,17 +35,20 @@ const shortNames = getFiguresCatalog('en')
   .filter(([id, en, de]) => en !== fullName(id, 'en') || de !== fullName(id, 'de'))
   .map(([id, en, de]) => `${id}=${en}|${de}`)
   .join(';');
-// The router keeps the island with the props of the page it first mounted on: the page's own labels ride outside the
-// kept element, where the island reads them after every page change. "<" escaped so no label can close the element.
-const pageLabels = JSON.stringify(labels).replace(/</g, '\\u003c');
+// What the dock falls back to where a page's own labels cannot be read: the version naming the images.
+const fallback = { en: storyLabel('en', true), de: storyLabel('de', true) };
+// The router keeps the island with the props of the page it first mounted on: the page's language and labels ride
+// right before the kept element, where the island reads them after every page change. "<" escaped so no label can
+// close the element.
+const pageData = JSON.stringify({ lang, labels }).replace(/</g, '\\u003c');
 ---
-<script type="application/json" is:inline data-story-dock-labels set:html={pageLabels} />
+<script type="application/json" is:inline data-story-dock-labels set:html={pageData} />
 {persist ? (
   <div class="story-dock-mount" transition:persist="story-dock">
-    <StoryDock client:load lang={lang} labels={labels} facts={facts} shortNames={shortNames} />
+    <StoryDock client:load lang={lang} labels={labels} fallback={fallback} facts={facts} shortNames={shortNames} />
   </div>
 ) : (
   <div class="story-dock-mount">
-    <StoryDock client:load lang={lang} labels={labels} facts={facts} shortNames={shortNames} />
+    <StoryDock client:load lang={lang} labels={labels} fallback={fallback} facts={facts} shortNames={shortNames} />
   </div>
 )}
