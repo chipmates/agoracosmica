@@ -1,6 +1,7 @@
 ---
 // The label block of a page that shows AI portraits: the player's label line (player/label.ts), word for word, its
 // note one tap away. It stands once, on the page's first screen, beside or before the first portrait.
+// A label beside no AI image (portraits false) leaves the images out.
 import { storyLabel } from '../player/label';
 import LabelItems from './player/LabelItems.astro';
 import type { Lang } from '../i18n';
@@ -9,10 +10,11 @@ import './ai-label.css';
 interface Props {
   lang: Lang;
   class?: string;
+  portraits?: boolean;
 }
 
-const { lang, class: cls } = Astro.props;
-const label = storyLabel(lang);
+const { lang, class: cls, portraits = true } = Astro.props;
+const label = storyLabel(lang, portraits);
 ---
 <details class:list={['ai-label', cls]}>
   <summary>
