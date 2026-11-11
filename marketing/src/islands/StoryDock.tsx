@@ -82,14 +82,33 @@ interface Props {
   /** The page's language, for the resume offer before any story plays. */
   lang: PlayerLang;
   labels: Record<PlayerLang, Label>;
-  /** The labels naming the images, used where a page's own cannot be read. */
-  fallback: Record<PlayerLang, Label>;
   facts: Record<PlayerLang, FactWords>;
   /** Short names for a bar too narrow for the full one: "id=English|German;...", only where they differ. */
   shortNames: string;
 }
 
 const SERVER_STATE: PlayerState = getState();
+
+// The images' word and sentence as label.ts adds them (that module stays build time only, its helper files never ship).
+const IMAGES: Record<PlayerLang, { word: string; note: string }> = {
+  en: { word: 'AI images', note: 'The portraits are AI images.' },
+  de: { word: 'KI-Bilder', note: 'Die Porträts sind KI-Bilder.' },
+};
+
+/** The labels naming the images, built as label.ts builds them: the word before the last half, the sentence after the
+ * first one. The fallback where a page's own labels cannot be read. */
+function withImages(labels: Record<PlayerLang, Label>): Record<PlayerLang, Label> {
+  const one = (l: Label, lang: PlayerLang): Label => {
+    const { word, note } = IMAGES[lang];
+    const halves = l.brief.split(' · ');
+    const brief = halves.includes(word) ? l.brief : [...halves.slice(0, -1), word, ...halves.slice(-1)].join(' · ');
+    const cut = l.expanded.indexOf('. ');
+    const expanded = l.expanded.includes(note) ? l.expanded
+      : cut < 0 ? `${l.expanded} ${note}` : `${l.expanded.slice(0, cut + 1)} ${note} ${l.expanded.slice(cut + 2)}`;
+    return { ...l, brief, expanded };
+  };
+  return { en: one(labels.en, 'en'), de: one(labels.de, 'de') };
+}
 
 /** The page's language and labels as PlayerDock writes them; null where anything is missing. */
 function readPageData(text: string): { lang: PlayerLang; labels: Record<PlayerLang, Label> } | null {
@@ -185,7 +204,7 @@ function useOpenGesture(open: () => void) {
   return { onClick, onPointerDown, onPointerUp, onPointerCancel: () => { start.current = null; } };
 }
 
-export default function StoryDock({ lang, labels, fallback, facts, shortNames }: Props) {
+export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const state = useSyncExternalStore(subscribe, getState, () => SERVER_STATE);
   const [path, setPath] = useState(currentPath);
   const [wide, setWide] = useState(false);
@@ -204,6 +223,7 @@ export default function StoryDock({ lang, labels, fallback, facts, shortNames }:
 
   useEffect(() => {
     let last: string | null = null;
+    const fallback = withImages(labels);
     const read = () => {
       const el = slotRef.current?.closest('.story-dock-mount')?.previousElementSibling;
       const text = el?.matches('script[data-story-dock-labels]') ? el.textContent ?? '' : '';
