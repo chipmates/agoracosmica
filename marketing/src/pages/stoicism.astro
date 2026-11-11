@@ -113,7 +113,7 @@ const DOOR = { href: '/figures/marcus-aurelius/', buttonLabel: 'Hear the life of
   schemas={schemas}
 >
   {storyDock && <PlayerHead slot="head" />}
-  {storyDock && <PlayerDock slot="dock" lang="en" />}
+  {storyDock && <PlayerDock slot="dock" lang="en" portraits={false} />}
   <EssayStyles />
   <div class="pub-content esy">
     <Breadcrumbs lang={lang} items={[{ label: 'Stoicism' }]} />
