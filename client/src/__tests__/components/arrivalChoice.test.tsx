@@ -854,10 +854,11 @@ describe('the draw', () => {
     return import('../../../../marketing/src/islands/ArrivalChoice');
   }
 
-  it('puts half the undecided grant arrivals in the later arm, and at 0 none', async () => {
+  it('puts no undecided grant arrival in the later arm at the share of 0, and half at 0.5', async () => {
     const { drawArm, LATER_SHARE } = await load();
     forceArm(undefined);
-    expect(LATER_SHARE).toBe(0.5);
+    expect(LATER_SHARE).toBe(0);
+    for (let i = 0; i < 50; i++) expect(drawArm()).toBe('arrival');
     expect(drawArm(0.5, () => 0.4999)).toBe('later');
     expect(drawArm(0.5, () => 0.5)).toBe('arrival');
     for (const r of [0, 0.25, 0.5, 0.9999]) expect(drawArm(0, () => r)).toBe('arrival');
@@ -866,7 +867,7 @@ describe('the draw', () => {
   it('draws near half over 200 page loads from the browser\'s own random source', async () => {
     const { drawArm } = await load();
     forceArm(undefined);
-    const later = Array.from({ length: 200 }, () => drawArm()).filter((a) => a === 'later').length;
+    const later = Array.from({ length: 200 }, () => drawArm(0.5)).filter((a) => a === 'later').length;
     // Fair: 100 expected, a standard deviation of about 7; outside 70 to 130 happens about once in 30,000 runs.
     expect(later).toBeGreaterThanOrEqual(70);
     expect(later).toBeLessThanOrEqual(130);
@@ -886,18 +887,32 @@ describe('the draw', () => {
     expect(drawArm(0, () => 0.1)).toBe('arrival');
   });
 
+  it('shows an undecided grant arrival the card at once, with no arm forced', async () => {
+    forceArm(undefined);
+    vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(a: T): T => {
+      (a as unknown as Uint32Array)[0] = 0; // the lowest draw, the later arm at any share above 0
+      return a;
+    });
+    for (const kind of ['story', 'poem'] as const) {
+      const view = await mountAt(`/marcus-aurelius/?gclid=${CLICK}`, 'en', kind);
+      expect(shownCard(view.container), kind).not.toBeNull();
+      expect(heard.cardArm(), kind).toBe('arrival');
+      view.unmount();
+    }
+  });
+
   it('draws for an undecided grant arrival only, and counts each draw once', async () => {
     forceArm(undefined);
     vi.spyOn(globalThis.crypto, 'getRandomValues').mockImplementation(<T extends ArrayBufferView | null>(a: T): T => {
-      (a as unknown as Uint32Array)[0] = 0; // the later arm
+      (a as unknown as Uint32Array)[0] = 0; // the lowest draw: still the arrival arm at the share of 0
       return a;
     });
     await mountAt(`/marcus-aurelius/?gclid=${CLICK}`);
     await settle();
     expect(funnelRows().filter((r) => r.step === 'ad_consent_arm')).toEqual([
-      { step: 'ad_consent_arm', path: '/marcus-aurelius/', language: 'en', mode: 'later' },
+      { step: 'ad_consent_arm', path: '/marcus-aurelius/', language: 'en', mode: 'arrival' },
     ]);
-    expect(heard.cardArm()).toBe('later');
+    expect(heard.cardArm()).toBe('arrival');
     for (const url of ['/marcus-aurelius/', `/marcus-aurelius/?p=1&gclid=${CLICK}`]) {
       sent = [];
       await mountAt(url);

@@ -117,7 +117,7 @@ const SS_FIRED = 'agc_conv_fired_start_exploring';
 
 // The later arm's share of undecided grant arrivals. At 0 every one of them
 // gets the card at once, as before the split.
-export const LATER_SHARE = 0.5;
+export const LATER_SHARE = 0;
 
 // A browser test may fix the arm from an init script that runs before the
 // page's own (window.__agcCardArm = 'arrival' or 'later'). Nothing in the
