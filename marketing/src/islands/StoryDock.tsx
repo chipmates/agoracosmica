@@ -176,11 +176,37 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
   const [path, setPath] = useState(currentPath);
   const [wide, setWide] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
+  // The router keeps this island with the props of the page it first mounted on: the labels are the page's own, read
+  // from the element PlayerDock writes outside the kept mount, at mount and after every page change.
+  const [pageLabels, setPageLabels] = useState(labels);
 
   useEffect(() => {
     installPlayer();
     installPage();
   }, [labels]);
+
+  useEffect(() => {
+    let last = JSON.stringify(labels);
+    const read = () => {
+      const text = document.querySelector('script[data-story-dock-labels]')?.textContent ?? '';
+      if (!text || text === last) return;
+      try {
+        const next = JSON.parse(text) as Record<PlayerLang, Label>;
+        if (!next.en?.brief || !next.de?.brief) return;
+        last = text;
+        setPageLabels(next);
+      } catch {
+        // unreadable: the labels stay as they were
+      }
+    };
+    read();
+    document.addEventListener('astro:after-swap', read);
+    return () => document.removeEventListener('astro:after-swap', read);
+  }, []);
+  // The labels in use, on the mount, readable with no story loaded.
+  useEffect(() => {
+    document.querySelector('.story-dock-mount')?.setAttribute('data-labels', JSON.stringify(pageLabels));
+  }, [pageLabels]);
 
   useEffect(() => {
     const mq = window.matchMedia('(min-width: 1024px)');
@@ -246,7 +272,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
 
   const storyLang: PlayerLang = state.queue?.lang ?? lang;
   const s = playerStrings(storyLang);
-  const label = labels[storyLang];
+  const label = pageLabels[storyLang];
   const loaded = state.current !== null && !state.dismissed;
   // The label's last half, "Synthetic voice" / "Synthetische Stimme", read from the label itself.
   const halves = labelHalves(label.brief);
@@ -389,7 +415,7 @@ export default function StoryDock({ lang, labels, facts, shortNames }: Props) {
     <>
       {state.readerOpen && readerQueue && state.readerN !== null && (
         <Suspense fallback={null}>
-          <StoryReader state={state} queue={readerQueue} n={state.readerN} label={labels[readerQueue.lang]}
+          <StoryReader state={state} queue={readerQueue} n={state.readerN} label={pageLabels[readerQueue.lang]}
             factsWord={facts[readerQueue.lang].facts} documentedWord={facts[readerQueue.lang].documented}
             recreatedWord={facts[readerQueue.lang].recreated}
             home={figurePath(readerQueue.lang, readerQueue.slug)} selection={listPath(readerQueue.lang)} />
