@@ -49,6 +49,7 @@ function warm(): void {
 import { Icon } from '../player/icons';
 import { LIST_SEP, VOICE_DESC_ID, clockLabel, labelHalves, playerStrings } from '../player/strings';
 import { LabelItems } from '../player/LabelItems';
+import { withImages } from '../player/images';
 import type { FactWords } from '../player/factWords';
 import type { PlayerLang } from '../player/strings';
 import type { PlayerState } from '../player/types';
@@ -88,27 +89,6 @@ interface Props {
 }
 
 const SERVER_STATE: PlayerState = getState();
-
-// The images' word and sentence as label.ts adds them (that module stays build time only, its helper files never ship).
-const IMAGES: Record<PlayerLang, { word: string; note: string }> = {
-  en: { word: 'AI images', note: 'The portraits are AI images.' },
-  de: { word: 'KI-Bilder', note: 'Die Porträts sind KI-Bilder.' },
-};
-
-/** The labels naming the images, built as label.ts builds them: the word before the last half, the sentence after the
- * first one. The fallback where a page's own labels cannot be read. */
-function withImages(labels: Record<PlayerLang, Label>): Record<PlayerLang, Label> {
-  const one = (l: Label, lang: PlayerLang): Label => {
-    const { word, note } = IMAGES[lang];
-    const halves = l.brief.split(' · ');
-    const brief = halves.includes(word) ? l.brief : [...halves.slice(0, -1), word, ...halves.slice(-1)].join(' · ');
-    const cut = l.expanded.indexOf('. ');
-    const expanded = l.expanded.includes(note) ? l.expanded
-      : cut < 0 ? `${l.expanded} ${note}` : `${l.expanded.slice(0, cut + 1)} ${note} ${l.expanded.slice(cut + 2)}`;
-    return { ...l, brief, expanded };
-  };
-  return { en: one(labels.en, 'en'), de: one(labels.de, 'de') };
-}
 
 /** The page's language and labels as PlayerDock writes them; null where anything is missing. */
 function readPageData(text: string): { lang: PlayerLang; labels: Record<PlayerLang, Label> } | null {
