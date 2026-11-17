@@ -33,11 +33,11 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was hat Mark Aurel gelehrt?',
-          a: "Mark Aurel lehrte stoische Philosophie. Drei Gedanken tragen fast alles. Der erste ist die Prüfung der Eindrücke. Du legst eine Pause zwischen das, was passiert, und deine Antwort darauf, und prüfst dann das Urteil, das du angehängt hast. Der zweite ist das Leben im Einklang mit der Natur. Das wirkt auf drei Ebenen: deine eigene Vernunft, die Menschen, denen du etwas schuldest, und die größere Ordnung der Dinge. Der dritte sind die vorgezogenen Gleichgültigkeiten. Gesundheit, Familie und Erfolg darf man wollen. Über dein Handeln entscheiden sie trotzdem nicht. Aufgeschrieben hat er das alles für sich selbst, in den Selbstbetrachtungen.",
+          a: "Mark Aurel lehrte stoische Philosophie. Drei Gedanken tragen fast alles. Der erste ist die Prüfung der Eindrücke. Man legt eine Pause zwischen das, was passiert, und die eigene Antwort darauf, und prüft dann das Urteil, das man angehängt hat. Der zweite ist das Leben im Einklang mit der Natur. Das wirkt auf drei Ebenen: die eigene Vernunft, die Menschen, denen man etwas schuldet, und die größere Ordnung der Dinge. Der dritte sind die vorgezogenen Gleichgültigkeiten. Gesundheit, Familie und Erfolg darf man wollen. Über das eigene Handeln entscheiden sie trotzdem nicht. Aufgeschrieben hat er das alles für sich selbst, in den Selbstbetrachtungen.",
         },
         {
           q: 'Was ist die Prüfung der Eindrücke?',
-          a: "Sie ist die stoische Pause. Etwas passiert, und bevor du reagierst, schaust du dir den Eindruck an, den es hinterlassen hat. Dann stellst du eine Frage. Stimmt das Urteil, das ich gerade angehängt habe, überhaupt? Mark Aurel nannte das die Disziplin der Zustimmung. Nimm eine Kritik. Der Stich kommt meist nicht aus den Worten. Er kommt aus der Geschichte, die dein Kopf in derselben Sekunde darum gelegt hat. Das Ereignis ist das eine. Das Urteil hast du hinzugefügt, und das gehört dir.",
+          a: "Sie ist die stoische Pause. Etwas passiert, und bevor wir reagieren, schauen wir uns den Eindruck an, den es hinterlassen hat. Dann stellen wir eine Frage. Stimmt das Urteil, das ich gerade angehängt habe, überhaupt? Mark Aurel nannte das die Disziplin der Zustimmung. Nehmen wir eine Kritik. Der Stich kommt meist nicht aus den Worten. Er kommt aus der Geschichte, die unser Kopf in derselben Sekunde darum gelegt hat. Das Ereignis ist das eine. Das Urteil haben wir hinzugefügt, und das gehört uns.",
         },
       ],
       disclosure: {
@@ -95,28 +95,28 @@ export const fragment: FigureFragment = {
           h2: 'Was ist Stoizismus? Mark Aurel in 60 Sekunden',
           seedId: 1,
           body:
-            "Stoizismus ist eine antike Philosophie, die Denken als Training versteht, nicht als Gerede. Sie deckt drei Bereiche ab: wie die Welt funktioniert, wie man gut lebt, und wie man Wahres von Falschem unterscheidet. Mark Aurel übte das als drei tägliche Disziplinen, Verlangen, Handeln und Zustimmung. Gut ist am Ende nur dein Charakter. Weisheit, Gerechtigkeit, Mut und Mäßigung, mehr steht nicht auf der Liste. Alles andere, Gesundheit, Geld, Ansehen, darf man wollen und dafür arbeiten. Es entscheidet aber nicht darüber, ob du richtig handelst. Deshalb kann ein Stoiker fast alles verlieren und hat das Einzige noch, worauf es ankam.",
+            "Stoizismus ist eine antike Philosophie, die Denken als Training versteht, nicht als Gerede. Sie deckt drei Bereiche ab: wie die Welt funktioniert, wie man gut lebt, und wie man Wahres von Falschem unterscheidet. Mark Aurel übte das als drei tägliche Disziplinen, Verlangen, Handeln und Zustimmung. Gut ist am Ende nur der eigene Charakter. Weisheit, Gerechtigkeit, Mut und Mäßigung, mehr steht nicht auf der Liste. Alles andere, Gesundheit, Geld, Ansehen, darf man wollen und dafür arbeiten. Es entscheidet aber nicht darüber, ob man richtig handelt. Deshalb kann ein Stoiker fast alles verlieren und hat das Einzige noch, worauf es ankam.",
         },
         {
           h2: 'Mark Aurel einfach erklärt',
           body:
-            "Mark Aurel war römischer Kaiser und Stoiker, und das ist ein seltsames Paar. Der mächtigste Mann des Reiches schrieb sich nachts Zettel, auf denen er sich selbst zur Ordnung ruft. Vier Sätze reichen, um ihn zu verstehen. Erstens: Nicht die Dinge stören dich, sondern dein Urteil über sie. Zweitens: Zwischen Ereignis und Reaktion liegt eine Pause, und die gehört dir. Drittens: Du bist Teil von etwas Größerem und schuldest anderen Menschen etwas. Viertens: Du wirst sterben, und daran klärt sich, was heute wirklich zählt. Veröffentlicht hat er davon nichts. Geübt hat er es, jeden Morgen neu.",
+            "Mark Aurel war römischer Kaiser und Stoiker, und das ist ein seltsames Paar. Der mächtigste Mann des Reiches schrieb sich nachts Zettel, auf denen er sich selbst zur Ordnung ruft. Vier Sätze reichen, um ihn zu verstehen. Erstens: Nicht die Dinge stören uns, sondern unser Urteil über sie. Zweitens: Zwischen Ereignis und Reaktion liegt eine Pause, und die gehört uns. Drittens: Wir sind Teil von etwas Größerem und schulden anderen Menschen etwas. Viertens: Wir werden sterben, und daran klärt sich, was heute wirklich zählt. Veröffentlicht hat er davon nichts. Geübt hat er es, jeden Morgen neu.",
         },
         {
           h2: 'Was steht in den Selbstbetrachtungen?',
           body:
-            "Die Selbstbetrachtungen sind kein Buch für Leser. Es sind private Notizen, entstanden ungefähr zwischen 170 und 180 n. Chr., zum Teil im Feld an der Donaugrenze. Buch 1 ist eine Liste von Dankesschulden. Was er von seinen Lehrern und seiner Familie gelernt hat, Person für Person. Aus der Antike ist nichts Vergleichbares erhalten. In den Büchern 2 und 3 wird der Ton härter. Der Tod steht nah, der Druck des Krieges ist zu spüren, und er übt genau das, was er sonst lehrt: den Eindruck prüfen, bevor man ihm zustimmt. Anfangen kannst du an jeder Stelle.",
+            "Die Selbstbetrachtungen sind kein Buch für Leser. Es sind private Notizen, entstanden ungefähr zwischen 170 und 180 n. Chr., zum Teil im Feld an der Donaugrenze. Buch 1 ist eine Liste von Dankesschulden. Was er von seinen Lehrern und seiner Familie gelernt hat, Person für Person. Aus der Antike ist nichts Vergleichbares erhalten. In den Büchern 2 und 3 wird der Ton härter. Der Tod steht nah, der Druck des Krieges ist zu spüren, und er übt genau das, was er sonst lehrt: den Eindruck prüfen, bevor man ihm zustimmt. Anfangen kann man an jeder Stelle.",
         },
       ],
       ideaQuestion: 'Mein Problem fühlt sich riesig an. Wie bekomme ich es auf seine Größe zurück?',
       works: [
         {
           title: 'Selbstbetrachtungen (Ta eis heauton)',
-          note: 'Ein privates Tagebuch, entstanden etwa 170 bis 180 n. Chr. und nie zur Veröffentlichung gedacht. Du kannst irgendwo aufschlagen. Jeder Eintrag ist ein Mensch, der sich selbst wieder in die Spur bringt.',
+          note: 'Ein privates Tagebuch, entstanden etwa 170 bis 180 n. Chr. und nie zur Veröffentlichung gedacht. Man kann es irgendwo aufschlagen. Jeder Eintrag ist ein Mensch, der sich selbst wieder in die Spur bringt.',
         },
         {
           title: 'Selbstbetrachtungen, Buch 1',
-          note: 'Eine Liste dessen, was er anderen verdankt, Lehrer für Lehrer, Verwandter für Verwandter. Aus der Antike gibt es dazu nichts Vergleichbares. Lies es, wenn du sehen willst, wer ihn gemacht hat.',
+          note: 'Eine Liste dessen, was er anderen verdankt, Lehrer für Lehrer, Verwandter für Verwandter. Aus der Antike gibt es dazu nichts Vergleichbares. Lesenswert für alle, die sehen wollen, wer ihn gemacht hat.',
         },
         {
           title: 'Selbstbetrachtungen, Bücher 2 und 3',

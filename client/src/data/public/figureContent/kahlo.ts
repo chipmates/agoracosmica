@@ -30,7 +30,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Frida Kahlo lernen?',
-          a: 'Frida Kahlo (1907-1954) war achtzehn, als eine Straßenbahn ihren Körper zerschmetterte. Während sie genas, befestigte ihre Mutter einen Spiegel über dem Bett. Sie begann das eine Motiv zu malen, das sie immer erreichen konnte. Sich selbst. Daraus wurden ungefähr 55 Selbstporträts, und sie sagte klar, warum. Sie male ihre eigene Wirklichkeit, nicht ihre Träume. Bei Kahlo lernst du, dich selbst anzusehen, ohne wegzuschauen.',
+          a: 'Frida Kahlo (1907-1954) war achtzehn, als eine Straßenbahn ihren Körper zerschmetterte. Während sie genas, befestigte ihre Mutter einen Spiegel über dem Bett. Sie begann das eine Motiv zu malen, das sie immer erreichen konnte. Sich selbst. Daraus wurden ungefähr 55 Selbstporträts, und sie sagte klar, warum. Sie male ihre eigene Wirklichkeit, nicht ihre Träume. Bei Kahlo lernt man, sich selbst anzusehen, ohne wegzuschauen.',
         },
         {
           q: 'Was hat Frida Kahlo gelehrt?',

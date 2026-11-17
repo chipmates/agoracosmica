@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Mahatma Gandhi lernen?',
-          a: "Mohandas Gandhi (1869-1948) war ein indischer Anwalt, der sein eigenes Leben wie ein Labor behandelte. Seine Frage war, was die Wahrheit vermag, was Gewalt nicht vermag. Er prüfte sie am eigenen Körper, durch Fasten, Gehen und Gefängnis. Diese Prüfungen nannte er Experimente, und das meinte er wörtlich. Jede Überzeugung wurde an der Erfahrung getestet. Von ihm lernst du, für den eigenen Irrtum offen zu bleiben.",
+          a: "Mohandas Gandhi (1869-1948) war ein indischer Anwalt, der sein eigenes Leben wie ein Labor behandelte. Seine Frage war, was die Wahrheit vermag, was Gewalt nicht vermag. Er prüfte sie am eigenen Körper, durch Fasten, Gehen und Gefängnis. Diese Prüfungen nannte er Experimente, und das meinte er wörtlich. Jede Überzeugung wurde an der Erfahrung getestet. Von ihm lernt man, für den eigenen Irrtum offen zu bleiben.",
         },
         {
           q: 'Was hat Mahatma Gandhi gelehrt?',
-          a: "Gandhi lehrte drei Dinge, die zusammengehören. Satya ist die Wahrheit, und er drehte den alten Satz um. Nicht Gott ist Wahrheit, sondern Wahrheit ist Gott. Ahimsa ist die Gewaltlosigkeit, und er führte sie weiter als die Tradition, in der er aufwuchs. Sie gilt für das, was du denkst, und für das, was du sagst, nicht nur für das, was deine Hände tun. Satyagraha ist die Methode, die aus den ersten beiden entsteht. Wahrheitskraft nannte er sie, oder Seelenkraft. Du widerstehst dem Unrecht, ohne den Menschen zu hassen, der es aufrechterhält, und nimmst Leiden lieber auf dich, als es zuzufügen. Geschrieben hat er darüber in Hind Swaraj (1909) und in seiner Autobiografie Die Geschichte meiner Experimente mit der Wahrheit (1927).",
+          a: "Gandhi lehrte drei Dinge, die zusammengehören. Satya ist die Wahrheit, und er drehte den alten Satz um. Nicht Gott ist Wahrheit, sondern Wahrheit ist Gott. Ahimsa ist die Gewaltlosigkeit, und er führte sie weiter als die Tradition, in der er aufwuchs. Sie gilt für das, was man denkt, und für das, was man sagt, nicht nur für das, was die Hände tun. Satyagraha ist die Methode, die aus den ersten beiden entsteht. Wahrheitskraft nannte er sie, oder Seelenkraft. Man widersteht dem Unrecht, ohne den Menschen zu hassen, der es aufrechterhält, und nimmt Leiden lieber auf sich, als es zuzufügen. Geschrieben hat er darüber in Hind Swaraj (1909) und in seiner Autobiografie Die Geschichte meiner Experimente mit der Wahrheit (1927).",
         },
         {
           q: 'Was ist Ahimsa?',
-          a: "Ahimsa wird meist mit Gewaltlosigkeit übersetzt, und Gandhi war diese Übersetzung zu klein. In den hinduistischen und jainistischen Traditionen, in denen er aufwuchs, hieß sie, niemandem zu schaden. Er machte eine aktive Kraft daraus. Sie beginnt im Kopf, denn die Gewalt in einer Faust fängt an, bevor die Faust sich bewegt. Ahimsa heißt, diese Bewegung nicht zu Ende zu bringen, im Denken, im Sprechen und im Handeln. Sie verlangt außerdem mehr als Zurückhaltung. Du musst echtes Mitgefühl für den behalten, der dir Unrecht tut, und dich seinem Tun trotzdem klar entgegenstellen. Für Gandhi braucht das mehr Mut als kämpfen, nicht weniger.",
+          a: "Ahimsa wird meist mit Gewaltlosigkeit übersetzt, und Gandhi war diese Übersetzung zu klein. In den hinduistischen und jainistischen Traditionen, in denen er aufwuchs, hieß sie, niemandem zu schaden. Er machte eine aktive Kraft daraus. Sie beginnt im Kopf, denn die Gewalt in einer Faust fängt an, bevor die Faust sich bewegt. Ahimsa heißt, diese Bewegung nicht zu Ende zu bringen, im Denken, im Sprechen und im Handeln. Sie verlangt außerdem mehr als Zurückhaltung. Man muss echtes Mitgefühl für den behalten, der einem Unrecht tut, und sich seinem Tun trotzdem klar entgegenstellen. Für Gandhi braucht das mehr Mut als kämpfen, nicht weniger.",
         },
       ],
       disclosure: {
@@ -83,7 +83,7 @@ export const fragment: FigureFragment = {
           h2: 'Was bedeutet Satyagraha?',
           seedId: 9,
           body:
-            "Satyagraha ist Gandhis Name für seine Methode und heißt Wahrheitskraft oder Seelenkraft. Stell dir die üblichen Möglichkeiten vor, wenn dir jemand Unrecht tut. Zurückschlagen, fliehen oder sich fügen. Satyagraha ist eine vierte. Du weigerst dich offen, das Unrecht hinzunehmen, du weigerst dich, den Menschen zu hassen, der es durchsetzt, und du nimmst das Leiden auf dich, statt es weiterzugeben. Genau das ist der Motor. Gandhi war überzeugt, dass man einen Menschen mit Geduld und Mitgefühl aus einem Irrtum holen kann, mit Schlägen aber nie. Was für dich Wahrheit ist, kann für ihn Irrtum sein. Entwickelt hat er die Methode in Südafrika und sie danach gegen ein Weltreich eingesetzt.",
+            "Satyagraha ist Gandhis Name für seine Methode und heißt Wahrheitskraft oder Seelenkraft. Wenn einem jemand Unrecht tut, gibt es die üblichen Möglichkeiten. Zurückschlagen, fliehen oder sich fügen. Satyagraha ist eine vierte. Man weigert sich offen, das Unrecht hinzunehmen, man weigert sich, den Menschen zu hassen, der es durchsetzt, und man nimmt das Leiden auf sich, statt es weiterzugeben. Genau das ist der Motor. Gandhi war überzeugt, dass man einen Menschen mit Geduld und Mitgefühl aus einem Irrtum holen kann, mit Schlägen aber nie. Was für den einen Wahrheit ist, kann für den anderen Irrtum sein. Entwickelt hat er die Methode in Südafrika und sie danach gegen ein Weltreich eingesetzt.",
         },
         {
           h2: 'Was war der Salzmarsch?',
@@ -93,7 +93,7 @@ export const fragment: FigureFragment = {
         {
           h2: 'Mahatma Gandhi einfach erklärt',
           body:
-            "Gandhi war Anwalt und führte Indien in die Unabhängigkeit, ohne dafür eine Waffe zu benutzen. Drei Begriffe reichen, um ihn zu verstehen. Satya ist die Wahrheit. Er suchte sie nicht im Kopf, sondern im Versuch, und nannte sein Leben eine Reihe von Experimenten mit ihr. Ahimsa ist die Gewaltlosigkeit, und sie fängt im Denken an, nicht erst bei der Faust. Satyagraha ist die Methode, die daraus entsteht. Du stellst dich dem Unrecht offen entgegen, ohne den Gegner zu hassen, und nimmst das Leiden lieber selbst auf dich. 1930 lief er rund 390 Kilometer ans Meer, um ein Stück Salz aufzuheben und damit ein Gesetz zu brechen. 1948 wurde er ermordet.",
+            "Gandhi war Anwalt und führte Indien in die Unabhängigkeit, ohne dafür eine Waffe zu benutzen. Drei Begriffe reichen, um ihn zu verstehen. Satya ist die Wahrheit. Er suchte sie nicht im Kopf, sondern im Versuch, und nannte sein Leben eine Reihe von Experimenten mit ihr. Ahimsa ist die Gewaltlosigkeit, und sie fängt im Denken an, nicht erst bei der Faust. Satyagraha ist die Methode, die daraus entsteht. Man stellt sich dem Unrecht offen entgegen, ohne den Gegner zu hassen, und nimmt das Leiden lieber selbst auf sich. 1930 lief er rund 390 Kilometer ans Meer, um ein Stück Salz aufzuheben und damit ein Gesetz zu brechen. 1948 wurde er ermordet.",
         },
       ],
       ideaQuestion: 'Ich will lieber recht behalten als die Wahrheit. Wie drehe ich das um?',

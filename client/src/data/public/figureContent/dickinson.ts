@@ -30,7 +30,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Emily Dickinson lernen?',
-          a: 'Emily Dickinson (1830-1886) war eine amerikanische Dichterin. Sie schrieb fast achtzehnhundert Gedichte im Haus ihrer Familie in Amherst und zeigte sie fast niemandem. Viele nähte sie von Hand zu kleinen Heften. Ihre Schwester fand sie nach ihrem Tod. Für eine schwere Wahrheit hatte Dickinson eine Regel. Sag sie schräg, sonst kommt sie schon tot an der Tür an. Bei ihr lernst du, die Wahrheit schräg zu sagen.',
+          a: 'Emily Dickinson (1830-1886) war eine amerikanische Dichterin. Sie schrieb fast achtzehnhundert Gedichte im Haus ihrer Familie in Amherst und zeigte sie fast niemandem. Viele nähte sie von Hand zu kleinen Heften. Ihre Schwester fand sie nach ihrem Tod. Für eine schwere Wahrheit hatte Dickinson eine Regel. Man sagt sie schräg, sonst kommt sie schon tot an der Tür an. Bei ihr lernt man, die Wahrheit schräg zu sagen.',
         },
         {
           q: 'Was hat Emily Dickinson gelehrt?',
@@ -38,7 +38,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was heißt es, die Wahrheit schräg zu sagen?',
-          a: 'Schau direkt in die Sonne, und du wirst blind. Lass dasselbe Licht schräg ins Zimmer, und du siehst jedes Staubkorn darin. Das ist ihre Idee. Eine Wahrheit, die frontal ausgesprochen wird, kommt tot an. Man kann ihr nur zustimmen oder widersprechen. Schräg gesagt, über ein Bild, muss man sie sich selbst erarbeiten. Und wen sie etwas kostet, den verändert sie auch. Dickinson hat es in eine Zeile gepackt: Tell all the truth but tell it slant. Sag die ganze Wahrheit, aber sag sie schräg.',
+          a: 'Wer direkt in die Sonne schaut, wird blind. Fällt dasselbe Licht schräg ins Zimmer, sieht man jedes Staubkorn darin. Das ist ihre Idee. Eine Wahrheit, die frontal ausgesprochen wird, kommt tot an. Man kann ihr nur zustimmen oder widersprechen. Schräg gesagt, über ein Bild, muss man sie sich selbst erarbeiten. Und wen sie etwas kostet, den verändert sie auch. Dickinson hat es in eine Zeile gepackt: Tell all the truth but tell it slant. Sag die ganze Wahrheit, aber sag sie schräg.',
         },
       ],
       disclosure: {

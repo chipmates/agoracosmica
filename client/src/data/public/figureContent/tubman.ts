@@ -29,7 +29,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Harriet Tubman lernen?',
-          a: "Harriet Tubman (ca. 1822-1913) entkam Ende 1849 der Sklaverei in Maryland und tat dann das Unfassbare. Sie ging zurück. Etwa dreizehn Mal lief sie zurück in Sklavengebiet, um andere herauszuführen, rund siebzig Menschen insgesamt, und sie sagte, sie habe nie einen Fahrgast verloren. Im Bürgerkrieg diente sie der Unionsarmee als Kundschafterin, Spionin und Krankenpflegerin. Bei Tubman lernst du, zu handeln, bevor die Angst dich aufhält.",
+          a: "Harriet Tubman (ca. 1822-1913) entkam Ende 1849 der Sklaverei in Maryland und tat dann das Unfassbare. Sie ging zurück. Etwa dreizehn Mal lief sie zurück in Sklavengebiet, um andere herauszuführen, rund siebzig Menschen insgesamt, und sie sagte, sie habe nie einen Fahrgast verloren. Im Bürgerkrieg diente sie der Unionsarmee als Kundschafterin, Spionin und Krankenpflegerin. Bei Tubman lernt man, zu handeln, bevor die Angst einen aufhält.",
         },
         {
           q: 'Was hat Harriet Tubman gelehrt?',
@@ -37,7 +37,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Warum hatte Harriet Tubman Visionen?',
-          a: "Mit etwa dreizehn Jahren warf ein Aufseher ein knapp ein Kilogramm schweres Eisengewicht, das sie am Kopf traf und ihren Schädel brach. Die Wunde heilte nie ganz aus. Ihr Leben lang hatte sie Anfälle, die ohne Vorwarnung kamen, dazu lebhafte Träume und Visionen. Sie verstand sie als Führung Gottes und vertraute ihnen ihr eigenes Leben an und das Leben der Menschen, die sie führte. Ein Arzt würde heute von einer Kopfverletzung sprechen. Sie sprach von Gott. Beide Lesarten stehen in den Quellen, und wir entscheiden das nicht für dich.",
+          a: "Mit etwa dreizehn Jahren warf ein Aufseher ein knapp ein Kilogramm schweres Eisengewicht, das sie am Kopf traf und ihren Schädel brach. Die Wunde heilte nie ganz aus. Ihr Leben lang hatte sie Anfälle, die ohne Vorwarnung kamen, dazu lebhafte Träume und Visionen. Sie verstand sie als Führung Gottes und vertraute ihnen ihr eigenes Leben an und das Leben der Menschen, die sie führte. Ein Arzt würde heute von einer Kopfverletzung sprechen. Sie sprach von Gott. Beide Lesarten stehen in den Quellen, und wir entscheiden nicht, welche stimmt.",
         },
       ],
       disclosure: {
@@ -96,7 +96,7 @@ export const fragment: FigureFragment = {
         {
           h2: 'Welche Zitate von Harriet Tubman sind echt?',
           body:
-            "Weniger, als du denkst. Vermutlich kennst du den Satz, sie habe tausend Menschen befreit und hätte tausend weitere befreien können, wenn die nur gewusst hätten, dass sie Sklaven sind. In keiner belegten Quelle ihrer Worte steht dieser Satz. Den meisten hübschen Sprüchen unter ihrem Foto geht es genauso. Zwei Sätze sind belegt. Aus einer Rede von 1896 auf einem Frauenwahlrechts-Kongress: 'Ich war acht Jahre lang Schaffnerin der Underground Railroad, und ich kann sagen, was die meisten Schaffner nicht sagen können, ich habe meinen Zug nie entgleisen lassen, und ich habe nie einen Passagier verloren.' Und aus der ersten Biografie über sie von 1869: 'Es gab eines von zwei Dingen, auf die ich ein Recht hatte, Freiheit oder Tod. Wenn ich das eine nicht haben konnte, würde ich das andere haben.' Alles, was wir von ihr haben, hat jemand anders aufgeschrieben.",
+            "Weniger, als man denkt. Viele kennen den Satz, sie habe tausend Menschen befreit und hätte tausend weitere befreien können, wenn die nur gewusst hätten, dass sie Sklaven sind. In keiner belegten Quelle ihrer Worte steht dieser Satz. Den meisten hübschen Sprüchen unter ihrem Foto geht es genauso. Zwei Sätze sind belegt. Aus einer Rede von 1896 auf einem Frauenwahlrechts-Kongress: 'Ich war acht Jahre lang Schaffnerin der Underground Railroad, und ich kann sagen, was die meisten Schaffner nicht sagen können, ich habe meinen Zug nie entgleisen lassen, und ich habe nie einen Passagier verloren.' Und aus der ersten Biografie über sie von 1869: 'Es gab eines von zwei Dingen, auf die ich ein Recht hatte, Freiheit oder Tod. Wenn ich das eine nicht haben konnte, würde ich das andere haben.' Alles, was wir von ihr haben, hat jemand anders aufgeschrieben.",
         },
         {
           h2: 'Was heißt bei ihr, zuerst innerlich frei zu sein?',
@@ -117,7 +117,7 @@ export const fragment: FigureFragment = {
         },
         {
           title: 'Kate Clifford Larson, Bound for the Promised Land: Harriet Tubman, Portrait of an American Hero (2004)',
-          note: 'Die große moderne Biografie. Der richtige Einstieg, wenn du das belegte Leben willst und nicht die Legende.',
+          note: 'Die große moderne Biografie. Der richtige Einstieg für alle, die das belegte Leben wollen und nicht die Legende.',
         },
         {
           title: 'Milton C. Sernett, Harriet Tubman: Myth, Memory, and History (2007)',

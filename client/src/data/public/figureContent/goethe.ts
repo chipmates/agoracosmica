@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Johann Wolfgang von Goethe lernen?',
-          a: 'Johann Wolfgang von Goethe (1749-1832) war Dichter, Staatsmann und Naturforscher, und er weigerte sich, diese drei Rollen zu trennen. Er studierte ein einziges Blatt so lange, bis er sah, dass jeder Teil einer Pflanze dieselbe Form ist, die sich wandelt. Das ist seine ganze Methode. Sieh eine Sache lange genug und genau genug an, und sie beginnt dir zu zeigen, was sie tut. Bei Goethe lernst du, so lange hinzusehen, bis du verstehst.',
+          a: 'Johann Wolfgang von Goethe (1749-1832) war Dichter, Staatsmann und Naturforscher, und er weigerte sich, diese drei Rollen zu trennen. Er studierte ein einziges Blatt so lange, bis er sah, dass jeder Teil einer Pflanze dieselbe Form ist, die sich wandelt. Das ist seine ganze Methode. Wer eine Sache lange genug und genau genug ansieht, dem beginnt sie zu zeigen, was sie tut. Bei Goethe lernt man, so lange hinzusehen, bis man versteht.',
         },
         {
           q: 'Was hat Johann Wolfgang von Goethe gelehrt?',
-          a: 'Goethe lehrte eine Art zu sehen. Der erste Gedanke ist die Metamorphose. Eine Pflanze hängt keine neuen Teile an, sie verwandelt ein Grundorgan immer wieder, Blatt zu Kelchblatt zu Blütenblatt, und nichts wird dabei einfach ersetzt. Der zweite Gedanke heißt Polarität und Steigerung. Wachstum entsteht aus der Spannung zwischen Gegensätzen, und Farben treten genau dort auf, wo Licht und Dunkel sich begegnen. Der dritte ist die zarte Empirie. Beobachte streng, aber bleib nah an der Sache, statt auf Abstand zu gehen, und lass sie für sich selbst sprechen. Die Pflanzenarbeit steht in Die Metamorphose der Pflanzen (1790).',
+          a: 'Goethe lehrte eine Art zu sehen. Der erste Gedanke ist die Metamorphose. Eine Pflanze hängt keine neuen Teile an, sie verwandelt ein Grundorgan immer wieder, Blatt zu Kelchblatt zu Blütenblatt, und nichts wird dabei einfach ersetzt. Der zweite Gedanke heißt Polarität und Steigerung. Wachstum entsteht aus der Spannung zwischen Gegensätzen, und Farben treten genau dort auf, wo Licht und Dunkel sich begegnen. Der dritte ist die zarte Empirie. Streng beobachten, aber nah an der Sache bleiben, statt auf Abstand zu gehen, und sie für sich selbst sprechen lassen. Die Pflanzenarbeit steht in Die Metamorphose der Pflanzen (1790).',
         },
         {
           q: 'Was ist Goethes Idee der Metamorphose?',
-          a: 'Metamorphose meint keinen zufälligen Wandel. Sieh dir eine blühende Pflanze von der Wurzel bis zur Blüte an. Die breiten unteren Blätter werden nach oben hin schmaler, erst zu Hochblättern, dann zu Kelchblättern, dann zu Blütenblättern. Es ist dasselbe Organ, auf jeder Stufe verwandelt und nie durch ein anderes ersetzt. Darin sah Goethe eine Regel. Entwicklung trägt weiter, was vorher war, und findet zugleich einen neuen Ausdruck. Vielfalt ist bei ihm die Abwandlung einer einzigen Grundform.',
+          a: 'Metamorphose meint keinen zufälligen Wandel. Ein Blick auf eine blühende Pflanze, von der Wurzel bis zur Blüte, zeigt es. Die breiten unteren Blätter werden nach oben hin schmaler, erst zu Hochblättern, dann zu Kelchblättern, dann zu Blütenblättern. Es ist dasselbe Organ, auf jeder Stufe verwandelt und nie durch ein anderes ersetzt. Darin sah Goethe eine Regel. Entwicklung trägt weiter, was vorher war, und findet zugleich einen neuen Ausdruck. Vielfalt ist bei ihm die Abwandlung einer einzigen Grundform.',
         },
       ],
       disclosure: {

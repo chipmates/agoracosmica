@@ -29,7 +29,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Wolfgang Amadeus Mozart lernen?',
-          a: 'Wolfgang Amadeus Mozart (1756-1791) schrieb über sechshundert Werke und war mit fünfunddreißig tot. Mit etwa drei Jahren presste er die Wange an das Tasteninstrument, um das Spiel seiner Schwester durch das Holz zu spüren. Dann kamen die Jahre, in denen sein Vater ihn drillte. Was dabei herauskommt, klingt mühelos, und nichts davon war es. Bei ihm siehst du, dass strenge Form das Gefühl erst frei macht.',
+          a: 'Wolfgang Amadeus Mozart (1756-1791) schrieb über sechshundert Werke und war mit fünfunddreißig tot. Mit etwa drei Jahren presste er die Wange an das Tasteninstrument, um das Spiel seiner Schwester durch das Holz zu spüren. Dann kamen die Jahre, in denen sein Vater ihn drillte. Was dabei herauskommt, klingt mühelos, und nichts davon war es. Bei ihm sieht man, dass strenge Form das Gefühl erst frei macht.',
         },
         {
           q: 'Was hat Wolfgang Amadeus Mozart gelehrt?',
@@ -37,7 +37,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was ist verborgene Kunstfertigkeit?',
-          a: 'Die verborgene Kunstfertigkeit ist Mozarts Gedanke, dass die Arbeit nicht zu sehen sein soll. Denk an einen Springbrunnen. Das Wasser steigt scheinbar von selbst und fällt, als hätte die Schwerkraft zugestimmt, schön zu sein, und unter dem Platz liegen Pumpen und Rohre, die verschwinden sollen. Musik kann dasselbe. Das Komplizierte klingt zwingend statt clever. Wer weiß, worauf er hören muss, findet eine zweite Schicht, und alle anderen lieben einfach die Melodie, ohne zu wissen warum.',
+          a: 'Die verborgene Kunstfertigkeit ist Mozarts Gedanke, dass die Arbeit nicht zu sehen sein soll. Ein Bild dafür ist ein Springbrunnen. Das Wasser steigt scheinbar von selbst und fällt, als hätte die Schwerkraft zugestimmt, schön zu sein, und unter dem Platz liegen Pumpen und Rohre, die verschwinden sollen. Musik kann dasselbe. Das Komplizierte klingt zwingend statt clever. Wer weiß, worauf er hören muss, findet eine zweite Schicht, und alle anderen lieben einfach die Melodie, ohne zu wissen warum.',
         },
       ],
       disclosure: {
@@ -96,7 +96,7 @@ export const fragment: FigureFragment = {
           h2: 'Was heißt Freiheit in der Struktur?',
           seedId: 4,
           body:
-            'Er hat es als Bild gesagt. Ein Fluss ohne Ufer ist ein Sumpf. Er geht überallhin und kommt nirgends an. Die Ufer machen ihn erst zum Fluss. Mit musikalischer Form ist es genauso. In der Sonatenform richtet die Exposition ein Zuhause ein, die Durchführung zieht durch fremde Tonarten, und die Rückkehr ist von der Reise verändert. Diese Form ist kein Käfig, sondern Architektur, und deshalb hat das Gefühl in seiner Musik überhaupt einen Weg. Zugefallen ist ihm das nicht. Sein Vater drillte ihn von klein auf in Kontrapunkt und Harmonielehre, und die Freiheit, die du hörst, ist das, was dieser Drill gekauft hat.',
+            'Er hat es als Bild gesagt. Ein Fluss ohne Ufer ist ein Sumpf. Er geht überallhin und kommt nirgends an. Die Ufer machen ihn erst zum Fluss. Mit musikalischer Form ist es genauso. In der Sonatenform richtet die Exposition ein Zuhause ein, die Durchführung zieht durch fremde Tonarten, und die Rückkehr ist von der Reise verändert. Diese Form ist kein Käfig, sondern Architektur, und deshalb hat das Gefühl in seiner Musik überhaupt einen Weg. Zugefallen ist ihm das nicht. Sein Vater drillte ihn von klein auf in Kontrapunkt und Harmonielehre, und die Freiheit, die man hört, ist das, was dieser Drill gekauft hat.',
         },
         {
           h2: 'Wolfgang Amadeus Mozart einfach erklärt',

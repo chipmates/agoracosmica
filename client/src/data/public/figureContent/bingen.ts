@@ -28,15 +28,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Hildegard von Bingen lernen?',
-          a: 'Hildegard von Bingen (1098-1179) sah von Kindheit an in allen Dingen eine lebendige Helligkeit, und jahrzehntelang erzählte sie fast niemandem davon. Das Schweigen machte sie krank. Mit dreiundvierzig sprach sie endlich, und heraus strömten Musik, Heilkunde und Theologie zugleich. Für das Leben, das sie in allem sah, hatte sie ein Wort. Viriditas, die grünende Kraft. Bei Hildegard lernst du, das Leben in den Dingen wahrzunehmen.',
+          a: 'Hildegard von Bingen (1098-1179) sah von Kindheit an in allen Dingen eine lebendige Helligkeit, und jahrzehntelang erzählte sie fast niemandem davon. Das Schweigen machte sie krank. Mit dreiundvierzig sprach sie endlich, und heraus strömten Musik, Heilkunde und Theologie zugleich. Für das Leben, das sie in allem sah, hatte sie ein Wort. Viriditas, die grünende Kraft. Bei Hildegard lernt man, das Leben in den Dingen wahrzunehmen.',
         },
         {
           q: 'Was hat Hildegard von Bingen gelehrt?',
-          a: 'Hildegard von Bingen lehrte, dass Körper und Seele eines sind und nicht zweierlei. Trauere, und deine Brust tut wirklich weh. Halte eine Wahrheit zurück, die du kennst, und dir schnürt es die Kehle zu. Sie sagte, sie wäre fast gestorben, weil sie ihre Visionen für sich behielt, für sie war das also nie eine Theorie. Sie lehrte die Viriditas, die grünende Kraft, die Triebe durch kalten Boden schiebt und einen Menschen heil hält. Krankheit ist bei ihr genau diese Kraft, gestaut. Auch ihr Erkennen hatte einen Namen, der Schatten des Lebendigen Lichts. Sie bestand darauf, dass sie dabei hellwach war, mit offenen Augen und nie in Trance. Sie schrieb Scivias (um 1141 begonnen, etwa 1151 vollendet) und komponierte das Ordo Virtutum (um 1151).',
+          a: 'Hildegard von Bingen lehrte, dass Körper und Seele eines sind und nicht zweierlei. Wer trauert, dem tut die Brust wirklich weh. Wer eine Wahrheit zurückhält, die er kennt, dem schnürt es die Kehle zu. Sie sagte, sie wäre fast gestorben, weil sie ihre Visionen für sich behielt, für sie war das also nie eine Theorie. Sie lehrte die Viriditas, die grünende Kraft, die Triebe durch kalten Boden schiebt und einen Menschen heil hält. Krankheit ist bei ihr genau diese Kraft, gestaut. Auch ihr Erkennen hatte einen Namen, der Schatten des Lebendigen Lichts. Sie bestand darauf, dass sie dabei hellwach war, mit offenen Augen und nie in Trance. Sie schrieb Scivias (um 1141 begonnen, etwa 1151 vollendet) und komponierte das Ordo Virtutum (um 1151).',
         },
         {
           q: 'Was bedeutet Viriditas bei Hildegard von Bingen?',
-          a: 'Viriditas ist ihr eigenes Wort und heißt wörtlich die grünende Kraft. Denk an das, was grüne Triebe durch gefrorenen Boden schiebt, Knospen zum Aufplatzen bringt und den Saft in jedem Baum gegen die Schwerkraft steigen lässt. Für Hildegard war das nicht nur Botanik. Sie verstand es als göttlich, als die Lebendigkeit des Heiligen Geistes, die durch die ganze Schöpfung strömt, vom kleinsten Kraut bis zu den kreisenden Sternen. Das Gegenwort hat sie auch: Ariditas, die Austrocknung.',
+          a: 'Viriditas ist ihr eigenes Wort und heißt wörtlich die grünende Kraft. Gemeint ist das, was grüne Triebe durch gefrorenen Boden schiebt, Knospen zum Aufplatzen bringt und den Saft in jedem Baum gegen die Schwerkraft steigen lässt. Für Hildegard war das nicht nur Botanik. Sie verstand es als göttlich, als die Lebendigkeit des Heiligen Geistes, die durch die ganze Schöpfung strömt, vom kleinsten Kraut bis zu den kreisenden Sternen. Das Gegenwort hat sie auch: Ariditas, die Austrocknung.',
         },
       ],
       disclosure: {

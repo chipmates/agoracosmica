@@ -37,7 +37,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was ist das Buch der Natur?',
-          a: 'So nannte Galilei das Universum: ein Buch. Du kannst es in der Hand halten, jede Seite umblättern und trotzdem kein Wort verstehen, weil es in einer Sprache geschrieben ist, die dir niemand beigebracht hat. Diese Sprache ist die Mathematik, sagte er, also Dreiecke, Kreise und die Verhältnisse dazwischen. Solange du sie nicht lernst, bleibt der Sinn verschlossen. Der Gedanke steht in Il Saggiatore von 1623.',
+          a: 'So nannte Galilei das Universum: ein Buch. Man kann es in der Hand halten, jede Seite umblättern und trotzdem kein Wort verstehen, weil es in einer Sprache geschrieben ist, die einem niemand beigebracht hat. Diese Sprache ist die Mathematik, sagte er, also Dreiecke, Kreise und die Verhältnisse dazwischen. Solange man sie nicht lernt, bleibt der Sinn verschlossen. Der Gedanke steht in Il Saggiatore von 1623.',
         },
       ],
       disclosure: {

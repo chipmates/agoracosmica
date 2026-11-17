@@ -17,7 +17,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Marcus Aurelius - Stoicism & Meditations | Agora Cosmica",
     },
     de: {
-      description: "Entdecke stoische Philosophie mit Mark Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
+      description: "Stoische Philosophie mit Mark Aurel (Marcus Aurelius). 12 Kapitel Lebensgeschichte, Lehren zu emotionaler Klarheit, Memento Mori und Tugendethik.",
       teachingsHeading: "Stoische Lehren von Mark Aurel",
       seoTitle: "Mark Aurel (Marc Aurel): Stoizismus & Selbstbetrachtungen",
     },
@@ -29,7 +29,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Maya Angelou - Voice, Resilience, Identity | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Maya Angelous Weisheit über Resilienz, Identität und das Finden der eigenen Stimme. 12 Kapitel Lebensgeschichte und Lehren über Mut und Gemeinschaft.",
+      description: "Maya Angelous Weisheit über Resilienz, Identität und das Finden der eigenen Stimme. 12 Kapitel Lebensgeschichte und Lehren über Mut und Gemeinschaft.",
       teachingsHeading: "Maya Angelou über Mut, Stimme und Identität",
       seoTitle: "Maya Angelou - Stimme, Resilienz, Identität | Agora Cosmica",
     },
@@ -53,7 +53,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Simone de Beauvoir - Existential Feminism | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Simone de Beauvoirs existentialistischen Feminismus. 12 Kapitel Lebensgeschichte, Lehren zu Freiheit, Ethik der Ambiguität und Selbstwerdung.",
+      description: "Simone de Beauvoirs existentialistischer Feminismus. 12 Kapitel Lebensgeschichte, Lehren zu Freiheit, Ethik der Ambiguität und Selbstwerdung.",
       teachingsHeading: "Simone de Beauvoir über Freiheit und Selbstwerdung",
       seoTitle: "Simone de Beauvoir - Existenzialistischer Feminismus",
     },
@@ -65,7 +65,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Hildegard von Bingen - Visions & Music | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Hildegard von Bingens mystische Vision von Natur, Musik und göttlicher Ganzheit. 12 Kapitel Lebensgeschichte, Lehren zu Heilung und spirituellem Sehen.",
+      description: "Hildegard von Bingens mystische Vision von Natur, Musik und göttlicher Ganzheit. 12 Kapitel Lebensgeschichte, Lehren zu Heilung und spirituellem Sehen.",
       teachingsHeading: "Hildegard von Bingen über Vision, Natur und das Göttliche",
       seoTitle: "Hildegard von Bingen - Visionen & Musik | Agora Cosmica",
     },
@@ -77,7 +77,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "William Blake - Visionary Poetry | Agora Cosmica",
     },
     de: {
-      description: "Entdecke William Blakes visionäre Kunst und radikale Poesie. 12 Kapitel Lebensgeschichte, Lehren zu Imagination, Unschuld, Erfahrung und innerer Befreiung.",
+      description: "William Blakes visionäre Kunst und radikale Poesie. 12 Kapitel Lebensgeschichte, Lehren zu Imagination, Unschuld, Erfahrung und innerer Befreiung.",
       teachingsHeading: "William Blake über Imagination und Vision",
       seoTitle: "William Blake - Visionäre Dichtung | Agora Cosmica",
     },
@@ -89,7 +89,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Joseph Campbell - The Hero's Journey | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Joseph Campbells Heldenreise und die Kraft des Mythos. 12 Kapitel Lebensgeschichte, Lehren über Archetypen, persönliche Mythologie und deinen Weg.",
+      description: "Joseph Campbells Heldenreise und die Kraft des Mythos. 12 Kapitel Lebensgeschichte, Lehren über Archetypen, persönliche Mythologie und den eigenen Weg.",
       teachingsHeading: "Joseph Campbell über Mythos und die Heldenreise",
       seoTitle: "Joseph Campbell - Die Heldenreise | Agora Cosmica",
     },
@@ -113,7 +113,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Dōgen Zenji - Zen Buddhism & Shikantaza | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Dōgen Zenjis Zen-Philosophie des Sitzens, der Präsenz und alltäglichen Praxis. 12 Kapitel Lebensgeschichte, Lehren zu Shikantaza und Anfängergeist.",
+      description: "Dōgen Zenjis Zen-Philosophie des Sitzens, der Präsenz und alltäglichen Praxis. 12 Kapitel Lebensgeschichte, Lehren zu Shikantaza und Anfängergeist.",
       teachingsHeading: "Dōgen Zenji über Zen-Praxis und Sein-Zeit",
       seoTitle: "Dōgen Zenji - Zen-Buddhismus & Shikantaza | Agora Cosmica",
     },
@@ -125,7 +125,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Meister Eckhart - German Mysticism | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Meister Eckharts radikale christliche Mystik. 12 Kapitel Lebensgeschichte, Lehren über Gelassenheit, die Gottesgeburt in der Seele und das Loslassen.",
+      description: "Meister Eckharts radikale christliche Mystik. 12 Kapitel Lebensgeschichte, Lehren über Gelassenheit, die Gottesgeburt in der Seele und das Loslassen.",
       teachingsHeading: "Meister Eckhart über Gelassenheit und den göttlichen Grund",
       seoTitle: "Meister Eckhart - Deutsche Mystik | Agora Cosmica",
     },
@@ -137,7 +137,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Albert Einstein - Relativity & Imagination | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Einsteins Philosophie des Staunens, der Gedankenexperimente und des kosmischen Gefühls. 12 Kapitel Lebensgeschichte, Lehren zu Kreativität.",
+      description: "Einsteins Philosophie des Staunens, der Gedankenexperimente und des kosmischen Gefühls. 12 Kapitel Lebensgeschichte, Lehren zu Kreativität.",
       teachingsHeading: "Einstein über Kreativität, Staunen und den Kosmos",
       seoTitle: "Albert Einstein - Relativität & Imagination | Agora Cosmica",
     },
@@ -149,7 +149,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Galileo Galilei - Heliocentrism & Telescope | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Galileos Mut, Autorität durch Beobachtung herauszufordern. 12 Kapitel Lebensgeschichte, Lehren über Evidenz, Wahrheit und die Sprache der Natur.",
+      description: "Galileos Mut, Autorität durch Beobachtung herauszufordern. 12 Kapitel Lebensgeschichte, Lehren über Evidenz, Wahrheit und die Sprache der Natur.",
       teachingsHeading: "Galileo über Wahrheit, Beobachtung und Mut",
       seoTitle: "Galileo Galilei - Heliozentrismus & Teleskop",
     },
@@ -161,7 +161,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Mahatma Gandhi - Nonviolence & Satyagraha | Agora Cosmica",
     },
     de: {
-      description: "Entdecke Gandhis Philosophie der Gewaltlosigkeit, Wahrheit und Selbstbestimmung. 12 Kapitel Lebensgeschichte, Lehren zu Satyagraha, Ahimsa und moralischem Mut.",
+      description: "Gandhis Philosophie der Gewaltlosigkeit, Wahrheit und Selbstbestimmung. 12 Kapitel Lebensgeschichte, Lehren zu Satyagraha, Ahimsa und moralischem Mut.",
       teachingsHeading: "Gandhi über Gewaltlosigkeit, Wahrheit und Selbstbestimmung",
       seoTitle: "Mahatma Gandhi - Gewaltlosigkeit & Satyagraha",
     },
@@ -185,7 +185,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Buddha (Siddhartha Gautama) - Buddhism, Four Noble Truths",
     },
     de: {
-      description: "Lerne die buddhistische Philosophie des Buddha Siddhartha Gautama. Achtsamkeit, Vier Edle Wahrheiten, abhängiges Entstehen. 12 Kapitel Lebensgeschichte.",
+      description: "Die buddhistische Philosophie des Buddha Siddhartha Gautama. Achtsamkeit, Vier Edle Wahrheiten, abhängiges Entstehen. 12 Kapitel Lebensgeschichte.",
       teachingsHeading: "Die Lehren des Buddha (Siddhartha Gautama)",
       seoTitle: "Buddha - Buddhismus & Vier Edle Wahrheiten | Agora Cosmica",
     },
@@ -233,7 +233,7 @@ export const figureSeo: Record<string, FigureSeoData> = {
       seoTitle: "Laozi - Taoism, Wu Wei & Tao Te Ching | Agora Cosmica",
     },
     de: {
-      description: "Entdecke die taoistische Philosophie von Laozi (Laotse): Wu Wei, Einfachheit, Fließen mit der Natur. 12 Kapitel Lebensgeschichte, Lehren aus dem Tao Te King.",
+      description: "Die taoistische Philosophie von Laozi (Laotse): Wu Wei, Einfachheit, Fließen mit der Natur. 12 Kapitel Lebensgeschichte, Lehren aus dem Tao Te King.",
       teachingsHeading: "Laozi (Laotse) über das Tao, Wu Wei und natürliche Harmonie",
       seoTitle: "Laozi (Laotse) - Taoismus, Wu Wei & Tao Te King",
     },

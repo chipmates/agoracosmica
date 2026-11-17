@@ -34,11 +34,11 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was hat Virginia Woolf gelehrt?',
-          a: 'Virginia Woolf hat dich gelehrt zu merken, wo du eigentlich lebst. Der größte Teil eines Tages, sagte sie, ist Watte. Du gehst halb wach hindurch. Dann reißt etwas die Watte auf, eine Haarbürste, ein Lichtwechsel über einem Hügel, eine Geste von jemandem, und für eine Sekunde siehst du das Muster darunter. Das nannte sie Momente des Seins. Um sie aufs Papier zu bekommen, gab sie den ordentlichen, geerbten Satz auf, weil er vier gleichzeitige Dinge nicht fassen konnte. Und 1929 sagte sie in Ein Zimmer für sich allein die andere Hälfte laut. Zum Schreiben braucht eine Frau Geld und ein Zimmer mit einer Tür, die sich abschließen lässt.',
+          a: 'Virginia Woolf lehrte zu merken, wo man eigentlich lebt. Der größte Teil eines Tages, sagte sie, ist Watte. Man geht halb wach hindurch. Dann reißt etwas die Watte auf, eine Haarbürste, ein Lichtwechsel über einem Hügel, eine Geste von jemandem, und für eine Sekunde sieht man das Muster darunter. Das nannte sie Momente des Seins. Um sie aufs Papier zu bekommen, gab sie den ordentlichen, geerbten Satz auf, weil er vier gleichzeitige Dinge nicht fassen konnte. Und 1929 sagte sie in Ein Zimmer für sich allein die andere Hälfte laut. Zum Schreiben braucht eine Frau Geld und ein Zimmer mit einer Tür, die sich abschließen lässt.',
         },
         {
           q: 'Was ist der leuchtende Hof bei Virginia Woolf?',
-          a: 'Leg dich an einem Sommermorgen ins Gras. Das Licht, die Vögel, die Wärme, der Geruch der Blumen erreichen dich nicht nacheinander. Alles kommt auf einmal. Genau das, sagte Woolf, ist Bewusstsein. In ihrem Essay Modern Fiction von 1925 nannte sie das Leben einen leuchtenden Hof, eine halbdurchsichtige Hülle, die uns vom Beginn des Bewusstseins bis zu seinem Ende umgibt. Was es nicht sei, schrieb sie, sei eine Reihe symmetrisch angeordneter Kutschenlampen. Sie fand, die Romanautoren hätten immer nur die Lampenreihe beschrieben und das Leuchten übersehen.',
+          a: 'Wir liegen an einem Sommermorgen im Gras. Das Licht, die Vögel, die Wärme, der Geruch der Blumen erreichen uns nicht nacheinander. Alles kommt auf einmal. Genau das, sagte Woolf, ist Bewusstsein. In ihrem Essay Modern Fiction von 1925 nannte sie das Leben einen leuchtenden Hof, eine halbdurchsichtige Hülle, die uns vom Beginn des Bewusstseins bis zu seinem Ende umgibt. Was es nicht sei, schrieb sie, sei eine Reihe symmetrisch angeordneter Kutschenlampen. Sie fand, die Romanautoren hätten immer nur die Lampenreihe beschrieben und das Leuchten übersehen.',
         },
       ],
       disclosure: {

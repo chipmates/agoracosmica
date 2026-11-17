@@ -28,15 +28,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Laozi lernen?',
-          a: "Laozi (auch Laotse) ist der chinesische Denker hinter dem Tao Te King, überliefert für das 6. oder 5. Jahrhundert v. Chr. Ob er gelebt hat, ist unsicher. Geblieben sind etwa fünftausend Zeichen und ein Gedanke darunter. Was nachgibt, überdauert das, was erzwingt. Wasser ist weich und weicht aus, und es höhlt trotzdem den Stein. Von Laozi lernst du, zu handeln, ohne zu erzwingen. Er nennt das Wu Wei.",
+          a: "Laozi (auch Laotse) ist der chinesische Denker hinter dem Tao Te King, überliefert für das 6. oder 5. Jahrhundert v. Chr. Ob er gelebt hat, ist unsicher. Geblieben sind etwa fünftausend Zeichen und ein Gedanke darunter. Was nachgibt, überdauert das, was erzwingt. Wasser ist weich und weicht aus, und es höhlt trotzdem den Stein. Von Laozi lernt man, zu handeln, ohne zu erzwingen. Er nennt das Wu Wei.",
         },
         {
           q: 'Was hat Laozi gelehrt?',
-          a: "Laozi lehrte, dass hinter allem eine Quelle liegt, die sich nicht benennen lässt. Er nennt sie das Tao, die Mutter der zehntausend Dinge. Sie gibt Leben, ohne etwas zu besitzen oder zu befehlen. Daraus folgen zwei weitere Gedanken. Wu Wei ist Handeln ohne Zwang. Du suchst den Punkt, an dem der kleinste Einsatz mit dem zusammenfällt, was ohnehin schon in Bewegung ist. Te ist die Kraft, die von selbst entsteht, wenn dein Tun und dein Wesen aufhören, in verschiedene Richtungen zu ziehen. Erhalten ist das alles im Tao Te King, etwa fünftausend Zeichen in einundachtzig kurzen Abschnitten.",
+          a: "Laozi lehrte, dass hinter allem eine Quelle liegt, die sich nicht benennen lässt. Er nennt sie das Tao, die Mutter der zehntausend Dinge. Sie gibt Leben, ohne etwas zu besitzen oder zu befehlen. Daraus folgen zwei weitere Gedanken. Wu Wei ist Handeln ohne Zwang. Man sucht den Punkt, an dem der kleinste Einsatz mit dem zusammenfällt, was ohnehin schon in Bewegung ist. Te ist die Kraft, die von selbst entsteht, wenn Tun und Wesen aufhören, in verschiedene Richtungen zu ziehen. Erhalten ist das alles im Tao Te King, etwa fünftausend Zeichen in einundachtzig kurzen Abschnitten.",
         },
         {
           q: 'Was ist Wu Wei?',
-          a: "Wu Wei wird meistens mit Nicht-Handeln übersetzt, und das führt in die Irre. Gemeint ist nicht Nichtstun. Gemeint ist die eine Stelle, an der der kleinste Einsatz mit dem geht, was ohnehin passiert. Stell dir einen Bauern vor, der zwanzig Jahre beobachtet hat, wohin das Wasser laufen will, und dann einen einzigen Stein versetzt. Seine Felder bleiben grün, auch in der Dürre. Hundert Arbeiter, die einen Kanal gegen das Gelände graben, verausgaben sich und scheitern. Laozis Satz dahinter ist kurz. Das Nachgiebige hat Bestand, das Erzwungene zerbricht.",
+          a: "Wu Wei wird meistens mit Nicht-Handeln übersetzt, und das führt in die Irre. Gemeint ist nicht Nichtstun. Gemeint ist die eine Stelle, an der der kleinste Einsatz mit dem geht, was ohnehin passiert. Ein Bauer hat zwanzig Jahre beobachtet, wohin das Wasser laufen will, und versetzt dann einen einzigen Stein. Seine Felder bleiben grün, auch in der Dürre. Hundert Arbeiter, die einen Kanal gegen das Gelände graben, verausgaben sich und scheitern. Laozis Satz dahinter ist kurz. Das Nachgiebige hat Bestand, das Erzwungene zerbricht.",
         },
       ],
       disclosure: {
@@ -88,14 +88,14 @@ export const fragment: FigureFragment = {
         {
           h2: 'Was ist das Tao Te King?',
           body:
-            "Das Tao Te King, auch Daodejing geschrieben, ist ein kurzes Buch. Etwa fünftausend Zeichen, meist in einundachtzig Abschnitte geteilt, die selten länger sind als eine Seite. Es hat keine Beweisführung und kein System. Es kreist um dieselben paar Bilder. Wasser. Ein unbearbeiteter Holzblock, in dem noch jede Form steckt. Eine Schale, die wegen ihrer Höhlung nützlich ist. Ein Tal. Die Überlieferung schreibt es Laozi zu und verlegt die Niederschrift an einen westlichen Pass. Die Forschung sieht darin meist Sprüche, die in der späten Zhou-Zeit umliefen und bis zum 3. Jahrhundert v. Chr. zu einem festen Text wurden. Lies es so, wie es gebaut ist: ein paar Zeilen auf einmal.",
+            "Das Tao Te King, auch Daodejing geschrieben, ist ein kurzes Buch. Etwa fünftausend Zeichen, meist in einundachtzig Abschnitte geteilt, die selten länger sind als eine Seite. Es hat keine Beweisführung und kein System. Es kreist um dieselben paar Bilder. Wasser. Ein unbearbeiteter Holzblock, in dem noch jede Form steckt. Eine Schale, die wegen ihrer Höhlung nützlich ist. Ein Tal. Die Überlieferung schreibt es Laozi zu und verlegt die Niederschrift an einen westlichen Pass. Die Forschung sieht darin meist Sprüche, die in der späten Zhou-Zeit umliefen und bis zum 3. Jahrhundert v. Chr. zu einem festen Text wurden. Am besten liest man es so, wie es gebaut ist: ein paar Zeilen auf einmal.",
         },
       ],
       ideaQuestion: 'Mein Kopf ist so voll, dass nichts Neues mehr reinkommt. Was nehme ich raus?',
       works: [
         {
           title: 'Tao Te King (Daodejing)',
-          note: 'Das einzige Buch, das ihm zugeschrieben wird. Rund fünftausend Zeichen in einundachtzig kurzen Abschnitten, und du kannst bei jedem anfangen. Der Überlieferung nach entstand es an einem westlichen Grenzpass, auf seinem Weg hinaus.',
+          note: 'Das einzige Buch, das ihm zugeschrieben wird. Rund fünftausend Zeichen in einundachtzig kurzen Abschnitten, und man kann bei jedem anfangen. Der Überlieferung nach entstand es an einem westlichen Grenzpass, auf seinem Weg hinaus.',
         },
       ],
     },

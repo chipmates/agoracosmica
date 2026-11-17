@@ -90,7 +90,7 @@ export const fragment: FigureFragment = {
           h2: 'Was bedeutet saper vedere?',
           seedId: 2,
           body:
-            'Saper vedere heißt auf Italienisch sehen können, und Leonardo meinte damit eine Fähigkeit, keine Begabung. Stell dir ein weißes Tuch über einem Klumpen Ton vor. Du zeichnest den Schatten grau, weil du weißt, dass Schatten grau sind. Dann sagt dir jemand, du sollst noch einmal hinsehen, und der Schatten ist blau. Genau dieser Abstand zwischen dem, was da ist, und dem, was du annimmst, ist die ganze Übung. Gelernt hat er sie ab etwa 1466 in Verrocchios Werkstatt, beim Zeichnen von Stofffalten auf grundiertem Leinen, und er hörte nie damit auf. Die Regel ist leicht gesagt und schwer getan: Trenne das Gesehene vom Erwarteten und halte nur das Erste fest.',
+            'Saper vedere heißt auf Italienisch sehen können, und Leonardo meinte damit eine Fähigkeit, keine Begabung. Ein weißes Tuch liegt über einem Klumpen Ton. Man zeichnet den Schatten grau, weil man weiß, dass Schatten grau sind. Dann sagt jemand, man solle noch einmal hinsehen, und der Schatten ist blau. Genau dieser Abstand zwischen dem, was da ist, und dem, was man annimmt, ist die ganze Übung. Gelernt hat er sie ab etwa 1466 in Verrocchios Werkstatt, beim Zeichnen von Stofffalten auf grundiertem Leinen, und er hörte nie damit auf. Die Regel ist leicht gesagt und schwer getan: das Gesehene vom Erwarteten trennen und nur das Erste festhalten.',
         },
         {
           h2: 'Woher kam Leonardos Neugier?',
@@ -112,7 +112,7 @@ export const fragment: FigureFragment = {
         },
         {
           title: 'Felsgrottenmadonna (um 1483-1486)',
-          note: 'Gemalt in Mailand, in den Jahren nach seiner Ankunft dort. Schau auf die Felsen und die Pflanzen, nicht nur auf die Gesichter.',
+          note: 'Gemalt in Mailand, in den Jahren nach seiner Ankunft dort. Sehenswert sind die Felsen und die Pflanzen, nicht nur die Gesichter.',
         },
         {
           title: 'Das Abendmahl (1495-1498)',

@@ -30,15 +30,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Jane Austen lernen?',
-          a: 'Jane Austen (1775-1817) war eine englische Schriftstellerin. Sie schrieb sechs Romane fertig und sah ihren Namen nie auf einer Titelseite. Der erste erschien als Werk einer Dame. Sie schrieb über Frauen mit wenig Geld und noch weniger Macht, vor der einen Entscheidung, die den Rest ihres Lebens festlegen würde. Ihr eigentliches Thema ist die Lücke zwischen dem, was jemand sagt, und dem, was seine Hände tun. Bei ihr lernst du zu lesen, was Menschen nicht sagen.',
+          a: 'Jane Austen (1775-1817) war eine englische Schriftstellerin. Sie schrieb sechs Romane fertig und sah ihren Namen nie auf einer Titelseite. Der erste erschien als Werk einer Dame. Sie schrieb über Frauen mit wenig Geld und noch weniger Macht, vor der einen Entscheidung, die den Rest ihres Lebens festlegen würde. Ihr eigentliches Thema ist die Lücke zwischen dem, was jemand sagt, und dem, was seine Hände tun. Bei ihr lernt man zu lesen, was Menschen nicht sagen.',
         },
         {
           q: 'Was hat Jane Austen gelehrt?',
-          a: 'Jane Austen hat eine Art gelehrt, Menschen zu beobachten. Drei Dinge tragen sie. Erstens das Hinsehen. Sieh zu, wie jemand einen Menschen begrüßt, über den er gestern noch hergezogen ist. Hör nicht auf die Worte, die klingen herzlich. Sieh auf die Hände, die Haltung, den Moment des Lachens. Zweitens das Urteil. Charme kann einen schlechten Charakter verdecken, so wie Unbeholfenheit einen guten verdecken kann. Also lernst du, echten Wert von einer guten Kopie zu unterscheiden. Und drittens das Geld. Sie rechnet es auf der Seite vor, zehntausend im Jahr, zwanzig Pfund im Jahr, denn was jemand sich leisten kann, ist das, was er wählen kann.',
+          a: 'Jane Austen hat eine Art gelehrt, Menschen zu beobachten. Drei Dinge tragen sie. Erstens das Hinsehen. Zusehen, wie jemand einen Menschen begrüßt, über den er gestern noch hergezogen ist. Nicht auf die Worte hören, die klingen herzlich. Auf die Hände sehen, die Haltung, den Moment des Lachens. Zweitens das Urteil. Charme kann einen schlechten Charakter verdecken, so wie Unbeholfenheit einen guten verdecken kann. Also lernt man, echten Wert von einer guten Kopie zu unterscheiden. Und drittens das Geld. Sie rechnet es auf der Seite vor, zehntausend im Jahr, zwanzig Pfund im Jahr, denn was jemand sich leisten kann, ist das, was er wählen kann.',
         },
         {
           q: 'Wie kommt Jane Austen in den Kopf ihrer Figuren?',
-          a: 'Austen fand einen Kniff, den der Roman vorher kaum kannte. Die Erzählerin rutscht in eine Figur hinein und gibt deren Gedanken wieder, ohne den Wechsel anzukündigen. Man liest die Figur in der Stimme der Erzählerin. In der Literaturwissenschaft heißt das erlebte Rede. Der Effekt ist einfach und ein bisschen gemein. Du fühlst, was sie fühlt, und siehst zugleich, was sie übersieht. Du bist in ihr drin und stehst daneben. Deshalb kann eine Austen-Heldin dreihundert Seiten lang danebenliegen und dich trotzdem auf ihrer Seite halten.',
+          a: 'Austen fand einen Kniff, den der Roman vorher kaum kannte. Die Erzählerin rutscht in eine Figur hinein und gibt deren Gedanken wieder, ohne den Wechsel anzukündigen. Man liest die Figur in der Stimme der Erzählerin. In der Literaturwissenschaft heißt das erlebte Rede. Der Effekt ist einfach und ein bisschen gemein. Wir fühlen, was sie fühlt, und sehen zugleich, was sie übersieht. Wir sind in ihr drin und stehen daneben. Deshalb kann eine Austen-Heldin dreihundert Seiten lang danebenliegen und uns trotzdem auf ihrer Seite halten.',
         },
       ],
       disclosure: {
@@ -85,7 +85,7 @@ export const fragment: FigureFragment = {
           h2: 'Es ist eine allgemein anerkannte Wahrheit: Was meint Austen damit?',
           seedId: 3,
           body:
-            'Es ist eine allgemein anerkannte Wahrheit, dass ein unverheirateter Mann im Besitz eines schönen Vermögens eine Frau braucht. So beginnt Pride and Prejudice, auf Deutsch Stolz und Vorurteil, erschienen 1813. Der Witz steckt schon im ersten Halbsatz. Allgemein anerkannt von wem? Vom Mann jedenfalls nicht. Von den Müttern der Nachbarschaft, die Töchter haben und nichts, was sie ihnen hinterlassen könnten. Austen formuliert deren Wunsch, als wäre er ein Naturgesetz, und lässt dich den Unterschied hören. Ein Satz, und du weißt, worum es im Buch geht. Die Ehe ist hier nicht zuerst Romantik. Sie ist der einzige Beruf, der offensteht, und im Zimmer weiß das jeder.',
+            'Es ist eine allgemein anerkannte Wahrheit, dass ein unverheirateter Mann im Besitz eines schönen Vermögens eine Frau braucht. So beginnt Pride and Prejudice, auf Deutsch Stolz und Vorurteil, erschienen 1813. Der Witz steckt schon im ersten Halbsatz. Allgemein anerkannt von wem? Vom Mann jedenfalls nicht. Von den Müttern der Nachbarschaft, die Töchter haben und nichts, was sie ihnen hinterlassen könnten. Austen formuliert deren Wunsch, als wäre er ein Naturgesetz, und lässt uns den Unterschied hören. Ein Satz, und man weiß, worum es im Buch geht. Die Ehe ist hier nicht zuerst Romantik. Sie ist der einzige Beruf, der offensteht, und im Zimmer weiß das jeder.',
         },
         {
           h2: 'Jane Austen einfach erklärt',

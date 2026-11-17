@@ -45,7 +45,7 @@ export const GET: APIRoute = () => {
   );
   lines.push('');
   lines.push(
-    'Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist. Kein Konto, keine Anmeldung. Die Geschichten kannst du kostenlos hören und lesen.',
+    'Jede Geschichte zeigt einen Moment, in dem jemand etwas fürs Leben lernt. Die Fakten zu jeder Geschichte sagen, was dokumentiert und was nachgestellt ist. Kein Konto, keine Anmeldung. Die Geschichten sind kostenlos zu hören und zu lesen.',
   );
   lines.push('');
 

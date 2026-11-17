@@ -30,11 +30,11 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Simone de Beauvoir lernen?',
-          a: 'Simone de Beauvoir (1908-1986) sah, wie die Tage ihrer Mutter auf Waschen und Gebet zusammenschrumpften, während sich ihre eigenen zur Sorbonne hin öffneten, und sie fragte, warum. Ihre Antwort füllte ein Buch. Eine Frau wird gemacht, nicht geboren, durch Umstände, durch Wiederholung, durch das allmähliche Schließen von Türen. Erkenne, wie das geschieht, schrieb sie, und du kannst beginnen, es rückgängig zu machen. Bei Beauvoir lernst du zu erkennen, wie du gemacht wurdest.',
+          a: 'Simone de Beauvoir (1908-1986) sah, wie die Tage ihrer Mutter auf Waschen und Gebet zusammenschrumpften, während sich ihre eigenen zur Sorbonne hin öffneten, und sie fragte, warum. Ihre Antwort füllte ein Buch. Eine Frau wird gemacht, nicht geboren, durch Umstände, durch Wiederholung, durch das allmähliche Schließen von Türen. Wer erkennt, wie das geschieht, schrieb sie, kann beginnen, es rückgängig zu machen. Bei Beauvoir lernt man zu erkennen, wie man gemacht wurde.',
         },
         {
           q: 'Was hat Simone de Beauvoir gelehrt?',
-          a: 'Simone de Beauvoir lehrte, dass Freiheit wirklich ist, aber nie abstrakt. Sie nannte das situierte Freiheit. Du wählst immer innerhalb von Bedingungen, die du nicht gewählt hast: deine Herkunft, deinen Körper, dein Jahrhundert. Diese Bedingungen begrenzen dich und geben dir zugleich etwas, wogegen du dich stemmen kannst. Ihr zweiter Gedanke ist die Ethik der Ambiguität. Wir sind Freiheit und harte Tatsache in einem, und kein Regelbuch löst das auf, also entscheidest du den Fall vor dir und trägst ihn. Der dritte ist die Frau als das Andere. Er betritt ein Café und ist einfach ein Mensch. Sie betritt es und wird eingeschätzt und eingeordnet, bevor sie ein Wort gesagt hat. Die Bücher sind Sie kam und blieb (1943), Für eine Moral der Doppelsinnigkeit (1947) und Das andere Geschlecht (1949).',
+          a: 'Simone de Beauvoir lehrte, dass Freiheit wirklich ist, aber nie abstrakt. Sie nannte das situierte Freiheit. Wir wählen immer innerhalb von Bedingungen, die wir nicht gewählt haben: unsere Herkunft, unseren Körper, unser Jahrhundert. Diese Bedingungen begrenzen uns und geben uns zugleich etwas, wogegen wir uns stemmen können. Ihr zweiter Gedanke ist die Ethik der Ambiguität. Wir sind Freiheit und harte Tatsache in einem, und kein Regelbuch löst das auf, also entscheiden wir den Fall vor uns und tragen ihn. Der dritte ist die Frau als das Andere. Er betritt ein Café und ist einfach ein Mensch. Sie betritt es und wird eingeschätzt und eingeordnet, bevor sie ein Wort gesagt hat. Die Bücher sind Sie kam und blieb (1943), Für eine Moral der Doppelsinnigkeit (1947) und Das andere Geschlecht (1949).',
         },
         {
           q: 'Was bedeutet die Frau als das Andere bei Simone de Beauvoir?',
@@ -85,7 +85,7 @@ export const fragment: FigureFragment = {
           h2: 'Was ist Existenzialismus bei Simone de Beauvoir?',
           seedId: 4,
           body:
-            'Existenzialismus beginnt mit einem einfachen Satz. Es gibt keine feste Natur, die vorher festlegt, wer du bist. Du wirst, was du tust. Diesen Ausgangspunkt teilt Beauvoir, und dann geht sie weiter als die anderen. Freiheit ist bei ihr nie abstrakt. Du wählst innerhalb von Bedingungen, die du nicht gewählt hast, und diese Bedingungen prägen sogar, wonach du überhaupt greifen kannst. Dazu kommt die Ambiguität. Wir sind Freiheit und harte Tatsache zugleich, Subjekt und Objekt, und das löst sich nicht auf. Ihr Schritt: weder ein absolutes Regelbuch noch reiner Relativismus, sondern eine Ethik, die du von Fall zu Fall trägst. Das ist Für eine Moral der Doppelsinnigkeit (1947).',
+            'Existenzialismus beginnt mit einem einfachen Satz. Es gibt keine feste Natur, die vorher festlegt, wer wir sind. Wir werden, was wir tun. Diesen Ausgangspunkt teilt Beauvoir, und dann geht sie weiter als die anderen. Freiheit ist bei ihr nie abstrakt. Wir wählen innerhalb von Bedingungen, die wir nicht gewählt haben, und diese Bedingungen prägen sogar, wonach wir überhaupt greifen können. Dazu kommt die Ambiguität. Wir sind Freiheit und harte Tatsache zugleich, Subjekt und Objekt, und das löst sich nicht auf. Ihr Schritt: weder ein absolutes Regelbuch noch reiner Relativismus, sondern eine Ethik, die wir von Fall zu Fall tragen. Das ist Für eine Moral der Doppelsinnigkeit (1947).',
         },
         {
           h2: 'Simone de Beauvoir einfach erklärt',

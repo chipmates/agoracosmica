@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Friedrich Nietzsche lernen?',
-          a: 'Friedrich Nietzsche (1844-1900) war ein Pfarrerssohn, der seinen Glauben durch die Ehrlichkeit selbst verlor. Er hat daran nicht verzweifelt. Er hat die schwerere Frage gestellt. Wenn die alten Gewissheiten weg sind, was kann ein Mensch an ihre Stelle setzen? Mit dieser einen Frage verbrachte er sein Leben, unter Schmerzen und meist allein. Bei Nietzsche lernst du, dir deinen eigenen Sinn zu bauen.',
+          a: 'Friedrich Nietzsche (1844-1900) war ein Pfarrerssohn, der seinen Glauben durch die Ehrlichkeit selbst verlor. Er hat daran nicht verzweifelt. Er hat die schwerere Frage gestellt. Wenn die alten Gewissheiten weg sind, was kann ein Mensch an ihre Stelle setzen? Mit dieser einen Frage verbrachte er sein Leben, unter Schmerzen und meist allein. Bei Nietzsche lernt man, sich den eigenen Sinn zu bauen.',
         },
         {
           q: 'Was hat Friedrich Nietzsche gelehrt?',
-          a: 'Friedrich Nietzsche lehrte, dass du dich selbst überwinden musst. Nicht einmal, sondern immer wieder. Selbstüberwindung heißt: Was du schon bist, ist eine Stufe und kein Ziel. Der Wille zur Macht ist sein Name für die Kraft in allem Lebendigen, die Widerstand überwindet und weiter will. Amor fati ist die Liebe zum eigenen Schicksal, der Wunsch, dass nichts anders gelaufen wäre. Seine Methode war die Genealogie. Er grub unter jeder Moral nach, woher sie kommt und wer sie gebraucht hat. Lesen kannst du ihn in Die Geburt der Tragödie (1872), Menschliches, Allzumenschliches (1878) und Die fröhliche Wissenschaft (1882).',
+          a: 'Friedrich Nietzsche lehrte, dass man sich selbst überwinden muss. Nicht einmal, sondern immer wieder. Selbstüberwindung heißt: Was man schon ist, ist eine Stufe und kein Ziel. Der Wille zur Macht ist sein Name für die Kraft in allem Lebendigen, die Widerstand überwindet und weiter will. Amor fati ist die Liebe zum eigenen Schicksal, der Wunsch, dass nichts anders gelaufen wäre. Seine Methode war die Genealogie. Er grub unter jeder Moral nach, woher sie kommt und wer sie gebraucht hat. Lesen kann man ihn in Die Geburt der Tragödie (1872), Menschliches, Allzumenschliches (1878) und Die fröhliche Wissenschaft (1882).',
         },
         {
           q: 'Was ist der Wille zur Macht bei Nietzsche?',
-          a: 'Der Wille zur Macht meint keine Politik. Stell dir eine Kiefer an einem Alpenhang vor, deren Wurzeln über Jahrzehnte den Granit sprengen. Sie besiegt den Stein nicht. Sie wächst, sie wird mehr von dem, was sie ist. Genau das meint Nietzsche. Alles Lebendige drängt gegen Widerstand und greift weiter aus, und dieselbe Kraft sah er in der Kunst, im Denken, in der Liebe und in jedem echten Werden.',
+          a: 'Der Wille zur Macht meint keine Politik. Ein Bild dafür ist eine Kiefer an einem Alpenhang, deren Wurzeln über Jahrzehnte den Granit sprengen. Sie besiegt den Stein nicht. Sie wächst, sie wird mehr von dem, was sie ist. Genau das meint Nietzsche. Alles Lebendige drängt gegen Widerstand und greift weiter aus, und dieselbe Kraft sah er in der Kunst, im Denken, in der Liebe und in jedem echten Werden.',
         },
       ],
       disclosure: {
@@ -84,12 +84,12 @@ export const fragment: FigureFragment = {
           h2: 'Was heißt Selbstüberwindung bei Nietzsche?',
           seedId: 10,
           body:
-            'Selbstüberwindung heißt bei Nietzsche vor allem eines: Du bist nicht fertig. Was du heute bist, ist eine Stufe und kein Ziel. In Also sprach Zarathustra lässt er das Leben selbst sprechen, im Kapitel Von der Selbst-Überwindung. Das Leben sagt dort, es sei das, was sich immer selbst überwinden muss. Das klingt hart, und es ist auch hart gemeint. Etwas muss weggehen, damit etwas anderes wachsen kann. Eine bequeme Gewohnheit. Ein Stolz auf etwas, das lange her ist. Eine Rolle, die dir mal gepasst hat. Gemeint ist kein Wettkampf mit anderen. Der einzige Gegner ist die Form, die du gerade hast.',
+            'Selbstüberwindung heißt bei Nietzsche vor allem eines: Niemand ist fertig. Was man heute ist, ist eine Stufe und kein Ziel. In Also sprach Zarathustra lässt er das Leben selbst sprechen, im Kapitel Von der Selbst-Überwindung. Das Leben sagt dort, es sei das, was sich immer selbst überwinden muss. Das klingt hart, und es ist auch hart gemeint. Etwas muss weggehen, damit etwas anderes wachsen kann. Eine bequeme Gewohnheit. Ein Stolz auf etwas, das lange her ist. Eine Rolle, die einmal gepasst hat. Gemeint ist kein Wettkampf mit anderen. Der einzige Gegner ist die Form, die man gerade hat.',
         },
         {
           h2: 'Friedrich Nietzsche einfach erklärt',
           body:
-            'Nietzsche war ein Pfarrerssohn, der sich mit fast allem angelegt hat, was seine Zeit für sicher hielt. Vier Gedanken reichen für den Anfang. Erstens: Gott ist tot. Damit meint er nicht nur den Rückgang des Glaubens, sondern dass alle festen Fundamente weggebrochen sind. Zweitens: Perspektivismus. Es gibt keinen Blick von nirgendwo, jedes Wissen kommt aus einem Standpunkt. Drittens: Genealogie. Er fragt bei jeder Moral, woher sie kommt und wer sie gebraucht hat. Viertens: Selbstüberwindung. Wenn keine Ordnung mehr von außen kommt, musst du deine Werte selbst schaffen, immer wieder. Nietzsche gibt dir keine Antwort zum Mitnehmen. Er gibt dir die Frage zurück.',
+            'Nietzsche war ein Pfarrerssohn, der sich mit fast allem angelegt hat, was seine Zeit für sicher hielt. Vier Gedanken reichen für den Anfang. Erstens: Gott ist tot. Damit meint er nicht nur den Rückgang des Glaubens, sondern dass alle festen Fundamente weggebrochen sind. Zweitens: Perspektivismus. Es gibt keinen Blick von nirgendwo, jedes Wissen kommt aus einem Standpunkt. Drittens: Genealogie. Er fragt bei jeder Moral, woher sie kommt und wer sie gebraucht hat. Viertens: Selbstüberwindung. Wenn keine Ordnung mehr von außen kommt, muss man seine Werte selbst schaffen, immer wieder. Nietzsche gibt keine Antwort zum Mitnehmen. Er gibt die Frage zurück.',
         },
       ],
       ideaQuestion: 'Müsste ich genau dieses Leben noch einmal leben, für immer, könnte ich Ja sagen?',

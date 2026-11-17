@@ -89,10 +89,10 @@ const COPY = {
   },
   de: {
     kicker: 'Eine Frage zu dieser Anzeige',
-    heading: 'Dürfen wir deinen Besuch für Google zählen?',
+    heading: 'Dürfen wir Ihren Besuch für Google zählen?',
     lead: 'Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.',
-    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
-    age: 'Bist du unter 16, sag bitte Nein.',
+    fine: 'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige Sie zu uns gebracht hat und ob Sie 30 Sekunden zugehört haben. Google kann sie Ihrem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über Sie. Ihr Browser merkt sich Ihre Antwort ein Jahr lang. Ausschalten können Sie das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.',
+    age: 'Sind Sie unter 16, sagen Sie bitte Nein.',
     accept: 'Ja, zählen',
     decline: 'Nein, nicht zählen',
     close: 'Schließen. Das zählt als Nein.',

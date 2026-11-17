@@ -29,11 +29,11 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von William Shakespeare lernen?',
-          a: 'William Shakespeare (1564-1616) war ein englischer Dramatiker, und wir wissen fast nichts über ihn. Sechs Unterschriften sind erhalten, ein paar Kircheneinträge, und die Stücke. Die Stücke wissen alles. In ihnen wird er zum Mörder, zum König, zum verliebten Mädchen, zum Narren, der klar sieht, und aus jedem von ihnen heraus sagt er die Wahrheit. Bei ihm lernst du, einen Menschen von innen zu sehen statt von außen.',
+          a: 'William Shakespeare (1564-1616) war ein englischer Dramatiker, und wir wissen fast nichts über ihn. Sechs Unterschriften sind erhalten, ein paar Kircheneinträge, und die Stücke. Die Stücke wissen alles. In ihnen wird er zum Mörder, zum König, zum verliebten Mädchen, zum Narren, der klar sieht, und aus jedem von ihnen heraus sagt er die Wahrheit. Bei ihm lernt man, einen Menschen von innen zu sehen statt von außen.',
         },
         {
           q: 'Was hat William Shakespeare über Menschen gelehrt?',
-          a: 'Shakespeare zeigt Menschen als Vorgang, nicht als festen Typ. Die Psychologie seiner Zeit sagte, jeder Mensch habe ein festes Temperament. Seine Figuren sprengen das ständig. Jemand ist in einer Szene der liebende Bruder und in der nächsten der Mörder, und beides stimmt. Dafür baute er auch das Werkzeug. Im Monolog steht ein Mensch allein auf der Bühne und sagt, was er im vollen Raum nie sagen würde. So bekommst du den privaten Kopf und das öffentliche Gesicht im selben Stück. Sieh jemandem über fünf Akte zu, und die Identität zeigt sich als das Muster, das erst sichtbar wird, wenn alle Auftritte nebeneinanderliegen.',
+          a: 'Shakespeare zeigt Menschen als Vorgang, nicht als festen Typ. Die Psychologie seiner Zeit sagte, jeder Mensch habe ein festes Temperament. Seine Figuren sprengen das ständig. Jemand ist in einer Szene der liebende Bruder und in der nächsten der Mörder, und beides stimmt. Dafür baute er auch das Werkzeug. Im Monolog steht ein Mensch allein auf der Bühne und sagt, was er im vollen Raum nie sagen würde. So bekommt man den privaten Kopf und das öffentliche Gesicht im selben Stück. Wer jemandem über fünf Akte zusieht, dem zeigt sich die Identität als das Muster, das erst sichtbar wird, wenn alle Auftritte nebeneinanderliegen.',
         },
         {
           q: 'Was heißt es, der Natur den Spiegel vorzuhalten?',

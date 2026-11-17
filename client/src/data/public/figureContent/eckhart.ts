@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Meister Eckhart lernen?',
-          a: "Meister Eckhart (um 1260-1328) war ein deutscher Dominikaner. Er predigte auf schlichtem Deutsch, in einer Zeit, in der über Gott nur auf Latein gesprochen wurde. Einfachen Leuten sagte er das Gefährlichste, was er wusste. Das Tiefste in dir und das Tiefste in Gott sind ein und derselbe Grund. Die Kirche stellte ihn dafür vor Gericht. Bei ihm lernst du, aufzuhören, das festzuhalten, was du liebst.",
+          a: "Meister Eckhart (um 1260-1328) war ein deutscher Dominikaner. Er predigte auf schlichtem Deutsch, in einer Zeit, in der über Gott nur auf Latein gesprochen wurde. Einfachen Leuten sagte er das Gefährlichste, was er wusste. Das Tiefste im Menschen und das Tiefste in Gott sind ein und derselbe Grund. Die Kirche stellte ihn dafür vor Gericht. Bei ihm lernt man, aufzuhören, das festzuhalten, was man liebt.",
         },
         {
           q: 'Was hat Meister Eckhart gelehrt?',
-          a: "Meister Eckhart lehrte die Abgeschiedenheit, und er trieb sie weiter, als man erwartet. Lass die Dinge los. Dann die Bilder im Kopf. Dann die frommen Wünsche. Und zuletzt den eigenen Willen, der nach Gott greift. Was übrig bleibt, nennt er den Grund. Das ist die Stelle, an der der Boden der Seele und der Boden Gottes ein und derselbe Boden sind. Dazu kommt das Seelenfünklein, etwas Unerschaffenes in dir, an das kein Schaden herankommt. Und das Leben ohne Warum, ein Handeln, das aus dem kommt, was du bist, und nicht aus dem, was es dir einbringen soll.",
+          a: "Meister Eckhart lehrte die Abgeschiedenheit, und er trieb sie weiter, als man erwartet. Erst die Dinge loslassen. Dann die Bilder im Kopf. Dann die frommen Wünsche. Und zuletzt den eigenen Willen, der nach Gott greift. Was übrig bleibt, nennt er den Grund. Das ist die Stelle, an der der Boden der Seele und der Boden Gottes ein und derselbe Boden sind. Dazu kommt das Seelenfünklein, etwas Unerschaffenes im Menschen, an das kein Schaden herankommt. Und das Leben ohne Warum, ein Handeln, das aus dem kommt, was man ist, und nicht aus dem, was es einem einbringen soll.",
         },
         {
           q: 'Was ist das Seelenfünklein?',
-          a: "Das Seelenfünklein ist für Eckhart etwas in der Seele, das nie erschaffen wurde. Es teilt, sagt er, Gottes eigene Natur. Es ist keine Fähigkeit, die du dir über Jahre aufbaust. Es ist eine Gegenwart, und nichts kommt an sie heran. Sünde beschädigt sie nicht, Zeit macht sie nicht älter, Versagen macht sie nicht kleiner und Erfolg macht sie nicht größer. Das klingt fremd, wenn man gelernt hat, seinen Wert erst zu verdienen. Genau darauf zielt Eckhart. Was du dir verdienen wolltest, liegt längst da, unberührt, und wartet nur auf genug Stille.",
+          a: "Das Seelenfünklein ist für Eckhart etwas in der Seele, das nie erschaffen wurde. Es teilt, sagt er, Gottes eigene Natur. Es ist keine Fähigkeit, die man sich über Jahre aufbaut. Es ist eine Gegenwart, und nichts kommt an sie heran. Sünde beschädigt sie nicht, Zeit macht sie nicht älter, Versagen macht sie nicht kleiner und Erfolg macht sie nicht größer. Das klingt fremd, wenn man gelernt hat, seinen Wert erst zu verdienen. Genau darauf zielt Eckhart. Was man sich verdienen wollte, liegt längst da, unberührt, und wartet nur auf genug Stille.",
         },
       ],
       disclosure: {
@@ -92,7 +92,7 @@ export const fragment: FigureFragment = {
         {
           h2: 'Meister Eckhart einfach erklärt',
           body:
-            "Eckhart hat im Grunde einen Gedanken, und er wiederholt ihn in vielen Bildern. Tief in dir gibt es eine Stelle, die nicht gemacht wurde. Er nennt sie den Grund oder das Seelenfünklein. Dort, sagt er, sind Gott und Seele nicht zwei. Der Weg dorthin heißt Abgeschiedenheit. Loslassen, und zwar nicht nur den Besitz, sondern auch die Bilder im Kopf, die frommen Wünsche und am Ende sogar den Willen, der nach Gott greift. Was dann geschieht, nennt er die Geburt Gottes in der Seele. Und wie man danach lebt, nennt er ohne Warum. Nicht, um etwas zu bekommen, sondern so, wie das Leben lebt und nicht nach einem Warum fragt. Genau das machte ihn angreifbar. Er legte die höchste Erfahrung in jeden Menschen hinein.",
+            "Eckhart hat im Grunde einen Gedanken, und er wiederholt ihn in vielen Bildern. Tief in jedem Menschen gibt es eine Stelle, die nicht gemacht wurde. Er nennt sie den Grund oder das Seelenfünklein. Dort, sagt er, sind Gott und Seele nicht zwei. Der Weg dorthin heißt Abgeschiedenheit. Loslassen, und zwar nicht nur den Besitz, sondern auch die Bilder im Kopf, die frommen Wünsche und am Ende sogar den Willen, der nach Gott greift. Was dann geschieht, nennt er die Geburt Gottes in der Seele. Und wie man danach lebt, nennt er ohne Warum. Nicht, um etwas zu bekommen, sondern so, wie das Leben lebt und nicht nach einem Warum fragt. Genau das machte ihn angreifbar. Er legte die höchste Erfahrung in jeden Menschen hinein.",
         },
         {
           h2: 'Was ist deutsche Mystik?',
@@ -103,7 +103,7 @@ export const fragment: FigureFragment = {
           h2: "Was heißt bei Eckhart 'ohne Warum'?",
           seedId: 5,
           body:
-            "Ohne Warum ist Eckharts Formel für ein Handeln, das nicht auf Gegenleistung schielt. Die meisten guten Taten haben einen Zweck. Anerkennung, ein ruhiges Gewissen, ein besseres Jenseits. Für Eckhart ist das noch nicht frei. Frei ist eine Handlung erst, wenn sie aus dem kommt, was du bist, und nicht aus dem, was sie dir einbringen soll. Der fromme Zweck zählt für ihn dazu. Wer betet, um etwas zu bekommen, schaut Gott an wie eine Kuh, wegen der Milch. Damit verschiebt sich die ganze Ethik. Es geht nicht mehr darum, sich anzustrengen, sondern darum, der zu werden, aus dem das Richtige dann von selbst kommt.",
+            "Ohne Warum ist Eckharts Formel für ein Handeln, das nicht auf Gegenleistung schielt. Die meisten guten Taten haben einen Zweck. Anerkennung, ein ruhiges Gewissen, ein besseres Jenseits. Für Eckhart ist das noch nicht frei. Frei ist eine Handlung erst, wenn sie aus dem kommt, was man ist, und nicht aus dem, was sie einem einbringen soll. Der fromme Zweck zählt für ihn dazu. Wer betet, um etwas zu bekommen, schaut Gott an wie eine Kuh, wegen der Milch. Damit verschiebt sich die ganze Ethik. Es geht nicht mehr darum, sich anzustrengen, sondern darum, der zu werden, aus dem das Richtige dann von selbst kommt.",
         },
       ],
       ideaQuestion: 'Alles, was ich tue, muss zu etwas gut sein. Darf etwas einfach nur sein?',

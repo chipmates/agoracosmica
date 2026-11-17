@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Dōgen Zenji lernen?',
-          a: "Dōgen Zenji (1200-1253) war ein japanischer Zen-Meister und der Begründer der Sōtō-Schule in Japan. Eine Frage begleitete ihn von der Beerdigung seiner Mutter bis nach China und zurück. Wenn wir schon ganz sind, warum dann üben? Seine Antwort löste die Frage auf. Das Sitzen führt nicht zum Erwachen. Das Sitzen mit ganzem Herzen ist das Erwachen, und zwar jetzt. Bei ihm lernst du, dem nächsten Augenblick nicht mehr nachzujagen.",
+          a: "Dōgen Zenji (1200-1253) war ein japanischer Zen-Meister und der Begründer der Sōtō-Schule in Japan. Eine Frage begleitete ihn von der Beerdigung seiner Mutter bis nach China und zurück. Wenn wir schon ganz sind, warum dann üben? Seine Antwort löste die Frage auf. Das Sitzen führt nicht zum Erwachen. Das Sitzen mit ganzem Herzen ist das Erwachen, und zwar jetzt. Bei ihm lernt man, dem nächsten Augenblick nicht mehr nachzujagen.",
         },
         {
           q: 'Was hat Dōgen Zenji gelehrt?',
-          a: "Dōgen Zenji lehrte Shikantaza, das Nur-Sitzen. Du sitzt aufrecht, bleibst wach für den ganzen Körper und Geist und läufst den Gedanken weder nach noch schiebst du sie weg. Das ist die Übung, und sie bereitet nichts vor. Sein Kernsatz lautet: Übung und Erwachen sind eins, keine zwei Stufen, also gibt es auch keinen Preis in der Zukunft zu verdienen. Dazu kommt, dass die gewöhnliche Arbeit zählt. Kochen und Putzen mit voller Präsenz sind dasselbe Erwachen wie das Sitzen. Aufgeschrieben hat er das im Shōbōgenzō, in Faszikeln aus den Jahren 1231 bis 1253.",
+          a: "Dōgen Zenji lehrte Shikantaza, das Nur-Sitzen. Man sitzt aufrecht, bleibt wach für den ganzen Körper und Geist, läuft den Gedanken nicht nach und schiebt sie nicht weg. Das ist die Übung, und sie bereitet nichts vor. Sein Kernsatz lautet: Übung und Erwachen sind eins, keine zwei Stufen, also gibt es auch keinen Preis in der Zukunft zu verdienen. Dazu kommt, dass die gewöhnliche Arbeit zählt. Kochen und Putzen mit voller Präsenz sind dasselbe Erwachen wie das Sitzen. Aufgeschrieben hat er das im Shōbōgenzō, in Faszikeln aus den Jahren 1231 bis 1253.",
         },
         {
           q: 'Was ist Shikantaza?',
-          a: "Shikantaza heißt Nur-Sitzen. Stell dir vor, du setzt dich hin, weil es wirklich nichts anderes zu tun gibt. Dein Rücken richtet sich auf, ohne dass du es entscheidest. Deine Hände kommen zur Ruhe. Das Sitzen verlangt nichts, was darüber hinausgeht. Dieses vollständige Hingeben an diese Haltung und diesen Atem ist Shikantaza. Die Aufmerksamkeit bleibt wach, und die Gedanken werden weder verfolgt noch blockiert. Sie kommen, sie gehen, sie lösen sich selbst. Für die Verfassung, die das braucht, hat Dōgen ein Wort: Hishiryō, das Nicht-Denken. Es ist nicht Denken und nicht Leere im Kopf. Es ist ein Drittes.",
+          a: "Shikantaza heißt Nur-Sitzen. Man setzt sich hin, weil es wirklich nichts anderes zu tun gibt. Der Rücken richtet sich auf, ohne dass man es entscheidet. Die Hände kommen zur Ruhe. Das Sitzen verlangt nichts, was darüber hinausgeht. Dieses vollständige Hingeben an diese Haltung und diesen Atem ist Shikantaza. Die Aufmerksamkeit bleibt wach, und die Gedanken werden weder verfolgt noch blockiert. Sie kommen, sie gehen, sie lösen sich selbst. Für die Verfassung, die das braucht, hat Dōgen ein Wort: Hishiryō, das Nicht-Denken. Es ist nicht Denken und nicht Leere im Kopf. Es ist ein Drittes.",
         },
       ],
       disclosure: {
@@ -93,19 +93,19 @@ export const fragment: FigureFragment = {
           h2: 'Was ist Zazen?',
           seedId: 1,
           body:
-            "Zazen ist Sitzmeditation, und bei Dōgen ist sie eigenartiger, als es klingt. Die meisten Methoden wollen irgendwohin. Diese nicht. Du nimmst die Haltung ein, bleibst wach für Körper und Geist als Ganzes und lässt Gedanken kommen und gehen, ohne ihnen nachzulaufen und ohne gegen sie zu kämpfen. Die Haltung ist kein Aufwärmen für den geistigen Teil. In seiner Lehre ist die Haltung die Sache selbst, Buddha-Natur, die als ein still sitzender Mensch erscheint. So kann er sagen, dass das Sitzen schon das Erwachen ist, das du dir verdienen wolltest. Es fehlt nichts daran, also muss auch nichts dazukommen.",
+            "Zazen ist Sitzmeditation, und bei Dōgen ist sie eigenartiger, als es klingt. Die meisten Methoden wollen irgendwohin. Diese nicht. Man nimmt die Haltung ein, bleibt wach für Körper und Geist als Ganzes und lässt Gedanken kommen und gehen, ohne ihnen nachzulaufen und ohne gegen sie zu kämpfen. Die Haltung ist kein Aufwärmen für den geistigen Teil. In seiner Lehre ist die Haltung die Sache selbst, Buddha-Natur, die als ein still sitzender Mensch erscheint. So kann er sagen, dass das Sitzen schon das Erwachen ist, das man sich verdienen wollte. Es fehlt nichts daran, also muss auch nichts dazukommen.",
         },
         {
           h2: 'Dōgen einfach erklärt',
           body:
-            "Dōgen dreht die übliche Reihenfolge um. Sonst heißt es: erst üben, dann erwachen. Bei ihm ist beides eins. Wer sich ganz auf das Sitzen einlässt, übt nicht auf etwas hin, sondern drückt genau das aus, was er ohnehin schon ist. Daraus folgt der Rest. Erstens: Es gibt nichts zu erreichen, also auch keinen Grund, den nächsten Augenblick zu jagen. Zweitens: Der Körper macht mit. Die genaue Haltung ist nicht Vorbereitung, sie ist die Übung. Drittens: Der Alltag zählt. Kochen und Putzen mit voller Aufmerksamkeit sind dasselbe wie Sitzen. Und viertens: Zeit ist nicht etwas, das an dir vorbeizieht. Jeder Augenblick ist vollständig.",
+            "Dōgen dreht die übliche Reihenfolge um. Sonst heißt es: erst üben, dann erwachen. Bei ihm ist beides eins. Wer sich ganz auf das Sitzen einlässt, übt nicht auf etwas hin, sondern drückt genau das aus, was er ohnehin schon ist. Daraus folgt der Rest. Erstens: Es gibt nichts zu erreichen, also auch keinen Grund, den nächsten Augenblick zu jagen. Zweitens: Der Körper macht mit. Die genaue Haltung ist nicht Vorbereitung, sie ist die Übung. Drittens: Der Alltag zählt. Kochen und Putzen mit voller Aufmerksamkeit sind dasselbe wie Sitzen. Und viertens: Zeit ist nicht etwas, das an uns vorbeizieht. Jeder Augenblick ist vollständig.",
         },
       ],
       ideaQuestion: 'Ich warte ständig darauf, dass mein richtiges Leben anfängt. Wann fängt es an?',
       works: [
         {
           title: 'Fukanzazengi (Allgemeine Empfehlung für Zazen)',
-          note: 'Seine Anleitung zum Sitzen, zuerst um 1227 geschrieben und ein Leben lang überarbeitet. Sehr kurz. Wenn du nur einen Text von ihm liest, dann diesen.',
+          note: 'Seine Anleitung zum Sitzen, zuerst um 1227 geschrieben und ein Leben lang überarbeitet. Sehr kurz. Wer nur einen Text von ihm lesen will, nimmt diesen.',
         },
         {
           title: 'Bendōwa',

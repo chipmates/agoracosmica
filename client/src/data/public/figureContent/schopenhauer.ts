@@ -33,11 +33,11 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was hat Arthur Schopenhauer gelehrt?',
-          a: 'Arthur Schopenhauer lehrte, dass hinter allem eine einzige blinde Kraft steht. Er nannte sie den Willen. Es ist derselbe Drang, der einen Stein zu Boden zieht und einen Menschen wollen lässt. Alles, was du wahrnimmst, ist Vorstellung, gebaut aus Raum, Zeit und Ursache, also aus dem, was dein Verstand mitbringt. Die Welt selbst triffst du nie, nur das, was dein Erkennen aus ihr macht. Dahinter sitzt der Wille, und der kommt nie zur Ruhe. Deshalb ist die Zufriedenheit immer kürzer als das Wollen. Ein Satz von ihm hat alles andere überlebt: Der Mensch kann tun, was er will, aber er kann nicht wollen, was er will.',
+          a: 'Arthur Schopenhauer lehrte, dass hinter allem eine einzige blinde Kraft steht. Er nannte sie den Willen. Es ist derselbe Drang, der einen Stein zu Boden zieht und einen Menschen wollen lässt. Alles, was wir wahrnehmen, ist Vorstellung, gebaut aus Raum, Zeit und Ursache, also aus dem, was unser Verstand mitbringt. Die Welt selbst treffen wir nie, nur das, was unser Erkennen aus ihr macht. Dahinter sitzt der Wille, und der kommt nie zur Ruhe. Deshalb ist die Zufriedenheit immer kürzer als das Wollen. Ein Satz von ihm hat alles andere überlebt: Der Mensch kann tun, was er will, aber er kann nicht wollen, was er will.',
         },
         {
           q: 'Was ist das principium individuationis bei Schopenhauer?',
-          a: 'Das principium individuationis ist Schopenhauers Name für das, was uns getrennt aussehen lässt. Stell dir eine einzelne Lampe vor, die nachts am Flussufer brennt. Schau auf das bewegte Wasser, und du zählst zwanzig Lichter, wo nur eines ist. Genau das tun Raum und Zeit mit der Wirklichkeit. Sie zerbrechen das eine, ungeteilte Sein in den Anschein vieler getrennter Dinge. Wer diesen Anschein durchdringt, für den ist das Leid eines anderen nicht mehr nur dessen Leid.',
+          a: 'Das principium individuationis ist Schopenhauers Name für das, was uns getrennt aussehen lässt. Nachts brennt am Flussufer eine einzelne Lampe. Wer auf das bewegte Wasser schaut, zählt zwanzig Lichter, wo nur eines ist. Genau das tun Raum und Zeit mit der Wirklichkeit. Sie zerbrechen das eine, ungeteilte Sein in den Anschein vieler getrennter Dinge. Wer diesen Anschein durchdringt, für den ist das Leid eines anderen nicht mehr nur dessen Leid.',
         },
       ],
       disclosure: {
@@ -84,12 +84,12 @@ export const fragment: FigureFragment = {
           h2: 'Was ist Schopenhauers Pendel zwischen Schmerz und Langeweile?',
           seedId: 1,
           body:
-            'Schopenhauer beginnt hier nicht mit einer Theorie, sondern mit etwas, das du selbst prüfen kannst. Du willst etwas, und das Wollen tut weh. Dann bekommst du es, und die Erleichterung hält kurz. Danach kommt Langeweile, und die Langeweile erzeugt das nächste Wollen. Sein Bild dafür ist ein Pendel. Er schreibt: So schwingt sein Leben wie ein Pendel hin und her zwischen Schmerz und Langeweile, und diese beiden sind in der Tat seine letzten Bestandteile. Einen ruhigen Punkt in der Mitte gibt es nicht. Dahinter sieht er den Willen zum Leben, ein blindes Streben, das niemals zur Ruhe kommt. Gemeint ist das als Diagnose, nicht als schlechte Laune.',
+            'Schopenhauer beginnt hier nicht mit einer Theorie, sondern mit etwas, das jeder selbst prüfen kann. Man will etwas, und das Wollen tut weh. Dann bekommt man es, und die Erleichterung hält kurz. Danach kommt Langeweile, und die Langeweile erzeugt das nächste Wollen. Sein Bild dafür ist ein Pendel. Er schreibt: So schwingt sein Leben wie ein Pendel hin und her zwischen Schmerz und Langeweile, und diese beiden sind in der Tat seine letzten Bestandteile. Einen ruhigen Punkt in der Mitte gibt es nicht. Dahinter sieht er den Willen zum Leben, ein blindes Streben, das niemals zur Ruhe kommt. Gemeint ist das als Diagnose, nicht als schlechte Laune.',
         },
         {
           h2: 'Arthur Schopenhauer einfach erklärt',
           body:
-            'Schopenhauer teilt die Welt in zwei Seiten. Die eine ist die Vorstellung: alles, was du wahrnimmst, gebaut aus Raum, Zeit und Ursache. Die andere Seite ist der Wille. Damit meint er nicht deine Absichten, sondern ein blindes Drängen, das in allem steckt, im fallenden Stein genauso wie im Ehrgeiz ganzer Völker. Weil dieser Wille nie satt wird, pendelt das Leben zwischen Schmerz und Langeweile. Bis hierhin klingt es hoffnungslos. So hat er es aber nicht stehen lassen. Er beschreibt Auswege. Die Kunst, in der du für Momente nur noch schaust und nichts mehr willst. Das Mitleid, in dem die Grenze zum anderen kurz fällt. Und die Askese, das Aufgeben des Wollens selbst.',
+            'Schopenhauer teilt die Welt in zwei Seiten. Die eine ist die Vorstellung: alles, was wir wahrnehmen, gebaut aus Raum, Zeit und Ursache. Die andere Seite ist der Wille. Damit meint er nicht unsere Absichten, sondern ein blindes Drängen, das in allem steckt, im fallenden Stein genauso wie im Ehrgeiz ganzer Völker. Weil dieser Wille nie satt wird, pendelt das Leben zwischen Schmerz und Langeweile. Bis hierhin klingt es hoffnungslos. So hat er es aber nicht stehen lassen. Er beschreibt Auswege. Die Kunst, in der man für Momente nur noch schaut und nichts mehr will. Das Mitleid, in dem die Grenze zum anderen kurz fällt. Und die Askese, das Aufgeben des Wollens selbst.',
         },
       ],
       ideaQuestion: 'Das Leid anderer erreicht mich kaum noch. Kann das zurückkommen?',

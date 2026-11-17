@@ -13,7 +13,7 @@ Dates are commit dates from this repository's history. A version reaches visitor
 
 ## 1.3.0, from 28 October 2026
 
-Written on 2026-10-28.
+Written on 2026-10-28. Revised in wording on 2026-11-17: the German card speaks to the visitor with Sie instead of du, with the same facts and the same version, so earlier answers stand. The quote below is the current German.
 
 **What changed from 1.2.0.** Only the list of steps on the card. The app's chat ends with this version, so of the steps 1.2.0 named only two still send anything: the yes itself and 30 seconds of listening. The first sentence of the fine print became two sentences, what a yes sends and what Google learns from it. Every other word of the card stays as in 1.2.0. With it, a click on a Start Exploring button sends no conversion any more ([`marketing/public/agc-public.js`](../marketing/public/agc-public.js)), and the worker refuses every step but these two ([`workers/llm-proxy/src/routes/conversions.ts`](../workers/llm-proxy/src/routes/conversions.ts)). **Re-ask:** every 1.2.0 yes is asked again. A no stays a no.
 
@@ -24,10 +24,10 @@ Written on 2026-10-28.
 **What it says**, German:
 
 > Eine Frage zu dieser Anzeige
-> **Dürfen wir deinen Besuch für Google zählen?**
+> **Dürfen wir Ihren Besuch für Google zählen?**
 > Wir sind klein und gemeinnützig, und Google schenkt uns diese Anzeigen. Gezählte Besuche helfen ihnen, mehr Menschen zu erreichen, die dasselbe suchen.
-> Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30 Sekunden zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich. Dein Browser merkt sich deine Antwort ein Jahr lang. Ausschalten kannst du das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.
-> Bist du unter 16, sag bitte Nein.
+> Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige Sie zu uns gebracht hat und ob Sie 30 Sekunden zugehört haben. Google kann sie Ihrem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über Sie. Ihr Browser merkt sich Ihre Antwort ein Jahr lang. Ausschalten können Sie das jederzeit unten auf jeder Seite unter „Werbe-Messung“. So oder so bleibt die Bibliothek offen.
+> Sind Sie unter 16, sagen Sie bitte Nein.
 > [Ja, zählen] [Nein, nicht zählen]
 > Code ansehen · Datenschutzerklärung · Wie Google das nutzt
 

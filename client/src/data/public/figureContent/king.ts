@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Martin Luther King Jr. lernen?',
-          a: "Martin Luther King Jr. (1929-1968) war ein Baptistenpfarrer. Er führte die Bewegung an, die in den USA die gesetzliche Rassentrennung beendete. Liebe war für ihn kein weiches Gefühl. Er nannte sie Agape und behandelte sie wie eine Disziplin, stark genug, dem Unrecht entgegenzutreten, ohne selbst so zu werden. Mit neununddreißig wurde er getötet. Bei King lernst du, Widerstand zu leisten, ohne zu hassen.",
+          a: "Martin Luther King Jr. (1929-1968) war ein Baptistenpfarrer. Er führte die Bewegung an, die in den USA die gesetzliche Rassentrennung beendete. Liebe war für ihn kein weiches Gefühl. Er nannte sie Agape und behandelte sie wie eine Disziplin, stark genug, dem Unrecht entgegenzutreten, ohne selbst so zu werden. Mit neununddreißig wurde er getötet. Bei King lernt man, Widerstand zu leisten, ohne zu hassen.",
         },
         {
           q: 'Was hat Martin Luther King Jr. gelehrt?',
-          a: "Martin Luther King Jr. lehrte den gewaltfreien Widerstand. Drei Gedanken tragen ihn. Agape ist eine Liebe, die das Wohl aller sucht, auch das Wohl derer, die dir schaden. King nahm sie aus der christlichen Theologie und aus dem Bostoner Personalismus, den er für seine Doktorarbeit studierte. Die kreative Spannung ist die Methode. Eine gewaltfreie Aktion macht verstecktes Unrecht so sichtbar, dass eine Stadt, die nie reden wollte, reden muss. Die geliebte Gemeinschaft ist das Ziel, eine Gesellschaft, die Streit mit Gerechtigkeit und Wiedergutmachung löst statt mit Sieg und Niederlage. Aufgeschrieben hat er das in Aufbruch zur Freiheit (1958), Kraft zu lieben (1963) und im Brief aus dem Gefängnis von Birmingham (1963).",
+          a: "Martin Luther King Jr. lehrte den gewaltfreien Widerstand. Drei Gedanken tragen ihn. Agape ist eine Liebe, die das Wohl aller sucht, auch das Wohl derer, die einem schaden. King nahm sie aus der christlichen Theologie und aus dem Bostoner Personalismus, den er für seine Doktorarbeit studierte. Die kreative Spannung ist die Methode. Eine gewaltfreie Aktion macht verstecktes Unrecht so sichtbar, dass eine Stadt, die nie reden wollte, reden muss. Die geliebte Gemeinschaft ist das Ziel, eine Gesellschaft, die Streit mit Gerechtigkeit und Wiedergutmachung löst statt mit Sieg und Niederlage. Aufgeschrieben hat er das in Aufbruch zur Freiheit (1958), Kraft zu lieben (1963) und im Brief aus dem Gefängnis von Birmingham (1963).",
         },
         {
           q: 'Wie unterschied Martin Luther King Jr. gerechte von ungerechten Gesetzen?',
-          a: "King übernahm den Maßstab aus dem Naturrecht, aus der Tradition von Thomas von Aquin. Ein gerechtes Gesetz stimmt mit dem Moralgesetz überein und schützt die Menschenwürde. Ein ungerechtes Gesetz erniedrigt den Menschen, oder es bindet die eine Gruppe und lässt die andere frei, oder es wird Leuten auferlegt, die nie gefragt wurden. Deshalb war Ungehorsam für ihn keine Straftat, sondern eine Pflicht. Du brichst ein solches Gesetz offen und trägst die Strafe, und genau darin liegt für King der höchste Respekt vor dem Recht. Ausgeführt hat er das im Brief aus dem Gefängnis von Birmingham (1963).",
+          a: "King übernahm den Maßstab aus dem Naturrecht, aus der Tradition von Thomas von Aquin. Ein gerechtes Gesetz stimmt mit dem Moralgesetz überein und schützt die Menschenwürde. Ein ungerechtes Gesetz erniedrigt den Menschen, oder es bindet die eine Gruppe und lässt die andere frei, oder es wird Leuten auferlegt, die nie gefragt wurden. Deshalb war Ungehorsam für ihn keine Straftat, sondern eine Pflicht. Man bricht ein solches Gesetz offen und trägt die Strafe, und genau darin liegt für King der höchste Respekt vor dem Recht. Ausgeführt hat er das im Brief aus dem Gefängnis von Birmingham (1963).",
         },
       ],
       disclosure: {
@@ -84,7 +84,7 @@ export const fragment: FigureFragment = {
           h2: 'Was ist Agape-Liebe bei Martin Luther King?',
           seedId: 2,
           body:
-            "Agape ist ein griechisches Wort für Liebe. Die Griechen hatten mehrere davon, und King brauchte genau dieses. Agape ist keine Zuneigung und kein Sympathiegefühl. Sie ist die feste Entscheidung, das Wohl jedes Menschen zu wollen, auch das Wohl dessen, der dir schadet. Sein Grund dafür war ganz praktisch. Hass würde dich in genau das hineinziehen, wogegen du kämpfst. King trennte Liebe und Macht auch nicht. Macht ohne Liebe wird missbräuchlich. Liebe ohne Macht bleibt wirkungslos. Zusammen kannst du hart gegen ein Unrecht vorgehen und die Menschen auf der anderen Seite trotzdem als Menschen behandeln.",
+            "Agape ist ein griechisches Wort für Liebe. Die Griechen hatten mehrere davon, und King brauchte genau dieses. Agape ist keine Zuneigung und kein Sympathiegefühl. Sie ist die feste Entscheidung, das Wohl jedes Menschen zu wollen, auch das Wohl dessen, der einem schadet. Sein Grund dafür war ganz praktisch. Hass würde einen in genau das hineinziehen, wogegen man kämpft. King trennte Liebe und Macht auch nicht. Macht ohne Liebe wird missbräuchlich. Liebe ohne Macht bleibt wirkungslos. Zusammen kann man hart gegen ein Unrecht vorgehen und die Menschen auf der anderen Seite trotzdem als Menschen behandeln.",
         },
         {
           h2: 'Was ist kreative Spannung?',

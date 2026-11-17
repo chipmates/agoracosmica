@@ -466,7 +466,7 @@ const title = (n: number) => stories.find(e => e.n === n)?.title ?? '';
 const unplaced = at.map((_, i) => i).filter(i => !nextAt[i]).map(i => numbers[i]!);
 // The map's note where the stories' years do not follow the life's order (a placeholder for the writer).
 const mapNoteLoose = lang === 'de'
-  ? 'Jeder Stern ist eine Geschichte. Wähle einen Stern, und die Geschichte öffnet sich.'
+  ? 'Jeder Stern ist eine Geschichte. Wer einen Stern wählt, öffnet seine Geschichte.'
   : 'Each star is one story. Choose a star and the story opens.';
 ---
 {constellation && at.length > 1 && (

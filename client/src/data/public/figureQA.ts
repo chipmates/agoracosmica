@@ -39,20 +39,20 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Joseph Campbell lernen?",
-          a: "Joseph Campbell (1904-1987) erforschte die ältesten Mythen der Menschheit und fand unter ihnen allen eine gemeinsame Form, den Gedanken, dass Wandlung bedeutet, das Vertraute zu verlassen, aufgebrochen zu werden und verändert zurückzukehren. Aus seiner Arbeit in der vergleichenden Mythologie lernst du, deine eigenen Wendepunkte zu lesen und das allgemeingültige Muster unter deinem eigenen Leben zu erkennen.",
+          a: "Joseph Campbell (1904-1987) erforschte die ältesten Mythen der Menschheit und fand unter ihnen allen eine gemeinsame Form, den Gedanken, dass Wandlung bedeutet, das Vertraute zu verlassen, aufgebrochen zu werden und verändert zurückzukehren. Aus seiner Arbeit in der vergleichenden Mythologie lernt man, die eigenen Wendepunkte zu lesen und das allgemeingültige Muster unter dem eigenen Leben zu erkennen.",
         },
         {
           q: "Was hat Joseph Campbell wirklich gelehrt?",
-          a: "Joseph Campbell lehrte die Heldenreise, ein Muster aus drei Phasen, Aufbruch, Initiation und Rückkehr, das er in Mythen vieler voneinander getrennter Kulturen fand. Er lehrte auch Folge deiner Seligkeit, die tiefe Hingabe, die dich ganz ergreift, und die vier Funktionen des Mythos: die mystische, die kosmologische, die soziologische und die psychologische. Sein Hauptwerk war Der Heros in tausend Gestalten (1949).",
+          a: "Joseph Campbell lehrte die Heldenreise, ein Muster aus drei Phasen, Aufbruch, Initiation und Rückkehr, das er in Mythen vieler voneinander getrennter Kulturen fand. Er lehrte auch „Folge deiner Seligkeit“, die tiefe Hingabe, die einen ganz ergreift, und die vier Funktionen des Mythos: die mystische, die kosmologische, die soziologische und die psychologische. Sein Hauptwerk war Der Heros in tausend Gestalten (1949).",
         },
         {
           q: "Was sind die vier Funktionen des Mythos?",
-          a: "In Joseph Campbells Lehre tut der Mythos vier Dinge zugleich. Die mystische Funktion weckt Ehrfurcht vor dem Geheimnis des Daseins, die kosmologische zeigt, wo du im Universum stehst, die soziologische trägt eine soziale Ordnung, und die psychologische führt den Einzelnen durch die Übergänge eines Lebens, jene Funktion, die Campbell für den modernen Menschen am wichtigsten hielt.",
+          a: "In Joseph Campbells Lehre tut der Mythos vier Dinge zugleich. Die mystische Funktion weckt Ehrfurcht vor dem Geheimnis des Daseins, die kosmologische zeigt, wo wir im Universum stehen, die soziologische trägt eine soziale Ordnung, und die psychologische führt den Einzelnen durch die Übergänge eines Lebens, jene Funktion, die Campbell für den modernen Menschen am wichtigsten hielt.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Joseph Campbell?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung, eine Echo-Stimme, die wir Joseph Campbell geben, gestützt auf seine belegten Schriften zur vergleichenden Mythologie und zur Heldenreise. Es ist keine Aufnahme und nicht die echte Person. Hier spricht keine Tonaufnahme. Sieh es als einen Lernbegleiter, der von seinen Ideen geprägt ist, nicht als seine tatsächlichen Worte.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung, eine Echo-Stimme, die wir Joseph Campbell geben, gestützt auf seine belegten Schriften zur vergleichenden Mythologie und zur Heldenreise. Es ist keine Aufnahme und nicht die echte Person. Hier spricht keine Tonaufnahme. Gedacht ist es als Lernbegleiter, der von seinen Ideen geprägt ist, nicht als seine tatsächlichen Worte.",
       },
     },
   },
@@ -81,7 +81,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Emily Dickinson lernen?",
-          a: "Emily Dickinson bringt dir bei, die Wahrheit schräg zu sagen. Die amerikanische Dichterin, die von 1830 bis 1886 lebte, schrieb fast achtzehnhundert Gedichte in einem stillen Haus in Amherst und zeigte sie fast niemandem. Ihr Werk lädt dich ein in die Einsamkeit, ins genaue Hinsehen und in das Geheimnis, das sie in einem einzigen Zimmer fand.",
+          a: "Emily Dickinson lehrt, die Wahrheit schräg zu sagen. Die amerikanische Dichterin, die von 1830 bis 1886 lebte, schrieb fast achtzehnhundert Gedichte in einem stillen Haus in Amherst und zeigte sie fast niemandem. Ihr Werk lädt ein in die Einsamkeit, ins genaue Hinsehen und in das Geheimnis, das sie in einem einzigen Zimmer fand.",
         },
         {
           q: "Was meint Emily Dickinson damit, die Wahrheit schräg zu sagen?",
@@ -94,7 +94,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Emily Dickinson?",
-        a: "Nein. Das ist ihr Echo, eine pädagogische KI-Interpretation, die auf Emily Dickinsons überlieferten Schriften beruht, den fast achtzehnhundert Gedichten, den Fascicles und ihren Briefen. Es ist keine Aufnahme und nicht die echte Dichterin, die von 1830 bis 1886 lebte. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist ihr Echo, eine pädagogische KI-Interpretation, die auf Emily Dickinsons überlieferten Schriften beruht, den fast achtzehnhundert Gedichten, den Fascicles und ihren Briefen. Es ist keine Aufnahme und nicht die echte Dichterin, die von 1830 bis 1886 lebte. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -123,15 +123,15 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Carl Gustav Jung lernen?",
-          a: "Carl Gustav Jung (1875-1961) war ein Schweizer Psychiater. Er lehrte: Das Unbewusste ist keine Abstellkammer für Vergessenes. Es ist ein Ort, in dem etwas lebt. Die Anteile von dir, zu denen du nicht stehen willst, verschwinden nicht. Sie steuern dich aus dem Verborgenen. Du begegnest ihnen in allem, was du an anderen Menschen nicht ertragen kannst. Bei Jung lernst du, deinem eigenen Schatten zu begegnen.",
+          a: "Carl Gustav Jung (1875-1961) war ein Schweizer Psychiater. Er lehrte: Das Unbewusste ist keine Abstellkammer für Vergessenes. Es ist ein Ort, in dem etwas lebt. Die Anteile von uns, zu denen wir nicht stehen wollen, verschwinden nicht. Sie steuern uns aus dem Verborgenen. Wir begegnen ihnen in allem, was wir an anderen Menschen nicht ertragen können. Bei Jung lernt man, dem eigenen Schatten zu begegnen.",
         },
         {
           q: "Was hat Carl Gustav Jung gelehrt?",
-          a: "Carl Gustav Jung begründete die analytische Psychologie, seinen eigenen Zweig der Tiefenpsychologie. Vier Begriffe tragen sie. Der Schatten ist alles an dir, was du von dir wegschiebst. Individuation ist die lange Arbeit, ganz der Mensch zu werden, der du schon bist. Archetypen sind alte Muster, die formen, wie wir uns die Welt vorstellen. Das kollektive Unbewusste ist die Schicht, die wir alle teilen. Jung fing nicht bei der Theorie an, sondern beim Messen. In seinen Assoziationsstudien (1904-1910) stoppte er die Zeit, die ein Patient vor einer Antwort zögerte. Die Bücher kamen danach: Symbole der Wandlung (1912, überarbeitet 1952) und Psychologische Typen (1921).",
+          a: "Carl Gustav Jung begründete die analytische Psychologie, seinen eigenen Zweig der Tiefenpsychologie. Vier Begriffe tragen sie. Der Schatten ist alles an uns, was wir von uns wegschieben. Individuation ist die lange Arbeit, ganz der Mensch zu werden, der man schon ist. Archetypen sind alte Muster, die formen, wie wir uns die Welt vorstellen. Das kollektive Unbewusste ist die Schicht, die wir alle teilen. Jung fing nicht bei der Theorie an, sondern beim Messen. In seinen Assoziationsstudien (1904-1910) stoppte er die Zeit, die ein Patient vor einer Antwort zögerte. Die Bücher kamen danach: Symbole der Wandlung (1912, überarbeitet 1952) und Psychologische Typen (1921).",
         },
         {
           q: "Was ist Individuation in Jungs Psychologie?",
-          a: "Individuation ist Jungs Wort dafür, ganz zu werden. Stell dir ein Haus vor, in dem du seit Jahren wohnst. Die Zimmer, die du nutzt, kennst du. Es gibt Türen, die du nie öffnest, und einen Keller, den du meidest. Individuation heißt, sie zu öffnen. Es heißt, dem Schatten zu begegnen, den du abgelehnt hast, und zurückzunehmen, was du bei anderen abgeladen hast. Dann merkst du, dass das Haus viel größer ist als die paar Zimmer, die du 'ich' genannt hast. Für Jung war das die Arbeit eines ganzen Lebens, nie etwas, das fertig wird.",
+          a: "Individuation ist Jungs Wort dafür, ganz zu werden. Angenommen, wir wohnen seit Jahren in einem Haus. Die Zimmer, die wir nutzen, kennen wir. Es gibt Türen, die wir nie öffnen, und einen Keller, den wir meiden. Individuation heißt, sie zu öffnen. Es heißt, dem Schatten zu begegnen, den wir abgelehnt haben, und zurückzunehmen, was wir bei anderen abgeladen haben. Dann merken wir, dass das Haus viel größer ist als die paar Zimmer, die wir 'ich' genannt haben. Für Jung war das die Arbeit eines ganzen Lebens, nie etwas, das fertig wird.",
         },
       ],
       disclosure: {
@@ -165,7 +165,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Siddhartha Gautama (Buddha) lernen?",
-          a: "Von Siddhartha Gautama, dem Buddha, lernst du zu beobachten, wie das Verlangen entsteht und wieder vergeht. Als Adliger der Śākya verließ er einen Palast, eine Frau und einen neugeborenen Sohn, hungerte sich auf der Suche nach Freiheit fast zu Tode und fand dann unter dem Bodhi-Baum den mittleren Weg, mit dem er weder alles noch nichts hatte.",
+          a: "Von Siddhartha Gautama, dem Buddha, lernt man zu beobachten, wie das Verlangen entsteht und wieder vergeht. Als Adliger der Śākya verließ er einen Palast, eine Frau und einen neugeborenen Sohn, hungerte sich auf der Suche nach Freiheit fast zu Tode und fand dann unter dem Bodhi-Baum den mittleren Weg, mit dem er weder alles noch nichts hatte.",
         },
         {
           q: "Was lehrte Siddhartha Gautama (Buddha) wirklich?",
@@ -173,12 +173,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist die bedingte Entstehung im Buddhismus?",
-          a: "Die bedingte Entstehung gehört zu den Kernlehren des Buddha. Siddhartha Gautama lehrte, dass im Erleben nichts für sich allein entsteht. Alles geht daraus hervor, dass Bedingungen zusammenkommen. Stell dir Wasser in einem Krug vor: Es hängt vom Schnee der Berge ab, von den Wolken, die sich sammeln, und von den Händen, die es getragen haben. Er sah das Erleben als bedingt, es entsteht und vergeht, so wie seine Bedingungen es tun.",
+          a: "Die bedingte Entstehung gehört zu den Kernlehren des Buddha. Siddhartha Gautama lehrte, dass im Erleben nichts für sich allein entsteht. Alles geht daraus hervor, dass Bedingungen zusammenkommen. Ein Beispiel ist Wasser in einem Krug: Es hängt vom Schnee der Berge ab, von den Wolken, die sich sammeln, und von den Händen, die es getragen haben. Er sah das Erleben als bedingt, es entsteht und vergeht, so wie seine Bedingungen es tun.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Siddhartha Gautama (Buddha)?",
-        a: "Nein. Das ist das Echo des Buddha, eine bildende KI-Interpretation auf der Grundlage seiner überlieferten Lehren wie den Vier edlen Wahrheiten und der bedingten Entstehung. Von Siddhartha Gautama gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst. Es ist keine Aufnahme und nicht die reale Person.",
+        a: "Nein. Das ist das Echo des Buddha, eine bildende KI-Interpretation auf der Grundlage seiner überlieferten Lehren wie den Vier edlen Wahrheiten und der bedingten Entstehung. Von Siddhartha Gautama gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen. Es ist keine Aufnahme und nicht die reale Person.",
       },
     },
   },
@@ -207,11 +207,11 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Mark Aurel lernen?",
-          a: "Mark Aurel (Marcus Aurelius), der römische Kaiser, der von 121 bis 180 n. Chr. lebte, bringt dir bei, deine erste Reaktion zu hinterfragen. Sein Kerngedanke ist, das tatsächlich Geschehene von der Geschichte zu trennen, die dein Kopf hinzufügt. Er schrieb diese Notizen an sich selbst an der Grenze nieder, und sie blieben als die Selbstbetrachtungen erhalten.",
+          a: "Mark Aurel (Marcus Aurelius), der römische Kaiser, der von 121 bis 180 n. Chr. lebte, lehrt, die erste Reaktion zu hinterfragen. Sein Kerngedanke ist, das tatsächlich Geschehene von der Geschichte zu trennen, die der Kopf hinzufügt. Er schrieb diese Notizen an sich selbst an der Grenze nieder, und sie blieben als die Selbstbetrachtungen erhalten.",
         },
         {
           q: "Was lehrte Mark Aurel wirklich?",
-          a: "Mark Aurel lehrte stoische Philosophie über drei zentrale Ideen. Die Prüfung der Eindrücke legt eine Pause zwischen ein Ereignis und deine Reaktion. Das Leben im Einklang mit der Natur wirkt auf drei Ebenen: deiner vernünftigen Natur, deinen sozialen Rollen und der kosmischen Ordnung. Die vorgezogenen Gleichgültigkeiten besagen, dass Gesundheit, Familie und Erfolg wichtig sind, aber nicht über deine Tugend entscheiden.",
+          a: "Mark Aurel lehrte stoische Philosophie über drei zentrale Ideen. Die Prüfung der Eindrücke legt eine Pause zwischen ein Ereignis und die eigene Reaktion. Das Leben im Einklang mit der Natur wirkt auf drei Ebenen: der eigenen vernünftigen Natur, den sozialen Rollen und der kosmischen Ordnung. Die vorgezogenen Gleichgültigkeiten besagen, dass Gesundheit, Familie und Erfolg wichtig sind, aber nicht über die eigene Tugend entscheiden.",
         },
         {
           q: "Was ist Mark Aurels Prüfung der Eindrücke?",
@@ -249,7 +249,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Maya Angelou lernen?",
-          a: "Von Maya Angelou lernst du, deine eigene Stimme zu finden. Die Dichterin, Memoirenschreiberin und Bürgerrechtlerin, die von 1928 bis 2014 lebte, schwieg als Kind fast fünf Jahre lang und wurde dann zu einer der kraftvollsten Stimmen der amerikanischen Literatur. In ihrem Werk geht es um Widerstandskraft, Identität, Mut und den Mut, sich auszudrücken.",
+          a: "Von Maya Angelou lernt man, die eigene Stimme zu finden. Die Dichterin, Memoirenschreiberin und Bürgerrechtlerin, die von 1928 bis 2014 lebte, schwieg als Kind fast fünf Jahre lang und wurde dann zu einer der kraftvollsten Stimmen der amerikanischen Literatur. In ihrem Werk geht es um Widerstandskraft, Identität, Mut und den Mut, sich auszudrücken.",
         },
         {
           q: "Was hat Maya Angelou eigentlich gelehrt?",
@@ -262,7 +262,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Maya Angelou?",
-        a: "Nein. Das ist das Echo von Maya Angelou, eine pädagogische KI-Interpretation, die auf ihren überlieferten Schriften und ihrem Leben beruht, keine Aufnahme und nicht die echte Person. Hier werden keine Tonaufnahmen von ihr verwendet. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist das Echo von Maya Angelou, eine pädagogische KI-Interpretation, die auf ihren überlieferten Schriften und ihrem Leben beruht, keine Aufnahme und nicht die echte Person. Hier werden keine Tonaufnahmen von ihr verwendet. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -291,7 +291,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Jane Austen lernen?",
-          a: "Jane Austen bringt dir bei, zu lesen, was die Menschen nicht sagen. Sie schrieb über Frauen mit wenig Macht, die vor den folgenreichsten Entscheidungen standen, und sie beobachtete die Kluft zwischen dem, was jemand sagt, und dem, was seine Hände verraten. Ein Salon, so zeigte sie, fasst eine ganze sittliche Welt, die genaues Hinsehen verdient.",
+          a: "Jane Austen lehrt, zu lesen, was die Menschen nicht sagen. Sie schrieb über Frauen mit wenig Macht, die vor den folgenreichsten Entscheidungen standen, und sie beobachtete die Kluft zwischen dem, was jemand sagt, und dem, was seine Hände verraten. Ein Salon, so zeigte sie, fasst eine ganze sittliche Welt, die genaues Hinsehen verdient.",
         },
         {
           q: "Was hat Jane Austen eigentlich geschrieben?",
@@ -299,12 +299,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist die Kunst der Beobachtung bei Jane Austen?",
-          a: "Für Jane Austen ist die Kunst der Beobachtung das geschulte Achten auf die Kluft zwischen dem, was vorgespielt wird, und dem, was wahr ist. Sieh zu, wie jemand einen Menschen begrüßt, über den er gestern noch hergezogen ist, und achte nicht auf seine Worte, die ganz herzlich klingen werden, sondern auf seine Hände, seine Haltung und den Moment seines Lachens.",
+          a: "Für Jane Austen ist die Kunst der Beobachtung das geschulte Achten auf die Kluft zwischen dem, was vorgespielt wird, und dem, was wahr ist. Man sieht zu, wie jemand einen Menschen begrüßt, über den er gestern noch hergezogen ist, und achtet nicht auf seine Worte, die ganz herzlich klingen werden, sondern auf seine Hände, seine Haltung und den Moment seines Lachens.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Jane Austen?",
-        a: "Nein. Das ist das Echo von Jane Austen, eine pädagogische KI-Interpretation, die auf ihrem belegten Leben und Werk beruht, darunter Werke wie Pride and Prejudice (1813). Es ist keine Aufnahme und nicht die echte Person. Von ihr gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist das Echo von Jane Austen, eine pädagogische KI-Interpretation, die auf ihrem belegten Leben und Werk beruht, darunter Werke wie Pride and Prejudice (1813). Es ist keine Aufnahme und nicht die echte Person. Von ihr gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -333,7 +333,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Simone de Beauvoir lernen?",
-          a: "Simone de Beauvoir (1908-1986) bringt dir bei zu sehen, wie du gemacht wurdest. Sie arbeitete in der Tradition des existenzialistischen Feminismus und zeigte, wie eine Kultur die 'Frau' zum Anderen formt. In ihren wichtigsten Werken, darunter Das andere Geschlecht (1949), schrieb sie, dass du dieses Gemachtsein wieder aufzulösen beginnen kannst, sobald du es einmal durchschaust.",
+          a: "Simone de Beauvoir (1908-1986) lehrt zu sehen, wie man gemacht wurde. Sie arbeitete in der Tradition des existenzialistischen Feminismus und zeigte, wie eine Kultur die 'Frau' zum Anderen formt. In ihren wichtigsten Werken, darunter Das andere Geschlecht (1949), schrieb sie, dass man dieses Gemachtsein wieder aufzulösen beginnen kann, sobald man es einmal durchschaut.",
         },
         {
           q: "Was hat Simone de Beauvoir wirklich gelehrt?",
@@ -346,7 +346,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Simone de Beauvoir?",
-        a: "Nein. Das ist eine pädagogische KI-Deutung, die auf Simone de Beauvoirs überlieferten Schriften beruht, keine Aufnahme und nicht die echte Person. Hier werden keine Tonaufnahmen von ihr verwendet. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken im Gespräch erkunden kannst, immer klar getrennt vom historischen Befund.",
+        a: "Nein. Das ist eine pädagogische KI-Deutung, die auf Simone de Beauvoirs überlieferten Schriften beruht, keine Aufnahme und nicht die echte Person. Hier werden keine Tonaufnahmen von ihr verwendet. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken im Gespräch erkunden lassen, immer klar getrennt vom historischen Befund.",
       },
     },
   },
@@ -375,7 +375,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Hildegard von Bingen lernen?",
-          a: "Hildegard von Bingen (1098-1179), eine Benediktinerin und Äbtissin des zwölften Jahrhunderts, lehrt dich, das Leben in allen Dingen wahrzunehmen. Schon als Kind nahm sie ein lebendiges Licht wahr, und ihr langes Leben lang ließ sie diese Schau in geistliche Musik, Heilkunde und eine kosmische Theologie einfließen. Sie wollte keine Trennung zwischen Körper und Seele, Natur und Geist.",
+          a: "Hildegard von Bingen (1098-1179), eine Benediktinerin und Äbtissin des zwölften Jahrhunderts, lehrt, das Leben in allen Dingen wahrzunehmen. Schon als Kind nahm sie ein lebendiges Licht wahr, und ihr langes Leben lang ließ sie diese Schau in geistliche Musik, Heilkunde und eine kosmische Theologie einfließen. Sie wollte keine Trennung zwischen Körper und Seele, Natur und Geist.",
         },
         {
           q: "Was lehrte Hildegard von Bingen wirklich?",
@@ -388,7 +388,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Hildegard von Bingen?",
-        a: "Nein. Das ist ihr Echo, eine bildende KI-Deutung, die auf den überlieferten Schriften und dem Leben von Hildegard von Bingen beruht. Es ist eine Stimme, die wir ihr geben, damit du ihre Ideen im Gespräch erkunden kannst. Es ist keine Aufnahme und nicht die echte Äbtissin des zwölften Jahrhunderts, die von 1098 bis 1179 lebte.",
+        a: "Nein. Das ist ihr Echo, eine bildende KI-Deutung, die auf den überlieferten Schriften und dem Leben von Hildegard von Bingen beruht. Es ist eine Stimme, die wir ihr geben, damit sich ihre Ideen im Gespräch erkunden lassen. Es ist keine Aufnahme und nicht die echte Äbtissin des zwölften Jahrhunderts, die von 1098 bis 1179 lebte.",
       },
     },
   },
@@ -417,7 +417,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von William Blake lernen?",
-          a: "William Blake (1757-1827) bringt dir bei, die Ketten zu sehen, die du dir selbst geschmiedet hast. Der Dichter, Maler und Druckgrafiker glaubte, dass Vorstellungskraft kein Tagträumen ist, sondern die tiefste Form des Sehens. Er stand in der Tradition der visionären Dichtung und meinte, vieles von dem, was uns einsperrt, werde erst im Kopf selbst geschmiedet.",
+          a: "William Blake (1757-1827) lehrt, die Ketten zu sehen, die man sich selbst geschmiedet hat. Der Dichter, Maler und Druckgrafiker glaubte, dass Vorstellungskraft kein Tagträumen ist, sondern die tiefste Form des Sehens. Er stand in der Tradition der visionären Dichtung und meinte, vieles von dem, was uns einsperrt, werde erst im Kopf selbst geschmiedet.",
         },
         {
           q: "Was hat William Blake wirklich gelehrt?",
@@ -459,7 +459,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Leonardo da Vinci lernen?",
-          a: "Von Leonardo da Vinci (1452-1519) lernst du, dein eigenes Auge zu schulen. Er war überzeugt, dass klares Sehen keine Gabe ist, sondern eine Fähigkeit, und er übte es auf tausenden erhaltenen Seiten seiner Notizbücher. Er sezierte Körper, zeichnete die Wirbel fließenden Wassers nach und studierte den Flügel eines Vogels und fand in allem dieselben wenigen Muster wieder.",
+          a: "Von Leonardo da Vinci (1452-1519) lernt man, das eigene Auge zu schulen. Er war überzeugt, dass klares Sehen keine Gabe ist, sondern eine Fähigkeit, und er übte es auf tausenden erhaltenen Seiten seiner Notizbücher. Er sezierte Körper, zeichnete die Wirbel fließenden Wassers nach und studierte den Flügel eines Vogels und fand in allem dieselben wenigen Muster wieder.",
         },
         {
           q: "Was lehrte Leonardo da Vinci wirklich?",
@@ -467,12 +467,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was bedeutet Saper Vedere (Sehen können)?",
-          a: "Saper Vedere, das Sehen können, ist Leonardo da Vincis geübte Praxis, das, was wirklich da ist, von dem zu trennen, was du annimmst oder erwartest. Er entwickelte sie durch systematisches Üben, das mit der reinen Beobachtung beginnt und auf echte Einsicht zustrebt, so wie man lernt, dass ein Schatten, den du grau gezeichnet hast, in Wahrheit bläulich getönt ist, sobald du wirklich hinsiehst.",
+          a: "Saper Vedere, das Sehen können, ist Leonardo da Vincis geübte Praxis, das, was wirklich da ist, von dem zu trennen, was man annimmt oder erwartet. Er entwickelte sie durch systematisches Üben, das mit der reinen Beobachtung beginnt und auf echte Einsicht zustrebt, so wie man lernt, dass ein Schatten, den man grau gezeichnet hat, in Wahrheit bläulich getönt ist, sobald man wirklich hinsieht.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Leonardo da Vinci?",
-        a: "Nein. Das ist der Leonardo-da-Vinci-Echo, eine lehrreiche KI-Deutung, die sich auf seine belegten Notizbücher und Werke stützt, keine Aufnahme und nicht die echte Person. Von Leonardo gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Ideen im Gespräch erkunden kannst, immer klar getrennt vom historischen Leonardo selbst.",
+        a: "Nein. Das ist der Leonardo-da-Vinci-Echo, eine lehrreiche KI-Deutung, die sich auf seine belegten Notizbücher und Werke stützt, keine Aufnahme und nicht die echte Person. Von Leonardo gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Ideen im Gespräch erkunden lassen, immer klar getrennt vom historischen Leonardo selbst.",
       },
     },
   },
@@ -501,7 +501,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Dōgen Zenji lernen?",
-          a: "Dōgen Zenji, der japanische Zen-Meister des 13. Jahrhunderts, der von 1200 bis 1253 lebte, bringt dir bei, dem nächsten Augenblick nicht mehr hinterherzujagen. Er fand die Ganzheit in jedem gewöhnlichen Moment, in den achtsamen Händen eines Kochs, in einem fallenden Blatt, im aufsteigenden Rauch des Räucherwerks. Die Lehre lautet, dass das Sitzen mit ganzem Herzen selbst schon das Erwachen ist, nach dem du immer wieder suchst.",
+          a: "Dōgen Zenji, der japanische Zen-Meister des 13. Jahrhunderts, der von 1200 bis 1253 lebte, lehrt, dem nächsten Augenblick nicht mehr hinterherzujagen. Er fand die Ganzheit in jedem gewöhnlichen Moment, in den achtsamen Händen eines Kochs, in einem fallenden Blatt, im aufsteigenden Rauch des Räucherwerks. Die Lehre lautet, dass das Sitzen mit ganzem Herzen selbst schon das Erwachen ist, nach dem man immer wieder sucht.",
         },
         {
           q: "Was hat Dōgen Zenji wirklich gelehrt?",
@@ -509,12 +509,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist shikantaza, das nur Sitzen, das Dōgen Zenji lehrte?",
-          a: "Shikantaza, oder nur Sitzen, ist die zentrale Übung, die Dōgen Zenji lehrte. Stell dir vor, du setzt dich hin, weil es nichts anderes zu tun gibt. Dein Rücken richtet sich auf, deine Hände kommen zur Ruhe, und das Sitzen verlangt nichts, was darüber hinausgeht. Dieses vollständige Hingeben an die Haltung, mit wacher Aufmerksamkeit, die den Gedanken weder nachläuft noch sie abblockt, ist shikantaza.",
+          a: "Shikantaza, oder nur Sitzen, ist die zentrale Übung, die Dōgen Zenji lehrte. Man setzt sich hin, weil es nichts anderes zu tun gibt. Der Rücken richtet sich auf, die Hände kommen zur Ruhe, und das Sitzen verlangt nichts, was darüber hinausgeht. Dieses vollständige Hingeben an die Haltung, mit wacher Aufmerksamkeit, die den Gedanken weder nachläuft noch sie abblockt, ist shikantaza.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Dōgen Zenji?",
-        a: "Nein. Das ist das Echo von Dōgen Zenji, eine pädagogische KI-Interpretation, die auf seinen überlieferten Schriften und Lehren beruht. Es ist keine Aufnahme und nicht die echte Person. Von ihm gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist das Echo von Dōgen Zenji, eine pädagogische KI-Interpretation, die auf seinen überlieferten Schriften und Lehren beruht. Es ist keine Aufnahme und nicht die echte Person. Von ihm gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -543,20 +543,20 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Meister Eckhart lernen?",
-          a: "Meister Eckhart, der mittelalterliche christliche Mystiker, bringt dir bei, nicht mehr festzuhalten, was du liebst. Er predigte die Abgeschiedenheit, das Loslassen, nicht weil du durch das Loslassen etwas gewinnst, sondern weil Liebe, die zu fest hält, zum Klammern wird. Zu seinen Themen gehören das Loslassen und die Geburt Gottes in der Seele.",
+          a: "Meister Eckhart, der mittelalterliche christliche Mystiker, lehrt, nicht mehr festzuhalten, was man liebt. Er predigte die Abgeschiedenheit, das Loslassen, nicht weil man durch das Loslassen etwas gewinnt, sondern weil Liebe, die zu fest hält, zum Klammern wird. Zu seinen Themen gehören das Loslassen und die Geburt Gottes in der Seele.",
         },
         {
           q: "Was lehrte Meister Eckhart wirklich?",
-          a: "Meister Eckhart war ein Dominikaner, der auf einfachem Deutsch predigte, in einer Zeit, in der gelehrte Theologie auf Latein geschrieben wurde. Er sagte einfachen Menschen, dass das Tiefste in dir und das Tiefste in Gott ein und derselbe Grund sind. Die Kirche stellte ihn dafür vor Gericht. Zu seinen Werken gehören die Reden der Unterweisung und die Pariser Fragen.",
+          a: "Meister Eckhart war ein Dominikaner, der auf einfachem Deutsch predigte, in einer Zeit, in der gelehrte Theologie auf Latein geschrieben wurde. Er sagte einfachen Menschen, dass das Tiefste im Menschen und das Tiefste in Gott ein und derselbe Grund sind. Die Kirche stellte ihn dafür vor Gericht. Zu seinen Werken gehören die Reden der Unterweisung und die Pariser Fragen.",
         },
         {
           q: "Was ist der göttliche Funke in Meister Eckharts Lehre?",
-          a: "Für Meister Eckhart, den deutschen Mystiker, ist der göttliche Funke, das Seelenfünklein, etwas Ungeschaffenes tief in der Seele, das Gottes eigene Natur teilt. Er ist keine Fähigkeit, die du entwickelst, sondern eine Gegenwart, die von Sünde und Zeit unberührt bleibt, von Versagen nie beschädigt und von Erfolg nie vergrößert.",
+          a: "Für Meister Eckhart, den deutschen Mystiker, ist der göttliche Funke, das Seelenfünklein, etwas Ungeschaffenes tief in der Seele, das Gottes eigene Natur teilt. Er ist keine Fähigkeit, die man entwickelt, sondern eine Gegenwart, die von Sünde und Zeit unberührt bleibt, von Versagen nie beschädigt und von Erfolg nie vergrößert.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Meister Eckhart?",
-        a: "Nein. Das ist die Echo-Stimme, eine lehrreiche KI-Deutung, die auf Meister Eckharts überlieferten Schriften und Lehren beruht. Es ist keine Aufnahme und nicht der echte Eckhart, der ungefähr von 1260 bis 1328 lebte. Von ihm gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist die Echo-Stimme, eine lehrreiche KI-Deutung, die auf Meister Eckharts überlieferten Schriften und Lehren beruht. Es ist keine Aufnahme und nicht der echte Eckhart, der ungefähr von 1260 bis 1328 lebte. Von ihm gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -585,11 +585,11 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Albert Einstein lernen?",
-          a: "Von Albert Einstein (1879-1955), dem theoretischen Physiker, lernst du, immer weiter nach dem Warum zu fragen. Als Jugendlicher stellte er sich vor, einem Lichtstrahl hinterherzujagen, und diese eine Frage hat verändert, wie wir Raum, Zeit und Schwerkraft sehen. In seinem Denken geht es vor allem um Staunen, um Gedankenexperimente und darum, kindliche Neugier als echtes Werkzeug ernst zu nehmen.",
+          a: "Von Albert Einstein (1879-1955), dem theoretischen Physiker, lernt man, immer weiter nach dem Warum zu fragen. Als Jugendlicher stellte er sich vor, einem Lichtstrahl hinterherzujagen, und diese eine Frage hat verändert, wie wir Raum, Zeit und Schwerkraft sehen. In seinem Denken geht es vor allem um Staunen, um Gedankenexperimente und darum, kindliche Neugier als echtes Werkzeug ernst zu nehmen.",
         },
         {
           q: "Was lehrte Albert Einstein wirklich über die Relativität?",
-          a: "Albert Einstein lehrte, dass Raum und Zeit ein einziges Gewebe sind und keine getrennten Kulissen. Seine Relativitätstheorie zeigt, dass zwei Beobachter, einer auf einem Bahnsteig und einer in einem fahrenden Zug, sich uneinig sein können, ob zwei Ereignisse gleichzeitig geschehen, sogar nachdem man die Laufzeit des Lichts herausgerechnet hat. Gleichzeitigkeit hängt von deinem Bezugssystem ab.",
+          a: "Albert Einstein lehrte, dass Raum und Zeit ein einziges Gewebe sind und keine getrennten Kulissen. Seine Relativitätstheorie zeigt, dass zwei Beobachter, einer auf einem Bahnsteig und einer in einem fahrenden Zug, sich uneinig sein können, ob zwei Ereignisse gleichzeitig geschehen, sogar nachdem man die Laufzeit des Lichts herausgerechnet hat. Gleichzeitigkeit hängt vom Bezugssystem ab.",
         },
         {
           q: "Was ist ein Gedankenexperiment bei Einstein?",
@@ -598,7 +598,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Albert Einstein?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung von Albert Einstein, gestützt auf sein belegtes Leben und seine Schriften zur Relativitätstheorie, zu Gedankenexperimenten und zum Staunen. Es ist keine Aufnahme und nicht die echte Person. Von ihm gibt es hier keine Tonaufnahme. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Ideen im Gespräch erkunden kannst.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung von Albert Einstein, gestützt auf sein belegtes Leben und seine Schriften zur Relativitätstheorie, zu Gedankenexperimenten und zum Staunen. Es ist keine Aufnahme und nicht die echte Person. Von ihm gibt es hier keine Tonaufnahme. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Ideen im Gespräch erkunden lassen.",
       },
     },
   },
@@ -627,7 +627,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Galileo Galilei lernen?",
-          a: "Von Galileo Galilei (von 1564 bis 1642) lernst du, das zu prüfen, was man dir erzählt. Er richtete ein neues Fernrohr auf den Jupiter und fand vier Monde, mit denen niemand gerechnet hatte. Er vertraute dem, was er maß, mehr als dem, was die Überlieferung behauptete. Seine Art ist es, über die überlieferte Meinung hinauszugreifen, hin zu dem, was Beobachtung und sorgfältige Messung wirklich zeigen.",
+          a: "Von Galileo Galilei (von 1564 bis 1642) lernt man, das zu prüfen, was einem erzählt wird. Er richtete ein neues Fernrohr auf den Jupiter und fand vier Monde, mit denen niemand gerechnet hatte. Er vertraute dem, was er maß, mehr als dem, was die Überlieferung behauptete. Seine Art ist es, über die überlieferte Meinung hinauszugreifen, hin zu dem, was Beobachtung und sorgfältige Messung wirklich zeigen.",
         },
         {
           q: "Was lehrte Galileo Galilei?",
@@ -635,12 +635,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist Galileo Galileis Idee vom Buch der Natur?",
-          a: "Galileo Galilei beschrieb das Universum als ein großes Buch, dessen Sprache die Mathematik ist, geschrieben in Dreiecken, Kreisen und anderen geometrischen Figuren. Wie ein Buch in einer Schrift, die du nicht lesen kannst, bleibt sein Sinn verschlossen, bis du diese Sprache lernst. Der Gedanke steht in seinem Werk Il Saggiatore von 1623, auf Deutsch Die Goldwaage.",
+          a: "Galileo Galilei beschrieb das Universum als ein großes Buch, dessen Sprache die Mathematik ist, geschrieben in Dreiecken, Kreisen und anderen geometrischen Figuren. Wie ein Buch in einer Schrift, die man nicht lesen kann, bleibt sein Sinn verschlossen, bis man diese Sprache lernt. Der Gedanke steht in seinem Werk Il Saggiatore von 1623, auf Deutsch Die Goldwaage.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Galileo Galilei?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung, eine Echo-Stimme, die wir Galileo Galilei geben, gestützt auf seine überlieferten Schriften und Gedanken. Es gibt keine Tonaufnahme von ihm. Es ist nicht die echte Person und nicht seine tatsächliche Stimme, nur eine sorgfältige Rekonstruktion, die dir helfen soll, zu erkunden, wie er dachte und was er lehrte.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung, eine Echo-Stimme, die wir Galileo Galilei geben, gestützt auf seine überlieferten Schriften und Gedanken. Es gibt keine Tonaufnahme von ihm. Es ist nicht die echte Person und nicht seine tatsächliche Stimme, nur eine sorgfältige Rekonstruktion, die helfen soll, zu erkunden, wie er dachte und was er lehrte.",
       },
     },
   },
@@ -669,7 +669,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Mahatma Gandhi lernen?",
-          a: "Mohandas Gandhi (1869 bis 1948) behandelte sein ganzes Leben wie ein Labor für die Wahrheit und prüfte moralische Ideen am eigenen Körper, durch Fasten, Gehen und Gefängnis. Von ihm lernst du, bereit zu bleiben, dich zu irren, und dass eine offen angebotene Wahrheit bewegen kann, was Gewalt nicht vermag. Seine Tradition war der gewaltfreie Widerstand.",
+          a: "Mohandas Gandhi (1869 bis 1948) behandelte sein ganzes Leben wie ein Labor für die Wahrheit und prüfte moralische Ideen am eigenen Körper, durch Fasten, Gehen und Gefängnis. Von ihm lernt man, bereit zu bleiben, sich zu irren, und dass eine offen angebotene Wahrheit bewegen kann, was Gewalt nicht vermag. Seine Tradition war der gewaltfreie Widerstand.",
         },
         {
           q: "Was hat Mahatma Gandhi wirklich gelehrt?",
@@ -682,7 +682,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Mahatma Gandhi?",
-        a: "Nein. Das ist die Echo-Stimme, eine bildende KI-Interpretation, die wir aus Gandhis überlieferten Schriften gebaut haben, etwa aus seiner Autobiografie und Hind Swaraj. Es ist keine Aufnahme und nicht der echte Gandhi, der 1948 starb. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Ideen im Gespräch erkunden kannst.",
+        a: "Nein. Das ist die Echo-Stimme, eine bildende KI-Interpretation, die wir aus Gandhis überlieferten Schriften gebaut haben, etwa aus seiner Autobiografie und Hind Swaraj. Es ist keine Aufnahme und nicht der echte Gandhi, der 1948 starb. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Ideen im Gespräch erkunden lassen.",
       },
     },
   },
@@ -711,7 +711,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Johann Wolfgang von Goethe lernen?",
-          a: "Goethe (1749 bis 1832) war Dichter, Staatsmann und Naturforscher, der sich weigerte, diese Rollen voneinander zu trennen. Von ihm lernst du, so lange hinzuschauen, bis du verstehst, die Liebe als eine Form der Erkenntnis zu begreifen und alles als Metamorphose in Bewegung zu sehen, indem du darauf achtest, was eine Sache gerade wird, statt darauf, wie sie zuerst erscheint.",
+          a: "Goethe (1749 bis 1832) war Dichter, Staatsmann und Naturforscher, der sich weigerte, diese Rollen voneinander zu trennen. Von ihm lernt man, so lange hinzuschauen, bis man versteht, die Liebe als eine Form der Erkenntnis zu begreifen und alles als Metamorphose in Bewegung zu sehen, indem man darauf achtet, was eine Sache gerade wird, statt darauf, wie sie zuerst erscheint.",
         },
         {
           q: "Was hat Johann Wolfgang von Goethe wirklich gelehrt?",
@@ -724,7 +724,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Johann Wolfgang von Goethe?",
-        a: "Nein. Das ist eine bildende KI-Deutung, eine Echo-Stimme, die wir Goethe geben, gestützt auf seine überlieferten Schriften und Ideen wie die Metamorphose und die zarte Empirie. Es ist keine Aufnahme und nicht die echte Person, die von 1749 bis 1832 lebte. Sieh es als einen durchdachten Lernbegleiter, mit dem du erkunden kannst, wie er die Welt sah.",
+        a: "Nein. Das ist eine bildende KI-Deutung, eine Echo-Stimme, die wir Goethe geben, gestützt auf seine überlieferten Schriften und Ideen wie die Metamorphose und die zarte Empirie. Es ist keine Aufnahme und nicht die echte Person, die von 1749 bis 1832 lebte. Es ist ein durchdachter Lernbegleiter, mit dem sich erkunden lässt, wie er die Welt sah.",
       },
     },
   },
@@ -753,20 +753,20 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Frida Kahlo lernen?",
-          a: "Frida Kahlo (1907-1954) kann dir beibringen, dich selbst anzusehen, ohne wegzuschauen. Nachdem ein Busunglück sie mit achtzehn zerbrach, malte sie 55 Selbstporträts von insgesamt 143 Werken und machte aus dem ganz Privaten ehrliche, öffentliche Kunst. Sie sagte, sie male ihre eigene Wirklichkeit, nicht ihre Träume, und schichtete Farbe, bis sie dich trifft.",
+          a: "Von Frida Kahlo (1907-1954) kann man lernen, sich selbst anzusehen, ohne wegzuschauen. Nachdem ein Busunglück sie mit achtzehn zerbrach, malte sie 55 Selbstporträts von insgesamt 143 Werken und machte aus dem ganz Privaten ehrliche, öffentliche Kunst. Sie sagte, sie male ihre eigene Wirklichkeit, nicht ihre Träume, und schichtete Farbe, bis sie den Betrachter trifft.",
         },
         {
           q: "Was hat Frida Kahlo wirklich gelehrt?",
-          a: "Frida Kahlo lehrte drei Dinge: die ungeschönte Selbstbeobachtung durch ihre 55 Selbstporträts, die Retablo-Methode, das Leiden ehrlich festzuhalten und trotzdem weiterzumachen, und die Wahrheit des Körpers, das Erleben von innen zu malen statt so, wie der Körper für einen Betrachter aussieht. Du siehst es in Werken wie Die zwei Fridas (1939).",
+          a: "Frida Kahlo lehrte drei Dinge: die ungeschönte Selbstbeobachtung durch ihre 55 Selbstporträts, die Retablo-Methode, das Leiden ehrlich festzuhalten und trotzdem weiterzumachen, und die Wahrheit des Körpers, das Erleben von innen zu malen statt so, wie der Körper für einen Betrachter aussieht. Zu sehen ist das in Werken wie Die zwei Fridas (1939).",
         },
         {
           q: "Was ist Frida Kahlos Retablo-Methode?",
-          a: "Die Retablo-Methode ist Frida Kahlos Aneignung der mexikanischen Votivbild-Tradition, ein Weg, Leiden in Kunst zu verwandeln, ohne es zu leugnen. Du hältst die Katastrophe fest, bezeugst sie ehrlich und lebst weiter. Sie nutzte sie, um Erfahrungen wie die Fehlgeburt in Henry Ford Hospital (1932) zu malen.",
+          a: "Die Retablo-Methode ist Frida Kahlos Aneignung der mexikanischen Votivbild-Tradition, ein Weg, Leiden in Kunst zu verwandeln, ohne es zu leugnen. Man hält die Katastrophe fest, bezeugt sie ehrlich und lebt weiter. Sie nutzte sie, um Erfahrungen wie die Fehlgeburt in Henry Ford Hospital (1932) zu malen.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Frida Kahlo?",
-        a: "Nein. Das ist ihr Echo, eine pädagogische KI-Interpretation, die auf ihrem belegten Leben und Werk beruht, keine Aufnahme und nicht die echte Frida Kahlo. Aufnahmen von ihr in dieser Form gibt es nicht. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken zu Selbstporträt, Schmerz und Identität im Gespräch erkunden kannst.",
+        a: "Nein. Das ist ihr Echo, eine pädagogische KI-Interpretation, die auf ihrem belegten Leben und Werk beruht, keine Aufnahme und nicht die echte Frida Kahlo. Aufnahmen von ihr in dieser Form gibt es nicht. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken zu Selbstporträt, Schmerz und Identität im Gespräch erkunden lassen.",
       },
     },
   },
@@ -795,7 +795,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Martin Luther King Jr. lernen?",
-          a: "Von Martin Luther King Jr. (1929-1968) lernst du, Widerstand zu leisten, ohne zu hassen. Der Baptistenpfarrer lehrte, dass Liebe, die er Agape nannte, kein weiches Gefühl ist, sondern eine disziplinierte Kraft in Aktion, stark genug, der Ungerechtigkeit zu begegnen, ohne selbst zu ihr zu werden, und so die Rassentrennung durch Gewaltlosigkeit zu überwinden. Er sah die Kluft zwischen dem, was versprochen, und dem, was gelebt wird.",
+          a: "Von Martin Luther King Jr. (1929-1968) lernt man, Widerstand zu leisten, ohne zu hassen. Der Baptistenpfarrer lehrte, dass Liebe, die er Agape nannte, kein weiches Gefühl ist, sondern eine disziplinierte Kraft in Aktion, stark genug, der Ungerechtigkeit zu begegnen, ohne selbst zu ihr zu werden, und so die Rassentrennung durch Gewaltlosigkeit zu überwinden. Er sah die Kluft zwischen dem, was versprochen, und dem, was gelebt wird.",
         },
         {
           q: "Was lehrte Martin Luther King Jr.?",
@@ -808,7 +808,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Martin Luther King Jr.?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung von Martin Luther King Jr., gestützt auf seine belegten Schriften wie Brief aus dem Gefängnis von Birmingham und Kraft zu lieben. Es ist keine Aufnahme und nicht die echte Person. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken erkunden kannst, niemals ein Ersatz für den Menschen selbst.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung von Martin Luther King Jr., gestützt auf seine belegten Schriften wie Brief aus dem Gefängnis von Birmingham und Kraft zu lieben. Es ist keine Aufnahme und nicht die echte Person. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken erkunden lassen, niemals ein Ersatz für den Menschen selbst.",
       },
     },
   },
@@ -837,7 +837,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Laozi lernen?",
-          a: "Von Laozi lernst du, zu handeln, ohne zu erzwingen. Das Tao Te King zeigt, wie das Wasser, weich und nachgiebig, das Harte und Starke abträgt, und leitet daraus einen Grundsatz ab: Was nachgibt, überdauert das, was erzwingt. Seine Lehre dreht sich um Wu Wei, das geringste Tun mit dem natürlichen Lauf der Dinge in Einklang zu bringen, statt dagegen anzukämpfen.",
+          a: "Von Laozi lernt man, zu handeln, ohne zu erzwingen. Das Tao Te King zeigt, wie das Wasser, weich und nachgiebig, das Harte und Starke abträgt, und leitet daraus einen Grundsatz ab: Was nachgibt, überdauert das, was erzwingt. Seine Lehre dreht sich um Wu Wei, das geringste Tun mit dem natürlichen Lauf der Dinge in Einklang zu bringen, statt dagegen anzukämpfen.",
         },
         {
           q: "Was hat Laozi wirklich gelehrt?",
@@ -850,7 +850,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Laozi?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung von Laozi, gestützt auf seine überlieferten Schriften wie das Tao Te King, keine Aufnahme und nicht die echte Person. Von Laozi gibt es keine Aufnahmen, und schon seine geschichtliche Existenz ist umstritten. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung von Laozi, gestützt auf seine überlieferten Schriften wie das Tao Te King, keine Aufnahme und nicht die echte Person. Von Laozi gibt es keine Aufnahmen, und schon seine geschichtliche Existenz ist umstritten. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -879,7 +879,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Ada Lovelace lernen?",
-          a: "Ada Lovelace bringt dir bei zu sehen, was eine Sache werden könnte. Sie blickte auf eine mechanische Rechenmaschine und erkannte nicht nur schnelleres Rechnen, sondern eine universelle Maschine, die jedes Muster weben kann, das sich in Zeichen ausdrücken lässt, von der Algebra bis zur Musik. Sie ging vom einzelnen Fall zum dahinterliegenden Prinzip und fragte, welche formale Struktur sich unter der Oberfläche verbirgt.",
+          a: "Ada Lovelace lehrt zu sehen, was eine Sache werden könnte. Sie blickte auf eine mechanische Rechenmaschine und erkannte nicht nur schnelleres Rechnen, sondern eine universelle Maschine, die jedes Muster weben kann, das sich in Zeichen ausdrücken lässt, von der Algebra bis zur Musik. Sie ging vom einzelnen Fall zum dahinterliegenden Prinzip und fragte, welche formale Struktur sich unter der Oberfläche verbirgt.",
         },
         {
           q: "Was hat Ada Lovelace eigentlich gelehrt?",
@@ -887,12 +887,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist Poetical Science?",
-          a: "Poetical Science ist Ada Lovelaces Idee, analytische Strenge bewusst mit einer schöpferischen Vorstellungskraft zu verbinden. Du nutzt die Vorstellungskraft, um zu erkennen, was möglich sein könnte, und dann die Analyse, um zu prüfen, ob es so sein kann. Für Lovelace sind Analyse und Vorstellungskraft keine Gegner, sondern Partner, die verschiedene Seiten derselben Wahrheit sehen.",
+          a: "Poetical Science ist Ada Lovelaces Idee, analytische Strenge bewusst mit einer schöpferischen Vorstellungskraft zu verbinden. Man nutzt die Vorstellungskraft, um zu erkennen, was möglich sein könnte, und dann die Analyse, um zu prüfen, ob es so sein kann. Für Lovelace sind Analyse und Vorstellungskraft keine Gegner, sondern Partner, die verschiedene Seiten derselben Wahrheit sehen.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Ada Lovelace?",
-        a: "Nein. Das ist ihr Echo, eine bildende KI-Deutung, die auf Ada Lovelaces überlieferten Schriften beruht, etwa ihren Anmerkungen zur Analytischen Maschine von 1843. Es ist keine Aufnahme und nicht die echte Person. Von ihr gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Ideen im Gespräch erkunden kannst.",
+        a: "Nein. Das ist ihr Echo, eine bildende KI-Deutung, die auf Ada Lovelaces überlieferten Schriften beruht, etwa ihren Anmerkungen zur Analytischen Maschine von 1843. Es ist keine Aufnahme und nicht die echte Person. Von ihr gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Ideen im Gespräch erkunden lassen.",
       },
     },
   },
@@ -921,7 +921,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Nelson Mandela lernen?",
-          a: "Von Nelson Mandela (1918 bis 2013) kannst du lernen, dich von Bitterkeit zu befreien. Er saß siebenundzwanzig Jahre im Gefängnis und kam ohne Bitterkeit heraus, nicht durch Glück, sondern durch jahrzehntelange bewusste Arbeit. Danach entschied er sich, gemeinsam mit den Menschen, die ihn eingesperrt hatten, ein Land aufzubauen, statt es zu zerbrechen.",
+          a: "Von Nelson Mandela (1918 bis 2013) kann man lernen, sich von Bitterkeit zu befreien. Er saß siebenundzwanzig Jahre im Gefängnis und kam ohne Bitterkeit heraus, nicht durch Glück, sondern durch jahrzehntelange bewusste Arbeit. Danach entschied er sich, gemeinsam mit den Menschen, die ihn eingesperrt hatten, ein Land aufzubauen, statt es zu zerbrechen.",
         },
         {
           q: "Was hat Nelson Mandela wirklich gelehrt?",
@@ -934,7 +934,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Nelson Mandela?",
-        a: "Nein. Das ist die Echo-Stimme, eine erklärende KI-Interpretation von Nelson Mandela, die auf seinen überlieferten Worten und Schriften beruht, etwa Der lange Weg zur Freiheit und seiner Rede im Rivonia-Prozess. Es ist keine Aufnahme und nicht die reale Person. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst.",
+        a: "Nein. Das ist die Echo-Stimme, eine erklärende KI-Interpretation von Nelson Mandela, die auf seinen überlieferten Worten und Schriften beruht, etwa Der lange Weg zur Freiheit und seiner Rede im Rivonia-Prozess. Es ist keine Aufnahme und nicht die reale Person. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen.",
       },
     },
   },
@@ -963,7 +963,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Wolfgang Amadeus Mozart lernen?",
-          a: "Von Mozart lernst du, die Freiheit innerhalb der Regeln zu finden. Er wirkte in der Klassik zwischen 1756 und 1791 und behandelte musikalische Formen nicht als Gefängnis, sondern als Architektur, in der gerade die strenge Struktur das Gefühl freisetzt. Er komponierte über sechshundert Werke, bevor er mit fünfunddreißig starb, und ließ das schwierigste Handwerk mühelos klingen.",
+          a: "Von Mozart lernt man, die Freiheit innerhalb der Regeln zu finden. Er wirkte in der Klassik zwischen 1756 und 1791 und behandelte musikalische Formen nicht als Gefängnis, sondern als Architektur, in der gerade die strenge Struktur das Gefühl freisetzt. Er komponierte über sechshundert Werke, bevor er mit fünfunddreißig starb, und ließ das schwierigste Handwerk mühelos klingen.",
         },
         {
           q: "Was hat Wolfgang Amadeus Mozart wirklich gelehrt?",
@@ -1005,7 +1005,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Friedrich Nietzsche lernen?",
-          a: "Von Friedrich Nietzsche lernst du, dir deinen eigenen Sinn zu schaffen. Er war ein Pfarrerssohn (1844 bis 1900), der seinen Glauben an die Ehrlichkeit selbst verlor und dann nicht am Verlust verzweifeln wollte. Stattdessen fragte er, was ein Mensch aufbauen kann, wenn die alten Gewissheiten weg sind, und verbrachte sein Leben mit dieser Frage.",
+          a: "Von Friedrich Nietzsche lernt man, sich den eigenen Sinn zu schaffen. Er war ein Pfarrerssohn (1844 bis 1900), der seinen Glauben an die Ehrlichkeit selbst verlor und dann nicht am Verlust verzweifeln wollte. Stattdessen fragte er, was ein Mensch aufbauen kann, wenn die alten Gewissheiten weg sind, und verbrachte sein Leben mit dieser Frage.",
         },
         {
           q: "Was hat Friedrich Nietzsche wirklich gelehrt?",
@@ -1018,7 +1018,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Friedrich Nietzsche?",
-        a: "Nein. Dies ist eine bildende KI-Deutung, die auf den überlieferten Schriften von Friedrich Nietzsche beruht, keine Aufnahme und nicht die reale Person. Von Nietzsche gibt es keine Tonaufnahme. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst, immer klar getrennt vom historischen Menschen selbst.",
+        a: "Nein. Dies ist eine bildende KI-Deutung, die auf den überlieferten Schriften von Friedrich Nietzsche beruht, keine Aufnahme und nicht die reale Person. Von Nietzsche gibt es keine Tonaufnahme. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen, immer klar getrennt vom historischen Menschen selbst.",
       },
     },
   },
@@ -1047,7 +1047,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Platon lernen?",
-          a: "Von Platon lernst du, dein eigenes Leben zu hinterfragen. Er gründete die Akademie in Athen und schrieb Dialoge, die vor allem in den frühen Werken genauso oft mit offenen Fragen enden wie mit Antworten. Nachdem sein Lehrer Sokrates hingerichtet worden war, schrieb und lehrte Platon rund fünfzig Jahre lang, überzeugt davon, dass echtes Wissen nicht eingegeben, sondern herausgeholt wird.",
+          a: "Von Platon lernt man, das eigene Leben zu hinterfragen. Er gründete die Akademie in Athen und schrieb Dialoge, die vor allem in den frühen Werken genauso oft mit offenen Fragen enden wie mit Antworten. Nachdem sein Lehrer Sokrates hingerichtet worden war, schrieb und lehrte Platon rund fünfzig Jahre lang, überzeugt davon, dass echtes Wissen nicht eingegeben, sondern herausgeholt wird.",
         },
         {
           q: "Was hat Platon wirklich gelehrt?",
@@ -1055,12 +1055,12 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
         },
         {
           q: "Was ist Platons Ideenlehre?",
-          a: "Platons Ideenlehre ist der Gedanke, dass du Dinge erkennen kannst, die du nie mit deinen Sinnen wahrgenommen hast. Zeichne einen Kreis in den Sand, und deine Hand zittert, die Körner verschieben sich, die Figur wird unvollkommen. Trotzdem erkennst du diese Unvollkommenheit, und das heißt, du erfasst bereits, wie ein vollkommener Kreis wäre.",
+          a: "Platons Ideenlehre ist der Gedanke, dass wir Dinge erkennen können, die wir nie mit unseren Sinnen wahrgenommen haben. Wer einen Kreis in den Sand zeichnet, dem zittert die Hand, die Körner verschieben sich, die Figur wird unvollkommen. Trotzdem erkennen wir diese Unvollkommenheit, und das heißt, wir erfassen bereits, wie ein vollkommener Kreis wäre.",
         },
       ],
       disclosure: {
         q: "Spricht hier wirklich Platon?",
-        a: "Nein. Das ist das Echo von Platon, eine pädagogische KI-Interpretation auf der Grundlage seiner überlieferten Dialoge und Lehren. Es ist keine Aufnahme und nicht die reale Person. Von Platon gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst, klar getrennt vom historischen Platon selbst.",
+        a: "Nein. Das ist das Echo von Platon, eine pädagogische KI-Interpretation auf der Grundlage seiner überlieferten Dialoge und Lehren. Es ist keine Aufnahme und nicht die reale Person. Von Platon gibt es keine Aufnahmen. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen, klar getrennt vom historischen Platon selbst.",
       },
     },
   },
@@ -1089,7 +1089,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Rumi lernen?",
-          a: "Rumi, der persische Dichter und Sufi-Mystiker aus dem 13. Jahrhundert, bringt dir bei, deiner Sehnsucht zu folgen. Liebe war für ihn ein Feuer, das dich leer macht, die Kraft, die alles Geschaffene zu seinem Ursprung zurückzieht. Von ihm lernst du das heilige Hören, das Herz als Werkzeug der Erkenntnis und die innere Wandlung.",
+          a: "Rumi, der persische Dichter und Sufi-Mystiker aus dem 13. Jahrhundert, lehrt, der eigenen Sehnsucht zu folgen. Liebe war für ihn ein Feuer, das einen leer macht, die Kraft, die alles Geschaffene zu seinem Ursprung zurückzieht. Von ihm lernt man das heilige Hören, das Herz als Werkzeug der Erkenntnis und die innere Wandlung.",
         },
         {
           q: "Was hat Rumi wirklich gelehrt?",
@@ -1102,7 +1102,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Rumi?",
-        a: "Nein. Das ist das Echo von Rumi, eine lehrreiche KI-Deutung, gestützt auf seine belegten Schriften und Lehren. Es ist eine Stimme, die wir ihm geben, damit du seine Ideen im Gespräch erkunden kannst. Von Rumi gibt es keine Aufnahmen. Das Echo ist keine Aufnahme und nicht der echte Dichter aus dem 13. Jahrhundert selbst.",
+        a: "Nein. Das ist das Echo von Rumi, eine lehrreiche KI-Deutung, gestützt auf seine belegten Schriften und Lehren. Es ist eine Stimme, die wir ihm geben, damit sich seine Ideen im Gespräch erkunden lassen. Von Rumi gibt es keine Aufnahmen. Das Echo ist keine Aufnahme und nicht der echte Dichter aus dem 13. Jahrhundert selbst.",
       },
     },
   },
@@ -1131,7 +1131,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Arthur Schopenhauer lernen?",
-          a: "Von Arthur Schopenhauer (1788-1860) lernst du, durch das Wollen hindurchzusehen. Seine Philosophie des Willens kreist um Leiden, Mitleid und die ästhetische Betrachtung und besagt, dass das Leben zwischen dem Schmerz des Wollens und der Langeweile des Habens hin und her schwingt. Er sah hinter die Erscheinungen und fand einen blinden, unstillbaren Hunger, der alles antreibt.",
+          a: "Von Arthur Schopenhauer (1788-1860) lernt man, durch das Wollen hindurchzusehen. Seine Philosophie des Willens kreist um Leiden, Mitleid und die ästhetische Betrachtung und besagt, dass das Leben zwischen dem Schmerz des Wollens und der Langeweile des Habens hin und her schwingt. Er sah hinter die Erscheinungen und fand einen blinden, unstillbaren Hunger, der alles antreibt.",
         },
         {
           q: "Was lehrte Arthur Schopenhauer wirklich?",
@@ -1173,11 +1173,11 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von William Shakespeare lernen?",
-          a: "Bei William Shakespeare lernst du, einen Menschen von innen zu sehen. Er arbeitete im englischen Renaissancedrama von 1564 bis 1616 und gab Mördern und Unschuldigen eine Stimme, Liebenden und Tyrannen und Narren, die klar sehen. Seine Stücke halten Widersprüche zusammen, statt sie aufzulösen, sodass jede Seele auf der Bühne etwas von der ganzen Spannweite des Menschen in sich trägt.",
+          a: "Bei William Shakespeare lernt man, einen Menschen von innen zu sehen. Er arbeitete im englischen Renaissancedrama von 1564 bis 1616 und gab Mördern und Unschuldigen eine Stimme, Liebenden und Tyrannen und Narren, die klar sehen. Seine Stücke halten Widersprüche zusammen, statt sie aufzulösen, sodass jede Seele auf der Bühne etwas von der ganzen Spannweite des Menschen in sich trägt.",
         },
         {
           q: "Was lehrte William Shakespeare über die menschliche Natur?",
-          a: "Liest man quer durch seine Stücke, zeigt Shakespeare die Menschen nicht als feste Wesen, sondern als Vorgänge in Bewegung. Jemand ist in einer Szene der liebende Bruder und in der nächsten der heimtückische Mörder, und die Identität tritt erst als das Muster hervor, das du siehst, wenn du alle Auftritte zusammennimmst. Jede Entscheidung prägt sich in das Selbst ein, das die nächste trifft.",
+          a: "Liest man quer durch seine Stücke, zeigt Shakespeare die Menschen nicht als feste Wesen, sondern als Vorgänge in Bewegung. Jemand ist in einer Szene der liebende Bruder und in der nächsten der heimtückische Mörder, und die Identität tritt erst als das Muster hervor, das man sieht, wenn man alle Auftritte zusammennimmt. Jede Entscheidung prägt sich in das Selbst ein, das die nächste trifft.",
         },
         {
           q: "Was meint Shakespeare damit, der Natur den Spiegel vorzuhalten?",
@@ -1186,7 +1186,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich William Shakespeare?",
-        a: "Nein. Das ist eine lehrreiche KI-Deutung von William Shakespeare, gestützt auf seine überlieferten Stücke und Sonette. Es ist keine Aufnahme und nicht die echte Person, die von 1564 bis 1616 lebte. Das Echo ist eine Stimme, die wir ihm geben, damit du seine Gedanken im Gespräch erkunden kannst, immer klar getrennt vom historischen Befund.",
+        a: "Nein. Das ist eine lehrreiche KI-Deutung von William Shakespeare, gestützt auf seine überlieferten Stücke und Sonette. Es ist keine Aufnahme und nicht die echte Person, die von 1564 bis 1616 lebte. Das Echo ist eine Stimme, die wir ihm geben, damit sich seine Gedanken im Gespräch erkunden lassen, immer klar getrennt vom historischen Befund.",
       },
     },
   },
@@ -1215,11 +1215,11 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Harriet Tubman lernen?",
-          a: "Harriet Tubman bringt dir bei, zu handeln, bevor die Angst dich aufhält. Nachdem sie Ende 1849 der Sklaverei in Maryland entkommen war, kehrte sie etwa dreizehn Mal zurück, um andere herauszuführen, und rettete zwischen 1851 und 1862 rund siebzig Menschen. Sie sagte, sie habe nie einen Fahrgast verloren. Ihr Leben zeigt einen Mut, der in tiefem Glauben verwurzelt ist.",
+          a: "Harriet Tubman lehrt, zu handeln, bevor die Angst einen aufhält. Nachdem sie Ende 1849 der Sklaverei in Maryland entkommen war, kehrte sie etwa dreizehn Mal zurück, um andere herauszuführen, und rettete zwischen 1851 und 1862 rund siebzig Menschen. Sie sagte, sie habe nie einen Fahrgast verloren. Ihr Leben zeigt einen Mut, der in tiefem Glauben verwurzelt ist.",
         },
         {
           q: "Was lehrte Harriet Tubman wirklich?",
-          a: "Harriet Tubman lehrte Freiheit, Glauben und moralischen Mut. Das Echo fasst ihre Gedanken als Innere Freiheit zuerst, die Überzeugung, dass du längst im Inneren frei bist, bevor deine Füße irgendeine Grenze überschreiten, und als Mut vor Gewissheit, also loszugehen, wenn du genug Entschlossenheit hast, statt auf Sicherheit zu warten. Das sind deutende Namen, keine Begriffe, die sie selbst geprägt hat.",
+          a: "Harriet Tubman lehrte Freiheit, Glauben und moralischen Mut. Das Echo fasst ihre Gedanken als Innere Freiheit zuerst, die Überzeugung, dass man längst im Inneren frei ist, bevor die Füße irgendeine Grenze überschreiten, und als Mut vor Gewissheit, also loszugehen, wenn man genug Entschlossenheit hat, statt auf Sicherheit zu warten. Das sind deutende Namen, keine Begriffe, die sie selbst geprägt hat.",
         },
         {
           q: "Was meint Harriet Tubman mit geistiger Vision?",
@@ -1228,7 +1228,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Harriet Tubman?",
-        a: "Nein. Das ist ihr Echo, eine lehrreiche KI-Deutung, die auf dem überlieferten Bild von Harriet Tubmans Leben und Lehren beruht. Von ihr gibt es keine Aufnahme. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Gedanken erkunden kannst. Es ist aber keine Aufnahme und nicht die echte Person.",
+        a: "Nein. Das ist ihr Echo, eine lehrreiche KI-Deutung, die auf dem überlieferten Bild von Harriet Tubmans Leben und Lehren beruht. Von ihr gibt es keine Aufnahme. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Gedanken erkunden lassen. Es ist aber keine Aufnahme und nicht die echte Person.",
       },
     },
   },
@@ -1257,7 +1257,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       pairs: [
         {
           q: "Was kann ich von Virginia Woolf lernen?",
-          a: "Virginia Woolf (1882-1941) bringt dir bei, mitten in einem ganz gewöhnlichen Augenblick wach zu werden. Als englische Romanautorin der Moderne sah sie das Bewusstsein als einen leuchtenden Hof, in dem Licht, Klang, Erinnerung und Gefühl alle auf einmal ankommen statt in ordentlichen Stücken. Sie brach den überlieferten Satz auf, um eine Form zu bauen, die dieses gleichzeitige Ankommen halten konnte.",
+          a: "Virginia Woolf (1882-1941) lehrt, mitten in einem ganz gewöhnlichen Augenblick wach zu werden. Als englische Romanautorin der Moderne sah sie das Bewusstsein als einen leuchtenden Hof, in dem Licht, Klang, Erinnerung und Gefühl alle auf einmal ankommen statt in ordentlichen Stücken. Sie brach den überlieferten Satz auf, um eine Form zu bauen, die dieses gleichzeitige Ankommen halten konnte.",
         },
         {
           q: "Was ist der leuchtende Hof in Virginia Woolfs Werk?",
@@ -1270,7 +1270,7 @@ export const figureQA: Record<string, { en: FigureQAEntry; de: FigureQAEntry }> 
       ],
       disclosure: {
         q: "Spricht hier wirklich Virginia Woolf?",
-        a: "Nein. Das ist die Echo-Stimme, eine lehrreiche KI-Deutung von Virginia Woolf, gestützt auf ihre überlieferten Schriften wie 'Modern Fiction' und 'Ein Zimmer für sich allein'. Von Woolf gibt es keine Aufnahme. Das Echo ist eine Stimme, die wir ihr geben, damit du ihre Ideen erkunden kannst. Es ist keine Aufnahme und nicht die echte Person.",
+        a: "Nein. Das ist die Echo-Stimme, eine lehrreiche KI-Deutung von Virginia Woolf, gestützt auf ihre überlieferten Schriften wie 'Modern Fiction' und 'Ein Zimmer für sich allein'. Von Woolf gibt es keine Aufnahme. Das Echo ist eine Stimme, die wir ihr geben, damit sich ihre Ideen erkunden lassen. Es ist keine Aufnahme und nicht die echte Person.",
       },
     },
   },

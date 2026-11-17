@@ -29,15 +29,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Ada Lovelace lernen?',
-          a: 'Ada Lovelace (1815-1852) sah eine Maschine, die zum Rechnen gebaut war, und erkannte, was ihr Bauplan eigentlich bedeutet. Keinen schnelleren Rechner. Eine Maschine, die mit allem arbeiten kann, was sich in Zeichen aufschreiben lässt, Musik eingeschlossen. 1843 veröffentlichte sie ihre Anmerkungen dazu, und eine davon beschreibt Schritt für Schritt ein Verfahren, das die Maschine allein ausführen könnte. Bei ihr lernst du zu sehen, was etwas werden könnte.',
+          a: 'Ada Lovelace (1815-1852) sah eine Maschine, die zum Rechnen gebaut war, und erkannte, was ihr Bauplan eigentlich bedeutet. Keinen schnelleren Rechner. Eine Maschine, die mit allem arbeiten kann, was sich in Zeichen aufschreiben lässt, Musik eingeschlossen. 1843 veröffentlichte sie ihre Anmerkungen dazu, und eine davon beschreibt Schritt für Schritt ein Verfahren, das die Maschine allein ausführen könnte. Bei ihr lernt man zu sehen, was etwas werden könnte.',
         },
         {
           q: 'Was hat Ada Lovelace gelehrt?',
-          a: "Ada Lovelace, die Mathematikerin, die meist die erste Programmiererin genannt wird, lehrte, dass eine Rechenmaschine mit Zeichen und Operationen arbeitet und nicht mit Zahlen im eigentlichen Sinn. Ändere, wofür die Zeichen stehen, und dieselbe Maschine tut etwas völlig anderes. Aufgeschrieben hat sie das 1843 in ihren Anmerkungen zur Analytischen Maschine, erschienen in Taylor's Scientific Memoirs, mit dem Bernoulli-Verfahren in Anmerkung G. Sie lehrte auch die Grenze. Die Maschine, schrieb sie, 'hat keinerlei Anspruch, irgendetwas zu erschaffen. Sie kann alles tun, was wir ihr zu leisten befehlen können.'",
+          a: "Ada Lovelace, die Mathematikerin, die meist die erste Programmiererin genannt wird, lehrte, dass eine Rechenmaschine mit Zeichen und Operationen arbeitet und nicht mit Zahlen im eigentlichen Sinn. Ändert man, wofür die Zeichen stehen, tut dieselbe Maschine etwas völlig anderes. Aufgeschrieben hat sie das 1843 in ihren Anmerkungen zur Analytischen Maschine, erschienen in Taylor's Scientific Memoirs, mit dem Bernoulli-Verfahren in Anmerkung G. Sie lehrte auch die Grenze. Die Maschine, schrieb sie, 'hat keinerlei Anspruch, irgendetwas zu erschaffen. Sie kann alles tun, was wir ihr zu leisten befehlen können.'",
         },
         {
           q: 'Was ist poetische Wissenschaft?',
-          a: 'Poetische Wissenschaft war Ada Lovelaces eigener Name für ihre Arbeitsweise. Sie weigerte sich, zwischen dem Künstlerischen und dem Analytischen zu wählen, und setzte beides auf dasselbe Problem an. Die Vorstellungskraft zeigt dir, was möglich sein könnte. Die Analyse entscheidet dann, ob es so sein kann. Das kam aus ihrem eigenen Leben. Ihr Vater war der Dichter Lord Byron, ihre Mutter ließ sie in Mathematik unterrichten, und sie brachte beide Hälften zusammen, statt sich für eine zu entscheiden.',
+          a: 'Poetische Wissenschaft war Ada Lovelaces eigener Name für ihre Arbeitsweise. Sie weigerte sich, zwischen dem Künstlerischen und dem Analytischen zu wählen, und setzte beides auf dasselbe Problem an. Die Vorstellungskraft zeigt, was möglich sein könnte. Die Analyse entscheidet dann, ob es so sein kann. Das kam aus ihrem eigenen Leben. Ihr Vater war der Dichter Lord Byron, ihre Mutter ließ sie in Mathematik unterrichten, und sie brachte beide Hälften zusammen, statt sich für eine zu entscheiden.',
         },
       ],
       disclosure: {
@@ -101,7 +101,7 @@ export const fragment: FigureFragment = {
         {
           h2: 'Ada Lovelace einfach erklärt',
           body:
-            'Ada Lovelace war Mathematikerin im viktorianischen England. Charles Babbage plante damals die Analytische Maschine, einen Rechner aus Messing, der nie fertig gebaut wurde. Lovelace übersetzte einen Aufsatz darüber und schrieb sieben eigene Anmerkungen dazu, die 1843 erschienen. Darin steht das Entscheidende. Erstens: Die Maschine rechnet nicht mit Zahlen, sie arbeitet mit Zeichen nach festen Regeln. Wenn du die Regeln eines Gebiets aufschreiben kannst, kann sie auch dieses Gebiet bearbeiten, zum Beispiel Musik. Zweitens: In Anmerkung G steht ein vollständiges Verfahren, das die Maschine allein ausführen könnte. Drittens: Sie hielt fest, dass die Maschine nichts von sich aus erschafft.',
+            'Ada Lovelace war Mathematikerin im viktorianischen England. Charles Babbage plante damals die Analytische Maschine, einen Rechner aus Messing, der nie fertig gebaut wurde. Lovelace übersetzte einen Aufsatz darüber und schrieb sieben eigene Anmerkungen dazu, die 1843 erschienen. Darin steht das Entscheidende. Erstens: Die Maschine rechnet nicht mit Zahlen, sie arbeitet mit Zeichen nach festen Regeln. Wenn sich die Regeln eines Gebiets aufschreiben lassen, kann sie auch dieses Gebiet bearbeiten, zum Beispiel Musik. Zweitens: In Anmerkung G steht ein vollständiges Verfahren, das die Maschine allein ausführen könnte. Drittens: Sie hielt fest, dass die Maschine nichts von sich aus erschafft.',
         },
       ],
       ideaQuestion: 'Ich soll mich zwischen Kunst und Analyse entscheiden. Muss ich wirklich?',

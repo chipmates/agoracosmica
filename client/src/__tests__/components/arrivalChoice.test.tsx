@@ -651,7 +651,7 @@ describe('ArrivalChoice copy and version', () => {
   it('speaks German, with the same three links', async () => {
     const { container } = await arriveAndListen(`/de/figures/marcus-aurelius/?gclid=${CLICK}`, 'de');
     expect(container.querySelector('.agc-consent__fine')!.textContent!.startsWith(
-      'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige dich zu uns gebracht hat und ob du 30\u00a0Sekunden zugehört hast. '
+      'Ein Ja schickt Google die Klick-ID der Anzeige. So sieht Google, dass die Anzeige Sie zu uns gebracht hat und ob Sie 30\u00a0Sekunden zugehört haben. '
     )).toBe(true);
     const labels = Array.from(container.querySelectorAll('.agc-consent__link')).map((a) => a.textContent);
     expect(labels).toEqual(['Code ansehen', 'Datenschutzerklärung', 'Wie Google das nutzt']);
@@ -664,7 +664,7 @@ describe('ArrivalChoice copy and version', () => {
     );
     const de = (await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
     expect(de.querySelector('.agc-consent__fine')!.textContent).toContain(
-      'zugehört hast. Google kann sie deinem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über dich.'
+      'zugehört haben. Google kann sie Ihrem Google-Konto zuordnen und auch in den USA verarbeiten. Für personalisierte Werbung geben wir sie nicht frei. Sonst nichts über Sie.'
     );
   });
 
@@ -678,7 +678,7 @@ describe('ArrivalChoice copy and version', () => {
   });
 
   it('carries the age line on its own, between the words and the answers', async () => {
-    for (const [lang, line] of [['en', 'If you’re under 16, please say no.'], ['de', 'Bist du unter 16, sag bitte Nein.']] as const) {
+    for (const [lang, line] of [['en', 'If you’re under 16, please say no.'], ['de', 'Sind Sie unter 16, sagen Sie bitte Nein.']] as const) {
       const { container, unmount } = await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, lang);
       const age = container.querySelector('.agc-consent__age')!;
       expect(age.textContent).toBe(line);
@@ -791,7 +791,7 @@ describe('ArrivalChoice after the legal read', () => {
     expect(labels).toEqual(['See the code', 'Privacy policy', 'How Google uses this']);
     const de = (await arriveAndListen(`/marcus-aurelius/?gclid=${CLICK}`, 'de')).container;
     expect(de.querySelector('.agc-consent')!.textContent).not.toMatch(/Tracking-Cookies|Profiling/);
-    expect(de.querySelector('.agc-consent__q')!.textContent).toBe('Dürfen wir deinen Besuch für Google zählen?');
+    expect(de.querySelector('.agc-consent__q')!.textContent).toBe('Dürfen wir Ihren Besuch für Google zählen?');
   });
 
   for (const [answer, pick] of [

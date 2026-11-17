@@ -30,15 +30,15 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Joseph Campbell lernen?',
-          a: 'Joseph Campbell (1904-1987) hat die Mythen der ganzen Welt gelesen und unter allen dieselbe Form gefunden. Er nannte sie den Monomythos. Die meisten kennen sie als Heldenreise: Verlass das Vertraute, lass dich erschüttern, komm verwandelt zurück. In seinem Buch Der Heros in tausend Gestalten (1949) beschreibt er sie in 17 Stationen, als Landkarte eines Lebens.',
+          a: 'Joseph Campbell (1904-1987) hat die Mythen der ganzen Welt gelesen und unter allen dieselbe Form gefunden. Er nannte sie den Monomythos. Die meisten kennen sie als Heldenreise: das Vertraute verlassen, sich erschüttern lassen, verwandelt zurückkommen. In seinem Buch Der Heros in tausend Gestalten (1949) beschreibt er sie in 17 Stationen, als Landkarte eines Lebens.',
         },
         {
           q: 'Was hat Joseph Campbell gelehrt?',
-          a: 'Joseph Campbell lehrte die Heldenreise: Aufbruch, Initiation, Rückkehr. Dieses Dreierschema fand er in Mythen weit voneinander entfernter Kulturen wieder, und 1949 legte er es in Der Heros in tausend Gestalten dar. Er lehrte, dass die Gestalten, die in solchen Geschichten den Weg versperren, nicht da sind, um dich aufzuhalten. Sie sind da, um zu prüfen, ob du bereit bist. Und er lehrte, dass der Mythos vier Aufgaben zugleich erfüllt. Er weckt das Staunen vor dem Geheimnis und zeigt dir, wo du im Universum stehst. Er hält eine Gesellschaft zusammen, und er führt einen Menschen durch die Stufen eines Lebens. Die letzte Aufgabe hielt er für Menschen von heute für die wichtigste.',
+          a: 'Joseph Campbell lehrte die Heldenreise: Aufbruch, Initiation, Rückkehr. Dieses Dreierschema fand er in Mythen weit voneinander entfernter Kulturen wieder, und 1949 legte er es in Der Heros in tausend Gestalten dar. Er lehrte, dass die Gestalten, die in solchen Geschichten den Weg versperren, nicht da sind, um uns aufzuhalten. Sie sind da, um zu prüfen, ob wir bereit sind. Und er lehrte, dass der Mythos vier Aufgaben zugleich erfüllt. Er weckt das Staunen vor dem Geheimnis und zeigt uns, wo wir im Universum stehen. Er hält eine Gesellschaft zusammen, und er führt einen Menschen durch die Stufen eines Lebens. Die letzte Aufgabe hielt er für Menschen von heute für die wichtigste.',
         },
         {
           q: 'Was meinte Campbell mit „Folge deiner Glückseligkeit“?',
-          a: 'Das ist der Satz, für den Campbell am häufigsten zitiert wird, und der am häufigsten falsch verstanden wird. Er meinte nicht: Tu, was sich gerade angenehm anfühlt. Glückseligkeit ist bei ihm das, was dich ganz ergreift. Du vergisst darin die Zeit, und dein Körper weiß es früher als dein Kopf, so wie eine Kompassnadel den Norden findet, ohne den Magnetismus zu verstehen. Vergnügen ist flach und schnell befriedigt. Das hier nicht. Er meinte das Zweite, und die Formel selbst benutzte er erst spät in seinem Leben.',
+          a: 'Das ist der Satz, für den Campbell am häufigsten zitiert wird, und der am häufigsten falsch verstanden wird. Er meinte nicht, man solle tun, was sich gerade angenehm anfühlt. Glückseligkeit ist bei ihm das, was einen ganz ergreift. Man vergisst darin die Zeit, und der Körper weiß es früher als der Kopf, so wie eine Kompassnadel den Norden findet, ohne den Magnetismus zu verstehen. Vergnügen ist flach und schnell befriedigt. Das hier nicht. Er meinte das Zweite, und die Formel selbst benutzte er erst spät in seinem Leben.',
         },
       ],
       disclosure: {
@@ -90,13 +90,13 @@ export const fragment: FigureFragment = {
           h2: 'Was ist die Heldenreise?',
           seedId: 5,
           body:
-            'Die Heldenreise ist ein Muster aus drei Teilen, das Campbell in Mythen weit entfernter Kulturen immer wieder fand. Aufbruch: Etwas bricht in den Alltag ein, und du verlässt das Vertraute. Initiation: Du gehst durch die Prüfung, die dich auseinandernimmt und anders wieder zusammensetzt. Rückkehr: Du kommst zurück und bringst etwas mit, das die anderen brauchen. Ausgeführt hat er das 1949 in Der Heros in tausend Gestalten. Für ihn ging es dabei nicht nur um Mythen. Er hielt das Muster für eine Beschreibung davon, wie Menschen sich tatsächlich verändern. Deshalb ist die nützliche Frage nicht, wie das Muster heißt, sondern an welcher Stelle du gerade stehst.',
+            'Die Heldenreise ist ein Muster aus drei Teilen, das Campbell in Mythen weit entfernter Kulturen immer wieder fand. Aufbruch: Etwas bricht in den Alltag ein, und man verlässt das Vertraute. Initiation: Man geht durch die Prüfung, die einen auseinandernimmt und anders wieder zusammensetzt. Rückkehr: Man kommt zurück und bringt etwas mit, das die anderen brauchen. Ausgeführt hat er das 1949 in Der Heros in tausend Gestalten. Für ihn ging es dabei nicht nur um Mythen. Er hielt das Muster für eine Beschreibung davon, wie Menschen sich tatsächlich verändern. Deshalb ist die nützliche Frage nicht, wie das Muster heißt, sondern an welcher Stelle man gerade steht.',
         },
         {
           h2: 'Was sind Schwellenhüter?',
           seedId: 6,
           body:
-            'In Mythen überall auf der Welt erreicht die Heldin oder der Held eine Grenze, und dort steht etwas. Ein Drache, ein Torwächter, ein Dämon, ein sperriger Alter. Campbell las diese Gestalten als Bilder für den Widerstand, der auftaucht, sobald du etwas ändern willst. Ein Teil davon sitzt in dir, als Angst und Zweifel. Ein Teil steht außen, als Menschen und Umstände. Sein Punkt war: Der Wächter ist nicht da, um die Reise zu beenden. Er ist da, um zu prüfen, ob du bereit bist. Wer ihm mit Mut begegnet statt mit Angriff oder Ausweichen, macht aus dem, was im Weg steht, oft einen Verbündeten.',
+            'In Mythen überall auf der Welt erreicht die Heldin oder der Held eine Grenze, und dort steht etwas. Ein Drache, ein Torwächter, ein Dämon, ein sperriger Alter. Campbell las diese Gestalten als Bilder für den Widerstand, der auftaucht, sobald man etwas ändern will. Ein Teil davon sitzt in einem selbst, als Angst und Zweifel. Ein Teil steht außen, als Menschen und Umstände. Sein Punkt war: Der Wächter ist nicht da, um die Reise zu beenden. Er ist da, um zu prüfen, ob man bereit ist. Wer ihm mit Mut begegnet statt mit Angriff oder Ausweichen, macht aus dem, was im Weg steht, oft einen Verbündeten.',
         },
         {
           h2: 'Welche Bücher hat Joseph Campbell geschrieben?',

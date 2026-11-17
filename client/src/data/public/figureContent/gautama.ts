@@ -29,7 +29,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Siddhartha Gautama (Buddha) lernen?',
-          a: "Siddhartha Gautama, der Buddha, lebte um das 5. Jahrhundert v. Chr. in Indien. Als Adliger der Śākya verließ er einen Palast, eine Frau und einen neugeborenen Sohn, um das Ende des Leidens zu finden. Dabei hungerte er sich fast zu Tode. Dann erinnerte er sich an einen stillen Moment seiner Kindheit unter einem Baum und hörte auf, sich zu quälen. Der Weg lag weder im Alles-Haben noch im Nichts-Haben. Von ihm lernst du, dem Verlangen beim Kommen und Gehen zuzusehen.",
+          a: "Siddhartha Gautama, der Buddha, lebte um das 5. Jahrhundert v. Chr. in Indien. Als Adliger der Śākya verließ er einen Palast, eine Frau und einen neugeborenen Sohn, um das Ende des Leidens zu finden. Dabei hungerte er sich fast zu Tode. Dann erinnerte er sich an einen stillen Moment seiner Kindheit unter einem Baum und hörte auf, sich zu quälen. Der Weg lag weder im Alles-Haben noch im Nichts-Haben. Von ihm lernt man, dem Verlangen beim Kommen und Gehen zuzusehen.",
         },
         {
           q: 'Was hat Siddhartha Gautama gelehrt?',
@@ -37,7 +37,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was ist die bedingte Entstehung?',
-          a: "Die bedingte Entstehung ist die Antwort des Buddha auf die Frage, woher die Dinge kommen. Nichts in deinem Erleben taucht für sich allein auf. Alles kommt zustande, weil Bedingungen zusammenkommen. Denk an Wasser in einem Krug. Es hängt vom Schnee der Berge ab, von Wolken, die sich woanders gesammelt haben, von den Händen, die es getragen haben. Nimm eine Bedingung weg, und es ist nicht da. Das Leiden betrachtete er genauso und verfolgte es über zwölf Glieder, vom nicht klaren Sehen bis zum Schmerz und wieder hinaus. Nützlich ist die Stelle, an der die Kette am dünnsten ist. Zwischen einem Gefühl und dem Verlangen danach liegt eine Lücke, und in dieser Lücke kannst du handeln.",
+          a: "Die bedingte Entstehung ist die Antwort des Buddha auf die Frage, woher die Dinge kommen. Nichts in unserem Erleben taucht für sich allein auf. Alles kommt zustande, weil Bedingungen zusammenkommen. Ein Beispiel ist Wasser in einem Krug. Es hängt vom Schnee der Berge ab, von Wolken, die sich woanders gesammelt haben, von den Händen, die es getragen haben. Fällt eine Bedingung weg, ist es nicht da. Das Leiden betrachtete er genauso und verfolgte es über zwölf Glieder, vom nicht klaren Sehen bis zum Schmerz und wieder hinaus. Nützlich ist die Stelle, an der die Kette am dünnsten ist. Zwischen einem Gefühl und dem Verlangen danach liegt eine Lücke, und in dieser Lücke kann man handeln.",
         },
       ],
       disclosure: {
@@ -94,24 +94,24 @@ export const fragment: FigureFragment = {
           h2: 'Die vier edlen Wahrheiten einfach erklärt',
           seedId: 2,
           body:
-            "Sie sind seine erste Lehre und der Rahmen für alles Weitere. Erstens. Leiden zieht sich durch das gewöhnliche Leben. Nicht nur das offensichtliche, auch das leise Ziehen, wenn du bekommst, was du wolltest, und am Abend schon das Nächste brauchst. Zweitens. Die Ursache ist das Begehren, in drei Formen. Vergnügen wollen, weiter dasein wollen, nicht mehr dasein wollen. Drittens. Es kann aufhören, und dieses Aufhören ist keine Stimmung, sondern vollständig. Viertens. Es gibt einen Weg, und er ist praktisch. Der Aufbau folgt bewusst der Medizin. Diagnose, Ursache, Prognose, Behandlung. Er verlangt nicht, dass du das glaubst. Er verlangt, dass du es prüfst.",
+            "Sie sind seine erste Lehre und der Rahmen für alles Weitere. Erstens. Leiden zieht sich durch das gewöhnliche Leben. Nicht nur das offensichtliche, auch das leise Ziehen, wenn man bekommt, was man wollte, und am Abend schon das Nächste braucht. Zweitens. Die Ursache ist das Begehren, in drei Formen. Vergnügen wollen, weiter dasein wollen, nicht mehr dasein wollen. Drittens. Es kann aufhören, und dieses Aufhören ist keine Stimmung, sondern vollständig. Viertens. Es gibt einen Weg, und er ist praktisch. Der Aufbau folgt bewusst der Medizin. Diagnose, Ursache, Prognose, Behandlung. Er verlangt nicht, dass man das glaubt. Er verlangt, dass man es prüft.",
         },
         {
           h2: 'Was ist der edle achtfache Pfad?',
           seedId: 3,
           body:
-            "Die acht Teile sind die Behandlung aus der vierten Wahrheit. Sie fallen in drei Gruppen. Wie du dich verhältst, wie du den Geist beruhigst, und was du verstehst. Die alten Wörter dafür sind Ethik, Sammlung und Weisheit. Die acht sind keine Stufen. Du hakst nicht eine ab und gehst weiter, sie wachsen gemeinsam, und eine Schwäche in einem Teil zeigt sich in den anderen. Der Weg heißt auch der Mittlere Weg, weil er zwischen zwei Sackgassen verläuft, die der Buddha selbst ausprobiert hatte. Ein Leben mit allem, und ein Leben, das den Körper bestraft. Keines von beiden beendete das Verlangen.",
+            "Die acht Teile sind die Behandlung aus der vierten Wahrheit. Sie fallen in drei Gruppen. Wie man sich verhält, wie man den Geist beruhigt, und was man versteht. Die alten Wörter dafür sind Ethik, Sammlung und Weisheit. Die acht sind keine Stufen. Man hakt nicht eine ab und geht weiter, sie wachsen gemeinsam, und eine Schwäche in einem Teil zeigt sich in den anderen. Der Weg heißt auch der Mittlere Weg, weil er zwischen zwei Sackgassen verläuft, die der Buddha selbst ausprobiert hatte. Ein Leben mit allem, und ein Leben, das den Körper bestraft. Keines von beiden beendete das Verlangen.",
         },
       ],
       ideaQuestion: 'Ich halte es keine zehn Minuten still mit mir aus. Was passiert da?',
       works: [
         {
           title: 'Dhammacakkappavattana Sutta (SN 56.11)',
-          note: 'Seine erste Lehrrede, das Ingangsetzen des Rades der Lehre. Die Vier Edlen Wahrheiten in ihrer kürzesten Form. Fang hier an.',
+          note: 'Seine erste Lehrrede, das Ingangsetzen des Rades der Lehre. Die Vier Edlen Wahrheiten in ihrer kürzesten Form. Hier fängt man am besten an.',
         },
         {
           title: 'Anattalakkhaṇa Sutta (SN 22.59)',
-          note: 'Die zweite Lehrrede, über das Nicht-Selbst. Er zerlegt die Erfahrung Stück für Stück und fragt bei jedem Stück, ob es wirklich du bist.',
+          note: 'Die zweite Lehrrede, über das Nicht-Selbst. Er zerlegt die Erfahrung Stück für Stück und fragt bei jedem Stück, ob es wirklich das eigene Ich ist.',
         },
         {
           title: 'Satipaṭṭhāna Sutta (MN 10)',

@@ -29,7 +29,7 @@ export const fragment: FigureFragment = {
       pairs: [
         {
           q: 'Was kann ich von Rumi lernen?',
-          a: "Rumi (1207-1273) war ein persischer Dichter und Sufi-Mystiker. Den größten Teil seines Lebens war er etwas anderes, nämlich ein angesehener islamischer Gelehrter und Rechtsgelehrter in Konya. Dann hielt ihn 1244 ein umherziehender Derwisch auf, und das Leben, das er aufgebaut hatte, zerfiel. Aus diesem Zerbrechen strömten einige der meistgeliebten Gedichte der Welt. Er lehrt, dass Liebe kein Trost ist. Sie ist ein Feuer, das dich leert.",
+          a: "Rumi (1207-1273) war ein persischer Dichter und Sufi-Mystiker. Den größten Teil seines Lebens war er etwas anderes, nämlich ein angesehener islamischer Gelehrter und Rechtsgelehrter in Konya. Dann hielt ihn 1244 ein umherziehender Derwisch auf, und das Leben, das er aufgebaut hatte, zerfiel. Aus diesem Zerbrechen strömten einige der meistgeliebten Gedichte der Welt. Er lehrt, dass Liebe kein Trost ist. Sie ist ein Feuer, das einen leert.",
         },
         {
           q: 'Was hat Rumi gelehrt?',
@@ -37,7 +37,7 @@ export const fragment: FigureFragment = {
         },
         {
           q: 'Was bedeutet Ishq?',
-          a: "Ishq ist die göttliche Liebe, und in der sufischen Lehre ist sie kein warmes Gefühl. Die Tradition kennt Stufen der Liebe, von der Zuneigung bis hin zu Ishq, die verzehrt. Rumi stellt sie in die Mitte von allem. Sie ist die Kraft, die alles Geschaffene dorthin zurückzieht, wo es herkommt, so wie die Motte der Flamme folgt. Deshalb sind seine Gedichte nicht ruhig. Das Masnavi beginnt mit einer Rohrflöte, die darüber klagt, dass sie vom Schilf abgeschnitten wurde, und genau diese Klage ist der Punkt. Die Sehnsucht, die du spürst, ist kein Fehler, den man beheben muss. Sie ist die Sache selbst, und sie zieht.",
+          a: "Ishq ist die göttliche Liebe, und in der sufischen Lehre ist sie kein warmes Gefühl. Die Tradition kennt Stufen der Liebe, von der Zuneigung bis hin zu Ishq, die verzehrt. Rumi stellt sie in die Mitte von allem. Sie ist die Kraft, die alles Geschaffene dorthin zurückzieht, wo es herkommt, so wie die Motte der Flamme folgt. Deshalb sind seine Gedichte nicht ruhig. Das Masnavi beginnt mit einer Rohrflöte, die darüber klagt, dass sie vom Schilf abgeschnitten wurde, und genau diese Klage ist der Punkt. Die Sehnsucht, die wir spüren, ist kein Fehler, den man beheben muss. Sie ist die Sache selbst, und sie zieht.",
         },
       ],
       disclosure: {
@@ -98,14 +98,14 @@ export const fragment: FigureFragment = {
         {
           h2: 'Rumi einfach erklärt',
           body:
-            "Rumi hat ein Thema, und das ist die Sehnsucht. Sein Bild dafür steht gleich am Anfang des Masnavi. Eine Rohrflöte klagt, weil sie vom Schilf abgeschnitten wurde, und genau diese Klage macht die Musik. So sieht er den Menschen. Etwas fehlt dir, du kannst es nicht benennen, und dieses Fehlen ist kein Defekt, sondern die Spur zurück. Drei Begriffe reichen. Ishq ist die Liebe als Kraft, nicht als Gefühl, sie zieht alles zu seinem Ursprung. Qalb, das Herz, ist bei ihm ein Organ der Erkenntnis, nicht nur der Gefühle. Fana ist das Loslassen des kleinen, abgetrennten Ich. Und was danach bleibt, heißt Baqa.",
+            "Rumi hat ein Thema, und das ist die Sehnsucht. Sein Bild dafür steht gleich am Anfang des Masnavi. Eine Rohrflöte klagt, weil sie vom Schilf abgeschnitten wurde, und genau diese Klage macht die Musik. So sieht er den Menschen. Etwas fehlt ihm, er kann es nicht benennen, und dieses Fehlen ist kein Defekt, sondern die Spur zurück. Drei Begriffe reichen. Ishq ist die Liebe als Kraft, nicht als Gefühl, sie zieht alles zu seinem Ursprung. Qalb, das Herz, ist bei ihm ein Organ der Erkenntnis, nicht nur der Gefühle. Fana ist das Loslassen des kleinen, abgetrennten Ich. Und was danach bleibt, heißt Baqa.",
         },
       ],
       ideaQuestion: 'Ich muss etwas loslassen und habe Angst vor dem, was dann bleibt. Was bleibt denn?',
       works: [
         {
           title: 'Divan-e Shams-e Tabrizi',
-          note: 'Seine lyrischen Gedichte, entstanden etwa zwischen 1248 und 1273 und benannt nach dem Freund, der ihn verwandelt hat. Ekstatisch, ungleichmäßig, lebendig. Du kannst irgendwo aufschlagen.',
+          note: 'Seine lyrischen Gedichte, entstanden etwa zwischen 1248 und 1273 und benannt nach dem Freund, der ihn verwandelt hat. Ekstatisch, ungleichmäßig, lebendig. Man kann ihn irgendwo aufschlagen.',
         },
         {
           title: "Masnavi-yi Ma'navi",

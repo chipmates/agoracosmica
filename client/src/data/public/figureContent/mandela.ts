@@ -83,7 +83,7 @@ export const fragment: FigureFragment = {
           h2: 'Was bedeutet Ubuntu?',
           seedId: 1,
           body:
-            "Ubuntu ist ein Gedanke aus dem südlichen Afrika darüber, was ein Mensch ist. Dahinter steht der Nguni-Bantu-Satz 'umuntu ngumuntu ngabantu', ein Mensch ist ein Mensch durch andere Menschen. Du kommst nicht fertig auf die Welt und triffst dann andere. Du wirst du selbst mitten unter ihnen, durch das, was du gibst, und das, was du bekommst. Das hat eine harte Kante. Wenn jemand neben dir wie ein halber Mensch behandelt wird, nimmt deine eigene Menschlichkeit ebenfalls Schaden. Deine Rechte und das, was du anderen schuldest, stehen also nicht gegeneinander. Es ist eine Sache, von zwei Seiten gesehen. Für Mandela war das die Grundlage des Kampfes gegen die Apartheid und des Friedens danach.",
+            "Ubuntu ist ein Gedanke aus dem südlichen Afrika darüber, was ein Mensch ist. Dahinter steht der Nguni-Bantu-Satz 'umuntu ngumuntu ngabantu', ein Mensch ist ein Mensch durch andere Menschen. Man kommt nicht fertig auf die Welt und trifft dann andere. Zu sich selbst wird man mitten unter ihnen, durch das, was man gibt, und das, was man bekommt. Das hat eine harte Kante. Wenn jemand neben einem wie ein halber Mensch behandelt wird, nimmt die eigene Menschlichkeit ebenfalls Schaden. Die eigenen Rechte und das, was man anderen schuldet, stehen also nicht gegeneinander. Es ist eine Sache, von zwei Seiten gesehen. Für Mandela war das die Grundlage des Kampfes gegen die Apartheid und des Friedens danach.",
         },
         {
           h2: 'Wie lange war Nelson Mandela im Gefängnis?',
@@ -104,7 +104,7 @@ export const fragment: FigureFragment = {
         },
         {
           title: 'Der lange Weg zur Freiheit (1994)',
-          note: 'Sein eigener Bericht über den ganzen Weg, erschienen vier Jahre nach seiner Freilassung. Das eine Buch, wenn du die Geschichte in seinen Worten willst.',
+          note: 'Sein eigener Bericht über den ganzen Weg, erschienen vier Jahre nach seiner Freilassung. Das eine Buch für alle, die die Geschichte in seinen Worten wollen.',
         },
         {
           title: 'Antrittsrede als Präsident (10. Mai 1994)',
