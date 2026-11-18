@@ -45,7 +45,7 @@ const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
     prism: { tab: 'Prism', glyph: 'Hear a dialogue', kicker: 'A four-voice dialogue between Echoes', duration: 'The opening exchange', playLabel: 'Play the opening', scale: 'one of 360 prism dialogues', disclosure: 'Four AI Echoes in dialogue. Interpretations, not recordings.', linkLabel: 'Hear the full dialogue' },
     quest: { tab: 'Quest', glyph: 'Test yourself', kicker: 'A short Socratic challenge', linkLabel: 'Take the quest' },
     council: { tab: 'Council', glyph: 'Hear a debate', kicker: 'A four-voice debate you sit in on', playLabel: 'Play preview', duration: '0:50', scale: 'one of 110 council debates', disclosure: 'Four AI Echoes, one of them moderating. Interpretations, not recordings.', linkLabel: 'See the debate' },
-    freetalk: { tab: 'Free Talk', glyph: 'Ask anything', kicker: 'Open conversation, whenever you want', scale: '30 free messages a day', linkLabel: 'Start talking' },
+    freetalk: { tab: 'Free Talk', glyph: 'Ask anything', kicker: 'Open conversation, whenever you want', scale: 'Stories free to hear and to read', linkLabel: 'Start talking' },
   },
   de: {
     story: { tab: 'Story', glyph: 'Mit Geschichten lernen', kicker: 'Eine Lehre, als Geschichte erzählt', playLabel: 'Kapitel 1 abspielen', duration: '~13 Min.', scale: 'das erste von zwölf Kapiteln', scaleAny: 'eines von zwölf Kapiteln', disclosure: 'Jedes Kapitel macht aus einer Idee eine Szene, durch die du dich bewegst, gelesen in der KI-Echo-Stimme. Eine Deutung, keine Aufnahme.', linkLabel: 'Die ganze Geschichte hören' },
@@ -53,7 +53,7 @@ const TX: Record<'en' | 'de', Record<string, ModeCopy>> = {
     prism: { tab: 'Prisma', glyph: 'Einen Dialog hören', kicker: 'Ein vierstimmiger Dialog zwischen Echos', duration: 'Der erste Wortwechsel', playLabel: 'Den Anfang abspielen', scale: 'einer von 360 Prisma-Dialogen', disclosure: 'Vier KI-Echos im Dialog. Deutungen, keine Aufnahmen.', linkLabel: 'Den ganzen Dialog hören' },
     quest: { tab: 'Quest', glyph: 'Dich selbst prüfen', kicker: 'Eine kurze sokratische Herausforderung', linkLabel: 'Die Quest starten' },
     council: { tab: 'Council', glyph: 'Eine Debatte hören', kicker: 'Eine vierstimmige Debatte, bei der du zuhörst', playLabel: 'Vorschau abspielen', duration: '0:50', scale: 'eine von 110 Council-Debatten', disclosure: 'Vier KI-Echos, eines davon moderiert. Deutungen, keine Aufnahmen.', linkLabel: 'Die Debatte ansehen' },
-    freetalk: { tab: 'Free Talk', glyph: 'Frag alles', kicker: 'Offenes Gespräch, wann immer du willst', scale: '30 kostenlose Nachrichten pro Tag', linkLabel: 'Jetzt loslegen' },
+    freetalk: { tab: 'Free Talk', glyph: 'Frag alles', kicker: 'Offenes Gespräch, wann immer du willst', scale: 'Geschichten kostenlos zum Hören und Lesen', linkLabel: 'Jetzt loslegen' },
   },
 };
 

@@ -399,7 +399,7 @@ export function getFiguresFaq(lang: Lang): FaqEntry[] {
       },
       {
         q: 'Ist die Nutzung kostenlos?',
-        a: '30 kostenlose Nachrichten pro Tag, ohne Anmeldung. Willst du mehr, bring deinen eigenen OpenRouter-Schlüssel mit. Die ganze Plattform ist Open Source unter der AGPL-3.0, gemeinnützig, und es gibt keine Tracking-Cookies und keine Profile darüber, wer du bist.',
+        a: 'Die Geschichten kann man kostenlos hören und lesen, ohne Konto und ohne Anmeldung. Die ganze Plattform ist Open Source unter der AGPL-3.0, gemeinnützig, und es gibt keine Tracking-Cookies und keine Profile darüber, wer du bist.',
       },
     ];
   }
@@ -418,7 +418,7 @@ export function getFiguresFaq(lang: Lang): FaqEntry[] {
     },
     {
       q: 'Is it free to use?',
-      a: 'You get 30 free messages a day with no signup. Want more, bring your own OpenRouter key. The whole platform is open source under AGPL-3.0 and nonprofit, with no tracking cookies and no profiles of who you are.',
+      a: 'The stories are free to hear and to read, with no account and no signup. The whole platform is open source under AGPL-3.0 and nonprofit, with no tracking cookies and no profiles of who you are.',
     },
   ];
 }
