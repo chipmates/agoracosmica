@@ -95,23 +95,6 @@
   font-weight: 500;
 }
 
-.legal-doc__jugendschutz {
-  display: flex;
-  align-items: flex-start;
-  gap: 1.25rem;
-}
-
-.legal-doc__jugendschutz img {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.legal-doc__jugendschutz p {
-  margin: 0;
-}
-
 .legal-doc table {
   width: 100%;
   border-collapse: collapse;
