@@ -1471,11 +1471,11 @@
   "legal": {
     "privacy": {
       "title": "Datenschutzerklärung",
-      "lastUpdated": "Stand: 22. Oktober 2026"
+      "lastUpdated": "Stand: 27. November 2026"
     },
     "imprint": {
       "title": "Impressum",
-      "lastUpdated": "Stand: 5. Oktober 2026"
+      "lastUpdated": "Stand: 27. November 2026"
     },
     "terms": {
       "title": "Nutzungsbedingungen"
@@ -1494,7 +1494,6 @@
       "clickwrapMid": "zu und bist mindestens 16 Jahre alt.",
       "termsLink": "Nutzungsbedingungen",
       "privacyNote": "Datenschutzerklärung",
-      "jsbNote": "Jugendschutzbeauftragter",
       "startButton": "Jetzt entdecken",
       "aiNoticeKicker": "KI-Hinweis",
       "termsUpdated": "Neue {link} (Version\u00a0{version}, {date}) für den heutigen Dienst.",

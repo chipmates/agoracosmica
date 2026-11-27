@@ -106,10 +106,9 @@ const NutzungsbedingungenPage: FC = () => {
 
       <section className="legal-section">
         <h2>§ 7 Protection of Minors</h2>
-        <p>(1) The Provider has appointed a Youth Protection Officer pursuant to Sect. 7 JMStV (the German Interstate Treaty on the Protection of Minors in the Media). Their contact details are provided in the <Link to="/impressum#jugendschutz">Imprint</Link>.</p>
-        <p>(2) The Service uses technical protective measures to prevent the generation of content harmful to minors. Despite these measures, it cannot be ruled out that AI-generated content may be inappropriate in individual cases.</p>
-        <p>(3) Users and legal guardians can report problematic content via the reporting function in the chat or by email to <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.</p>
-        <p>(4) If you are in a crisis or need help, please contact the Telefonseelsorge crisis line (0800 111 0 111, free of charge, 24/7) or the Nummer gegen Kummer helpline (116 111).</p>
+        <p>(1) The Service uses technical protective measures to prevent the generation of content harmful to minors. Despite these measures, it cannot be ruled out that AI-generated content may be inappropriate in individual cases.</p>
+        <p>(2) Users and legal guardians can report problematic content via the reporting function in the chat or by email to <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a>.</p>
+        <p>(3) If you are in a crisis or need help, please contact the Telefonseelsorge crisis line (0800 111 0 111, free of charge, 24/7) or the Nummer gegen Kummer helpline (116 111).</p>
       </section>
 
       <section className="legal-section">
@@ -217,10 +216,9 @@ const NutzungsbedingungenPage: FC = () => {
 
         <section className="legal-section">
           <h2>§ 7 Jugendschutz</h2>
-          <p>(1) Der Anbieter hat gemäß § 7 JMStV einen Jugendschutzbeauftragten bestellt. Dessen Kontaktdaten sind im <Link to="/impressum#jugendschutz">Impressum</Link> angegeben.</p>
-          <p>(2) Der Dienst setzt technische Schutzmaßnahmen ein, um die Erzeugung jugendgefährdender Inhalte zu verhindern. Trotz dieser Maßnahmen kann nicht ausgeschlossen werden, dass KI-generierte Inhalte im Einzelfall unangemessen sein können.</p>
-          <p>(3) Nutzer und Erziehungsberechtigte können problematische Inhalte über die Meldefunktion im Chat oder per E-Mail an <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a> melden.</p>
-          <p>(4) Sollten Sie sich in einer Krise befinden oder Hilfe benötigen, wenden Sie sich bitte an die Telefonseelsorge (0800 111 0 111, kostenlos, 24/7) oder an die Nummer gegen Kummer (116 111).</p>
+          <p>(1) Der Dienst setzt technische Schutzmaßnahmen ein, um die Erzeugung jugendgefährdender Inhalte zu verhindern. Trotz dieser Maßnahmen kann nicht ausgeschlossen werden, dass KI-generierte Inhalte im Einzelfall unangemessen sein können.</p>
+          <p>(2) Nutzer und Erziehungsberechtigte können problematische Inhalte über die Meldefunktion im Chat oder per E-Mail an <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a> melden.</p>
+          <p>(3) Sollten Sie sich in einer Krise befinden oder Hilfe benötigen, wenden Sie sich bitte an die Telefonseelsorge (0800 111 0 111, kostenlos, 24/7) oder an die Nummer gegen Kummer (116 111).</p>
         </section>
 
         <section className="legal-section">

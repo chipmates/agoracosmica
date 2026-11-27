@@ -1469,11 +1469,11 @@
   "legal": {
     "privacy": {
       "title": "Privacy Policy",
-      "lastUpdated": "Last updated: October 22, 2026"
+      "lastUpdated": "Last updated: November 27, 2026"
     },
     "imprint": {
       "title": "Impressum",
-      "lastUpdated": "Last updated: October 5, 2026"
+      "lastUpdated": "Last updated: November 27, 2026"
     },
     "terms": {
       "title": "Terms of Service"
@@ -1492,7 +1492,6 @@
       "clickwrapMid": "and you are 16 or older.",
       "termsLink": "Terms of Service",
       "privacyNote": "Privacy Policy",
-      "jsbNote": "Youth Protection Officer",
       "startButton": "Start exploring",
       "aiNoticeKicker": "AI notice",
       "termsUpdated": "New {link} (version\u00a0{version}, {date}), made for today's service.",

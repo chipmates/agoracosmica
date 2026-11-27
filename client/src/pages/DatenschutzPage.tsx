@@ -284,7 +284,6 @@ const DatenschutzPage: FC = () => {
           <ul>
             <li>Altersbestätigung vor der ersten Chat-Nutzung</li>
             <li>Technische Inhaltssicherung (mehrschichtige Inhaltsfilterung)</li>
-            <li>Jugendschutzbeauftragter benannt (siehe <a href="/impressum#jugendschutz">Impressum</a>)</li>
           </ul>
         </section>
 

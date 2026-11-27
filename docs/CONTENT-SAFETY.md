@@ -133,7 +133,7 @@ The log holds no message content, no visitor identifier and no conversation cont
 
 **§4 JMStV.** The absolute violations, a short and deliberately tight list, are also scanned in the outgoing stream, so a model that produces one is cut off mid-reply.
 
-**JMStV in general.** The site carries an `age-de.xml` declaration rated 16 and up, screening runs for everyone, and a youth protection officer is appointed under §7 JMStV and named on the [Impressum page](https://agoracosmica.org/impressum#jugendschutz). See [COMPLIANCE.md](COMPLIANCE.md).
+**JMStV in general.** The site carries an `age-de.xml` declaration rated 16 and up, and screening runs for everyone. See [COMPLIANCE.md](COMPLIANCE.md).
 
 ---
 

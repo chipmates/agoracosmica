@@ -305,10 +305,6 @@ const WelcomeDisclosureModal: FC<WelcomeDisclosureModalProps> = ({ isOpen, onCom
             <a href={language === 'de' ? '/datenschutz' : '/privacy'} target="_blank" rel="noopener" className={styles.consentLink}>
               {tNode('legal.consent.privacyNote')}
             </a>
-            {' · '}
-            <a href="/impressum#jugendschutz" target="_blank" rel="noopener" className={styles.consentLink}>
-              {tNode('legal.consent.jsbNote')}
-            </a>
           </p>
         </div>
       </div>

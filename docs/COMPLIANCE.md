@@ -95,7 +95,7 @@ The welcome screen asks for three confirmations before the first conversation: t
 
 ### Impressum (§5 DDG / §18 MStV)
 
-The [Impressum page](https://agoracosmica.org/impressum) carries the operator details, the person responsible under §18 (2) MStV, the AI note, a consumer dispute resolution section, and the youth protection officer appointed under §7 JMStV with a direct email address.
+The [Impressum page](https://agoracosmica.org/impressum) carries the operator details, the person responsible under §18 (2) MStV, the AI note, and a consumer dispute resolution section.
 
 ---
 

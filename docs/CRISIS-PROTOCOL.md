@@ -48,7 +48,7 @@ A category, a timestamp, a hashed connection address, the figure, the format and
 
 ## Age
 
-The site carries the age-de label for sixteen and older and a youth protection officer is named in the Impressum. See [COMPLIANCE.md](COMPLIANCE.md).
+The site carries the age-de label for sixteen and older. See [COMPLIANCE.md](COMPLIANCE.md).
 
 ## When we get it wrong
 

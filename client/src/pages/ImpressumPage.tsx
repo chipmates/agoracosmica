@@ -102,24 +102,6 @@ const ImpressumPage: FC = () => {
           </p>
         </section>
 
-        <section className="legal-section" id="jugendschutz">
-          <h2>Jugendschutzbeauftragter gemäß § 7 JMStV</h2>
-          <div style={{ display: 'flex', alignItems: 'flex-start', gap: '1.25rem' }}>
-            <img
-              src="/assets/images/jugendschutz-siegel.jpeg"
-              alt="Jugendschutz-Siegel der IT-Recht Kanzlei"
-              width={80}
-              height={80}
-              style={{ borderRadius: '50%', flexShrink: 0 }}
-            />
-            <p style={{ margin: 0 }}>
-              Rechtsanwalt Jan Müller<br/>
-              IT-Recht Kanzlei, München<br/>
-              E-Mail: <a href="mailto:jugendschutzbeauftragter@it-recht-kanzlei.de">jugendschutzbeauftragter@it-recht-kanzlei.de</a>
-            </p>
-          </div>
-        </section>
-
         <section className="legal-section">
           <h2>Hinweis zur künstlichen Intelligenz</h2>
           <p>
