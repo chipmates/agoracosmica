@@ -3,7 +3,7 @@ import Public from '../layouts/Public.astro';
 import LegalDoc from '../components/legal/LegalDoc.astro';
 
 const title = 'Cookie-Richtlinie';
-const lastUpdated = 'Zuletzt aktualisiert: 14. Oktober 2026';
+const lastUpdated = 'Zuletzt aktualisiert: 27. November 2026';
 const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analyse- oder Marketing-Cookies. Für die Werbe-Messung speichern wir erst etwas, wenn Sie antworten: Ihr Ja oder Nein, und die Klick-ID nur nach einem Ja.';
 ---
 <Public
@@ -51,23 +51,8 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analy
         </thead>
         <tbody>
           <tr>
-            <td>IndexedDB</td>
-            <td>Ihre Gespräche und Ihr Fortschritt, verschlüsselt, nur auf Ihrem Gerät. Bei BYOK auch Ihr eigener API-Schlüssel, verschlüsselt</td>
-            <td>Bis Sie sie löschen</td>
-          </tr>
-          <tr>
             <td>Local Storage</td>
-            <td>Spracheinstellung, Zustimmung zu den Nutzungsbedingungen, Altersbestätigung, Zustand der App (Fortschritt, gesehene Hinweise)</td>
-            <td>Bis Sie sie löschen</td>
-          </tr>
-          <tr>
-            <td>Local Storage (<code>agora_client_id</code>)</td>
-            <td>Zufällige Browser-Kennung für das tägliche kostenlose Kontingent, nur dafür genutzt</td>
-            <td>Ein Tag, danach beim nächsten Öffnen der App gelöscht</td>
-          </tr>
-          <tr>
-            <td>Local Storage (<code>community_tally_id</code>)</td>
-            <td>Zufällige Kennung, damit Ihr Browser in der Community-Zählung nur einmal zählt. Entsteht erst, wenn Sie sich zählen lassen</td>
+            <td>Spracheinstellung, Ihr Fortschritt und der Zustand der Seiten, etwa wo Sie in einer Geschichte stehen, gehörte und gelesene Geschichten, gemerkte Sätze und Ihre Einstellungen für Wiedergabe und Darstellung</td>
             <td>Bis Sie sie löschen</td>
           </tr>
           <tr>
@@ -77,7 +62,7 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analy
           </tr>
           <tr>
             <td>Session Storage</td>
-            <td>Was Sie auf unseren Seiten gewählt haben, bevor Sie in die App gehen, ob die Startseite Sie schon weitergeleitet hat, bereits erstellte Zusammenfassungen, Zustand der Oberfläche</td>
+            <td>Der Zustand der Oberfläche, etwa ob ein Hinweis schon gezeigt wurde</td>
             <td>Bis Sie den Tab schließen</td>
           </tr>
           <tr>
@@ -97,7 +82,7 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analy
     <section>
       <h2>Sicherheits-Cookie (__cf_bm)</h2>
       <p>
-        Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt Sie nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Anwendung sich vor automatisiertem Missbrauch schützen kann. Nach einer Sicherheitsprüfung setzt Cloudflare außerdem cf_clearance, ebenfalls technisch notwendig.
+        Wir verwenden ein technisch notwendiges Cookie, das Cloudflare für Bot-Schutz und Firewall (WAF) setzt. Es trackt Sie nicht über Websites hinweg, enthält keine personenbezogenen Daten und ist nötig, damit die Website sich vor automatisiertem Missbrauch schützen kann. Nach einer Sicherheitsprüfung setzt Cloudflare außerdem cf_clearance, ebenfalls technisch notwendig.
       </p>
 
       <table>
@@ -122,9 +107,9 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analy
 
     <section>
       <h2>Was wir NICHT verwenden</h2>
-      <p>Abgesehen von den oben genannten Sicherheits-Cookies verwenden wir KEINE:</p>
+      <p>Abgesehen von den oben genannten Sicherheits-Cookies und der freiwilligen Werbe-Messung verwenden wir KEINE:</p>
       <ul>
-        <li>Analyse-Cookies oder Tracking (z.B. Google Analytics, Facebook Pixel)</li>
+        <li>Analyse-Cookies oder Analysedienste von Drittanbietern (z. B. Google Analytics, Facebook Pixel)</li>
         <li>Marketing- oder Werbe-Cookies</li>
         <li>Social Media Tracking-Cookies</li>
         <li>Tracking-Cookies von Drittanbietern</li>
@@ -135,21 +120,21 @@ const description = 'Cookie-Richtlinie von Agora Cosmica. Keine Tracking-, Analy
     <section>
       <h2>Ihre Datenschutzrechte</h2>
       <p>
-        Wir verwenden keine Tracking-Cookies, Ihre Privatsphäre ist standardmäßig geschützt. Die einzige Einstellung, die Sie verwalten können, ist die freiwillige Werbe-Messung für Besuche über eine unserer kostenlosen Google-Anzeigen. Sie können diese Einwilligung jederzeit über den Link „Werbe-Messung“ unten auf jeder Seite widerrufen, oder in der App unter Optionen › Recht &amp; Datenschutz. Der Widerruf löscht die gespeicherte Klick-ID und vermerkt Ihr Nein. Die übrige Speicherung ist für Funktionen nötig, die Sie nutzen, etwa Ihre Sprachauswahl.
+        Wir verwenden keine Tracking-Cookies, Ihre Privatsphäre ist standardmäßig geschützt. Die einzige Einstellung, die Sie verwalten können, ist die freiwillige Werbe-Messung für Besuche über eine unserer kostenlosen Google-Anzeigen. Sie können diese Einwilligung jederzeit über den Link „Werbe-Messung“ unten auf jeder Seite widerrufen. Der Widerruf löscht die gespeicherte Klick-ID und vermerkt Ihr Nein. Die übrige Speicherung ist für Funktionen nötig, die Sie nutzen, etwa Ihre Sprachauswahl.
       </p>
     </section>
 
     <section>
       <h2>Datenschutzfreundliche Analyse</h2>
       <p>
-        Wir zählen anonyme Ereignisse über einen eigenen Zähler auf unserem Server (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Jede Zählung trägt nur grobe Angaben, etwa was geschah, die Sprache, ein Länder-Kürzel und die Geräteart, und beim Start eines Besuchs ein grobes Stichwort zur Herkunft, zum Beispiel „Suche“ oder „direkt“. Für die Zählung wird nichts auf Ihrem Gerät gespeichert oder ausgelesen. Wir speichern keine IP-Adressen in der Analyse, verfolgen keine Einzelpersonen und bilden keine Profile. Einzelheiten stehen in unserer Datenschutzerklärung im Abschnitt „Reichweitenmessung“.
+        Wir zählen anonyme Ereignisse über einen eigenen Zähler auf unserem Server (kein Drittanbieter-Dienst, kein Cookie, kein Pixel). Jede Zählung trägt nur grobe Angaben, etwa was geschah, die Sprache, ein Länder-Kürzel und die Geräteart, und beim Start eines Besuchs ein grobes Stichwort zur Herkunft, zum Beispiel „Suche“ oder „direkt“. Für die Zählung wird auf Ihrem Gerät nichts gespeichert. Gelesen wird nur, ob der Browser ein Testmerkmal für unsere eigenen Testbesuche trägt (agc_probe, nur vorhanden nach dem Öffnen einer Adresse mit ?probe=1). Wir speichern keine IP-Adressen in der Analyse, verfolgen keine Einzelpersonen und bilden keine Profile. Einzelheiten stehen in unserer Datenschutzerklärung im Abschnitt „Reichweitenmessung“.
       </p>
     </section>
 
     <section>
       <h2>Änderungen dieser Richtlinie</h2>
       <p>
-        Wenn wir Änderungen an unseren Cookie-Praktiken vornehmen, werden wir diese Richtlinie aktualisieren und die Nutzer entsprechend informieren.
+        Wenn wir Änderungen an unseren Cookie-Praktiken vornehmen, werden wir diese Richtlinie aktualisieren und das Datum oben anpassen.
       </p>
     </section>
 

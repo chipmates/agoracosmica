@@ -38,13 +38,11 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         * Rights of data subjects<br/>
         * Cookies and local storage<br/>
         * Provision of the online offering and web hosting<br/>
-        * AI-powered chat service<br/>
-        * Audio service<br/>
-        * Community tally<br/>
-        * Bot protection (Cloudflare Turnstile)<br/>
+        * Storage on your device<br/>
+        * Processors<br/>
         * Conversion measurement (Google Ads)<br/>
         * Reach measurement<br/>
-        * Processors
+        * Dispute resolution
       </p>
     </section>
 
@@ -97,7 +95,6 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       </p>
       <ul>
         <li>Consent (Art. 6(1)(a) GDPR)</li>
-        <li>Performance of a contract and pre-contractual requests (Art. 6(1)(b) GDPR)</li>
         <li>Legitimate interests (Art. 6(1)(f) GDPR)</li>
       </ul>
       <p>
@@ -132,9 +129,6 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
       <p>
         <strong>EU-US Trans-Atlantic Data Privacy Framework:</strong> Certain companies in the USA provide a recognized level of data protection through the Data Privacy Framework (DPF), which has been recognized as safe within the scope of an adequacy decision.
       </p>
-      <p>
-        <strong>United Kingdom (AI inference in the free mode):</strong> The primary model of the free mode is served by Nebius from a data center in the United Kingdom. What is transferred is the text of your messages and the model's reply, no name, no account data and no IP address. The European Commission recognizes the United Kingdom as providing an adequate level of data protection (adequacy decision under Art. 45 GDPR, renewed on 19 December 2025 and in force until 27 December 2031), so this transfer requires no additional safeguards. Should that decision lapse, the standard contractual clauses contained in our data processing agreement with Nebius apply as the safeguard. The fallback model runs in Finland (EEA).
-      </p>
     </section>
 
     <section>
@@ -149,9 +143,6 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <li>Right to data portability (Art. 20 GDPR)</li>
         <li>Right to lodge a complaint with a supervisory authority (Art. 77 GDPR)</li>
       </ul>
-      <p>
-        <strong>Erasing your data:</strong> Because all chat data is stored exclusively locally on your device (encrypted in IndexedDB), you can remove it completely at any time by clearing your browser data. Server-side erasure is not necessary, as we do not store chat content on our servers.
-      </p>
       <p>
         <strong>Competent supervisory authority:</strong> The State Commissioner for Data Protection and Freedom of Information of Baden-Württemberg, Heilbronner Straße 35, 70191 Stuttgart, Germany, <a href="https://www.baden-wuerttemberg.datenschutz.de">www.baden-wuerttemberg.datenschutz.de</a>.
       </p>
@@ -182,10 +173,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         * Legitimate interests (Art. 6(1)(f) GDPR)
       </p>
       <p>
-        <strong>Web hosting:</strong> The website is delivered via Cloudflare Pages (Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA) as a content delivery network. Cloudflare is certified under the EU-US Data Privacy Framework (DPF). When delivering the static website files (HTML, CSS, JavaScript), IP addresses are recorded in Cloudflare access logs. No chat content, audio data, or other user data is processed via Cloudflare Pages.
+        <strong>Web hosting:</strong> The website is delivered via Cloudflare Pages (Cloudflare, Inc., 101 Townsend St, San Francisco, CA 94107, USA) as a content delivery network. Cloudflare is certified under the EU-US Data Privacy Framework (DPF). When delivering the static website files (HTML, CSS, JavaScript), IP addresses are recorded in Cloudflare access logs. Beyond this, no user data is processed via Cloudflare Pages.
       </p>
       <p>
-        <strong>Audio server:</strong> For voice processing (TTS/STT) we operate our own server at Hetzner Online GmbH, Industriestr. 25, 91710 Gunzenhausen, Germany. Location: Falkenstein, Germany. Hetzner's privacy policy: <a href="https://www.hetzner.com/legal/privacy-policy">https://www.hetzner.com/legal/privacy-policy</a>.
+        <strong>Audio files and images:</strong> The stories you can listen to are pre-recorded audio files. We deliver these files and the images from our own storage at Cloudflare (media.agoracosmica.org). As with the website, your IP address is processed to transmit the files to your browser.
       </p>
       <p>
         Data is collected on the basis of Art. 6(1)(f) GDPR. The operator has a legitimate interest in the technically error-free presentation and reliable provision of the service.
@@ -193,77 +184,18 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     </section>
 
     <section>
-      <h2>AI-powered chat service</h2>
-      <p>Our chat service uses artificial intelligence (AI) to generate educational content. The following data is processed:</p>
-      <p><strong>Data processed:</strong></p>
-      <ul>
-        <li>Your chat inputs, together with the conversation so far, which the app sends with each message so the figure can answer in context</li>
-        <li>Technical data: IP address, time, and a random browser ID that the app keeps in your browser for the daily free quota</li>
-        <li>Language setting</li>
-      </ul>
-      <p><strong>Purpose of processing:</strong> Provision of the AI-powered educational service (Art. 6(1)(b) GDPR, performance of a contract).</p>
-      <p><strong>Processors:</strong></p>
-      <ul>
-        <li>Nebius B.V. (Netherlands), processing in uk-south1 (United Kingdom) and eu-north1 (Finland, EEA). Purpose: AI inference (text generation) in the free mode. The primary model answers from the United Kingdom. The fallback model in Finland answers when the primary model's daily budget is used up or the model is unavailable. No data retention (Zero Data Retention enabled, which Nebius applies to our whole organization account and to every region). No training on user data. The data processing agreement is integrated into the Nebius terms of use.</li>
-        <li>Cloudflare, Inc. (USA), processing predominantly in Europe. Purpose: API proxy, security (WAF, bot protection), rate limiting. The data processing agreement is available in the Cloudflare dashboard. EU Cloud Code of Conduct compliance mark.</li>
-      </ul>
-      <p><strong>Your own AI access (your own key or another AI server):</strong> If you add your own OpenRouter key, your browser sends your typed messages straight to OpenRouter, Inc. (USA), under your own OpenRouter account and its terms. These messages do not pass through our servers, and we do not see or receive them. There is one exception. If OpenRouter rejects your key and you agree in the app to continue on the daily free quota, the conversation concerned (with what was written before), a question to a council or a conversation to be summarized passes through our servers, as without your own key. Only what you said yes to passes through our servers as content. As in the free mode, the legal basis is then Art. 6(1)(b) GDPR (performance of a contract). Your key is stored only in your browser, encrypted. While the "Zero Data Retention" switch is on (the default), the app asks OpenRouter to route only to providers that keep no data. OpenRouter's privacy policy: <a href="https://openrouter.ai/privacy">https://openrouter.ai/privacy</a>. If you instead enter the address of another AI server in the settings, for example one you run yourself, your browser sends your typed messages straight to that server, under its operator's terms. These messages do not pass through our servers either. A key for that server is also stored only in your browser, encrypted. In both cases our speech server still turns spoken input into text and the responses into speech for reading aloud, except where you have connected your own speech services for this.</p>
-      <p><strong>Storage period:</strong> We do not store chat content on our servers. Each message passes through our server to the AI model, and the answer streams back to your browser. Our server logs record errors without message content. To enforce the daily free quota and protect the service, our servers keep the random browser ID and the IP address, or a hash of it made with a secret key, for at most 24 hours and two minutes. When the content filter blocks a message, we keep a security record without the message text for up to 90 days: the time, the kind of block, the figure, the mode, the language and a hash of the IP address made with a secret key (pseudonymized). IP addresses never enter our analytics records.</p>
-      <p><strong>Note:</strong> Please do not enter personal data (name, address, phone number, email, bank details) into the chat.</p>
-    </section>
-
-    <section>
-      <h2>Audio service (speech synthesis and speech recognition)</h2>
-      <p>For speech output (text-to-speech) and speech input (speech-to-text) we use our own server in Germany:</p>
-      <ul>
-        <li>Location: Hetzner GEX130, Falkenstein, Germany</li>
-        <li>Speech is generated and transcribed only on this server</li>
-        <li>For speech output, the text to be spoken is sent there, for example a figure's answer or a story. For speech input, your recording is sent there and turned into text.</li>
-        <li>Both pass through our audio proxy at Cloudflare, which forwards them and stores nothing</li>
-        <li>Texts and recordings are deleted right after processing. Your voice is not recorded or stored.</li>
-        <li>To prevent abuse, the proxy keeps a hash of your IP address, made with a secret key, for at most 24 hours and two minutes</li>
-      </ul>
-    </section>
-
-    <section>
-      <h2>Community tally</h2>
-      <p>
-        The Community page in the app can show how many people take part and their combined voting power. When you add yourself to the tally, the app creates a random ID for this browser, stores it in your browser (localStorage) and sends it to our server with your voting power and the number of figures you have completed, and again each time you open the Community page after that, so that each browser counts once. Our server keeps these values under a hash of the ID made with a secret key and deletes them 12 months after your last visit to the Community page. To prevent abuse, it also keeps a hash of your IP address, made with a secret key, for 6 hours.
-      </p>
-      <p>
-        <strong>Legal basis:</strong> Art. 6(1)(f) GDPR, our interest in a fair count. The ID on your device is needed for this feature you use (Sect. 25(2) No. 2 TDDDG).
-      </p>
-    </section>
-
-    <section>
-      <h2>Minors / users under 16</h2>
-      <p>
-        The chat service may only be used from the age of 16 (§ 3 (2) of the Terms of Service). Before first use, users confirm that they are at least 16.
-      </p>
-      <p>We have implemented the following protective measures:</p>
-      <ul>
-        <li>Age confirmation before first use of the chat</li>
-        <li>Technical content safeguarding (multi-layered content filtering)</li>
-      </ul>
-    </section>
-
-    <section>
       <h2>Storage on your device</h2>
       <p>
-        We do not use tracking, analytics or marketing cookies. Our pages and the app store the following in your browser.
+        We do not use tracking, analytics or marketing cookies. Our pages store the following in your browser.
       </p>
       <p>
         <strong>Technically necessary for a function you use</strong> (Sect. 25(2) No. 2 TDDDG, no consent needed):
       </p>
       <ul>
-        <li>Your conversations and progress (IndexedDB, encrypted with AES-256-GCM, only on your device), and app state such as reading progress, stories played and hints already seen (localStorage)</li>
-        <li>Your own API key, if you use BYOK (IndexedDB, encrypted, only on your device)</li>
+        <li>Your progress and the state of the pages, such as where you are in a story, stories heard and read, saved sentences, and your settings for playback and display (localStorage)</li>
         <li>Language setting (localStorage)</li>
-        <li>Consent to the terms of use, and age confirmation (localStorage)</li>
-        <li>A random browser ID for the daily free quota, created when you open the app without your own key or agree to that quota after your key was rejected (localStorage) and renewed every day</li>
-        <li>A random ID for the community tally, created only when you add yourself to it (localStorage)</li>
         <li>Your answer to the ad-measurement question, yes or no, with version and date, so that we can respect it (localStorage) for 12 months</li>
-        <li>Short-lived data for the current tab (sessionStorage, deleted when the tab closes): what you picked on our pages before entering the app (figure, council, chapter, question), whether the home page has already taken you on to the app, summaries already made, and interface state such as whether an animation already played</li>
+        <li>Short-lived data for the current tab (sessionStorage, deleted when the tab closes): interface state such as whether a note was already shown</li>
         <li>Cloudflare security cookies: __cf_bm (bot protection, 30 minutes) and, after a security check, cf_clearance</li>
       </ul>
       <p>
@@ -289,31 +221,11 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         <tbody>
           <tr>
             <td>Cloudflare, Inc.</td>
-            <td>CDN, WAF, API proxy, bot protection</td>
+            <td>CDN and web hosting, storage for audio files and images, server for counting and ad measurement, WAF, bot protection</td>
             <td>Edge (EU-prioritized)</td>
-          </tr>
-          <tr>
-            <td>Nebius B.V.</td>
-            <td>AI inference (free mode)</td>
-            <td>uk-south1 (United Kingdom, primary model) and eu-north1 (Finland, EEA, fallback model)</td>
-          </tr>
-          <tr>
-            <td>Hetzner Online GmbH</td>
-            <td>Audio server (TTS/STT)</td>
-            <td>Falkenstein, Germany</td>
           </tr>
         </tbody>
       </table>
-    </section>
-
-    <section>
-      <h2>Bot protection (Cloudflare Turnstile)</h2>
-      <p>
-        To protect against automated abuse we use Cloudflare Turnstile, a bot-protection service from Cloudflare, Inc. This loads an external script from challenges.cloudflare.com. Turnstile works in invisible mode (no CAPTCHA) and generates a security token to verify that the request comes from a real user. No personal data is transmitted to Cloudflare beyond the technically necessary connection.
-      </p>
-      <p>
-        <strong>Legal basis:</strong> Legitimate interest (Art. 6(1)(f) GDPR) in the security and integrity of the service.
-      </p>
     </section>
 
     <section>
@@ -325,13 +237,13 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         If you arrive through such an ad, we may ask whether we can count your visit for Google, either right away or later in your visit, for example after a minute of listening or at the end of a poem. The question is optional, and the whole library stays open either way. If you are under 16, we ask you to say no. Until you answer, the click ID stays only in the page's memory and is not stored. If you say no, it is discarded, and your browser remembers the no. If you close the question with the X, that counts as a no for this visit: the click ID is discarded, nothing is stored and nothing is sent to Google. Your browser does not remember this no, so we ask again the next time you arrive through one of our ads. As soon as the page has read the click ID, we take it out of the address bar, so a reload carries none and a shared link does not pass it on. An empty placeholder (gclid=) stays in its place, so our anonymous count still recognises a reload as an arrival from an ad. If you say yes, your browser keeps the click ID in this tab (sessionStorage) until the tab closes, and remembers the yes (localStorage) for 12 months, so that later visits through our ads are counted too. Visitors from our paid ads (their web address contains p=1) are never asked, and their click ID is discarded at once.
       </p>
       <p>
-        With your consent, our server sends Google the click ID at most twice: when you say yes to the question, and once you have heard 30 seconds of audio in total. Seconds you heard before your answer count toward the 30. If you come back later through one of our ads while your yes still holds, we do not ask again, and Google receives the new click ID at most once, after 30 seconds of audio. With each of these sends, Google receives the click ID, the step (as a conversion action), a value and a currency, the time, an order number (click ID plus step, so nothing counts twice) and a consent signal (use for measurement allowed, use for personalized advertising not allowed). Google receives neither the figure nor your country, no conversation content and no other data about you. No Google script or pixel runs on our pages. The transfer goes from our server to Google (Google Ads API).
+        With your consent, our server sends Google the click ID at most twice: when you say yes to the question, and once you have heard 30 seconds of audio in total. Seconds you heard before your answer count toward the 30. If you come back later through one of our ads while your yes still holds, we do not ask again, and Google receives the new click ID at most once, after 30 seconds of audio. With each of these sends, Google receives the click ID, the step (as a conversion action), a value and a currency, the time, an order number (click ID plus step, so nothing counts twice) and a consent signal (use for measurement allowed, use for personalized advertising not allowed). Google receives neither the figure nor your country, and no other data about you. No Google script or pixel runs on our pages. The transfer goes from our server to Google (Google Ads API).
       </p>
       <p>
         Recipient: Google Ireland Limited and Google LLC (USA). A transfer to the USA can take place. Google is certified under the EU-US Data Privacy Framework. How Google uses data from partner sites: <a href="https://business.safety.google/privacy">https://business.safety.google/privacy</a>.
       </p>
       <p>
-        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, and the time) for 90 days, to check that the counting works. To prevent abuse, when steps are sent our server also keeps a hash of your IP address, made with a secret key, together with how many steps came from it in the same hour. Both are stored apart from this record and expire after at most one hour and two minutes. Google keeps the data according to its own retention rules for advertising data.
+        <strong>Storage period:</strong> We do not keep the click ID on our servers. For each step sent, we keep a record without the click ID (the step, the figure if there was one, whether the question came at once or later, and the time) for 90 days, to check that the counting works. To prevent abuse, when steps are sent our server also keeps a hash of your IP address, made with a secret key, together with how many steps came from it in the same hour. Both are stored apart from this record and expire after at most one hour and two minutes. Google keeps the data according to its own retention rules for advertising data.
       </p>
       <p>
         <strong>Legal basis and withdrawal:</strong> Your consent (Art. 6(1)(a) GDPR and Sect. 25(1) TDDDG). You can withdraw it at any time with effect for the future: with the "Ad measurement" link at the foot of every page. Withdrawing deletes the stored click ID and records your no. After that, nothing more is sent. The hash of your IP address that our server keeps when steps are sent rests not on your consent but on our legitimate interest in protecting the measurement from floods of reports (Art. 6(1)(f) GDPR), as described under "Reach measurement".
@@ -341,10 +253,10 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
     <section>
       <h2>Reach measurement</h2>
       <p>
-        We count how our pages and the app are used, without cookies and without identifying anyone. When something happens, for example a page opens, a chat starts or a story plays, the page sends a short count to our server. Each count is one row with a few coarse labels, depending on what happened: what happened (for example "chat started" or "story finished"), the page path, the figure, the mode or chapter, the language (en or de), the country as a two-letter code that Cloudflare derives from the connection (for example DE, or XX when unknown), the type of device (mobile, tablet or desktop), how long our server took to answer, and for some steps a rough range instead of an exact number (for example "1 to 3 minutes listened"). Our measurement documentation lists every label. This is also how we count how often the question about our ads was on screen, and how often it was answered yes or no, or closed with the X.
+        We count how our pages are used, without cookies and without identifying anyone. When something happens, for example a page opens or a story plays, the page sends a short count to our server. Each count is one row with a few coarse labels, depending on what happened: what happened (for example "story finished"), the page path, the figure, the mode or chapter, for stories the version of the text, the language (en or de), the country as a two-letter code that Cloudflare derives from the connection (for example DE, or XX when unknown), the type of device (mobile, tablet or desktop), and for some steps a rough range instead of an exact number (for example "1 to 3 minutes listened"). Our measurement documentation lists every label. This is also how we count how often the question about our ads was on screen, and how often it was answered yes or no, or closed with the X.
       </p>
       <p>
-        When a visit starts, the count also notes in one coarse word what kind of place the visitor came from, for example "search", "Google ad", "AI assistant" or "direct". The page works this out from the address of the page that linked here, which browsers normally pass along, or for an ad from its mark in the address you arrive at, and keeps only that word. The same word can also go with the counts for entering the app, for the first chat and for the first real use, when you come into the app through a link on our pages, or when you open the app itself as the first page of a visit. Real use means you typed a first message yourself, or heard two minutes or the first quarter of a story, a teaching or a council.
+        When a visit starts, the count also notes in one coarse word what kind of place the visitor came from, for example "search", "Google ad", "AI assistant" or "direct". The page works this out from the address of the page that linked here, which browsers normally pass along, or for an ad from its mark in the address you arrive at, and keeps only that word. The same word can also go with the counts of the stories you hear or read after that. Those counts then also note what kind of page the visit began on: the front page, a figure's page, poems, or another page.
       </p>
       <p>
         When a count comes from the network of a data centre or cloud provider, our server marks it with the word "auto". This lets us read counts that may come from programs in data centres apart from the rest. The count itself is kept. Counts from people who connect through such a network, for example some VPN services, carry this word too. To do this, the server compares the number of the network, which Cloudflare passes along with every connection, with a fixed list of such providers. It keeps only the word "auto". It does not store the network number, write it to a log or pass it on.
@@ -356,7 +268,7 @@ const description = 'Privacy Policy of ChipMates gemeinnützige GmbH for the Ago
         To prevent abuse, when counts arrive our server keeps a hash of your IP address, made with a secret key, together with how many counts of one kind came from it in the same hour. Both are stored apart from the counts and expire after at most one hour and two minutes.
       </p>
       <p>
-        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). We process the hash of your IP address on the basis of our legitimate interest in protecting the counting and our server from floods of reports (Art. 6(1)(f) GDPR). It is pseudonymised but still personal data, because with the key it could be traced back to an IP address. For the counting, nothing is stored on your device and nothing already stored there is read, which is why we do not ask for consent under Sect. 25 TDDDG. What the app stores on your device for its own functions is listed under "Storage on your device".
+        <strong>Legal basis:</strong> Our legitimate interest in knowing whether our nonprofit service works and whom it reaches (Art. 6(1)(f) GDPR). The counts carry no identifier and cannot be traced back to a person by us, so they are not personal data (Recital 26 GDPR). We process the hash of your IP address on the basis of our legitimate interest in protecting the counting and our server from floods of reports (Art. 6(1)(f) GDPR). It is pseudonymised but still personal data, because with the key it could be traced back to an IP address. For the counting, nothing is stored on your device. The only thing read there is whether the browser carries a test marker (agc_probe), which lets us subtract our own test visits from the counts. It is a fixed value with no identifier, and your browser has it only if you opened a page with ?probe=1 in its address. What our pages store on your device for their own functions is listed under "Storage on your device".
       </p>
     </section>
 

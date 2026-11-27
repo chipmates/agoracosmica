@@ -4,7 +4,7 @@ import LegalDoc from '../components/legal/LegalDoc.astro';
 import { termsVersionLine } from '@client/utils/public/termsVersion';
 
 const title = 'Nutzungsbedingungen';
-// The version the in-app consent record carries; version and date come from
+// The version and date shown on the page come from
 // client/src/utils/public/termsVersion.json.
 const lastUpdated = termsVersionLine('de');
 const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMates gemeinnützige GmbH. Geltungsbereich, KI-Hinweise, Altersanforderung, Nutzungsregeln, Haftung und Streitbeilegung.';
@@ -26,62 +26,49 @@ const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMat
     <section>
       <h2>§ 1 Geltungsbereich und Vertragsgegenstand</h2>
       <p>(1) Diese Nutzungsbedingungen gelten für die Nutzung der Plattform Agora Cosmica (nachfolgend "Plattform"), betrieben von ChipMates gemeinnützige GmbH, Schusterstr. 50, 79098 Freiburg im Breisgau (nachfolgend "Anbieter").</p>
-      <p>(2) Die Plattform bietet einen KI-gestützten Bildungsdienst, bei dem Nutzer historische Persönlichkeiten aus Philosophie, Wissenschaft, Kunst und Aktivismus in Text, Ton und Bild kennenlernen und mit ihnen ins Gespräch kommen können (nachfolgend "Dienst"). Der Dienst nutzt ein KI-System zur automatischen Generierung von Antworten. Der Anbieter verlangt für den Dienst kein Entgelt. Der Chat und andere Funktionen, die Antworten neu erzeugen, stehen im Rahmen eines täglichen kostenlosen Kontingents zur Verfügung. Stattdessen kann der Nutzer einen eigenen Schlüssel eines KI-Dienstleisters hinterlegen oder die Adresse eines anderen KI-Servers eintragen, etwa eines selbst betriebenen (nachfolgend "eigener KI-Zugang"). Dafür gelten die Preise und Bedingungen, die der Nutzer mit dem jeweiligen KI-Dienstleister oder Serverbetreiber vereinbart hat. Der Anbieter ist an diesen Verträgen nicht beteiligt.</p>
-      <p>(3) Mit der Nutzung des Chat-Dienstes akzeptiert der Nutzer diese Nutzungsbedingungen. Die Nutzung der übrigen Bereiche der Plattform (Informationsseiten, Impressum etc.) ist ohne Zustimmung zu diesen Bedingungen möglich.</p>
-      <p>(4) Abweichende oder ergänzende Bedingungen des Nutzers werden nicht Vertragsbestandteil.</p>
+      <p>(2) Die Plattform bietet einen KI-gestützten Bildungsdienst, bei dem Nutzer historische Persönlichkeiten aus Philosophie, Wissenschaft, Kunst und Aktivismus in Text, Ton und Bild kennenlernen können (nachfolgend "Dienst"). Der Anbieter verlangt für den Dienst kein Entgelt.</p>
+      <p>(3) Abweichende oder ergänzende Bedingungen des Nutzers werden nicht Vertragsbestandteil.</p>
     </section>
 
     <section>
       <h2>§ 2 Leistungsbeschreibung und Hinweis auf Künstliche Intelligenz</h2>
-      <p>(1) Der Chat-Dienst wird vollständig von einem KI-System (Künstliche Intelligenz) betrieben. Der Nutzer interagiert nicht mit einer realen Person, sondern mit einer Software, die automatisch Antworten generiert. Die Antworten erscheinen als Text und können mit einer KI-Stimme vorgelesen werden. Auch was die Persönlichkeiten in Geschichten, Dialogen und Debatten sagen, ist KI-generiert, ebenso die Stimmen, mit denen sie sprechen. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien.</p>
-      <p>(2) Die im Chat dargestellten historischen Persönlichkeiten sind fiktive KI-Simulationen. Sie geben nicht die tatsächlichen Aussagen, Meinungen oder Positionen der dargestellten Personen wieder. Es handelt sich ausdrücklich nicht um authentische Wiedergaben historischer Äußerungen.</p>
-      <p>(3) KI-generierte Inhalte können sachlich unrichtig, unvollständig, veraltet oder irreführend sein (sogenannte "Halluzinationen"). Die Überprüfung der KI-generierten Inhalte auf Richtigkeit und Anwendbarkeit auf einen konkreten Sachverhalt ist nicht Teil des Dienstes und obliegt allein dem Nutzer.</p>
-      <p>(4) Der Dienst stellt keine professionelle Beratung dar, insbesondere keine medizinische, psychologische, rechtliche oder finanzielle Beratung. KI-generierte Inhalte ersetzen nicht die Konsultation qualifizierter Fachpersonen.</p>
-      <p>(5) Der Anbieter behält sich vor, den Dienst jederzeit ganz oder teilweise einzuschränken, zu ändern oder einzustellen. Ein Anspruch auf ununterbrochene Verfügbarkeit besteht nicht.</p>
+      <p>(1) Was die Persönlichkeiten in den Geschichten sagen, ist KI-generiert, ebenso die Stimmen, mit denen sie sprechen. Ihre Porträts sind KI-erzeugte Bilder, keine Fotografien.</p>
+      <p>(2) KI-generierte Inhalte können sachlich unrichtig, unvollständig, veraltet oder irreführend sein (sogenannte "Halluzinationen"). Ob ein Inhalt auf einen konkreten Sachverhalt zutrifft, prüft der Nutzer selbst.</p>
+      <p>(3) Der Dienst stellt keine professionelle Beratung dar, insbesondere keine medizinische, psychologische, rechtliche oder finanzielle Beratung. KI-generierte Inhalte ersetzen nicht die Konsultation qualifizierter Fachpersonen.</p>
+      <p>(4) Der Anbieter behält sich vor, den Dienst jederzeit ganz oder teilweise einzuschränken, zu ändern oder einzustellen. Ein Anspruch auf ununterbrochene Verfügbarkeit besteht nicht.</p>
     </section>
 
     <section>
       <h2>§ 3 Zugang und Altersanforderung</h2>
-      <p>(1) Die Nutzung des Chat-Dienstes setzt die Zustimmung zu diesen Nutzungsbedingungen sowie die Bestätigung des Mindestalters voraus.</p>
-      <p>(2) Der Chat-Dienst ist für Personen ab 16 Jahren bestimmt. Personen unter 16 Jahren dürfen ihn nicht nutzen. Mit der Altersbestätigung versichert der Nutzer, dass er mindestens 16 Jahre alt ist.</p>
-      <p>(3) Im Geltungsbereich des US-amerikanischen Children's Online Privacy Protection Act (COPPA) ist die Nutzung des Dienstes durch Personen unter 13 Jahren untersagt.</p>
-      <p>(4) Der Anbieter behält sich vor, den Zugang zu beschränken, wenn Anhaltspunkte dafür bestehen, dass ein Nutzer die Altersanforderungen nicht erfüllt.</p>
+      <p>(1) Im Geltungsbereich des US-amerikanischen Children's Online Privacy Protection Act (COPPA) ist die Nutzung des Dienstes durch Personen unter 13 Jahren untersagt.</p>
+      <p>(2) Der Anbieter behält sich vor, den Zugang zu beschränken, wenn Anhaltspunkte dafür bestehen, dass ein Nutzer die Altersanforderung nach Absatz 1 nicht erfüllt.</p>
     </section>
 
     <section>
       <h2>§ 4 Nutzungsregeln</h2>
       <p>(1) Der Dienst darf ausschließlich zu privaten, nicht-kommerziellen und bildungsbezogenen Zwecken genutzt werden.</p>
       <p>(2) Es ist untersagt:</p>
-      <p>a) den Dienst für rechtswidrige Zwecke zu nutzen oder rechtswidrige Inhalte zu erzeugen, insbesondere volksverhetzende (§ 130 StGB), beleidigende oder sonst strafbare Inhalte;</p>
-      <p>b) die technischen Sicherheitsmechanismen des Dienstes zu umgehen, zu manipulieren oder auszuhebeln, insbesondere durch sogenanntes "Prompt Injection" oder "Jailbreaking";</p>
+      <p>a) den Dienst für rechtswidrige Zwecke zu nutzen;</p>
+      <p>b) die technischen Sicherheitsmechanismen des Dienstes zu umgehen, zu manipulieren oder auszuhebeln;</p>
       <p>c) KI-generierte Inhalte als authentische Aussagen der dargestellten historischen Persönlichkeiten auszugeben oder zu verbreiten;</p>
-      <p>d) den Dienst systematisch oder automatisiert abzufragen, etwa durch Bots, Scraper oder automatisierte Skripte;</p>
-      <p>e) KI-generierte Inhalte als menschlich verfasste Texte auszugeben oder deren KI-Herkunft zu verschleiern;</p>
-      <p>f) den Dienst zur Erstellung von Inhalten zu nutzen, die reale lebende Personen verunglimpfen, beleidigen oder deren Persönlichkeitsrechte verletzen;</p>
-      <p>g) persönliche Daten Dritter in den Chat einzugeben;</p>
-      <p>h) den Dienst zur Erzeugung von Inhalten zu nutzen, die Minderjährige sexualisieren, ausbeuten oder in gewaltverherrlichenden Kontexten darstellen (§§ 131, 184b, 184c StGB).</p>
-      <p>(3) Der Nutzer nimmt zur Kenntnis, dass der Dienst technische Inhaltsfilter einsetzt, die bestimmte Eingaben blockieren oder Antworten einschränken können. Diese Maßnahmen dienen dem Jugendschutz und der Einhaltung gesetzlicher Vorgaben.</p>
+      <p>d) den Dienst automatisiert in einem Umfang abzufragen, der seinen Betrieb beeinträchtigt (das Lesen durch Suchmaschinen und andere Crawler im Rahmen unserer robots.txt ist erlaubt);</p>
+      <p>e) KI-generierte Inhalte als menschlich verfasste Texte auszugeben oder deren KI-Herkunft zu verschleiern.</p>
     </section>
 
     <section>
       <h2>§ 5 Geistiges Eigentum und Nutzungsrechte</h2>
-      <p>(1) Der veröffentlichte Quellcode der Plattform ist Open Source und steht unter der <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU Affero General Public License, Version 3 (AGPL-3.0)</a>. Für seine Nutzung, Weitergabe und Änderung gelten die Bedingungen dieser Lizenz. Bestandteile Dritter darin unterliegen ihren eigenen Lizenzen. Die übrigen Inhalte der Plattform, insbesondere ihre Texte, Geschichten, Audioaufnahmen, Porträts und Grafiken, können urheber- oder leistungsschutzrechtlich geschützt sein. Soweit solche Rechte bestehen, verbleiben sie beim Anbieter bzw. den jeweiligen Rechteinhabern, wenn bei einem Inhalt nichts anderes angegeben ist.</p>
-      <p>(2) An den KI-generierten Chat-Antworten bestehen nach derzeitiger Rechtslage voraussichtlich keine Urheberrechte, da es an einer persönlichen geistigen Schöpfung fehlt. Soweit dem Anbieter dennoch Rechte an den Outputs zustehen sollten, räumt er dem Nutzer ein einfaches, nicht übertragbares Nutzungsrecht für private und bildungsbezogene Zwecke ein.</p>
-      <p>(3) Die Eingaben (Prompts) des Nutzers verbleiben beim Nutzer. Der Anbieter erwirbt an den Eingaben keine Rechte und nutzt sie ausschließlich zur Erbringung des Dienstes (Umwandlung gesprochener Eingaben in Text, automatische Prüfung durch die Inhaltsfilter nach § 4 Abs. 3 und Weiterleitung an das KI-Modell, das die Antwort erzeugt). Bei eigenem KI-Zugang erhält der Anbieter die geschriebenen Eingaben nicht (zur Ausnahme siehe § 6 Abs. 2). Eine darüber hinausgehende Speicherung oder Auswertung der Eingaben durch den Anbieter erfolgt nicht; weitere Hinweise enthält die Datenschutzerklärung.</p>
+      <p>Der veröffentlichte Quellcode der Plattform ist Open Source und steht unter der <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU Affero General Public License, Version 3 (AGPL-3.0)</a>. Für seine Nutzung, Weitergabe und Änderung gelten die Bedingungen dieser Lizenz. Bestandteile Dritter darin unterliegen ihren eigenen Lizenzen. Die übrigen Inhalte der Plattform, insbesondere ihre Texte, Geschichten, Audioaufnahmen, Porträts und Grafiken, können urheber- oder leistungsschutzrechtlich geschützt sein. Soweit solche Rechte bestehen, verbleiben sie beim Anbieter bzw. den jeweiligen Rechteinhabern, wenn bei einem Inhalt nichts anderes angegeben ist.</p>
     </section>
 
     <section>
       <h2>§ 6 Datenschutz</h2>
-      <p>(1) Der Anbieter verarbeitet personenbezogene Daten ausschließlich nach Maßgabe der geltenden Datenschutzgesetze, insbesondere der DSGVO und des BDSG. Einzelheiten entnehmen Sie bitte unserer <a href="/datenschutz/">Datenschutzerklärung</a>.</p>
-      <p>(2) Im Rahmen der Chat-Nutzung ohne eigenen KI-Zugang werden die Eingaben des Nutzers über die Server des Anbieters an einen KI-Dienstleister übermittelt, der diese zur Erzeugung der Antwort verarbeitet. Bei eigenem KI-Zugang sendet der Browser des Nutzers die geschriebenen Nachrichten direkt an den gewählten KI-Dienstleister oder Server, nicht über die Server des Anbieters. Auch bei eigenem KI-Zugang wandelt der Sprachserver des Anbieters gesprochene Eingaben in Text und die Antworten zum Vorlesen in Sprache um, soweit der Nutzer dafür keine eigenen Sprachdienste angebunden hat. Lehnt der KI-Dienstleister einen hinterlegten Schlüssel ab, übermittelt die App die Eingaben dieses Gesprächs nur dann wie ohne eigenen KI-Zugang über die Server des Anbieters, wenn der Nutzer dem in der App zustimmt. Näheres hierzu finden Sie in der Datenschutzerklärung.</p>
-      <p>(3) Der Nutzer wird gebeten, keine personenbezogenen Daten (insbesondere Name, Adresse, Telefonnummer, E-Mail) in den Chat einzugeben.</p>
+      <p>Der Anbieter verarbeitet personenbezogene Daten ausschließlich nach Maßgabe der geltenden Datenschutzgesetze, insbesondere der DSGVO und des BDSG. Einzelheiten entnehmen Sie bitte unserer <a href="/datenschutz/">Datenschutzerklärung</a>.</p>
     </section>
 
     <section>
       <h2>§ 7 Jugendschutz</h2>
-      <p>(1) Der Dienst setzt technische Schutzmaßnahmen ein, um die Erzeugung jugendgefährdender Inhalte zu verhindern. Trotz dieser Maßnahmen kann nicht ausgeschlossen werden, dass KI-generierte Inhalte im Einzelfall unangemessen sein können.</p>
-      <p>(2) Nutzer und Erziehungsberechtigte können problematische Inhalte über die Meldefunktion im Chat oder per E-Mail an <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a> melden.</p>
-      <p>(3) Sollten Sie sich in einer Krise befinden oder Hilfe benötigen, wenden Sie sich bitte an die Telefonseelsorge (0800 111 0 111, kostenlos, 24/7) oder an die Nummer gegen Kummer (116 111).</p>
+      <p>(1) Nutzer und Erziehungsberechtigte können problematische Inhalte per E-Mail an <a href="mailto:agoracosmica@chipmates.ai">agoracosmica@chipmates.ai</a> melden.</p>
+      <p>(2) Sollten Sie sich in einer Krise befinden oder Hilfe benötigen, wenden Sie sich bitte an die Telefonseelsorge (0800 111 0 111, kostenlos, 24/7) oder an die Nummer gegen Kummer (116 111).</p>
     </section>
 
     <section>
@@ -102,25 +89,18 @@ const description = 'Nutzungsbedingungen der Plattform Agora Cosmica der ChipMat
 
     <section>
       <h2>§ 10 Änderung der Nutzungsbedingungen</h2>
-      <p>(1) Der Anbieter ist berechtigt, diese Nutzungsbedingungen mit Wirkung für die Zukunft zu ändern, sofern dies aufgrund von Änderungen der Rechtslage, Einführung neuer Funktionen, Behebung von Sicherheitslücken oder sonstigen sachlichen Gründen erforderlich ist und der Nutzer dadurch nicht unangemessen benachteiligt wird.</p>
-      <p>(2) Bei Änderungen wird dem Nutzer bei seiner nächsten Nutzung des Chat-Dienstes die aktualisierte Version zur erneuten Zustimmung angezeigt.</p>
+      <p>Der Anbieter ist berechtigt, diese Nutzungsbedingungen mit Wirkung für die Zukunft zu ändern, sofern dies aufgrund von Änderungen der Rechtslage, Einführung neuer Funktionen, Behebung von Sicherheitslücken oder sonstigen sachlichen Gründen erforderlich ist und der Nutzer dadurch nicht unangemessen benachteiligt wird.</p>
     </section>
 
     <section>
-      <h2>§ 11 Inhaltemoderation und Meldemöglichkeiten</h2>
-      <p>(1) Der Anbieter setzt automatisierte Inhaltsfilter ein, um die Erzeugung rechtswidriger oder jugendgefährdender Inhalte zu verhindern.</p>
-      <p>(2) Nutzer können problematische KI-generierte Inhalte über den "Inhalt melden"-Button im Chat melden. Meldungen werden zeitnah geprüft und beantwortet.</p>
-    </section>
-
-    <section>
-      <h2>§ 12 Anwendbares Recht und Streitbeilegung</h2>
+      <h2>§ 11 Anwendbares Recht und Streitbeilegung</h2>
       <p>(1) Diese Nutzungsbedingungen unterliegen dem Recht der Bundesrepublik Deutschland unter Ausschluss des UN-Kaufrechts.</p>
       <p>(2) Soweit der Nutzer Verbraucher im Sinne des § 13 BGB ist und seinen gewöhnlichen Aufenthalt in einem anderen Staat hat, bleiben zwingende Verbraucherschutzvorschriften dieses Staates unberührt.</p>
       <p>(3) Der Anbieter ist weder bereit noch verpflichtet, an Streitbeilegungsverfahren vor einer Verbraucherschlichtungsstelle teilzunehmen.</p>
     </section>
 
     <section>
-      <h2>§ 13 Kontakt</h2>
+      <h2>§ 12 Kontakt</h2>
       <p>
         ChipMates gemeinnützige GmbH<br/>
         Schusterstr. 50<br/>

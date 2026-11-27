@@ -167,8 +167,8 @@ describe('agc-public.js: the ad click ID', () => {
     // 1.3.0 names the yes and 30 seconds of listening: an entry door is neither.
     expect(conversions()).toHaveLength(0);
     expect(storageKeys(sessionStorage).filter((k) => k.startsWith('agc_conv_fired_'))).toEqual([]);
-    // The intent for the app and the anonymous click count stay.
-    expect(sessionStorage.getItem('agc_intended_figure')).toBe('aurelius');
+    // No figure intent is stored (the app is not served); the anonymous click count stays.
+    expect(sessionStorage.getItem('agc_intended_figure')).toBeNull();
     const cta = beacons.filter((b) => b.body.step === 'cta_click');
     expect(cta).toHaveLength(1);
     expect(cta[0].body.mode).toBe('hero');

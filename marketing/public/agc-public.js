@@ -33,8 +33,6 @@
   }
 
   var SS_GCLID = 'agc_gclid';
-  var SS_FIGURE = 'agc_intended_figure';
-  var SS_COUNCIL = 'agc_intended_council';
   var LS_LANG = 'selectedLanguage';
   var LS_AD_CONSENT = 'agc_ad_consent';
   // Keep in sync with AD_CONSENT_VERSION in client/src/utils/public/
@@ -124,13 +122,8 @@
 
   function persistIntent(opts) {
     try {
+      // Only the language: the app that read a chosen figure is no longer served.
       if (opts.lang) localStorage.setItem(LS_LANG, opts.lang);
-      if (opts.figureId && opts.figureId.length < 64) {
-        sessionStorage.setItem(SS_FIGURE, opts.figureId);
-      }
-      if (opts.councilId && opts.councilId.length < 64) {
-        sessionStorage.setItem(SS_COUNCIL, opts.councilId);
-      }
     } catch (e) { /* storage blocked — app falls back */ }
   }
 
@@ -562,10 +555,8 @@
     if (!target) return;
     var cta = target.getAttribute('data-agc-cta');
     if (cta !== 'start-exploring') return;
-    var figureId = target.getAttribute('data-agc-figure') || undefined;
-    var councilId = target.getAttribute('data-agc-council') || undefined;
     var lang = document.documentElement.lang || 'en';
-    persistIntent({ figureId: figureId, councilId: councilId, lang: lang });
+    persistIntent({ lang: lang });
     // No conversion here: the card's words name only the yes and 30 seconds
     // of listening, so a click on an entry door sends Google nothing.
     sendCtaFunnelBeacon(target.getAttribute('data-agc-door') || '');
